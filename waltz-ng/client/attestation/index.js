@@ -20,7 +20,9 @@ import angular from 'angular';
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as attestationInstanceStore from './services/attestation-instance-store';
 import attestationRunStore from './services/attestation-run-store';
-import attestationConfirmation from './components/attestation-confirmation';
+import attestationConfirmation from './components/confirmation/attestation-confirmation';
+import attestationRunOverview from './components/run-overview/attestation-run-overview';
+import attestationRecipients from './components/recipients/attestation-recipients';
 import routes from './routes';
 
 export default () => {
@@ -37,7 +39,11 @@ export default () => {
         attestationRunStore
     ]);
 
-    registerComponents(module, [attestationConfirmation]);
-    
+    registerComponents(module, [
+        attestationConfirmation,
+        attestationRunOverview,
+        attestationRecipients
+    ]);
+
     return module.name;
 };

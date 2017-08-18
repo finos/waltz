@@ -221,6 +221,13 @@ export const dataFormatKindNames  = {
 };
 
 
+export const hierarchyQueryScopeNames  = {
+    EXACT: 'Exact',
+    PARENTS: 'Parents',
+    CHILDREN: 'Children'
+};
+
+
 export const lifecycleStatusNames = {
     'ACTIVE': 'Active',
     'BUILDING': 'Building',

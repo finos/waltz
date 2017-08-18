@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
@@ -30,6 +31,14 @@ public class AttestationInstanceService {
 
 
     public boolean attestInstance(long instanceId, String attestedBy) {
+        checkNotEmpty(attestedBy, "attestedBy must be provided");
+
         return attestationInstanceDao.attestInstance(instanceId, attestedBy, nowUtc());
     }
+
+
+    public List<AttestationInstance> findByRunId(long runId) {
+        return attestationInstanceDao.findByRunId(runId);
+    }
+
 }

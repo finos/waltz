@@ -99,4 +99,9 @@ public class PersonService {
     public Person findPersonByUserId(String userId) {
         return personDao.findPersonByUserId(userId);
     }
+
+
+    public List<Person> findRecipientsByAttestationInstanceId(long instanceId) {
+        return personDao.findRecipientsByAttestationInstanceId(instanceId);
+    }
 }

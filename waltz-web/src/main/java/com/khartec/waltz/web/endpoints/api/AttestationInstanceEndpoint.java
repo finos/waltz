@@ -30,19 +30,24 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByUserPath = mkPath(BASE_URL, "user");
         String attestInstancePath = mkPath(BASE_URL, "attest", ":id");
-
-        ListRoute<AttestationInstance> findByUserRoute =
-                (req, res) -> attestationInstanceService.findByRecipient(getUsername(req));
+        String findByRunIdPath = mkPath(BASE_URL, "run", ":id");
+        String findByUserPath = mkPath(BASE_URL, "user");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
                             getId(req),
                             getUsername(req));
 
-        getForList(findByUserPath, findByUserRoute);
+        ListRoute<AttestationInstance> findByUserRoute =
+                (req, res) -> attestationInstanceService.findByRecipient(getUsername(req));
+
+        ListRoute<AttestationInstance> findByRunIdRoute =
+                (req, res) -> attestationInstanceService.findByRunId(getId(req));
+
         postForDatum(attestInstancePath, attestInstanceRoute);
+        getForList(findByUserPath, findByUserRoute);
+        getForList(findByRunIdPath, findByRunIdRoute);
     }
 
 }

@@ -43,6 +43,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
     private static final String FIND_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
+    private static final String FIND_RECIPIENTS_BY_ATTESTATION_INSTANCE_ID_PATH = mkPath(BASE_URL, "attestation-instance-id", ":instanceId");
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
     private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
 
@@ -71,6 +72,11 @@ public class PersonEndpoint implements Endpoint {
         getForList(DIRECTS_PATH, (request, response) -> {
             String empId = request.params("empId");
             return personService.findDirectsByEmployeeId(empId);
+        });
+
+        getForList(FIND_RECIPIENTS_BY_ATTESTATION_INSTANCE_ID_PATH, (request, response) -> {
+            long instanceId = Long.valueOf(request.params("instanceId"));
+            return personService.findRecipientsByAttestationInstanceId(instanceId);
         });
 
         getForDatum(MANAGERS_PATH, (request, response) -> {

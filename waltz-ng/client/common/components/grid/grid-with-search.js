@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 
 const bindings = {
+    appScopeProvider: '<',
     columnDefs: '<',
     entries: '<',
     searchPlaceholderText: '@',
@@ -42,7 +43,10 @@ const initialState = {
 
 
 function mkSearchFields(columnDefs = []) {
-    return _.map(columnDefs, "field");
+    return _.chain(columnDefs)
+        .filter(c => !_.isUndefined(c.field))
+        .map('field')
+        .value();
 }
 
 

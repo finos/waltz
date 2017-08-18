@@ -1,0 +1,38 @@
+<div>
+    <waltz-page-header icon="check-square-o"
+                       name="{{ctrl.run.name}}"
+                       small="Attestation Run">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Attestation runs</li>
+            <li><span ng-bind="ctrl.run.name"></span></li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-attestation-run-overview run="ctrl.run">
+        </waltz-attestation-run-overview>
+    </div>
+
+    <br>
+
+    <waltz-section name="Instances">
+        <div class="col-sm-9">
+            <waltz-grid-with-search app-scope-provider="ctrl"
+                                    column-defs="ctrl.columnDefs"
+                                    entries="ctrl.tableData"
+                                    searchPlaceholderText="Search"
+                                    exportFilename="attestation_instances.csv"
+                                    on-initialise="ctrl.onGridInitialise">
+            </waltz-grid-with-search>
+        </div>
+
+        <div class="col-sm-3">
+            <waltz-attestation-recipients class="waltz-fade-if"
+                                          ng-if="ctrl.selectedInstance"
+                                          instance="ctrl.selectedInstance">
+            </waltz-attestation-recipients>
+        </div>
+    </waltz-section>
+
+</div>

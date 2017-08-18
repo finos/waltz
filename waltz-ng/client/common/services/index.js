@@ -27,9 +27,12 @@ import {
     capabilityRatingNames,
     changeInitiativeNames,
     criticalityDisplayNames,
+    dataFormatKindNames,
     endOfLifeStatusNames,
     entityNames,
     entityStatisticCategoryDisplayNames,
+    frequencyKindNames,
+    hierarchyQueryScopeNames,
     investmentRatingNames,
     issuanceDisplayNames,
     lifecyclePhaseDisplayNames,
@@ -38,24 +41,22 @@ import {
     physicalSpecDefinitionFieldTypeNames,
     physicalSpecDefinitionTypeNames,
     relationshipKindNames,
+    releaseLifecycleStatusNames,
     rollupKindNames,
     severityNames,
     surveyInstanceStatusNames,
-    surveyRunStatusNames,
-    releaseLifecycleStatusNames,
     surveyQuestionFieldTypeNames,
-    usageKindDisplayNames,
+    surveyRunStatusNames,
     transportKindNames,
-    frequencyKindNames,
-    dataFormatKindNames
+    usageKindDisplayNames
 } from "./display-names";
 import {
     bookmarkIconNames,
     booleanTypeIconNames,
     entityIconNames,
     entityStatisticCategoryIconNames,
-    severityIconNames,
     ragIconNames,
+    severityIconNames,
     usageKindIconNames
 } from "./icon-names";
 
@@ -141,6 +142,7 @@ export default (module) => {
         .register('entity', entityNames)
         .register('entityStatistic', entityStatisticCategoryDisplayNames)
         .register('frequencyKind', frequencyKindNames)
+        .register('hierarchyScope', hierarchyQueryScopeNames)
         .register('investmentRating', investmentRatingNames)
         .register('issuance', issuanceDisplayNames)
         .register('lifecyclePhase', lifecyclePhaseDisplayNames)
