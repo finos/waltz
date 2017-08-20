@@ -70,7 +70,6 @@ public class AssetCostGenerator {
                     .map(a -> ImmutableAssetCost.builder()
                             .assetCode(a.assetCode().get())
                             .cost(ImmutableCost.builder()
-                                    .currencyCode("EUR")
                                     .amount(generateAmount(mean))
                                     .year(year)
                                     .kind(kind)
@@ -80,7 +79,6 @@ public class AssetCostGenerator {
                         AssetCostRecord record = new AssetCostRecord();
                         record.setAssetCode(c.assetCode());
                         record.setAmount(c.cost().amount());
-                        record.setCurrency(c.cost().currencyCode());
                         record.setKind(c.cost().kind().name());
                         record.setYear(c.cost().year());
                         return record;

@@ -27,9 +27,8 @@
                             <br>
                             <h3>
                                 Total Cost:
-                                <span style='font-weight: bolder'
-                                      ng-bind="$ctrl.currentTotal | currency:'€'">
-                                </span>
+                                <waltz-currency-amount amount="$ctrl.currentTotal">
+                                </waltz-currency-amount>
                             </h3>
                             <h4>
                                 <span ng-bind="$ctrl.currentYear"></span>
@@ -51,7 +50,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <span ng-bind="item.cost.amount | currency:'€'"></span>
+                                        <waltz-currency-amount amount="item.cost.amount"></waltz-currency-amount>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -66,12 +65,17 @@
                     <uib-tab-heading>
                         Detail
                     </uib-tab-heading>
-                    <p class="small">
-                        The table shows historic cost entries for this application
-                    </p>
-                    <div ng-if="showTableTab">
-                        <waltz-asset-cost-table costs="$ctrl.costs">
-                        </waltz-asset-cost-table>
+                    <div class="row"
+                         style="padding-top: 1em">
+                        <div class="col-md-12">
+                            <div ng-if="showTableTab">
+                                <waltz-asset-cost-table costs="$ctrl.costs">
+                                </waltz-asset-cost-table>
+                            </div>
+                            <p class="small">
+                                The table shows historic cost entries for this application
+                            </p>
+                        </div>
                     </div>
                 </uib-tab>
             </uib-tabset>

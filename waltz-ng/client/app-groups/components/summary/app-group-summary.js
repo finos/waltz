@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,94 +16,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
+import _ from 'lodash';
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './org-unit-overview.html';
+import template from './app-group-summary.html';
 import {initialiseData} from "../../../common/index";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
     parentEntityRef: '<',
-    scope: '@?',
-    orgUnitDescendants: '<',
-    apps: '<',
+    appGroup: '<',
+    applications: '<',
+    totalCost: '<',
     complexity: '<',
-    immediateHierarchy: '<',
-    flows: '<',
     serverStats: '<',
-    orgUnit: '<',
-    loadOrgUnitDescendants: '<'
-};
-
-const intialState = {
-    scope: 'CHILDREN'
+    editable: '=',
+    flows: '=',
+    members: '<'
 };
 
 
-function buildTree(orgUnits = [], self = {}) {
-    return buildHierarchies(_.filter(orgUnits, ou => ou.id != self.id));
-}
+const initialState = {
 
-
-function calcParentsAndChildren(hierarchy = [], orgUnit) {
-    if (! orgUnit) return { parentOrgUnits: [], childOrgUnits: [] };
-    const self = _.find(hierarchy, { entityReference: { id: orgUnit.id } });
-    const parentOrgUnits = self
-        ? _.filter(hierarchy, h => h.level < self.level)
-        : [];
-
-    const childOrgUnits = self
-        ? _.filter(hierarchy, h => h.level > self.level)
-        : [];
-
-    return { parentOrgUnits, childOrgUnits };
-}
-
+};
 
 
 function controller(serviceBroker) {
-    const vm = initialiseData(this, intialState);
+
+    const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'CHILDREN'
+            scope: 'EXACT'
         };
 
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
+                [selector])
             .then(r => vm.totalCost = r.data);
     };
 
     vm.$onChanges = () => {
-        Object.assign(vm, calcParentsAndChildren(vm.immediateHierarchy, vm.orgUnit));
         vm.complexitySummary = calcComplexitySummary(vm.complexity);
         vm.enrichedServerStats = enrichServerStats(vm.serverStats);
-        vm.descendantsTree = buildTree(vm.orgUnitDescendants, vm.orgUnit);
-
-        if (vm.orgUnit) {
-            vm.entityRef = {
-                kind: 'ORG_UNIT',
-                id: vm.orgUnit.id
-            };
-        }
+        vm.owners = _.filter(vm.members, { role: 'OWNER' });
     };
-}
 
+}
 
 controller.$inject = ['ServiceBroker'];
 
 
 const component = {
-    bindings,
+    controller,
     template,
-    controller
+    bindings
 };
 
-
-export default component;
+export default {
+    component,
+    id: 'waltzAppGroupSummary'
+}

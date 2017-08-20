@@ -18,16 +18,20 @@
 
 import _ from "lodash";
 import namedSettings from "../named-settings";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 let settingsPromise = null;
 
-function service(settingsStore) {
+function service(serviceBroker) {
 
     const findAll = (force = false) => {
-        if (force || settingsPromise == null) {
-            settingsPromise = settingsStore.findAll();
-        }
+        return serviceBroker
+            .loadAppData(
+                CORE_API.SettingsStore.findAll,
+                [],
+                { force })
+            .then(r => r.data)
         return settingsPromise;
     };
 
@@ -37,7 +41,7 @@ function service(settingsStore) {
             .then(settings => {
                 const found = _.find(settings, { name });
                 return found ? found.value : dflt;
-        });
+            });
     };
 
 
@@ -55,7 +59,7 @@ function service(settingsStore) {
 }
 
 service.$inject = [
-    'SettingsStore'
+    'ServiceBroker'
 ];
 
 
