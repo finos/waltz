@@ -31,6 +31,16 @@ const flowDiagramsWidget = {
 };
 
 
+const costsWidget = {
+    template: `
+        <waltz-app-costs-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-app-costs-section> `,
+    id: 'app-costs-widget',
+    name: 'Costs',
+    icon: 'money'
+};
+
+
 const entityNamedNoteWidget = {
     template: `
         <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
@@ -61,7 +71,8 @@ const flowWidget = {
 
 const bookmarkWidget = {
     template: `
-        <waltz-bookmarks-section parent-entity-ref="$ctrl.parentEntityRef">
+        <waltz-bookmarks-section parent-entity-ref="$ctrl.parentEntityRef"
+                                 show-filter="true">
         </waltz-bookmarks-section>`,
     id: 'bookmark-widget',
     name: 'Bookmarks',
@@ -84,6 +95,7 @@ const initData = {
         flowDiagramsWidget,
         bookmarkWidget,
         entityNamedNoteWidget,
+        costsWidget,
         changesWidget]
 };
 
@@ -97,7 +109,6 @@ function controller()
     };
 
     vm.addWidget = w => {
-        console.log('addWidget', w.id)
         vm.widgets =  _.reject(vm.widgets, x => x.id === w.id)
         vm.widgets.unshift(w);
     };
