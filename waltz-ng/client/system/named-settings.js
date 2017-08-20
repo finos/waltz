@@ -22,5 +22,6 @@ export default {
     devExtEnabled: "web.devext.enabled",
     httpHeaderPrefix: "web.devext.http.header.",
     betaEnvironment: "web.beta",
-    betaNagMessage: "web.beta.nag-message"
+    betaNagMessage: "web.beta.nag-message",
+    defaultCurrency: "settings.asset-cost.default-currency"
 };

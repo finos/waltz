@@ -393,4 +393,16 @@
         </insert>
     </changeSet>
 
+
+    <!-- 2489: Currency -->
+    <changeSet id="20170818-2489-1"
+               author="davidwatkins73">
+        <insert tableName="settings">
+            <column name="name"
+                    value="settings.asset-cost.default-currency"/>
+            <column name="value"
+                    value="EUR"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

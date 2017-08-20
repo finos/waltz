@@ -1,4 +1,7 @@
-import {checkIsComponentDefinition, checkIsServiceDefinition, checkIsStoreDefinition, ensureNotNull} from "./checks";
+import {
+    checkIsArray, checkIsComponentDefinition, checkIsServiceDefinition, checkIsStoreDefinition,
+    ensureNotNull
+} from "./checks";
 
 export const registerComponent = (module, componentDefinition) => {
     ensureNotNull(module, 'must provide a module');
@@ -22,7 +25,8 @@ export const registerStore = (module, storeDefinition) => {
 
 
 export const registerStores = (module, storeDefinitions = []) => {
-    storeDefinitions.forEach(defn => registerStore(module, defn));
+    checkIsArray(storeDefinitions, 'store definitions must be an array');
+    storeDefinitions.forEach(storeDefinition => registerStore(module, storeDefinition));
 };
 
 

@@ -100,7 +100,6 @@ public class AssetCostStatsDao {
                 .where(optionsCondition)
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
-                        .currencyCode("EUR")
                         .kind(CostKind.CUMULATIVE)
                         .year(year)
                         .build());

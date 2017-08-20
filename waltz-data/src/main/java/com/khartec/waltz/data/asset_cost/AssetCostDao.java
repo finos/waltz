@@ -50,7 +50,6 @@ public class AssetCostDao {
     private RecordMapper<Record, Cost> costMapper = r -> {
         AssetCostRecord record = r.into(ASSET_COST);
         return ImmutableCost.builder()
-                .currencyCode(record.getCurrency())
                 .amount(record.getAmount())
                 .year(record.getYear())
                 .kind(CostKind.valueOf(record.getKind()))

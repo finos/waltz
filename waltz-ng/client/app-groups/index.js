@@ -18,6 +18,8 @@
  */
 
 import angular from 'angular';
+import AppGroupSummary from './components/summary/app-group-summary'
+import {registerComponents} from "../common/module-utils";
 
 export default () => {
 
@@ -32,8 +34,10 @@ export default () => {
     module
         .directive('waltzAppGroupList', require('./directives/app-group-list'))
         .directive('waltzAppGroupListSection', require('./directives/app-group-list-section'))
-        .directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'))
-        .directive('waltzAppGroupSummary', require('./directives/app-group-summary'));
+        .directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'));
+
+
+    registerComponents(module, [ AppGroupSummary ])
 
     return module.name;
 }

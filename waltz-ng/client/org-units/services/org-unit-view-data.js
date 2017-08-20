@@ -81,13 +81,6 @@ function initialiseDataFlows(service, id, holder) {
 }
 
 
-function initialiseAssetCosts(service, selector, holder) {
-    return service
-        .initialise(selector, 2016)
-        .then(r => holder.assetCostData = r);
-}
-
-
 function loadAuthSources(store, id, holder) {
     return store
         .determineAuthSourcesForOrgUnit(id)
@@ -113,7 +106,6 @@ function loadTechStats(serviceBroker, id, holder) {
 
 function service($q,
                  serviceBroker,
-                 assetCostViewService,
                  authSourcesStore,
                  complexityStore,
                  involvementStore,
@@ -147,7 +139,6 @@ function service($q,
             loadOrgUnit(orgUnitStore, orgUnitId, rawData),
             loadImmediateHierarchy(orgUnitStore, orgUnitId, rawData),
             loadApps(serviceBroker, selector, rawData),
-            initialiseAssetCosts(assetCostViewService, selector, rawData)
         ]);
     }
 
@@ -166,12 +157,6 @@ function service($q,
         return $q.all([
             loadTechStats(serviceBroker, orgUnitId, rawData)
         ]);
-    }
-
-
-    function loadAllCosts() {
-        assetCostViewService.loadDetail()
-            .then(data => rawData.assetCostData = data);
     }
 
 
@@ -196,7 +181,6 @@ function service($q,
     return {
         data: rawData,
         loadAll,
-        loadAllCosts,
         loadFlowDetail,
         loadOrgUnitDescendants,
         loadInvolvements
@@ -208,7 +192,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'AssetCostViewService',
     'AuthSourcesStore',
     'ComplexityStore',
     'InvolvementStore',

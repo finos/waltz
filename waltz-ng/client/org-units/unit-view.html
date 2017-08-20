@@ -15,11 +15,11 @@
 
 
     <!-- OVERVIEW -->
-    <waltz-org-unit-overview org-unit="ctrl.viewData.orgUnit"
+    <waltz-org-unit-overview parent-entity-ref="ctrl.entityRef"
+                             org-unit="ctrl.viewData.orgUnit"
                              org-unit-descendants="ctrl.viewData.orgUnitDescendants"
                              apps="ctrl.viewData.apps"
                              flows="ctrl.viewData.dataFlows.stats"
-                             total-cost="ctrl.viewData.assetCostData.total"
                              server-stats="ctrl.viewData.techStats.serverStats"
                              immediate-hierarchy="ctrl.viewData.immediateHierarchy"
                              complexity="ctrl.viewData.complexity"
@@ -162,15 +162,13 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section cost-view="ctrl.viewData.assetCostData"
-                               id="costs-section"
-                               load-all="ctrl.loadAllCosts"
+    <waltz-asset-costs-section parent-entity-ref="ctrl.entityRef"
                                csv-name="{{ ctrl.viewData.orgUnit.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef">
+    <waltz-bookmarks-section >
     </waltz-bookmarks-section>
 
 
