@@ -72,6 +72,7 @@ function controller(serviceBroker) {
     };
 
     vm.$onInit = () => {
+
         serviceBroker
             .loadAppData(
                 CORE_API.StaticPanelStore.findByGroup,
@@ -97,7 +98,7 @@ const component = {
 
 
 component.$inject = [
-    'ServiceBroker'
+    'ServiceBroker',
 ];
 
 export default {

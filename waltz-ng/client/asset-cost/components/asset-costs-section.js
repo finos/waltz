@@ -16,19 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {assetCostKindNames} from '../../common/services/display-names';
 import {initialiseData} from '../../common';
 import {CORE_API} from '../../common/services/core-api-utils';
-
+import template from './asset-costs-section.html';
 
 const bindings = {
-    costView: '<',
-    loadAll: '<',
+    parentEntityRef: '<',
+    scope: '@?',
     csvName: '@?',
 };
 
 
 const initialState = {
+    scope: 'CHILDREN',
     visibility: {
         summary: true,
         detail: false
@@ -47,6 +49,8 @@ function processSelection(d) {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    let selector = null;
+
     vm.onSummarySelect = (d) => vm.summarySelection = processSelection(d);
 
     vm.showSummary = () => {
@@ -57,10 +61,30 @@ function controller(serviceBroker) {
     vm.showDetail = () => {
         vm.visibility.summary = false;
         vm.visibility.detail = true;
-        vm.loadAll();
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findAppCostsByAppIdSelector,
+                [ selector ])
+            .then(r => vm.allCosts = r.data);
+
     };
 
     vm.$onInit = () => {
+        selector = {
+            entityReference: vm.parentEntityRef,
+            scope: vm.scope
+        };
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findTopAppCostsByAppIdSelector,
+                [ selector ])
+            .then(r => vm.topCosts = r.data);
+
+
+        global.vm = vm;
+
         serviceBroker
             .loadAppData(
                 CORE_API.StaticPanelStore.findByGroup,
@@ -76,10 +100,13 @@ controller.$inject = [
 
 
 const component = {
-    template: require('./asset-costs-section.html'),
+    template,
     bindings,
     controller
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzAssetCostsSection'
+};

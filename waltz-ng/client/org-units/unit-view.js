@@ -37,7 +37,6 @@ function initTour(tourService, holder = {}) {
 
 
 function controller($stateParams,
-                    $scope,
                     viewDataService,
                     historyStore,
                     involvedSectionService,
@@ -57,11 +56,6 @@ function controller($stateParams,
 
 
     // -- INTERACTIONS ---
-
-    vm.loadAllCosts = () => {
-        $scope.$applyAsync(() => viewDataService.loadAllCosts());
-    };
-
     vm.loadFlowDetail = () => viewDataService
         .loadFlowDetail()
         .then(flowData => vm.viewData.dataFlows = flowData);
@@ -86,7 +80,6 @@ function controller($stateParams,
 
 controller.$inject = [
     '$stateParams',
-    '$scope',
     'OrgUnitViewDataService',
     'HistoryStore',
     'InvolvedSectionService',

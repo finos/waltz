@@ -16,6 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import CurrencyAmount from './currency-amount'
+import {registerComponents} from "../common/module-utils";
+
 
 export default () => {
     const module = angular.module('waltz.widgets', []);
@@ -53,5 +56,7 @@ export default () => {
         .component('waltzToggle', require('./toggle'))
         .component('waltzTwistie', require('./twistie'));
 
+
+    registerComponents(module, [ CurrencyAmount ])
     return module.name;
 };

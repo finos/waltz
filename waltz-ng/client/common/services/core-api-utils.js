@@ -50,6 +50,7 @@ import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspe
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
+import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
@@ -89,6 +90,7 @@ export const CORE_API = {
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
     PhysicalSpecificationStore,
+    SettingsStore,
     SourceDataRatingStore,
     StaticPanelStore,
     TechnologyStatisticsService,

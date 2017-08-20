@@ -79,7 +79,6 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 
 function service($q,
                  serviceBroker,
-                 assetCostViewService,
                  complexityStore,
                  involvementStore,
                  involvementKindService,
@@ -182,13 +181,6 @@ function service($q,
     }
 
 
-    function loadCostStats(personId) {
-        return assetCostViewService
-            .initialise(toSelector(personId), 2016)
-            .then(assetCostData => state.model.assetCostData = assetCostData);
-    }
-
-
     function loadComplexity(personId) {
         return complexityStore
             .findBySelector(personId, 'PERSON', 'CHILDREN')
@@ -228,8 +220,7 @@ function service($q,
         return $q
             .all([
                 loadRelatedPeople(employeeId),
-                loadAllApplications(employeeId, personId),
-                loadCostStats(personId)
+                loadAllApplications(employeeId, personId)
             ])
             .then(() => personId);
     }
@@ -256,12 +247,6 @@ function service($q,
 
     // -- INTERACTION ---
 
-    function loadAllCosts() {
-        assetCostViewService
-            .loadDetail()
-            .then(data => state.model.assetCostData = data);
-    }
-
 
     function loadFlowDetail() {
         return logicalFlowViewService
@@ -273,7 +258,6 @@ function service($q,
     return {
         load,
         state,
-        loadAllCosts,
         loadFlowDetail
     };
 }
@@ -282,7 +266,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'AssetCostViewService',
     'ComplexityStore',
     'InvolvementStore',
     'InvolvementKindService',

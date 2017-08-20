@@ -54,8 +54,10 @@
                                                description="Cumulative value of infra and app dev costs"
                                                waltz-jump-to="costs-section"
                                                icon="money">
-                            <span style="font-size: x-large;"
-                                  ng-bind="$ctrl.portfolioCostStr">
+                            <span style="font-size: x-large;">
+                                <waltz-currency-amount amount="$ctrl.totalCost.amount"
+                                                       simplify="true">
+                                </waltz-currency-amount>
                             </span>
                         </waltz-basic-info-tile>
                     </div>
