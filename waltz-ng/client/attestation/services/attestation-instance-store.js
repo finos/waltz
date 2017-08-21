@@ -18,10 +18,17 @@ export function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findPersonsById = (id) => {
+        return $http
+            .get(`${base}/${id}/person`)
+            .then(result => result.data);
+    };
+
     return {
         attestInstance,
         findByRunId,
         findByUser,
+        findPersonsById
     };
 }
 
@@ -50,5 +57,10 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: 'findByUser',
         description: 'find attestations for a user'
+    },
+    findPersonsById: {
+        serviceName,
+        serviceFnName: 'findPersonsById',
+        description: 'find recipients (person) for an instance'
     }
 };

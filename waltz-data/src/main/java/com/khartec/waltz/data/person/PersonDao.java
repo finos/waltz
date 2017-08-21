@@ -166,7 +166,7 @@ public class PersonDao {
     }
 
 
-    public List<Person> findRecipientsByAttestationInstanceId(long instanceId) {
+    public List<Person> findPersonsByAttestationInstanceId(long instanceId) {
         return dsl.select(PERSON.fields())
                 .from(ATTESTATION_INSTANCE_RECIPIENT)
                 .innerJoin(PERSON)

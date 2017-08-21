@@ -36,10 +36,6 @@ function store($http,
         .get(`${BASE}/user-id/${userId}`)
         .then(result => result.data);
 
-    const findRecipientsByAttestationInstanceId = (instanceId) => $http
-        .get(`${BASE}/attestation-instance-id/${instanceId}`)
-        .then(result => result.data);
-
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
         .then(result => (result.data)? result.data : unknownPerson(id));
@@ -63,7 +59,6 @@ function store($http,
         getByEmployeeId,
         getById,
         findByUserId,
-        findRecipientsByAttestationInstanceId,
         findDirects,
         findManagers,
         search
@@ -95,11 +90,6 @@ export const PersonStore_API = {
         serviceName,
         serviceFnName: 'findByUserId',
         description: 'find person by user id'
-    },
-    findRecipientsByAttestationInstanceId: {
-        serviceName,
-        serviceFnName: 'findRecipientsByAttestationInstanceId',
-        description: 'find a list of recipients by instance id'
     },
     findDirects: {
         serviceName,

@@ -35,7 +35,7 @@ function controller(serviceBroker) {
             vm.recipientReferences = [];
             vm.visibility.loading = true;
             serviceBroker
-                .loadViewData(CORE_API.PersonStore.findRecipientsByAttestationInstanceId, [vm.instance.id], { force: true})
+                .loadViewData(CORE_API.AttestationInstanceStore.findPersonsById, [vm.instance.id])
                 .then(r => {
                     vm.recipientReferences = _.map(r.data, mkEntityRef) ;
                     vm.visibility.loading = false;

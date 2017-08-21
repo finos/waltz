@@ -19,13 +19,10 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
 
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -41,7 +38,6 @@ public class PersonHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         PersonDao personDao = ctx.getBean(PersonDao.class);
-        List<Person> recipientsByInstanceId = personDao.findRecipientsByAttestationInstanceId(1);
 
         int c = dsl.fetchCount(PERSON, PERSON.MANAGER_EMPLOYEE_ID.eq("").or(PERSON.MANAGER_EMPLOYEE_ID.isNull()));
 
