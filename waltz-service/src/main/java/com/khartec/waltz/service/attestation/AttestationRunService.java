@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.*;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -57,10 +57,20 @@ public class AttestationRunService {
     }
 
 
+    public List<AttestationRun> findAll() {
+        return attestationRunDao.findAll();
+    }
+
+
     public List<AttestationRun> findByRecipient(String userId) {
         checkNotNull(userId, "userId cannot be null");
 
         return attestationRunDao.findByRecipient(userId);
+    }
+
+
+    public List<AttestationRunResponseSummary> findResponseSummaries() {
+        return attestationRunDao.findResponseSummaries();
     }
 
 

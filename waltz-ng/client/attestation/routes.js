@@ -18,6 +18,7 @@
 
 import attestationInstanceListUserView from './attestation-instance-list-user-view';
 import attestationRunCreate from './attestation-run-create';
+import attestationRunList from './attestation-run-list';
 import attestationRunView from './attestation-run-view';
 
 const baseState = {
@@ -42,6 +43,11 @@ const runCreateState = {
     views: {'content@': attestationRunCreate}
 };
 
+const runListState = {
+    url: '/list',
+    views: {'content@': attestationRunList}
+};
+
 const runViewState = {
     url: '/{id:int}',
     views: {'content@': attestationRunView}
@@ -55,6 +61,7 @@ function setup($stateProvider) {
         .state('main.attestation.instance.user', instanceUserState)
         .state('main.attestation.run', runBaseState)
         .state('main.attestation.run.create', runCreateState)
+        .state('main.attestation.run.list', runListState)
         .state('main.attestation.run.view', runViewState);
 }
 

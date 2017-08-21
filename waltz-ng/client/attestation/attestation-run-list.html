@@ -1,0 +1,80 @@
+<div>
+    <waltz-page-header icon="check-square-o"
+                       name="Attestation runs"
+                       small="list">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.attestation.instance.user">Attestations</a></li>
+            <li>runs</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="ADMIN"
+               ui-sref="main.attestation.run.create ({id: ctrl.template.id })">
+                Create
+            </a>
+        </waltz-section-actions>
+
+        <div>
+            <table class="table table-condensed table-striped">
+                <colgroup>
+                    <col width="20%">
+                    <col width="30%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="10%">
+                    <col width="10%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Responses</th>
+                    <th>Issuer</th>
+                    <th>Issued</th>
+                    <th>Due</th>
+                </tr>
+                </thead>
+                <tr ng-repeat="r in ctrl.runs">
+                    <td>
+                        <a ng-bind="r.name"
+                           class="clickable"
+                           ui-sref="main.attestation.run.view ({id: r.id})"></a>
+                    </td>
+                    <td><span ng-bind="r.description"></span></td>
+                    <td>
+                        <div uib-popover="{{
+                                ctrl.responseSummaries[r.id].completeCount + ' completed'
+                                + ', '
+                                + ctrl.responseSummaries[r.id].pendingCount + ' pending'
+                            }}"
+                             popover-trigger="mouseenter">
+                            <uib-progress max="ctrl.responseSummaries[r.id].completeCount + ctrl.responseSummaries[r.id].pendingCount"
+                                          animate="false">
+                                <uib-bar value="ctrl.responseSummaries[r.id].completeCount"
+                                         ng-bind="ctrl.responseSummaries[r.id].completeCount"
+                                         type="success">
+                                </uib-bar>
+                                <uib-bar value="ctrl.responseSummaries[r.id].pendingCount"
+                                         ng-bind="ctrl.responseSummaries[r.id].pendingCount"
+                                         type="{{ctrl.getPendingBarType(r)}}">
+                                </uib-bar>
+                            </uib-progress>
+                        </div>
+                    </td>
+                    <td><span ng-bind="r.issuedBy"></span></td>
+                    <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
+                    <td ng-class="{'text-danger': ctrl.isOverdue(r)}">
+                        <waltz-from-now ng-if='r.dueDate'
+                                        timestamp="r.dueDate">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

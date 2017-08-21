@@ -1,4 +1,3 @@
-import {checkIsEntityRef} from "../../common/checks";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -39,9 +38,21 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findAll = () => {
+        return $http
+            .get(`${base}`)
+            .then(r => r.data);
+    };
+
     const findByRecipient = () => {
         return $http
             .get(`${base}/user`)
+            .then(r => r.data);
+    };
+
+    const findResponseSummaries = () => {
+        return $http
+            .get(`${base}/summary/response`)
             .then(r => r.data);
     };
 
@@ -49,7 +60,9 @@ function store($http, baseApiUrl) {
         getCreateSummary,
         create,
         getById,
-        findByRecipient
+        findAll,
+        findByRecipient,
+        findResponseSummaries
     };
 }
 
@@ -79,10 +92,20 @@ export const AttestationRunStore_API = {
         serviceFnName: 'getById',
         description: 'attestation run by id'
     },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'all attestation runs'
+    },
     findByRecipient: {
         serviceName,
         serviceFnName: 'findByRecipient',
         description: 'attestation runs for recipient'
+    },
+    findResponseSummaries: {
+        serviceName,
+        serviceFnName: 'findResponseSummaries',
+        description: 'attestation run response summaries'
     }
 };
 
