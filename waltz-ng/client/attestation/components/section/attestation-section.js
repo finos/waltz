@@ -28,7 +28,7 @@ const bindings = {
 };
 
 
-const template = require('./attestation-section.html');
+import template from './attestation-section.html';
 
 
 function mkAttestationData(attestationRuns = [], attestationInstances = []){
