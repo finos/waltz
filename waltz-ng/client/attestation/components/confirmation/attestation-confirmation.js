@@ -1,4 +1,4 @@
-import {initialiseData, invokeFunction} from '../../common';
+import {initialiseData, invokeFunction} from '../../../common/index';
 
 import template from './attestation-confirmation.html';
 

@@ -86,10 +86,18 @@ public class AttestationInstanceDao {
 
     public boolean attestInstance(long instanceId, String attestedBy, LocalDateTime dateTime) {
         return dsl.update(ATTESTATION_INSTANCE)
-            .set(ATTESTATION_INSTANCE.ATTESTED_BY, attestedBy)
-            .set(ATTESTATION_INSTANCE.ATTESTED_AT, Timestamp.valueOf(dateTime) )
-            .where(ATTESTATION_INSTANCE.ID.eq(instanceId).and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull()))
-            .execute() == 1;
+                .set(ATTESTATION_INSTANCE.ATTESTED_BY, attestedBy)
+                .set(ATTESTATION_INSTANCE.ATTESTED_AT, Timestamp.valueOf(dateTime))
+                .where(ATTESTATION_INSTANCE.ID.eq(instanceId).and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull()))
+                .execute() == 1;
     }
 
+
+    public List<AttestationInstance> findByRunId(long runId) {
+        return dsl.select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

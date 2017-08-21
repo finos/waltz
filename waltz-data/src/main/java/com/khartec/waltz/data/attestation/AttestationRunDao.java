@@ -17,14 +17,22 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
+import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 
 @Repository
 public class AttestationRunDao {
+
+    private static final Field<String> ENTITY_NAME_FIELD = mkEntityNameField(
+            ATTESTATION_RUN.SELECTOR_ENTITY_ID,
+            ATTESTATION_RUN.SELECTOR_ENTITY_KIND,
+            newArrayList(EntityKind.values()))
+            .as("entity_name");
 
     private static final String ID_SEPARATOR = ";";
 
@@ -39,7 +47,8 @@ public class AttestationRunDao {
                 .selectionOptions(IdSelectionOptions.mkOpts(
                         EntityReference.mkRef(
                                 EntityKind.valueOf(record.getSelectorEntityKind()),
-                                record.getSelectorEntityId()),
+                                record.getSelectorEntityId(),
+                                r.getValue(ENTITY_NAME_FIELD)),
                         HierarchyQueryScope.valueOf(record.getSelectorHierarchyScope())))
                 .involvementKindIds(splitThenMap(
                         record.getInvolvementKindIds(),
@@ -62,7 +71,9 @@ public class AttestationRunDao {
 
 
     public AttestationRun getById(long attestationRunId) {
-        return dsl.selectFrom(ATTESTATION_RUN)
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
                 .where(ATTESTATION_RUN.ID.eq(attestationRunId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -70,6 +81,7 @@ public class AttestationRunDao {
 
     public List<AttestationRun> findByRecipient(String userId) {
         return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .innerJoin(ATTESTATION_INSTANCE)
                     .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))

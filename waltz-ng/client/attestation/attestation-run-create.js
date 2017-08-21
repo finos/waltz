@@ -18,7 +18,6 @@
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common/index";
-import {timeFormat} from "d3-time-format";
 
 const exactScope = {
     value: 'EXACT',
@@ -84,7 +83,10 @@ function mkCreateCommand(attestationRun){
 }
 
 
-function controller(notification, serviceBroker, involvementKindStore) {
+function controller($state,
+                    notification,
+                    serviceBroker,
+                    involvementKindStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -121,8 +123,8 @@ function controller(notification, serviceBroker, involvementKindStore) {
         serviceBroker
             .execute(CORE_API.AttestationRunStore.create, [command])
             .then(res => {
-                // todo redirect to attestation run page
                 notification.success('Attestation run created successfully');
+                $state.go('main.attestation.run.view', {id: res.data.id});
             }, () => notification.error('Failed to create attestation run'))
     };
 
@@ -134,6 +136,7 @@ function controller(notification, serviceBroker, involvementKindStore) {
 
 
 controller.$inject = [
+    '$state',
     'Notification',
     'ServiceBroker',
     'InvolvementKindStore'

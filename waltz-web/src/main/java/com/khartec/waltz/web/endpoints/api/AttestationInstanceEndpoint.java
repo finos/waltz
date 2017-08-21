@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -30,19 +31,32 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByUserPath = mkPath(BASE_URL, "user");
         String attestInstancePath = mkPath(BASE_URL, "attest", ":id");
-
-        ListRoute<AttestationInstance> findByUserRoute =
-                (req, res) -> attestationInstanceService.findByRecipient(getUsername(req));
+        String findByRunIdPath = mkPath(BASE_URL, "run", ":id");
+        String findByUserPath = mkPath(BASE_URL, "user");
+        String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
                             getId(req),
                             getUsername(req));
 
-        getForList(findByUserPath, findByUserRoute);
+        ListRoute<AttestationInstance> findByUserRoute =
+                (req, res) -> attestationInstanceService.findByRecipient(getUsername(req));
+
+        ListRoute<AttestationInstance> findByRunIdRoute =
+                (req, res) -> attestationInstanceService.findByRunId(getId(req));
+
+        ListRoute<Person> findPersonsByInstanceRoute = (request, response) -> {
+            long id = Long.valueOf(request.params("id"));
+            return attestationInstanceService.findPersonsByInstanceId(id);
+        };
+
+
         postForDatum(attestInstancePath, attestInstanceRoute);
+        getForList(findByUserPath, findByUserRoute);
+        getForList(findByRunIdPath, findByRunIdRoute);
+        getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
     }
 
 }

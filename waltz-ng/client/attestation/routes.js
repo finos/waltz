@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import attestationInstanceListUserView from './attestation-instance-list-user-view';
+import attestationRunCreate from './attestation-run-create';
+import attestationRunView from './attestation-run-view';
+
 const baseState = {
     url: 'attestation'
 };
@@ -26,7 +30,7 @@ const instanceBaseState = {
 
 const instanceUserState = {
     url: '/user',
-    views: {'content@': require('./attestation-instance-list-user-view')}
+    views: {'content@': attestationInstanceListUserView}
 };
 
 const runBaseState = {
@@ -35,8 +39,14 @@ const runBaseState = {
 
 const runCreateState = {
     url: '/create',
-    views: {'content@': require('./attestation-run-create')}
+    views: {'content@': attestationRunCreate}
 };
+
+const runViewState = {
+    url: '/{id:int}',
+    views: {'content@': attestationRunView}
+};
+
 
 function setup($stateProvider) {
     $stateProvider
@@ -44,7 +54,8 @@ function setup($stateProvider) {
         .state('main.attestation.instance', instanceBaseState)
         .state('main.attestation.instance.user', instanceUserState)
         .state('main.attestation.run', runBaseState)
-        .state('main.attestation.run.create', runCreateState);
+        .state('main.attestation.run.create', runCreateState)
+        .state('main.attestation.run.view', runViewState);
 }
 
 

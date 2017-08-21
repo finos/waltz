@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 
 
 const bindings = {
+    appScopeProvider: '<',
     columnDefs: '<',
     rowData: '<',
     rowTemplate: '<',
@@ -69,6 +70,7 @@ function controller(uiGridExporterConstants,
     };
 
     vm.gridOptions = {
+        appScopeProvider: vm.appScopeProvider,
         columnDefs: vm.columnDefs,
         data: vm.rowData,
         enableGridMenu: false,

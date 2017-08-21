@@ -12,7 +12,8 @@
 
     <br>
 
-    <waltz-grid column-defs="$ctrl.columnDefs"
+    <waltz-grid app-scope-provider="$ctrl.appScopeProvider"
+                column-defs="$ctrl.columnDefs"
                 row-data="$ctrl.filteredEntries"
                 on-initialise="$ctrl.onInitialise"
                 class="small">
