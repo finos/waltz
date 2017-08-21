@@ -118,6 +118,18 @@ public class AttestationRunDao {
     }
 
 
+    public List<AttestationRun> findByEntityReference(EntityReference ref) {
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                    .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
+                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<AttestationRunResponseSummary> findResponseSummaries() {
         return dsl.select(
                     ATTESTATION_RUN.ID,

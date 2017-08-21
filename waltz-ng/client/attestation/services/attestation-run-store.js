@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {checkIsEntityRef} from "../../common/checks";
+
 function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/attestation-run`;
@@ -56,13 +58,22 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findByEntityRef = (ref) => {
+        checkIsEntityRef(ref);
+
+        return $http
+            .get(`${base}/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
     return {
         getCreateSummary,
         create,
         getById,
         findAll,
         findByRecipient,
-        findResponseSummaries
+        findResponseSummaries,
+        findByEntityRef
     };
 }
 
@@ -106,6 +117,11 @@ export const AttestationRunStore_API = {
         serviceName,
         serviceFnName: 'findResponseSummaries',
         description: 'attestation run response summaries'
+    },
+    findByEntityRef: {
+        serviceName,
+        serviceFnName: 'findByEntityRef',
+        description: 'find runs for an entity'
     }
 };
 

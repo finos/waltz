@@ -2,6 +2,7 @@ package com.khartec.waltz.service.attestation;
 
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.person.Person;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,13 @@ public class AttestationInstanceService {
         checkNotNull(userId, "userId cannot be null");
 
         return attestationInstanceDao.findByRecipient(userId);
+    }
+
+
+    public List<AttestationInstance> findByEntityReference(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+
+        return attestationInstanceDao.findByEntityReference(ref);
     }
 
 
