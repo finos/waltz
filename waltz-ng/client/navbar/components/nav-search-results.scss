@@ -6,7 +6,7 @@
     right: 100px;
     position: absolute;
     background-color: #fafafa;
-    width:75%;
+    width:70%;
     border: 1px solid #ccc;
     @include waltz-box-shadow();
 
@@ -15,7 +15,7 @@
         padding-right: 10px;
         overflow-y: auto;
         overflow-x: hidden;
-        height: 70vh
+        height: 80vh;
     }
 }
 

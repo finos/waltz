@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/app-group`;
 
@@ -121,10 +121,89 @@ function service($http, BaseApiUrl) {
 
 }
 
-service.$inject = [
+
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = "AppGroupStore";
+
+
+export const AppGroupStore_API = {
+    findMyGroupSubscriptions: {
+        serviceName,
+        serviceFnName: 'findMyGroupSubscriptions',
+        description: 'executes findMyGroupSubscriptions'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    },
+    findByIds: {
+        serviceName,
+        serviceFnName: 'findByIds',
+        description: 'executes findByIds'
+    },
+    findPublicGroups: {
+        serviceName,
+        serviceFnName: 'findPublicGroups',
+        description: 'executes findPublicGroups'
+    },
+    findPrivateGroups: {
+        serviceName,
+        serviceFnName: 'findPrivateGroups',
+        description: 'executes findPrivateGroups'
+    },
+    subscribe: {
+        serviceName,
+        serviceFnName: 'subscribe',
+        description: 'executes subscribe'
+    },
+    unsubscribe: {
+        serviceName,
+        serviceFnName: 'unsubscribe',
+        description: 'executes unsubscribe'
+    },
+    addOwner: {
+        serviceName,
+        serviceFnName: 'addOwner',
+        description: 'executes addOwner'
+    },    createNewGroup: {
+        serviceName,
+        serviceFnName: 'createNewGroup',
+        description: 'executes createNewGroup'
+    },
+    deleteGroup: {
+        serviceName,
+        serviceFnName: 'deleteGroup',
+        description: 'executes deleteGroup'
+    },
+    updateGroupOverview: {
+        serviceName,
+        serviceFnName: 'updateGroupOverview',
+        description: 'executes updateGroupOverview'
+    },
+    addApplication: {
+        serviceName,
+        serviceFnName: 'addApplication',
+        description: 'executes addApplication'
+    },
+    removeApplication: {
+        serviceName,
+        serviceFnName: 'removeApplication',
+        description: 'executes removeApplication'
+    },
+    addChangeInitiative: {
+        serviceName,
+        serviceFnName: 'addChangeInitiative',
+        description: 'executes addChangeInitiative'
+    },
+    removeChangeInitiative: {
+        serviceName,
+        serviceFnName: 'removeChangeInitiative',
+        description: 'executes removeChangeInitiative'
+    }
+};
