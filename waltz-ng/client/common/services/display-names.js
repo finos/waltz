@@ -35,28 +35,6 @@ export const attestationTypeDisplayNames = {
 };
 
 
-export const authSourceRatingNames = {
-    PRIMARY: 'Primary Source',
-    SECONDARY: 'Secondary Source',
-    NO_OPINION: 'No Opinion',
-    DISCOURAGED: 'Discouraged Source',
-    NOT_APPLICABLE: 'N/A'
-};
-
-
-export const bookmarkNames = {
-    APPLICATION_INSTANCE: 'Application Instance',
-    BUILD_SYSTEM: 'Automated Build / Deployment System',
-    BUSINESS_SPECIFICATION: 'Business Specification',
-    DOCUMENTATION: 'Documentation',
-    ISSUE_TRACKER: 'Issue Tracking',
-    MONITORING: 'Monitoring Systems',
-    QUALITY_CONTROL: 'Quality Control',
-    SOURCE_CODE_CONTROL: 'Source Code Control',
-    TECHNICAL_SPECIFICATION: 'Technical Specification',
-};
-
-
 export const investmentRatingNames = {
     R: 'Disinvest',
     A: 'Maintain',
@@ -111,8 +89,8 @@ export const entityNames = {
     INVOLVEMENT: 'Involvement',
     LOGICAL_DATA_FLOW: "Logical Data Flow",
     ORG_UNIT: 'Org Unit',
-    MEASURABLE: 'Measurable',
-    MEASURABLE_RATING: 'Measurable Rating',
+    MEASURABLE: 'Viewpoint',
+    MEASURABLE_RATING: 'Viewpoint Rating',
     PERSON: 'Person',
     PHYSICAL_SPECIFICATION: 'Physical Specification',
     PHYSICAL_FLOW: 'Physical Flow',

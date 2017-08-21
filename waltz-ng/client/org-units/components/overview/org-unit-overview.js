@@ -19,16 +19,19 @@
 
 import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
-import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './org-unit-overview.html';
+import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
+    parentEntityRef: '<',
+    scope: '@?',
     orgUnitDescendants: '<',
     apps: '<',
     complexity: '<',
-    totalCost: '<',
     immediateHierarchy: '<',
     flows: '<',
     serverStats: '<',
@@ -36,8 +39,9 @@ const bindings = {
     loadOrgUnitDescendants: '<'
 };
 
-
-const template = require('./org-unit-overview.html');
+const intialState = {
+    scope: 'CHILDREN'
+};
 
 
 function buildTree(orgUnits = [], self = {}) {
@@ -60,13 +64,26 @@ function calcParentsAndChildren(hierarchy = [], orgUnit) {
 }
 
 
-function controller() {
-    const vm = this;
+
+function controller(serviceBroker) {
+    const vm = initialiseData(this, intialState);
+
+    vm.$onInit = () => {
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: 'CHILDREN'
+        };
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findTotalCostForAppSelector,
+                [ selector ])
+            .then(r => vm.totalCost = r.data);
+    };
 
     vm.$onChanges = () => {
         Object.assign(vm, calcParentsAndChildren(vm.immediateHierarchy, vm.orgUnit));
         vm.complexitySummary = calcComplexitySummary(vm.complexity);
-        vm.portfolioCostStr = calcPortfolioCost(vm.totalCost);
         vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         vm.descendantsTree = buildTree(vm.orgUnitDescendants, vm.orgUnit);
 
@@ -80,7 +97,7 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {

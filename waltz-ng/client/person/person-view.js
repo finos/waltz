@@ -59,13 +59,6 @@ function controller($scope,
     }, true);
 
 
-    vm.loadAllCosts = () => {
-        $scope.$applyAsync(() => {
-            viewService.loadAllCosts();
-        });
-    };
-
-
     vm.loadFlowDetail = () => viewService.loadFlowDetail();
 
     vm.exportApps = () => {

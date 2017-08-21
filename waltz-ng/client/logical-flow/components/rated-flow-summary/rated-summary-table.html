@@ -11,10 +11,30 @@
         <thead>
         <tr>
             <th>Data Type</th>
-            <th ng-click="$ctrl.columnClick($event, 'PRIMARY')">Primary</th>
-            <th ng-click="$ctrl.columnClick($event, 'SECONDARY')">Secondary</th>
-            <th ng-click="$ctrl.columnClick($event, 'DISCOURAGED')">Discouraged</th>
-            <th ng-click="$ctrl.columnClick($event, 'NO_OPINION')">No Opinion</th>
+            <th ng-click="$ctrl.columnClick($event, 'PRIMARY')">
+                <waltz-enum-value type="'AuthoritativenessRating'"
+                                  show-icon="false"
+                                  key="'PRIMARY'">
+                </waltz-enum-value>
+            </th>
+            <th ng-click="$ctrl.columnClick($event, 'SECONDARY')">
+                <waltz-enum-value type="'AuthoritativenessRating'"
+                                  show-icon="false"
+                                  key="'SECONDARY'">
+                </waltz-enum-value>
+            </th>
+            <th ng-click="$ctrl.columnClick($event, 'DISCOURAGED')">
+                <waltz-enum-value type="'AuthoritativenessRating'"
+                                  show-icon="false"
+                                  key="'DISCOURAGED'">
+                </waltz-enum-value>
+            </th>
+            <th ng-click="$ctrl.columnClick($event, 'NO_OPINION')">
+                <waltz-enum-value type="'AuthoritativenessRating'"
+                                  show-icon="false"
+                                  key="'NO_OPINION'">
+                </waltz-enum-value>
+            </th>
             <th>Total</th>
         </tr>
         </thead>

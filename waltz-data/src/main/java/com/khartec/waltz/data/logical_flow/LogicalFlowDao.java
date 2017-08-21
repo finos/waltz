@@ -35,12 +35,16 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -132,6 +136,26 @@ public class LogicalFlowDao {
                 .and(isTargetCondition(target))
                 .and(NOT_REMOVED)
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+
+    public Collection<LogicalFlow> findUpstreamFlowsForEntityReferences(List<EntityReference> references) {
+
+        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(ref -> ref.kind(), references);
+
+        Condition anyTargetMatches = refsByKind
+                .entrySet()
+                .stream()
+                .map(entry -> LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(entry.getKey().name())
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(map(entry.getValue(), ref -> ref.id()))))
+                .collect(Collectors.reducing(DSL.falseCondition(), (acc, c) -> acc.or(c)));
+
+        return baseQuery()
+                .where(anyTargetMatches)
+                .and(LogicalFlowDao.NOT_REMOVED)
+                .fetch()
+                .map(TO_DOMAIN_MAPPER);
     }
 
 
@@ -268,5 +292,4 @@ public class LogicalFlowDao {
                 .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
                 .from(LOGICAL_FLOW);
     }
-
 }

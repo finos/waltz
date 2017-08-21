@@ -16,71 +16,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-
+import {CORE_API} from '../../common/services/core-api-utils';
+import {refToString} from '../../common/entity-utils';
 
 const initialState = {
-    physicalFlows: [],
-    specifications: [],
-    onInitialise: () => console.log('init'),
-    onChange: () => console.log('change')
+    // parentEntityRef: { kind: 'APPLICATION', id: /*25747*/ 25991 },
+    fooData: []
+
 };
 
 
-function controller($q,
-                    $stateParams,
-                    physicalSpecificationStore,
-                    physicalFlowStore,
-                    logicalFlowStore) {
+
+function controller(serviceBroker, $stateParams) {
 
     const vm = Object.assign(this, initialState);
 
-    const entityReference = {
-        id: 1,
-        kind: 'FLOW_DIAGRAM'
+    vm.$onInit = () => {
+        vm.parentEntityRef = { kind: $stateParams.kind, id: $stateParams.id };
+        const ref = vm.parentEntityRef;
+        const selector = {
+            entityReference: ref,
+            scope: 'EXACT'
+        };
+
+        // vm.addData();
+        // vm.addData();
+        // vm.addNoData();
+        // vm.addData();
+        // vm.addData();
+
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findByEntityReference,
+                [ref]);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
+                [selector, 'DATA_TYPE']);
     };
 
-    const idSelector = {
-        entityReference,
-        scope: 'EXACT'
+
+    vm.addData = () => {
+        const more = {
+            DISCOURAGED: _.random(0, 30),
+            SECONDARY: _.random(0, 30),
+            PRIMARY: _.random(0, 30),
+            NO_OPINION: _.random(0, 30)
+        };
+        vm.fooData = _.concat(vm.fooData, [more])
     };
 
-    physicalSpecificationStore
-        .findByEntityReference(entityReference)
-        .then(x => {
-            console.log('specs', x);
-            return x;
-        })
-        .then(specs => vm.specifications = specs);
-
-    physicalFlowStore
-        .findByEntityReference(entityReference)
-        .then(x => {
-            console.log('pfs', x);
-            return x;
-        })
-        .then(pfs => vm.physicalFlows = pfs);
-
-    logicalFlowStore
-        .findByEntityReference(entityReference)
-        .then(x => {
-            console.log('lfs', x);
-            return x;
-        })
-        .then(xs => vm.logicalFlows = xs);
-
-    vm.entityRef = entityReference;
+    vm.addNoData = () => {
+        const more = {
+            // DISCOURAGED: 0,
+            // SECONDARY: 0,
+            // PRIMARY: 0,
+            // NO_OPINION: 0
+        };
+        vm.fooData = _.concat(vm.fooData, [more])
+    };
 }
 
 
 controller.$inject = [
-    '$q',
-    '$stateParams',
-    'PhysicalSpecificationStore',
-    'PhysicalFlowStore',
-    'LogicalFlowStore',
-    'FlowDiagramAnnotationStore',
-    'FlowDiagramEntityStore',
-    'FlowDiagramStore'
+    'ServiceBroker',
+    '$stateParams'
 ];
 
 

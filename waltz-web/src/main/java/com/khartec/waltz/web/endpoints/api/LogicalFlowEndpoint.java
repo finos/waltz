@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
@@ -37,6 +38,7 @@ import spark.Response;
 import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -67,6 +69,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findStatsPath = mkPath(BASE_URL, "stats");
+        String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
@@ -78,6 +81,12 @@ public class LogicalFlowEndpoint implements Endpoint {
         ListRoute<LogicalFlow> findBySelectorRoute = (request, response)
                 -> logicalFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
 
+        ListRoute<LogicalFlow> findUpstreamFlowsForEntityReferencesRoute = (request, response) -> {
+            EntityReference[] refs = readBody(request, EntityReference[].class);
+            return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
+        };
+
+
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
                 -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
@@ -87,6 +96,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForList(findByEntityPath, getByEntityRef);
         getForDatum(getByIdPath, getByIdRoute);
+        postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForDatum(findStatsPath, findStatsRoute);
         deleteForDatum(removeFlowPath, this::removeFlowRoute);

@@ -18,6 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../common'
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -37,9 +38,6 @@ const initialState = {
 function prepareData(dataTypes = [], flowOriginators = {}) {
     const typesById = _.keyBy(dataTypes, 'id');
 
-    const typeToAppIdsForFlows = _.mapValues(flowOriginators, xs => _.map(xs, 'id'));
-
-
     // TODO: enrich with dtu flow info
     return _.map(flowOriginators, (apps, typeId) => {
         return {
@@ -52,13 +50,13 @@ function prepareData(dataTypes = [], flowOriginators = {}) {
 }
 
 
-function controller(dataTypeService) {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    dataTypeService.loadDataTypes()
-        .then(dataTypes => vm.dataTypes = dataTypes);
-
+    serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll)
+        .then(r => vm.dataTypes = r.data);
 
     vm.$onChanges = () => {
         vm.originators = prepareData(vm.dataTypes, vm.flowOriginators);
@@ -68,7 +66,7 @@ function controller(dataTypeService) {
 
 
 controller.$inject = [
-    'DataTypeService'
+    'ServiceBroker'
 ];
 
 

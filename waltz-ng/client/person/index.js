@@ -17,9 +17,10 @@
  */
 
 import angular from 'angular';
-import {registerStore} from '../common/module-utils';
+import {registerComponents, registerStore} from '../common/module-utils';
 
-import personStore from './services/person-store';
+import PersonStore from './services/person-store';
+import PersonSummary from './components/summary/person-summary';
 
 
 export default () => {
@@ -33,13 +34,13 @@ export default () => {
         .directive('waltzPersonSelector', require('./directives/person-selector'))
         .directive('waltzPersonLink', require('./directives/person-link'))
         .directive('waltzManagerList', require('./directives/manager-list'))
-        .directive('waltzPersonDirectsList', require('./directives/person-directs-list'))
-        .directive('waltzPersonSummary', require('./directives/person-summary'));
+        .directive('waltzPersonDirectsList', require('./directives/person-directs-list'));
 
     module
         .service('PersonViewDataService', require('./person-view-data'));
 
-    registerStore(module, personStore);
+    registerStore(module, PersonStore);
+    registerComponents(module, [ PersonSummary ])
 
     return module.name;
 };

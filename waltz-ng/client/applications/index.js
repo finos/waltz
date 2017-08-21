@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import AppCostsSection from './components/app-costs-section/app-costs-section';
+import { registerComponents } from '../common/module-utils';
 
 export default () => {
 
@@ -38,8 +40,9 @@ export default () => {
         .component('waltzAppOverview', require('./components/app-overview'))
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
-        .component('waltzAppTable', require('./components/app-table'))
-        .component('waltzAppCostsSection', require('./components/app-costs-section/app-costs-section'));
+        .component('waltzAppTable', require('./components/app-table'));
+
+    registerComponents(module, [ AppCostsSection ]);
 
     return module.name;
 };

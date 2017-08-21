@@ -16,17 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.bookmark;
+export function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/enum-value`;
 
-public enum BookmarkKind {
-    APPLICATION_INSTANCE,
-    BUILD_SYSTEM,
-    BUSINESS_SPECIFICATION,
-    DOCUMENTATION,
-    ISSUE_TRACKER,
-    MONITORING,
-    QUALITY_CONTROL,
-    SOURCE_CODE_CONTROL,
-    TECHNICAL_SPECIFICATION,
+    // --- FINDERS ---
+    const findAll = () => $http
+        .get(BASE)
+        .then(r => r.data);
 
+    return {
+        findAll,
+    };
 }
+
+
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
+
+export const serviceName = 'EnumValueStore';
+
+
+export const EnumValueStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'find all enum values'
+    }
+};
+
+

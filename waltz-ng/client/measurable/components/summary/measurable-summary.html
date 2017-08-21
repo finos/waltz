@@ -24,7 +24,10 @@
                                        icon="rocket">
                     <div style="font-size: large;"
                          waltz-jump-to="costs-section">
-                        Cost: <span ng-bind="$ctrl.portfolioCostStr"></span>
+                        Cost:
+                        <waltz-currency-amount amount="$ctrl.totalCost.amount"
+                                               simplify="true">
+                        </waltz-currency-amount>
                     </div>
                     <div style="font-size: large;"
                          waltz-jump-to="complexity-section">

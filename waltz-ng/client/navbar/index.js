@@ -17,6 +17,9 @@
  */
 
 import angular from 'angular';
+import {registerComponents} from "../common/module-utils";
+import NavbarSearchForm from './components/navbar-search-form';
+import NavSearchResults from './components/nav-search-results';
 
 
 export default () => {
@@ -28,9 +31,6 @@ export default () => {
         .directive('waltzNavbarRecentlyViewed', require('./directives/navbar-recently-viewed'))
         .directive('waltzNavbarProfile', require('./directives/navbar-profile'));
 
-    module
-        .component('waltzNavbarSearchForm', require('./components/navbar-search-form'))
-        .component('waltzNavSearchResults', require('./components/nav-search-results'));
-
+    registerComponents(module, [ NavbarSearchForm, NavSearchResults ]);
     return module.name;
 };

@@ -19,6 +19,9 @@
 import _ from "lodash";
 import {toGridOptions, assetCostKindNames} from "./../../common/services/display-names";
 import {mkEntityLinkGridCell} from "../../common/link-utils";
+import template from './asset-cost-table.html';
+import {initialiseData} from "../../common/index";
+
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,
@@ -27,11 +30,16 @@ const DEFAULT_OPTIONS = {
 };
 
 
-const BINDINGS = {
-    costs: '=',
-    options: '=?',
-    selectedBucket: '=?',
+const bindings = {
+    costs: '<',
+    options: '<?',
+    selectedBucket: '<?',
     csvName: '@?'
+};
+
+
+const initialState = {
+
 };
 
 
@@ -49,8 +57,12 @@ function prepareColumns(uiGridConstants) {
     const amountCol = {
         field: 'cost.amount',
         displayName: 'Amount',
-        cellFilter: 'currency:"€"',
         cellClass: 'waltz-grid-currency',
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-currency-amount amount="COL_FIELD">
+                </waltz-currency-amount>
+            </div>`,
         filters: [
             {
                 condition: uiGridConstants.filter.GREATER_THAN,
@@ -156,9 +168,9 @@ function setupOrgFilter(costs, uiGridConstants) {
 }
 
 
-function controller(uiGridConstants, $scope, $animate) {
+function controller(uiGridConstants, $animate) {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const options = _.defaults(vm.options || {}, DEFAULT_OPTIONS);
 
@@ -187,39 +199,36 @@ function controller(uiGridConstants, $scope, $animate) {
         }
     };
 
-
-    const filterOrgUnit = ({ name }) => {
-        colDefinitions.orgCol.filter.term = name;
-    };
-
-
     const applyFilter = (filterOptions) => {
         if (! filterOptions) return;
         filterAmount(filterOptions);
     };
 
 
-    $scope.$watch('ctrl.costs', configureWithCosts);
-    $scope.$watch('ctrl.selectedBucket', applyFilter);
+    vm.$onChanges = () => {
+        configureWithCosts(vm.costs);
+        applyFilter(vm.filterOptions);
+    };
 
     vm.gridOptions = gridOptions;
 }
 
+
 controller.$inject = [
     'uiGridConstants',
-    '$scope',
     '$animate'
 ];
 
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./asset-cost-table.html'),
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
+const component = {
+    controller,
+    template,
+    bindings
 };
+
+
+export default {
+    component,
+    id: 'waltzAssetCostTable'
+};
+

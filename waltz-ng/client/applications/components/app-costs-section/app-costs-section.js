@@ -18,15 +18,20 @@
 
 import _ from 'lodash';
 import {CORE_API} from '../../../common/services/core-api-utils';
+import {initialiseData} from "../../../common/index";
+import template from './app-costs-section.html';
 
 
 const bindings = {
-    costs: '<',
-    sourceDataRatings: '<'
+    parentEntityRef: '<'
 };
 
 
-const template = require('./app-costs-section.html');
+const initialState = {
+    currentYear: null,
+    currentCosts : [],
+    currentTotal : null
+};
 
 
 function getCurrentYear(costs = []) {
@@ -50,19 +55,36 @@ function filterCostsForYear(year, costs = []) {
 
 
 function controller(serviceBroker) {
-    const vm = this;
-    vm.$onChanges = () => {
-        vm.currentYear = getCurrentYear(vm.costs);
-        vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);
-        vm.currentTotal = calcTotalCost(vm.currentCosts);
+    const vm = initialiseData(this, initialState);
+
+    const refresh = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findByAppId,
+                [vm.parentEntityRef.id])
+            .then(r => {
+                console.log('costs', r.data)
+                vm.costs = r.data;
+                vm.currentYear = getCurrentYear(vm.costs);
+                vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);
+                vm.currentTotal = calcTotalCost(vm.currentCosts);
+            });
     };
 
     vm.$onInit = () => {
+
         serviceBroker
             .loadAppData(
                 CORE_API.StaticPanelStore.findByGroup,
                 ['SECTION.ASSET_COSTS.ABOUT'])
-            .then(rs => vm.staticPanels = rs.data);
+            .then(r => vm.staticPanels = r.data);
+
+        serviceBroker
+            .loadAppData(CORE_API.SourceDataRatingStore.findAll)
+            .then(r => vm.sourceDataRatings = r.data);
+
+        refresh();
+        vm.$onChanges = refresh;
     };
 
 }
@@ -76,7 +98,10 @@ const component = {
 
 
 component.$inject = [
-    'ServiceBroker'
+    'ServiceBroker',
 ];
 
-export default component;
+export default {
+    component,
+    id: 'waltzAppCostsSection'
+};

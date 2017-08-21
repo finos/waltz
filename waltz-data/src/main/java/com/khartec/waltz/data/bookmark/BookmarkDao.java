@@ -22,7 +22,6 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.bookmark.BookmarkKind;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
 import org.jooq.DSLContext;
@@ -58,7 +57,7 @@ public class BookmarkDao {
                 .description(record.getDescription())
                 .title(record.getTitle())
                 .url(record.getUrl())
-                .kind(BookmarkKind.valueOf(record.getKind()))
+                .kind(record.getKind())
                 .isPrimary(record.getIsPrimary())
                 .provenance(record.getProvenance())
                 .lastUpdatedBy(record.getLastUpdatedBy())
@@ -113,7 +112,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
-                .set(BOOKMARK.KIND, bookmark.kind().name())
+                .set(BOOKMARK.KIND, bookmark.kind())
                 .set(BOOKMARK.PARENT_ID, bookmark.parent().id())
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
@@ -137,7 +136,7 @@ public class BookmarkDao {
         checkNotEmpty(username, "username cannot be empty");
 
         int rc = dsl.update(BOOKMARK)
-                .set(BOOKMARK.KIND, bookmark.kind().name())
+                .set(BOOKMARK.KIND, bookmark.kind())
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))

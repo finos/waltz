@@ -58,6 +58,9 @@ export function kindToViewState(kind) {
     if (kind === 'PROCESS') {
         return "main.process.view";
     }
+    if (kind === 'PHYSICAL_SPECIFICATION') {
+        return "main.physical-specification.view";
+    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }
 

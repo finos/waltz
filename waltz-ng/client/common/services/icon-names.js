@@ -16,19 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const bookmarkIconNames = {
-    APPLICATION_INSTANCE: 'desktop',
-    BUILD_SYSTEM: 'simplybuilt',
-    BUSINESS_SPECIFICATION: 'briefcase',
-    DOCUMENTATION: 'book',
-    ISSUE_TRACKER: 'tasks',
-    MONITORING: 'bar-chart',
-    QUALITY_CONTROL: 'sliders',
-    SOURCE_CODE_CONTROL: 'code',
-    TECHNICAL_SPECIFICATION: 'tty',
-};
-
-
 export const entityIconNames = {
     ACTOR: 'user-circle',
     APP_GROUP: 'object-group',

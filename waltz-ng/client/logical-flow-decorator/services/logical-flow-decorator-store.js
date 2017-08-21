@@ -27,7 +27,14 @@ export function store($http,
     const findBySelectorAndKind = (selector, kind = 'DATA_TYPE') => {
         checkIsApplicationIdSelector(selector);
         return $http
-            .post(`${BASE}/kind/${kind}`, selector)
+            .post(`${BASE}/selector/kind/${kind}`, selector)
+            .then(result => result.data);
+    };
+
+
+    const findByFlowIdsAndKind = (flowIds = [], kind = 'DATA_TYPE') => {
+        return $http
+            .post(`${BASE}/flow-ids/kind/${kind}`, flowIds)
             .then(result => result.data);
     };
 
@@ -79,6 +86,7 @@ export function store($http,
     return {
         findBySelectorAndKind,
         findBySelector,
+        findByFlowIdsAndKind,
         updateDecorators,
         summarizeBySelector
     };
@@ -103,6 +111,11 @@ export const LogicalFlowDecoratorStore_API = {
         serviceName,
         serviceFnName: 'findBySelector',
         description: 'executes findBySelector'
+    },
+    findByFlowIdsAndKind: {
+        serviceName,
+        serviceFnName: 'findByFlowIdsAndKind',
+        description: 'executes findByFlowIdsAndKind - arg1: [flowIds], arg2: decoratorKind'
     },
     updateDecorators: {
         serviceName,

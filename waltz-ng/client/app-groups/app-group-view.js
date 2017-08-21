@@ -47,12 +47,10 @@ const initialState = {
 };
 
 
-function controller($scope,
-                    $q,
+function controller($q,
                     $stateParams,
                     serviceBroker,
                     appGroupStore,
-                    assetCostViewService,
                     complexityStore,
                     historyStore,
                     logicalFlowViewService,
@@ -79,10 +77,6 @@ function controller($scope,
     logicalFlowViewService
         .initialise(id, 'APP_GROUP', 'EXACT')
         .then(flows => vm.dataFlows = flows);
-
-    assetCostViewService
-        .initialise(idSelector, 2016)
-        .then(costs => vm.assetCostData = costs);
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
@@ -123,12 +117,6 @@ function controller($scope,
         return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
-    vm.loadAllCosts = () => {
-        $scope.$applyAsync(() => {
-            assetCostViewService.loadDetail()
-                .then(data => vm.assetCostData = data);
-        });
-    };
 
     vm.loadFlowDetail = () => logicalFlowViewService
         .loadDetail()
@@ -144,12 +132,10 @@ function controller($scope,
 
 
 controller.$inject = [
-    '$scope',
     '$q',
     '$stateParams',
     'ServiceBroker',
     'AppGroupStore',
-    'AssetCostViewService',
     'ComplexityStore',
     'HistoryStore',
     'LogicalFlowViewService',

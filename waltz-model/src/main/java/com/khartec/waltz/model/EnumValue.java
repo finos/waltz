@@ -16,28 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const EventTypes = {
-    APP_RATING_CELL_SELECTED: 'rated-flow-chart-app-type-cell-selected',
-    APP_SELECTED: 'rated-flow-chart-app-selected',
-    ORG_UNIT_SELECTED: 'rated-flow-chart-org-unit-selected',
-    ORG_UNIT_RATING_SELECTED: 'rated-flow-chart-org-unit-rating-selected'
-};
+package com.khartec.waltz.model;
 
 
-export function appRatingCellSelected(data) {
-    return { type: EventTypes.APP_RATING_CELL_SELECTED, data };
-}
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableEnumValue.class)
+@JsonDeserialize(as = ImmutableEnumValue.class)
+public abstract class EnumValue implements
+        IconProvider,
+        DescriptionProvider,
+        NameProvider {
 
-export function appSelected(data) {
-    return { type: EventTypes.APP_SELECTED, data };
-}
+    public abstract String type();
+    public abstract String key();
 
-
-export function orgUnitSelected(data) {
-    return { type: EventTypes.ORG_UNIT_SELECTED, data };
-}
-
-export function orgUnitRatingSelected(data) {
-    return { type: EventTypes.ORG_UNIT_RATING_SELECTED, data };
 }

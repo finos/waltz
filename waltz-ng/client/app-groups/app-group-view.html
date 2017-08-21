@@ -14,7 +14,7 @@
 
 
     <!-- SUMMARY -->
-    <waltz-app-group-summary class='waltz-page-summary-attach'
+    <waltz-app-group-summary parent-entity-ref="ctrl.entityRef"
                              applications="ctrl.applications"
                              total-cost="ctrl.assetCostData.total"
                              complexity="ctrl.complexity"
@@ -83,9 +83,9 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section cost-view='ctrl.assetCostData'
-                               source-data-ratings="ctrl.sourceDataRatings"
-                               load-all="ctrl.loadAllCosts">
+    <waltz-asset-costs-section parent-entity-ref='ctrl.entityRef'
+                               scope="EXACT"
+                               csv-name="{{ ctrl.groupDetail.appGroup.name }}_costs.csv">
     </waltz-asset-costs-section>
 
 
