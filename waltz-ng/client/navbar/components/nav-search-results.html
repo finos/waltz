@@ -14,185 +14,67 @@
 
     <div class="row">
 
-        <div class="col-md-6">
-            <!-- APPS -->
-            <h5>
-                <waltz-icon name="desktop"></waltz-icon>
-                Applications
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.apps.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="app in $ctrl.results.apps">
-                        <a ui-sref="main.app.view ({id: app.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="app.name"></span>
-                            <small>
-                                ( <span ng-bind="app.assetCode"></span> )
-                            </small>
-                        </a>
-                    </li>
-                    <li ng-show="$ctrl.results.apps.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
-
-            <hr>
-
-            <!-- CHANGE INITIATIVE -->
-            <h5>
-                <waltz-icon name="paper-plane-o"></waltz-icon>
-                Change Initiatives
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.changeInitiatives.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="changeInitiative in $ctrl.results.changeInitiatives">
-                        <a ui-sref="main.change-initiative.view ({id: changeInitiative.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="changeInitiative.name"></span>
-                            <small>
-                                ( <span ng-bind="changeInitiative.externalId"></span> )
-                            </small>
-                        </a>
-                    </li>
-                    <li ng-show="$ctrl.results.changeInitiatives.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
-
-            <hr>
-
-            <!-- CHARACTERISTICS -->
-            <h5>
-                <waltz-icon name="puzzle-piece"></waltz-icon>
-                Characteristics
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.measurables.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="measurable in $ctrl.results.measurables">
-                        <span class='small text-muted'
-                              ng-bind="measurable.categoryId | toDisplayName:'measurableCategory'">
+        <!-- FILTERS -->
+        <div class="col-md-4">
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="10%">
+                    <col width="80%">
+                    <col width="10%">
+                </colgroup>
+                <tr ng-repeat="category in $ctrl.categories"
+                    class="waltz-visibility-parent"
+                    ng-class="{ clickable : $ctrl.results[category].length > 0 }"
+                    ng-click="$ctrl.toggleCategory(category)">
+                    <td>
+                        <span class="waltz-visibility-child-50 waltz-fade-if"
+                              ng-if="$ctrl.results[category].length > 0 ">
+                            <waltz-toggle state="$ctrl.selectedCategory == category">
+                            </waltz-toggle>
                         </span>
-                        <a ui-sref="main.measurable.view ({id: measurable.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="measurable.name"></span>
-                        </a>
-                        <small>
-                            <span ng-bind="measurable.description | limitTo:60"></span>
-                            <span ng-if="measurable.description.length > 60">...</span>
-                        </small>
-                    </li>
-                    <li ng-show="$ctrl.results.measurable.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
-
-            <hr>
-
-            <!-- ACTORS -->
-            <h5>
-                <waltz-icon name="user-circle"></waltz-icon>
-                Actors
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.actors.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="actor in $ctrl.results.actors">
-                        <a ui-sref="main.actor.view ({id: actor.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="actor.name"></span>
-                        </a>
-                        <small>
-                            <span ng-bind="actor.description | limitTo:60"></span>
-                            <span ng-if="actor.description.length > 60">...</span>
-                        </small>
-                    </li>
-                    <li ng-show="$ctrl.results.actors.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
-
-
+                    </td>
+                    <td>
+                        <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}"
+                              ng-bind="category | toDisplayName:'entity'">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="$ctrl.results[category].length > 0"
+                              class="small"
+                              ng-bind="$ctrl.results[category].length">
+                        </span>
+                    </td>
+                </tr>
+            </table>
         </div>
 
 
-        <div class="col-md-6">
-            <!-- PEOPLE -->
-            <h5>
-                <waltz-icon name="users"></waltz-icon>
-                People
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.people.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="person in $ctrl.results.people">
-                        <a ui-sref="main.person.view ({empId: person.employeeId})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="person.displayName"></span>
-                        </a>
-                        <small><span ng-bind="person.title"></span></small>
-                    </li>
-                    <li ng-show="$ctrl.results.people.length == 0" class="text-muted">No results...</li>
-                </ul>
-            </div>
+        <!-- RESULTS -->
+        <div class="col-md-8">
+            <table class="table table-condensed table-striped table-hover">
+                <tbody ng-repeat="category in $ctrl.categories"
+                       class="waltz-fade-if"
+                       ng-if="$ctrl.selectedCategory === category || $ctrl.selectedCategory === null">
+                    <tr ng-repeat="item in $ctrl.results[category]">
+                        <td>
+                            <waltz-entity-link tooltip-placement="'right'"
+                                               ng-click="$ctrl.dismiss()"
+                                               entity-ref="item">
+                            </waltz-entity-link>
+                            <small class="text-muted"
+                                   ng-if="item.qualifier">
+                                (
+                                <span ng-bind="item.qualifier | limitTo:60"></span>
+                                <span ng-if="item.qualifier.length > 60">...</span>
+                                )
+                            </small>
+                        </td>
+                    </tr>
+                </tbody>
 
-            <hr>
-
-            <!-- ORG UNITS -->
-            <h5>
-                <waltz-icon name="sitemap"></waltz-icon>
-                Organisational Units
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.orgUnits.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="orgUnit in $ctrl.results.orgUnits">
-                        <a ui-sref="main.org-unit.view ({id: orgUnit.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="orgUnit.name"></span>
-                        </a>
-                        <small>
-                            <span ng-bind="orgUnit.description | limitTo:60"></span>
-                            <span ng-if="orgUnit.description.length > 60">...</span>
-                        </small>
-                    </li>
-                    <li ng-show="$ctrl.results.orgUnits.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
-
-
-            <hr>
-
-            <!-- SPECIFICATIONS -->
-            <h5>
-                <waltz-icon name="qrcode"></waltz-icon>
-                Specifications
-            </h5>
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.results.specifications.length > 10 }">
-                <ul class="list-unstyled">
-                    <li ng-repeat="result in $ctrl.results.specifications">
-                        <a ui-sref="main.physical-specification.view ({id: result.id})"
-                           ng-click="$ctrl.dismiss()">
-                            <span ng-bind="result.name"></span>
-                        </a>
-                        <span class="small"
-                              ng-bind="result.description | limitTo:60"></span>
-                        <span ng-if="result.description.length > 60">...</span>
-                    </li>
-                    <li ng-show="$ctrl.results.specifications.length == 0"
-                        class="text-muted">
-                        No results...
-                    </li>
-                </ul>
-            </div>
+            </table>
         </div>
+
     </div>
 
 </div>

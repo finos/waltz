@@ -16,13 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {initialiseData} from "../../common/index";
+import template from './nav-search-results.html';
+
+
 const bindings = {
     query: '@',
     results: '<',
     onDismiss: '<'
 };
 
-const template = require('./nav-search-results.html');
+
+const initialState = {
+    categories: [
+        'APPLICATION',
+        'PERSON',
+        'ACTOR',
+        'CHANGE_INITIATIVE',
+        'APP_GROUP',
+        'ORG_UNIT',
+        'MEASURABLE',
+        'PHYSICAL_SPECIFICATION'
+    ],
+    selectedCategory: null,
+    filteredResults: []
+};
 
 
 function isDescendant(parent, child) {
@@ -37,9 +55,11 @@ function isDescendant(parent, child) {
 }
 
 
+
 function controller($element,
                     $document) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
+
 
     vm.dismiss = () => {
         if (vm.onDismiss) {
@@ -48,6 +68,18 @@ function controller($element,
             console.log('No dismiss handler registered');
         }
     };
+
+    vm.toggleCategory = (c) => {
+        if ((vm.results[c] || []).length === 0) {
+            return;
+        }
+        if (vm.selectedCategory === c) {
+            vm.selectedCategory = null;
+        } else {
+            vm.selectedCategory = c;
+        }
+    };
+
 
     const onClick = (e) => {
         const element = $element[0];
@@ -77,4 +109,7 @@ const component = {
     controller,
 };
 
-export default component;
+export default {
+    component,
+    id: 'waltzNavSearchResults'
+};

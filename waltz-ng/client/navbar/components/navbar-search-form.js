@@ -18,7 +18,8 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../common";
-
+import {CORE_API} from "../../common/services/core-api-utils";
+import template from './navbar-search-form.html';
 
 const bindings = {
 };
@@ -37,66 +38,105 @@ const initialState = {
 };
 
 
-const template = require('./navbar-search-form.html');
 
 
 function controller($timeout,
-                    actorStore,
-                    applicationStore,
-                    changeInitiativeStore,
-                    measurableStore,
-                    personStore,
-                    physicalSpecificationStore,
-                    orgUnitStore) {
-    const searchResults = {
-        show: false
-    };
+                    serviceBroker,
+                    displayNameService) {
 
     const vm = initialiseData(this, initialState);
 
+    const searchAppGroups = (q) => {
+        let groups = [];
+
+        const prepareResults = (gs, q) => {
+            return _
+                .chain(gs)
+                .filter(g => _.includes(_.lowerCase(g.name), q))
+                .map(g => ({
+                    kind: 'APP_GROUP',
+                    id: g.id,
+                    name: g.name,
+                    description: g.description,
+                    qualifier: g.kind === 'PUBLIC' ? 'Public group' : 'Private Group'
+                }))
+                .value();
+        };
+
+        serviceBroker
+            .loadViewData(CORE_API.AppGroupStore.findPublicGroups)
+            .then(r => groups = _.union(groups, r.data))
+            .then(() => serviceBroker.loadViewData(CORE_API.AppGroupStore.findPrivateGroups))
+            .then(r => groups = _.union(groups, r.data))
+            .then(r => vm.searchResults.APP_GROUP = prepareResults(groups, q));
+
+    };
+
     // helper fn, to reduce boilerplate
-    const handleSearch = (query, store, resultKey) => {
-        return store
-            .search(query)
-            .then(r => searchResults[resultKey] = r || []);
+    const handleSearch = (query, searchAPI, entityKind) => {
+        const transformResult = r => {
+            let qualifier = null;
+
+            switch (entityKind) {
+                case 'APPLICATION':
+                    qualifier = r.assetCode;
+                    break;
+                case 'MEASURABLE':
+                    qualifier = displayNameService.lookup('measurableCategory', r.categoryId)
+                    break;
+                default:
+                    qualifier = r.externalId || '';
+                    break;
+            };
+
+            return {
+                id: r.id,
+                kind: entityKind,
+                name: r.name || r.displayName,
+                qualifier,
+                description: r.description
+            };
+        };
+
+        return serviceBroker
+            .loadViewData(searchAPI, [ query ])
+            .then(r => vm.searchResults[entityKind] = _.map(r.data, transformResult));
     };
 
     const doSearch = (query) => {
         if (_.isEmpty(query)) {
-            searchResults.show = false;
+            vm.searchResults.show = false;
         } else {
-            searchResults.show = true;
-            handleSearch(query, applicationStore, 'apps');
-            handleSearch(query, changeInitiativeStore, 'changeInitiatives');
-            handleSearch(query, personStore, 'people');
-            handleSearch(query, measurableStore, 'measurables');
-            handleSearch(query, orgUnitStore, 'orgUnits');
-            handleSearch(query, actorStore, 'actors');
-            handleSearch(query, physicalSpecificationStore, 'specifications');
+            vm.searchResults.show = true;
+            handleSearch(query, CORE_API.ApplicationStore.search, 'APPLICATION');
+            handleSearch(query, CORE_API.ChangeInitiativeStore.search, 'CHANGE_INITIATIVE');
+            handleSearch(query, CORE_API.PersonStore.search, 'PERSON');
+            handleSearch(query, CORE_API.MeasurableStore.search, 'MEASURABLE');
+            handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');
+            handleSearch(query, CORE_API.ActorStore.search, 'ACTOR');
+            handleSearch(query, CORE_API.PhysicalSpecificationStore.search, 'PHYSICAL_SPECIFICATION');
 
+            searchAppGroups(query);
         }
     };
 
     const dismissResults = (e) => $timeout(
-        () => searchResults.show = false,
+        () => vm.searchResults.show = false,
         200);
 
-    vm.searchResults = searchResults;
     vm.doSearch = () => doSearch(vm.query);
-    vm.showSearch = () => searchResults.show;
+    vm.showSearch = () => vm.searchResults.show;
     vm.dismissResults = dismissResults;
+
+
+
 }
 
 
 controller.$inject = [
     '$timeout',
-    'ActorStore',
-    'ApplicationStore',
-    'ChangeInitiativeStore',
-    'MeasurableStore',
-    'PersonStore',
-    'PhysicalSpecificationStore',
-    'OrgUnitStore'
+    'ServiceBroker',
+    'DisplayNameService'
 ];
 
 
@@ -107,4 +147,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzNavbarSearchForm'
+};

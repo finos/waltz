@@ -19,6 +19,7 @@
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
@@ -59,6 +60,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 export const CORE_API = {
     ActorStore,
+    AppGroupStore,
     ApplicationStore,
     AssetCostStore,
     AuthSourcesStore,
