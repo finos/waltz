@@ -3,12 +3,22 @@
                        name="Attestations"
                        small="{{ctrl.user.userName}}">
         <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Attestation</a></li>
+            <li><a ui-sref="main">Home</a></li>
+            <li>Attestations</li>
             <li ng-bind="ctrl.user.userName"></li>
         </ol>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <a class="btn btn-primary btn-xs"
+               waltz-has-role="ADMIN"
+               ui-sref="main.attestation.run.list">
+                Manage Runs
+            </a>
+        </waltz-section-actions>
+
+
         <h4>Pending</h4>
         <br>
         <div ng-if="ctrl.attestations.incomplete.length > 0">

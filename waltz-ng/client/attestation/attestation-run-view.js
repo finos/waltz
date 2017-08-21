@@ -2,7 +2,7 @@ import _ from "lodash";
 import moment from "moment";
 
 import {CORE_API} from "../common/services/core-api-utils";
-import {initialiseData} from "../common/index";
+import {formats, initialiseData} from "../common/index";
 import {mkEntityLinkGridCell} from "../common/link-utils";
 
 import template from './attestation-run-view.html';
@@ -16,13 +16,6 @@ const initialState = {
     columnDefs: [],
     tableData: [],
     onGridInitialise: (cfg) => console.log('default grid initialise handler for attestation-run-view')
-};
-
-
-const formats = {
-    daysAndMinutes: 'ddd Do MMM YYYY - HH:mm:ss',
-    daysOnly: 'ddd Do MMM YYYY',
-    parse: 'YYYY-MM-DDThh:mm:ss.SSS'
 };
 
 
