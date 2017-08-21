@@ -4,16 +4,14 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.attestation.AttestationRun;
-import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
-import com.khartec.waltz.model.attestation.ImmutableAttestationRun;
-import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.schema.tables.records.AttestationRunRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -34,6 +32,14 @@ public class AttestationRunDao {
             ATTESTATION_RUN.SELECTOR_ENTITY_KIND,
             newArrayList(EntityKind.values()))
             .as("entity_name");
+
+    private static final Field<BigDecimal> COMPLETE_SUM = DSL.sum(DSL
+            .when(ATTESTATION_INSTANCE.ATTESTED_BY.isNotNull(), DSL.val(1))
+            .otherwise(DSL.val(0))).as("Complete");
+
+    private static final Field<BigDecimal> PENDING_SUM = DSL.sum(DSL
+            .when(ATTESTATION_INSTANCE.ATTESTED_BY.isNull(), DSL.val(1))
+            .otherwise(DSL.val(0))).as("Pending");
 
     private static final String ID_SEPARATOR = ";";
 
@@ -61,6 +67,17 @@ public class AttestationRunDao {
                 .build();
     };
 
+
+    private static final RecordMapper<Record, AttestationRunResponseSummary> TO_RESPONSE_SUMMARY_MAPPER = r -> {
+        Field<Long> runId = ATTESTATION_RUN.ID.field(r);
+
+        return ImmutableAttestationRunResponseSummary.builder()
+                .runId(r.get(runId))
+                .completeCount(r.get(COMPLETE_SUM).longValue())
+                .pendingCount(r.get(PENDING_SUM).longValue())
+                .build();
+    };
+
     private final DSLContext dsl;
 
 
@@ -77,6 +94,14 @@ public class AttestationRunDao {
                 .from(ATTESTATION_RUN)
                 .where(ATTESTATION_RUN.ID.eq(attestationRunId))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<AttestationRun> findAll() {
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -102,6 +127,18 @@ public class AttestationRunDao {
                 .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
                 .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<AttestationRunResponseSummary> findResponseSummaries() {
+        return dsl.select(
+                    ATTESTATION_RUN.ID,
+                    COMPLETE_SUM,
+                    PENDING_SUM)
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE).on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .groupBy(ATTESTATION_RUN.ID)
+                .fetch(TO_RESPONSE_SUMMARY_MAPPER);
     }
 
 

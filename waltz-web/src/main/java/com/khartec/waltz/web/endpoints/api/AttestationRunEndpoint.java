@@ -6,8 +6,7 @@ import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
-import com.khartec.waltz.model.survey.SurveyRun;
-import com.khartec.waltz.model.survey.SurveyRunCreateCommand;
+import com.khartec.waltz.model.attestation.AttestationRunResponseSummary;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -45,19 +44,27 @@ public class AttestationRunEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findAllPath = mkPath(BASE_URL);
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByRecipientPath = mkPath(BASE_URL, "user");
+        String findResponseSummariesPath = mkPath(BASE_URL, "summary", "response");
         String getCreateSummaryPath = mkPath(BASE_URL, "create-summary");
 
 
         DatumRoute<AttestationRun> getByIdRoute = (req, res) ->
                 attestationRunService.getById(getId(req));
 
+        ListRoute<AttestationRun> findAllRoute = (req, res) ->
+                attestationRunService.findAll();
+
         ListRoute<AttestationRun> findByEntityRefRoute =
                 (req, res) -> attestationRunService.findByEntityReference(getEntityReference(req));
 
         ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
                 attestationRunService.findByRecipient(WebUtilities.getUsername(req));
+
+        ListRoute<AttestationRunResponseSummary> findResponseSummariesRoute = (req, res) ->
+                attestationRunService.findResponseSummaries();
 
         DatumRoute<AttestationCreateSummary> getCreateSummaryRoute = (req, res) -> {
             AttestationRunCreateCommand createCommand = readBody(req, AttestationRunCreateCommand.class);
@@ -76,8 +83,10 @@ public class AttestationRunEndpoint implements Endpoint {
         };
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findAllPath, findAllRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByRecipientPath, findByRecipientRoute);
+        getForList(findResponseSummariesPath, findResponseSummariesRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
         postForDatum(getCreateSummaryPath, getCreateSummaryRoute);
     }
