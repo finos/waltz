@@ -23,6 +23,7 @@ import attestationRunStore from './services/attestation-run-store';
 import attestationConfirmation from './components/confirmation/attestation-confirmation';
 import attestationRunOverview from './components/run-overview/attestation-run-overview';
 import attestationRecipients from './components/recipients/attestation-recipients';
+import attestationSection from './components/section/attestation-section';
 import routes from './routes';
 
 export default () => {
@@ -42,7 +43,8 @@ export default () => {
     registerComponents(module, [
         attestationConfirmation,
         attestationRunOverview,
-        attestationRecipients
+        attestationRecipients,
+        attestationSection
     ]);
 
     return module.name;

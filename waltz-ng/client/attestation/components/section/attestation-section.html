@@ -1,0 +1,65 @@
+<div>
+    <waltz-section name="Attestations"
+                   icon="check-square-o"
+                   small="( {{$ctrl.attestations.length}} )"
+                   id="attestation-instance-list-section">
+
+        <div ng-if="$ctrl.attestations.length > 0">
+            <table class="table table-striped table-condensed small">
+                <colgroup>
+                    <col width="16%">
+                    <col width="20%">
+                    <col width="16%">
+                    <col width="12%">
+                    <col width="12%">
+                    <col width="14%">
+                    <col width="10%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Attestation</th>
+                    <th>Description</th>
+                    <th>Target</th>
+                    <th>Issued</th>
+                    <th>Due</th>
+                    <th>Attested by</th>
+                    <th>Attested</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true">
+                    <td ng-bind="attestation.run.name">
+                    </td>
+                    <td ng-bind="attestation.run.description">
+                    </td>
+                    <td>
+                        <span ng-bind="attestation.instance.childEntityKind | toDisplayName:'entity'">
+                        </span>s
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.run.issuedOn">
+                        </waltz-from-now>
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.run.dueDate">
+                        </waltz-from-now>
+                    </td>
+                    <td ng-bind="attestation.instance.attestedBy">
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.instance.attestedAt">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <waltz-no-data ng-if="$ctrl.attestations.length == 0">
+            <message>
+                <strong>No attestations</strong>
+            </message>
+        </waltz-no-data>
+
+    </waltz-section>
+</div>

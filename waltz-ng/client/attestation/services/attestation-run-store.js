@@ -1,4 +1,3 @@
-import {checkIsEntityRef} from "../../common/checks";
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,6 +15,8 @@ import {checkIsEntityRef} from "../../common/checks";
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {checkIsEntityRef} from "../../common/checks";
 
 function store($http, baseApiUrl) {
 
@@ -45,11 +46,20 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findByEntityRef = (ref) => {
+        checkIsEntityRef(ref);
+        
+        return $http
+            .get(`${base}/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
     return {
         getCreateSummary,
         create,
         getById,
-        findByRecipient
+        findByRecipient,
+        findByEntityRef
     };
 }
 
@@ -83,6 +93,11 @@ export const AttestationRunStore_API = {
         serviceName,
         serviceFnName: 'findByRecipient',
         description: 'attestation runs for recipient'
+    },
+    findByEntityRef: {
+        serviceName,
+        serviceFnName: 'findByEntityRef',
+        description: 'find runs for an entity'
     }
 };
 

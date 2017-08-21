@@ -84,6 +84,16 @@ public class AttestationInstanceDao {
     }
 
 
+    public List<AttestationInstance> findByEntityReference(EntityReference ref) {
+        return dsl.select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
+                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public boolean attestInstance(long instanceId, String attestedBy, LocalDateTime dateTime) {
         return dsl.update(ATTESTATION_INSTANCE)
                 .set(ATTESTATION_INSTANCE.ATTESTED_BY, attestedBy)

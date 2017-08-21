@@ -7,6 +7,7 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.attestation.ImmutableAttestationRun;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.AttestationRunRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -88,6 +89,18 @@ public class AttestationRunDao {
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                     .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
                 .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<AttestationRun> findByEntityReference(EntityReference ref) {
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                    .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
+                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

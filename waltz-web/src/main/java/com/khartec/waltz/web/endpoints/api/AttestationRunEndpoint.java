@@ -3,6 +3,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.attestation.AttestationCreateSummary;
+import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.survey.SurveyRun;
@@ -44,12 +45,16 @@ public class AttestationRunEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByRecipientPath = mkPath(BASE_URL, "user");
         String getCreateSummaryPath = mkPath(BASE_URL, "create-summary");
 
 
         DatumRoute<AttestationRun> getByIdRoute = (req, res) ->
                 attestationRunService.getById(getId(req));
+
+        ListRoute<AttestationRun> findByEntityRefRoute =
+                (req, res) -> attestationRunService.findByEntityReference(getEntityReference(req));
 
         ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
                 attestationRunService.findByRecipient(WebUtilities.getUsername(req));
@@ -71,6 +76,7 @@ public class AttestationRunEndpoint implements Endpoint {
         };
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByRecipientPath, findByRecipientRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
         postForDatum(getCreateSummaryPath, getCreateSummaryRoute);

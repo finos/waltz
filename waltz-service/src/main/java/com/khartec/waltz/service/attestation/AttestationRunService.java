@@ -64,6 +64,13 @@ public class AttestationRunService {
     }
 
 
+    public List<AttestationRun> findByEntityReference(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+
+        return attestationRunDao.findByEntityReference(ref);
+    }
+
+
     public AttestationCreateSummary getCreateSummary(AttestationRunCreateCommand command){
 
         Select<Record1<Long>> idSelector = mkIdSelector(command.targetEntityKind(), command.selectionOptions());
