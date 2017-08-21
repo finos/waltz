@@ -40,10 +40,8 @@ function logHistory(measurable, historyStore) {
 
 
 function controller($q,
-                    $scope,
                     $stateParams,
                     serviceBroker,
-                    assetCostViewService,
                     complexityStore,
                     historyStore,
                     involvedSectionService,
@@ -108,9 +106,6 @@ function controller($q,
             complexityStore
                 .findBySelector(childrenSelector)
                 .then(complexity => vm.complexity = complexity),
-            assetCostViewService
-                .initialise(childrenSelector, 2016)
-                .then(costs => vm.assetCostData = costs),
         ]);
 
     const loadWave4 = () => logHistory(vm.measurable, historyStore);
@@ -134,12 +129,6 @@ function controller($q,
 
     // -- INTERACTION ---
 
-    vm.loadAllCosts = () => $scope
-        .$applyAsync(() => {
-            assetCostViewService
-                .loadDetail()
-                .then(data => vm.assetCostData = data);
-        });
 
     vm.loadFlowDetail = () => logicalFlowViewService
         .loadDetail()
@@ -163,10 +152,8 @@ function controller($q,
 
 controller.$inject = [
     '$q',
-    '$scope',
     '$stateParams',
     'ServiceBroker',
-    'AssetCostViewService',
     'ComplexityStore',
     'HistoryStore',
     'InvolvedSectionService',

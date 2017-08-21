@@ -47,6 +47,13 @@ export function store($http, BaseApiUrl) {
     };
 
 
+    const findUpstreamFlowsForEntityReferences = (refs = []) => {
+        return $http
+            .post(`${BASE}/find-upstream-flows`, refs)
+            .then(result => result.data);
+    };
+
+
     // --- STATS ---
     const calculateStats = (options) => {
         checkIsIdSelector(options);
@@ -75,6 +82,7 @@ export function store($http, BaseApiUrl) {
     return {
         findBySelector,
         findByEntityReference,
+        findUpstreamFlowsForEntityReferences,
         calculateStats,
         countByDataType,
         removeFlow,
@@ -104,6 +112,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'find logical flows involving a given entity'
+    },
+    findUpstreamFlowsForEntityReferences: {
+        serviceName,
+        serviceFnName: 'findUpstreamFlowsForEntityReferences',
+        description: 'findUpstreamFlowsForEntityReferences - given a list of entity reference returns all flows feeding any of those apps'
     },
     calculateStats: {
         serviceName,

@@ -13,8 +13,9 @@
 
 
     <!-- SUMMARY -->
-    <waltz-person-summary person="ctrl.person"
-                          total-cost="ctrl.assetCostData.total"
+    <waltz-person-summary parent-entity-ref='ctrl.entityRef'
+                          scope="CHILDREN"
+                          person="ctrl.person"
                           managers="ctrl.managers"
                           complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
@@ -151,9 +152,10 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section cost-view="ctrl.assetCostData"
-                               ng-if="ctrl.hasInvolvements"
-                               load-all="ctrl.loadAllCosts">
+    <waltz-asset-costs-section parent-entity-ref='ctrl.entityRef'
+                               scope="CHILDREN"
+                               csv-name="{{ ctrl.person.displayName }}_costs.csv"
+                               ng-if="ctrl.hasInvolvements">
     </waltz-asset-costs-section>
 
 

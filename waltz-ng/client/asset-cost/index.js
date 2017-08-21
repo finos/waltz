@@ -17,21 +17,24 @@
  */
 
 import angular from 'angular';
+import {registerComponents, registerStores} from '../common/module-utils';
+import * as AssetCostStore from './services/asset-cost-store';
+import AssetCostsSection from './components/asset-costs-section';
+import AssetCostsGraph from './components/asset-costs-graph';
+import AssetCostTable from './components/asset-cost-table';
+
 
 export default () => {
 
     const module = angular.module('waltz.asset.cost', []);
 
-    module
-        .service('AssetCostStore', require('./services/asset-cost-store'))
-        .service('AssetCostViewService', require('./services/asset-cost-view-service'));
+    registerStores(module, [
+        AssetCostStore ]);
 
-    module
-        .component('waltzAssetCostsGraph', require('./components/asset-costs-graph'))
-        .component('waltzAssetCostsSection', require('./components/asset-costs-section'));
-
-    module
-        .directive('waltzAssetCostTable', require('./directives/asset-cost-table'));
+    registerComponents(module, [
+        AssetCostsSection,
+        AssetCostsGraph,
+        AssetCostTable]);
 
     return module.name;
 

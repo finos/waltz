@@ -17,25 +17,29 @@
  */
 import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
-import {calcPortfolioCost} from "../../../asset-cost/services/asset-cost-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {refToString, sameRef} from '../../../common/entity-utils';
 import {entityNames} from '../../../common/services/display-names';
+import template from './measurable-summary.html';
+import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
+    parentEntityRef: '<',
+    scope: '@?',
     applications: '<',
     children: '<',
     complexity: '<',
     measurable: '<',
     parents: '<',
-    serverStats: '<',
-    totalCost: '<'
+    serverStats: '<'
 };
 
 
-const template = require('./measurable-summary.html');
+const initialState = {
+    scope: 'CHILDREN'
+};
 
 
 function enrichWithRefs(measurables = []) {
@@ -77,10 +81,22 @@ function prepareRelationshipStats(stats = [], entityReference) {
 
 
 function controller(serviceBroker) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: vm.scope
+        };
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findTotalCostForAppSelector,
+                [selector])
+            .then(r => vm.totalCost = r.data);
+    };
 
     vm.$onChanges = (c) => {
-        if (c.totalCost) vm.portfolioCostStr = calcPortfolioCost(vm.totalCost);
         if (c.complexity) vm.complexitySummary = calcComplexitySummary(vm.complexity);
         if (c.serverStats) vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         if (c.children || c.measurable) vm.childRefs = prepareChildRefs(vm.children, vm.measurable);

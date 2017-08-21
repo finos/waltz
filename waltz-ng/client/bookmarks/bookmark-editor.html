@@ -46,8 +46,9 @@
 
                     </td>
                     <td>
-                        <waltz-icon name="{{ bookmark.kind | toIconName:'bookmark' }}"></waltz-icon>
-                        <span ng-bind="bookmark.kind | toDisplayName:'bookmark'"></span>
+                        <waltz-enum-value type="'BookmarkKind'"
+                                          key="bookmark.kind">
+                        </waltz-enum-value>
                     </td>
 
                     <td>

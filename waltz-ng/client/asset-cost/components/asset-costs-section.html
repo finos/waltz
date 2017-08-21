@@ -13,7 +13,7 @@
                                    entities="['ASSET_COST']">
         </waltz-source-data-overlay>
 
-        <div ng-if="$ctrl.costView.total.amount === 0">
+        <div ng-if="$ctrl.topCosts.length === 0">
             <waltz-no-data>
                 <message>
                     <strong>No associated costs found.</strong>
@@ -22,8 +22,8 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-8">
-                <uib-tabset ng-if="$ctrl.costView.total.amount > 0">
+            <div class="col-sm-12">
+                <uib-tabset ng-if="$ctrl.topCosts.length > 0">
                     <!-- TOP 10 -->
                     <uib-tab select="$ctrl.showSummary()">
                         <uib-tab-heading>
@@ -33,21 +33,42 @@
                         <br >
 
                         <div class="row">
-                            <div class="col-sm-8">
+                            <div class="col-sm-9">
                                 <div ng-if="$ctrl.visibility.summary">
-                                    <waltz-asset-costs-graph costs="$ctrl.costView.summary"
+                                    <waltz-asset-costs-graph costs="$ctrl.topCosts"
+                                                             style="width: 95%"
                                                              on-select="$ctrl.onSummarySelect">
                                     </waltz-asset-costs-graph>
                                 </div>
                             </div>
 
-                            <div class="col-sm-4"
+                            <div class="col-sm-3"
                                  style="border-left: 1px solid #eee">
+
+                                <!-- STATIC PANEL -->
+                                <div ng-if="! $ctrl.summarySelection"
+                                     class="waltz-fade-if">
+                                    <waltz-static-panels panels="$ctrl.staticPanels"
+                                                         class="small"
+                                                         render-mode="minimal-border">
+                                    </waltz-static-panels>
+                                </div>
+
+                                <!-- SUMMARY SECTION -->
                                 <div ng-if="$ctrl.summarySelection"
                                      class="waltz-fade-if">
-                                    <a ui-sref="main.app.view ({ id: $ctrl.summarySelection.entityRef.id })">
-                                        <h5 ng-bind="$ctrl.summarySelection.entityRef.name"></h5>
-                                    </a>
+                                        <h5>
+                                            <a class='clickable'
+                                               title="Go to application"
+                                               ui-sref="main.app.view ({ id: $ctrl.summarySelection.entityRef.id })">
+                                                <span ng-bind="$ctrl.summarySelection.entityRef.name"></span>
+                                            </a>
+                                            <a class="clickable"
+                                               title="Dismiss"
+                                               ng-click="$ctrl.summarySelection = null">
+                                                <span class="pull-right">x</span>
+                                            </a>
+                                        </h5>
 
                                     <hr>
 
@@ -97,25 +118,19 @@
                         <br>
 
                         <div ng-if="$ctrl.visibility.detail">
-                            <div ng-if="$ctrl.costView.costs.length > 0">
+                            <div ng-if="$ctrl.allCosts.length > 0">
                                 <waltz-asset-cost-table options='{
-                                                    showOrgUnit: false,
-                                                    showAppName: true,
-                                                    showAssetCode: false
-                                                }'
+                                                            showOrgUnit: false,
+                                                            showAppName: true,
+                                                            showAssetCode: false
+                                                        }'
                                                         csv-name='{{ $ctrl.csvName }}'
-                                                        costs='$ctrl.costView.costs'>
+                                                        costs='$ctrl.allCosts'>
                                 </waltz-asset-cost-table>
                             </div>
                         </div>
                     </uib-tab>
                 </uib-tabset>
-            </div>
-            <div class="col-sm-4">
-                <waltz-static-panels panels="$ctrl.staticPanels"
-                                     class="small"
-                                     render-mode="minimal-border">
-                </waltz-static-panels>
             </div>
         </div>
 

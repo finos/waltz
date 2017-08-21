@@ -18,6 +18,7 @@
 
 import _ from "lodash";
 import {isEmpty} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -99,8 +100,7 @@ function mkInfoCell(selection, flowData, apps = []) {
 }
 
 
-function controller(dataTypeService,
-                    LogicalFlowDecoratorStore)
+function controller(serviceBroker)
 {
     const vm = _.defaultsDeep(this, initialState);
 
@@ -114,17 +114,23 @@ function controller(dataTypeService,
         scope: 'EXACT'
     };
 
-    LogicalFlowDecoratorStore
-        .summarizeBySelector(childSelector)
-        .then(r => vm.childSummaries = r);
 
-    LogicalFlowDecoratorStore
-        .summarizeBySelector(exactSelector)
-        .then(r => vm.exactSummaries = r);
 
-    dataTypeService
-        .loadDataTypes()
-        .then(dts => vm.dataTypes = dts);
+    serviceBroker
+        .loadViewData(
+            CORE_API.LogicalFlowDecoratorStore.summarizeBySelector,
+            [ childSelector ])
+        .then(r => vm.childSummaries = r.data);
+
+    serviceBroker
+        .loadViewData(
+            CORE_API.LogicalFlowDecoratorStore.summarizeBySelector,
+            [ exactSelector ])
+        .then(r => vm.exactSummaries = r.data);
+
+    serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll)
+        .then(r => vm.dataTypes = r.data);
 
     vm.onTableClick = (clickData) => {
         if (clickData.type === 'CELL') {
@@ -139,8 +145,7 @@ function controller(dataTypeService,
 
 
 controller.$inject = [
-    'DataTypeService',
-    'LogicalFlowDecoratorStore'
+    'ServiceBroker'
 ];
 
 

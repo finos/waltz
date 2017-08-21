@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, baseUrl) {
+export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/settings`;
 
@@ -33,10 +33,19 @@ function service($http, baseUrl) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = 'SettingsStore';
+
+
+export const SettingsStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'executes findAll'
+    }
+};

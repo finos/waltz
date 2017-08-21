@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,33 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { EventTypes } from './events.js';
-import { perhaps } from '../../../common';
+package com.khartec.waltz.service.enum_value;
 
-function controller($scope) {
-    const vm = this;
 
-    const onSelect = data => $scope.$applyAsync(() => vm.eventData = data);
+import com.khartec.waltz.data.enum_value.EnumValueDao;
+import com.khartec.waltz.model.EnumValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    this.eventDispatcher.subscribe(onSelect, EventTypes.ORG_UNIT_RATING_SELECTED);
-    this.eventDispatcher.subscribe(onSelect, EventTypes.ORG_UNIT_SELECTED);
+import java.util.List;
 
-    vm.eventTypes = EventTypes;
+import static com.khartec.waltz.common.Checks.checkNotNull;
+
+@Service
+public class EnumValueService {
+
+    private final EnumValueDao enumValueDao;
+
+
+    @Autowired
+    public EnumValueService(EnumValueDao enumValueDao) {
+        checkNotNull(enumValueDao, "enumValueDao cannot be null");
+        this.enumValueDao = enumValueDao;
+    }
+
+
+    public List<EnumValue> findAll() {
+        return enumValueDao.findAll();
+    }
 }
-
-controller.$inject = ['$scope'];
-
-
-export default [
-    () => ({
-        restrict: 'E',
-        replace: true,
-        template: require('./rated-flow-summary-detail.html'),
-        scope: {},
-        controller,
-        controllerAs: 'ctrl',
-        bindToController: {
-            eventDispatcher: '='
-        }
-    })
-];

@@ -64,13 +64,14 @@ export function responsivefy(svg, type = 'both') {
 }
 
 
-export function lineWithArrowPath(selection) {
+export function lineWithArrowPath(selection, arrowLoc = 0.2) {
     return selection.attr("d", (d) =>
         mkLineWithArrowPath(
             d.source.x,
             d.source.y,
             d.target.x,
-            d.target.y));
+            d.target.y,
+            arrowLoc));
 }
 
 

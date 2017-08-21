@@ -43,7 +43,7 @@ export default class BaseLookupService {
     lookup(type, value) {
         const lookupMap = this.lookupsByType[type];
         if (!lookupMap) {
-            console.error('No lookupMap registered for type', type);
+            console.warn('No lookupMap registered for type', type);
             return '??' + value + '??';
         }
         return lookupMap[value] || '';

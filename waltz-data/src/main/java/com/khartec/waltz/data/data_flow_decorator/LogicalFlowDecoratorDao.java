@@ -140,6 +140,17 @@ public class LogicalFlowDecoratorDao {
     }
 
 
+    public Collection<LogicalFlowDecorator> findByFlowIdsAndKind(List<Long> flowIds, EntityKind decorationKind) {
+        checkNotNull(flowIds, "flowIds cannot be null");
+        checkNotNull(decorationKind, "decorationKind cannot be null");
+
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds)
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decorationKind.name()));
+
+        return findByCondition(condition);
+    }
+
+
     public Collection<LogicalFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
                 .or(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));

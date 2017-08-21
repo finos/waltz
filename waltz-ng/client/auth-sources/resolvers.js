@@ -17,6 +17,8 @@
  */
 
 
+import {CORE_API} from "../common/services/core-api-utils";
+
 function mkSelector(params) {
     const { id } = params;
 
@@ -51,18 +53,22 @@ export function idResolver(params) {
 idResolver.$inject = ['$stateParams'];
 
 
-export function orgUnitsResolver(orgUnitStore) {
-    return orgUnitStore.findAll();
+export function orgUnitsResolver(serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.OrgUnitStore.findAll)
+        .then(r => r.data);
 }
 
-orgUnitsResolver.$inject = ['OrgUnitStore'];
+orgUnitsResolver.$inject = ['ServiceBroker'];
 
 
-export function dataTypesResolver(dataTypeService) {
-    return dataTypeService.loadDataTypes();
+export function dataTypesResolver(serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll)
+        .then(r => r.data);
 }
 
-dataTypesResolver.$inject = ['DataTypeService'];
+dataTypesResolver.$inject = ['ServiceBroker'];
 
 
 export function flowDecoratorsResolver(logicalFlowDecoratorStore, $stateParams) {

@@ -1,0 +1,24 @@
+.waltz-flow-explorer {
+    .wfe-node {
+        path,circle {
+            fill: #ccc;
+            opacity: 0.5;
+            stroke: #777;
+            stroke-width: 2;
+        }
+        text {
+            fill: #444;
+            opacity: 0.8;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    };
+
+    .wfe-flow {
+        stroke: #ccc;
+        fill: #aaa;
+        opacity: 0.9;
+    }
+}

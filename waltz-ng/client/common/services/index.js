@@ -22,8 +22,6 @@ import {
     applicationRatingNames,
     assetCostKindNames,
     attestationTypeDisplayNames,
-    authSourceRatingNames,
-    bookmarkNames,
     capabilityRatingNames,
     changeInitiativeNames,
     criticalityDisplayNames,
@@ -51,7 +49,6 @@ import {
     usageKindDisplayNames
 } from "./display-names";
 import {
-    bookmarkIconNames,
     booleanTypeIconNames,
     entityIconNames,
     entityStatisticCategoryIconNames,
@@ -63,6 +60,7 @@ import {
 import preventNavigationService from './prevent-navigation-service';
 import serviceBroker from './service-broker';
 import {CORE_API} from './core-api-utils';
+import {toMap} from "../map-utils";
 
 
 const displayNameService = new BaseLookupService();
@@ -70,16 +68,15 @@ const iconNameService = new BaseLookupService();
 const descriptionService = new BaseLookupService();
 
 
-function loadFromServer(dataTypeService,
-                        involvementKindService,
-                        measurableCategoryStore,
+function loadFromServer(involvementKindService,
                         serviceBroker) {
-    dataTypeService
-        .loadDataTypes()
-        .then(results => {
+
+    serviceBroker
+        .loadAppData(CORE_API.DataTypeStore.findAll)
+        .then(result => {
             // DEPRECATED, should be byId
-            const indexedByCode = _.keyBy(results, 'code');
-            const indexedById = _.keyBy(results, 'id');
+            const indexedByCode = _.keyBy(result.data, 'code');
+            const indexedById = _.keyBy(result.data, 'id');
 
             displayNameService
                 .register('dataType', _.mapValues(indexedByCode, 'name'))
@@ -92,6 +89,7 @@ function loadFromServer(dataTypeService,
                 ;
         });
 
+
     involvementKindService
         .loadInvolvementKinds()
         .then(results => {
@@ -100,22 +98,34 @@ function loadFromServer(dataTypeService,
             descriptionService.register('involvementKind', _.mapValues(indexedById, 'description'));
         });
 
-    measurableCategoryStore
-        .findAll()
-        .then(results => {
-            const indexedById = _.keyBy(results, 'id');
+    serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+        .then(result => {
+            const indexedById = _.keyBy(result.data, 'id');
             displayNameService.register('measurableCategory', _.mapValues(indexedById, 'name'));
             descriptionService.register('measurableCategory', _.mapValues(indexedById, 'description'));
         });
 
     serviceBroker
-        .loadAppData(
-            CORE_API.EntityNamedNoteTypeStore.findAll,
-            [])
+        .loadAppData(CORE_API.EntityNamedNoteTypeStore.findAll)
         .then(result => {
             const indexedById = _.keyBy(result.data, 'id');
             displayNameService.register('entityNamedNoteType', _.mapValues(indexedById, 'name'));
             descriptionService.register('entityNamedNoteType', _.mapValues(indexedById, 'description'));
+        });
+
+    serviceBroker
+        .loadAppData(CORE_API.EnumValueStore.findAll)
+        .then(r => {
+            const keyFn = x => x.key;
+            _.chain(r.data)
+                .groupBy('type')
+                .each((xs, type) => {
+                    displayNameService.register(type, toMap(xs, keyFn, x => x.name));
+                    descriptionService.register(type, toMap(xs, keyFn, x => x.description));
+                    iconNameService.register(type, toMap(xs, keyFn, x => x.icon));
+                })
+                .value();
         });
 }
 
@@ -133,7 +143,6 @@ export default (module) => {
         .register('applicationRating', applicationRatingNames)
         .register('assetCost', assetCostKindNames)
         .register('attestationType', attestationTypeDisplayNames)
-        .register('bookmark', bookmarkNames)
         .register('capabilityRating', capabilityRatingNames)
         .register('changeInitiative', changeInitiativeNames)
         .register('criticality', criticalityDisplayNames)
@@ -150,7 +159,6 @@ export default (module) => {
         .register('orgUnitKind', orgUnitKindNames)
         .register('physicalSpecDefinitionFieldType', physicalSpecDefinitionFieldTypeNames)
         .register('physicalSpecDefinitionType', physicalSpecDefinitionTypeNames)
-        .register('rating', authSourceRatingNames)
         .register('relationshipKind', relationshipKindNames)
         .register('rollupKind', rollupKindNames)
         .register('severity', severityNames)
@@ -162,7 +170,6 @@ export default (module) => {
         .register('transportKind', transportKindNames);
 
     iconNameService
-        .register('bookmark', bookmarkIconNames)
         .register('BOOLEAN', booleanTypeIconNames)
         .register('entity', entityIconNames)
         .register('entityStatistic', entityStatisticCategoryIconNames)
@@ -172,9 +179,7 @@ export default (module) => {
 
 
     loadFromServer.$inject = [
-        'DataTypeService',
         'InvolvementKindService',
-        'MeasurableCategoryStore',
         'ServiceBroker'
     ];
 

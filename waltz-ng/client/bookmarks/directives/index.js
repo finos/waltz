@@ -18,6 +18,5 @@
 
 export default (module) => {
     module
-        .directive('waltzBookmarkKindSelect', require('./bookmark-kind-select'))
         .directive('waltzBookmarkForm', require('./bookmark-form'));
 };

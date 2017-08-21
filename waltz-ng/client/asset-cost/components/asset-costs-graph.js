@@ -24,6 +24,8 @@ import {extent} from "d3-array";
 import {axisLeft, axisBottom} from "d3-axis";
 import {format} from "d3-format";
 import "d3-selection-multi";
+import namedSettings from "../../system/named-settings";
+import {currenciesByCode} from "../../common/currency-utils";
 
 
 const template = `<div class='waltz-asset-costs-graph'></div>`;
@@ -41,9 +43,6 @@ const initialState = {
     onSelect: _.identity
 };
 
-
-const numberFormat = format(",d");
-const currencyFormat = d => `€${numberFormat(d)}`;
 
 const startColor = "#F6F9EC";
 const endColor = "#B3C95A";
@@ -79,7 +78,7 @@ function processCosts(costs = []) {
 }
 
 
-function drawXAxis(xScale, container) {
+function drawXAxis(xScale, container, currencyFormat) {
     const xAxis = axisBottom(xScale)
         .tickFormat(currencyFormat)
         .ticks(5);
@@ -101,7 +100,8 @@ function drawYAxis(yScale, container) {
 
 function draw(svg, costs = [],
               onHover = _.identity,
-              onSelect = _.identity) {
+              onSelect = _.identity,
+              currencyFormat) {
     const totalExtent = extent(costs, c => c.total);
 
     const xScale = scaleLinear()
@@ -144,12 +144,12 @@ function draw(svg, costs = [],
         .attr("y", yScale.bandwidth() / 2 + 3)  // middle of the bar
         .text(d => currencyFormat(d.total));
 
-    drawXAxis(xScale, g);
+    drawXAxis(xScale, g, currencyFormat);
     drawYAxis(yScale, svg);
 }
 
 
-function controller($element, $scope) {
+function controller($element, $scope, settingsService) {
     const vm = initialiseData(this, initialState);
 
     const holder = $element.find('div')[0];
@@ -158,11 +158,11 @@ function controller($element, $scope) {
         .attr('id', 'waltz-asset-costs-graph');
 
     let unregisterResponsivefy = () => {};
+    let currencyFormat = null;
 
-    vm.$onDestroy = () => unregisterResponsivefy();
 
-    vm.$onChanges = () => {
-        if (isEmpty(vm.costs)) {
+    const refresh = () => {
+        if (isEmpty(vm.costs) || ! currencyFormat) {
             return;
         }
 
@@ -178,17 +178,35 @@ function controller($element, $scope) {
             svg,
             aggCosts,
             x => $scope.$applyAsync(() => vm.onHover(x)),
-            x => $scope.$applyAsync(() => vm.onSelect(x)));
+            x => $scope.$applyAsync(() => vm.onSelect(x)),
+            currencyFormat);
 
         unregisterResponsivefy();
-        unregisterResponsivefy = responsivefy(svg, 'width-only');
+        $scope.$applyAsync(() => unregisterResponsivefy = responsivefy(svg, 'width-only'));
     };
+
+
+    vm.$onDestroy = () => unregisterResponsivefy();
+
+    vm.$onInit = () => {
+        settingsService
+            .findOrDefault(namedSettings.defaultCurrency, 'EUR')
+            .then(code => {
+                const currency = currenciesByCode[code]
+                currencyFormat = d => `${currency.symbol}${format(",d")(d)}`;
+                refresh();
+            })
+    };
+
+    vm.$onChanges = refresh;
+
 }
 
 
 controller.$inject = [
     '$element',
-    '$scope'
+    '$scope',
+    'SettingsService'
 ];
 
 
@@ -199,4 +217,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzAssetCostsGraph'
+};

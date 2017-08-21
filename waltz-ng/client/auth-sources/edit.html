@@ -20,9 +20,9 @@
                 <h4>{{ dataType | toDisplayName:'dataType' }}</h4>
                 <table class="table">
                     <colgroup>
-                        <col width="15%"/>
                         <col width="20%"/>
-                        <col width="50%"/>
+                        <col width="20%"/>
+                        <col width="40%"/>
                         <col width="20%"/>
                     </colgroup>
                     <tr ng-repeat="source in sources"
@@ -31,9 +31,11 @@
                             <waltz-rating-indicator value="{{ source.rating }}">
                             </waltz-rating-indicator>
 
-                            <span class="text-muted"
-                                  ng-bind="source.rating | toDisplayName:'rating'">
-                            </span>
+                            <waltz-enum-value class='text-muted'
+                                              type="'AuthoritativenessRating'"
+                                              show-icon="false"
+                                              key="source.rating">
+                            </waltz-enum-value>
                         </td>
                         <td>
                             <a class="clickable"
@@ -132,7 +134,7 @@
                                 <div class="waltz-scroll-region" style="height: 300px">
                                     <ul style="margin-top:10px">
                                         <li ng-repeat="app in ctrl.getSupplyingApps(ctrl.wizard.dataType)| orderBy:'name'">
-                                           <span style="font-weight: {{ctrl.wizard.app == app ? 'bolder' : ''}}">
+                                           <span style="font-weight: {{ctrl.wizard.app === app ? 'bolder' : ''}}">
                                               <a href
                                                  ng-click="ctrl.wizard.app = app"
                                                  ng-if="!editForm.$submitted">
@@ -183,14 +185,20 @@
                                            name="rating"
                                            ng-model="ctrl.wizard.rating"
                                            value="PRIMARY">
-                                    {{ 'PRIMARY' | toDisplayName:'rating' }}
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'PRIMARY'">
+                                    </waltz-enum-value>
                                 </div>
                                 <div>
                                     <input type="radio"
                                            name="rating"
                                            ng-model="ctrl.wizard.rating"
                                            value="SECONDARY">
-                                    {{ 'SECONDARY' | toDisplayName:'rating' }}
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'SECONDARY'">
+                                    </waltz-enum-value>
                                 </div>
                             </div>
                         </div>

@@ -66,8 +66,9 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByIdSelectorAndKindPath = mkPath(BASE_URL, "kind", ":kind");
+        String findByIdSelectorAndKindPath = mkPath(BASE_URL, "selector", "kind", ":kind");
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
+        String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
         String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
 
@@ -82,6 +83,11 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                         .findBySelector(
                                 readIdSelectionOptionsFromBody(request));
 
+        ListRoute<LogicalFlowDecorator> findByFlowIdsAndKindRoute =
+                (request, response) -> logicalFlowDecoratorService
+                        .findByFlowIdsAndKind(
+                                readIdsFromBody(request), getKind(request));
+
         ListRoute<DecoratorRatingSummary> summarizeForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeForSelector(
                         readIdSelectionOptionsFromBody(request));
@@ -89,6 +95,10 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         postForList(
                 findByIdSelectorAndKindPath,
                 findByIdSelectorAndKindRoute);
+
+        postForList(
+                findByFlowIdsAndKindPath,
+                findByFlowIdsAndKindRoute);
 
         postForList(
                 findByIdSelectorPath,
@@ -122,6 +132,4 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
         return logicalFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
     }
-
-
 }

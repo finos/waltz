@@ -9,18 +9,61 @@
         </ol>
     </waltz-page-header>
 
+    <waltz-section name="boo">
+
+
+        <waltz-entity-data-sourcing-panel parent-entity-ref="ctrl.parentEntityRef"
+                                          initial-depth="2">
+        </waltz-entity-data-sourcing-panel>
+
+        <div class="row">
+            <div class="col-md-8">
+                <button class="btn btn-primary" ng-click="ctrl.addData()">Add Rand</button>
+                <button class="btn btn-warning" ng-click="ctrl.addNoData()">Add None</button>
+                <br>
+                <table class="table table-condensed">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="15%">
+                        <col width="25%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Applciation</th>
+                        <th>Data Type</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>A</td>
+                        <td>B</td>
+                        <td>
+                            <waltz-foo-widget data="ctrl.fooData"
+                                              keys="[ 'NO_OPINION', 'DISCOURAGED', 'SECONDARY', 'PRIMARY' ]">
+                            </waltz-foo-widget>
+                        </td>
+                        <td>
+                            <waltz-foo-widget data="ctrl.fooData"
+                                              keys="[ 'NO_OPINION', 'DISCOURAGED', 'SECONDARY', 'PRIMARY' ]">
+                            </waltz-foo-widget>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </waltz-section>
 
     <waltz-section name="Hello"
                    id="">
 
-
-       <waltz-physical-data-section primary-ref='ctrl.entityRef'
-                                    physical-flows="ctrl.physicalFlows"
-                                    logical-flows="ctrl.logicalFlows"
-                                    specifications="ctrl.specifications"
-                                    on-initialise="ctrl.onInitialise"
-                                    on-change="ctrl.onChange">
-       </waltz-physical-data-section>
+        <waltz-flow-explorer parent-entity-ref="ctrl.parentEntityRef"></waltz-flow-explorer>
 
     </waltz-section>
 

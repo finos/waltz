@@ -19,9 +19,11 @@
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
+import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
@@ -34,6 +36,7 @@ import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../en
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
+import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
@@ -51,6 +54,7 @@ import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspe
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
+import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
@@ -59,9 +63,11 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 export const CORE_API = {
     ActorStore,
+    AppGroupStore,
     ApplicationStore,
     AttestationInstanceStore,
     AttestationRunStore,
+    AssetCostStore,
     AuthSourcesStore,
     BookmarkStore,
     ChangeInitiativeStore,
@@ -73,6 +79,7 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntitySearchStore,
     EntityStatisticStore,
+    EnumValueStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,
@@ -91,6 +98,7 @@ export const CORE_API = {
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
     PhysicalSpecificationStore,
+    SettingsStore,
     SourceDataRatingStore,
     StaticPanelStore,
     TechnologyStatisticsService,

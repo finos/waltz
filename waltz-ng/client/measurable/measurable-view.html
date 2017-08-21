@@ -16,13 +16,14 @@
     </waltz-page-header>
 
 
-    <waltz-measurable-summary applications="ctrl.applications"
+    <waltz-measurable-summary parent-entity-ref='ctrl.entityReference'
+                              scope="CHILDREN"
+                              applications="ctrl.applications"
                               children="ctrl.children"
                               complexity="ctrl.complexity"
                               measurable="ctrl.measurable"
                               parents="ctrl.parents"
-                              server-stats="ctrl.techStats.serverStats"
-                              total-cost="ctrl.assetCostData.total">
+                              server-stats="ctrl.techStats.serverStats">
     </waltz-measurable-summary>
 
     <br>
@@ -110,8 +111,7 @@
 
 
     <!-- COSTS -->
-    <waltz-asset-costs-section cost-view="ctrl.assetCostData"
-                               load-all="ctrl.loadAllCosts"
+    <waltz-asset-costs-section parent-entity-ref="ctrl.entityReference"
                                csv-name="{{ ctrl.measurable.name }}_asset_costs.csv">
     </waltz-asset-costs-section>
 

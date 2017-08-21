@@ -17,16 +17,11 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 function service($q,
-                 appStore,
-                 dataTypeUsageStore,
-                 dataTypeService,
-                 sourceDataRatingStore,
-                 authSourcesStore,
-                 orgUnitStore
-) {
+                 serviceBroker) {
 
     const rawData = {};
 
@@ -42,8 +37,12 @@ function service($q,
         };
 
         const promises = [
-            dataTypeService.loadDataTypes(),
-            appStore.findBySelector(dataTypeIdSelector)
+            serviceBroker
+                .loadAppData(CORE_API.DataTypeStore.findAll)
+                .then(r => r.data),
+            serviceBroker
+                .loadViewData(CORE_API.ApplicationStore.findBySelector, [dataTypeIdSelector])
+                .then(r => r.data)
         ];
 
         return $q.all(promises)
@@ -74,9 +73,19 @@ function service($q,
         };
 
         const bulkPromise = $q.all([
-            sourceDataRatingStore.findAll(),
-            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('ORIGINATOR', selector),
-            dataTypeUsageStore.findForUsageKindByDataTypeIdSelector('DISTRIBUTOR', selector)
+            serviceBroker
+                .loadAppData(CORE_API.SourceDataRatingStore.findAll)
+                .then(r => r.data),
+            serviceBroker
+                .loadViewData(
+                    CORE_API.DataTypeUsageStore.findForUsageKindByDataTypeIdSelector,
+                    ['ORIGINATOR', selector])
+                .then(r => r.data),
+            serviceBroker
+                .loadViewData(
+                    CORE_API.DataTypeUsageStore.findForUsageKindByDataTypeIdSelector,
+                    ['DISTRIBUTOR', selector])
+                .then(r => r.data)
         ]);
 
         const prepareRawDataPromise = bulkPromise
@@ -100,16 +109,30 @@ function service($q,
                 return rawData;
             });
 
-        authSourcesStore
-            .findByDataTypeIdSelector(selector)
-            .then(authSources => rawData.authSources = authSources)
-            .then(authSources => _.chain(authSources).map('parentReference.id').uniq().value() )
-            .then(orgUnitStore.findByIds)
-            .then(orgUnits => rawData.orgUnits = orgUnits);
 
-        authSourcesStore
-            .calculateConsumersForDataTypeIdSelector(selector)
-            .then(d => rawData.authSourceConsumers = d);
+        serviceBroker
+            .loadViewData(CORE_API.AuthSourcesStore.findByDataTypeIdSelector, [ selector ])
+            .then(r => {
+                const authSources = r.data;
+                rawData.authSources = authSources;
+                const orgUnitIds = _
+                    .chain(authSources)
+                    .map('parentReference.id')
+                    .uniq()
+                    .value();
+
+                return serviceBroker
+                    .loadViewData(
+                        CORE_API.OrgUnitStore.findByIds,
+                        [ orgUnitIds ])
+            })
+            .then(r => rawData.orgUnits = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
+                [ selector ])
+            .then(r => rawData.authSourceConsumers = r.data);
 
         return prepareRawDataPromise;
     }
@@ -123,12 +146,7 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'ApplicationStore',
-    'DataTypeUsageStore',
-    'DataTypeService',
-    'SourceDataRatingStore',
-    'AuthSourcesStore',
-    'OrgUnitStore'
+    'ServiceBroker'
 ];
 
 

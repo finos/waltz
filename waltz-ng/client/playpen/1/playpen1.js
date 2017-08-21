@@ -16,30 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-
+import {CORE_API} from '../../common/services/core-api-utils';
 
 const initData = {
     id: 134,
 };
 
 
-function controller()
+function controller(serviceBroker)
 {
     const vm = Object.assign(this, initData);
 
-    vm.measurableRef = {
-        id: 134,
-        kind: 'MEASURABLE'
-    };
-
-    vm.changeInitiativeRef = {
-        id: 17,
-        kind: 'CHANGE_INITIATIVE'
-    };
+    serviceBroker.loadViewData(CORE_API.EnumValueStore.findAll).then(r => console.log(r.data));
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const view = {

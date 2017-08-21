@@ -31,7 +31,6 @@ public abstract class Cost {
 
     public abstract BigDecimal amount();
     public abstract CostKind kind();
-    public abstract String currencyCode();
     public abstract int year();
 
 }

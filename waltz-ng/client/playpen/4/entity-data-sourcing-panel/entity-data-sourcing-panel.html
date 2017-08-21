@@ -1,0 +1,38 @@
+
+<div>
+
+    <button class="btn btn-primary" ng-click="$ctrl.loadNextLevel()">Load next level (curr: {{$ctrl.levels.length}})</button>
+    <br>
+
+    <table class="table table-condensed small">
+        <colgroup>
+            <col width="40%">
+            <col width="40%">
+            <col width="30%">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Application</th>
+            <th>Data Type</th>
+            <th>Sourcing Overview</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="appRow in $ctrl.sources">
+        <tr ng-repeat="dtRow in  appRow.dataTypes">
+            <td><span ng-if="$first" ng-bind="appRow.source.name"></span></td>
+            <td><span ng-bind="dtRow.dataType.name"></span></td>
+            <td>
+                <waltz-foo-widget data="$ctrl.levelStatsByKey[dtRow.key]"
+                                  keys="[ 'NO_OPINION', 'DISCOURAGED', 'SECONDARY', 'PRIMARY' ]">
+                </waltz-foo-widget>
+            </td>
+            <!--<td><pre ng-bind="dtRow.key | json"></pre></td>-->
+            <!--<td><pre ng-bind="$ctrl.levelStatsByKey[dtRow.key] | json"></pre></td>-->
+
+        </tr>
+
+        </tbody>
+    </table>
+
+</div>
