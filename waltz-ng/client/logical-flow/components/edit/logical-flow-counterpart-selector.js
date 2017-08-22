@@ -68,7 +68,6 @@ function controller() {
         vm.visibility.addingApplication = !visible;
     };
 
-    console.log('logical-flow-counterpart-selector - init');
 }
 
 

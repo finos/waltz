@@ -63,7 +63,6 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findByAppId,
                 [vm.parentEntityRef.id])
             .then(r => {
-                console.log('costs', r.data)
                 vm.costs = r.data;
                 vm.currentYear = getCurrentYear(vm.costs);
                 vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);
