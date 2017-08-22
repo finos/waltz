@@ -149,6 +149,7 @@ public class PersonDao {
                     r.setOfficePhone(p.officePhone().orElse(""));
                     r.setMobilePhone(p.mobilePhone().orElse(""));
                     r.setUserPrincipalName(p.userPrincipalName().orElse(""));
+                    r.setOrganisationalUnitId(p.organisationalUnitId().orElse(null));
                     return r;
                 })
                 .collect(Collectors.toList());
