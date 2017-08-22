@@ -30,7 +30,7 @@ const bindings = {
 
 
 const initialState = {
-    currencyStr: '',
+    currencyStr: '-',
     simplify: false
 
 };
@@ -42,7 +42,7 @@ function controller($filter, settingsService) {
     let currency = null;
 
     const refresh = () => {
-        if (currency) {
+        if (currency && vm.amount) {
             if (vm.simplify) {
                 vm.currencyStr = currency.symbol + numberFormatter(vm.amount, 1, true);
             } else {
