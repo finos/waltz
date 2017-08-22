@@ -1,4 +1,3 @@
-
 <div>
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.changeInitiative.name }}"
@@ -91,22 +90,16 @@
 
 
     <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef"
-                             source-data-ratings="ctrl.sourceDataRatings">
+    <waltz-bookmarks-section parent-entity-ref="ctrl.entityRef">
     </waltz-bookmarks-section>
 
 
-    <!-- PEOPLE -->
-    <waltz-involved-people-section
-        id="people-section"
-        entity-ref="ctrl.entityRef"
-        involvements="ctrl.involvements"
-        on-add="ctrl.onAddInvolvement"
-        on-remove="ctrl.onRemoveInvolvement"
-        source-data-ratings="ctrl.sourceDataRatings">
+    <!-- INVOLVED PEOPLE -->
+    <waltz-involved-people-section parent-entity-ref="ctrl.entityReference">
     </waltz-involved-people-section>
 
 
+    <!-- RELATED ENTITIES -->
     <waltz-section icon="link"
                    name="Related Entities">
         <waltz-related-measurables-panel parent-entity-ref='ctrl.entityRef'>

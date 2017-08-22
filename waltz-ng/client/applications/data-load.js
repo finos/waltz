@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
-
-
 export function loadServers(serverInfoStore, appId, vm) {
     serverInfoStore
         .findByAppId(appId)
@@ -36,16 +33,6 @@ export function loadSoftwareCatalog(catalogStore, appId, vm) {
 export function loadDatabases(databaseStore, appId, vm) {
     databaseStore.findByAppId(appId)
         .then(resp => vm.databases = resp);
-}
-
-
-export function loadInvolvements($q, involvementStore, id, vm) {
-    $q.all([
-        involvementStore.findByEntityReference('APPLICATION', id),
-        involvementStore.findPeopleByEntityReference('APPLICATION', id)
-    ]).then(([involvements, people]) => {
-        vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people);
-    });
 }
 
 

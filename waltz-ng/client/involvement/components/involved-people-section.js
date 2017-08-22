@@ -20,30 +20,24 @@ import _ from "lodash";
 import {initialiseData} from "../../common";
 
 import template from './involved-people-section.html';
+import {CORE_API} from "../../common/services/core-api-utils";
+import {aggregatePeopleInvolvements} from "../involvement-utils";
 
 
 const bindings = {
-    entityRef: '<',
-    involvements: '<',
-    involvementKinds: '<',
-
-    onAdd: '<',
-    onRemove: '<'
+    parentEntityRef: '<',
 };
 
 
 const initialState = {
     allowedInvolvements: [],
     currentInvolvements: [],
-    involvements: [],
     gridData: [],
     gridDataCount: 0,
     exportGrid: () => {},
     visibility: {
         editor: false
-    },
-    onAdd: () => console.log("default onAdd handler for involved-people-section"),
-    onRemove: () => console.log("default onRemove handler for involved-people-section")
+    }
 };
 
 
@@ -60,6 +54,7 @@ function mkGridData(involvements = [], displayNameService) {
                 roles: roles
             }
         })
+        .sortBy('person.displayName')
         .value();
 }
 
@@ -90,13 +85,45 @@ function mkCurrentInvolvements(involvements = []) {
 }
 
 
-function controller(displayNameService) {
+function controller($q, displayNameService, serviceBroker, involvedSectionService) {
 
     const vm = initialiseData(this, initialState);
 
+    const refresh = () => {
+        const involvementPromise = serviceBroker
+            .loadViewData(
+                CORE_API.InvolvementStore.findByEntityReference,
+                [ vm.parentEntityRef ],
+                { force: true })
+            .then(r => r.data);
+
+        const peoplePromise = serviceBroker
+            .loadViewData(
+                CORE_API.InvolvementStore.findPeopleByEntityReference,
+                [ vm.parentEntityRef ],
+                { force: true })
+            .then(r => r.data);
+
+        $q.all([involvementPromise, peoplePromise])
+            .then(([involvements = [], people = []]) => {
+                const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
+                vm.gridData = mkGridData(aggInvolvements, displayNameService);
+                vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
+            });
+    };
+
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
+            .then(r => vm.involementKinds = r.data);
+    };
+
     vm.$onChanges = (changes) => {
-        vm.gridData = mkGridData(vm.involvements, displayNameService);
-        vm.currentInvolvements = mkCurrentInvolvements(vm.involvements);
+        if (vm.parentEntityRef) {
+            refresh();
+        }
+
 
         vm.allowedInvolvements = _.map(
             displayNameService.getAllByType('involvementKind'),
@@ -107,7 +134,13 @@ function controller(displayNameService) {
         {
             field: 'person.displayName',
             displayName: 'Name',
-            cellTemplate: '<div class="ui-grid-cell-contents"> <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - <a href="mailto:{{row.entity.person.email}}"><waltz-icon name="envelope-o"></waltz-icon></a></div>'
+            cellTemplate: `
+                <div class="ui-grid-cell-contents"> 
+                    <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - 
+                    <a href="mailto:{{row.entity.person.email}}">
+                        <waltz-icon name="envelope-o"></waltz-icon>
+                    </a>
+                </div>`
         },
         { field: 'person.title', displayName: 'Title' },
         { field: 'person.officePhone', displayName: 'Telephone' },
@@ -125,11 +158,28 @@ function controller(displayNameService) {
     vm.editMode = (editMode) => {
         vm.visibility.editor = editMode;
     };
+
+
+    vm.onAdd = (entityInvolvement) => {
+        involvedSectionService
+            .addInvolvement(vm.parentEntityRef, entityInvolvement)
+            .then(refresh);
+    };
+
+
+    vm.onRemove = (entityInvolvement) => {
+        involvedSectionService
+            .removeInvolvement(vm.parentEntityRef, entityInvolvement)
+            .then(refresh);
+    };
 }
 
 
 controller.$inject = [
-    'DisplayNameService'
+    '$q',
+    'DisplayNameService',
+    'ServiceBroker',
+    'InvolvedSectionService'
 ];
 
 

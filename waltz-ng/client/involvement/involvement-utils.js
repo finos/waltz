@@ -20,7 +20,8 @@
 import _ from "lodash";
 
 export function aggregatePeopleInvolvements(involvements, people) {
-    const involvementsByPerson = _.chain(involvements)
+    const involvementsByPerson = _
+        .chain(involvements)
         .groupBy('employeeId')
         .mapValues(xs => _.map(xs, x => ({
             kindId: x.kindId,
@@ -28,10 +29,11 @@ export function aggregatePeopleInvolvements(involvements, people) {
         })))
         .value();
 
-    return _.chain(people)
-            .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
-            .uniqBy(i => i.person.id)
-            .value();
+    return _
+        .chain(people)
+        .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
+        .uniqBy(i => i.person.id)
+        .value();
 }
 
 
