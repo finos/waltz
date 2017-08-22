@@ -89,7 +89,8 @@
                                                 <span ng-bind="row.type"></span>
                                             </td>
                                             <td align="right">
-                                                <span ng-bind="row.amount | currency:'€'"></span>
+                                                <waltz-currency-amount amount="row.amount">
+                                                </waltz-currency-amount>
                                             </td>
                                         </tr>
                                         <tr>
@@ -97,7 +98,8 @@
                                                 <strong>Total</strong>
                                             </td>
                                             <td align="right">
-                                                <span ng-bind="$ctrl.summarySelection.total | currency:'€'"></span>
+                                                <waltz-currency-amount amount="$ctrl.summarySelection.total">
+                                                </waltz-currency-amount>
                                             </td>
                                         </tr>
                                         </tbody>
