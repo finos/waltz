@@ -19,6 +19,7 @@
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
@@ -37,6 +38,7 @@ import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/servi
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
+import {InvolvementKindStore_API as InvolvementKindStore} from "../../involvement-kind/services/involvement-kind-store";
 import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/services/logical-flow-store";
 import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
@@ -59,6 +61,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 export const CORE_API = {
     ActorStore,
+    AppGroupStore,
     ApplicationStore,
     AssetCostStore,
     AuthSourcesStore,
@@ -77,6 +80,7 @@ export const CORE_API = {
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,
     InvolvementStore,
+    InvolvementKindStore,
     LogicalFlowStore,
     LogicalFlowDecoratorStore,
     MeasurableCategoryStore,

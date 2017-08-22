@@ -19,7 +19,8 @@
 
 import angular from 'angular';
 import AppGroupSummary from './components/summary/app-group-summary'
-import {registerComponents} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
+import * as AppGroupStore from './services/app-group-store';
 
 export default () => {
 
@@ -29,15 +30,13 @@ export default () => {
         .config(require('./routes'));
 
     module
-        .service('AppGroupStore', require('./services/app-group-store'));
-
-    module
         .directive('waltzAppGroupList', require('./directives/app-group-list'))
         .directive('waltzAppGroupListSection', require('./directives/app-group-list-section'))
         .directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'));
 
-
-    registerComponents(module, [ AppGroupSummary ])
+    registerComponents(module, [ AppGroupSummary ]);
+    registerStores(module, [ AppGroupStore ]);
 
     return module.name;
+
 }

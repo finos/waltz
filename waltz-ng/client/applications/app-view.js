@@ -18,7 +18,6 @@
 import _ from "lodash";
 import {
     loadDatabases,
-    loadInvolvements,
     loadServers,
     loadSoftwareCatalog
 } from "./data-load";
@@ -38,7 +37,6 @@ const initialState = {
     flows: [],
     ouAuthSources: [],
     organisationalUnit: null,
-    peopleInvolvements: [],
     servers: [],
     softwareCatalog: [],
     surveyInstances: [],
@@ -99,7 +97,6 @@ function controller($q,
                     flowDiagramEntityStore,
                     historyStore,
                     involvedSectionService,
-                    involvementStore,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
@@ -203,7 +200,6 @@ function controller($q,
 
     function loadThirdWave() {
         const promises = [
-            loadInvolvements($q, involvementStore, id, vm),
             loadServers(serverInfoStore, id, vm),
             loadSoftwareCatalog(softwareCatalogStore, id, vm),
             loadDatabases(databaseStore, id, vm),
@@ -274,19 +270,6 @@ function controller($q,
         return _.concat(modelCommands, moveCommands);
     };
 
-
-    vm.onAddInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
-            .then(() => loadInvolvements($q, involvementStore, id, vm));
-    };
-
-
-    vm.onRemoveInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
-            .then(() => loadInvolvements($q, involvementStore, id, vm));
-    };
 }
 
 
@@ -303,7 +286,6 @@ controller.$inject = [
     'FlowDiagramEntityStore',
     'HistoryStore',
     'InvolvedSectionService',
-    'InvolvementStore',
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',

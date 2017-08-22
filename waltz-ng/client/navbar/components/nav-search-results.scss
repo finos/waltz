@@ -1,21 +1,29 @@
 @import "../../../style/util";
+@import "../../../style/variables";
 
-
-.waltz-nav-search-panel {
+.waltz-nav-search-results {
     top: 52px;
     right: 100px;
     position: absolute;
     background-color: #fafafa;
-    width:75%;
+    width:70%;
     border: 1px solid #ccc;
     @include waltz-box-shadow();
 
-    .wns-results {
+    .wnsr-main {
         margin: 10px;
         padding-right: 10px;
         overflow-y: auto;
         overflow-x: hidden;
-        height: 70vh
+        height: 80vh;
+    }
+
+    .wnsr-category {
+        transition: background-color 300ms;
+    }
+
+    .wnsr-selected {
+        background-color: $waltz-selected-item-bg-color;
     }
 }
 

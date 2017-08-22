@@ -18,6 +18,7 @@
  */
 
 import _ from "lodash";
+import {initialiseData} from "../common/index";
 
 
 const bindings = {
@@ -41,7 +42,7 @@ const initialState = {
 
 
 function controller() {
-    _.defaultsDeep(this, initialState);
+    const vm = initialiseData(this, initialState);
 }
 
 
