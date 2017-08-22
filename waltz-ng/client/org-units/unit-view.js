@@ -64,17 +64,6 @@ function controller($stateParams,
         .loadOrgUnitDescendants(id)
         .then(descendants => vm.viewData.orgUnitDescendants = descendants);
 
-    vm.onAddInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
-            .then(() => viewDataService.loadInvolvements(id));
-    };
-
-    vm.onRemoveInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
-            .then(() => viewDataService.loadInvolvements(id));
-    };
 }
 
 

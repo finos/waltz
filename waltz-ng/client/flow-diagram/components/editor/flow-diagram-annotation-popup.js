@@ -51,8 +51,6 @@ function controller() {
         vm.title = vm.annotation.id ? 'Update Annotation' : 'Add Annotation';
         vm.actionLabel = vm.annotation.id ? 'Update' : 'Add';
         vm.note = vm.annotation.note;
-
-        console.log(vm)
     };
 
     vm.send = () => {

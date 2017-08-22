@@ -17,10 +17,7 @@
  */
 import * as _ from "lodash";
 import {CORE_API} from '../common/services/core-api-utils';
-
 import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
-import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
-
 import template from './change-initiative-view.html';
 
 
@@ -42,7 +39,6 @@ function controller($q,
                     appGroupStore,
                     historyStore,
                     involvedSectionService,
-                    involvementStore,
                     serviceBroker,
                     sourceDataRatingStore,
                     surveyInstanceStore,
@@ -119,32 +115,6 @@ function controller($q,
         .findByEntityReference(vm.entityRef)
         .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
 
-    const loadInvolvements = () => {
-        const involvementPromises = [
-            involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),
-            involvementStore.findPeopleByEntityReference('CHANGE_INITIATIVE', id)
-        ];
-        $q.all(involvementPromises)
-            .then(([relations, people]) => {
-                return aggregatePeopleInvolvements(relations, people)
-            })
-            .then(involvements => vm.involvements = involvements);
-
-    };
-
-    loadInvolvements();
-
-    vm.onAddInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
-
-    vm.onRemoveInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
 }
 
 
@@ -155,7 +125,6 @@ controller.$inject = [
     'AppGroupStore',
     'HistoryStore',
     'InvolvedSectionService',
-    'InvolvementStore',
     'ServiceBroker',
     'SourceDataRatingStore',
     'SurveyInstanceStore',

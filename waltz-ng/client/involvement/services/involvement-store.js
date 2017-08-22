@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {checkIsEntityInvolvementChangeCommand} from '../../common/checks';
 
 
@@ -44,14 +45,20 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
 
 
-    const findByEntityReference = (kind, id) =>
-        $http.get(`${BASE}/entity/${kind}/${id}`)
+    const findByEntityReference = (kind, id) => {
+        const ref = _.isObject(kind) ? kind : { id, kind };
+
+        return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}`)
             .then(result => result.data);
+    };
 
 
-    const findPeopleByEntityReference = (kind, id) =>
-        $http.get(`${BASE}/entity/${kind}/${id}/people`)
+    const findPeopleByEntityReference = (kind, id) => {
+        const ref = _.isObject(kind) ? kind : { id, kind };
+
+        return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}/people`)
             .then(result => result.data);
+    };
 
 
     const changeInvolvement = (entityRef, cmd) => {
