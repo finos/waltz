@@ -41,6 +41,16 @@ const costsWidget = {
 };
 
 
+const peopleWidget = {
+    template: `
+        <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-involved-people-section> `,
+    id: 'people-widget',
+    name: 'People',
+    icon: 'users'
+};
+
+
 const entityNamedNoteWidget = {
     template: `
         <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
@@ -95,6 +105,7 @@ const initData = {
         flowDiagramsWidget,
         bookmarkWidget,
         entityNamedNoteWidget,
+        peopleWidget,
         costsWidget,
         changesWidget]
 };
