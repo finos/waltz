@@ -168,41 +168,17 @@ public class LogicalFlowDecoratorDao {
     // --- STATS ---
 
     public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
-        // this is intentionally TARGET only as we use to calculate auth source stats
-        Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector);
+        Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector)
+                .and(NOT_REMOVED);
 
-        Condition dataFlowJoinCondition = LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID);
-
-        Collection<Field<?>> groupingFields = newArrayList(
-                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
-                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
-                LOGICAL_FLOW_DECORATOR.RATING);
-
-        Field<Integer> countField = DSL.count(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID).as("count");
-
-        return dsl.select(groupingFields)
-                .select(countField)
-                .from(LOGICAL_FLOW_DECORATOR)
-                .innerJoin(LOGICAL_FLOW)
-                .on(dsl.renderInlined(dataFlowJoinCondition))
-                .where(dsl.renderInlined(condition))
-                .and(NOT_REMOVED)
-                .groupBy(groupingFields)
-                .fetch(r -> {
-                    EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));
-                    long decoratorEntityId = r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
-
-                    EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
-                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.RATING));
-                    Integer count = r.getValue(countField);
-
-                    return ImmutableDecoratorRatingSummary.builder()
-                            .decoratorEntityReference(decoratorRef)
-                            .rating(rating)
-                            .count(count)
-                            .build();
-                });
+        return summarizeForCondition(condition);
     }
+
+
+    public List<DecoratorRatingSummary> summarizeForAll() {
+        return summarizeForCondition(NOT_REMOVED);
+    }
+
 
 
     // --- UPDATERS ---
@@ -260,4 +236,40 @@ public class LogicalFlowDecoratorDao {
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
+
+    private List<DecoratorRatingSummary> summarizeForCondition(Condition condition) {
+        // this is intentionally TARGET only as we use to calculate auth source stats
+        Condition dataFlowJoinCondition = LOGICAL_FLOW.ID
+                .eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID);
+
+        Collection<Field<?>> groupingFields = newArrayList(
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+                LOGICAL_FLOW_DECORATOR.RATING);
+
+        Field<Integer> countField = DSL.count(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID).as("count");
+
+        return dsl
+                .select(groupingFields)
+                .select(countField)
+                .from(LOGICAL_FLOW_DECORATOR)
+                .innerJoin(LOGICAL_FLOW)
+                .on(dsl.renderInlined(dataFlowJoinCondition))
+                .where(dsl.renderInlined(condition))
+                .groupBy(groupingFields)
+                .fetch(r -> {
+                    EntityKind decoratorEntityKind = EntityKind.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND));
+                    long decoratorEntityId = r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
+
+                    EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
+                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.RATING));
+                    Integer count = r.getValue(countField);
+
+                    return ImmutableDecoratorRatingSummary.builder()
+                            .decoratorEntityReference(decoratorRef)
+                            .rating(rating)
+                            .count(count)
+                            .build();
+                });
+    }
 }

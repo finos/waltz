@@ -274,7 +274,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 LOGICAL_FLOW.TARGET_ENTITY_ID.as(appId),
                 condition.and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
-        return dsl.selectDistinct(appId)
+        return dsl
+                .selectDistinct(appId)
                 .from(sources)
                 .union(targets);
     }

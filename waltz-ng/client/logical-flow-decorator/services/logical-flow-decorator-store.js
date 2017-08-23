@@ -83,12 +83,18 @@ export function store($http,
             .then(r => r.data);
     };
 
+    const summarizeForAll = () => {
+        return $http.get(`${BASE}/summarize`)
+            .then(r => r.data);
+    };
+
     return {
         findBySelectorAndKind,
         findBySelector,
         findByFlowIdsAndKind,
         updateDecorators,
-        summarizeBySelector
+        summarizeBySelector,
+        summarizeForAll
     };
 }
 
@@ -125,6 +131,11 @@ export const LogicalFlowDecoratorStore_API = {
     summarizeBySelector: {
         serviceName,
         serviceFnName: 'summarizeBySelector',
-        description: 'executes summarizeBySelector'
+        description: 'executes summarizeBySelector - arg1: app_selector'
+    },
+    summarizeForAll: {
+        serviceName,
+        serviceFnName: 'summarizeForAll',
+        description: 'executes summarizeForAll (no args)'
     }
 };
