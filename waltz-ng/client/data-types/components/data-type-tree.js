@@ -60,7 +60,7 @@ function prepareTree(dataTypes = [], usageCounts = []) {
     const sumBy = (rating, n) => {
         if (!n) return 0;
         const childTotals = _.sum(_.map(n.children, c => sumBy(rating, c)));
-        const total = childTotals + (n.directCounts[rating] || 0);
+        const total = childTotals + _.get(n, `directCounts.${rating}`, 0);
         n.cumulativeCounts = Object.assign({}, n.cumulativeCounts, { [rating] : total });
         return total;
     };
