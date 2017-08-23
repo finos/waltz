@@ -111,6 +111,7 @@
                      oldTableName="attestation"/>
     </changeSet>
 
+
     <changeSet id="20170808-2474-1a"
                author="kamransaleem"
                dbms="mssql">
@@ -123,6 +124,7 @@
                        constraintName="attestation_1_6_pkey"
                        tableName="attestation_1_6" />
     </changeSet>
+
 
     <changeSet id="20170808-2474-2"
                author="rovats">
@@ -323,6 +325,215 @@
         <comment>2485: Attestation_Instance - remove comments column</comment>
         <dropColumn tableName="attestation_instance"
                     columnName="comments" />
+    </changeSet>
+
+    <!-- 2492: enum value table -->
+    <changeSet id="20170816-2492-1"
+               author="davidwatkins73">
+        <comment>2492: Create enum value table</comment>
+        <createTable tableName="enum_value"
+                     remarks="Store enum values - display names, descriptions and icon names">
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon_name"
+                    type="${enum.type}"
+                    remarks="The default value 'fw', stands for fixed-width which acts like a spacer icon"
+                    defaultValue="fw">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="type,key"
+                       constraintName="enum_value_pkey"
+                       tableName="enum_value"/>
+    </changeSet>
+
+
+    <!-- 2493: Auth source rating names etc -->
+    <changeSet id="20170817-2493-1"
+               author="davidwatkins73">
+        <comment>2493: Adding auth source rating names to enum values</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="PRIMARY"/>
+            <column name="display_name"
+                    value="Primary Source"/>
+            <column name="description"
+                    value="Primary Sources should be the golden master"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="SECONDARY"/>
+            <column name="display_name"
+                    value="Secondary Source"/>
+            <column name="description"
+                    value="Secondary Sources should be authorised redistributors of data"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="DISCOURAGED"/>
+            <column name="display_name"
+                    value="Discouraged Source"/>
+            <column name="description"
+                    value="A discouraged source is one where an alternative primary or secondary source is available"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="AuthoritativenessRating"/>
+            <column name="key"
+                    value="NO_OPINION"/>
+            <column name="display_name"
+                    value="No "/>
+            <column name="description"
+                    value="A source's rating is 'no opinion' when no primary or secondary sources have been declared for the associated data type"/>
+        </insert>
+    </changeSet>
+
+
+    <!-- 2494: system defined bookmarks -->
+    <changeSet id="20170817-2494-1"
+               author="davidwatkins73">
+        <comment>2494: Adding bookmark kinds to enum-value table</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="APPLICATION_INSTANCE"/>
+            <column name="display_name"
+                    value="Application Instance"/>
+            <column name="description"
+                    value="Application Instance"/>
+            <column name="icon_name"
+                    value="desktop"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="BUILD_SYSTEM"/>
+            <column name="display_name"
+                    value="Automated Build / Deployment System"/>
+            <column name="description"
+                    value="Automated Build and Deployment Systems, e.g. Teamcity, Jenkins, Hudson"/>
+            <column name="icon_name"
+                    value="simplybuilt"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="BUSINESS_SPECIFICATION"/>
+            <column name="display_name"
+                    value="Business Specification"/>
+            <column name="description"
+                    value="Business Specification"/>
+            <column name="icon_name"
+                    value="briefcase"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="DOCUMENTATION"/>
+            <column name="display_name"
+                    value="Documentation"/>
+            <column name="description"
+                    value="Documentation, e.g. Wiki, Sharepoint"/>
+            <column name="icon_name"
+                    value="book"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="ISSUE_TRACKER"/>
+            <column name="display_name"
+                    value="Issue Tracker"/>
+            <column name="description"
+                    value="Issue Tracker, e.g. Jira, Bugzilla"/>
+            <column name="icon_name"
+                    value="tasks"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="MONITORING"/>
+            <column name="display_name"
+                    value="Monitoring"/>
+            <column name="description"
+                    value="Monitoring Systems"/>
+            <column name="icon_name"
+                    value="bar-chart"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="QUALITY_CONTROL"/>
+            <column name="display_name"
+                    value="Quality Control"/>
+            <column name="description"
+                    value="Quality Control Systems"/>
+            <column name="icon_name"
+                    value="sliders"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="SOURCE_CODE_CONTROL"/>
+            <column name="display_name"
+                    value="Source Code Control"/>
+            <column name="description"
+                    value="Source Code Control / Management"/>
+            <column name="icon_name"
+                    value="code"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="BookmarkKind"/>
+            <column name="key"
+                    value="TECHNICAL_SPECIFICATION"/>
+            <column name="display_name"
+                    value="Technical Specification"/>
+            <column name="description"
+                    value="Technical Specification"/>
+            <column name="icon_name"
+                    value="tty"/>
+        </insert>
+    </changeSet>
+
+
+    <!-- 2489: Currency -->
+    <changeSet id="20170818-2489-1"
+               author="davidwatkins73">
+        <insert tableName="settings">
+            <column name="name"
+                    value="settings.asset-cost.default-currency"/>
+            <column name="value"
+                    value="EUR"/>
+        </insert>
     </changeSet>
 
     <!-- 2492: enum value table -->

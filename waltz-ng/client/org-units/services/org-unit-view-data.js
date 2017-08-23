@@ -17,7 +17,6 @@
  */
 
 import _ from "lodash";
-import {aggregatePeopleInvolvements} from "../../involvement/involvement-utils";
 import {CORE_API} from "../../common/services/core-api-utils";
 
 function mkRef(orgUnitId) {
@@ -65,15 +64,6 @@ function loadApps(serviceBroker, selector, holder) {
 }
 
 
-function loadInvolvement(store, id, holder) {
-    return store
-        .findPeopleByEntityReference('ORG_UNIT', id)
-        .then(people => holder.people = people)
-        .then(() => store.findByEntityReference('ORG_UNIT', id))
-        .then(involvements => holder.involvements = aggregatePeopleInvolvements(involvements, holder.people));
-}
-
-
 function initialiseDataFlows(service, id, holder) {
     return service
         .initialise(id, "ORG_UNIT", "CHILDREN")
@@ -108,7 +98,6 @@ function service($q,
                  serviceBroker,
                  authSourcesStore,
                  complexityStore,
-                 involvementStore,
                  logicalFlowViewService,
                  orgUnitStore) {
 
@@ -146,7 +135,6 @@ function service($q,
     function loadSecondWave(orgUnitId) {
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
-            loadInvolvement(involvementStore, orgUnitId, rawData),
             loadAuthSources(authSourcesStore, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData)
         ]);
@@ -174,16 +162,11 @@ function service($q,
     }
 
 
-    function loadInvolvements(orgUnitId) {
-        return loadInvolvement(involvementStore, orgUnitId, rawData);
-    }
-
     return {
         data: rawData,
         loadAll,
         loadFlowDetail,
-        loadOrgUnitDescendants,
-        loadInvolvements
+        loadOrgUnitDescendants
     };
 
 }
@@ -194,7 +177,6 @@ service.$inject = [
     'ServiceBroker',
     'AuthSourcesStore',
     'ComplexityStore',
-    'InvolvementStore',
     'LogicalFlowViewService',
     'OrgUnitStore'
 ];

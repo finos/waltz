@@ -40,7 +40,8 @@ export default () => {
         .component('waltzAppOverview', require('./components/app-overview'))
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
-        .component('waltzAppTable', require('./components/app-table'));
+        .component('waltzAppTable', require('./components/app-table'))
+        .component('waltzRelatedAppsSection', require('./components/related-apps-section/related-apps-section'));
 
     registerComponents(module, [ AppCostsSection ]);
 

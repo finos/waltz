@@ -37,7 +37,8 @@ const bindings = {
 
 
 const initialState = {
-    scope: 'CHILDREN'
+    scope: 'CHILDREN',
+    organisationalUnit: null
 };
 
 
@@ -52,6 +53,16 @@ function controller(serviceBroker) {
     };
 
     vm.$onChanges = () => {
+        if (vm.person && vm.person.organisationalUnitId) {
+            serviceBroker
+                .loadAppData(
+                    CORE_API.OrgUnitStore.getById,
+                    [ vm.person.organisationalUnitId ])
+                .then(r => vm.organisationalUnit = Object.assign(
+                    {},
+                    r.data,
+                    { kind: 'ORG_UNIT' }));
+        }
         if (vm.parentEntityRef) {
 
             const selector = {

@@ -20,7 +20,7 @@
 import {checkIsCreateInvolvementKindCommand} from "../../common/checks";
 
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/involvement-kind`;
 
@@ -79,4 +79,33 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'InvolvementKindStore';
+
+
+export const InvolvementKindStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'executes findAll'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'executes create'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'executes update'
+    },
+    deleteById: {
+        serviceName,
+        serviceFnName: 'deleteById',
+        description: 'executes deleteById'
+    }
+};

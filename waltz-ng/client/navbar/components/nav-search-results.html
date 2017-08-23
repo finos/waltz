@@ -1,60 +1,70 @@
-<div class="wns-results">
-    <h4>
-        Search Results:
-        <span ng-bind="$ctrl.query"></span>
-        <small class="pull-right">
-            <a class="clickable"
-               ng-click="$ctrl.dismiss()">
-                <waltz-icon name="close"></waltz-icon>
-            </a>
-        </small>
-    </h4>
+<div class="waltz-nav-search-results">
+    <div class="wnsr-main">
+        <h4>
+            Search Results:
+            <span ng-bind="$ctrl.query"></span>
+            <small class="pull-right">
+                <a class="clickable"
+                   ng-click="$ctrl.dismiss()">
+                    <waltz-icon name="close"></waltz-icon>
+                </a>
+            </small>
+        </h4>
 
-    <hr>
+        <hr>
 
-    <div class="row">
+        <div class="row">
 
-        <!-- FILTERS -->
-        <div class="col-md-4">
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="10%">
-                    <col width="80%">
-                    <col width="10%">
-                </colgroup>
-                <tr ng-repeat="category in $ctrl.categories"
-                    class="waltz-visibility-parent"
-                    ng-class="{ clickable : $ctrl.results[category].length > 0 }"
-                    ng-click="$ctrl.toggleCategory(category)">
-                    <td>
-                        <span class="waltz-visibility-child-50 waltz-fade-if"
-                              ng-if="$ctrl.results[category].length > 0 ">
-                            <waltz-toggle state="$ctrl.selectedCategory == category">
-                            </waltz-toggle>
-                        </span>
-                    </td>
-                    <td>
+            <!-- FILTERS -->
+            <div class="col-md-4">
+                <table class="table table-condensed">
+                    <colgroup>
+                        <col width="85%">
+                        <col width="15%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                Filter
+                            </th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="category in $ctrl.categories"
+                        class="wnsr-category"
+                        ng-class="{
+                        'clickable' : $ctrl.results[category].length > 0,
+                        'wnsr-selected': $ctrl.selectedCategory === category
+                    }"
+                        ng-click="$ctrl.toggleCategory(category)">
+                        <td>
                         <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}"
                               ng-bind="category | toDisplayName:'entity'">
                         </span>
-                    </td>
-                    <td>
+                        </td>
+                        <td>
                         <span ng-if="$ctrl.results[category].length > 0"
                               class="small"
                               ng-bind="$ctrl.results[category].length">
                         </span>
-                    </td>
-                </tr>
-            </table>
-        </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
 
-        <!-- RESULTS -->
-        <div class="col-md-8">
-            <table class="table table-condensed table-striped table-hover">
-                <tbody ng-repeat="category in $ctrl.categories"
-                       class="waltz-fade-if"
-                       ng-if="$ctrl.selectedCategory === category || $ctrl.selectedCategory === null">
+            <!-- RESULTS -->
+            <div class="col-md-8">
+                <table class="table table-condensed table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th colspan="2">
+                            Results
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody ng-repeat="category in $ctrl.categories"
+                           class="waltz-fade-if"
+                           ng-if="$ctrl.selectedCategory === category || $ctrl.selectedCategory === null">
                     <tr ng-repeat="item in $ctrl.results[category]">
                         <td>
                             <waltz-entity-link tooltip-placement="'right'"
@@ -70,9 +80,11 @@
                             </small>
                         </td>
                     </tr>
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+            </div>
+
         </div>
 
     </div>

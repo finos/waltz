@@ -70,7 +70,6 @@ function controller($q,
 
     vm.cancelNewinvolvementKind = () => {
         vm.creatinginvolvementKind = false;
-        console.log('cancelled new');
     };
 
 

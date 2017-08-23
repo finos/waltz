@@ -19,7 +19,6 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {getParents, populateParents} from "../common/hierarchy-utils";
-import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
 
 import template from "./measurable-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -45,7 +44,6 @@ function controller($q,
                     complexityStore,
                     historyStore,
                     involvedSectionService,
-                    involvementStore,
                     logicalFlowViewService) {
 
     const id = $stateParams.id;
@@ -97,8 +95,6 @@ function controller($q,
             logicalFlowViewService
                 .initialise(childrenSelector)
                 .then(flowView => vm.logicalFlowView = flowView),
-
-            loadInvolvements()
         ]);
 
     const loadWave3 = () =>
@@ -109,15 +105,6 @@ function controller($q,
         ]);
 
     const loadWave4 = () => logHistory(vm.measurable, historyStore);
-
-    const loadInvolvements = () => {
-        return $q.all([
-            involvementStore.findByEntityReference('MEASURABLE', id),
-            involvementStore.findPeopleByEntityReference('MEASURABLE', id)
-        ]).then(([involvements, people]) =>
-            vm.peopleInvolvements = aggregatePeopleInvolvements(involvements, people)
-        );
-    };
 
     // -- BOOT ---
 
@@ -134,19 +121,6 @@ function controller($q,
         .loadDetail()
         .then(flowView => vm.logicalFlowView = flowView);
 
-
-    vm.onAddInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.addInvolvement(vm.entityReference, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
-
-    vm.onRemoveInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.removeInvolvement(vm.entityReference, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
-
 }
 
 
@@ -157,7 +131,6 @@ controller.$inject = [
     'ComplexityStore',
     'HistoryStore',
     'InvolvedSectionService',
-    'InvolvementStore',
     'LogicalFlowViewService'
 ];
 
