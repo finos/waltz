@@ -17,17 +17,12 @@
  */
 import * as _ from "lodash";
 import {CORE_API} from '../common/services/core-api-utils';
-
 import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
-import {aggregatePeopleInvolvements} from "../involvement/involvement-utils";
-
 import template from './change-initiative-view.html';
 
 
 const initialState = {
     changeInitiative: {},
-    childrenRefs: [],
-    parentRefs: [],
     involvements: [],
     sourceDataRatings: [],
     surveyInstances: [],
@@ -38,23 +33,12 @@ const initialState = {
 };
 
 
-function enrichWithRefs(changeInitiatives = []) {
-    return _.map(
-        changeInitiatives,
-        d => Object.assign(
-            {},
-            d,
-            { entityReference: {kind: 'CHANGE_INITIATIVE', id: d.id, name: d.name, description: d.description }}));
-}
-
-
 function controller($q,
                     $stateParams,
                     applicationStore,
                     appGroupStore,
                     historyStore,
                     involvedSectionService,
-                    involvementStore,
                     serviceBroker,
                     sourceDataRatingStore,
                     surveyInstanceStore,
@@ -131,50 +115,6 @@ function controller($q,
         .findByEntityReference(vm.entityRef)
         .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
 
-    serviceBroker
-        .loadViewData(CORE_API.ChangeInitiativeStore.findByParentId, [vm.entityRef.id])
-        .then(r => {
-            const children = _.chain(r.data)
-                .sortBy('name')
-                .value();
-            vm.childRefs = enrichWithRefs(children);
-        });
-
-    serviceBroker
-        .loadViewData(CORE_API.ChangeInitiativeStore.findParentsById, [vm.entityRef.id])
-        .then(r => {
-            const parents = _.chain(r.data)
-                .sortBy('name')
-                .value();
-            vm.parentRefs = enrichWithRefs(parents);
-        });
-
-    const loadInvolvements = () => {
-        const involvementPromises = [
-            involvementStore.findByEntityReference('CHANGE_INITIATIVE', id),
-            involvementStore.findPeopleByEntityReference('CHANGE_INITIATIVE', id)
-        ];
-        $q.all(involvementPromises)
-            .then(([relations, people]) => {
-                return aggregatePeopleInvolvements(relations, people)
-            })
-            .then(involvements => vm.involvements = involvements);
-
-    };
-
-    loadInvolvements();
-
-    vm.onAddInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.addInvolvement(vm.entityRef, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
-
-    vm.onRemoveInvolvement = (entityInvolvement) => {
-
-        involvedSectionService.removeInvolvement(vm.entityRef, entityInvolvement)
-            .then(_ => loadInvolvements());
-    };
 }
 
 
@@ -185,7 +125,6 @@ controller.$inject = [
     'AppGroupStore',
     'HistoryStore',
     'InvolvedSectionService',
-    'InvolvementStore',
     'ServiceBroker',
     'SourceDataRatingStore',
     'SurveyInstanceStore',

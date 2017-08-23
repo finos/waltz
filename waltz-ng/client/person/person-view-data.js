@@ -80,10 +80,7 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 function service($q,
                  serviceBroker,
                  complexityStore,
-                 involvementStore,
-                 involvementKindService,
-                 logicalFlowViewService,
-                 personStore) {
+                 logicalFlowViewService) {
 
     const state = { model: initModel };
 
@@ -93,20 +90,20 @@ function service($q,
 
 
     function loadPerson(employeeId) {
-        return personStore
-            .getByEmployeeId(employeeId)
-            .then(person => state.model.person = person);
+        return serviceBroker
+            .loadViewData(CORE_API.PersonStore.getByEmployeeId, [ employeeId ])
+            .then(r => state.model.person = r.data);
     }
 
 
     function loadRelatedPeople(employeeId) {
-        const directsPromise = personStore
-            .findDirects(employeeId)
-            .then(directs => state.model.directs = directs);
+        const directsPromise = serviceBroker
+            .loadViewData(CORE_API.PersonStore.findDirects, [ employeeId ])
+            .then(r => state.model.directs = r.data);
 
-        const managersPromise = personStore
-            .findManagers(employeeId)
-            .then(managers => state.model.managers = managers);
+        const managersPromise = serviceBroker
+            .loadViewData(CORE_API.PersonStore.findManagers, [ employeeId ])
+            .then(r => state.model.managers = r.data);
 
         return $q.all([
             directsPromise,
@@ -124,10 +121,10 @@ function service($q,
             scope: 'CHILDREN'
         };
 
-        return involvementStore
-            .findEndUserAppsByIdSelector(endUserAppIdSelector)
-            .then(endUserApps => _.map(
-                _.cloneDeep(endUserApps),
+        return serviceBroker
+            .loadViewData(CORE_API.InvolvementStore.findEndUserAppsByIdSelector, [ endUserAppIdSelector ])
+            .then(r => _.map(
+                _.cloneDeep(r.data),
                 a => _.assign(a, {
                     management: 'End User',
                     platform: a.kind,
@@ -142,8 +139,9 @@ function service($q,
 
 
     function buildInvolvementSummaries(employeeId, combinedApps = [], involvementKinds = []) {
-        return involvementStore
-            .findByEmployeeId(employeeId)
+        return serviceBroker
+            .loadViewData(CORE_API.InvolvementStore.findByEmployeeId, [ employeeId ])
+            .then(r => r.data)
             .then(involvements => {
                 const involvementsByKind = _.groupBy(involvements, 'entityReference.kind');
                 const combinedSummary = buildAppInvolvementSummary(combinedApps, _.concat(
@@ -160,19 +158,20 @@ function service($q,
             .all([
                 loadApplications(employeeId, personId),
                 loadEndUserApps(personId),
-                involvementKindService.loadInvolvementKinds()
+                serviceBroker.loadAppData(CORE_API.InvolvementKindStore.findAll).then(r => r.data)
             ])
             .then(([apps, endUserApps, involvementKinds]) => ({combinedApps: _.concat(apps, endUserApps), involvementKinds }))
             .then(({combinedApps, involvementKinds}) => {
-                buildInvolvementSummaries(employeeId, combinedApps, involvementKinds)
+                buildInvolvementSummaries(employeeId, combinedApps, involvementKinds);
             });
     }
 
 
     function loadApplications(employeeId) {
 
-        return involvementStore
-            .findAppsForEmployeeId(employeeId)
+        return serviceBroker
+            .loadViewData(CORE_API.InvolvementStore.findAppsForEmployeeId, [ employeeId ])
+            .then(r => r.data)
             .then((xs = []) => {
                 const apps = _.map(xs, a => _.assign(a, {management: 'IT'}));
                 state.model.apps = apps;
@@ -267,10 +266,7 @@ service.$inject = [
     '$q',
     'ServiceBroker',
     'ComplexityStore',
-    'InvolvementStore',
-    'InvolvementKindService',
-    'LogicalFlowViewService',
-    'PersonStore'
+    'LogicalFlowViewService'
 ];
 
 export default service;

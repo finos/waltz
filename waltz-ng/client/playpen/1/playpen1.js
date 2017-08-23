@@ -27,7 +27,10 @@ function controller(serviceBroker)
 {
     const vm = Object.assign(this, initData);
 
-    serviceBroker.loadViewData(CORE_API.EnumValueStore.findAll).then(r => console.log(r.data));
+    vm.parentEntityRef = {
+        kind: 'CHANGE_INITIATIVE',
+        id: 1
+    };
 }
 
 

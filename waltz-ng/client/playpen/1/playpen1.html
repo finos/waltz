@@ -9,8 +9,29 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-entity-svg-diagrams-section parent-entity-ref="{ kind: 'MEASURABLE', id: 3730 }"></waltz-entity-svg-diagrams-section>
-    <waltz-entity-svg-diagrams-section parent-entity-ref="{ kind: 'MEASURABLE', id: 3731 }"></waltz-entity-svg-diagrams-section>
-    <waltz-entity-svg-diagrams-section parent-entity-ref="{ kind: 'MEASURABLE', id: 4162 }"></waltz-entity-svg-diagrams-section>
+
+
+
+    <!-- PEOPLE -->
+    <waltz-involved-people-section
+        id="people-section"
+        parent-entity-ref="ctrl.parentEntityRef"
+        on-add="ctrl.onAddInvolvement"
+        on-remove="ctrl.onRemoveInvolvement">
+    </waltz-involved-people-section>
+
+
+    <waltz-section name="M" collapsible="true">
+        <span ng-bind="'PRIMARY' | toDisplayName:'AuthoritativenessRating'"></span>
+
+        <waltz-enum-value type="'AuthoritativenessRating'"
+                          show-icon="false"
+                          key="'PRIMARY'">
+        </waltz-enum-value>
+
+    </waltz-section>
+
+
+
 
 </div>

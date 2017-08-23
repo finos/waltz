@@ -40,6 +40,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
@@ -70,7 +71,7 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
-        String summarizeForSelectorPath = mkPath(BASE_URL, "summarize");
+        String summarizePath = mkPath(BASE_URL, "summarize");
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
@@ -92,6 +93,9 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                 (request, response) -> logicalFlowDecoratorService.summarizeForSelector(
                         readIdSelectionOptionsFromBody(request));
 
+        ListRoute<DecoratorRatingSummary> summarizeForAllRoute =
+                (request, response) -> logicalFlowDecoratorService.summarizeForAll();
+
         postForList(
                 findByIdSelectorAndKindPath,
                 findByIdSelectorAndKindRoute);
@@ -105,8 +109,12 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                 findByIdSelectorRoute);
 
         postForList(
-                summarizeForSelectorPath,
+                summarizePath,
                 summarizeForSelectorRoute);
+
+        getForList(
+                summarizePath,
+                summarizeForAllRoute);
 
         postForList(
                 updateDecoratorsPath,
@@ -132,4 +140,5 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
         return logicalFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
     }
+
 }

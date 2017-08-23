@@ -17,15 +17,17 @@
  */
 
 import angular from 'angular';
-
+import * as InvolvementKindStore from './services/involvement-kind-store';
+import {registerStores} from "../common/module-utils";
 
 export default () => {
 
     const module = angular.module('waltz.involvement.kind', []);
 
     module
-        .service('InvolvementKindStore', require('./services/involvement-kind-store'))
         .service('InvolvementKindService', require('./services/involvement-kind-service'));
+
+    registerStores(module, [ InvolvementKindStore]);
 
     return module.name;
 };

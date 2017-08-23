@@ -34,6 +34,8 @@ export function getEditRoleForEntityKind(kind) {
             return 'CAPABILITY_EDITOR';
         case 'ORG_UNIT':
             return 'ORG_UNIT_EDITOR';
+        case 'DATA_TYPE':
+            return 'AUTHORITATIVE_SOURCE_EDITOR';
         default:
             return 'ADMIN';
     }

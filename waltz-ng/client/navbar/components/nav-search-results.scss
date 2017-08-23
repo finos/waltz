@@ -1,7 +1,7 @@
 @import "../../../style/util";
+@import "../../../style/variables";
 
-
-.waltz-nav-search-panel {
+.waltz-nav-search-results {
     top: 52px;
     right: 100px;
     position: absolute;
@@ -10,7 +10,7 @@
     border: 1px solid #ccc;
     @include waltz-box-shadow();
 
-    .wns-results {
+    .wnsr-main {
         margin: 10px;
         padding-right: 10px;
         overflow-y: auto;
@@ -18,8 +18,12 @@
         height: 80vh;
     }
 
-    .wns-has-results {
-        font-weight: bold;
+    .wnsr-category {
+        transition: background-color 300ms;
+    }
+
+    .wnsr-selected {
+        background-color: $waltz-selected-item-bg-color;
     }
 }
 

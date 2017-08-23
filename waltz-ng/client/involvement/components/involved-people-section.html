@@ -1,11 +1,11 @@
-<div>
+<div id="people-section">
     <waltz-section name="People"
                    icon="users"
-                   small="( {{$ctrl.involvements.length}} )"
+                   small="( {{$ctrl.gridData.length}} )"
                    id="involved-people-section">
 
         <waltz-section-actions>
-            <button waltz-has-role-for-entity-kind="{{$ctrl.entityRef.kind}}"
+            <button waltz-has-role-for-entity-kind="{{$ctrl.parentEntityRef.kind}}"
                     ng-click="$ctrl.editMode(true)"
                     class="btn btn-xs btn-primary"
                     ng-if="$ctrl.visibility.editor === false">
@@ -46,7 +46,7 @@
             </div>
 
 
-            <waltz-no-data ng-if="$ctrl.involvements.length == 0">
+            <waltz-no-data ng-if="$ctrl.gridData.length == 0">
                 <message>
                     <strong>
                         No people

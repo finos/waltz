@@ -111,6 +111,7 @@
                      oldTableName="attestation"/>
     </changeSet>
 
+
     <changeSet id="20170808-2474-1a"
                author="kamransaleem"
                dbms="mssql">
@@ -123,6 +124,7 @@
                        constraintName="attestation_1_6_pkey"
                        tableName="attestation_1_6" />
     </changeSet>
+
 
     <changeSet id="20170808-2474-2"
                author="rovats">
