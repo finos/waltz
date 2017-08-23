@@ -21,7 +21,6 @@
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
-import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
@@ -38,7 +37,6 @@ import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
-import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
@@ -68,7 +66,6 @@ export const CORE_API = {
     ActorStore,
     AppGroupStore,
     ApplicationStore,
-    AssetCostStore,
     AttestationInstanceStore,
     AttestationRunStore,
     AssetCostStore,
