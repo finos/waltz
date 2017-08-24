@@ -16,7 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {registerComponents} from "../../common/module-utils";
+import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
+
 function setup(module) {
+
+    registerComponents(module, [ LogicalFlowTypeEditor ]);
+
     module
         .component('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))
         .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
@@ -26,7 +32,6 @@ function setup(module) {
         .component('waltzSourceAndTargetPanel', require('./source-and-target-panel/source-and-target-panel'))
         .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
         .component('waltzLogicalFlowDiagram', require('./boingy-graph/boingy-graph'))
-        .component('waltzLogicalFlowTypeEditor', require('./edit/logical-flow-type-editor'))
         .component('waltzLogicalFlowCounterpartSelector', require('./edit/logical-flow-counterpart-selector'))
         .component('waltzLogicalFlowsTabgroup', require('./logical-flows-tabgroup/logical-flows-tabgroup'))
         .component('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section/logical-flows-tabgroup-section'))
