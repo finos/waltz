@@ -110,12 +110,23 @@
                             </waltz-source-and-target-panel>
 
                             <p class="text-muted small">
-                                Diagram detailing the applications data types (Middle)
-                                from the sending system (LHS)
-                                to the receiving system on the (RHS).
-                                <span style="color: darkred">Red lines</span> indicate non-strategic flows,
-                                <span style="color: orange">Amber</span> indicates secondary and
-                                <span style="color: darkgreen">Green</span> indicates a primary system.
+                                This diagram shows flows categorized by data type to this application (center)
+                                from sending systems (on the left)
+                                and to the receiving system (on the right).
+                                <span style="color: darkred">Red lines</span>
+                                indicate
+                                <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
+                                flows.
+
+                                <span style="color: orange">Amber lines</span>
+                                indicate
+                                <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
+                                flows and
+
+                                <span style="color: darkgreen">Green Lines</span>
+                                indicate
+                                <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
+                                flows.
                             </p>
                         </div>
                     </div>
