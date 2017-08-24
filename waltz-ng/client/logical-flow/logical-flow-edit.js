@@ -20,7 +20,7 @@ import _ from "lodash";
 import { mkTweakers } from './components/source-and-target-graph/source-and-target-utilities';
 import { CORE_API } from '../common/services/core-api-utils';
 import { toEntityRef } from '../common/entity-utils';
-
+import template from './logical-flow-edit.html';
 
 function vetoMove(isDirty) {
     if (isDirty) {
@@ -44,7 +44,6 @@ const initialState = {
     allActors: [],
     app: null,
     appsById: {},
-    dataTypes: [],
     dataTypeUsages: [],
     flows: [],
     isDirty: false,
@@ -106,12 +105,6 @@ function controller($q,
                             vm.flows);
                     });
             });
-
-        serviceBroker
-            .loadAppData(
-                CORE_API.DataTypeStore.findAll,
-                [])
-            .then(r => vm.dataTypes = r.data);
 
         serviceBroker
             .loadViewData(
@@ -321,7 +314,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./logical-flow-edit.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };
