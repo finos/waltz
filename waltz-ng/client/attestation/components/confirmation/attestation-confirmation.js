@@ -4,14 +4,14 @@ import template from './attestation-confirmation.html';
 
 
 const bindings = {
-    attestation: '<',
+    instance: '<',
     onConfirm: '<',
     onCancel: '<'
 };
 
 
 const initialState = {
-    onConfirm: (attestation) => console.log('default onConfirm handler for attestation-confirmation: '+ attestation),
+    onConfirm: (attestation) => console.log('default onConfirm handler for attestation-confirmation: '+ instance),
     onCancel: () => console.log('default onCancel handler for attestation-confirmation')
 };
 
@@ -35,7 +35,8 @@ controller.$inject = [];
 const component = {
     template,
     bindings,
-    controller
+    controller,
+    transclude: true
 };
 
 

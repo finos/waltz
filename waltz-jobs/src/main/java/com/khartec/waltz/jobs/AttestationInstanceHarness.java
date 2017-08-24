@@ -37,7 +37,8 @@ public class AttestationInstanceHarness {
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("admin");
+        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", true);
+        List<AttestationInstance> instancesAll = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", false);
 
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 

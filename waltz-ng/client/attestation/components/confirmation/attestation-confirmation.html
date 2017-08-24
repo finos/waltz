@@ -1,24 +1,31 @@
 <div class="waltz-attestation-confirmation">
-    <span class="wac-declaration">
-        You are attesting that the
-        <span ng-bind="$ctrl.attestation.instance.childEntityKind | toDisplayName:'entity'"
-              class="wac-entity">
-        </span>s
-        for
-        <span ng-bind="$ctrl.attestation.instance.parentEntity.name"
-              class="wac-entity">
-        </span> are correct.
-    </span>
 
-    <span style="padding-left: 30px">
-        <a class="btn btn-success btn-sm"
-           ng-click="$ctrl.confirm($ctrl.attestation)">
-            Confirm
-        </a>
-        <a ng-click="$ctrl.cancel()"
-           class="clickable">
-            Cancel
-        </a>
-    </span>
+    <div class="wac-header">
+        <span class="wac-declaration">
+            You are attesting that the
+            <span ng-bind="$ctrl.instance.childEntityKind | toDisplayName:'entity'"
+                  class="wac-entity">
+            </span>s
+            for
+            <span ng-bind="$ctrl.instance.parentEntity.name"
+                  class="wac-entity">
+            </span> are correct.
+        </span>
+
+        <span style="padding-left: 30px">
+            <a class="btn btn-success btn-sm"
+               ng-click="$ctrl.confirm($ctrl.instance)">
+                Confirm
+            </a>
+            <a ng-click="$ctrl.cancel()"
+               class="clickable">
+                Cancel
+            </a>
+        </span>
+    </div>
+
+    <div class="wac-content">
+        <ng-transclude></ng-transclude>
+    </div>
 
 </div>

@@ -5,10 +5,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.ImmutableAttestationInstance;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -58,6 +55,16 @@ public class AttestationInstanceDao {
     }
 
 
+    public AttestationInstance getById (long id) {
+
+        return dsl.select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .where(ATTESTATION_INSTANCE.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public long create(AttestationInstance attestationInstance) {
         checkNotNull(attestationInstance, "attestationInstance cannot be null");
 
@@ -73,13 +80,18 @@ public class AttestationInstanceDao {
     }
 
 
-    public List<AttestationInstance> findByRecipient(String userId) {
+    public List<AttestationInstance> findByRecipient(String userId, boolean unattestedOnly) {
+        Condition condition = ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId);
+        if(unattestedOnly) {
+            condition = condition.and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
+        }
+
         return dsl.select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
-                .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

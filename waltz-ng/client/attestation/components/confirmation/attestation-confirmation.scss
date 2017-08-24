@@ -1,6 +1,15 @@
 .waltz-attestation-confirmation {
-    text-align: right;
-    padding: 10px;
+    $wac-border-color: $waltz-green-background;
+    border-left: 10px solid $wac-border-color;
+    border-right: 10px solid $wac-border-color;
+    border-bottom: 20px solid $wac-border-color;
+    border-radius: $border-radius-base;
+
+    .wac-header {
+        text-align: right;
+        background-color: $wac-border-color;
+        padding: 10px;
+    }
 
     .wac-declaration {
         font-size: medium;
@@ -8,5 +17,10 @@
 
     .wac-entity {
         font-weight: bold;
+    }
+
+    .wac-content {
+        padding: 10px;
+        width: 85vw;
     }
 }

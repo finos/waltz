@@ -32,9 +32,10 @@ export function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
-    const findByUser = () => {
+    const findByUser = (all = false) => {
+        const filter = all ? 'all' : 'unattested';
         return $http
-            .get(`${base}/user`)
+            .get(`${base}/${filter}/user`)
             .then(result => result.data);
     };
 
@@ -51,7 +52,7 @@ export function store($http, baseApiUrl) {
             .get(`${base}/entity/${ref.kind}/${ref.id}`)
             .then(r => r.data);
     };
-    
+
     return {
         attestInstance,
         findByRunId,

@@ -106,7 +106,7 @@ public class AttestationRunDao {
 
 
     public List<AttestationRun> findByRecipient(String userId) {
-        return dsl.select(ATTESTATION_RUN.fields())
+        return dsl.selectDistinct(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .innerJoin(ATTESTATION_INSTANCE)

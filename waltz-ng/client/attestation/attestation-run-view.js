@@ -38,6 +38,12 @@ function mkInstancesWithRagRating(run = {}, instances = []) {
    return _.map(instances, i => Object.assign({}, i, { rating: mkRagRating(run, i) }));
 }
 
+const ratingOrdinal = {
+    'R': 3,
+    'A': 2,
+    'G': 1,
+    'Z': 0
+};
 
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
@@ -58,7 +64,11 @@ function prepareColumnDefs() {
         {
             field: 'rating',
             name: 'Status',
-            cellTemplate: ratingCellTemplate
+            cellTemplate: ratingCellTemplate,
+            sortingAlgorithm: (a, b) => {
+                if(a.rag == b.rag) return 0;
+                return ratingOrdinal[a.rag] - ratingOrdinal[b.rag];
+            }
         },
         {
             field: 'attestedBy',
@@ -71,9 +81,9 @@ function prepareColumnDefs() {
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
         },
         {
-        name: 'Recipients',
-        cellTemplate: '<div class="ui-grid-cell-contents"><a ng-click="grid.appScope.selectInstance(row.entity)" class="clickable">Show</a></div>'
-}
+            name: 'Recipients',
+            cellTemplate: '<div class="ui-grid-cell-contents"><a ng-click="grid.appScope.selectInstance(row.entity)" class="clickable">Show</a></div>'
+        }
     ];
 
     return initialCols;
@@ -125,4 +135,4 @@ export default {
     template,
     controller,
     controllerAs: 'ctrl'
-}
+};
