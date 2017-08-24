@@ -24,6 +24,8 @@ import attestationConfirmation from './components/confirmation/attestation-confi
 import attestationRunOverview from './components/run-overview/attestation-run-overview';
 import attestationRecipients from './components/recipients/attestation-recipients';
 import attestationSection from './components/section/attestation-section';
+import inlineLogicalFlowPanel from './components/inline-logical-flow-panel/inline-logical-flow-panel';
+import inlinePhysicalFlowPanel from './components/inline-physical-flow-panel/inline-physical-flow-panel';
 import routes from './routes';
 
 export default () => {
@@ -44,7 +46,9 @@ export default () => {
         attestationConfirmation,
         attestationRunOverview,
         attestationRecipients,
-        attestationSection
+        attestationSection,
+        inlineLogicalFlowPanel,
+        inlinePhysicalFlowPanel
     ]);
 
     return module.name;

@@ -6,29 +6,11 @@ import template from './attestation-instance-list-user-view.html';
 
 
 const initialState = {
-    attestationInstancesAndRuns: [],
-    selectedAttestation: null
+    runsWithInstances: [],
+    selectedAttestation: null,
+    showAttested: false
 };
 
-
-function mkAttestationData(attestationRuns = [], attestationInstances = []){
-    const runsById = _.keyBy(attestationRuns, 'id');
-
-    const mappedData = _.map(attestationInstances, instance => {
-        return {
-            'instance': instance,
-            'run': runsById[instance.attestationRunId]
-        }
-    });
-
-    const [incomplete = [], complete = []] = _.partition(mappedData,
-        data => data.instance.attestedAt === null);
-
-    return {
-        'incomplete': incomplete,
-        'complete': complete
-    };
-}
 
 
 function controller($q,
@@ -47,26 +29,39 @@ function controller($q,
             .then(r => r.data);
 
         const instancesPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationInstanceStore.findByUser, [], {force: true})
+            .loadViewData(CORE_API.AttestationInstanceStore.findByUser, [vm.showAttested], {force: true})
             .then(r => r.data);
 
         $q.all([runsPromise, instancesPromise])
-            .then(([runs, instances]) => vm.attestations = mkAttestationData(runs, instances));
+            .then(([runs, instances]) => {
+                const instancesByRunId = _.groupBy(instances, 'attestationRunId');
+
+                vm.runsWithInstances =  _.chain(runs)
+                    .map(r => Object.assign({}, r, { instances: instancesByRunId[r.id]}))
+                    .filter(r => r.instances)
+                    .value();
+            });
     };
 
     loadData();
 
     // interaction
-    vm.attestEntity = (attestation) => {
+    vm.attestEntity = (instance) => {
         serviceBroker
-            .execute(CORE_API.AttestationInstanceStore.attestInstance, [attestation.instance.id])
+            .execute(CORE_API.AttestationInstanceStore.attestInstance, [instance.id])
             .then(() => loadData())
             .then(() => vm.selectedAttestation = null);
     };
 
     vm.cancelAttestation = () => {
         vm.selectedAttestation = null;
-    }
+    };
+
+    vm.toggleFilter = () => {
+        vm.showAttested = !vm.showAttested;
+        loadData();
+    };
+
 }
 
 
