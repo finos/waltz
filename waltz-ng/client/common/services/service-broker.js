@@ -127,6 +127,7 @@ function loadData($injector,
     })).catch(error => {
         //evict the cache entry because it's in error
         cache.delete(cacheKey);
+        console.warn(`SERVICE LOAD ERROR: ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams);
         throw error;
     });
     return resultPromise;
@@ -175,7 +176,8 @@ function service($injector) {
         const service = $injector.get(serviceName);
         const serviceFn = getFunction(service, serviceName, serviceFnName);
         return serviceFn(...targetParams)
-            .then(data => ({data}));
+            .then(data => ({data}))
+            .catch(error => console.warn(`SERVICE EXECUTE ERROR: ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams));
     };
 
     const resetViewData = () => {
