@@ -18,6 +18,8 @@
 
 import _ from "lodash";
 import {notEmpty} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './logical-flow-type-editor.html';
 
 
 const bindings = {
@@ -31,14 +33,10 @@ const bindings = {
 };
 
 
-const template = require('./logical-flow-type-editor.html');
-
-
 const initialState = {
     title: '-',
     flow: null,
     decorators: [],
-    allDataTypes: [],
     checkedItemIds: [],
     expandedItemIds: [],
     originalSelectedItemIds: [],
@@ -89,15 +87,29 @@ function mkUpdateCommand(flow, selectedIds = [], originalIds = []) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
 
     const vm = _.defaultsDeep(this, initialState);
 
-    vm.$onChanges = (changes) => {
+    const refresh = () => {
         vm.title = mkTitle(vm.flow);
         vm.checkedItemIds = mkSelectedTypeIds(vm.decorators);
         vm.originalSelectedItemIds = mkSelectedTypeIds(vm.decorators);
         vm.expandedItemIds = mkSelectedTypeIds(vm.decorators);
+    };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => {
+                vm.allDataTypes = r.data;
+                vm.allDataTypesById = _.keyBy(r.data, 'id');
+                refresh();
+            });
+    };
+
+    vm.$onChanges = () => {
+        refresh();
     };
 
     vm.save = () => {
@@ -119,7 +131,16 @@ function controller() {
     vm.typeSelected = (id) => {};
 
     vm.typeChecked = (id) => {
-        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+        // deselect any parents that are non-concrete
+        let dt = vm.allDataTypesById[id];
+        while (dt) {
+            const parent = vm.allDataTypesById[dt.parentId];
+            if (_.get(parent, 'concrete', true) === false) {
+                vm.typeUnchecked(parent.id);
+            }
+            dt = parent;
+        }
+        vm.checkedItemIds = _.union(vm.checkedItemIds, [id]);
     };
 
     vm.toggleTypeChecked = (id) => {
@@ -134,11 +155,14 @@ function controller() {
 }
 
 
-const component = {
+controller.$inject = ['ServiceBroker'];
+
+
+export const component = {
     bindings,
     controller,
     template
 };
 
+export const id = 'waltzLogicalFlowTypeEditor';
 
-export default component;

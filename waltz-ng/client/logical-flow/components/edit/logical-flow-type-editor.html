@@ -16,11 +16,12 @@
                                              on-uncheck="$ctrl.typeUnchecked"
                                              checked-item-ids="$ctrl.checkedItemIds"
                                              expanded-item-ids="$ctrl.expandedItemIds">
-                <strong ng-bind="node.name">
+                <strong ng-bind="node.name"
+                        uib-popover-template="'wlfte-popup.html'"
+                        popover-popup-delay="300"
+                        popover-append-to-body="true"
+                        popover-trigger="mouseenter">
                 </strong>
-                <span class="text-muted small"
-                      ng-bind="node.description">
-                </span>
             </waltz-multi-select-tree-control>
 
             <!-- ACTIONS -->
@@ -42,4 +43,18 @@
 
         </div>
     </div>
+
+    <script type="text/ng-template"
+            id="wlfte-popup.html">
+        <strong ng-bind="node.name"></strong>
+        <p class="small text-muted"
+           ng-bind="node.description">
+        </p>
+        <div class="alert alert-warning small" ng-if="!node.concrete">
+            Direct mappings have been disabled for this data type.
+            <span ng-if="$ctrl.checkedItemIds.indexOf(node.id) > -1">
+                Please remove this mapping by selecting a more specific sub type.
+            </span>
+        </div>
+    </script>
 </div>
