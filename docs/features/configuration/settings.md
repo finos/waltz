@@ -44,6 +44,11 @@ Features can be enabled/disabled and configured via settings.  Currently availab
     * (```true|false```) display software-catalog (technology sections)
 
 
+## General Settings (```settings.*```)
+
+* ```settings.asset-cost.default-currency```
+    * currency code, defaults to `EUR`
+
 ## Defaults
 
 General default settings
