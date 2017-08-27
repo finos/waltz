@@ -44,7 +44,8 @@ for removal in version 1.7  ( [Github issue](https://github.com/khartec/waltz/is
 The system property can be defined in the settings table, similar to:
 
 ```
-INSERT INTO waltztest.settings (name, value, restricted) VALUES ('settings.asset-cost.default-currency', 'USD', false);
+INSERT INTO settings (name, value, restricted) 
+  VALUES ('settings.asset-cost.default-currency', 'USD', false);
 ```
 
 If not set it default to `EUR`.
