@@ -1,6 +1,7 @@
 # Features
 
 - [Application Groups](app_groups/app_groups.md)
+- [Asset Costs](asset_costs/asset_costs.md)
 - [Logical Flows](logical_flows/logical_flows.md)
 - [Flow Diagrams](flow_diagrams/flow_diagram.md)
 - [Measurables](measurables/measurables.md)

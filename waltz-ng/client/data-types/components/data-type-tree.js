@@ -19,18 +19,66 @@
 import _ from 'lodash';
 import {CORE_API} from "../../common/services/core-api-utils";
 import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../common/hierarchy-utils';
-
+import template from './data-type-tree.html';
 
 const bindings = {
     onSelection: '<'
 };
 
 
-const template = require('./data-type-tree.html');
+function ratingToRag(r) {
+    switch(r){
+        case 'PRIMARY':
+            return 'G';
+        case 'SECONDARY':
+            return 'A';
+        case 'DISCOURAGED':
+            return 'R';
+        case 'NO_OPINION':
+            return 'Z';
+        default:
+            return r;
+    }
+}
 
 
-function prepareTree(dataTypes = []) {
-    const hierarchy = switchToParentIds(buildHierarchies(dataTypes));
+function prepareTree(dataTypes = [], usageCounts = []) {
+    const dataTypesById = _.keyBy(dataTypes, 'id');
+    _.chain(usageCounts)
+        .filter(uc => uc.decoratorEntityReference.kind === 'DATA_TYPE')
+        .forEach(uc => {
+            const dtId = uc.decoratorEntityReference.id;
+            const dt = dataTypesById[dtId];
+            const rag = ratingToRag(uc.rating);
+            const directCounts = Object.assign({}, dt.directCounts, { [rag] : uc.count });
+            dt.directCounts = directCounts;
+        })
+        .value();
+
+    const hierarchy = switchToParentIds(buildHierarchies(_.values(dataTypesById)));
+
+    const sumBy = (rating, n) => {
+        if (!n) return 0;
+        const childTotals = _.sum(_.map(n.children, c => sumBy(rating, c)));
+        const total = childTotals + _.get(n, `directCounts.${rating}`, 0);
+        n.cumulativeCounts = Object.assign({}, n.cumulativeCounts, { [rating] : total });
+        return total;
+    };
+
+    _.forEach(hierarchy, root => {
+        const R = sumBy('R', root);
+        const A = sumBy('A', root);
+        const G = sumBy('G', root);
+        const Z = sumBy('Z', root);
+        root.cumulativeCounts = {
+            R,
+            A,
+            G,
+            Z,
+            total: R + A + G + Z
+        };
+    });
+
     return hierarchy;
 }
 
@@ -45,13 +93,23 @@ function prepareExpandedNodes(hierarchy = []) {
 function controller(serviceBroker) {
     const vm = this;
 
-    serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll, [])
-        .then(r => {
-            const dataTypes = r.data;
-            vm.hierarchy = prepareTree(dataTypes);
-            vm.searchNodes = prepareSearchNodes(dataTypes);
-        });
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll, [])
+            .then(r => {
+                vm.dataTypes = r.data;
+                vm.searchNodes = prepareSearchNodes(vm.dataTypes);
+            })
+            .then(() => serviceBroker.loadViewData(CORE_API.LogicalFlowDecoratorStore.summarizeForAll))
+            .then(r => {
+                vm.hierarchy = prepareTree(vm.dataTypes, r.data);
+                vm.maxTotal = _
+                    .chain(vm.hierarchy)
+                    .map('cumulativeCounts.total')
+                    .max()
+                    .value();
+            });
+    };
 
 
     vm.treeOptions = {
@@ -70,7 +128,6 @@ function controller(serviceBroker) {
         vm.searchTermsChanged('');
         vm.searchTerms = '';
     };
-
 }
 
 
@@ -79,11 +136,12 @@ controller.$inject = [
 ];
 
 
-const component = {
+export const component = {
     bindings,
     template,
     controller
 };
 
 
-export default component;
+export const id = 'waltzDataTypeTree';
+

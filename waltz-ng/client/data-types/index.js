@@ -17,16 +17,17 @@
  */
 
 import angular from "angular";
-import {registerStore} from "../common/module-utils";
-import dataTypeStore from "./services/data-type-store";
-
+import {registerComponents, registerStores} from "../common/module-utils";
+import DataTypeStore from "./services/data-type-store";
+import * as DataTypeTree from './components/data-type-tree';
 
 export default () => {
     const module = angular.module('waltz.data.types', []);
 
     module.config(require('./routes'));
 
-    registerStore(module, dataTypeStore);
+    registerStores(module, [ DataTypeStore ]);
+    registerComponents(module, [ DataTypeTree ]);
 
     module
         .service('DataTypeViewDataService', require('./services/data-type-view-data'));
@@ -34,7 +35,6 @@ export default () => {
     module
         .component('waltzDataTypeOverview', require('./components/data-type-overview'))
         .component('waltzRatedFlowBoingyGraph', require('./components/rated-flow-boingy-graph'))
-        .component('waltzDataTypeTree', require('./components/data-type-tree'))
         .component('waltzDataTypeOriginators', require('./components/data-type-originators'));
 
     return module.name;

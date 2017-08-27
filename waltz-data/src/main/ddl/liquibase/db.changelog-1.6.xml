@@ -220,7 +220,7 @@
             </column>
             <column name="icon_name"
                     type="${enum.type}"
-                    remarks="The default value 'fw', stands for fixed-width which acts like a spacer icon"
+                    remarks="The default value fw, stands for fixed-width which acts like a spacer icon"
                     defaultValue="fw">
                 <constraints nullable="false"/>
             </column>
@@ -403,6 +403,30 @@
             <column name="value"
                     value="EUR"/>
         </insert>
+    </changeSet>
+
+
+    <!-- 2523: Correcting Typo -->
+    <changeSet id="20170823-2523-1"
+               author="davidwatkins73"
+               dbms="mysql">
+        <update tableName="enum_value">
+            <column name="display_name"
+                    value="No Opinion"
+                    type="${name.type}"/>
+            <where>'key' = 'NO_OPINION' AND 'type' = 'AuthoritativenessRating'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20170823-2523-1"
+               author="davidwatkins73"
+               dbms="mssql">
+        <update tableName="enum_value">
+            <column name="display_name"
+                    value="No Opinion"
+                    type="${name.type}"/>
+            <where>[key] = 'NO_OPINION' AND [type] = 'AuthoritativenessRating'</where>
+        </update>
     </changeSet>
 
 </databaseChangeLog>

@@ -207,6 +207,11 @@ public class LogicalFlowDecoratorService {
     }
 
 
+    public List<DecoratorRatingSummary> summarizeForAll() {
+        return logicalFlowDecoratorDao.summarizeForAll();
+    }
+
+
     // --- HELPERS ---
 
     private Collection<LogicalFlowDecorator> findByDataTypeIdSelector(IdSelectionOptions options) {
