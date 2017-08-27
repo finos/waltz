@@ -17,17 +17,17 @@
  */
 
 import angular from 'angular';
-
+import * as DatabaseStore from './services/database-store';
+import {registerStores} from "../common/module-utils";
 
 export default () => {
 
     const module = angular.module('waltz.databases', []);
 
     module
-        .service('DatabaseStore', require('./services/database-store'));
-
-    module
         .component('waltzDatabasePies', require('./components/database-pies'));
+
+    registerStores(module, [DatabaseStore]);
 
     return module.name;
 };

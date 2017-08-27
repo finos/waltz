@@ -19,7 +19,7 @@
 import _ from 'lodash';
 
 
-function service($http, baseUrl) {
+export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/database`;
 
@@ -52,7 +52,26 @@ function service($http, baseUrl) {
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http', 'BaseApiUrl'];
 
 
-export default service;
+export const serviceName = 'DatabaseStore';
+
+
+export const DatabaseStore_API = {
+    findByAppId: {
+        serviceName,
+        serviceFnName: 'findByAppId',
+        description: 'executes findByAppId'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
+    findStatsForSelector: {
+        serviceName,
+        serviceFnName: 'findStatsForSelector',
+        description: 'executes findStatsForSelector'
+    },
+};

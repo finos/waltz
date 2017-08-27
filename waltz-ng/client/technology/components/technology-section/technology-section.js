@@ -17,23 +17,13 @@
  */
 
 import _ from "lodash";
-import {termSearch, perhaps} from "../../common";
-
-const BINDINGS = {
-    softwareCatalog: '<',
-    servers: '<',
-    databases: '<',
-    sourceDataRatings: '<'
-};
+import {termSearch, perhaps} from "../../../common";
+import template from './technology-section.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
-const FIELDS_TO_SEARCH = {
-    SOFTWARE: [
-        'vendor',
-        'name',
-        'version',
-        'maturityStatus'
-    ]
+const bindings = {
+    parentEntityRef: '<'
 };
 
 
@@ -83,7 +73,10 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             displayName: 'Virtual',
             width: "5%",
             filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon></div>'
+            cellTemplate: `
+                <div class="ui-grid-cell-contents"> 
+                    <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon>
+                </div>`
         },
         { field: 'operatingSystem', displayName: 'OS' },
         { field: 'operatingSystemVersion', displayName: 'Version' },
@@ -153,102 +146,85 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
 
 
 
-function controller($animate, $scope, uiGridConstants) {
+function controller($animate, uiGridConstants, serviceBroker) {
 
     const vm = this;
 
-    const watchExpressionForQueries = [
-        'ctrl.qry',
-        'ctrl.softwareCatalog.packages',
-        'ctrl.servers',
-        'ctrl.databases'
-    ];
 
-    $scope.$watchGroup(
-        watchExpressionForQueries,
-        ([qry, packages = [], servers = [], databases = []]) => {
-            if (qry) {
-                vm.filteredSoftwareCatalog = {
-                    usages: vm.softwareCatalog.usages,
-                    packages: termSearch(packages, qry, FIELDS_TO_SEARCH.SOFTWARE)
-                };
-                vm.filteredServers = termSearch(servers, qry);
-                vm.filteredDatabases = termSearch(databases, qry);
-            } else {
-                vm.filteredSoftwareCatalog = vm.softwareCatalog;
-                vm.filteredServers = servers;
-                vm.filteredDatabases = databases;
-            }
+    function refresh(qry) {
+        if (qry) {
+            vm.filteredServers = termSearch(vm.servers, qry);
+            vm.filteredDatabases = termSearch(vm.databases, qry);
+            console.log('sr', qry, vm.servers.length, vm.filteredServers.length)
+        } else {
+            vm.filteredServers = vm.servers;
+            vm.filteredDatabases = vm.databases;
         }
-    );
+    }
 
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.ServerInfoStore.findByAppId,
+                [ vm.parentEntityRef.id ])
+            .then(r => {
+                vm.servers = r.data;
+                _.forEach(vm.servers,
+                    (s) => Object.assign(s, {
+                        "isHwEndOfLife": isEndOfLife(s.hardwareEndOfLifeStatus),
+                        "isOperatingSystemEndOfLife": isEndOfLife(s.operatingSystemEndOfLifeStatus)
+                    })
+                );
+                vm.serverGridOptions.data = vm.servers;
+            })
+            .then(() => refresh(vm.qry));
 
-    $scope.$watch(
-        'ctrl.softwareCatalog.usages',
-        (usages = []) => {
-            vm.softwareUsages = _.chain(usages)
-                .groupBy('provenance')
-                .value();
-        }
-    );
+        serviceBroker
+            .loadViewData(
+                CORE_API.DatabaseStore.findByAppId,
+                [ vm.parentEntityRef.id ])
+            .then(r => {
+                vm.databases = r.data;
+                _.forEach(vm.databases,
+                    (db) => Object.assign(db, {
+                        "isEndOfLife": isEndOfLife(db.endOfLifeStatus)
+                    })
+                );
+                vm.databaseGridOptions.data = vm.databases;
+            })
+            .then(() => refresh(vm.qry));
 
-    $scope.$watch(
-        'ctrl.servers',
-        servers => {
-            _.forEach(servers,
-                (svr) => Object.assign(svr, {
-                    "isHwEndOfLife": isEndOfLife(svr.hardwareEndOfLifeStatus),
-                    "isOperatingSystemEndOfLife": isEndOfLife(svr.operatingSystemEndOfLifeStatus)
-                })
-            );
-            vm.serverGridOptions.data = servers;
-        }
-    );
-
-    $scope.$watch(
-        'ctrl.databases',
-        databases => {
-            _.forEach(databases,
-                (db) => Object.assign(db, {
-                    "isEndOfLife": isEndOfLife(db.endOfLifeStatus)
-                })
-            );
-            vm.databaseGridOptions.data = databases;
-        }
-    );
-
+    };
 
     vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);
     vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
 
+    vm.doSearch = () => refresh(vm.qry);
+
 
     vm.hasAnyData = () => {
-        const hasSoftware = perhaps(() => vm.softwareCatalog.packages.length > 0, false);
         const hasServers = perhaps(() => vm.servers.length > 0, false);
         const hasDatabases = perhaps(() => vm.databases.length > 0, false);
-
-        return hasSoftware || hasServers || hasDatabases;
-    }
-
+        return hasServers || hasDatabases;
+    };
 }
 
 
 controller.$inject = [
     '$animate',
-    '$scope',
-    'uiGridConstants'
+    'uiGridConstants',
+    'ServiceBroker'
 ];
 
 
-const directive = {
-    restrict: 'E',
-    replace: true,
-    scope: {},
-    template: require('./technology-section.html'),
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
+const component = {
+    template,
+    bindings,
     controller
 };
 
+export default {
+    id: 'waltzTechnologySection',
+    component
+};
 
-export default () => directive;

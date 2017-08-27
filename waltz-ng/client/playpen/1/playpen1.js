@@ -50,6 +50,15 @@ const peopleWidget = {
     icon: 'users'
 };
 
+const technologyWidget = {
+    template: `
+        <waltz-technology-section parent-entity-ref="$ctrl.parentEntityRef" >
+        </waltz-technology-section>`,
+    id: 'technology-widget',
+    name: 'Technology',
+    icon: 'server'
+};
+
 
 const entityNamedNoteWidget = {
     template: `
@@ -94,7 +103,7 @@ const initData = {
     id: 134,
     parentEntityRef: {
         kind: 'APPLICATION',
-        id: 25821
+        id: 28083
     },
     visibility: {
         flows: false
@@ -105,6 +114,7 @@ const initData = {
         flowDiagramsWidget,
         bookmarkWidget,
         entityNamedNoteWidget,
+        technologyWidget,
         peopleWidget,
         costsWidget,
         changesWidget]
@@ -116,7 +126,8 @@ function controller()
     const vm = Object.assign(this, initData);
 
     vm.$onInit = () => {
-        vm.addWidget(bookmarkWidget)
+        vm.addWidget(bookmarkWidget);
+        vm.addWidget(technologyWidget);
     };
 
     vm.addWidget = w => {
