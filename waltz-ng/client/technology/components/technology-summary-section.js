@@ -24,13 +24,14 @@ import template from  './technology-summary-section.html';
 
 const bindings = {
     parentEntityRef: '<',
-    scope: '@'
+    scope: '@?'
 };
 
 
 const initialState = {
     stats: {},
-    hasAnyData: false
+    hasAnyData: false,
+    scope: 'CHILDREN'
 };
 
 

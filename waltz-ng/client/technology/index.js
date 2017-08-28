@@ -21,7 +21,7 @@ import TechnologyStatisticsService from './services/technology-statistics-servic
 import TechnologySummarySection from './components/technology-summary-section';
 import GroupTechnologySummary from './components/group-technology-summary';
 import TechnologySummaryPies from './components/technology-summary-pies';
-
+import TechnologySection from './components/technology-section/technology-section';
 
 export default () => {
     const module = angular.module('waltz.technology', []);
@@ -31,11 +31,9 @@ export default () => {
     registerComponents(module, [
         GroupTechnologySummary,
         TechnologySummaryPies,
-        TechnologySummarySection
+        TechnologySummarySection,
+        TechnologySection
     ]);
-
-    module
-        .directive('waltzTechnologySection', require('./directives/technology-section'));
 
     return module.name;
 };

@@ -1,14 +1,4 @@
 <div>
-    <div ng-if="$ctrl.softwareCatalog.packages.length > 0">
-        <h4 class="text-center">
-            <waltz-icon name="leaf"></waltz-icon>
-            Software Packages
-        </h4>
-        <waltz-simple-software-usage-pies packages="$ctrl.softwareCatalog.packages"
-                                          usages="$ctrl.softwareCatalog.usages">
-        </waltz-simple-software-usage-pies>
-    </div>
-
     <div style="border-top: 2px dotted #ddd; margin-top: 4px; margin-bottom: 8px;"
          ng-if="$ctrl.servers.length > 0">
         <h4 class="text-center">

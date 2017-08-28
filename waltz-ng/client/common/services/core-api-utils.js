@@ -26,6 +26,7 @@ import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/servi
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
+import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
@@ -52,6 +53,7 @@ import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspe
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
+import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
@@ -68,6 +70,7 @@ export const CORE_API = {
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
+    DatabaseStore,
     DataTypeStore,
     DataTypeUsageStore,
     EndUserAppStore,
@@ -94,6 +97,7 @@ export const CORE_API = {
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
     PhysicalSpecificationStore,
+    ServerInfoStore,
     SettingsStore,
     SourceDataRatingStore,
     StaticPanelStore,

@@ -17,7 +17,6 @@
  */
 
 const bindings = {
-    softwareCatalog: '<',
     servers: '<',
     databases: '<',
 };
