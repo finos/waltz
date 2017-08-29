@@ -1,22 +1,38 @@
-<div class="waltz-nav-search-results">
-    <div class="wnsr-main">
-        <h4>
-            Search Results:
-            <span ng-bind="$ctrl.query"></span>
-            <small class="pull-right">
-                <a class="clickable"
-                   ng-click="$ctrl.dismiss()">
-                    <waltz-icon name="close"></waltz-icon>
-                </a>
-            </small>
-        </h4>
+<div class="waltz-nav-search-overlay waltz-fade-if"
+     ng-if="$ctrl.visible">
 
-        <hr>
+    <div class="wnso-main">
+        <!-- Dismiss -->
+        <small class="pull-right">
+            <a class="clickable"
+               ng-click="$ctrl.dismiss()">
+                <waltz-icon name="close"></waltz-icon>
+            </a>
+        </small>
+
+        <!-- Search Control -->
+        <div class="wnso-search-region">
+            <waltz-icon name="search"
+                        ng-class="{
+                    'wnso-search-active' : $ctrl.query.length > 0,
+                    'wnso-search-inactive' : $ctrl.query.length == 0
+                }">
+            </waltz-icon>
+            <input type='search'
+                   class="form-control"
+                   ng-model="$ctrl.query"
+                   ng-model-options="{ debounce: 250 }"
+                   ng-change="$ctrl.doSearch()"
+                   autocomplete="off"
+                   autofocus="autofocus"
+                   placeholder="Search"
+                   ng-keydown="$ctrl.onKeypress($event)" />
+        </div>
 
         <div class="row">
 
             <!-- FILTERS -->
-            <div class="col-md-4">
+            <div class="col-sm-4">
                 <table class="table table-condensed">
                     <colgroup>
                         <col width="85%">
@@ -30,10 +46,10 @@
                         </tr>
                     </thead>
                     <tr ng-repeat="category in $ctrl.categories"
-                        class="wnsr-category"
+                        class="wnso-category"
                         ng-class="{
                         'clickable' : $ctrl.results[category].length > 0,
-                        'wnsr-selected': $ctrl.selectedCategory === category
+                        'wnso-selected': $ctrl.selectedCategory === category
                     }"
                         ng-click="$ctrl.toggleCategory(category)">
                         <td>
@@ -53,7 +69,7 @@
 
 
             <!-- RESULTS -->
-            <div class="col-md-8">
+            <div class="col-sm-8">
                 <table class="table table-condensed table-striped table-hover">
                     <thead>
                     <tr>
