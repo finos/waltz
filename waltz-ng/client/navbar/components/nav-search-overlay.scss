@@ -1,7 +1,7 @@
 @import "../../../style/util";
 @import "../../../style/variables";
 
-.waltz-nav-search-results {
+.waltz-nav-search-overlay {
     top: 52px;
     right: 100px;
     position: absolute;
@@ -10,7 +10,7 @@
     border: 1px solid #ccc;
     @include waltz-box-shadow();
 
-    .wnsr-main {
+    .wnso-main {
         margin: 10px;
         padding-right: 10px;
         overflow-y: auto;
@@ -18,11 +18,30 @@
         height: 80vh;
     }
 
-    .wnsr-category {
+    .wnso-search-region {
+        margin-left: 24px;
+        padding-bottom: 12px;
+
+        input {
+            display: inline-block;
+            width: 60%;
+            margin-left: 4px;
+        }
+    }
+
+    .wnso-search-active {
+        color: #32a226;
+    }
+
+    .wnso-search-inactive {
+        color: #858c85;
+    }
+
+    .wnso-category {
         transition: background-color 300ms;
     }
 
-    .wnsr-selected {
+    .wnso-selected {
         background-color: $waltz-selected-item-bg-color;
     }
 }
