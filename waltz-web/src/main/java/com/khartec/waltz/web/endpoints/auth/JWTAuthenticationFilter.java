@@ -43,7 +43,7 @@ public class JWTAuthenticationFilter extends WaltzFilter {
     public JWTAuthenticationFilter(SettingsService settingsService) {
         super(settingsService);
         try {
-            Algorithm algorithm = Algorithm.HMAC256(JWTUtilities.SECRET);
+            Algorithm algorithm = Algorithm.HMAC512(JWTUtilities.SECRET);
             verifier = JWT.require(algorithm)
                     .withIssuer(JWTUtilities.ISSUER)
                     .build(); //Reusable verifier instance

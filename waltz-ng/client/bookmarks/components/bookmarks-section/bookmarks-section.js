@@ -16,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData,isEmpty} from "../../../common";
+import {initialiseData} from "../../../common";
 
 import template from './bookmarks-section.html';
 
@@ -30,40 +29,38 @@ const bindings = {
 
 
 const initialState = {
-    filteredBookmarks: [],
-    bookmarkKind: null,
-    showFilter: false
+    showFilter: false,
+    visibility: {
+        editor: false
+    }
 };
 
-
-function filterBookmarks(bookmarks = [], kind = null) {
-    if (isEmpty(bookmarks)) return [];
-
-    const byKind = _.groupBy(bookmarks, 'kind');
-
-    const groupsToShow = kind
-        ? { kind : byKind[kind] }
-        : byKind;
-
-    return _.map(groupsToShow, (v, k) => ({ kind: k, bookmarks: v }));
-}
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const load = (force = false) => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.BookmarkStore.findByParent,
+                [ vm.parentEntityRef ],
+                { force })
+            .then(r => vm.bookmarks = r.data);
+    };
+
     vm.$onInit = () => {
         if(vm.parentEntityRef) {
-            serviceBroker
-                .loadViewData(CORE_API.BookmarkStore.findByParent, [vm.parentEntityRef])
-                .then(r => vm.bookmarks = r.data)
-                .then(() => vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind));
+            load();
         }
     };
 
-    vm.selectBookmarkKind = (kind) => {
-        vm.bookmarkKind = kind;
-        vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind);
+    vm.onReload = () => {
+        load(true);
+    };
+
+    vm.onDismiss = () => {
+        vm.visibility.editor = false;
     };
 }
 
