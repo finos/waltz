@@ -6,6 +6,7 @@ import com.khartec.waltz.common.StringUtilities;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -19,10 +20,12 @@ import java.util.Map;
 @Service
 public class WaltzEmailer {
 
-    private static final String FROM_ADDRESS = "waltz.support@db.com";
     private static final String DEFAULT_EMAIL_TEMPLATE_LOCATION = "/templates/waltz-email-template.ftlh";
 
     private final JavaMailSender mailSender;
+
+    @Value("${waltz.from.email}")
+    private String fromEmail;
 
 
     @Autowired
@@ -43,7 +46,7 @@ public class WaltzEmailer {
         final MimeMessagePreparator preparator = mimeMessage -> {
             final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
             message.setSubject(subject);
-            message.setFrom(FROM_ADDRESS);
+            message.setFrom(fromEmail);
             message.setTo(to);
             message.addAttachment("waltz.png", IOUtilities.getFileResource("/images/waltz.png"));
             message.addAttachment("vendor-logo", IOUtilities.getFileResource("/templates/images/vendor-logo.png"));
