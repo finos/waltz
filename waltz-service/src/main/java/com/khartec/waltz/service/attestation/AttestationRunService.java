@@ -9,7 +9,6 @@ import com.khartec.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.attestation.*;
-import com.khartec.waltz.model.email.ImmutableEmailNotification;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.email.EmailService;
 import org.jooq.Record1;
@@ -249,12 +248,7 @@ public class AttestationRunService {
                 + attestationRunCreateCommand.description() +  MAIL_NEW_LINE +  MAIL_NEW_LINE
                 + "Please use this URL to view your pending attestations: " + attestationsUrl;
 
-        emailService.sendEmailNotification(ImmutableEmailNotification
-                .builder()
-                .subject(subject)
-                .body(body)
-                .recipients(recipientEmails)
-                .build());
+        emailService.sendEmailNotification(subject, body, recipientEmails);
     }
 
 }
