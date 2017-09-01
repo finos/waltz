@@ -19,6 +19,7 @@
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
@@ -26,6 +27,7 @@ import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/servi
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
+import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
@@ -34,6 +36,7 @@ import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-nam
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
+import {EntityTagStore_API as EntityTagStore} from "../../entity-tags/services/entity-tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
@@ -63,6 +66,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 export const CORE_API = {
     ActorStore,
+    AliasStore,
     AppGroupStore,
     ApplicationStore,
     AssetCostStore,
@@ -70,6 +74,7 @@ export const CORE_API = {
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
+    ComplexityStore,
     DatabaseStore,
     DataTypeStore,
     DataTypeUsageStore,
@@ -78,6 +83,7 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntitySearchStore,
     EntityStatisticStore,
+    EntityTagStore,
     EnumValueStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,

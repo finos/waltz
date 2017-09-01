@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import * as AliasStore from './services/alias-store';
+import {registerStores} from "../common/module-utils";
+
 
 function setup() {
-
     const module = angular.module('waltz.alias', []);
-
-    module
-        .service('AliasStore', require('./services/alias-store'));
-
+    registerStores(module, [AliasStore]);
     return module.name;
 }
 
