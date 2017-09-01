@@ -17,6 +17,7 @@
  */
 
 import AppCostsSection from './components/app-costs-section/app-costs-section';
+import AppOverview from './components/overview/app-overview';
 import { registerComponents } from '../common/module-utils';
 
 export default () => {
@@ -29,7 +30,6 @@ export default () => {
         .config(require('./routes'));
 
     module
-        .directive('waltzAppOverviewSection', require('./directives/app-overview-section'))
         .directive('waltzAppSelector', require('./directives/app-selector'))
         .directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'))
         .directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
@@ -37,13 +37,15 @@ export default () => {
     module
         .component('waltzAppsByInvestmentPie', require('./components/apps-by-investment-pie'))
         .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
-        .component('waltzAppOverview', require('./components/app-overview'))
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
         .component('waltzAppTable', require('./components/app-table'))
         .component('waltzRelatedAppsSection', require('./components/related-apps-section/related-apps-section'));
 
-    registerComponents(module, [ AppCostsSection ]);
+    registerComponents(
+        module, [
+            AppCostsSection,
+            AppOverview ]);
 
     return module.name;
 };

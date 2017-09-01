@@ -19,40 +19,63 @@
 import _ from 'lodash';
 
 
-export default [
+export function store($http, BaseApiUrl) {
+
+    const BASE = `${BaseApiUrl}/complexity`;
+
+    const findByApplication = id => {
+        console.log('DEPRECATED (1.2) - complexity-store:findByApplication');
+        return $http
+            .get(`${BASE}/application/${id}`)
+            .then(result => result.data);
+    };
+
+    const findBySelector = (id, kind, scope = 'CHILDREN') => {
+        const options = _.isObject(id)
+            ? id
+            : {scope, entityReference: {id, kind}};
+
+        return $http
+            .post(BASE, options)
+            .then(result => result.data);
+    };
+
+    const recalculateAll = () =>
+        $http
+            .get(`${BASE}/rebuild`)
+            .then(r => r.data);
+
+
+    return {
+        findByApplication,
+        findBySelector,
+        recalculateAll
+    };
+}
+
+store.$inject = [
     '$http',
     'BaseApiUrl',
-    ($http, BaseApiUrl) => {
-
-        const BASE = `${BaseApiUrl}/complexity`;
-
-        const findByApplication = id => {
-            console.log('DEPRECATED (1.2) - complexity-store:findByApplication');
-            return $http
-                .get(`${BASE}/application/${id}`)
-                .then(result => result.data);
-        };
-
-        const findBySelector = (id, kind, scope = 'CHILDREN') => {
-            const options = _.isObject(id)
-                ? id
-                : {scope, entityReference: {id, kind}};
-
-            return $http
-                .post(BASE, options)
-                .then(result => result.data);
-        };
-
-        const recalculateAll = () =>
-            $http
-                .get(`${BASE}/rebuild`)
-                .then(r => r.data);
-
-
-        return {
-            findByApplication,
-            findBySelector,
-            recalculateAll
-        };
-    }
 ];
+
+export const serviceName = 'ComplexityStore';
+
+export const ComplexityStore_API = {
+    findByApplication: {
+        serviceName,
+        serviceFnName: 'findByApplication',
+        description: 'executes findByApplication (takes an id)'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
+    recalculateAll: {
+        serviceName,
+        serviceFnName: 'recalculateAll',
+        description: 'executes recalculateAll'
+    },
+};
+
+
