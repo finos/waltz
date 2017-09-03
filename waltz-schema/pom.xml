@@ -20,9 +20,6 @@
     <profiles>
 
         <profile>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <id>waltz-mariadb</id>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>

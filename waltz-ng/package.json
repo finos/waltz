@@ -56,7 +56,7 @@
     "moment": "2.18.1",
     "ng-showdown": "1.1.0",
     "ng-tags-input": "3.2.0",
-    "satellizer": "0.12.5",
+    "satellizer": "0.15.5",
     "ui-select": "0.19.8"
   },
   "devDependencies": {

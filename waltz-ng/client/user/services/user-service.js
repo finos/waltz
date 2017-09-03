@@ -16,9 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'lodash';
+
 
 let userPromise = null;
 let userName = null;
+
 
 function service(http, baseUrl, $auth) {
 

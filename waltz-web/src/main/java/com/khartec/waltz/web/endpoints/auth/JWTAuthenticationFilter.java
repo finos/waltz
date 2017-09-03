@@ -36,17 +36,22 @@ import java.io.UnsupportedEncodingException;
  * about the bearer name.
  */
 public class JWTAuthenticationFilter extends WaltzFilter {
+
     private static final Logger LOG = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
-    private final JWTVerifier verifier;
+    private final JWTVerifier verifier256;
+    private final JWTVerifier verifier512;
+
 
     public JWTAuthenticationFilter(SettingsService settingsService) {
         super(settingsService);
         try {
-            Algorithm algorithm = Algorithm.HMAC512(JWTUtilities.SECRET);
-            verifier = JWT.require(algorithm)
-                    .withIssuer(JWTUtilities.ISSUER)
-                    .build(); //Reusable verifier instance
+            Algorithm algorithm256 = Algorithm.HMAC256(JWTUtilities.SECRET);
+            Algorithm algorithm512 = Algorithm.HMAC512(JWTUtilities.SECRET);
+
+            verifier256 = mkVerifier(algorithm256);
+            verifier512 = mkVerifier(algorithm512);
+
         } catch (UnsupportedEncodingException uee) {
             LOG.error("Cannot create JWT Verifier, this is bad", uee);
             throw new UnsupportedOperationException(uee);
@@ -62,8 +67,33 @@ public class JWTAuthenticationFilter extends WaltzFilter {
             AuthenticationUtilities.setUserAsAnonymous(request);
         } else {
             String token = authorizationHeader.replaceFirst("Bearer ", "");
+            DecodedJWT decodedToken = JWT.decode(token);
+
+            JWTVerifier verifier = selectVerifier(decodedToken);
+
             DecodedJWT decodedJWT = verifier.verify(token);
             AuthenticationUtilities.setUser(request, decodedJWT.getSubject());
+        }
+    }
+
+
+    private JWTVerifier mkVerifier(Algorithm algorithm) {
+        return JWT
+                .require(algorithm)
+                .withIssuer(JWTUtilities.ISSUER)
+                .build();
+    }
+
+
+    private JWTVerifier selectVerifier(DecodedJWT decodedToken) {
+        String algorithm = decodedToken.getAlgorithm();
+        switch (algorithm) {
+            case "HS256":
+                return verifier256;
+            case "HS512":
+                return verifier512;
+            default:
+                throw new IllegalStateException("Cannot verify against algorithm: " + algorithm);
         }
     }
 

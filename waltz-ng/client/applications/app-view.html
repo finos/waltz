@@ -1,6 +1,5 @@
 <div>
 
-
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
                        small="{{ ctrl.app.assetCode }}">
@@ -63,10 +62,8 @@
 
 
     <!-- TECHNOLOGIES -->
-    <div waltz-has-setting="feature.software-catalog.enabled=true">
-        <waltz-technology-section parent-entity-ref="ctrl.entityRef">
-        </waltz-technology-section>
-    </div>
+    <waltz-technology-section parent-entity-ref="ctrl.entityRef">
+    </waltz-technology-section>
 
 
     <!-- COSTS -->
