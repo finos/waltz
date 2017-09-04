@@ -16,36 +16,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.user;
+import {initialiseData} from "../../common";
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import template from './navbar-search.html';
 
-
-public enum Role {
-    ADMIN,
-    APP_EDITOR,
-    ANONYMOUS,
-    ATTESTATION_ADMIN,
-    AUTHORITATIVE_SOURCE_EDITOR,
-    BETA_TESTER,
-    BOOKMARK_EDITOR,
-    CAPABILITY_EDITOR,
-    CHANGE_INITIATIVE_EDITOR,
-    LINEAGE_EDITOR,
-    LOGICAL_DATA_FLOW_EDITOR,
-    ORG_UNIT_EDITOR,
-    RATING_EDITOR,
-    SURVEY_ADMIN,
-    USER_ADMIN
-    ;
+const bindings = {
+};
 
 
-    public static Set<String> allNames() {
-        return Stream
-                .of(Role.values())
-                .map(r -> r.name())
-                .collect(Collectors.toSet());
+const initialState = {
+    query: '',
+    visibility: {
+        overlay: false
     }
+};
+
+
+function controller($timeout) {
+
+    const vm = initialiseData(this, initialState);
+
+    const dismissResults = (e) => $timeout(
+        () => vm.visibility.overlay = false,
+        200);
+
+    vm.dismissResults = dismissResults;
+
+    vm.showSearch = () => vm.visibility.overlay = true;
 }
+
+
+controller.$inject = [
+    '$timeout'
+];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default {
+    component,
+    id: 'waltzNavbarSearch'
+};

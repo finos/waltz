@@ -3,7 +3,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.attestation.AttestationCreateSummary;
-import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.attestation.AttestationRunResponseSummary;
@@ -73,7 +72,7 @@ public class AttestationRunEndpoint implements Endpoint {
         };
 
         DatumRoute<IdCommandResponse> attestationRunCreateRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
+            ensureUserHasAttestationAdminRights(req);
 
             res.type(WebUtilities.TYPE_JSON);
             AttestationRunCreateCommand createCommand = readBody(req, AttestationRunCreateCommand.class);
@@ -92,7 +91,7 @@ public class AttestationRunEndpoint implements Endpoint {
     }
 
 
-    private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+    private void ensureUserHasAttestationAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.ATTESTATION_ADMIN);
     }
 }
