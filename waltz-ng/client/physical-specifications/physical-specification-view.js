@@ -196,53 +196,6 @@ function controller($q,
             });
     };
 
-    vm.createFlowDiagramCommands = () => {
-        const nodeCommands = _
-            .chain(vm.logicalFlows)
-            .map(f => { return [f.source, f.target]; })
-            .flatten()
-            .uniqBy(toGraphId)
-            .map(a => ({ command: 'ADD_NODE', payload: a }))
-            .value();
-
-        const flowCommands = _.map(
-            vm.logicalFlows,
-            f => ({ command: 'ADD_FLOW', payload: Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' } )}));
-
-        const moveCommands = _.map(
-            nodeCommands,
-            (nc, idx) => {
-                return {
-                    command: 'MOVE',
-                    payload: {
-                        id : toGraphId(nc.payload),
-                        dx: 50 + (110 * (idx % 8)),
-                        dy: 10 + (50 * (idx / 8))
-                    }
-                };
-            });
-
-        const physFlowCommands = _.map(
-            vm.physicalFlows,
-            pf => {
-                return {
-                    command: 'ADD_DECORATION',
-                    payload: {
-                        ref: { kind: 'LOGICAL_DATA_FLOW', id: pf.logicalFlowId },
-                        decoration: Object.assign({}, pf, { kind: 'PHYSICAL_FLOW' })
-                    }
-                };
-            });
-
-        const title = `${vm.specification.name} Flows`;
-
-        const titleCommands = [
-            { commands: 'SET_TITLE', payload: title }
-        ];
-
-        return _.concat(nodeCommands, flowCommands, physFlowCommands, moveCommands, titleCommands);
-    };
-
     vm.deleteSpec = (specDef) => {
         physicalSpecDefinitionStore
             .deleteSpecification(specDef.id)

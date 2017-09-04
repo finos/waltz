@@ -148,5 +148,8 @@ const shapes = {
 export function toNodeShape(d, widthHint = 100) {
     const kind = _.isObject(d) ? d.kind : d;
     const mkShapeFn = shapes[kind];
+    if (!mkShapeFn) {
+        console.error('Cannot determine shape function for node', d)
+    }
     return mkShapeFn(widthHint);
 }

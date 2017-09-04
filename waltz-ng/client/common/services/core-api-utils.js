@@ -19,6 +19,7 @@
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
@@ -28,6 +29,8 @@ import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/servi
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
+import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
+import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
@@ -35,6 +38,7 @@ import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-nam
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
+import {EntityTagStore_API as EntityTagStore} from "../../entity-tags/services/entity-tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
@@ -55,6 +59,7 @@ import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspe
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
+import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
@@ -64,6 +69,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 export const CORE_API = {
     ActorStore,
+    AliasStore,
     AppGroupStore,
     ApplicationStore,
     AttestationInstanceStore,
@@ -73,6 +79,8 @@ export const CORE_API = {
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
+    ComplexityStore,
+    DatabaseStore,
     DataTypeStore,
     DataTypeUsageStore,
     EndUserAppStore,
@@ -80,6 +88,7 @@ export const CORE_API = {
     EntityNamedNoteTypeStore,
     EntitySearchStore,
     EntityStatisticStore,
+    EntityTagStore,
     EnumValueStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
@@ -100,6 +109,7 @@ export const CORE_API = {
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
     PhysicalSpecificationStore,
+    ServerInfoStore,
     SettingsStore,
     SourceDataRatingStore,
     StaticPanelStore,

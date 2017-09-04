@@ -19,11 +19,12 @@
 import angular from "angular";
 
 
-import * as flowDiagramStore from './services/flow-diagram-store';
-import * as flowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
-import * as flowDiagramEntityStore from './services/flow-diagram-entity-store';
+import * as FlowDiagramStore from './services/flow-diagram-store';
+import * as FlowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
+import * as FlowDiagramEntityStore from './services/flow-diagram-entity-store';
 
-import flowDiagramStateService from './services/flow-diagram-state-service';
+import * as FlowDiagramStarterService from './services/flow-diagram-starter-service';
+import * as FlowDiagramStateService from './services/flow-diagram-state-service';
 
 import flowDiagram from './components/diagram/flow-diagram';
 import flowDiagramLogicalFlowPopup from './components/editor/flow-diagram-logical-flow-popup';
@@ -33,9 +34,9 @@ import flowDiagramAnnotationPopup from './components/editor/flow-diagram-annotat
 import flowDiagramEditor from './components/editor/flow-diagram-editor';
 import flowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
 import flowDiagramsSection from './components/section/flow-diagrams-section';
-import * as flowDiagramAssociations from './components/associations/flow-diagram-associations';
+import * as FlowDiagramAssociations from './components/associations/flow-diagram-associations';
 
-import {registerComponents, registerStores} from '../common/module-utils'
+import {registerComponents, registerServices, registerStores} from '../common/module-utils'
 
 import routes from './routes';
 
@@ -43,10 +44,6 @@ import routes from './routes';
 export default () => {
 
     const module = angular.module('waltz.flow-diagram', []);
-
-    module
-        .service('FlowDiagramStateService', flowDiagramStateService)
-        ;
 
     module
         .component('waltzFlowDiagram', flowDiagram)
@@ -63,17 +60,20 @@ export default () => {
         .config(routes)
         ;
 
-    registerComponents(module, [
-        flowDiagramAssociations
+    registerServices(module, [
+        FlowDiagramStarterService,
+        FlowDiagramStateService
     ]);
 
+    registerComponents(module, [
+        FlowDiagramAssociations
+    ]);
 
     registerStores(module, [
-        flowDiagramStore,
-        flowDiagramAnnotationStore,
-        flowDiagramEntityStore
+        FlowDiagramStore,
+        FlowDiagramAnnotationStore,
+        FlowDiagramEntityStore
     ]);
-
 
     return module.name;
 };

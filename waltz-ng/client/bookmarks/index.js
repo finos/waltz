@@ -24,22 +24,25 @@ import bookmarkStore from './services/bookmark-store';
 import bookmarkKindSelect from './components/bookmark-kind-select/bookmark-kind-select';
 import bookmarksSection from './components/bookmarks-section/bookmarks-section';
 import bookmarkKinds from './components/bookmark-kinds/bookmark-kinds';
+import bookmarksViewPanel from './components/bookmarks-view-panel/bookmarks-view-panel';
+import bookmarksEditPanel from './components/bookmarks-edit-panel/bookmarks-edit-panel';
+import bookmarkFormDirective from './directives/bookmark-form';
 
 export default () => {
 
     const module = angular.module('waltz.bookmarks', []);
-
-    require('./directives')(module);
-
-    module
-        .config(require('./routes'));
 
     registerStores(module, [bookmarkStore]);
 
     registerComponents(module, [
         bookmarkKinds,
         bookmarkKindSelect,
-        bookmarksSection]);
+        bookmarksSection,
+        bookmarksEditPanel,
+        bookmarksViewPanel]);
+
+    module
+        .directive('waltzBookmarkForm', bookmarkFormDirective);
 
     return module.name;
 };

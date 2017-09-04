@@ -19,7 +19,7 @@
 import {checkIsEntityRef, checkIsStringList} from "../../common/checks";
 
 
-function service($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/entity/alias`;
 
@@ -48,9 +48,24 @@ function service($http, BaseApiUrl) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
-export default service;
+
+export const serviceName = 'AliasStore';
+
+
+export const AliasStore_API = {
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'executes update'
+    },
+    getForEntity: {
+        serviceName,
+        serviceFnName: 'getForEntity',
+        description: 'executes getForEntity'
+    }
+};

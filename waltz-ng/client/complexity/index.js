@@ -16,13 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-
+import {registerStores} from "../common/module-utils";
+import * as ComplexityStore from './services/complexity-store';
 
 export default () => {
     const module = angular.module('waltz.complexity', []);
 
-    module
-        .service('ComplexityStore', require('./services/complexity-store'));
+    registerStores(module, [ ComplexityStore ]);
+
 
     module
         .component("waltzComplexityBarChart", require('./components/complexity-bar-chart'))

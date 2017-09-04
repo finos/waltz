@@ -28,7 +28,6 @@ import template from './flow-diagrams-panel.html';
 
 const bindings = {
     parentEntityRef: '<',
-    createDiagramCommands: '<',
     canCreate: '<'
 };
 
@@ -49,18 +48,11 @@ const initialState = {
 };
 
 
-function toRef(d) {
-    return {
-        id: d.id,
-        kind: d.kind,
-        name: d.name
-    };
-}
-
 function controller(
     $q,
     $timeout,
     serviceBroker,
+    flowDiagramStarterService,
     flowDiagramStateService,
     notification,
     physicalFlowStore,
@@ -212,10 +204,12 @@ function controller(
 
         showEditableDiagram();
 
-        flowDiagramStateService.processCommands(vm.createDiagramCommands() || []);
-        setTimeout(() => flowDiagramStateService.processCommands([]), 0);
-
-        notification.warning("Flow diagrams are not automatically saved.  Remember to save your work.")
+        flowDiagramStarterService
+            .mkCommands(vm.parentEntityRef)
+            .then(starterCommands => {
+                flowDiagramStateService.processCommands(starterCommands);
+                notification.warning("Flow diagrams are not automatically saved. Remember to save your work.")
+            });
     };
 
     vm.editDiagram = () => {
@@ -274,11 +268,20 @@ function controller(
     }
 }
 
+function toRef(d) {
+    return {
+        id: d.id,
+        kind: d.kind,
+        name: d.name
+    };
+}
+
 
 controller.$inject = [
     '$q',
     '$timeout',
     'ServiceBroker',
+    'FlowDiagramStarterService',
     'FlowDiagramStateService',
     'Notification',
     'PhysicalFlowStore',

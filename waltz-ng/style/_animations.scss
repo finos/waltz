@@ -57,3 +57,21 @@ $animation-speed: 0.2s;
 .waltz-fade-if.ng-enter.ng-enter-active {
     opacity: 1;
 }
+
+.waltz-animate-repeat.ng-move,
+.waltz-animate-repeat.ng-enter,
+.waltz-animate-repeat.ng-leave {
+    transition:all ease 0.5s;
+}
+
+.waltz-animate-repeat.ng-leave.ng-leave-active,
+.waltz-animate-repeat.ng-move,
+.waltz-animate-repeat.ng-enter {
+    opacity:0;
+}
+
+.waltz-animate-repeat.ng-leave,
+.waltz-animate-repeat.ng-move.ng-move-active,
+.waltz-animate-repeat.ng-enter.ng-enter-active {
+    opacity:1;
+}

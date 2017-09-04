@@ -9,28 +9,55 @@
         </ol>
     </waltz-page-header>
 
+    <style>
+        .h-navigation ul {
+            list-style-type:none;
+            /*height:30px;*/
+            text-align:center;
+            width: 100%;
+            display: table;
+            margin-bottom: 0;
+        }
+
+        .h-navigation ul li {
+            margin-left:50px;
+            display: table-cell;
+        }
+
+    </style>
+
+    <waltz-app-overview parent-entity-ref="ctrl.parentEntityRef"></waltz-app-overview>
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-2">
+                Navigation:
+            </div>
+            <div class="col-md-10 h-navigation">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="w in ctrl.availableWidgets">
+                        <a ng-click="ctrl.addWidget(w)"
+                           class="clickable">
+                            <waltz-icon name="{{ w.icon }}"></waltz-icon>
+                            <span ng-bind="w.name"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <br>
 
 
-
-    <!-- PEOPLE -->
-    <waltz-involved-people-section
-        id="people-section"
-        parent-entity-ref="ctrl.parentEntityRef"
-        on-add="ctrl.onAddInvolvement"
-        on-remove="ctrl.onRemoveInvolvement">
-    </waltz-involved-people-section>
-
-
-    <waltz-section name="M" collapsible="true">
-        <span ng-bind="'PRIMARY' | toDisplayName:'AuthoritativenessRating'"></span>
-
-        <waltz-enum-value type="'AuthoritativenessRating'"
-                          show-icon="false"
-                          key="'PRIMARY'">
-        </waltz-enum-value>
-
-    </waltz-section>
-
+    <div ng-repeat="widget in ctrl.widgets track by widget.id"
+         class='waltz-animate-repeat'>
+        <waltz-dyna-widget widget="widget"
+                           additional-scope="ctrl.additionalScope"
+                           parent-entity-ref="ctrl.parentEntityRef">
+        </waltz-dyna-widget>
+    </div>
 
 
 
