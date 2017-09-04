@@ -17,26 +17,34 @@
  */
 
 // -- APP --
-export function appResolver(appStore, $stateParams) {
-    return appStore.getById($stateParams.id);
+import {CORE_API} from "../common/services/core-api-utils";
+
+
+export function appResolver(serviceBroker, $stateParams) {
+    return serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.getById, [ $stateParams.id ])
+        .then(r => r.data);
 }
 
-appResolver.$inject = ['ApplicationStore', '$stateParams'];
+appResolver.$inject = ['ServiceBroker', '$stateParams'];
 
 
-export function appByAssetCodeResolver(appStore, $stateParams) {
-    return appStore.findByAssetCode($stateParams.assetCode);
+export function appByAssetCodeResolver(serviceBroker, $stateParams) {
+    return serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.findByAssetCode, [ $stateParams.assetCode ])
+        .then(r => r.data);
 }
 
-appByAssetCodeResolver.$inject = ['ApplicationStore', '$stateParams'];
-
+appByAssetCodeResolver.$inject = ['ServiceBroker', '$stateParams'];
 
 
 // -- OUs --
-export function orgUnitsResolver(orgUnitStore) {
-    return orgUnitStore.findAll();
+export function orgUnitsResolver(serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.OrgUnitStore.findAll)
+        .then(r => r.data);
 }
 
-orgUnitsResolver.$inject = [ 'OrgUnitStore' ];
+orgUnitsResolver.$inject = [ 'ServiceBroker' ];
 
 
