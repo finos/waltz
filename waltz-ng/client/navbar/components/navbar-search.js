@@ -16,25 +16,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerComponents} from "../common/module-utils";
-import NavbarSearch from './components/navbar-search';
-import NavSearchOverlay from './components/nav-search-overlay';
+import {initialiseData} from "../../common";
+
+import template from './navbar-search.html';
+
+const bindings = {
+};
 
 
-export default () => {
+const initialState = {
+    query: '',
+    visibility: {
+        overlay: false
+    }
+};
 
-    const module = angular.module('waltz.navbar', []);
 
-    module
-        .directive('waltzNavbar', require('./directives/navbar'))
-        .directive('waltzNavbarRecentlyViewed', require('./directives/navbar-recently-viewed'))
-        .directive('waltzNavbarProfile', require('./directives/navbar-profile'));
+function controller($timeout) {
 
-    registerComponents(module, [
-        NavbarSearch,
-        NavSearchOverlay
-    ]);
+    const vm = initialiseData(this, initialState);
 
-    return module.name;
+    const dismissResults = (e) => $timeout(
+        () => vm.visibility.overlay = false,
+        200);
+
+    vm.dismissResults = dismissResults;
+
+    vm.showSearch = () => vm.visibility.overlay = true;
+}
+
+
+controller.$inject = [
+    '$timeout'
+];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default {
+    component,
+    id: 'waltzNavbarSearch'
 };
