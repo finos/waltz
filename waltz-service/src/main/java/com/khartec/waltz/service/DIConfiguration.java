@@ -78,6 +78,9 @@ public class DIConfiguration {
     @Value("${smtpHost:localhost}")
     private String smtpHost;
 
+    @Value("${smtpPort:25}")
+    private int smtpPort;
+
     // -- BUILD ---
 
     @Value("${build.pom}")
@@ -169,6 +172,7 @@ public class DIConfiguration {
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(smtpHost);
+        mailSender.setPort(smtpPort);
 
         return mailSender;
     }

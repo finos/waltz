@@ -43,23 +43,26 @@ public class WaltzEmailer {
         Checks.checkNotEmpty(to, "to cannot be empty");
         Checks.checkAll(to, StringUtilities::notEmpty, "email address cannot be empty");
 
-        final MimeMessagePreparator preparator = mimeMessage -> {
-            final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
+        MimeMessagePreparator preparator = mimeMessage -> {
+            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
             message.setSubject(subject);
             message.setFrom(fromEmail);
             message.setTo(to);
             message.addAttachment("waltz.png", IOUtilities.getFileResource("/images/waltz.png"));
-            message.addAttachment("vendor-logo", IOUtilities.getFileResource("/templates/images/vendor-logo.png"));
+            message.addAttachment("client-logo", IOUtilities.getFileResource("/templates/images/client-logo.png"));
 
-            final Map model = new HashMap();
+            Map model = new HashMap();
             model.put("body", body);
 
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
 
-            InputStreamReader templateReader = new InputStreamReader(IOUtilities.getFileResource(DEFAULT_EMAIL_TEMPLATE_LOCATION).getInputStream());
-            Template template = new Template("test", templateReader, cfg);
-            String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
-            message.setText(text, true);
+            try(InputStreamReader templateReader = new InputStreamReader(IOUtilities
+                    .getFileResource(DEFAULT_EMAIL_TEMPLATE_LOCATION)
+                    .getInputStream())) {
+                Template template = new Template("template", templateReader, cfg);
+                String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                message.setText(text, true);
+            }
         };
 
         this.mailSender.send(preparator);

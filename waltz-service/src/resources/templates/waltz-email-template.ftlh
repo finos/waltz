@@ -174,7 +174,7 @@
                         <td align="right">
                             <table cellpadding="5">
                                 <tr>
-                                    <td align="right"><img height="40px" width="40px" src="cid:vendor-logo" align="right"/></td>
+                                    <td align="right"><img height="40px" width="40px" src="cid:client-logo" align="right"/></td>
                                 </tr>
                                 <tr>
                                     <td>
