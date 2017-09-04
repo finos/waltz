@@ -17,34 +17,95 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import template from './navbar-search-form.html';
+import {initialiseData} from "../../common/index";
+
+import template from './nav-search-overlay.html';
+
 
 const bindings = {
+    query: '@',
+    onDismiss: '<',
+    visible: '<'
 };
 
 
 const initialState = {
-    query: '',
-    searchResults: {
-        show: false,
-        apps: [],
-        people: [],
-        capabilities: [],
-        changeInitiatives: [],
-        orgUnits: []
-    }
+    categories: [
+        'APPLICATION',
+        'PERSON',
+        'ACTOR',
+        'CHANGE_INITIATIVE',
+        'APP_GROUP',
+        'ORG_UNIT',
+        'MEASURABLE',
+        'PHYSICAL_SPECIFICATION'
+    ],
+    selectedCategory: null,
+    results: {},
+    filteredResults: []
 };
 
 
+function isDescendant(parent, child) {
+    let node = child.parentNode;
+    while (node != null) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
 
 
-function controller($timeout,
+
+function controller($element,
+                    $document,
+                    $timeout,
                     serviceBroker,
                     displayNameService) {
-
     const vm = initialiseData(this, initialState);
+
+    const documentClick = (e) => {
+        const element = $element[0];
+        if(!isDescendant(element, e.target)) {
+            vm.dismiss();
+        }
+    };
+
+    vm.$onChanges = c => {
+        if(vm.visible) {
+            const input = $element.find('input')[0];
+            input.focus();
+            $timeout(() => $document.on('click', documentClick), 200);
+        }  else {
+            $document.off('click', documentClick);
+        }
+    };
+
+    vm.$onDestroy = () => {
+        $document.off('click', documentClick);
+    };
+
+    vm.dismiss = () => {
+        if (vm.onDismiss) {
+            vm.onDismiss();
+        } else {
+            console.log('No dismiss handler registered');
+        }
+    };
+
+    vm.toggleCategory = (c) => {
+        if ((vm.results[c] || []).length === 0) {
+            return;
+        }
+        if (vm.selectedCategory === c) {
+            vm.selectedCategory = null;
+        } else {
+            vm.selectedCategory = c;
+        }
+    };
 
     const searchAppGroups = (q) => {
         let groups = [];
@@ -68,7 +129,7 @@ function controller($timeout,
             .then(r => groups = _.union(groups, r.data))
             .then(() => serviceBroker.loadViewData(CORE_API.AppGroupStore.findPrivateGroups))
             .then(r => groups = _.union(groups, r.data))
-            .then(r => vm.searchResults.APP_GROUP = prepareResults(groups, q));
+            .then(r => vm.results.APP_GROUP = prepareResults(groups, q));
 
     };
 
@@ -100,40 +161,51 @@ function controller($timeout,
 
         return serviceBroker
             .loadViewData(searchAPI, [ query ])
-            .then(r => vm.searchResults[entityKind] = _.map(r.data, transformResult));
+            .then(r => vm.results[entityKind] = _.map(r.data, transformResult));
     };
+
 
     const doSearch = (query) => {
-        if (_.isEmpty(query)) {
-            vm.searchResults.show = false;
-        } else {
-            vm.searchResults.show = true;
-            handleSearch(query, CORE_API.ApplicationStore.search, 'APPLICATION');
-            handleSearch(query, CORE_API.ChangeInitiativeStore.search, 'CHANGE_INITIATIVE');
-            handleSearch(query, CORE_API.PersonStore.search, 'PERSON');
-            handleSearch(query, CORE_API.MeasurableStore.search, 'MEASURABLE');
-            handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');
-            handleSearch(query, CORE_API.ActorStore.search, 'ACTOR');
-            handleSearch(query, CORE_API.PhysicalSpecificationStore.search, 'PHYSICAL_SPECIFICATION');
-
-            searchAppGroups(query);
+        if(!query){
+            vm.clearSearch();
+            return;
         }
+
+        handleSearch(query, CORE_API.ApplicationStore.search, 'APPLICATION');
+        handleSearch(query, CORE_API.ChangeInitiativeStore.search, 'CHANGE_INITIATIVE');
+        handleSearch(query, CORE_API.PersonStore.search, 'PERSON');
+        handleSearch(query, CORE_API.MeasurableStore.search, 'MEASURABLE');
+        handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');
+        handleSearch(query, CORE_API.ActorStore.search, 'ACTOR');
+        handleSearch(query, CORE_API.PhysicalSpecificationStore.search, 'PHYSICAL_SPECIFICATION');
+
+        searchAppGroups(query);
     };
 
-    const dismissResults = (e) => $timeout(
-        () => vm.searchResults.show = false,
-        200);
-
     vm.doSearch = () => doSearch(vm.query);
-    vm.showSearch = () => vm.searchResults.show;
-    vm.dismissResults = dismissResults;
 
+    vm.clearSearch = () => {
+        vm.results = {};
+        vm.query = '';
+    };
 
+    vm.onKeypress = (evt) => {
+        if(evt.keyCode === 27) {
+            if(vm.query) {
+                vm.clearSearch();
+            }
+            else {
+                vm.dismiss();
+            }
+        }
+    };
 
 }
 
 
 controller.$inject = [
+    '$element',
+    '$document',
     '$timeout',
     'ServiceBroker',
     'DisplayNameService'
@@ -141,13 +213,13 @@ controller.$inject = [
 
 
 const component = {
+    template,
     bindings,
     controller,
-    template
 };
 
 
 export default {
     component,
-    id: 'waltzNavbarSearchForm'
+    id: 'waltzNavSearchOverlay'
 };

@@ -1,0 +1,13 @@
+<ul class="nav navbar-nav navbar-right" style="padding-right: 20px">
+    <li>
+        <a class="clickable"
+           ng-click="$ctrl.showSearch()">
+            <waltz-icon name="search"></waltz-icon>
+            Search
+            <b class="caret"></b>
+        </a>
+    </li>
+    <waltz-nav-search-overlay on-dismiss="$ctrl.dismissResults"
+                              visible="$ctrl.visibility.overlay">
+    </waltz-nav-search-overlay>
+</ul>
