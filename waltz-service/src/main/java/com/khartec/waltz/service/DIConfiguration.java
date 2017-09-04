@@ -36,6 +36,8 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jndi.JndiPropertySource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.sql.DataSource;
 
@@ -73,6 +75,11 @@ public class DIConfiguration {
     @Value("${jooq.dialect}")
     private String dialect;
 
+    @Value("${smtpHost:localhost}")
+    private String smtpHost;
+
+    @Value("${smtpPort:25}")
+    private int smtpPort;
 
     // -- BUILD ---
 
@@ -158,6 +165,16 @@ public class DIConfiguration {
     @Autowired
     public PersonMaintenance personMaintenance(PersonHierarchyService personHierarchyService) {
         return new PersonMaintenance(personHierarchyService);
+    }
+
+
+    @Bean
+    public JavaMailSender mailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(smtpHost);
+        mailSender.setPort(smtpPort);
+
+        return mailSender;
     }
 
 }
