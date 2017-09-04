@@ -58,9 +58,9 @@ export const serviceName = 'ServerInfoStore';
 
 
 export const ServerInfoStore_API = {
-    findByAssetCodes: {
+    findByAssetCode: {
         serviceName,
-        serviceFnName: 'findByAssetCodes',
+        serviceFnName: 'findByAssetCode',
         description: 'executes findByAssetCodes'
     },
     findByAppId: {
