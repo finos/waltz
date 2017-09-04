@@ -67,31 +67,6 @@ function controller($stateParams,
         .then(() => vm.entityRef = Object.assign({}, vm.entityRef, { name: vm.actor.name }))
         .then(() => addToHistory(historyStore, vm.actor));
 
-
-    vm.createFlowDiagramCommands = () => {
-        const actor = Object.assign({}, vm.actor, { kind: 'ACTOR' });
-        const title = `${actor.name} flows`;
-        const annotation = {
-            id: +new Date()+'',
-            kind: 'ANNOTATION',
-            entityReference: actor,
-            note: `${actor.name} data flows`
-        };
-
-        const modelCommands = [
-            { command: 'ADD_NODE', payload: actor },
-            { command: 'ADD_ANNOTATION', payload: annotation },
-            { command: 'SET_TITLE', payload: title }
-        ];
-
-        const moveCommands = [
-            { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
-            { command: 'MOVE', payload: { id: `ACTOR/${actor.id}`, dx: 300, dy: 200 }},
-        ];
-
-        return _.concat(modelCommands, moveCommands);
-    };
-
 }
 
 

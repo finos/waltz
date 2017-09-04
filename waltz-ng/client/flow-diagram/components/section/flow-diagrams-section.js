@@ -26,7 +26,6 @@
 
 const bindings = {
     parentEntityRef: '<',
-    createDiagramCommands: '<',
     canCreate: '<'
 };
 
