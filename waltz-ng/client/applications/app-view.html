@@ -1,6 +1,5 @@
 <div>
 
-
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
                        small="{{ ctrl.app.assetCode }}">
@@ -13,14 +12,8 @@
 
 
     <!-- OVERVIEW -->
-    <waltz-app-overview-section app='ctrl.app'
-                                tags='ctrl.tags'
-                                aliases='ctrl.aliases'
-                                organisational-unit="ctrl.organisationalUnit"
-                                complexity="ctrl.complexity"
-                                on-save-aliases="ctrl.saveAliases"
-                                on-save-tags="ctrl.saveTags">
-    </waltz-app-overview-section>
+    <waltz-app-overview parent-entity-ref="ctrl.entityRef">
+    </waltz-app-overview>
 
     <br>
 
@@ -58,8 +51,7 @@
 
     <!-- FLOW DIAGRAMS -->
     <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityRef"
-                                 can-create="true"
-                                 create-diagram-commands="ctrl.createFlowDiagramCommands">
+                                 can-create="true">
     </waltz-flow-diagrams-section>
 
 
@@ -69,12 +61,8 @@
 
 
     <!-- TECHNOLOGIES -->
-    <div waltz-has-setting="feature.software-catalog.enabled=true">
-        <waltz-technology-section software-catalog="ctrl.softwareCatalog"
-                                  databases="ctrl.databases"
-                                  servers="ctrl.servers">
-        </waltz-technology-section>
-    </div>
+    <waltz-technology-section parent-entity-ref="ctrl.entityRef">
+    </waltz-technology-section>
 
 
     <!-- COSTS -->

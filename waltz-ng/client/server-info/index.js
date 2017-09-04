@@ -18,6 +18,8 @@
  */
 
 import angular from 'angular';
+import * as ServerInfoStore from './services/server-info-store';
+import {registerStores} from "../common/module-utils";
 
 
 export default () => {
@@ -25,13 +27,12 @@ export default () => {
     const module = angular.module('waltz.server.info', []);
 
     module
-        .service('ServerInfoStore', require('./services/server-info-store'));
-
-    module
         .component('waltzServerPies', require('./components/server-pies'));
 
     module
         .directive('waltzServerList', require('./directives/server-list'));
+
+    registerStores(module, [ServerInfoStore]);
 
     return module.name;
 };

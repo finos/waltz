@@ -89,16 +89,16 @@ function controller(serviceBroker) {
 }
 
 
+controller.$inject = [
+    'ServiceBroker',
+];
+
+
 const component = {
     bindings,
     template,
     controller
 };
-
-
-component.$inject = [
-    'ServiceBroker',
-];
 
 export default {
     component,

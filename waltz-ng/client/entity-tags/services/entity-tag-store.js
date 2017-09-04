@@ -18,7 +18,7 @@
 import {checkIsEntityRef, checkIsStringList} from "../../common/checks";
 
 
-function store($http, base) {
+export function store($http, base) {
     const BASE = `${base}/entity-tag`;
 
     const findAllTags = () => $http
@@ -31,7 +31,7 @@ function store($http, base) {
         .then(x => x.data);
 
     const findTagsByEntityRef = (ref) => $http
-        .post(`${BASE}/entity/${ref.kind}/${ref.id}`)
+        .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(x => x.data);
 
     const update = (entityRef, tags = []) => {
@@ -57,5 +57,31 @@ store.$inject = [
     'BaseApiUrl'
 ];
 
+
+export const serviceName = 'EntityTagStore';
+
+
+export const EntityTagStore_API = {
+    findAllTags: {
+        serviceName,
+        serviceFnName: 'findAllTags',
+        description: 'executes findAllTags'
+    },
+    findByTag: {
+        serviceName,
+        serviceFnName: 'findByTag',
+        description: 'executes findByTag'
+    },
+    findTagsByEntityRef: {
+        serviceName,
+        serviceFnName: 'findTagsByEntityRef',
+        description: 'executes findTagsByEntityRef'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'executes update'
+    }
+};
 
 export default store;

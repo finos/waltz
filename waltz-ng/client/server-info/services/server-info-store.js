@@ -18,7 +18,7 @@
 import _ from 'lodash';
 
 
-function service($http, baseUrl) {
+export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/server-info`;
 
@@ -47,7 +47,30 @@ function service($http, baseUrl) {
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
 
 
-export default service;
+export const serviceName = 'ServerInfoStore';
+
+
+export const ServerInfoStore_API = {
+    findByAssetCodes: {
+        serviceName,
+        serviceFnName: 'findByAssetCodes',
+        description: 'executes findByAssetCodes'
+    },
+    findByAppId: {
+        serviceName,
+        serviceFnName: 'findByAppId',
+        description: 'executes findByAppId'
+    },
+    findStatsForSelector: {
+        serviceName,
+        serviceFnName: 'findStatsForSelector',
+        description: 'executes findStatsForSelector'
+    }
+};

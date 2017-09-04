@@ -16,66 +16,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from "../../../common";
-
-import template from './bookmarks-section.html';
-
-
-const bindings = {
-    parentEntityRef: '<',
-    showFilter: '@?'
-};
+import template from './dyna-widget.html';
+import {initialiseData} from "../../common/index";
 
 
 const initialState = {
-    showFilter: false,
-    visibility: {
-        editor: false
-    }
+    additionalScope: {}
 };
 
 
+function controller($element, $compile, $scope) {
 
-function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const load = (force = false) => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.BookmarkStore.findByParent,
-                [ vm.parentEntityRef ],
-                { force })
-            .then(r => vm.bookmarks = r.data);
-    };
-
     vm.$onInit = () => {
-        if(vm.parentEntityRef) {
-            load();
-        }
-    };
+        const widgetScope = $scope.$new();
+        widgetScope.parentEntityRef = vm.parentEntityRef;
+        widgetScope.createDiagramCommands = "x"; // () => console.log('wtf');
+        // Object.assign(widgetScope, vm.additionalScope);
 
-    vm.onReload = () => {
-        load(true);
-    };
-
-    vm.onDismiss = () => {
-        vm.visibility.editor = false;
+        const linkFn = $compile(vm.widget.template);
+        const content = linkFn(widgetScope);
+        $element.append(content);
     };
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject=[
+    '$element',
+    '$compile',
+    '$scope'
+];
+
+
+const bindings = {
+    additionalScope: '<?',
+    widget: '<',
+    parentEntityRef: '<'
+};
 
 
 const component = {
-    bindings,
+    controller,
     template,
-    controller
+    bindings
 };
 
 
 export default {
     component,
-    id: 'waltzBookmarksSection'
-};
+    id: 'waltzDynaWidget'
+}

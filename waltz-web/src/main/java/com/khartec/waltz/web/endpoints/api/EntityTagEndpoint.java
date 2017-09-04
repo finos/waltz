@@ -61,9 +61,15 @@ public class EntityTagEndpoint implements Endpoint {
             return entityTagService.updateTags(ref, tags, username);
         };
 
+        ListRoute<String> findTagsForEntityReference = (req, resp) -> {
+            EntityReference ref = getEntityReference(req);
+            return entityTagService.findTagsForEntityReference(ref);
+        };
+
         getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
         postForList(mkPath(BASE_URL, "tags"), findByTagRoute);
         postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
+        getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
     }
 
 }

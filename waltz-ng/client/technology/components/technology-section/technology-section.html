@@ -3,21 +3,23 @@
                    icon="server"
                    id="technology">
 
-        <div ng-if="ctrl.hasAnyData()">
+        <div ng-if="$ctrl.hasAnyData()">
             <waltz-section-actions>
                 <input type="search"
                        placeholder="Search"
                        style="border-radius: 6px; padding-left: 3px"
-                       ng-model="ctrl.qry">
+                       ng-change="$ctrl.doSearch()"
+                       ng-model-options="{ debounce: 200 }"
+                       ng-model="$ctrl.qry">
 
                 <button class="btn btn-xs waltz-btn-transparent"
-                        ng-click="ctrl.visibility.overlay = ! ctrl.visibility.overlay">
+                        ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
                     <waltz-icon name="map-signs"></waltz-icon>
                 </button>
             </waltz-section-actions>
 
-            <waltz-source-data-overlay visible="ctrl.visibility.overlay"
-                                       ratings="ctrl.sourceDataRatings"
+            <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                                       ratings="$ctrl.sourceDataRatings"
                                        entities="['DATABASE', 'SERVER', 'SOFTWARE']">
             </waltz-source-data-overlay>
 
@@ -25,42 +27,34 @@
             <uib-tabset>
 
                 <uib-tab heading="Overview">
-                    <waltz-technology-summary-pies servers="ctrl.filteredServers"
-                                                   databases="ctrl.filteredDatabases"
-                                                   software-catalog="ctrl.filteredSoftwareCatalog">
+                    <waltz-technology-summary-pies servers="$ctrl.filteredServers"
+                                                   databases="$ctrl.filteredDatabases">
                     </waltz-technology-summary-pies>
                 </uib-tab>
 
-                <uib-tab heading="Software Packages"
-                         disable="ctrl.softwareCatalog.packages.length == 0">
-                    <div class="waltz-scroll-region" style="height: 300px">
-                        <waltz-simple-software-usage-list catalog="ctrl.filteredSoftwareCatalog">
-                        </waltz-simple-software-usage-list>
-                    </div>
-                </uib-tab>
 
                 <uib-tab heading="Servers"
                          select="showServerDetail = true"
-                         disable="ctrl.servers.length == 0">
+                         disable="$ctrl.servers.length == 0">
                     <div ng-if="showServerDetail">
                         <br>
                         <div style="font-size: smaller; height: 300px"
                              ui-grid-exporter
                              ui-grid-resize-columns
-                             ui-grid="ctrl.serverGridOptions">
+                             ui-grid="$ctrl.serverGridOptions">
                         </div>
                     </div>
                 </uib-tab>
 
                 <uib-tab heading="Databases"
                          select="showDatabaseDetail = true"
-                         disable="ctrl.databases.length == 0">
+                         disable="$ctrl.databases.length == 0">
                     <div ng-if="showDatabaseDetail">
                         <br>
                         <div style="font-size: smaller; height: 300px"
                              ui-grid-exporter
                              ui-grid-resize-columns
-                             ui-grid="ctrl.databaseGridOptions">
+                             ui-grid="$ctrl.databaseGridOptions">
                         </div>
                     </div>
                 </uib-tab>
@@ -73,7 +67,7 @@
                 Associated software packages have been sourced from:
                 <ul class="list-inline"
                     style="display: inline-block">
-                    <li ng-repeat="(source, usages) in ctrl.softwareUsages">
+                    <li ng-repeat="(source, usages) in $ctrl.softwareUsages">
                         {{ source }}
                         <span ng-if="!$last">,</span>
                     </li>
@@ -82,7 +76,7 @@
 
         </div>
 
-        <waltz-no-data ng-if="! ctrl.hasAnyData()">
+        <waltz-no-data ng-if="! $ctrl.hasAnyData()">
             <message>
                 <strong>No associated technology found</strong>
             </message>

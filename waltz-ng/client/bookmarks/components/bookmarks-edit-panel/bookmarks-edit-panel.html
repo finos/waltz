@@ -1,0 +1,93 @@
+<div>
+    <div ng-if="$ctrl.bookmarks.length > 0">
+        <table class="table table-condensed" >
+            <colgroup>
+                <col width="3%">
+                <col width="15%">
+                <col width="20%">
+                <col width="22%">
+                <col width="25%">
+                <col width="15%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th></th>
+                <th>Kind</th>
+                <th>Title</th>
+                <th>URL</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="bookmark in $ctrl.bookmarks" class="waltz-visibility-parent">
+                <td>
+                    <span ng-if="bookmark.isPrimary">
+                        <waltz-icon name="star"></waltz-icon>
+                    </span>
+                    <span ng-if="!bookmark.isPrimary">
+                        <waltz-icon name="star-o"></waltz-icon>
+                    </span>
+                </td>
+                <td>
+                    <waltz-enum-value type="'BookmarkKind'"
+                                      key="bookmark.kind">
+                    </waltz-enum-value>
+                </td>
+
+                <td>
+                    <span ng-bind="bookmark.title"></span>
+                </td>
+                <td>
+                    <span ng-bind="bookmark.url"></span>
+                </td>
+                <td>
+                    <span ng-bind="bookmark.description"></span>
+                </td>
+                <td>
+                    <span class="waltz-visibility-child-50">
+                        <a class="clickable" ng-click="$ctrl.remove(bookmark)">
+                            Remove
+                        </a>
+                        |
+                        <a class="clickable" ng-click="$ctrl.edit(bookmark)">
+                            Edit
+                        </a>
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <waltz-no-data ng-if="$ctrl.bookmarks.length == 0">
+        <message>
+            <strong>No bookmarks</strong> have been registered yet
+        </message>
+    </waltz-no-data>
+
+    <div>
+        <div ng-if="!$ctrl.visibility.form">
+            <button ng-click="$ctrl.create()"
+                    class="btn btn-sm btn-primary">
+                Add New
+            </button>
+            &nbsp;
+            <a class="clickable"
+               ng-click="$ctrl.onDismiss()">
+                Done
+            </a>
+        </div>
+    </div>
+
+    <div ng-if="$ctrl.visibility.form">
+        <hr>
+        <waltz-bookmark-form bookmark="$ctrl.selectedBookmark"
+                             confirm-label="{{ $ctrl.selectedBoookmark.id ? 'Edit' : 'Save'}}"
+                             on-cancel="$ctrl.visibility.form = false"
+                             on-submit="$ctrl.save(bookmark)">
+        </waltz-bookmark-form>
+    </div>
+
+
+</div>
