@@ -126,8 +126,8 @@ function controller()
     const vm = Object.assign(this, initData);
 
     vm.$onInit = () => {
-        vm.addWidget(bookmarkWidget);
-        vm.addWidget(technologyWidget);
+        // vm.addWidget(bookmarkWidget);
+        // vm.addWidget(technologyWidget);
     };
 
     vm.addWidget = w => {

@@ -257,7 +257,7 @@ function removeDecoration(payload, model) {
 }
 
 
-function service(
+export function service(
     $q,
     applicationStore,
     flowDiagramStore,
@@ -512,4 +512,4 @@ service.$inject = [
 ];
 
 
-export default service;
+export const serviceName = 'FlowDiagramStateService';

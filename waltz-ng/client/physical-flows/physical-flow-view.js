@@ -228,36 +228,6 @@ function controller($q,
         }
     };
 
-    vm.createFlowDiagramCommands = () => {
-        const source = Object.assign({}, vm.logicalFlow.source, { isNotable: true });
-        const target = Object.assign({}, vm.logicalFlow.target, { isNotable: true });
-        const logicalFlow = Object.assign({}, vm.logicalFlow, { kind: 'LOGICAL_DATA_FLOW'});
-        const physicalFlow = Object.assign({}, vm.physicalFlow, { kind: 'PHYSICAL_FLOW'});
-        const title = `${source.name} sends ${vm.specification.name} to ${target.name}`;
-        const annotation = {
-            id: +new Date()+'',
-            kind: 'ANNOTATION',
-            entityReference: logicalFlow,
-            note: `${vm.specification.name} is sent ${vm.physicalFlow.frequency} via ${vm.physicalFlow.transport}`
-        };
-
-        const modelCommands = [
-            { command: 'ADD_NODE', payload: source },
-            { command: 'ADD_NODE', payload: target },
-            { command: 'ADD_FLOW', payload: logicalFlow },
-            { command: 'ADD_DECORATION', payload: { ref: logicalFlow, decoration: physicalFlow }},
-            { command: 'ADD_ANNOTATION', payload: annotation },
-            { command: 'SET_TITLE', payload: title }
-        ];
-
-        const moveCommands = [
-            { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
-            { command: 'MOVE', payload: { id: `APPLICATION/${source.id}`, dx: 300, dy: 200 }},
-            { command: 'MOVE', payload: { id: `APPLICATION/${target.id}`, dx: 400, dy: 300 }},
-        ];
-
-        return _.concat(modelCommands, moveCommands);
-    };
 }
 
 
