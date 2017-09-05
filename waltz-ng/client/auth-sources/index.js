@@ -19,7 +19,8 @@
 
 import angular from 'angular';
 import * as authSourcesStore from './services/auth-sources-store';
-import {registerStore} from '../common/module-utils';
+import * as AuthSourceEditorPanel from './components/editor/auth-source-editor-panel';
+import {registerComponents, registerStore} from '../common/module-utils';
 
 
 export default () => {
@@ -37,7 +38,7 @@ export default () => {
         .config(require('./routes'));
 
     registerStore(module, authSourcesStore);
-
+    registerComponents(module, [ AuthSourceEditorPanel ]);
 
     return module.name;
 };

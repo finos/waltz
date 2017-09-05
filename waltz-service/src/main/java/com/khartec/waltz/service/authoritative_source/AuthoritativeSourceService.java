@@ -23,10 +23,11 @@ import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.Record1;
@@ -99,17 +100,17 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int update(long id, AuthoritativenessRating rating) {
-        int updateCount = authoritativeSourceDao.update(id, rating);
-        AuthoritativeSource updatedAuthSource = getById(id);
+    public int update(AuthoritativeSourceUpdateCommand command) {
+        int updateCount = authoritativeSourceDao.update(command);
+        AuthoritativeSource updatedAuthSource = getById(command.id().get());
         ratingCalculator.update(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
         return updateCount;
     }
 
 
-    public int insert(EntityReference parentRef, String dataTypeCode, Long appId, AuthoritativenessRating rating) {
-        int insertedCount = authoritativeSourceDao.insert(parentRef, dataTypeCode, appId, rating);
-        ratingCalculator.update(dataTypeCode, parentRef);
+    public int insert(AuthoritativeSourceCreateCommand command) {
+        int insertedCount = authoritativeSourceDao.insert(command);
+        ratingCalculator.update(command.dataTypeId(), EntityReference.mkRef(EntityKind.ORG_UNIT, command.orgUnitId()));
         return insertedCount;
     }
 

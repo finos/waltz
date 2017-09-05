@@ -43,95 +43,96 @@
         <uib-tab index="0"
                  select="$ctrl.showTab(0)"
                  heading="Summary">
-            <br>
-
-            <!-- NO DATA, BOTH FLOWS AND TYPES -->
-            <div ng-if="$ctrl.dataTypeUsages.length == 0 && $ctrl.logicalFlows.length == 0">
-                <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
-                    <message>
-                        <strong>
-                            No flows or types
-                        </strong>
-                        registered for this application.  Add them
-                        <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                            here.
-                        </a>
-                    </message>
-                </waltz-no-data>
-            </div>
-
-            <!-- DATA TYPE SUMMARY -->
-            <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
-                <div class='row'>
-                    <div class="col-md-12">
-                        <h5>Data Types</h5>
-                        <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
-                            <message>
-                                <strong>
-                                    No Types
-                                </strong>
-                                registered for this application.  Add them
-                                <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                                    here.
-                                </a>
-                            </message>
-                        </waltz-no-data>
-
-                        <waltz-app-data-type-usage-list usages="$ctrl.dataTypeUsages"
-                                                        ng-if="$ctrl.dataTypeUsages.length > 0">
-                        </waltz-app-data-type-usage-list>
-                        <hr>
-                    </div>
+            <div class="waltz-panel-content">
+                <!-- NO DATA, BOTH FLOWS AND TYPES -->
+                <div ng-if="$ctrl.dataTypeUsages.length == 0 && $ctrl.logicalFlows.length == 0">
+                    <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
+                        <message>
+                            <strong>
+                                No flows or types
+                            </strong>
+                            registered for this application.  Add them
+                            <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
+                                here.
+                            </a>
+                        </message>
+                    </waltz-no-data>
                 </div>
 
-                <!-- SOURCE AND TARGET GRAPH -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <h5>Logical Flows</h5>
-                        <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
-                            <message>
-                                <strong>
-                                    No Logical Data Flows
-                                </strong>
-                                registered for this application.  Add one
-                                <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                                    here
-                                </a>.
-                            </message>
-                        </waltz-no-data>
+                <!-- DATA TYPE SUMMARY -->
+                <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
+                    <div class='row'>
+                        <div class="col-md-12">
+                            <h5>Data Types</h5>
+                            <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
+                                <message>
+                                    <strong>
+                                        No Types
+                                    </strong>
+                                    registered for this application.  Add them
+                                    <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
+                                        here.
+                                    </a>
+                                </message>
+                            </waltz-no-data>
 
-                        <div ng-if="$ctrl.logicalFlows.length > 0">
+                            <waltz-app-data-type-usage-list usages="$ctrl.dataTypeUsages"
+                                                            ng-if="$ctrl.dataTypeUsages.length > 0">
+                            </waltz-app-data-type-usage-list>
+                            <hr>
+                        </div>
+                    </div>
 
-                            <waltz-source-and-target-panel entity-ref="$ctrl.parentEntityRef"
-                                                           logical-flows="$ctrl.logicalFlows"
-                                                           decorators="$ctrl.logicalFlowDecorators"
-                                                           physical-flows="$ctrl.physicalFlows"
-                                                           physical-specifications="$ctrl.physicalSpecifications">
-                            </waltz-source-and-target-panel>
+                    <!-- SOURCE AND TARGET GRAPH -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Logical Flows</h5>
+                            <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
+                                <message>
+                                    <strong>
+                                        No Logical Data Flows
+                                    </strong>
+                                    registered for this application.  Add one
+                                    <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
+                                        here
+                                    </a>.
+                                </message>
+                            </waltz-no-data>
 
-                            <p class="text-muted small">
-                                This diagram shows flows categorized by data type to this application (center)
-                                from sending systems (on the left)
-                                and to the receiving system (on the right).
-                                <span style="color: darkred">Red lines</span>
-                                indicate
-                                <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
-                                flows.
+                            <div ng-if="$ctrl.logicalFlows.length > 0">
 
-                                <span style="color: orange">Amber lines</span>
-                                indicate
-                                <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
-                                flows and
+                                <waltz-source-and-target-panel entity-ref="$ctrl.parentEntityRef"
+                                                               logical-flows="$ctrl.logicalFlows"
+                                                               decorators="$ctrl.logicalFlowDecorators"
+                                                               physical-flows="$ctrl.physicalFlows"
+                                                               physical-specifications="$ctrl.physicalSpecifications">
+                                </waltz-source-and-target-panel>
 
-                                <span style="color: darkgreen">Green Lines</span>
-                                indicate
-                                <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
-                                flows.
-                            </p>
+                                <p class="text-muted small">
+                                    This diagram shows flows categorized by data type to this application (center)
+                                    from sending systems (on the left)
+                                    and to the receiving system (on the right).
+                                    <span style="color: darkred">Red lines</span>
+                                    indicate
+                                    <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
+                                    flows.
+
+                                    <span style="color: orange">Amber lines</span>
+                                    indicate
+                                    <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
+                                    flows and
+
+                                    <span style="color: darkgreen">Green Lines</span>
+                                    indicate
+                                    <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
+                                    flows.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </uib-tab>
 
         <!-- PHYSICAL FLOW TAB -->
@@ -157,69 +158,7 @@
                  heading="Authority">
 
             <div ng-if="$ctrl.visibility.dataTab == 2">
-                <br>
-
-                <div ng-if="!($ctrl.authSources | isEmpty)">
-                    <p>
-                        This application has been declared as an authoritative source for some of the datatypes
-                        it deals with.
-                    </p>
-
-                    <div ng-repeat="(dataType, data) in $ctrl.nestedAuthSources"
-                         style="padding-top: 5px;">
-                        <h4 ng-bind="dataType | toDisplayName:'dataType'">
-                        </h4>
-                        <p class="text-muted"
-                           ng-bind="dataType | toDescription:'dataType'">
-                        </p>
-
-                        <table class="table table-condensed">
-                            <colgroup>
-                                <col width="15%"/>
-                                <col width="15%"/>
-                                <col/>
-                            </colgroup>
-                            <tr ng-repeat="(rating, sources) in data">
-                                <td>
-                                    <waltz-rating-indicator value="{{ rating }}">
-                                    </waltz-rating-indicator>
-                                </td>
-                                <td>
-                                    <waltz-enum-value type="'AuthoritativenessRating'"
-                                                      show-icon="false"
-                                                      key="rating">
-                                    </waltz-enum-value>
-                                </td>
-                                <td>
-                                    Organisational Units:
-                                    <ul class="list-inline"
-                                        style="display: inline-block">
-                                        <li ng-repeat="source in sources">
-                                            <a ui-sref="main.org-unit.view({ id: source.parentReference.id })"
-                                               ng-bind="$ctrl.orgUnitsById[source.parentReference.id].name">
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <hr/>
-                    <small class="text-muted">
-                        The above table shows the datatypes this application is considered to be an authoritative source for.
-                        The classification of authoritativeness is from the viewpoint of an organisational unit (and its sub units)
-                        therefore you may see multiple declarations from different areas in the organisation.
-                    </small>
-                </div>
-
-
-                <waltz-no-data ng-if="($ctrl.authSources|isEmpty)">
-                    <message>
-                        This application has not been declared an
-                        <strong>Authoritative Source</strong>
-                        for any datatypes
-                    </message>
-                </waltz-no-data>
+                <waltz-app-authority-panel auth-sources="$ctrl.authSources"></waltz-app-authority-panel>
             </div>
 
 

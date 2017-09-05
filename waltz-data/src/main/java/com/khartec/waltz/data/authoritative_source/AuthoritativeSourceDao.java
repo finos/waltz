@@ -18,15 +18,12 @@
 
 package com.khartec.waltz.data.authoritative_source;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
+import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeSource;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.DataType;
@@ -69,7 +66,7 @@ public class AuthoritativeSourceDao {
 
     private final DSLContext dsl;
 
-    private static final RecordMapper<Record, AuthoritativeSource> TO_AUTH_SOURCE_MAPPER = r -> {
+    private static final RecordMapper<Record, AuthoritativeSource> TO_DOMAIN_MAPPER = r -> {
         AuthoritativeSourceRecord record = r.into(AuthoritativeSourceRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -96,6 +93,7 @@ public class AuthoritativeSourceDao {
                 .applicationReference(appRef)
                 .dataType(record.getDataType())
                 .rating(AuthoritativenessRating.valueOf(record.getRating()))
+                .description(record.getDescription())
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -130,7 +128,7 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -141,7 +139,7 @@ public class AuthoritativeSourceDao {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(ref.kind().name()))
                 .and(AUTHORITATIVE_SOURCE.PARENT_ID.eq(ref.id()))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -160,32 +158,40 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(applicationId))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public int update(long id, AuthoritativenessRating rating) {
-        checkTrue(id > -1, "id must be +ve");
-        checkNotNull(rating, "rating must not be null");
+    public int update(AuthoritativeSourceUpdateCommand command) {
+        checkNotNull(command, "command cannot be null");
+        checkTrue(command.id().isPresent(), "id must be +ve");
 
-        return dsl.update(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.RATING, rating.name())
-                .where(AUTHORITATIVE_SOURCE.ID.eq(id))
+        UpdateSetMoreStep<AuthoritativeSourceRecord> upd = dsl.update(AUTHORITATIVE_SOURCE)
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description());
+
+        return upd
+                .where(AUTHORITATIVE_SOURCE.ID.eq(command.id().get()))
                 .execute();
     }
 
 
-    public int insert(EntityReference parentRef, String dataType, Long appId, AuthoritativenessRating rating) {
-        checkNotNull(parentRef, "parentRef must not be null");
-        Checks.checkNotEmpty(dataType, "dataType cannot be empty");
-        checkNotNull(rating, "rating must not be null");
+    public int insert(AuthoritativeSourceCreateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        SelectConditionStep<Record1<String>> dataTypeSelection = DSL
+                .select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.eq(command.dataTypeId()));
 
         return dsl.insertInto(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, parentRef.kind().name())
-                .set(AUTHORITATIVE_SOURCE.PARENT_ID, parentRef.id())
-                .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataType)
-                .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, appId)
-                .set(AUTHORITATIVE_SOURCE.RATING, rating.name())
+                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, EntityKind.ORG_UNIT.name())
+                .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.orgUnitId())
+                .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataTypeSelection)
+                .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, command.applicationId())
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
+                .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
                 .execute();
     }
 
@@ -200,7 +206,7 @@ public class AuthoritativeSourceDao {
     public AuthoritativeSource getById(long id) {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.ID.eq(id))
-                .fetchOne(TO_AUTH_SOURCE_MAPPER);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -223,7 +229,7 @@ public class AuthoritativeSourceDao {
 
     public List<AuthoritativeSource> findAll() {
         return baseSelect()
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -235,7 +241,7 @@ public class AuthoritativeSourceDao {
 
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

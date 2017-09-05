@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,20 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-
-import {registerComponents} from '../common/module-utils';
-import * as AppAuthorityPanel from './components/app-authority-panel/app-authority-panel';
-import * as DataFlowSection from './components/data-flow-section/data-flow-section';
+package com.khartec.waltz.model.authoritativesource;
 
 
-function setup() {
-    const module = angular.module('waltz.data-flow', []);
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import org.immutables.value.Value;
 
-    registerComponents(module, [ AppAuthorityPanel, DataFlowSection ]);
-
-    return module.name;
+@Value.Immutable
+@JsonSerialize(as = ImmutableAuthoritativeSourceUpdateCommand.class)
+@JsonDeserialize(as = ImmutableAuthoritativeSourceUpdateCommand.class)
+public abstract class AuthoritativeSourceUpdateCommand implements
+        DescriptionProvider,
+        IdProvider
+{
+    public abstract AuthoritativenessRating rating();
 }
-
-
-export default setup;

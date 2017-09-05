@@ -25,7 +25,6 @@ import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
 import com.khartec.waltz.service.access_log.AccessLogService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.jooq.tools.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -79,7 +78,7 @@ public class AccessLogEndpoint implements Endpoint {
     }
 
 
-    private WaltzVersionInfo writeRoute(Request request, Response response) throws ParseException {
+    private WaltzVersionInfo writeRoute(Request request, Response response) {
         AccessLog accessLog = ImmutableAccessLog.builder()
                 .userId(getUsername(request))
                 .state(request.params("state"))

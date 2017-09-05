@@ -17,7 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsIdSelector} from "../../common/checks";
+import _ from 'lodash';
+import {
+    checkIsAuthSourceCreateCommand,
+    checkIsAuthSourceUpdateCommand,
+    checkIsIdSelector} from "../../common/checks";
 
 
 export function store($http, root) {
@@ -25,10 +29,12 @@ export function store($http, root) {
     const BASE = `${root}/authoritative-source`;
 
 
-    const findByReference = (kind, id) =>
-        $http
-            .get(`${BASE}/entity-ref/${kind}/${id}`)
+    const findByReference = (kind, id) => {
+        const ref = _.isObject(kind) ? kind : { kind, id };
+        return $http
+            .get(`${BASE}/entity-ref/${ref.kind}/${ref.id}`)
             .then(result => result.data);
+    };
 
 
     const findByApp = (id) =>
@@ -53,9 +59,11 @@ export function store($http, root) {
     };
 
 
-    const update = (id, newRating) =>
-        $http
-            .post(`${BASE}/id/${id}`, newRating);
+    const update = (cmd) => {
+        checkIsAuthSourceUpdateCommand(cmd);
+        return $http
+            .put(BASE, cmd);
+    }
 
 
     const remove = (id) =>
@@ -69,11 +77,10 @@ export function store($http, root) {
             .then(r => r.data);
 
 
-    const insert = (insertRequest) => {
-        const { kind, id, dataType, appId, rating} = insertRequest;
-        const url = `${BASE}/kind/${kind}/${id}/${dataType}/${appId}`;
+    const insert = (command) => {
+        checkIsAuthSourceCreateCommand(command);
         return $http
-            .post(url, rating);
+            .post(BASE, command);
     };
 
     const determineAuthSourcesForOrgUnit = (orgUnitId) =>

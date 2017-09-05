@@ -21,9 +21,10 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -84,9 +85,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
-        String updatePath = mkPath(BASE_URL, "id", ":id");
         String deletePath = mkPath(BASE_URL, "id", ":id");
-        String insertPath = mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId");
         String determineAuthSourcesForOrgUnitPath = mkPath(BASE_URL, "org-unit", ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
@@ -111,9 +110,9 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         postForList(findByDataTypeIdSelectPath, findByDataTypeIdSelectorRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
-        postForDatum(updatePath, this::updateRoute);
+        putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
-        postForDatum(insertPath, this::insertRoute);
+        postForDatum(BASE_URL, this::insertRoute);
 
 
         getForDatum(determineAuthSourcesForOrgUnitPath, determineAuthSourcesForOrgUnitRoute);
@@ -130,16 +129,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     }
 
 
-    private String insertRoute(Request request, Response response) {
+    private String insertRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-        EntityReference parentRef = getEntityReference(request);
-        String dataType = request.params("dataType");
-        Long appId = getLong(request, "appId");
-
-        String ratingStr = request.body();
-        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-
-        authoritativeSourceService.insert(parentRef, dataType, appId, rating);
+        AuthoritativeSourceCreateCommand command = readBody(request, AuthoritativeSourceCreateCommand.class);
+        authoritativeSourceService.insert(command);
         return "done";
     }
 
@@ -174,11 +167,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     }
 
 
-    private String updateRoute(Request request, Response response) {
+    private String updateRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-        String ratingStr = request.body();
-        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-        authoritativeSourceService.update(getId(request), rating);
+        AuthoritativeSourceUpdateCommand command = readBody(request, AuthoritativeSourceUpdateCommand.class);
+        authoritativeSourceService.update(command);
         return "done";
     }
 
