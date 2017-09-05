@@ -179,6 +179,10 @@
                                     <span ng-bind="ctrl.answers[qi.question.id].answer | number">
                                     </span>
                                 </div>
+                                <div ng-switch-when="DATE">
+                                    <span ng-bind="ctrl.answers[qi.question.id].answer | date:'dd-MMM-yyyy'">
+                                    </span>
+                                </div>
                                 <div ng-switch-when="TEXTAREA">
                                     <waltz-markdown text="ctrl.answers[qi.question.id].answer">
                                     </waltz-markdown>

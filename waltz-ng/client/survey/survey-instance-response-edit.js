@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData} from "../common/index";
+import {formats, initialiseData} from "../common/index";
 import {groupQuestions} from "./survey-utils";
 import _ from "lodash";
+import moment from "moment";
 
 
 const initialState = {
@@ -41,6 +42,9 @@ function indexResponses(responses = []) {
                 qr.booleanResponse = qr.booleanResponse
                     ? 'true'
                     : 'false';
+            }
+            if (!_.isNil(qr.dateResponse)) {
+                qr.dateResponse = moment(qr.dateResponse, formats.parseDateOnly).toDate()
             }
             return qr;
         })
@@ -100,19 +104,34 @@ function controller($location,
         + $state.href('main.survey.instance.view', {id: id}));
 
     vm.saveResponse = (questionId) => {
+        const questionResponse = vm.surveyResponses[questionId];
         surveyInstanceStore.saveResponse(
             vm.surveyInstance.id,
-            Object.assign({'questionId': questionId}, vm.surveyResponses[questionId])
+            Object.assign(
+                {'questionId': questionId},
+                questionResponse,
+                {
+                    dateResponse : questionResponse.dateResponse
+                                    ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
+                                    : null
+                })
         );
     };
 
-    vm.saveEntityRespone = (questionId, entity) => {
+    vm.saveEntityResponse = (questionId, entity) => {
         vm.surveyResponses[questionId] = {
             entityResponse: {
                 id: entity.id,
                 kind: entity.kind,
                 name: entity.name
             }
+        };
+        vm.saveResponse(questionId);
+    };
+
+    vm.saveDateResponse = (questionId, dateVal) => {
+        vm.surveyResponses[questionId] = {
+            dateResponse: dateVal
         };
         vm.saveResponse(questionId);
     };

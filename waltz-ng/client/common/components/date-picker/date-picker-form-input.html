@@ -5,6 +5,7 @@
            placeholder="{{$ctrl.placeHolder}}"
            ng-model="$ctrl.model"
            ng-required="$ctrl.required"
+           ng-change="$ctrl.valueChanged()"
            uib-datepicker-popup="{{$ctrl.format}}"
            is-open="$ctrl.datePickerOpened"
            datepicker-options="$ctrl.dateOptions"

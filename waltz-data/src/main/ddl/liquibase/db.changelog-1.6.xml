@@ -560,4 +560,16 @@
         </update>
     </changeSet>
 
+
+    <!-- 2534: Survey: Date Question Type -->
+    <changeSet id="20170905-2534-1"
+               author="rovats">
+        <addColumn tableName="survey_question_response">
+            <column name="date_response"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
