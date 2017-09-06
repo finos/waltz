@@ -4,12 +4,13 @@
                    id="logical-flows-section">
 
         <waltz-section-actions>
-            <a class="btn btn-xs btn-primary"
-               ng-click="$ctrl.export()"
-               ng-if="$ctrl.visibility.exportButton">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </a>
+            <waltz-data-extract-link name="Export"
+                                     filename="logical-flows.csv"
+                                     extract="logical-flows"
+                                     method="POST"
+                                     request-body="$ctrl.selector"
+                                     ng-if="$ctrl.visibility.exportButton">
+            </waltz-data-extract-link>
             <button class="btn btn-xs waltz-btn-transparent"
                     ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
                 <waltz-icon name="map-signs"></waltz-icon>

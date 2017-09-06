@@ -60,6 +60,17 @@
                                 <waltz-static-panels render-mode="chromeless"
                                                      panels="ctrl.panelsByCategory[tab.category.id]">
                                 </waltz-static-panels>
+
+                                <hr>
+
+                                <waltz-data-extract-link name="Export"
+                                                         uib-popover="Exports this taxonomy and the key people associated with it"
+                                                         popover-trigger="mouseenter"
+                                                         extract="measurable-category/{{tab.category.id}}"
+                                                         filename="{{tab.category.name}}.csv">
+                                </waltz-data-extract-link>
+
+
                             </div>
                         </div>
 

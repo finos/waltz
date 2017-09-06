@@ -22,7 +22,8 @@ import _ from 'lodash';
 const bindings = {
     flowData: '<',
     applications: '<',
-    onLoadDetail: '<'
+    onLoadDetail: '<',
+    selector: '<'
 };
 
 
@@ -53,9 +54,6 @@ function controller() {
         vm.visibility.exportButton = index == 2;
         if(index === 0) vm.visibility.flowConfigOverlay = false;
     };
-
-    vm.tableInitialised = (cfg) =>
-        vm.export = () => cfg.exportFn('logical-flows.csv');
 
     vm.$onChanges = c => {
         vm.hasFlows = calcHasFlows(vm.flowData);

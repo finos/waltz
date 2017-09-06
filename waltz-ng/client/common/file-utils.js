@@ -8,6 +8,11 @@ export function downloadTextFile(dataRows = [],
         .dsvFormat(delimiter)
         .formatRows(dataRows);
 
+    downloadFile(fileContent, fileName);
+}
+
+
+export function downloadFile(fileContent, fileName = 'download.csv') {
     const D = document;
     const a = D.createElement('a');
     const strMimeType = 'application/octet-stream;charset=utf-8';
