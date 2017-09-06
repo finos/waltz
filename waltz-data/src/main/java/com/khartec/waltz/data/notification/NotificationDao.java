@@ -19,13 +19,12 @@ public class NotificationDao {
 
     private final DSLContext dsl;
 
-    private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull();
-    private static final Field<Integer> count = DSL.count().as("count");
+    private static final Field<Integer> COUNT = DSL.count().as("count");
 
     private static final RecordMapper<Record, NotificationSummary> TO_DOMAIN_MAPPER = r -> {
         return ImmutableNotificationSummary.builder()
                 .kind(EntityKind.valueOf(r.get("kind", String.class)))
-                .count(r.get(count))
+                .count(r.get(COUNT))
                 .build();
     };
 
@@ -40,7 +39,7 @@ public class NotificationDao {
 
     public List<NotificationSummary> findNotificationsByUserId(String userId) {
         Select<Record2<String, Integer>> attestationCount = dsl
-                .select(DSL.val(EntityKind.ATTESTATION.name()).as("kind"), count)
+                .select(DSL.val(EntityKind.ATTESTATION.name()).as("kind"), COUNT)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
@@ -48,14 +47,14 @@ public class NotificationDao {
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
 
         Select<Record2<String, Integer>> surveyCount = dsl
-                .select(DSL.val(EntityKind.SURVEY_INSTANCE.name()).as("kind"), count)
+                .select(DSL.val(EntityKind.SURVEY_INSTANCE.name()).as("kind"), COUNT)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .innerJoin(PERSON)
                 .on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
                 .where(PERSON.EMAIL.eq(userId))
-                .and(IS_ORIGINAL_INSTANCE_CONDITION);
+                .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull());
 
         return attestationCount
                 .union(surveyCount)
