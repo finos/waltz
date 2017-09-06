@@ -16,25 +16,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const template = require('./data-extract-link.html');
+import {downloadFile} from "../common/file-utils";
+import {initialiseData} from "../common/index";
+
+import template from './data-extract-link.html';
 
 
 const bindings = {
     name: '@',
-    extract: '@'
+    extract: '@',
+    method: '@',
+    filename: '@',
+    requestBody: '<'
 };
 
 
-function controller(BaseExtractUrl) {
-    const vm = this;
+const initialState = {
+    name: 'Export',
+    filename: 'extract.csv',
+    method: 'GET',
+    requestBody: null
+};
+
+
+function controller($http, BaseExtractUrl) {
+    const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
         vm.url = `${BaseExtractUrl}/${vm.extract}`;
     };
+
+    vm.export = () => {
+        debugger;
+        switch (vm.method) {
+            case 'GET':
+                return $http.get(vm.url)
+                    .then(r => downloadFile(r.data, vm.filename));
+            case 'POST':
+                return $http.post(vm.url, vm.requestBody)
+                    .then(r => downloadFile(r.data, vm.filename));
+            default:
+                throw 'Unrecognised method: ' + vm.method;
+        }
+    };
+
 }
 
 
 controller.$inject = [
+    '$http',
     'BaseExtractUrl'
 ];
 

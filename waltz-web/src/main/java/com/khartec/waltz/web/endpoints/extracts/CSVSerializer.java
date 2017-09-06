@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 import org.supercsv.io.CsvListWriter;
 
 
-public interface Extractor {
+public interface CSVSerializer {
 
     void accept(CsvListWriter csvWriter) throws Exception;
 }

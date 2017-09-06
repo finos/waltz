@@ -25,6 +25,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
+import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -98,6 +99,12 @@ public class Main {
         endpoints.forEach((name, endpoint) -> {
             LOG.info("Registering Endpoint: {}", name);
             endpoint.register();
+        });
+
+        Map<String, BaseDataExtractor> extractors = ctx.getBeansOfType(BaseDataExtractor.class);
+        extractors.forEach((name, extractor) -> {
+            LOG.info("Registering Extractor: {}", name);
+            extractor.register();
         });
 
 
