@@ -124,6 +124,7 @@ function controller($state,
             .execute(CORE_API.AttestationRunStore.create, [command])
             .then(res => {
                 notification.success('Attestation run created successfully');
+                serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
                 $state.go('main.attestation.run.view', {id: res.data.id});
             }, () => notification.error('Failed to create attestation run'))
     };

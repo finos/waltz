@@ -41,6 +41,8 @@ function controller($q,
                     .filter(r => r.instances)
                     .value();
             });
+
+        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
     };
 
     loadData();

@@ -71,6 +71,16 @@ public class SurveyInstanceService {
     }
 
 
+    public int findPendingCountForRecipient(String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        Person person = personDao.getByUserName(userName);
+        checkNotNull(person, "userName " + userName + " cannot be resolved");
+
+        return surveyInstanceDao.findPendingCountForRecipient(person.id().get());
+    }
+
+
     public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return surveyInstanceDao.findForSurveyRun(surveyRunId);
     }

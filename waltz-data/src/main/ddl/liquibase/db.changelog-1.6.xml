@@ -584,4 +584,16 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 2552 - attestation_instance_recipient index on user_id -->
+    <changeSet id="20170906-2552-1"
+               author="kamransaleem">
+        <createIndex indexName="idx_air_user_id"
+                     tableName="attestation_instance_recipient"
+                     unique="false">
+            <column name="user_id" type="${name.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

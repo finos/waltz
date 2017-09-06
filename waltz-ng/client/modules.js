@@ -91,6 +91,7 @@ const dependencies = [
     require('./measurable-rating')(),
     require('./measurable-relationship')(),
     require('./navbar')(),
+    require('./notification')(),
     require('./org-units')(),
     require('./orphan')(),
     require('./person')(),

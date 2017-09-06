@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.survey;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.*;
@@ -82,6 +81,17 @@ public class SurveyInstanceDao {
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int findPendingCountForRecipient(long personId) {
+        return dsl.selectCount()
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_INSTANCE_RECIPIENT)
+                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetchOne(0, int.class);
     }
 
 
