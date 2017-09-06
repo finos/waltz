@@ -52,6 +52,7 @@ import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../meas
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
+import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
 import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-unit-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../../perspective/services/perspective-definition-store";
@@ -102,6 +103,7 @@ export const CORE_API = {
     MeasurableRatingStore,
     MeasurableRelationshipStore,
     MeasurableStore,
+    NotificationStore,
     OrgUnitStore,
     PersonStore,
     PerspectiveDefinitionStore,

@@ -18,6 +18,7 @@
 import {formats, initialiseData} from "../common/index";
 import {groupQuestions} from "./survey-utils";
 import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 
 
@@ -58,6 +59,7 @@ function controller($location,
                     $state,
                     $stateParams,
                     notification,
+                    serviceBroker,
                     surveyInstanceStore,
                     surveyRunStore,
                     surveyQuestionStore,
@@ -161,6 +163,7 @@ function controller($location,
             )
             .then(result => {
                 notification.success('Survey response submitted successfully');
+                serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
                 $state.go('main.survey.instance.response.view', {id: id});
             });
         }
@@ -173,6 +176,7 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'Notification',
+    'ServiceBroker',
     'SurveyInstanceStore',
     'SurveyRunStore',
     'SurveyQuestionStore',

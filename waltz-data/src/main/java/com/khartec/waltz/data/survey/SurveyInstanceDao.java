@@ -1,6 +1,5 @@
 package com.khartec.waltz.data.survey;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.*;
