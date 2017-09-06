@@ -121,6 +121,11 @@ export const ApplicationStore_API = {
         serviceFnName: 'findBySelector',
         description: 'find apps for the given selector options'
     },
+    findByAssetCode: {
+        serviceName,
+        serviceFnName: 'findByAssetCode',
+        description: 'executes findByAssetCode'
+    },
     countByOrganisationalUnit: {
         serviceName,
         serviceFnName: 'countByOrganisationalUnit',

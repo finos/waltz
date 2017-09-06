@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016  Khartec Ltd.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.EntityNameUtilities;
@@ -55,8 +73,8 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
 
 
     @Override
-    public void register(String baseUrl) {
-        post(mkPath(baseUrl, "logical-flows"), (request, response) -> {
+    public void register() {
+        post(mkPath("data-extract", "logical-flows"), (request, response) -> {
             IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
             CSVSerializer serializer = extract(options);
             return writeFile("logical-flows.csv", serializer, response);
