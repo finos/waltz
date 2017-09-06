@@ -429,4 +429,16 @@
         </update>
     </changeSet>
 
+
+    <!-- 2553 - survey_instance_recipient index on person_id -->
+    <changeSet id="20170906-2553-1"
+               author="kamransaleem">
+        <createIndex indexName="idx_sir_person"
+                     tableName="survey_instance_recipient"
+                     unique="false">
+            <column name="person_id" type="${id.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
