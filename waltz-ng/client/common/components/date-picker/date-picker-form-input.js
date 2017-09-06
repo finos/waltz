@@ -24,7 +24,10 @@ const bindings = {
     placeHolder: '@',
     required: '@',
     format: '@',
-    model: '='
+    allowPastDates: '@',
+    model: '=',
+    itemId: '<',
+    onChange: '<'
 };
 
 
@@ -34,19 +37,29 @@ const template = require('./date-picker-form-input.html');
 const initialState = {
     dateOptions: {
         formatYear: 'yyyy',
-        minDate: new Date(),
         startingDay: 1
     },
     datePickerOpened: false,
-    placeHolder: ''
+    placeHolder: '',
+    onChange: (itemId, val) => console.log("default onChange ")
 };
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
 
+    vm.$onInit = () => {
+        if (!vm.allowPastDates) {
+            vm.dateOptions.minDate = new Date();
+        }
+    };
+
     vm.datePickerOpen = () => {
         vm.datePickerOpened = true;
+    };
+
+    vm.valueChanged = () => {
+        vm.onChange(vm.itemId, vm.model);
     };
 }
 

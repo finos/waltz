@@ -22,7 +22,7 @@ import {groupQuestions} from './survey-utils';
 function extractAnswer(response = {}) {
     return !_.isNil(response.booleanResponse)
             ? response.booleanResponse
-            : (response.stringResponse || response.numberResponse || response.entityResponse)
+            : (response.stringResponse || response.numberResponse || response.dateResponse || response.entityResponse)
 }
 
 

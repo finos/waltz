@@ -23,7 +23,8 @@ import {nest} from "d3-collection";
 export const formats = {
     daysAndMinutes: 'ddd Do MMM YYYY - HH:mm:ss',
     daysOnly: 'ddd Do MMM YYYY',
-    parse: 'YYYY-MM-DDThh:mm:ss.SSS'
+    parse: 'YYYY-MM-DDThh:mm:ss.SSS',
+    parseDateOnly: 'YYYY-MM-DD'
 };
 
 
