@@ -572,4 +572,13 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 2551: Bookmark: Increase URL field length -->
+    <changeSet id="20170906-2551-1"
+               author="rovats">
+        <modifyDataType tableName="bookmark"
+                        columnName="url"
+                        newDataType="${url.type}"/>
+    </changeSet>
+
 </databaseChangeLog>
