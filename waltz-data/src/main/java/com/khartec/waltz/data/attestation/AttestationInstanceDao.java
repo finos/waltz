@@ -96,17 +96,6 @@ public class AttestationInstanceDao {
     }
 
 
-    public int findPendingCountByRecipient(String userId) {
-        return dsl.selectCount()
-                .from(ATTESTATION_INSTANCE)
-                .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
-                .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
-                .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
-                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
-                .fetchOne(0, int.class);
-    }
-
-
     public List<AttestationInstance> findByEntityReference(EntityReference ref) {
         return dsl.select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)

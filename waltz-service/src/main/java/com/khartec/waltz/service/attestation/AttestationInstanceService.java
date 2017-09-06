@@ -45,13 +45,6 @@ public class AttestationInstanceService {
     }
 
 
-    public int findPendingCountByRecipient(String userId) {
-        checkNotNull(userId, "userId cannot be null");
-
-        return attestationInstanceDao.findPendingCountByRecipient(userId);
-    }
-
-
     public List<AttestationInstance> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 

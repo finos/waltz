@@ -84,17 +84,6 @@ public class SurveyInstanceDao {
     }
 
 
-    public int findPendingCountForRecipient(long personId) {
-        return dsl.selectCount()
-                .from(SURVEY_INSTANCE)
-                .innerJoin(SURVEY_INSTANCE_RECIPIENT)
-                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
-                .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
-                .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .fetchOne(0, int.class);
-    }
-
-
     public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
