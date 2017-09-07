@@ -246,12 +246,12 @@ public class AuthoritativeSourceDao {
 
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
-            Select<Record1<Long>> selector) {
+            Select<Record1<Long>> dataTypeIdSelector) {
 
         SelectConditionStep<Record1<String>> dataTypeCodeSelector = DSL
                 .select(dt.CODE)
                 .from(dt)
-                .where(dt.ID.in(selector));
+                .where(dt.ID.in(dataTypeIdSelector));
 
         Condition appJoin = app.ID.eq(lf.TARGET_ENTITY_ID)
                 .and(app.ORGANISATIONAL_UNIT_ID.eq(eh.ID));
@@ -264,11 +264,10 @@ public class AuthoritativeSourceDao {
 
         Condition dataFlowDecoratorJoin = lfd.LOGICAL_FLOW_ID.eq(lf.ID);
 
-        Condition condition = lfd.DECORATOR_ENTITY_ID.in(selector)
+        Condition condition = lfd.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
                 .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                .and(au.DATA_TYPE.in(dataTypeCodeSelector));
-
-        Condition notRemoved = lf.IS_REMOVED.isFalse();
+                .and(au.DATA_TYPE.in(dataTypeCodeSelector))
+                .and(lf.IS_REMOVED.isFalse());
 
         Field<Long> authSourceIdField = au.ID.as("auth_source_id");
         Field<Long> applicationIdField = app.ID.as("application_id");
@@ -284,7 +283,6 @@ public class AuthoritativeSourceDao {
                 .innerJoin(eh).on(hierarchyJoin)
                 .innerJoin(app).on(appJoin)
                 .where(condition)
-                .and(notRemoved)
                 .orderBy(au.ID, app.NAME)
                 .fetch();
 

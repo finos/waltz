@@ -37,6 +37,11 @@ export function store($http, root) {
     };
 
 
+    const findAll = (id) =>
+        $http
+            .get(BASE)
+            .then(result => result.data);
+
     const findByApp = (id) =>
         $http
             .get(`${BASE}/app/${id}`)
@@ -96,6 +101,7 @@ export function store($http, root) {
     return {
         calculateConsumersForDataTypeIdSelector,
         findByReference,
+        findAll,
         findByApp,
         findByDataTypeIdSelector,
         update,
@@ -127,6 +133,11 @@ export const AuthSourcesStore_API = {
         serviceName,
         serviceFnName: 'findByReference',
         description: 'findByReference'
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'findAll'
     },
     findByApp: {
         serviceName,

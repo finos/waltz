@@ -1,0 +1,74 @@
+<div class="waltz-auth-sources-table">
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Data Type</th>
+            <th>Declaring Org Unit</th>
+            <th>Application</th>
+            <th>Authoritativeness</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="group in $ctrl.authSourceTable">
+        <tr ng-repeat="source in group.values"
+            ng-class="{
+                    'direct' : source.parentReference.id == $ctrl.orgUnitId,
+                    'indirect' : source.parentReference.id != $ctrl.orgUnitId,
+                }">
+
+            <td>
+                <waltz-entity-link ng-if='$first'
+                                   entity-ref="group.values[0].dataType">
+                </waltz-entity-link>
+            </td>
+            <td>
+                <waltz-entity-link entity-ref="source.declaringOrgUnit">
+                </waltz-entity-link>
+            </td>
+            <td>
+                <waltz-entity-link entity-ref="source.app">
+                </waltz-entity-link>
+                <small>
+                    ( {{source.appOrgUnit.name}} )
+                </small>
+            </td>
+            <td>
+                <span>
+                    <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                       show-icon="false"
+                                       key="source.rating">
+                    </waltz-enum-value>
+                </span>
+            </td>
+
+            <td>
+                <span ng-if="source.description" class="clickable">
+                    <waltz-icon name="sticky-note"
+                                style="color: #337ab7"
+                                uib-popover-template="'wast/desc-popup.html'"
+                                popover-class="waltz-popover-wide"
+                                popover-append-to-body="true"
+                                popover-placement="top-right"
+                                popover-trigger="outsideClick">
+                    </waltz-icon>
+                </span>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+    <waltz-static-panels panels="$ctrl.descriptionPanels"
+                         ng-if="$ctrl.showDescription"
+                         class="small"
+                         render-mode="minimal-border">
+    </waltz-static-panels>
+</div>
+
+<script type="text/ng-template"
+        id="wast/desc-popup.html">
+    <div>
+        <waltz-markdown text="source.description"></waltz-markdown>
+    </div>
+</script>

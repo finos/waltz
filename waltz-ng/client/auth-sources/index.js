@@ -32,7 +32,7 @@ export default () => {
     module
         .component('waltzAuthSourcesList', require('./components/auth-sources-list'))
         .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'))
-        .component('waltzAuthSourcesTable', require('./components/auth-sources-table'));
+        .component('waltzAuthSourcesTable', require('./components/table/auth-sources-table'));
 
     module
         .config(require('./routes'));

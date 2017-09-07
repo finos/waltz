@@ -101,6 +101,9 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         ListRoute<AuthoritativeSource> findByApplicationIdRoute = (request, response)
                 -> authoritativeSourceService.findByApplicationId(getId(request));
 
+        ListRoute<AuthoritativeSource> findAllRoute = (request, response)
+                -> authoritativeSourceService.findAll();
+
         DatumRoute<?> determineAuthSourcesForOrgUnitRoute = (request, response)
                 -> authoritativeSourceService.determineAuthSourcesForOrgUnit(getId(request));
 
@@ -110,6 +113,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         postForList(findByDataTypeIdSelectPath, findByDataTypeIdSelectorRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
+        getForList(BASE_URL, findAllRoute);
         putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
         postForDatum(BASE_URL, this::insertRoute);
