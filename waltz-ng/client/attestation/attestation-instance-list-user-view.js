@@ -39,6 +39,7 @@ function controller($q,
                 vm.runsWithInstances =  _.chain(runs)
                     .map(r => Object.assign({}, r, { instances: instancesByRunId[r.id]}))
                     .filter(r => r.instances)
+                    .sortBy(r => r.dueDate)
                     .value();
             });
 
