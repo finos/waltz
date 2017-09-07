@@ -3,6 +3,7 @@ package com.khartec.waltz.data.notification;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.notification.ImmutableNotificationSummary;
 import com.khartec.waltz.model.notification.NotificationSummary;
+import com.khartec.waltz.model.survey.SurveyInstanceStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,9 @@ public class NotificationDao {
                 .innerJoin(PERSON)
                 .on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
                 .where(PERSON.EMAIL.eq(userId))
-                .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull());
+                .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())
+                .and(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.NOT_STARTED.name())
+                        .or(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.IN_PROGRESS.name())));
 
         return attestationCount
                 .union(surveyCount)
