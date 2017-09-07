@@ -29,86 +29,101 @@
         <!-- Pending attestations -->
         <div ng-repeat="run in ctrl.runsWithInstances" class="waltz-display-section ailuv-run">
             <h4 ng-bind="run.name"></h4>
-            <br>
             <div class="row">
-                <div class="col-sm-2 waltz-display-field-label">
-                    Description
-                </div>
-                <div class="col-sm-4">
-                    <span ng-bind="run.description"></span>
+                <div class="col-sm-3">
+
+                    <!-- Description -->
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Description
+                        </div>
+                        <div class="col-sm-8">
+                            <span ng-bind="run.description"></span>
+                        </div>
+                    </div>
+
+                    <!-- Due -->
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Due
+                        </div>
+                        <div class="col-sm-8">
+                            <waltz-from-now timestamp="run.dueDate">
+                            </waltz-from-now>
+                        </div>
+                    </div>
+
+                    <!-- Issued By -->
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Issued by
+                        </div>
+                        <div class="col-sm-8">
+                            <span ng-bind="run.issuedBy"></span>
+                        </div>
+                    </div>
+
+                    <!-- Issued On -->
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Issued on
+                        </div>
+                        <div class="col-sm-8">
+                            <waltz-from-now timestamp="run.issuedOn">
+                            </waltz-from-now>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="col-sm-2 waltz-display-field-label">
-                    Due
-                </div>
-                <div class="col-sm-4">
-                    <waltz-from-now timestamp="run.dueDate">
-                    </waltz-from-now>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-sm-2 waltz-display-field-label">
-                    Issued by
-                </div>
-                <div class="col-sm-4">
-                    <span ng-bind="run.issuedBy"></span>
-                </div>
+                <div class="col-sm-9">
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th width="40%"></th>
+                        </tr>
+                        </thead>
 
-                <div class="col-sm-2 waltz-display-field-label">
-                    Issued on
-                </div>
-                <div class="col-sm-4">
-                    <waltz-from-now timestamp="run.issuedOn">
-                    </waltz-from-now>
-                </div>
-            </div>
-            <br>
-
-            <table class="table table-condensed">
-                <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th width="40%"></th>
-                </tr>
-                </thead>
-
-                <tbody ng-repeat="instance in run.instances">
-                    <tr>
-                        <td>
-                            <waltz-entity-link entity-ref="instance.parentEntity">
-                            </waltz-entity-link>
-                        </td>
-                        <td>
-                            <a class="btn btn-primary btn-xs"
-                               ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance"
-                               ng-bind="'Attest ' + (instance.childEntityKind | toDisplayName:'entity' | lowercase)+'s'"
-                               ng-click="ctrl.selectedAttestation = instance">
-                            </a>
-                            <span ng-if="instance.attestedAt">
+                        <tbody ng-repeat="instance in run.instances">
+                        <tr>
+                            <td>
+                                <waltz-entity-link entity-ref="instance.parentEntity">
+                                </waltz-entity-link>
+                            </td>
+                            <td>
+                                <a class="btn btn-primary btn-xs"
+                                   ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance"
+                                   ng-bind="'Attest ' + (instance.childEntityKind | toDisplayName:'entity' | lowercase)+'s'"
+                                   ng-click="ctrl.selectedAttestation = instance">
+                                </a>
+                                <span ng-if="instance.attestedAt">
                                 <span ng-bind="(instance.childEntityKind | toDisplayName:'entity')+'s' + ' attested by ' + instance.attestedBy"></span>
                                 (<waltz-from-now timestamp="instance.attestedAt"></waltz-from-now>)
                             </span>
-                        </td>
-                    </tr>
-                    <tr ng-if="ctrl.selectedAttestation === instance"
-                        class="waltz-fade-if">
-                        <td colspan="2"
-                            style="padding-right: 3em; border-top: none">
-                            <waltz-attestation-confirmation instance="ctrl.selectedAttestation"
-                                                            on-confirm="ctrl.attestEntity"
-                                                            on-cancel="ctrl.cancelAttestation">
-                                <waltz-inline-logical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                  ng-if="ctrl.selectedAttestation.childEntityKind === 'LOGICAL_DATA_FLOW'">
-                                </waltz-inline-logical-flow-panel>
-                                <waltz-inline-physical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                   ng-if="ctrl.selectedAttestation.childEntityKind === 'PHYSICAL_FLOW'">
-                                </waltz-inline-physical-flow-panel>
-                            </waltz-attestation-confirmation>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        <tr ng-if="ctrl.selectedAttestation === instance"
+                            class="waltz-fade-if">
+                            <td colspan="2"
+                                style="padding-right: 3em; border-top: none">
+                                <waltz-attestation-confirmation instance="ctrl.selectedAttestation"
+                                                                on-confirm="ctrl.attestEntity"
+                                                                on-cancel="ctrl.cancelAttestation">
+                                    <waltz-inline-logical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
+                                                                      ng-if="ctrl.selectedAttestation.childEntityKind === 'LOGICAL_DATA_FLOW'">
+                                    </waltz-inline-logical-flow-panel>
+                                    <waltz-inline-physical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
+                                                                       ng-if="ctrl.selectedAttestation.childEntityKind === 'PHYSICAL_FLOW'">
+                                    </waltz-inline-physical-flow-panel>
+                                </waltz-attestation-confirmation>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
 
         <!-- No data -->

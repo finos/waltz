@@ -4,6 +4,7 @@
     border-right: 10px solid $wac-border-color;
     border-bottom: 20px solid $wac-border-color;
     border-radius: $border-radius-base;
+    background: white;
 
     .wac-header {
         text-align: right;
@@ -21,6 +22,6 @@
 
     .wac-content {
         padding: 10px;
-        width: 85vw;
+        width: 95%;
     }
 }
