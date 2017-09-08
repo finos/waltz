@@ -16,24 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditView from "./logical-flow-edit";
-
 const base = {
     url: 'logical-flow'
-};
-
-
-const editState = {
-    url: '/edit/:kind/:id',
-    views: {'content@': EditView }
 };
 
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.logical-flow', base)
-        .state('main.logical-flow.edit', editState);
+        .state('main.logical-flow', base);
 }
 
 
