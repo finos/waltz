@@ -47,7 +47,6 @@ function controller($http, BaseExtractUrl) {
     };
 
     vm.export = () => {
-        debugger;
         switch (vm.method) {
             case 'GET':
                 return $http.get(vm.url)
