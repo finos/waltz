@@ -167,8 +167,15 @@ public class LogicalFlowDecoratorDao {
 
     // --- STATS ---
 
-    public List<DecoratorRatingSummary> summarizeForSelector(Select<Record1<Long>> selector) {
+    public List<DecoratorRatingSummary> summarizeInboundForSelector(Select<Record1<Long>> selector) {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector)
+                .and(NOT_REMOVED);
+
+        return summarizeForCondition(condition);
+    }
+
+    public List<DecoratorRatingSummary> summarizeOutboundForSelector(Select<Record1<Long>> selector) {
+        Condition condition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(selector)
                 .and(NOT_REMOVED);
 
         return summarizeForCondition(condition);

@@ -18,19 +18,23 @@
 
 package com.khartec.waltz.service.authoritative_source;
 
-import com.khartec.waltz.common.hierarchy.Node;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
+import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +45,11 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.newHashMap;
-import static com.khartec.waltz.common.hierarchy.HierarchyUtilities.parents;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 
 @Service
@@ -55,26 +60,30 @@ public class AuthoritativeSourceService {
     private final AuthoritativeSourceDao authoritativeSourceDao;
     private final AuthSourceRatingCalculator ratingCalculator;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final OrganisationalUnitService organisationalUnitService;
+    private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
     private final ChangeLogService changeLogService;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
 
     @Autowired
     public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
                                       AuthSourceRatingCalculator ratingCalculator,
+                                      ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                       DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                      OrganisationalUnitService organisationalUnitService, 
+                                      OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory,
                                       ChangeLogService changeLogService) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(ratingCalculator, "ratingCalculator cannot be null");
+        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-        checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
+        checkNotNull(organisationalUnitIdSelectorFactory, "organisationalUnitIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.ratingCalculator = ratingCalculator;
+        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-        this.organisationalUnitService = organisationalUnitService;
+        this.organisationalUnitIdSelectorFactory = organisationalUnitIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 
@@ -99,17 +108,17 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int update(long id, AuthoritativenessRating rating) {
-        int updateCount = authoritativeSourceDao.update(id, rating);
-        AuthoritativeSource updatedAuthSource = getById(id);
+    public int update(AuthoritativeSourceUpdateCommand command) {
+        int updateCount = authoritativeSourceDao.update(command);
+        AuthoritativeSource updatedAuthSource = getById(command.id().get());
         ratingCalculator.update(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
         return updateCount;
     }
 
 
-    public int insert(EntityReference parentRef, String dataTypeCode, Long appId, AuthoritativenessRating rating) {
-        int insertedCount = authoritativeSourceDao.insert(parentRef, dataTypeCode, appId, rating);
-        ratingCalculator.update(dataTypeCode, parentRef);
+    public int insert(AuthoritativeSourceCreateCommand command) {
+        int insertedCount = authoritativeSourceDao.insert(command);
+        ratingCalculator.update(command.dataTypeId(), mkRef(EntityKind.ORG_UNIT, command.orgUnitId()));
         return insertedCount;
     }
 
@@ -134,12 +143,6 @@ public class AuthoritativeSourceService {
                         authSource.parentReference()));
 
         return true;
-    }
-
-
-    public List<AuthoritativeSource> findByDataTypeIdSelector(IdSelectionOptions idSelectionOptions) {
-        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
-        return authoritativeSourceDao.findByDataTypeIdSelector(selector);
     }
 
 
@@ -174,38 +177,81 @@ public class AuthoritativeSourceService {
     }
 
 
-    /** (ouId) -> dataType -> appId -> rating
-     * @param orgUnitId */
-    public Map<String, Map<Long, AuthoritativeSource>> determineAuthSourcesForOrgUnit(long orgUnitId) {
-        Node<OrganisationalUnit, Long> startNode = organisationalUnitService.loadHierarchy(orgUnitId);
-        List<AuthoritativeSource> allAuthSources = findByEntityKind(EntityKind.ORG_UNIT);
-        Map<Long, Collection<AuthoritativeSource>> authSourcesByOrgId = groupBy(as -> as.parentReference().id(), allAuthSources);
-        return determineCumulativeRules(startNode, authSourcesByOrgId);
-    }
+    public List<NonAuthoritativeSource> findNonAuthSources(EntityReference parentRef) {
 
 
-    /** (ouNode, ouId -> [authSource]) -> dataType -> appId -> rating */
-    private Map<String, Map<Long, AuthoritativeSource>> determineCumulativeRules(Node<OrganisationalUnit, Long> node,
-                                                                                 Map<Long, Collection<AuthoritativeSource>> authSourcesByOrgId) {
 
-        // get orgIds in order from root (reverse of our parents + us)
-        List<Long> ids = append(reverse(map(parents(node), x -> x.getId())), node.getId());
+        Condition customSelectionCriteria;
+        switch(parentRef.kind()) {
+            case DATA_TYPE:
+                Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(mkOpts(
+                        parentRef,
+                        HierarchyQueryScope.CHILDREN));
+                customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dtSelector);
+                break;
 
+            case ORG_UNIT:
+                Select<Record1<Long>> ouSelector = organisationalUnitIdSelectorFactory.apply(mkOpts(
+                        parentRef,
+                        HierarchyQueryScope.CHILDREN));
+                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(ouSelector);
+                break;
 
-        Map<String, Map<Long, AuthoritativeSource>> cumulativeRules = newHashMap();
+            case MEASURABLE:
+            case PERSON:
+                customSelectionCriteria = mkConsumerSelectionCondition(parentRef, HierarchyQueryScope.CHILDREN);
+                break;
 
-        for (Long unitId : ids) {
-            Collection<AuthoritativeSource> authSources = authSourcesByOrgId.getOrDefault(unitId, newArrayList());
-            Map<String, Collection<AuthoritativeSource>> byType = groupBy(as -> as.dataType(), authSources);
-            for (String type: byType.keySet()) {
-                Map<Long, AuthoritativeSource> appRatingMap = cumulativeRules.getOrDefault(type, newHashMap());
-                byType.get(type).forEach(as -> appRatingMap.put(as.applicationReference().id(), as));
-                cumulativeRules.put(type, appRatingMap);
-            }
+            case APP_GROUP:
+            case FLOW_DIAGRAM:
+                customSelectionCriteria = mkConsumerSelectionCondition(parentRef, HierarchyQueryScope.EXACT);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Cannot calculate non-auth sources for ref" + parentRef);
         }
 
-        return cumulativeRules;
+        return authoritativeSourceDao.findNonAuthSources(customSelectionCriteria);
+    }
+
+
+    public List<AuthoritativeSource> findAuthSources(EntityReference parentRef) {
+        Condition customSelectionCriteria;
+        switch(parentRef.kind()) {
+            case ORG_UNIT:
+                Select<Record1<Long>> ouSelector = organisationalUnitIdSelectorFactory.apply(
+                        mkOpts(parentRef, HierarchyQueryScope.CHILDREN));
+                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(ouSelector);
+                break;
+            case DATA_TYPE:
+                Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(
+                        mkOpts(parentRef, HierarchyQueryScope.CHILDREN));
+                SelectConditionStep<Record1<String>> codeSelector = DSL
+                        .select(DATA_TYPE.CODE)
+                        .from(DATA_TYPE)
+                        .where(DATA_TYPE.ID.in(dtSelector));
+                customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector);
+                break;
+            case MEASURABLE:
+            case PERSON:
+                customSelectionCriteria = mkConsumerSelectionCondition(parentRef, HierarchyQueryScope.CHILDREN);
+                break;
+            case APP_GROUP:
+            case FLOW_DIAGRAM:
+                customSelectionCriteria = mkConsumerSelectionCondition(parentRef, HierarchyQueryScope.EXACT);
+                break;
+            default:
+                throw new UnsupportedOperationException("Cannot calculate auth sources for ref" + parentRef);
+        }
+
+        return authoritativeSourceDao.findAuthSources(customSelectionCriteria);
 
     }
 
+
+//    BiFunction<EntityReference, HierarchyQueryScope, Condition>
+    private Condition mkConsumerSelectionCondition(EntityReference ref, HierarchyQueryScope scope) {
+        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref, scope));
+        return AuthoritativeSourceDao.CONSUMER_APP.ID.in(appIdSelector);
+    };
 }

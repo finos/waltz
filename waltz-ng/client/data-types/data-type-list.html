@@ -51,13 +51,17 @@
                            small="Types"
                            id="data-types-tree-section">
 
-
-                <waltz-data-type-tree trees="ctrl.hierarchy"
-                                      expanded-nodes="$ctrl.expandedNodes"
-                                      on-selection="ctrl.nodeSelected">
+                <waltz-data-type-tree on-selection="ctrl.nodeSelected">
                 </waltz-data-type-tree>
             </waltz-section>
         </div>
     </div>
+
+    <!-- AUTH SOURCES -->
+    <waltz-section icon='shield'
+                   name="Authoritative Sources">
+        <waltz-auth-sources-table auth-sources="ctrl.authSources">
+        </waltz-auth-sources-table>
+    </waltz-section>
 
 </div>

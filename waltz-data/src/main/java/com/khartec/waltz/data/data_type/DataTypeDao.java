@@ -91,4 +91,11 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN);
     }
 
+
+    public DataType getById(long dataTypeId) {
+        return dsl
+                .selectFrom(DATA_TYPE)
+                .where(DATA_TYPE.ID.eq(dataTypeId))
+                .fetchOne(TO_DOMAIN);
+    }
 }

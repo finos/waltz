@@ -39,7 +39,6 @@ function initTour(tourService, holder = {}) {
 function controller($stateParams,
                     viewDataService,
                     historyStore,
-                    involvedSectionService,
                     tourService) {
 
     const id = $stateParams.id;
@@ -75,7 +74,6 @@ controller.$inject = [
     '$stateParams',
     'OrgUnitViewDataService',
     'HistoryStore',
-    'InvolvedSectionService',
     'TourService'
 ];
 

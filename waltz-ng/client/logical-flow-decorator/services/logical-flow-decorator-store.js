@@ -77,14 +77,20 @@ export function store($http,
      * @param selector
      * @returns {*|Promise.<TResult>}
      */
-    const summarizeBySelector = (selector) => {
+    const summarizeInboundBySelector = (selector) => {
         checkIsApplicationIdSelector(selector);
-        return $http.post(`${BASE}/summarize`, selector)
+        return $http.post(`${BASE}/summarize-inbound`, selector)
             .then(r => r.data);
     };
 
-    const summarizeForAll = () => {
-        return $http.get(`${BASE}/summarize`)
+    const summarizeOutboundBySelector = (selector) => {
+        checkIsApplicationIdSelector(selector);
+        return $http.post(`${BASE}/summarize-outbound`, selector)
+            .then(r => r.data);
+    };
+
+    const summarizeInboundForAll = () => {
+        return $http.get(`${BASE}/summarize-inbound`)
             .then(r => r.data);
     };
 
@@ -93,8 +99,9 @@ export function store($http,
         findBySelector,
         findByFlowIdsAndKind,
         updateDecorators,
-        summarizeBySelector,
-        summarizeForAll
+        summarizeInboundBySelector,
+        summarizeOutboundBySelector,
+        summarizeInboundForAll
     };
 }
 
@@ -128,14 +135,19 @@ export const LogicalFlowDecoratorStore_API = {
         serviceFnName: 'updateDecorators',
         description: 'executes updateDecorators'
     },
-    summarizeBySelector: {
+    summarizeInboundBySelector: {
         serviceName,
-        serviceFnName: 'summarizeBySelector',
-        description: 'executes summarizeBySelector - arg1: app_selector'
+        serviceFnName: 'summarizeInboundBySelector',
+        description: 'executes summarizeInboundBySelector - arg1: app_selector'
     },
-    summarizeForAll: {
+    summarizeOutboundBySelector: {
         serviceName,
-        serviceFnName: 'summarizeForAll',
+        serviceFnName: 'summarizeOutboundBySelector',
+        description: 'executes summarizeOutboundBySelector - arg1: app_selector'
+    },
+    summarizeInboundForAll: {
+        serviceName,
+        serviceFnName: 'summarizeInboundForAll',
         description: 'executes summarizeForAll (no args)'
     }
 };

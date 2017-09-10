@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, base) {
+export function store($http, base) {
 
     const findByGroups = (groups = []) =>
         $http
@@ -33,10 +33,24 @@ function service($http, base) {
 }
 
 
-service.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default service;
+export const serviceName = 'SvgDiagramStore';
+
+
+export const SvgDiagramStore_API = {
+    findByGroup: {
+        serviceName,
+        serviceFnName: 'findByGroup',
+        description: 'executes findByGroup'
+    },
+    findByGroups: {
+        serviceName,
+        serviceFnName: 'findByGroups',
+        description: 'executes findByGroups'
+    }
+};

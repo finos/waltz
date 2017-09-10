@@ -19,14 +19,15 @@
 
 import angular from 'angular';
 
-import {registerComponent} from '../common/module-utils';
-import * as dataFlowSection from './components/data-flow-section/data-flow-section';
+import {registerComponents} from '../common/module-utils';
+import * as AppAuthorityPanel from './components/app-authority-panel/app-authority-panel';
+import * as DataFlowSection from './components/data-flow-section/data-flow-section';
 
 
 function setup() {
     const module = angular.module('waltz.data-flow', []);
 
-    registerComponent(module, dataFlowSection);
+    registerComponents(module, [ AppAuthorityPanel, DataFlowSection ]);
 
     return module.name;
 }

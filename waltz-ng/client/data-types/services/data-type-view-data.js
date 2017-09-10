@@ -110,29 +110,6 @@ function service($q,
             });
 
 
-        serviceBroker
-            .loadViewData(CORE_API.AuthSourcesStore.findByDataTypeIdSelector, [ selector ])
-            .then(r => {
-                const authSources = r.data;
-                rawData.authSources = authSources;
-                const orgUnitIds = _
-                    .chain(authSources)
-                    .map('parentReference.id')
-                    .uniq()
-                    .value();
-
-                return serviceBroker
-                    .loadViewData(
-                        CORE_API.OrgUnitStore.findByIds,
-                        [ orgUnitIds ])
-            })
-            .then(r => rawData.orgUnits = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
-                [ selector ])
-            .then(r => rawData.authSourceConsumers = r.data);
 
         return prepareRawDataPromise;
     }

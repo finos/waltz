@@ -430,6 +430,26 @@
     </changeSet>
 
 
+    <changeSet id="20170907-2515-1"
+               author="davidwatkins73">
+        <insert tableName="static_panel">
+            <column name="group"
+                    value="SECTION.AUTH_SOURCES.ABOUT"/>
+            <column name="icon"
+                    value="shield"/>
+            <column name="title"
+                    value=""/>
+            <column name="priority"
+                    value="1"/>
+            <column name="width"
+                    value="12"/>
+            <column name="encoding"
+                    value="MARKDOWN"/>
+            <column name="content"
+                    value="Applications may be identified as authoritative for data set. The organisational unit whose applications receive the data is responsible for declaring this list, enabling differing parts of the organisation to have their own policies."/>
+        </insert>
+    </changeSet>
+  
     <!-- 2553 - survey_instance_recipient index on person_id -->
     <changeSet id="20170906-2553-1"
                author="kamransaleem">

@@ -71,13 +71,6 @@ function initialiseDataFlows(service, id, holder) {
 }
 
 
-function loadAuthSources(store, id, holder) {
-    return store
-        .determineAuthSourcesForOrgUnit(id)
-        .then(r => holder.authSources = r);
-}
-
-
 function loadComplexity(store, id, holder) {
     return store
         .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
@@ -96,7 +89,6 @@ function loadTechStats(serviceBroker, id, holder) {
 
 function service($q,
                  serviceBroker,
-                 authSourcesStore,
                  complexityStore,
                  logicalFlowViewService,
                  orgUnitStore) {
@@ -135,7 +127,6 @@ function service($q,
     function loadSecondWave(orgUnitId) {
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
-            loadAuthSources(authSourcesStore, orgUnitId, rawData),
             loadComplexity(complexityStore, orgUnitId, rawData)
         ]);
     }
@@ -154,13 +145,11 @@ function service($q,
             .then(dataFlows => rawData.dataFlows = dataFlows);
     }
 
-
     function loadOrgUnitDescendants(orgUnitId) {
         return orgUnitStore
             .findDescendants(orgUnitId)
             .then(descendants => rawData.orgUnitDescendants = descendants);
     }
-
 
     return {
         data: rawData,
@@ -175,7 +164,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'AuthSourcesStore',
     'ComplexityStore',
     'LogicalFlowViewService',
     'OrgUnitStore'

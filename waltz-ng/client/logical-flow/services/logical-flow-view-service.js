@@ -18,6 +18,7 @@
 
 import _ from 'lodash';
 import {notEmpty} from "../../common";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const initData = {
@@ -31,9 +32,7 @@ const initData = {
 
 
 function service($q,
-                 dataTypeUsageStore,
-                 logicalFlowDecoratorStore,
-                 logicalFlowStore)
+                 serviceBroker)
 {
     let data = initData;
 
@@ -45,15 +44,15 @@ function service($q,
             ? id
             : { entityReference: { id, kind }, scope };
 
-        const statStore = data.options.entityReference.kind === 'DATA_TYPE'
-            ? dataTypeUsageStore
-            : logicalFlowStore;
+        const statMethod = data.options.entityReference.kind === 'DATA_TYPE'
+            ? CORE_API.DataTypeUsageStore.calculateStats
+            : CORE_API.LogicalFlowStore.calculateStats;
 
-        return statStore
-            .calculateStats(data.options)
-            .then(stats => {
+        return serviceBroker
+            .loadViewData(statMethod, [ data.options ])
+            .then(r => {
                 data.loadingStats = false;
-                data.stats = stats;
+                data.stats = r.data;
                 return data;
             });
     }
@@ -66,13 +65,17 @@ function service($q,
 
         data.loadingFlows = true;
 
-        const flowPromise = logicalFlowStore
-            .findBySelector(data.options)
-            .then(flows => data.flows = flows);
+        const flowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findBySelector,
+                [ data.options ])
+            .then(r => data.flows = r.data);
 
-        const decoratorPromise = logicalFlowDecoratorStore
-            .findBySelector(data.options)
-            .then(decorators => data.decorators = decorators);
+        const decoratorPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelector,
+                [ data.options ])
+            .then(r => data.decorators = r.data);
 
         return $q
             .all([flowPromise, decoratorPromise])
@@ -96,9 +99,7 @@ function service($q,
 
 service.$inject = [
     '$q',
-    'DataTypeUsageStore',
-    'LogicalFlowDecoratorStore',
-    'LogicalFlowStore'
+    'ServiceBroker'
 ];
 
 

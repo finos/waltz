@@ -48,14 +48,8 @@
 
 
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources"
-                   id="auth-flows-section">
-        <waltz-rated-flow-summary-panel apps="ctrl.applications"
-                                        entity-reference="ctrl.entityRef"
-                                        flow-data="ctrl.dataFlows"
-                                        on-load-detail="ctrl.loadFlowDetail">
-        </waltz-rated-flow-summary-panel>
-    </waltz-section>
+    <waltz-auth-sources-section parent-entity-ref="ctrl.entityRef">
+    </waltz-auth-sources-section>
 
 
     <!-- APPS -->

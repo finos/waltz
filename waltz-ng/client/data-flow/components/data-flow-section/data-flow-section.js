@@ -113,10 +113,6 @@ function controller(serviceBroker) {
                 [ vm.parentEntityRef.id ])
             .then(r => {
                 vm.authSources = r.data;
-                vm.nestedAuthSources = nest()
-                    .key(a => a.dataType)
-                    .key(a => a.rating)
-                    .object(r.data);
             });
     }
 

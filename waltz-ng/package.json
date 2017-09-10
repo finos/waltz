@@ -11,6 +11,7 @@
     "test-server": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
     "build-orig": "BUILD_ENV=prod webpack --config webpack.config.js -p --progress --profile --colors",
     "build": "webpack --config webpack.config.js -p --progress --profile --colors",
+    "build-debug": "webpack --config webpack.config.js --progress --profile --colors",
     "watch": "webpack --progress --watch --colors",
     "start-dev": "node lib/server-development",
     "start": "node lib/server-production"
