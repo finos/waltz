@@ -20,6 +20,10 @@
 import angular from 'angular';
 import * as authSourcesStore from './services/auth-sources-store';
 import * as AuthSourceEditorPanel from './components/editor/auth-source-editor-panel';
+import * as AuthSourcesTable from './components/table/auth-sources-table';
+import * as NonAuthSourcesTable from './components/non-auth-sources-table/non-auth-sources-table';
+import * as AuthSourcesSection from './components/section/auth-sources-section';
+import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
 import {registerComponents, registerStore} from '../common/module-utils';
 
 
@@ -27,18 +31,19 @@ export default () => {
 
     const module = angular.module('waltz.auth.sources', []);
 
-    require('./directives')(module);
-
     module
-        .component('waltzAuthSourcesList', require('./components/auth-sources-list'))
-        .component('waltzNonAuthSourcesList', require('./components/non-auth-sources-list'))
-        .component('waltzAuthSourcesTable', require('./components/table/auth-sources-table'));
+        .directive('waltzRatingIndicator', require('./directives/rating-indicator'));
 
     module
         .config(require('./routes'));
 
     registerStore(module, authSourcesStore);
-    registerComponents(module, [ AuthSourceEditorPanel ]);
+    registerComponents(module, [
+        AuthSourceEditorPanel,
+        AuthSourcesTable,
+        AuthSourcesSection,
+        AuthSourcesSummaryPanel,
+        NonAuthSourcesTable ]);
 
     return module.name;
 };

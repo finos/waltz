@@ -22,15 +22,14 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
+import java.util.List;
 
-/**
- * Created by dwatkins on 03/09/2016.
- */
 public class LogicalFlowDecoratorHarness {
 
     public static void main(String[] args) throws SQLException {
@@ -38,13 +37,13 @@ public class LogicalFlowDecoratorHarness {
 
         LogicalFlowDecoratorService service = ctx.getBean(LogicalFlowDecoratorService.class);
 
-        EntityReference dataType = EntityReference.mkRef(EntityKind.DATA_TYPE, 1000);
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(dataType, HierarchyQueryScope.CHILDREN);
+        List<DecoratorRatingSummary> inboundSummaries = service.summarizeInboundForSelector(IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
+        inboundSummaries.forEach(s -> System.out.println(String.format("%d %s: %d", s.decoratorEntityReference().id(), s.rating().name(), s.count())));
 
-        service.findBySelector(options).forEach(System.out::println);
-        System.out.println("--done");
+        System.out.println("--------");
 
-
+        List<DecoratorRatingSummary> outboundSummaries = service.summarizeOutboundForSelector(IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
+        outboundSummaries.forEach(s -> System.out.println(String.format("%d %s: %d", s.decoratorEntityReference().id(), s.rating().name(), s.count())));
     }
 
 }

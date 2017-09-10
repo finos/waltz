@@ -33,7 +33,6 @@ const initialState = {};
 function controller($q, serviceBroker, notification) {
 
     const vm = initialiseData(this, initialState);
-    global.vm = vm;
 
     const refresh = () => {
         serviceBroker
@@ -60,7 +59,6 @@ function controller($q, serviceBroker, notification) {
     };
 
     vm.$onInit = () => {
-        console.log('go', vm)
         const promises  = [
             serviceBroker
                 .loadAppData(CORE_API.DataTypeStore.findAll)

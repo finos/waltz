@@ -362,3 +362,14 @@ a.subtle-link:hover {
 .waltz-popover-wide {
     max-width: 500px;
 }
+
+
+.waltz-mini-table {
+    td,th {
+        padding-left: 0.3em;
+        padding-right: 0.3em;
+    }
+    thead {
+        border-bottom: 1px solid $waltz-border-color-lighter;
+    }
+}

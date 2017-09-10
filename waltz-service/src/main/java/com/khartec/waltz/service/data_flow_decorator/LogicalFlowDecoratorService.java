@@ -200,10 +200,17 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public List<DecoratorRatingSummary> summarizeForSelector(IdSelectionOptions options) {
+    public List<DecoratorRatingSummary> summarizeInboundForSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
-        return logicalFlowDecoratorDao.summarizeForSelector(selector);
+        return logicalFlowDecoratorDao.summarizeInboundForSelector(selector);
+    }
+
+
+    public List<DecoratorRatingSummary> summarizeOutboundForSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        return logicalFlowDecoratorDao.summarizeOutboundForSelector(selector);
     }
 
 

@@ -63,7 +63,7 @@
                 <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
                     <div class='row'>
                         <div class="col-md-12">
-                            <h5>Data Types</h5>
+                            <strong>Data Types</strong>
                             <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
                                 <message>
                                     <strong>
@@ -86,7 +86,7 @@
                     <!-- SOURCE AND TARGET GRAPH -->
                     <div class="row">
                         <div class="col-md-12">
-                            <h5>Logical Flows</h5>
+                            <strong>Logical Flows</strong>
                             <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
                                 <message>
                                     <strong>
@@ -157,8 +157,9 @@
                  disable="$ctrl.authSources | isEmpty"
                  heading="Authority">
 
-            <div ng-if="$ctrl.visibility.dataTab == 2">
-                <waltz-app-authority-panel auth-sources="$ctrl.authSources"></waltz-app-authority-panel>
+            <div ng-if="$ctrl.visibility.dataTab == 2" style="padding-top: 1em;">
+                <waltz-auth-sources-table auth-sources="$ctrl.authSources">
+                </waltz-auth-sources-table>
             </div>
 
 

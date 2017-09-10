@@ -24,14 +24,17 @@ import {ascending} from "d3-array";
 
 
 const bindings = {
+    parentEntityRef: '<',
     authSources: '<',
-    showDescription: '@?',
     orgUnits: '<',
 };
 
 
 const initialState = {
-    showDescription: true
+    consumersByAuthSourceId: {},
+    visibility: {
+        consumerColumn: false
+    }
 };
 
 
@@ -41,7 +44,6 @@ const template = require('./auth-sources-table.html');
 function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-
 
     const refresh = () => {
         const dataTypesByCode= _.keyBy(vm.dataTypes, 'code');
@@ -55,17 +57,16 @@ function controller(serviceBroker) {
                 appOrgUnit: d.appOrgUnitReference,
                 declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: 'ORG_UNIT' }),
                 description: d.description,
-                rating: d.rating
+                rating: d.rating,
+                consumers: vm.consumersByAuthSourceId[d.id] || []
             };
         });
-        const nested = nest()
+
+        vm.authSourceTable = nest()
             .key(d => d.dataType.id)
             .sortKeys((a, b) => ascending(dataTypesById[a].name, dataTypesById[b].name))
             .sortValues((a, b) => ascending(a.app.name, b.app.name))
             .entries(authSources);
-
-
-        vm.authSourceTable = nested;
     };
 
     vm.$onInit = () => {
@@ -78,27 +79,46 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.OrgUnitStore.findAll)
             .then(r => vm.orgUnits = r.data)
             .then(refresh);
-
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                ['SECTION.AUTH_SOURCES.ABOUT'])
-            .then(rs => vm.descriptionPanels = rs.data);
     };
 
-    vm.$onChanges = () => refresh();
+    vm.$onChanges = () => {
+        const isDataTypeEntity = _.get(vm, 'parentEntityRef.kind', null) === 'DATA_TYPE';
+        if (isDataTypeEntity) {
+            vm.visibility.consumerColumn = true;
 
+            const selector = {
+                entityReference: vm.parentEntityRef,
+                scope: 'CHILDREN'
+            };
+
+            serviceBroker
+                .loadViewData(
+                    CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
+                    [ selector ])
+                .then(r => {
+                    vm.consumersByAuthSourceId = _
+                        .chain(r.data)
+                        .keyBy(d => d.key.id)
+                        .mapValues(v => _.sortBy(v.value, 'name'))
+                        .value();
+                    refresh();
+                });
+
+        } else {
+            refresh();
+        }
+    }
 }
 
 
 controller.$inject = ['ServiceBroker'];
 
 
-const component = {
+export const component = {
     bindings,
     controller,
     template
 };
 
+export const id = 'waltzAuthSourcesTable';
 
-export default component;

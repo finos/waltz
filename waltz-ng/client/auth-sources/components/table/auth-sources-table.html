@@ -1,74 +1,123 @@
 <div class="waltz-auth-sources-table">
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th>Data Type</th>
-            <th>Declaring Org Unit</th>
-            <th>Application</th>
-            <th>Authoritativeness</th>
-            <th>Notes</th>
-        </tr>
-        </thead>
-        <tbody ng-repeat="group in $ctrl.authSourceTable">
-        <tr ng-repeat="source in group.values"
-            ng-class="{
-                    'direct' : source.parentReference.id == $ctrl.orgUnitId,
-                    'indirect' : source.parentReference.id != $ctrl.orgUnitId,
-                }">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Declaring Org Unit</th>
+                    <th>Application</th>
+                    <th>Authoritativeness</th>
+                    <th>Notes</th>
+                    <th ng-if="$ctrl.showConsumers">Consumers</th>
+                </tr>
+                </thead>
+                <tbody ng-repeat="group in $ctrl.authSourceTable">
+                <tr ng-repeat="source in group.values"
+                    class="waltz-visibility-parent"
+                    ng-class="{
+                        'direct' : source.parentReference.id == $ctrl.orgUnitId,
+                        'indirect' : source.parentReference.id != $ctrl.orgUnitId,
+                    }">
+                    <!-- TYPE -->
+                    <td>
+                        <span ng-class="{ 'waltz-visibility-child-30': !$first }">
+                            <waltz-entity-link entity-ref="source.dataType">
+                            </waltz-entity-link>
+                        </span>
+                    </td>
+                    <!-- OU -->
+                    <td>
+                        <waltz-entity-link entity-ref="source.declaringOrgUnit">
+                        </waltz-entity-link>
+                    </td>
+                    <!-- APP -->
+                    <td>
+                        <waltz-entity-link entity-ref="source.app">
+                        </waltz-entity-link>
+                        <small>
+                            ( {{source.appOrgUnit.name}} )
+                        </small>
+                    </td>
+                    <!-- RATING -->
+                    <td>
+                        <span>
+                            <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
+                            <waltz-enum-value type="'AuthoritativenessRating'"
+                                              show-icon="false"
+                                              key="source.rating">
+                            </waltz-enum-value>
+                        </span>
+                    </td>
+                    <!-- DESC -->
+                    <td>
+                        <span ng-if="source.description" class="clickable">
+                            <waltz-icon name="sticky-note"
+                                        style="color: #337ab7"
+                                        uib-popover-template="'wast/desc-popup.html'"
+                                        popover-class="waltz-popover-wide"
+                                        popover-append-to-body="true"
+                                        popover-placement="top-right"
+                                        popover-trigger="outsideClick">
+                            </waltz-icon>
+                        </span>
+                    </td>
+                    <!-- CONSUMERS ? -->
+                    <td ng-if="$ctrl.visibility.consumerColumn">
+                        <span class="label clickable"
+                              ng-class="{
+                                'label-danger' : source.consumers.length == 0,
+                                'label-success' : source.consumers.length > 0
+                              }"
+                              uib-popover-template="'wast/consumers-popup.html'"
+                              popover-class="waltz-popover-wide"
+                              popover-append-to-body="true"
+                              popover-placement="top-right"
+                              popover-trigger="outsideClick"
+                              ng-bind="source.consumers.length">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <td>
-                <waltz-entity-link ng-if='$first'
-                                   entity-ref="group.values[0].dataType">
-                </waltz-entity-link>
-            </td>
-            <td>
-                <waltz-entity-link entity-ref="source.declaringOrgUnit">
-                </waltz-entity-link>
-            </td>
-            <td>
-                <waltz-entity-link entity-ref="source.app">
-                </waltz-entity-link>
-                <small>
-                    ( {{source.appOrgUnit.name}} )
-                </small>
-            </td>
-            <td>
-                <span>
-                    <waltz-rating-indicator value="{{source.rating}}"></waltz-rating-indicator>
-                    <waltz-enum-value type="'AuthoritativenessRating'"
-                                       show-icon="false"
-                                       key="source.rating">
-                    </waltz-enum-value>
-                </span>
-            </td>
+    </div>
 
-            <td>
-                <span ng-if="source.description" class="clickable">
-                    <waltz-icon name="sticky-note"
-                                style="color: #337ab7"
-                                uib-popover-template="'wast/desc-popup.html'"
-                                popover-class="waltz-popover-wide"
-                                popover-append-to-body="true"
-                                popover-placement="top-right"
-                                popover-trigger="outsideClick">
-                    </waltz-icon>
-                </span>
-            </td>
-
-        </tr>
-        </tbody>
-    </table>
-
-    <waltz-static-panels panels="$ctrl.descriptionPanels"
-                         ng-if="$ctrl.showDescription"
-                         class="small"
-                         render-mode="minimal-border">
-    </waltz-static-panels>
 </div>
 
+<!-- DESCRIPTION POPUP -->
 <script type="text/ng-template"
         id="wast/desc-popup.html">
     <div>
         <waltz-markdown text="source.description"></waltz-markdown>
     </div>
+</script>
+
+<!-- CONSUMER DETAIL POPUP -->
+<script type="text/ng-template"
+        id="wast/consumers-popup.html">
+    <div>
+        <div ng-if="source.consumers.length > 0">
+            <table class="table table-condensed table-striped small">
+                <thead>
+                <tr>
+                    <th>Consumers</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="consumer in source.consumers">
+                    <td>
+                        <waltz-entity-link entity-ref="consumer"></waltz-entity-link>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="source.consumers.length == 0">
+            <p>No consumers have been defined</p>
+        </div>
+
+        </div>
 </script>

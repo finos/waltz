@@ -26,24 +26,7 @@
     </waltz-entity-named-notes-section>
 
 
-    <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources"
-                   id="authoritative-sources-section"
-                   icon="shield">
-        <waltz-auth-sources-list auth-sources="ctrl.viewData.authSources"
-                                 org-units="ctrl.viewData.orgUnits"
-                                 consumers="ctrl.viewData.authSourceConsumers"
-                                 ng-if="ctrl.viewData.authSources.length > 0">
-        </waltz-auth-sources-list>
-
-        <waltz-no-data ng-if="ctrl.viewData.authSources.length === 0">
-            <message>
-                <strong>
-                    No Authoritative Sources declared by any Organisational Units
-                </strong>
-            </message>
-        </waltz-no-data>
-    </waltz-section>
+    <waltz-auth-sources-section parent-entity-ref="ctrl.entityRef"></waltz-auth-sources-section>
 
 
     <!-- FLOWS -->
@@ -51,26 +34,6 @@
                                    type-id="ctrl.dataType.id"
                                    data-data-types="ctrl.viewData.dataTypes">
     </waltz-rated-flow-boingy-graph>
-
-
-    <!-- NON AUTH SOURCES -->
-    <waltz-section name="Non Authoritative Sources"
-                   id="non-authoritative-sources-section"
-                   icon="asterisk">
-        <waltz-non-auth-sources-list distributors="ctrl.viewData.flowDistributors"
-                                     logical-flows="ctrl.flowData.flows"
-                                     data-data-types="ctrl.viewData.dataTypes"
-                                     ng-if="!(ctrl.viewData.flowDistributors | isEmpty)">
-        </waltz-non-auth-sources-list>
-
-        <waltz-no-data ng-if="ctrl.viewData.flowDistributors | isEmpty">
-            <message>
-                <strong>
-                    No Non-Authoritative Sources distributing data
-                </strong>
-            </message>
-        </waltz-no-data>
-    </waltz-section>
 
 
     <!-- ORIGINATORS -->

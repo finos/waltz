@@ -20,8 +20,9 @@
 import _ from 'lodash';
 import {
     checkIsAuthSourceCreateCommand,
-    checkIsAuthSourceUpdateCommand,
-    checkIsIdSelector} from "../../common/checks";
+    checkIsAuthSourceUpdateCommand, checkIsEntityRef,
+    checkIsIdSelector
+} from "../../common/checks";
 
 
 export function store($http, root) {
@@ -48,14 +49,6 @@ export function store($http, root) {
             .then(result => result.data);
 
 
-    const findByDataTypeIdSelector = (selector) => {
-        checkIsIdSelector(selector);
-        return $http
-            .post(`${BASE}/data-type`, selector)
-            .then(result => result.data);
-    };
-
-
     const calculateConsumersForDataTypeIdSelector = (selector) => {
         checkIsIdSelector(selector);
         return $http
@@ -68,19 +61,16 @@ export function store($http, root) {
         checkIsAuthSourceUpdateCommand(cmd);
         return $http
             .put(BASE, cmd);
-    }
-
+    };
 
     const remove = (id) =>
         $http
             .delete(`${BASE}/id/${id}`);
 
-
     const recalculateAll = () =>
         $http
             .get(`${BASE}/recalculate-flow-ratings`)
             .then(r => r.data);
-
 
     const insert = (command) => {
         checkIsAuthSourceCreateCommand(command);
@@ -88,10 +78,20 @@ export function store($http, root) {
             .post(BASE, command);
     };
 
-    const determineAuthSourcesForOrgUnit = (orgUnitId) =>
-        $http
-            .get(`${BASE}/org-unit/${orgUnitId}`)
+
+    const findNonAuthSources = (entityRef) => {
+        checkIsEntityRef(entityRef);
+        return $http
+            .get(`${BASE}/non-auth-for/${entityRef.kind}/${entityRef.id}`)
             .then(r => r.data);
+    };
+
+    const findAuthSources = (entityRef) => {
+        checkIsEntityRef(entityRef);
+        return $http
+            .get(`${BASE}/auth-for/${entityRef.kind}/${entityRef.id}`)
+            .then(r => r.data);
+    };
 
     const cleanupOrphans = () =>
         $http
@@ -103,12 +103,12 @@ export function store($http, root) {
         findByReference,
         findAll,
         findByApp,
-        findByDataTypeIdSelector,
         update,
         insert,
         recalculateAll,
         remove,
-        determineAuthSourcesForOrgUnit,
+        findNonAuthSources,
+        findAuthSources,
         cleanupOrphans
     };
 
@@ -144,11 +144,6 @@ export const AuthSourcesStore_API = {
         serviceFnName: 'findByApp',
         description: 'findByApp'
     },
-    findByDataTypeIdSelector: {
-        serviceName,
-        serviceFnName: 'findByDataTypeIdSelector',
-        description: 'findByDataTypeIdSelector'
-    },
     update: {
         serviceName,
         serviceFnName: 'update',
@@ -169,14 +164,19 @@ export const AuthSourcesStore_API = {
         serviceFnName: 'remove',
         description: 'remove'
     },
-    determineAuthSourcesForOrgUnit: {
+    findNonAuthSources: {
         serviceName,
-        serviceFnName: 'determineAuthSourcesForOrgUnit',
-        description: 'determineAuthSourcesForOrgUnit'
+        serviceFnName: 'findNonAuthSources',
+        description: 'findNonAuthSources'
+    },
+    findAuthSources: {
+        serviceName,
+        serviceFnName: 'findAuthSources',
+        description: 'findAuthSources'
     },
     cleanupOrphans: {
         serviceName,
         serviceFnName: 'cleanupOrphans',
         description: 'cleanupOrphans'
     },
-}
+};
