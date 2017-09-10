@@ -18,18 +18,18 @@
  */
 
 import angular from 'angular';
-import * as logicalFlowStore from './services/logical-flow-store';
 import {registerStore} from '../common/module-utils';
+
+import directives from './directives';
+import components from './components';
+import * as logicalFlowStore from './services/logical-flow-store';
 
 export default () => {
 
     const module = angular.module('waltz.logical.flow', []);
 
-    module
-        .config(require('./routes'));
-
-    require('./directives')(module);
-    require('./components')(module);
+    directives(module);
+    components(module);
 
     registerStore(module, logicalFlowStore);
 

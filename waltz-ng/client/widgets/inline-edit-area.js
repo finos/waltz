@@ -31,6 +31,13 @@ function controller() {
     vm.mode = Modes.VIEWING;
     vm.Modes = Modes;
 
+    vm.$onChanges = (c) => {
+        if(c.value) {
+            // go back to viewing mode
+            vm.mode = Modes.VIEWING;
+        }
+    };
+
     vm.edit = () => {
         vm.editor = {
             modifiableValue: angular.copy(vm.value)

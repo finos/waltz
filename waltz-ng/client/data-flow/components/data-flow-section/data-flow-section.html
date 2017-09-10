@@ -6,10 +6,16 @@
     <!-- ACTIONS -->
     <waltz-section-actions>
         <a waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-           ng-if="$ctrl.visibility.dataTab == 0"
-           ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'
+           ng-if="$ctrl.visibility.dataTab == 0 && !$ctrl.visibility.editor.logicalFlow"
+           ng-click="$ctrl.visibility.editor.logicalFlow = true"
            class="btn btn-xs btn-primary">
             Edit
+        </a>
+
+        <a ng-if="$ctrl.isAnyEditorVisible()"
+           ng-click="$ctrl.resetToViewMode()"
+           class="btn btn-xs btn-primary">
+            Done
         </a>
 
         <a class="btn btn-xs btn-primary"
@@ -37,7 +43,8 @@
     </waltz-source-data-overlay>
 
     <!-- TABS -->
-    <uib-tabset active="active">
+    <uib-tabset active="active"
+                ng-if="!$ctrl.isAnyEditorVisible()">
 
         <!-- LOGICAL FLOW TAB -->
         <uib-tab index="0"
@@ -165,5 +172,14 @@
 
         </uib-tab>
     </uib-tabset>
+
+
+    <!-- Editing -->
+    <div ng-if="$ctrl.visibility.editor.logicalFlow">
+        <h4>Edit Logical Data Flows</h4>
+        <waltz-logical-flow-edit-panel parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-logical-flow-edit-panel>
+    </div>
+
 
 </waltz-section>
