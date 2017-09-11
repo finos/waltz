@@ -4,13 +4,6 @@
 
     <!-- ACTIONS -->
     <waltz-section-actions>
-            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
-                <a ng-if="$ctrl.visibility.editBtn"
-                   ui-sref="main.auth-sources.edit ( $ctrl.parentEntityRef )"
-                   class="btn btn-xs btn-primary">
-                    Edit
-                </a>
-            </span>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.toggleSourceDataRatingOverlay()">
             <waltz-icon name="map-signs"></waltz-icon>

@@ -22,6 +22,9 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
+    visibility: {
+        editor: false
+    }
 };
 
 
@@ -31,8 +34,13 @@ function controller($state,
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    const loadAuthSources = ()  => {
+        serviceBroker
+            .loadViewData(CORE_API.AuthSourcesStore.findAll)
+            .then(r => vm.authSources = r.data);
+    };
 
+    vm.$onInit = () => {
         serviceBroker
             .loadAppData(CORE_API.StaticPanelStore.findByGroup, ["HOME.DATA-TYPE"])
             .then(r => vm.panels = r.data);
@@ -41,9 +49,7 @@ function controller($state,
             .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ['DATA_TYPE'])
             .then(r => vm.diagrams = r.data);
 
-        serviceBroker
-            .loadViewData(CORE_API.AuthSourcesStore.findAll)
-            .then(r => vm.authSources = r.data);
+        loadAuthSources();
 
     };
 
@@ -54,6 +60,14 @@ function controller($state,
         angular.element(b.block).addClass('clickable');
     };
 
+    vm.showAuthSources = () => {
+        vm.visibility.editor = false;
+        loadAuthSources();
+    };
+
+    vm.editAuthSources = () => {
+        vm.visibility.editor = true;
+    };
 }
 
 

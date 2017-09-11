@@ -1,23 +1,59 @@
 <div>
-    <div ng-if="$ctrl.authSourceTable.length > 0">
+    <div ng-if="$ctrl.authSourceTable.length > 0"
+        ng-class="{ 'waltz-scroll-region-300' : $ctrl.authSourceTable.length > 15 }">
+        <input type="search"
+               class="form-control"
+               ng-model="$ctrl.currentSearchTerms"
+               placeholder="Search current Authoritative Sources">
         <table class="table">
             <colgroup>
 
             </colgroup>
             <thead>
             <tr>
-                <th>Data Types</th>
+                <th>Operations</th>
+                <th>Data Type</th>
+                <th>Declaring Org Unit</th>
                 <th>Application</th>
                 <th>Rating</th>
                 <th>Description</th>
-                <th>Operations</th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="row in $ctrl.authSourceTable"
+            <tr ng-repeat="row in $ctrl.authSourceTable | filter: $ctrl.currentSearchTerms"
                 class="waltz-visibility-parent">
                 <td>
+                    <div class="btn-group" uib-dropdown is-open="status.isopen">
+                        <button type="button"
+                                class="btn btn-xs btn-default"
+                                uib-dropdown-toggle>
+                            Operations <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                            <li role="menuitem">
+                                <a class="clickable"
+                                   ng-click="$ctrl.onShowUpdateForm(row.authSource)">
+                                    <waltz-icon name="sticky-note-o"></waltz-icon>
+                                    Update
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li role="menuitem">
+                                <a class="clickable"
+                                   ng-click="$ctrl.remove(row.authSource)">
+                                    <waltz-icon name="trash"></waltz-icon>
+                                    Delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+
+                <td>
                     <span ng-bind="row.dataType.name"></span>
+                </td>
+                <td>
+                    <waltz-entity-icon-label entity-ref="row.orgUnit"></waltz-entity-icon-label>
                 </td>
                 <td>
                     <span ng-bind="row.authSource.applicationReference.name"></span>
@@ -28,27 +64,16 @@
                 <td style="vertical-align: top;">
                     <waltz-rating-indicator value="{{ row.authSource.rating }}">
                     </waltz-rating-indicator>
-
-                    <waltz-enum-value class='text-muted'
-                                      type="'AuthoritativenessRating'"
-                                      show-icon="false"
-                                      key="row.authSource.rating">
-                    </waltz-enum-value>
                 </td>
                 <td>
                     <span ng-bind="row.authSource.description | limitTo:30"></span>
-                </td>
-                <td class="waltz-visibility-child-30">
-                    <a class="clickable"
-                       ng-click="$ctrl.remove(row.authSource)">
-                        <waltz-icon name="trash"></waltz-icon>
-                        Delete
-                    </a>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- NO DATA -->
     <waltz-no-data ng-if="$ctrl.authSourceTable.length == 0">
         <message>
             <strong>No Authoritative Sources</strong> have been defined for
@@ -56,154 +81,268 @@
         </message>
     </waltz-no-data>
 
+    <br>
 
-    <div>
-        <form name="editForm"
-              ng-submit="ctrl.submit()">
-            <fieldset ng-disabled="editForm.$submitted">
-                <div>
-                    <!-- STEP 1 -->
-                    <span class="vertical-align">
-                            <waltz-step-count count="1"
-                                              colour="#d6f3ff"></waltz-step-count>
-                            &nbsp;
-                            <span style="font-size: larger">Select a data type to update...</span>
+    <!-- ADD BUTTON -->
+    <button class="btn btn-sm btn-success"
+            ng-if="!($ctrl.visibility.createForm || $ctrl.visibility.updateForm)"
+            ng-click="$ctrl.onShowCreateForm()">
+        Add new Authoritative Source
+    </button>
+
+    <hr>
+
+
+    <!-- NOTE FORM -->
+    <div ng-if="$ctrl.visibility.updateForm">
+
+        <form name="noteForm"
+              ng-submit="$ctrl.submitUpdate()">
+            <fieldset ng-disabled="updateForm.$submitted">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Update Rating</label>
+                        <span class="help-block">
+
                         </span>
-
-                    <div class="row" style="margin-left: 25px">
-                        <div class="col-md-6">
-                            ...from data types already used with this organisational unit:
-                            <div style="margin-left: 25px; margin-top:10px">
-                                <div ng-repeat="type in ctrl.usedDataTypes | orderBy:'name'" >
-                                    <input type="radio"
-                                           id="wased-used-{{type.id}}"
-                                           name="dataType"
-                                           ng-model="ctrl.wizard.dataType"
-                                           ng-value="type">
-                                    <label for="wased-used-{{type.id}}"
-                                           ng-bind="type.name">
-                                    </label>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            ...or from data types that have yet to be used:
-                            <div style="margin-left: 25px; margin-top:10px">
-                                <div ng-repeat="type in ctrl.unusedDataTypes | orderBy:'name'" >
-                                    <input type="radio"
-                                           name="dataType"
-                                           id="wased-unused-{{type.id}}"
-                                           ng-model="ctrl.wizard.dataType"
-                                           value="{{ type.code }}">
-                                    <label for="wased-unused-{{type.id}}"
-                                           ng-bind="type.name">
-                                    </label>
-                                </div>
-
-                            </div>
-                        </div>
                     </div>
-
-                </div>
-
-                <div ng-if="ctrl.wizard.dataType">
-                    <hr/>
-                    <!-- STEP 2 -->
-                    <span class="vertical-align">
-                            <waltz-step-count count="2" colour="#d6f3ff"></waltz-step-count>
-                            &nbsp;
-                            <span style="font-size: large">Choose an application to rate as a source...</span>
-                        </span>
-
-                    <div class="row" style="margin-left: 25px;">
-                        <div class="col-md-6">
-                            ...from applications which already provide this organisational unit with:
-                            <code ng-bind="ctrl.wizard.dataType | toDisplayName:'dataType'"></code>
-
-                            <div class="waltz-scroll-region" style="height: 300px">
-                                <ul style="margin-top:10px">
-                                    <li ng-repeat="app in ctrl.getSupplyingApps(ctrl.wizard.dataType)| orderBy:'name'">
-                                           <span style="font-weight: {{ctrl.wizard.app === app ? 'bolder' : ''}}">
-                                              <a href
-                                                 ng-click="ctrl.wizard.app = app"
-                                                 ng-if="!editForm.$submitted">
-                                                  <span ng-bind="app.name"></span>
-                                              </a>
-                                               <span class="text-muted"
-                                                     ng-if="editForm.$submitted">
-                                                   <span ng-bind="app.name"></span>
-                                               </span>
-                                           </span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            ...or search for an application:
-                            <waltz-app-selector model="ctrl.wizard"></waltz-app-selector>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div ng-if="ctrl.wizard.app">
-                    <hr/>
-                    <!-- STEP 3 -->
-                    <span class="vertical-align">
-                            <waltz-step-count count="3" colour="#d6f3ff"></waltz-step-count>
-                            &nbsp;
-                            <span style="font-size: large">
-                                Rate
-                                <span ng-bind="ctrl.wizard.app.name"></span>
-                                as a strategic source
-                            </span>
-                        </span>
-
-                    <div class="row" style="margin-left: 25px">
-
-                        Rate
-                        <span ng-bind="ctrl.wizard.app.name"></span>
-                        as a strategic source for
-                        <code ng-bind="ctrl.wizard.dataType | toDisplayName:'dataType'"></code>
-
+                    <div class="col-md-6">
                         <div style="margin-left: 25px; margin-top:10px">
                             <div>
                                 <input type="radio"
+                                       id="wasep-pri-u"
                                        name="rating"
-                                       ng-model="ctrl.wizard.rating"
+                                       ng-model="$ctrl.updateForm.rating"
                                        value="PRIMARY">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'PRIMARY'">
-                                </waltz-enum-value>
+                                <label for="wasep-pri-u">
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'PRIMARY'">
+                                    </waltz-enum-value>
+                                </label>
                             </div>
                             <div>
                                 <input type="radio"
+                                       id="wasep-sec-u"
                                        name="rating"
-                                       ng-model="ctrl.wizard.rating"
+                                       ng-model="$ctrl.updateForm.rating"
                                        value="SECONDARY">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'SECONDARY'">
-                                </waltz-enum-value>
+                                <label for="wasep-sec-u">
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'SECONDARY'">
+                                    </waltz-enum-value>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Update Notes</label>
+                        <span class="help-block">
+                            Additional Notes (supports markdown formatting)
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="margin-left: 25px; margin-top:10px">
+                           <textarea ng-model="$ctrl.updateForm.description"
+                                     rows="5"
+                                     cols="50"
+                                     placeholder="Additional notes and information..">
+                           </textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <input class='btn btn-success'
+                               type="submit"
+                               value="Submit">
+                        <a class="clickable"
+                           ng-click="$ctrl.onDismissUpdateForm()">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+
+    <!-- CREATE FORM -->
+    <div ng-if="$ctrl.visibility.createForm">
+        <form name="createForm"
+              ng-submit="$ctrl.submitCreate()">
+            <fieldset ng-disabled="createForm.$submitted">
+
+                <!-- DATA TYPE -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Data Type</label>
+                        <span class="help-block">
+                            Select a data type from the tree
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-if="!$ctrl.createForm.dataType">
+                            <waltz-tree-picker items="$ctrl.dataTypes"
+                                               on-select="$ctrl.onSelectDataType">
+                            </waltz-tree-picker>
+                        </div>
+                        <div ng-if="$ctrl.createForm.dataType">
+                            <waltz-entity-icon-label style='font-weight: bold'
+                                                     entity-ref="$ctrl.createForm.dataType"></waltz-entity-icon-label>
+                            &nbsp;
+                            <a ng-click="$ctrl.onClearDataType()"
+                               class="clickable">
+                                <waltz-icon name="times"></waltz-icon>
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- ORG UNIT -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Org Unit</label>
+                        <span class="help-block">
+                            Select an organisational unit from the tree
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-if="!$ctrl.createForm.orgUnit">
+                            <waltz-tree-picker items="$ctrl.orgUnits"
+                                               on-select="$ctrl.onSelectOrgUnit">
+                            </waltz-tree-picker>
+                        </div>
+                        <div ng-if="$ctrl.createForm.orgUnit">
+                            <waltz-entity-icon-label style='font-weight: bold'
+                                                     entity-ref="$ctrl.createForm.orgUnit"></waltz-entity-icon-label>
+                            &nbsp;
+                            <a ng-click="$ctrl.onClearOrgUnit()"
+                               class="clickable">
+                                <waltz-icon name="times"></waltz-icon>
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- APPLICATION -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Application</label>
+                        <span class="help-block">
+                            Select an application
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div ng-if="!$ctrl.createForm.app">
+                            <waltz-app-selector model="$ctrl.createForm"
+                                                on-select="$ctrl.onSelectApp">
+                            </waltz-app-selector>
+                        </div>
+                        <div ng-if="$ctrl.createForm.app">
+                            <waltz-entity-icon-label style='font-weight: bold'
+                                                     entity-ref="$ctrl.createForm.app"></waltz-entity-icon-label>
+                            &nbsp;
+                            <a ng-click="$ctrl.onClearApp()"
+                               class="clickable">
+                                <waltz-icon name="times"></waltz-icon>
+                                Clear
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- RATING -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Rating</label>
+                        <span class="help-block">
+                            Select a rating
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="margin-left: 25px; margin-top:10px">
+                            <div>
+                                <input type="radio"
+                                       id="wasep-pri-c"
+                                       name="rating"
+                                       ng-model="$ctrl.createForm.rating"
+                                       ng-change="$ctrl.onCreateFormChange()"
+                                       value="PRIMARY">
+                                <label for="wasep-pri-c">
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'PRIMARY'">
+                                    </waltz-enum-value>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio"
+                                       id="wasep-sec-c"
+                                       name="rating"
+                                       ng-model="$ctrl.createForm.rating"
+                                       ng-change="$ctrl.onCreateFormChange()"
+                                       value="SECONDARY">
+                                <label for="wasep-sec-c">
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="'SECONDARY'">
+                                    </waltz-enum-value>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- NOTES -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Notes</label>
+                        <span class="help-block">
+                            Additional Notes (supports markdown formatting)
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="margin-left: 25px; margin-top:10px">
+                            <div>
+                               <textarea ng-model="$ctrl.createForm.description"
+                                         rows="5"
+                                         cols="50"
+                                         placeholder="Additional notes and information..">
+                               </textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <hr/>
+
+                <!-- SUBMIT / CANCEL -->
                 <div>
                     <input class='btn btn-success'
                            type="submit"
                            value="Submit"
-                           ng-disabled="ctrl.isDisabled()">
-                    <a ui-sref="main.org-unit.view ({id: ctrl.id})">
+                           ng-disabled="$ctrl.isCreateFormDisabled()">
+
+                    <a class="clickable"
+                       ng-click="$ctrl.onDismissCreateForm()">
                         Cancel
                     </a>
                 </div>
+
             </fieldset>
         </form>
     </div>

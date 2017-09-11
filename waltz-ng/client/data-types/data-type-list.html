@@ -32,7 +32,6 @@
 
     <br>
 
-
     <!-- STATIC PANELS -->
     <div class="row"
          ng-if="ctrl.panels.length > 0">
@@ -50,7 +49,6 @@
                            icon="qrcode"
                            small="Types"
                            id="data-types-tree-section">
-
                 <waltz-data-type-tree on-selection="ctrl.nodeSelected">
                 </waltz-data-type-tree>
             </waltz-section>
@@ -59,9 +57,36 @@
 
     <!-- AUTH SOURCES -->
     <waltz-section icon='shield'
+                   ng-init="ctrl.visibility.editor = false"
                    name="Authoritative Sources">
-        <waltz-auth-sources-table auth-sources="ctrl.authSources">
-        </waltz-auth-sources-table>
+
+        <waltz-section-actions>
+            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
+                <a ng-click="ctrl.editAuthSources()"
+                   ng-if="!ctrl.visibility.editor"
+                   class="btn btn-xs btn-primary">
+                    Edit
+                </a>
+            </span>
+            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
+                <a ng-click="ctrl.showAuthSources()"
+                   ng-if="ctrl.visibility.editor"
+                   class="btn btn-xs btn-primary">
+                    View
+                </a>
+            </span>
+        </waltz-section-actions>
+
+        <div ng-if="!ctrl.visibility.editor">
+            <waltz-auth-sources-table auth-sources="ctrl.authSources">
+            </waltz-auth-sources-table>
+        </div>
+
+        <div ng-if="ctrl.visibility.editor">
+            <waltz-auth-source-editor-panel>
+            </waltz-auth-source-editor-panel>
+        </div>
+
     </waltz-section>
 
 </div>

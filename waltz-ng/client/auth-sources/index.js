@@ -24,6 +24,7 @@ import * as AuthSourcesTable from './components/table/auth-sources-table';
 import * as NonAuthSourcesTable from './components/non-auth-sources-table/non-auth-sources-table';
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
+import * as TreePicker from './components/tree-picker/tree-picker';
 import {registerComponents, registerStore} from '../common/module-utils';
 
 
@@ -43,6 +44,7 @@ export default () => {
         AuthSourcesTable,
         AuthSourcesSection,
         AuthSourcesSummaryPanel,
+        TreePicker,
         NonAuthSourcesTable ]);
 
     return module.name;
