@@ -19,10 +19,14 @@
 package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.data_type.DataTypeDao;
+import com.khartec.waltz.data.data_type.search.DataTypeSearchDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -32,12 +36,16 @@ public class DataTypeService {
 
 
     private final DataTypeDao dataTypeDao;
+    private final DataTypeSearchDao searchDao;
 
 
     @Autowired
-    public DataTypeService(DataTypeDao dataTypeDao) {
+    public DataTypeService(DataTypeDao dataTypeDao, DataTypeSearchDao searchDao) {
         checkNotNull(dataTypeDao, "dataTypeDao must not be null");
+        checkNotNull(searchDao, "searchDao cannot be null");
+
         this.dataTypeDao = dataTypeDao;
+        this.searchDao = searchDao;
     }
 
 
@@ -49,4 +57,10 @@ public class DataTypeService {
     public DataType getByCode(String code) {
         return dataTypeDao.getByCode(code);
     }
+
+
+    public Collection<DataType> search(String query) {
+        return searchDao.search(query, EntitySearchOptions.mkForEntity(EntityKind.DATA_TYPE));
+    }
+
 }

@@ -25,9 +25,14 @@ function store($http, BaseApiUrl) {
         $http.get(BASE)
             .then(result => result.data);
 
+    const search = (query) => $http
+        .get(`${BASE}/search/${query}`)
+        .then(r => r.data);
+
 
     return {
-        findAll
+        findAll,
+        search
     };
 }
 
@@ -46,6 +51,11 @@ export const DataTypeStore_API = {
         serviceName,
         serviceFnName: 'findAll',
         description: 'finds all data types'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'search data types'
     }
 };
 

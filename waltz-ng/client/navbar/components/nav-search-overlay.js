@@ -36,6 +36,7 @@ const initialState = {
         'PERSON',
         'ACTOR',
         'CHANGE_INITIATIVE',
+        'DATA_TYPE',
         'APP_GROUP',
         'ORG_UNIT',
         'MEASURABLE',
@@ -173,6 +174,7 @@ function controller($element,
 
         handleSearch(query, CORE_API.ApplicationStore.search, 'APPLICATION');
         handleSearch(query, CORE_API.ChangeInitiativeStore.search, 'CHANGE_INITIATIVE');
+        handleSearch(query, CORE_API.DataTypeStore.search, 'DATA_TYPE');
         handleSearch(query, CORE_API.PersonStore.search, 'PERSON');
         handleSearch(query, CORE_API.MeasurableStore.search, 'MEASURABLE');
         handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');

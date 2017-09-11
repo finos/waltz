@@ -18,14 +18,17 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
 @Service
@@ -44,7 +47,13 @@ public class DataTypesEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        EndpointUtilities.getForList(BASE_URL, (request, response) -> service.getAll());
+        String searchPath = mkPath(BASE_URL, "search", ":query");
+
+        ListRoute<DataType> searchRoute = (request, response) ->
+                service.search(request.params("query"));
+
+        getForList(BASE_URL, (request, response) -> service.getAll());
+        getForList(searchPath, searchRoute);
     }
 
 
