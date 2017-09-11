@@ -100,7 +100,7 @@ function controller($q,
                     vm.flowTweakers = mkTweakers(
                         baseTweakers,
                         vm.physicalFlows,
-                        vm.flows);
+                        vm.logicalFlows);
                 });
 
             serviceBroker
