@@ -17,14 +17,17 @@
  */
 
 import angular from 'angular';
+import {registerStores} from "../common/module-utils";
+import * as SvgDiagramStore from './services/svg-diagram-store';
 
 
 export default () => {
 
     const module = angular.module('waltz.svg.diagram', []);
 
-    module
-        .service('SvgDiagramStore', require('./services/svg-diagram-store'));
+
+    registerStores(module, [SvgDiagramStore]);
+
 
     module
         .component('waltzSvgDiagram', require('./component/svg-diagram'))

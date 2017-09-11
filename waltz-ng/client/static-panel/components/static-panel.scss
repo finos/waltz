@@ -11,8 +11,8 @@
 
     .wsp-minimal-border {
         border: 1px solid $waltz-border-color-lighter;
-        margin-bottom: 20px;
-        padding: 15px;
+        border-radius: 2px;
+        padding: 0.6em;
 
         > h3 {
             margin-top: 0px;

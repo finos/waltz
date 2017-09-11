@@ -16,30 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditView from "./logical-flow-edit";
-
-const base = {
-    url: 'logical-flow'
-};
+package com.khartec.waltz.model.authoritativesource;
 
 
-const editState = {
-    url: '/edit/:kind/:id',
-    views: {'content@': EditView }
-};
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import org.immutables.value.Value;
 
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.logical-flow', base)
-        .state('main.logical-flow.edit', editState);
+@Value.Immutable
+@JsonSerialize(as = ImmutableAuthoritativeSourceUpdateCommand.class)
+@JsonDeserialize(as = ImmutableAuthoritativeSourceUpdateCommand.class)
+public abstract class AuthoritativeSourceUpdateCommand implements
+        DescriptionProvider,
+        IdProvider
+{
+    public abstract AuthoritativenessRating rating();
 }
-
-
-setup.$inject = [
-    '$stateProvider'
-];
-
-
-export default setup;

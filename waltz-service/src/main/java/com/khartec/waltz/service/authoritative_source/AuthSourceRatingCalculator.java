@@ -73,17 +73,34 @@ public class AuthSourceRatingCalculator {
         this.ratingsCalculator = ratingsCalculator;
     }
 
-    
+
+    // use dataTypeId variant, want to move away from codes
+    @Deprecated
     public int[] update(String dataTypeCode, EntityReference vantageRef) {
         DataType dataType = dataTypeDao.getByCode(dataTypeCode);
-
         if (dataType == null) {
             LOG.error("Cannot update ratings for data type code: {} for vantage point: {} as cannot find corresponding data type",
                     dataTypeCode,
                     vantageRef);
             return new int[0];
         }
+        return update(dataType, vantageRef);
+    }
 
+
+    public int[] update(long dataTypeId, EntityReference vantageRef) {
+        DataType dataType = dataTypeDao.getById(dataTypeId);
+        if (dataType == null) {
+            LOG.error("Cannot update ratings for data type id: {} for vantage point: {} as cannot find corresponding data type",
+                    dataTypeId,
+                    vantageRef);
+            return new int[0];
+        }
+        return update(dataType, vantageRef);
+    }
+
+
+    private int[] update(DataType dataType, EntityReference vantageRef) {
         LOG.info("Updating ratings for auth source - dataType: {}, vantage point: {}",
                 dataType,
                 vantageRef);

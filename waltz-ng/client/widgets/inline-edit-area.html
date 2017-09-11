@@ -22,10 +22,9 @@
                   style="width: 80%">
         </textarea>
         <br>
-
         <button ng-click="$ctrl.mySave()"
                 class="btn btn-xs btn-success"
-                ng-disabled="$ctrl.editor.modifiableValue == value"
+                ng-disabled="$ctrl.editor.modifiableValue == $ctrl.value"
                 uib-popover-html="'Shortcut: <kbd>ctrl+enter</kbd>'"
                 popover-trigger="mouseenter"
                 popover-placement="bottom">

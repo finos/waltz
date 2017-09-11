@@ -18,18 +18,13 @@
 
 package com.khartec.waltz.data.authoritative_source;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.schema.tables.*;
-import com.khartec.waltz.schema.tables.DataType;
+import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.*;
@@ -60,16 +55,14 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 @Repository
 public class AuthoritativeSourceDao {
 
-    private static LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private static DataType dt = DATA_TYPE.as("dt");
-    private static LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
-    private static EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
-    private static Application app = APPLICATION.as("app");
-    private static com.khartec.waltz.schema.tables.AuthoritativeSource au = AUTHORITATIVE_SOURCE.as("au");
+    public final static Application CONSUMER_APP = APPLICATION.as("consumer");
+    private final static Application SUPPLIER_APP = APPLICATION.as("supplier");
+    private final static AggregateFunction<Integer> COUNT_FIELD = DSL.count(LOGICAL_FLOW);
+
 
     private final DSLContext dsl;
 
-    private static final RecordMapper<Record, AuthoritativeSource> TO_AUTH_SOURCE_MAPPER = r -> {
+    private static final RecordMapper<Record, AuthoritativeSource> TO_DOMAIN_MAPPER = r -> {
         AuthoritativeSourceRecord record = r.into(AuthoritativeSourceRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -85,8 +78,8 @@ public class AuthoritativeSourceDao {
 
         EntityReference appRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
-                .id(r.getValue(APPLICATION.ID))
-                .name(r.getValue(APPLICATION.NAME))
+                .id(r.getValue(SUPPLIER_APP.ID))
+                .name(r.getValue(SUPPLIER_APP.NAME))
                 .build();
 
         return ImmutableAuthoritativeSource.builder()
@@ -96,6 +89,7 @@ public class AuthoritativeSourceDao {
                 .applicationReference(appRef)
                 .dataType(record.getDataType())
                 .rating(AuthoritativenessRating.valueOf(record.getRating()))
+                .description(record.getDescription())
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -130,7 +124,7 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -141,17 +135,7 @@ public class AuthoritativeSourceDao {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(ref.kind().name()))
                 .and(AUTHORITATIVE_SOURCE.PARENT_ID.eq(ref.id()))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
-    }
-
-
-    private SelectOnConditionStep<Record> baseSelect() {
-        return dsl.select()
-                .from(AUTHORITATIVE_SOURCE)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
-                .innerJoin(ORGANISATIONAL_UNIT)
-                .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID));
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -160,32 +144,40 @@ public class AuthoritativeSourceDao {
         
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(applicationId))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public int update(long id, AuthoritativenessRating rating) {
-        checkTrue(id > -1, "id must be +ve");
-        checkNotNull(rating, "rating must not be null");
+    public int update(AuthoritativeSourceUpdateCommand command) {
+        checkNotNull(command, "command cannot be null");
+        checkTrue(command.id().isPresent(), "id must be +ve");
 
-        return dsl.update(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.RATING, rating.name())
-                .where(AUTHORITATIVE_SOURCE.ID.eq(id))
+        UpdateSetMoreStep<AuthoritativeSourceRecord> upd = dsl.update(AUTHORITATIVE_SOURCE)
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description());
+
+        return upd
+                .where(AUTHORITATIVE_SOURCE.ID.eq(command.id().get()))
                 .execute();
     }
 
 
-    public int insert(EntityReference parentRef, String dataType, Long appId, AuthoritativenessRating rating) {
-        checkNotNull(parentRef, "parentRef must not be null");
-        Checks.checkNotEmpty(dataType, "dataType cannot be empty");
-        checkNotNull(rating, "rating must not be null");
+    public int insert(AuthoritativeSourceCreateCommand command) {
+        checkNotNull(command, "command cannot be null");
+
+        SelectConditionStep<Record1<String>> dataTypeSelection = DSL
+                .select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.eq(command.dataTypeId()));
 
         return dsl.insertInto(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, parentRef.kind().name())
-                .set(AUTHORITATIVE_SOURCE.PARENT_ID, parentRef.id())
-                .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataType)
-                .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, appId)
-                .set(AUTHORITATIVE_SOURCE.RATING, rating.name())
+                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, EntityKind.ORG_UNIT.name())
+                .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.orgUnitId())
+                .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataTypeSelection)
+                .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, command.applicationId())
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
+                .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
                 .execute();
     }
 
@@ -200,7 +192,7 @@ public class AuthoritativeSourceDao {
     public AuthoritativeSource getById(long id) {
         return baseSelect()
                 .where(AUTHORITATIVE_SOURCE.ID.eq(id))
-                .fetchOne(TO_AUTH_SOURCE_MAPPER);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -223,63 +215,49 @@ public class AuthoritativeSourceDao {
 
     public List<AuthoritativeSource> findAll() {
         return baseSelect()
-                .fetch(TO_AUTH_SOURCE_MAPPER);
-    }
-
-
-    public List<AuthoritativeSource> findByDataTypeIdSelector(Select<Record1<Long>> selector) {
-        SelectConditionStep<Record1<String>> codeSelector = DSL
-                .select(DATA_TYPE.CODE)
-                .from(DATA_TYPE)
-                .where(DATA_TYPE.ID.in(selector));
-
-        return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector))
-                .fetch(TO_AUTH_SOURCE_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
-            Select<Record1<Long>> selector) {
+            Select<Record1<Long>> dataTypeIdSelector) {
 
         SelectConditionStep<Record1<String>> dataTypeCodeSelector = DSL
-                .select(dt.CODE)
-                .from(dt)
-                .where(dt.ID.in(selector));
+                .select(DATA_TYPE.CODE)
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
 
-        Condition appJoin = app.ID.eq(lf.TARGET_ENTITY_ID)
-                .and(app.ORGANISATIONAL_UNIT_ID.eq(eh.ID));
+        Condition appJoin = APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
+                .and(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ENTITY_HIERARCHY.ID));
 
-        Condition hierarchyJoin = eh.ANCESTOR_ID.eq(au.PARENT_ID)
-                .and(eh.KIND.eq(EntityKind.ORG_UNIT.name()));
+        Condition hierarchyJoin = ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition authSourceJoin = au.APPLICATION_ID.eq(lf.SOURCE_ENTITY_ID)
-                .and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition authSourceJoin = AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        Condition dataFlowDecoratorJoin = lfd.LOGICAL_FLOW_ID.eq(lf.ID);
+        Condition dataFlowDecoratorJoin = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID);
 
-        Condition condition = lfd.DECORATOR_ENTITY_ID.in(selector)
-                .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                .and(au.DATA_TYPE.in(dataTypeCodeSelector));
+        Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .and(AUTHORITATIVE_SOURCE.DATA_TYPE.in(dataTypeCodeSelector))
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
 
-        Condition notRemoved = lf.IS_REMOVED.isFalse();
-
-        Field<Long> authSourceIdField = au.ID.as("auth_source_id");
-        Field<Long> applicationIdField = app.ID.as("application_id");
-        Field<String> applicationNameField = app.NAME.as("application_name");
+        Field<Long> authSourceIdField = AUTHORITATIVE_SOURCE.ID.as("auth_source_id");
+        Field<Long> applicationIdField = APPLICATION.ID.as("application_id");
+        Field<String> applicationNameField = APPLICATION.NAME.as("application_name");
 
         Result<Record3<Long, Long, String>> records = dsl
                 .select(authSourceIdField,
                         applicationIdField,
                         applicationNameField)
-                .from(lf)
-                .innerJoin(lfd).on(dataFlowDecoratorJoin)
-                .innerJoin(au).on(authSourceJoin)
-                .innerJoin(eh).on(hierarchyJoin)
-                .innerJoin(app).on(appJoin)
+                .from(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(dataFlowDecoratorJoin)
+                .innerJoin(AUTHORITATIVE_SOURCE).on(authSourceJoin)
+                .innerJoin(ENTITY_HIERARCHY).on(hierarchyJoin)
+                .innerJoin(APPLICATION).on(appJoin)
                 .where(condition)
-                .and(notRemoved)
-                .orderBy(au.ID, app.NAME)
+                .orderBy(AUTHORITATIVE_SOURCE.ID, APPLICATION.NAME)
                 .fetch();
 
         return groupBy(
@@ -339,4 +317,82 @@ public class AuthoritativeSourceDao {
 
         return bereaved;
     }
+
+
+    public List<NonAuthoritativeSource> findNonAuthSources(Condition customSelectionCriteria) {
+        Condition flowNotRemoved = LOGICAL_FLOW.IS_REMOVED.isFalse();
+        Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
+        Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
+        Condition decorationIsAboutDataTypes = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name());
+        Condition badFlow = LOGICAL_FLOW_DECORATOR.RATING.in(
+                AuthoritativenessRating.DISCOURAGED.name(),
+                AuthoritativenessRating.NO_OPINION.name());
+
+        Condition commonSelectionCriteria = flowNotRemoved
+                .and(consumerNotRemoved)
+                .and(supplierNotRemoved)
+                .and(decorationIsAboutDataTypes)
+                .and(badFlow);
+
+        return dsl
+                .select(SUPPLIER_APP.ID, SUPPLIER_APP.NAME)
+                .select(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                .select(DSL.count(LOGICAL_FLOW))
+                .from(SUPPLIER_APP)
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(SUPPLIER_APP.ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .innerJoin(LOGICAL_FLOW_DECORATOR)
+                .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(CONSUMER_APP)
+                .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(customSelectionCriteria)
+                .and(commonSelectionCriteria)
+                .groupBy(SUPPLIER_APP.ID, LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                .fetch()
+                .map(r -> ImmutableNonAuthoritativeSource.builder()
+                        .sourceReference(mkRef(
+                                EntityKind.APPLICATION,
+                                r.get(SUPPLIER_APP.ID),
+                                r.get(SUPPLIER_APP.NAME)))
+                        .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
+                        .count(r.get(COUNT_FIELD))
+                        .build());
+    }
+
+
+    public List<AuthoritativeSource> findAuthSources(Condition customSelectionCriteria) {
+        Condition criteria = AUTHORITATIVE_SOURCE.ID.in(DSL
+                .select(AUTHORITATIVE_SOURCE.ID)
+                .from(AUTHORITATIVE_SOURCE)
+                    .innerJoin(LOGICAL_FLOW)
+                    .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID)
+                            .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                            .and(LOGICAL_FLOW.IS_REMOVED.isFalse()))
+                    .innerJoin(CONSUMER_APP)
+                    .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
+                            .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                    .where(customSelectionCriteria));
+
+        return baseSelect()
+                .where(criteria)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    // -- HELPERS --
+
+    private SelectOnConditionStep<Record> baseSelect() {
+        return dsl
+                .select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME)
+                .select(AUTHORITATIVE_SOURCE.fields())
+                .select(SUPPLIER_APP.NAME, SUPPLIER_APP.ID)
+                .from(AUTHORITATIVE_SOURCE)
+                .innerJoin(SUPPLIER_APP)
+                .on(SUPPLIER_APP.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
+                .innerJoin(ORGANISATIONAL_UNIT)
+                .on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID));
+    }
+
 }

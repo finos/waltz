@@ -21,14 +21,15 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
+import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -80,21 +81,16 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         // -- PATHS
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
-        String findByDataTypeIdSelectPath = mkPath(BASE_URL, "data-type");
+        String findNonAuthSourcesPath = mkPath(BASE_URL, "non-auth-for", ":kind", ":id");
+        String findAuthSourcesPath = mkPath(BASE_URL, "auth-for", ":kind", ":id");
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
-        String updatePath = mkPath(BASE_URL, "id", ":id");
         String deletePath = mkPath(BASE_URL, "id", ":id");
-        String insertPath = mkPath(BASE_URL, "kind", ":kind", ":id", ":dataType", ":appId");
-        String determineAuthSourcesForOrgUnitPath = mkPath(BASE_URL, "org-unit", ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
 
         // -- ROUTES
-
-        ListRoute<AuthoritativeSource> findByDataTypeIdSelectorRoute = (request, response)
-                -> authoritativeSourceService.findByDataTypeIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<AuthoritativeSource> findByEntityReferenceRoute = (request, response)
                 -> authoritativeSourceService.findByEntityReference(getEntityReference(request));
@@ -102,21 +98,26 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         ListRoute<AuthoritativeSource> findByApplicationIdRoute = (request, response)
                 -> authoritativeSourceService.findByApplicationId(getId(request));
 
-        DatumRoute<?> determineAuthSourcesForOrgUnitRoute = (request, response)
-                -> authoritativeSourceService.determineAuthSourcesForOrgUnit(getId(request));
+        ListRoute<NonAuthoritativeSource> findNonAuthSourcesRoute = (request, response)
+                -> authoritativeSourceService.findNonAuthSources(getEntityReference(request));
+
+        ListRoute<AuthoritativeSource> findAuthSourcesRoute = (request, response)
+                -> authoritativeSourceService.findAuthSources(getEntityReference(request));
+
+        ListRoute<AuthoritativeSource> findAllRoute = (request, response)
+                -> authoritativeSourceService.findAll();
 
         getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
-        postForList(findByDataTypeIdSelectPath, findByDataTypeIdSelectorRoute);
+        getForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
-        postForDatum(updatePath, this::updateRoute);
+        getForList(findAuthSourcesPath, findAuthSourcesRoute);
+        getForList(BASE_URL, findAllRoute);
+        putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
-        postForDatum(insertPath, this::insertRoute);
-
-
-        getForDatum(determineAuthSourcesForOrgUnitPath, determineAuthSourcesForOrgUnitRoute);
+        postForDatum(BASE_URL, this::insertRoute);
     }
 
 
@@ -130,16 +131,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     }
 
 
-    private String insertRoute(Request request, Response response) {
+    private String insertRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-        EntityReference parentRef = getEntityReference(request);
-        String dataType = request.params("dataType");
-        Long appId = getLong(request, "appId");
-
-        String ratingStr = request.body();
-        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-
-        authoritativeSourceService.insert(parentRef, dataType, appId, rating);
+        AuthoritativeSourceCreateCommand command = readBody(request, AuthoritativeSourceCreateCommand.class);
+        authoritativeSourceService.insert(command);
         return "done";
     }
 
@@ -174,11 +169,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     }
 
 
-    private String updateRoute(Request request, Response response) {
+    private String updateRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
-        String ratingStr = request.body();
-        AuthoritativenessRating rating = AuthoritativenessRating.valueOf(ratingStr);
-        authoritativeSourceService.update(getId(request), rating);
+        AuthoritativeSourceUpdateCommand command = readBody(request, AuthoritativeSourceUpdateCommand.class);
+        authoritativeSourceService.update(command);
         return "done";
     }
 

@@ -22,10 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    apps: '<',
-    entityReference: '<',
-    flowData: '<',
-    onLoadDetail: '<'
+    entityReference: '<'
 };
 
 
@@ -33,7 +30,6 @@ const template = require('./rated-flow-summary-panel.html');
 
 
 const initialState = {
-    apps: [],
     infoCell : null
 };
 
@@ -104,40 +100,91 @@ function controller(serviceBroker)
 {
     const vm = _.defaultsDeep(this, initialState);
 
-    const childSelector = {
-        entityReference: vm.entityReference,
-        scope: 'CHILDREN'
+    const processSummaries = (xs) => {
+        if (vm.entityReference.kind === 'DATA_TYPE') {
+            const relevantIds = [];
+            const descend = (ptr) => {
+                relevantIds.push(ptr);
+                _.chain(vm.dataTypes)
+                    .filter(c => c.parentId === ptr)
+                    .forEach(c => descend(c.id))
+                    .value();
+            };
+            descend(vm.entityReference.id);
+
+            return _.filter(xs, x => {
+                const decorator = x.decoratorEntityReference;
+                return decorator.kind = 'DATA_TYPE' && _.includes(relevantIds, decorator.id);
+            });
+        } else {
+            return xs;
+        }
     };
 
-    const exactSelector = {
-        entityReference: vm.entityReference,
-        scope: 'EXACT'
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.dataTypes = r.data);
     };
 
+    vm.$onChanges = () => {
 
+        if (!vm.entityReference) return;
 
-    serviceBroker
-        .loadViewData(
-            CORE_API.LogicalFlowDecoratorStore.summarizeBySelector,
-            [ childSelector ])
-        .then(r => vm.childSummaries = r.data);
+        const childSelector = {
+            entityReference: vm.entityReference,
+            scope: 'CHILDREN'
+        };
 
-    serviceBroker
-        .loadViewData(
-            CORE_API.LogicalFlowDecoratorStore.summarizeBySelector,
-            [ exactSelector ])
-        .then(r => vm.exactSummaries = r.data);
+        const exactSelector = {
+            entityReference: vm.entityReference,
+            scope: 'EXACT'
+        };
 
-    serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(r => vm.dataTypes = r.data);
+        serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ childSelector ])
+            .then(r => vm.apps= r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
+                [ childSelector ])
+            .then(r => vm.childSummaries = processSummaries(r.data));
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
+                [ exactSelector ])
+            .then(r => vm.exactSummaries = processSummaries(r.data));
+
+    };
 
     vm.onTableClick = (clickData) => {
         if (clickData.type === 'CELL') {
-            vm.onLoadDetail()
-                .then(() => vm.infoPanel = mkInfoCell(clickData, vm.flowData, vm.apps));
-        } else {
-            console.log('rated-flow-summary-panel: unsupported selection', clickData);
+
+            const childSelector = {
+                entityReference: vm.entityReference,
+                scope: 'CHILDREN'
+            };
+
+            const flowData = {};
+            serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.findBySelector,
+                    [ childSelector ])
+                .then(r => {
+                    flowData.flows = r.data;
+                    return serviceBroker
+                        .loadViewData(
+                            CORE_API.LogicalFlowDecoratorStore.findBySelector,
+                            [ childSelector ]);
+                })
+                .then(r => {
+                    flowData.decorators = r.data;
+                    vm.infoPanel = mkInfoCell(clickData, flowData, vm.apps);
+                });
         }
     };
 

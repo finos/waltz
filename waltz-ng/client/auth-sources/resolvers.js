@@ -31,13 +31,6 @@ function mkSelector(params) {
 }
 
 
-export function authSourcesResolver(authSourcesStore, params) {
-    const { kind, id } = params;
-    return authSourcesStore.findByReference(kind, id);
-}
-
-authSourcesResolver.$inject = ['AuthSourcesStore', '$stateParams'];
-
 
 export function flowResolver(flowStore, params) {
     return flowStore.findBySelector(mkSelector(params));
@@ -46,29 +39,6 @@ export function flowResolver(flowStore, params) {
 flowResolver.$inject = ['LogicalFlowStore', '$stateParams'];
 
 
-export function idResolver(params) {
-    return params.id;
-}
-
-idResolver.$inject = ['$stateParams'];
-
-
-export function orgUnitsResolver(serviceBroker) {
-    return serviceBroker
-        .loadAppData(CORE_API.OrgUnitStore.findAll)
-        .then(r => r.data);
-}
-
-orgUnitsResolver.$inject = ['ServiceBroker'];
-
-
-export function dataTypesResolver(serviceBroker) {
-    return serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(r => r.data);
-}
-
-dataTypesResolver.$inject = ['ServiceBroker'];
 
 
 export function flowDecoratorsResolver(logicalFlowDecoratorStore, $stateParams) {

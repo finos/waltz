@@ -18,6 +18,11 @@
 import _ from 'lodash';
 
 
+/**
+ *  Given a set of nodes with id and parentId constructs a 'searchStr' property for each
+ *  node which is the concatenation of a specified property (attr) of all the nodes
+ *  parent nodes.
+ */
 export function prepareSearchNodes(nodes = [], attr = 'name', parentKey = 'parentId') {
     const nodesById = _.keyBy(nodes, 'id');
 

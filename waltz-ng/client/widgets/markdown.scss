@@ -1,2 +1,9 @@
 .waltz-markdown {
+    div {
+        display: inline;
+
+        p:first-child {
+            display: inline;
+        }
+    }
 }

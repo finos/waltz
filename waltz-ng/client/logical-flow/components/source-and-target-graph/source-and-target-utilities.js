@@ -1,4 +1,3 @@
-
 /*
  *
  *  * Waltz - Enterprise Architecture
@@ -18,6 +17,8 @@
  *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+import * as _ from 'lodash';
+
 
 const iconCodes = {
     // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)

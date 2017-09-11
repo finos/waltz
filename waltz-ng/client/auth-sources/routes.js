@@ -34,12 +34,8 @@ const editState = {
     url: '/:kind/{id:int}/edit',
     views: { 'content@': editView },
     resolve: {
-        authSources: authSourcesResolver,
-        orgUnits: orgUnitsResolver,
-        id: idResolver,
         flows: flowResolver,
-        flowDecorators: flowDecoratorsResolver,
-        dataTypes: dataTypesResolver
+        flowDecorators: flowDecoratorsResolver
     }
 };
 

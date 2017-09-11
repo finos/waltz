@@ -21,12 +21,15 @@
 
     <div class="wsp-minimal-border"
          ng-if="$ctrl.renderMode === 'minimal-border'">
-        <h3>
+        <h3 ng-if="$ctrl.panel.title">
             <waltz-icon name="{{ $ctrl.panel.icon }}">
             </waltz-icon>
             <span ng-bind="$ctrl.panel.title">
             </span>
         </h3>
+        <waltz-icon name="{{ $ctrl.panel.icon }}"
+                    ng-if="!$ctrl.panel.title && $ctrl.panel.icon">
+        </waltz-icon>
         <waltz-markdown text="$ctrl.panel.content"></waltz-markdown>
     </div>
 </div>

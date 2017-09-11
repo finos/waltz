@@ -100,7 +100,7 @@ function controller(serviceBroker) {
                 vm.dataTypes = r.data;
                 vm.searchNodes = prepareSearchNodes(vm.dataTypes);
             })
-            .then(() => serviceBroker.loadViewData(CORE_API.LogicalFlowDecoratorStore.summarizeForAll))
+            .then(() => serviceBroker.loadViewData(CORE_API.LogicalFlowDecoratorStore.summarizeInboundForAll))
             .then(r => {
                 vm.hierarchy = prepareTree(vm.dataTypes, r.data);
                 vm.maxTotal = _

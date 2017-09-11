@@ -21,7 +21,6 @@ package com.khartec.waltz.service.access_log;
 import com.khartec.waltz.data.access_log.AccessLogDao;
 import com.khartec.waltz.model.accesslog.AccessLog;
 import com.khartec.waltz.model.accesslog.AccessTime;
-import org.jooq.tools.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,7 @@ public class AccessLogService {
     }
 
 
-    public int write(AccessLog logEntry) throws ParseException {
+    public int write(AccessLog logEntry) {
         checkNotNull(logEntry, "logEntry must not be null");
         return accessLogDao.write(logEntry);
     }
