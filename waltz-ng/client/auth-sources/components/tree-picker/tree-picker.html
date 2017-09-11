@@ -1,0 +1,41 @@
+<div class="row">
+
+    <div class="col-md-6">
+        <waltz-search-control on-query="$ctrl.doSearch"
+                              min-characters='2'
+                              delay="200"
+                              placeholderText="Search Data Types">
+        </waltz-search-control>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 0.7em;">
+    <div class="col-md-12">
+        <treecontrol class="tree-light"
+                     tree-model="$ctrl.hierarchy"
+                     order-by="'-name'"
+                     expanded-nodes="$ctrl.expandedNodes"
+                     options="$ctrl.treeOptions">
+            <span class="clickable"
+                  ng-if="node.concrete"
+                  ng-click="$ctrl.onSelect(node)">
+                <strong ng-bind="node.name"
+                        uib-popover="{{node.description}}"
+                        popover-append-to-body="true"
+                        popover-placement="right"
+                        popover-trigger="mouseenter">
+                </strong>
+            </span>
+            <span ng-if="node.concrete == false"
+                  style="cursor: not-allowed"
+                  uib-popover="{{node.description}}"
+                  popover-append-to-body="true"
+                  popover-placement="right"
+                  popover-trigger="mouseenter"
+                  ng-bind="node.name">
+            </span>
+        </treecontrol>
+    </div>
+</div>
+
+</div>
