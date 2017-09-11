@@ -27,7 +27,7 @@ const BINDINGS = {
 
 const initialState = {
     apps: []
-}
+};
 
 
 function controller(ApplicationStore) {
@@ -43,7 +43,6 @@ function controller(ApplicationStore) {
 
 
     vm.select = (item) => invokeFunction(vm.onSelect, item);
-
 }
 
 

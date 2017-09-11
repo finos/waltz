@@ -37,7 +37,11 @@ const initialState = {
     physicalSpecifications: [],
     visibility: {
         dataTab: 0,
-        logicalFlows: false // this is the source data ratings panel, rename
+        logicalFlows: false, // this is the source data ratings panel, rename
+        editor: {
+            logicalFlows: false
+        }
+
     }
 };
 
@@ -66,7 +70,7 @@ function controller(serviceBroker) {
     }
 
 
-    vm.$onInit = () => {
+    function loadData() {
         const selector = {
             entityReference: vm.parentEntityRef,
             scope: 'EXACT'
@@ -109,11 +113,12 @@ function controller(serviceBroker) {
                 [ vm.parentEntityRef.id ])
             .then(r => {
                 vm.authSources = r.data;
-                vm.nestedAuthSources = nest()
-                    .key(a => a.dataType)
-                    .key(a => a.rating)
-                    .object(r.data);
             });
+    }
+
+
+    vm.$onInit = () => {
+        loadData();
     };
 
     vm.showTab = (idx) => {
@@ -139,6 +144,15 @@ function controller(serviceBroker) {
 
     vm.exportPhysicalFlowUnusedSpecifications = () => {
         vm.physicalFlowUnusedSpecificationsExportFn();
+    };
+
+    vm.isAnyEditorVisible = () => {
+        return _.some(vm.visibility.editor, r => r);
+    };
+
+    vm.resetToViewMode = () => {
+        vm.visibility.editor = Object.assign({}, initialState.visibility.editor);
+        loadData();
     };
 
 }

@@ -4,7 +4,7 @@
          ng-if="$ctrl.produces.length > 0">
 
         <div class="col-md-12">
-            <h4>Produces (<span ng-bind="$ctrl.produces.length"></span>)</h4>
+            <strong>Produces (<span ng-bind="$ctrl.produces.length"></span>)</strong>
 
             <waltz-grid-with-search column-defs="$ctrl.produceColumnDefs"
                         entries="$ctrl.produces"
@@ -18,7 +18,7 @@
     <div class="row"
          ng-if="$ctrl.consumes.length > 0">
         <div class="col-md-12">
-            <h4>Consumes (<span ng-bind="$ctrl.consumes.length"></span>)</h4>
+            <strong>Consumes (<span ng-bind="$ctrl.consumes.length"></span>)</strong>
 
             <waltz-grid-with-search column-defs="$ctrl.consumeColumnDefs"
                                     entries="$ctrl.consumes"
@@ -46,7 +46,7 @@
         <br>
 
         <div class="col-md-12">
-            <h4>Unused Specifications</h4>
+            <strong>Unused Specifications</strong>
             <small class="text-muted">
                 Specifications which have been registered, but are not sent to any consumers.
             </small>

@@ -16,6 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default (module) => {
-    module.directive('waltzRatingIndicator', require('./rating-indicator'));
-};
+package com.khartec.waltz.model.authoritativesource;
+
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityReference;
+import org.immutables.value.Value;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableNonAuthoritativeSource.class)
+@JsonDeserialize(as = ImmutableNonAuthoritativeSource.class)
+public abstract class NonAuthoritativeSource {
+
+    public abstract EntityReference sourceReference();
+    public abstract long dataTypeId();
+    public abstract int count();
+}

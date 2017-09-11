@@ -18,6 +18,7 @@
 
 import {loadDataTypes, dataTypeByCodeResolver, dataTypeByIdResolver} from "./resolvers";
 
+
 const baseState = {
     resolve: {
         dataTypes: loadDataTypes
@@ -46,7 +47,6 @@ const viewState = {
 
 
 function setup($stateProvider) {
-
     $stateProvider
         .state('main.data-type', baseState)
         .state('main.data-type.list', listState)

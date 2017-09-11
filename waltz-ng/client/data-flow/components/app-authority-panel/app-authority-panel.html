@@ -1,0 +1,77 @@
+<div class="waltz-panel-content">
+    <pre>{{$ctrl.authSources|json}}</pre>
+    <div ng-if="!($ctrl.authSources | isEmpty)">
+        <p>
+            This application has been declared as an authoritative source for some of the data-types
+            it deals with.
+        </p>
+
+        <div
+             style="padding-top: 5px;">
+            <p class="text-muted"
+               ng-bind="authSource.dataType | toDescription:'dataType'">
+            </p>
+
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="15%"/>
+                    <col width="15%"/>
+                    <col width="15%"/>
+                    <col/>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Rating</th>
+                    <th>Applicable Org Unit</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="authSource in $ctrl.authSources">
+                    <td>
+                        <span ng-bind="authSource.dataType | toDescription:'dataType'">
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-rating-indicator value="{{ authSource.rating }}">
+                        </waltz-rating-indicator>
+                        <waltz-enum-value type="'AuthoritativenessRating'"
+                                          show-icon="false"
+                                          key="authSource.rating">
+                        </waltz-enum-value>
+                    </td>
+                    <td>
+                        Organisational Units:
+                        <ul class="list-inline"
+                            style="display: inline-block">
+                            <li ng-repeat="source in sources">
+                                <waltz-entity-link entity-ref="$ctrl.orgUnitsById[source.parentReference.id]">
+                                </waltz-entity-link>
+                            </li>
+                        </ul>
+                    </td>
+                    <td></td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+        <hr/>
+        <small class="text-muted">
+            The above table shows the data-types this application is considered to be an authoritative source for.
+            The classification of authoritativeness is from the viewpoint of an organisational unit (and its sub units)
+            therefore you may see multiple declarations from different areas in the organisation.
+        </small>
+    </div>
+
+
+    <waltz-no-data ng-if="($ctrl.authSources|isEmpty)">
+        <message>
+            This application has not been declared an
+            <strong>Authoritative Source</strong>
+            for any data-types
+        </message>
+    </waltz-no-data>
+
+</div>

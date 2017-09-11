@@ -82,9 +82,6 @@ function controller(serviceBroker) {
                 [ selector ])
             .then(r => vm.topCosts = r.data);
 
-
-        global.vm = vm;
-
         serviceBroker
             .loadAppData(
                 CORE_API.StaticPanelStore.findByGroup,

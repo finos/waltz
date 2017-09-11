@@ -23,8 +23,8 @@ import "d3-selection-multi";
 import{perhaps} from '../common';
 
 const bindings = {
-    values: '=',
-    max: '='
+    values: '<',
+    max: '<'
 };
 
 
@@ -64,7 +64,7 @@ function controller($element) {
 
         const height = 24;
         const width = perhaps(
-            () => $element[0].parentElement.clientWidth,
+            () => $element[0].parentElement.clientWidth || 150,
             150);
 
         svg

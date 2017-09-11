@@ -18,10 +18,15 @@
 
 import {registerComponents} from "../../common/module-utils";
 import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
+import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel'
+
 
 function setup(module) {
 
-    registerComponents(module, [ LogicalFlowTypeEditor ]);
+    registerComponents(module, [
+        LogicalFlowEditPanel,
+        LogicalFlowTypeEditor
+    ]);
 
     module
         .component('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))

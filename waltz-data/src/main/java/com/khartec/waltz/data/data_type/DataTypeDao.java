@@ -42,7 +42,7 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 @Repository
 public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
-    private final static RecordMapper<Record, DataType> TO_DOMAIN = r -> {
+    public final static RecordMapper<Record, DataType> TO_DOMAIN = r -> {
         DataTypeRecord record = r.into(DataTypeRecord.class);
         return ImmutableDataType.builder()
                 .code(record.getCode())
@@ -91,4 +91,11 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN);
     }
 
+
+    public DataType getById(long dataTypeId) {
+        return dsl
+                .selectFrom(DATA_TYPE)
+                .where(DATA_TYPE.ID.eq(dataTypeId))
+                .fetchOne(TO_DOMAIN);
+    }
 }

@@ -20,6 +20,7 @@ package com.khartec.waltz.model.authoritativesource;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
@@ -30,7 +31,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableAuthoritativeSource.class)
 @JsonDeserialize(as = ImmutableAuthoritativeSource.class)
-public abstract class AuthoritativeSource implements IdProvider, ProvenanceProvider {
+public abstract class AuthoritativeSource implements IdProvider, ProvenanceProvider, DescriptionProvider {
 
     public abstract EntityReference applicationReference();
     public abstract EntityReference appOrgUnitReference();

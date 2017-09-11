@@ -98,6 +98,20 @@ const serviceBrokerTargetShape = {
     serviceFnName: apiCheck.string
 };
 
+const authSourceUpdateCommand = {
+    description: apiCheck.string.optional,
+    rating: apiCheck.string,
+    id: apiCheck.number
+};
+
+const authSourceCreateCommand = {
+    description: apiCheck.string.optional,
+    rating: apiCheck.string,
+    applicationId: apiCheck.number,
+    dataTypeId: apiCheck.number,
+    orgUnitId: apiCheck.number
+};
+
 const serviceBrokerCacheRefreshListenerShape = {
     componentId: apiCheck.string,
     fn: myApiCheck.func
@@ -206,6 +220,14 @@ export const checkIsServiceDefinition = (def) => {
 
 export const checkIsServiceBrokerTarget = (target) => {
     check(myApiCheck.shape(serviceBrokerTargetShape), target);
+};
+
+export const checkIsAuthSourceUpdateCommand = (target) => {
+    check(myApiCheck.shape(authSourceUpdateCommand), target);
+};
+
+export const checkIsAuthSourceCreateCommand = (target) => {
+    check(myApiCheck.shape(authSourceCreateCommand), target);
 };
 
 export const checkIsServiceBrokerOptions = (options) => {

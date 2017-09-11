@@ -18,28 +18,19 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
+import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
 public class AuthSourceHarness {
 
-
-
-
     public static void main(String[] args) {
-
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        AuthoritativeSourceService authoritativeSourceService = ctx.getBean(AuthoritativeSourceService.class);
-
-        boolean done = authoritativeSourceService.recalculateAllFlowRatings();
-        System.out.println("RC: "+done);
-
-
+        AuthoritativeSourceService svc = ctx.getBean(AuthoritativeSourceService.class);
     }
 
 

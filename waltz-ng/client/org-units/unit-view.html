@@ -47,84 +47,8 @@
     </waltz-logical-flows-tabgroup-section>
 
 
-    <!-- AUTH-FLOWS -->
-    <waltz-section name="Authoritative Sources"
-                   icon="shield"
-                   id="flows-section">
-        <waltz-section-actions>
-            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
-                <a ng-if="ctrl.showAuthSourceEditBtn"
-                   ui-sref="main.auth-sources.edit ( ctrl.entityRef )"
-                   class="btn btn-xs btn-primary">
-                    Edit
-                </a>
-            </span>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="ctrl.visibility.authOverlay = ! ctrl.visibility.authOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
-
-        <waltz-source-data-overlay visible="ctrl.visibility.authOverlay"
-                                   entities="['AUTHORITATIVE_SOURCE']">
-        </waltz-source-data-overlay>
-
-        <uib-tabset>
-
-            <!-- RATED FLOWS -->
-            <uib-tab>
-                <uib-tab-heading>
-                    Rated Flows
-                </uib-tab-heading>
-
-                <waltz-rated-flow-summary-panel apps="ctrl.viewData.apps"
-                                                entity-reference="ctrl.entityRef"
-                                                flow-data="ctrl.viewData.dataFlows"
-                                                on-load-detail="ctrl.loadFlowDetail">
-                </waltz-rated-flow-summary-panel>
-            </uib-tab>
-
-
-            <!-- AUTH SOURCES -->
-            <uib-tab select="ctrl.showAuthSourceEditBtn = true"
-                     deselect="ctrl.showAuthSourceEditBtn = false">
-                <uib-tab-heading>
-                    Authoritative Sources
-                </uib-tab-heading>
-
-                <div ng-show="! (ctrl.viewData.authSources | isEmpty)">
-                    <waltz-auth-sources-table org-unit-id="ctrl.viewData.orgUnit.id"
-                                              org-unit-refs="ctrl.viewData.immediateHierarchy"
-                                              auth-sources="ctrl.viewData.authSources">
-                    </waltz-auth-sources-table>
-                </div>
-
-                <waltz-no-data ng-show="ctrl.viewData.authSources | isEmpty">
-                    <message>
-                        <strong>No Authoritative Sources</strong>
-                        have been defined for this Organisational Unit.
-                    </message>
-                </waltz-no-data>
-
-                <div class="small text-muted">
-                    This section shows the authoritative sources for data types.  A source can be declared locally to this
-                    organisational unit or declared by a <i>parent</i> organisational unit.  An authoritative source
-                    consists of the data type, the source application (it's owning unit is shown in parenthesis) and a rating
-                    of either '
-                    <waltz-enum-value type="'AuthoritativenessRating'"
-                                      show-icon="false"
-                                      key="'PRIMARY'">
-                    </waltz-enum-value>
-                    ' or '
-                    <waltz-enum-value type="'AuthoritativenessRating'"
-                                      show-icon="false"
-                                      key="'SECONDARY'">
-                    </waltz-enum-value>'.
-                </div>
-
-            </uib-tab>
-        </uib-tabset>
-    </waltz-section>
+    <waltz-auth-sources-section parent-entity-ref="ctrl.entityRef">
+    </waltz-auth-sources-section>
 
 
     <!-- COMPLEXITY -->

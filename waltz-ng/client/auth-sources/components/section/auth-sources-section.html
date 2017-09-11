@@ -1,0 +1,95 @@
+<waltz-section name="Authoritative Sources"
+               id="authoritative-sources-section"
+               icon="shield">
+
+    <!-- ACTIONS -->
+    <waltz-section-actions>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.toggleSourceDataRatingOverlay()">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.visibility.sourceDataRatingsOverlay"
+                               entities="['AUTHORITATIVE_SOURCE']">
+    </waltz-source-data-overlay>
+
+    <!-- TABS -->
+    <uib-tabset active="$ctrl.visibility.tab">
+
+        <!-- SUMMARY -->
+        <uib-tab index="0"
+                 ng-if="$ctrl.parentEntityRef.kind != 'DATA_TYPE'"
+                 heading="Summary"
+                 select="$ctrl.tabSelected('summary', 0)">
+            <div class="waltz-panel-content">
+                <waltz-auth-sources-summary-panel parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-auth-sources-summary-panel>
+            </div>
+        </uib-tab>
+
+
+        <!-- RATED FLOW SCORECARD -->
+        <uib-tab index="1"
+                 heading="Rated Flows Scorecard"
+                 select="$ctrl.tabSelected('scorecard', 1)">
+            <div class="waltz-panel-content"
+                 ng-show="$ctrl.visibility.tab == 1">
+                <waltz-rated-flow-summary-panel entity-reference="$ctrl.parentEntityRef">
+                </waltz-rated-flow-summary-panel>
+            </div>
+        </uib-tab>
+
+        <!-- AUTH SOURCES -->
+        <uib-tab index="2"
+                 heading="Authoritative Sources"
+                 select="$ctrl.tabSelected('authSources', 2)">
+            <div class="waltz-panel-content">
+                <waltz-auth-sources-table ng-if="$ctrl.authSources.length > 0"
+                                          auth-sources="$ctrl.authSources"
+                                          parent-entity-ref="$ctrl.parentEntityRef"
+                                          show-consumers="true">
+                </waltz-auth-sources-table>
+
+                <waltz-no-data ng-if="$ctrl.authSources.length === 0">
+                    <message>
+                        <strong>
+                            None defined
+                        </strong>
+                    </message>
+                </waltz-no-data>
+            </div>
+        </uib-tab>
+
+        <!-- NON AUTH SOURCES -->
+        <uib-tab index="3"
+                 heading="Non Authoritative Sources"
+                 select="$ctrl.tabSelected('nonAuthSources', 3)">
+            <div class="waltz-panel-content">
+                <waltz-non-auth-sources-table non-auth-sources="$ctrl.nonAuthSources"
+                                              ng-if="!($ctrl.nonAuthSources | isEmpty)">
+                </waltz-non-auth-sources-table>
+
+                <waltz-no-data ng-if="$ctrl.nonAuthSources | isEmpty">
+                    <message>
+                        <strong>
+                            No Non-Authoritative Sources distributing data
+                        </strong>
+                    </message>
+                </waltz-no-data>
+
+            </div>
+        </uib-tab>
+
+    </uib-tabset>
+
+    <!-- ABOUT -->
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-static-panels panels="$ctrl.descriptionPanels"
+                                 class="small text-muted"
+                                 render-mode="minimal-border">
+            </waltz-static-panels>
+        </div>
+    </div>
+</waltz-section>

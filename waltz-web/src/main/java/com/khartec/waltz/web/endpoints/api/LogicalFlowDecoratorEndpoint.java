@@ -71,7 +71,8 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
-        String summarizePath = mkPath(BASE_URL, "summarize");
+        String summarizeInboundPath = mkPath(BASE_URL, "summarize-inbound");
+        String summarizeOutboundPath = mkPath(BASE_URL, "summarize-outbound");
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
@@ -89,8 +90,12 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                         .findByFlowIdsAndKind(
                                 readIdsFromBody(request), getKind(request));
 
-        ListRoute<DecoratorRatingSummary> summarizeForSelectorRoute =
-                (request, response) -> logicalFlowDecoratorService.summarizeForSelector(
+        ListRoute<DecoratorRatingSummary> summarizeInboundForSelectorRoute =
+                (request, response) -> logicalFlowDecoratorService.summarizeInboundForSelector(
+                        readIdSelectionOptionsFromBody(request));
+
+        ListRoute<DecoratorRatingSummary> summarizeOutboundForSelectorRoute =
+                (request, response) -> logicalFlowDecoratorService.summarizeOutboundForSelector(
                         readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForAllRoute =
@@ -109,11 +114,15 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                 findByIdSelectorRoute);
 
         postForList(
-                summarizePath,
-                summarizeForSelectorRoute);
+                summarizeInboundPath,
+                summarizeInboundForSelectorRoute);
+
+        postForList(
+                summarizeOutboundPath,
+                summarizeOutboundForSelectorRoute);
 
         getForList(
-                summarizePath,
+                summarizeInboundPath,
                 summarizeForAllRoute);
 
         postForList(

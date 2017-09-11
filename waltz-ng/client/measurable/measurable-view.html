@@ -76,16 +76,10 @@
     </waltz-logical-flows-tabgroup-section>
 
 
+
     <!-- AUTH SOURCES -->
-    <waltz-section name="Authoritative Sources"
-                   icon="shield"
-                   id="authoritative-sources-section">
-        <waltz-rated-flow-summary-panel apps="ctrl.applications"
-                                        entity-reference="ctrl.entityReference"
-                                        flow-data="ctrl.logicalFlowView"
-                                        on-load-detail="ctrl.loadFlowDetail">
-        </waltz-rated-flow-summary-panel>
-    </waltz-section>
+    <waltz-auth-sources-section parent-entity-ref="ctrl.entityReference">
+    </waltz-auth-sources-section>
 
 
     <!-- INDICATORS -->

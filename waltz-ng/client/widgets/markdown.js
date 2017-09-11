@@ -21,7 +21,11 @@ const bindings = {
 };
 
 
-const template = '<span ng-if="$ctrl.text" class="waltz-markdown" markdown-to-html="$ctrl.text"></span>';
+const template = `
+    <span ng-if="$ctrl.text" 
+          class="waltz-markdown" 
+          markdown-to-html="$ctrl.text">
+    </span>`;
 
 
 function controller() {
