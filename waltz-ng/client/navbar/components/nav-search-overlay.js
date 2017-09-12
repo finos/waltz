@@ -80,8 +80,10 @@ function controller($element,
             const input = $element.find('input')[0];
             input.focus();
             $timeout(() => $document.on('click', documentClick), 200);
+            $timeout(() => $element.on('keydown', vm.onOverlayKeypress), 200);
         }  else {
             $document.off('click', documentClick);
+            $element.off('keydown', vm.onOverlayKeypress);
         }
     };
 
@@ -199,6 +201,13 @@ function controller($element,
             else {
                 vm.dismiss();
             }
+        }
+        evt.stopPropagation();
+    };
+
+    vm.onOverlayKeypress = (evt) => {
+        if(evt.keyCode === 27) {
+            vm.dismiss();
         }
     };
 
