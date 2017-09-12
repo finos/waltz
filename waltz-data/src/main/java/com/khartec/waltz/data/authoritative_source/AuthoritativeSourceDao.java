@@ -349,7 +349,7 @@ public class AuthoritativeSourceDao {
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(customSelectionCriteria)
                 .and(commonSelectionCriteria)
-                .groupBy(SUPPLIER_APP.ID, LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                .groupBy(SUPPLIER_APP.ID, SUPPLIER_APP.NAME, LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                 .fetch()
                 .map(r -> ImmutableNonAuthoritativeSource.builder()
                         .sourceReference(mkRef(
