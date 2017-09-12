@@ -66,9 +66,9 @@
                  heading="Non Authoritative Sources"
                  select="$ctrl.tabSelected('nonAuthSources', 3)">
             <div class="waltz-panel-content">
-                <waltz-non-auth-sources-table non-auth-sources="$ctrl.nonAuthSources"
+                <waltz-non-auth-sources-panel non-auth-sources="$ctrl.nonAuthSources"
                                               ng-if="!($ctrl.nonAuthSources | isEmpty)">
-                </waltz-non-auth-sources-table>
+                </waltz-non-auth-sources-panel>
 
                 <waltz-no-data ng-if="$ctrl.nonAuthSources | isEmpty">
                     <message>
