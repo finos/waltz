@@ -93,33 +93,11 @@ function controller(serviceBroker) {
         const g = svg.append('g')
             .attr('transform', options.transform);
 
-        const empty = [];
-
         const isEmpty = _.sum(_.values(rawStats)) == 0;
 
         if (isEmpty) {
-            empty.push(true);
-        }
-
-        const empties = svg
-            .selectAll('.empty')
-            .data(empty);
-
-        empties
-            .enter()
-            .append('circle')
-            .classed('empty', true)
-            .attr('stroke', '#ccc')
-            .attr('fill', '#eee')
-            .attr('r', 20)
-            .attr('cx', w / 2)
-            .attr('cy', h / 2 + 5);
-
-        empties
-            .exit()
-            .remove();
-
-        if (! isEmpty) {
+            return;
+        } else {
             const pieStats= _.map(rawStats, (value, key) => ({value, key}));
 
             const pieData = pie()
