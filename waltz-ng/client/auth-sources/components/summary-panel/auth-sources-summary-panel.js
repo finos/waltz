@@ -36,8 +36,9 @@ const initialState = {
         r => ({
             rating: r,
             style: {
-                'border-color': authoritativeRatingColorScale(r),
-                'background-color': authoritativeRatingColorScale(r).brighter(1.6)
+                'border-radius': '2px',
+                'border-color': authoritativeRatingColorScale(r).toString(),
+                'background-color': authoritativeRatingColorScale(r).brighter(2).toString()
             }
         }))
 };
@@ -83,13 +84,6 @@ function controller(serviceBroker) {
 
     const drawPie = (rawStats, options) => {
 
-        const pieStats= _.map(rawStats, (value, key) => ({value, key}))
-
-        const pieData = pie()
-            .value(d => d.value)
-            .startAngle(options.startAngle)
-            .endAngle(options.endAngle)
-            (pieStats);
 
         const svg = select(options.selector)
             .append('svg')
@@ -99,20 +93,56 @@ function controller(serviceBroker) {
         const g = svg.append('g')
             .attr('transform', options.transform);
 
-        const pieArc = arc()
-            .outerRadius(w - 10)
-            .innerRadius(w * 0.4)
-            .padAngle(0.07)
-            .cornerRadius(0);
+        const empty = [];
 
-        g.selectAll('.arc')
-            .data(pieData)
+        const isEmpty = _.sum(_.values(rawStats)) == 0;
+
+        if (isEmpty) {
+            empty.push(true);
+        }
+
+        const empties = svg
+            .selectAll('.empty')
+            .data(empty);
+
+        empties
             .enter()
-            .append('path')
-            .classed('arc', true)
-            .attr('fill', d => authoritativeRatingColorScale(d.data.key).brighter())
-            .attr('stroke', d => authoritativeRatingColorScale(d.data.key))
-            .attr('d', d => pieArc(d));
+            .append('circle')
+            .classed('empty', true)
+            .attr('stroke', '#ccc')
+            .attr('fill', '#eee')
+            .attr('r', 20)
+            .attr('cx', w / 2)
+            .attr('cy', h / 2 + 5);
+
+        empties
+            .exit()
+            .remove();
+
+        if (! isEmpty) {
+            const pieStats= _.map(rawStats, (value, key) => ({value, key}));
+
+            const pieData = pie()
+                .value(d => d.value)
+                .startAngle(options.startAngle)
+                .endAngle(options.endAngle)
+                (pieStats);
+
+            const pieArc = arc()
+                .outerRadius(w - 10)
+                .innerRadius(w * 0.4)
+                .padAngle(0.07)
+                .cornerRadius(0);
+
+            g.selectAll('.arc')
+                .data(pieData)
+                .enter()
+                .append('path')
+                .classed('arc', true)
+                .attr('fill', d => authoritativeRatingColorScale(d.data.key).brighter())
+                .attr('stroke', d => authoritativeRatingColorScale(d.data.key))
+                .attr('d', d => pieArc(d));
+        }
     };
 
 
