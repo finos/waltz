@@ -21,7 +21,7 @@ import angular from 'angular';
 import * as authSourcesStore from './services/auth-sources-store';
 import * as AuthSourceEditorPanel from './components/editor/auth-source-editor-panel';
 import * as AuthSourcesTable from './components/table/auth-sources-table';
-import * as NonAuthSourcesTable from './components/non-auth-sources-table/non-auth-sources-table';
+import * as NonAuthSourcesPanel from './components/non-auth-sources-panel/non-auth-sources-panel';
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
 import * as TreePicker from './components/tree-picker/tree-picker';
@@ -45,7 +45,7 @@ export default () => {
         AuthSourcesSection,
         AuthSourcesSummaryPanel,
         TreePicker,
-        NonAuthSourcesTable ]);
+        NonAuthSourcesPanel ]);
 
     return module.name;
 };

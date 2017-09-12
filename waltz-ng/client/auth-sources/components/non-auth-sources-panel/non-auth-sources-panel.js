@@ -18,9 +18,9 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {nest} from "d3-collection";
-import {ascending} from "d3-array";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './non-auth-sources-panel.html';
+
 
 const bindings = {
     nonAuthSources: '<'
@@ -28,11 +28,10 @@ const bindings = {
 
 
 const initialState = {
-    nonAuthSourceTable: []
+    groupedNonAuthSources: [],
+    selected: null,
+    totalCount: 0
 };
-
-
-const template = require('./non-auth-sources-table.html');
 
 
 function controller(serviceBroker) {
@@ -41,21 +40,21 @@ function controller(serviceBroker) {
     const refresh = () => {
         if (! vm.dataTypes) return;
 
-        const dataTypesById= _.keyBy(vm.dataTypes, 'id');
+        const dataTypesById = _.keyBy(vm.dataTypes, 'id');
 
-        const nonAuthSources = _.map(vm.nonAuthSources, d => {
-            return {
-                source: d.sourceReference,
-                dataType: Object.assign({}, dataTypesById[d.dataTypeId], { kind: 'DATA_TYPE' }),
-                count: d.count
-            };
-        });
+        vm.groupedNonAuthSources = _
+            .chain(vm.nonAuthSources)
+            .groupBy('dataTypeId')
+            .map((v, k) => {
+                return {
+                    dataType: dataTypesById[k],
+                    sources: _.sortBy(v, 'sourceReference.name')
+                };
+            })
+            .sortBy('dataType.name')
+            .value();
 
-        vm.nonAuthSourcesTable = nest()
-            .key(d => d.dataType.id)
-            .sortKeys((a, b) => ascending(dataTypesById[a].name, dataTypesById[b].name))
-            .sortValues((a, b) => ascending(a.source.name, b.source.name))
-            .entries(nonAuthSources);
+        vm.totalCount = _.sumBy(vm.nonAuthSources, 'count');
     };
 
 
@@ -83,4 +82,4 @@ export const component = {
 };
 
 
-export const id = "waltzNonAuthSourcesTable";
+export const id = "waltzNonAuthSourcesPanel";

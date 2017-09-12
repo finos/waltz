@@ -16,17 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function controller() {
+function controller($timeout) {
     const vm = this;
 
     vm.show = (diagram) => {
-        diagram.visible = true;
+        // timeout needed to prevent IE from crashing
+        $timeout(() => diagram.visible = true, 100);
     };
 
     vm.hide = (diagram) => {
         diagram.visible = false;
     };
 }
+
+
+controller.$inject = [
+    '$timeout'
+];
 
 
 export default {
