@@ -20,7 +20,6 @@
 
 package com.khartec.waltz.data.data_type.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -32,6 +31,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
 import static com.khartec.waltz.common.StringUtilities.length;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
@@ -58,7 +58,7 @@ public class DataTypeSearchDao {
             return emptyList();
         }
 
-        List<String> terms = StringUtilities.mkTerms(query.toLowerCase());
+        List<String> terms = mkTerms(query.toLowerCase());
         return dataTypeDao.getAll()
                 .stream()
                 .filter(dataType -> {
