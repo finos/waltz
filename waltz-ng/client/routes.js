@@ -16,7 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// -- BASIC ROUTES ---
+import {CORE_API} from "./common/services/core-api-utils";
+
+
+function warmUpCache($q, serviceBroker) {
+    return $q.all([
+        serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll),
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+    ]);
+}
+
+
+warmUpCache.$inject = [
+    '$q',
+    'ServiceBroker'
+];
+
 
 function configureRoutes($stateProvider, $urlRouterProvider) {
 
@@ -25,6 +42,9 @@ function configureRoutes($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state('main', {
             url: '/',
+            resolve: {
+                warmUp: warmUpCache
+            },
             views: {
                 'header': {template: '<waltz-navbar></waltz-navbar>'},
                 'content': require('./welcome/welcome.js')
