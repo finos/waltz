@@ -36,6 +36,7 @@ const viewState = {
 
 const listState = {
     url: 'measurable?{category:int}',
+    reloadOnSearch: false,
     views: {
         'content@': ListView
     }
@@ -64,7 +65,7 @@ function bouncer($q, $state, $stateParams, serviceBroker) {
             } else {
                 console.log(`Cannot find measure corresponding category: ${categoryExternalId}, external id: ${externalId}`);
             }
-    });
+        });
 }
 
 
@@ -86,7 +87,7 @@ const bouncerState = {
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.capabilityBouncer', bouncerState)
+        .state('main.measurableBouncer', bouncerState)
         .state('main.measurable', baseState)
         .state('main.measurable.list', listState)
         .state('main.measurable.view', viewState);

@@ -17,6 +17,7 @@
                            ng-model="ctrl.visibility.tab"
                            ng-value="tab.category.id"
                            ng-disabled="! tab.measurables"
+                           ng-change="ctrl.onTabSelect(tab)"
                            name="measurable_list"
                            id="{{ tab.category.id + '_' + $id }}">
                     <label for="{{ tab.category.id + '_' + $id }}"
