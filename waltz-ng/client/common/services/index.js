@@ -89,7 +89,6 @@ function loadFromServer(involvementKindService,
                 ;
         });
 
-
     involvementKindService
         .loadInvolvementKinds()
         .then(results => {

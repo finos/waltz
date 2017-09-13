@@ -1,104 +1,113 @@
 <div>
-    <div ng-if="$ctrl.authSourceTable.length > 0"
-        ng-class="{ 'waltz-scroll-region-300' : $ctrl.authSourceTable.length > 15 }">
+
+    <div ng-if="!($ctrl.visibility.createForm || $ctrl.visibility.updateForm)">
         <input type="search"
                class="form-control"
                ng-model="$ctrl.currentSearchTerms"
                placeholder="Search current Authoritative Sources">
-        <table class="table">
-            <colgroup>
+        <div ng-if="$ctrl.authSourceTable.length > 0"
+             ng-class="{ 'waltz-scroll-region-300' : $ctrl.authSourceTable.length > 15 }">
+            <table class="table">
+                <colgroup>
 
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Operations</th>
-                <th>Data Type</th>
-                <th>Declaring Org Unit</th>
-                <th>Application</th>
-                <th>Rating</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="row in $ctrl.authSourceTable | filter: $ctrl.currentSearchTerms"
-                class="waltz-visibility-parent">
-                <td>
-                    <div class="btn-group" uib-dropdown is-open="status.isopen">
-                        <button type="button"
-                                class="btn btn-xs btn-default"
-                                uib-dropdown-toggle>
-                            Operations <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                            <li role="menuitem">
-                                <a class="clickable"
-                                   ng-click="$ctrl.onShowUpdateForm(row.authSource)">
-                                    <waltz-icon name="sticky-note-o"></waltz-icon>
-                                    Update
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li role="menuitem">
-                                <a class="clickable"
-                                   ng-click="$ctrl.remove(row.authSource)">
-                                    <waltz-icon name="trash"></waltz-icon>
-                                    Delete
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Operations</th>
+                    <th>Data Type</th>
+                    <th>Declaring Org Unit</th>
+                    <th>Application</th>
+                    <th>Rating</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in $ctrl.authSourceTable | filter: $ctrl.currentSearchTerms"
+                    class="waltz-visibility-parent">
+                    <td>
+                        <div class="btn-group" uib-dropdown is-open="status.isopen">
+                            <button type="button"
+                                    class="btn btn-xs btn-default"
+                                    uib-dropdown-toggle>
+                                Operations <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                                <li role="menuitem">
+                                    <a class="clickable"
+                                       ng-click="$ctrl.onShowUpdateForm(row.authSource)">
+                                        <waltz-icon name="sticky-note-o"></waltz-icon>
+                                        Update
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li role="menuitem">
+                                    <a class="clickable"
+                                       ng-click="$ctrl.remove(row.authSource)">
+                                        <waltz-icon name="trash"></waltz-icon>
+                                        Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
 
-                <td>
-                    <span ng-bind="row.dataType.name"></span>
-                </td>
-                <td>
-                    <waltz-entity-icon-label entity-ref="row.orgUnit"></waltz-entity-icon-label>
-                </td>
-                <td>
-                    <span ng-bind="row.authSource.applicationReference.name"></span>
-                    <small class="text-muted">
-                        ( <span ng-bind="row.authSource.appOrgUnitReference.name"></span> )
-                    </small>
-                </td>
-                <td style="vertical-align: top;">
-                    <waltz-rating-indicator value="{{ row.authSource.rating }}">
-                    </waltz-rating-indicator>
-                </td>
-                <td>
-                    <span ng-bind="row.authSource.description | limitTo:30"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                    <td>
+                        <span ng-bind="row.dataType.name"></span>
+                    </td>
+                    <td>
+                        <waltz-entity-icon-label entity-ref="row.orgUnit"></waltz-entity-icon-label>
+                    </td>
+                    <td>
+                        <span ng-bind="row.authSource.applicationReference.name"></span>
+                        <small class="text-muted">
+                            ( <span ng-bind="row.authSource.appOrgUnitReference.name"></span> )
+                        </small>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <waltz-rating-indicator value="{{ row.authSource.rating }}">
+                        </waltz-rating-indicator>
+                    </td>
+                    <td>
+                        <span ng-bind="row.authSource.description | limitTo:30"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- NO DATA -->
+        <waltz-no-data ng-if="$ctrl.authSourceTable.length == 0">
+            <message>
+                <strong>No Authoritative Sources</strong> have been defined for
+                <span ng-bind="$ctrl.orgUnit.name"></span>.
+            </message>
+        </waltz-no-data>
+
+        <br>
+
+        <!-- ADD BUTTON -->
+        <button class="btn btn-sm btn-success"
+                ng-if="!($ctrl.visibility.createForm || $ctrl.visibility.updateForm)"
+                ng-click="$ctrl.onShowCreateForm()">
+            Add new Authoritative Source
+        </button>
+
+        <hr>
+
     </div>
 
-    <!-- NO DATA -->
-    <waltz-no-data ng-if="$ctrl.authSourceTable.length == 0">
-        <message>
-            <strong>No Authoritative Sources</strong> have been defined for
-            <span ng-bind="$ctrl.orgUnit.name"></span>.
-        </message>
-    </waltz-no-data>
 
-    <br>
-
-    <!-- ADD BUTTON -->
-    <button class="btn btn-sm btn-success"
-            ng-if="!($ctrl.visibility.createForm || $ctrl.visibility.updateForm)"
-            ng-click="$ctrl.onShowCreateForm()">
-        Add new Authoritative Source
-    </button>
-
-    <hr>
 
 
     <!-- NOTE FORM -->
     <div ng-if="$ctrl.visibility.updateForm">
 
+        <h4>Update Authoritative Source </h4>
         <form name="noteForm"
               ng-submit="$ctrl.submitUpdate()">
             <fieldset ng-disabled="updateForm.$submitted">
+                <hr>
+
                 <div class="row">
                     <div class="col-md-3">
                         <label>Update Rating</label>
@@ -172,16 +181,21 @@
 
     <!-- CREATE FORM -->
     <div ng-if="$ctrl.visibility.createForm">
+
+        <h4>Add new Authoritative Source </h4>
+
         <form name="createForm"
               ng-submit="$ctrl.submitCreate()">
             <fieldset ng-disabled="createForm.$submitted">
+
+                <hr>
 
                 <!-- DATA TYPE -->
                 <div class="row">
                     <div class="col-md-3">
                         <label>Data Type</label>
                         <span class="help-block">
-                            Select a data type from the tree
+                            Select the data type this authoritative source will be associated to.
                         </span>
                     </div>
                     <div class="col-md-6">
@@ -210,18 +224,24 @@
                     <div class="col-md-3">
                         <label>Org Unit</label>
                         <span class="help-block">
-                            Select an organisational unit from the tree
+                            Authoritative sources are chosen at the organisational level.  Select an organisational unit
+                            that this authoritative source will apply to.
                         </span>
                     </div>
                     <div class="col-md-6">
                         <div ng-if="!$ctrl.createForm.orgUnit">
-                            <waltz-tree-picker items="$ctrl.orgUnits"
-                                               on-select="$ctrl.onSelectOrgUnit">
-                            </waltz-tree-picker>
+                            <waltz-entity-selector current-selection="$ctrl.createForm.orgUnit"
+                                                   entity-kinds="['ORG_UNIT']"
+                                                   item-id="OrgUnit"
+                                                   limit="30"
+                                                   on-select="$ctrl.onSelectOrgUnit"
+                                                   required="true">
+                            </waltz-entity-selector>
                         </div>
                         <div ng-if="$ctrl.createForm.orgUnit">
                             <waltz-entity-icon-label style='font-weight: bold'
-                                                     entity-ref="$ctrl.createForm.orgUnit"></waltz-entity-icon-label>
+                                                     entity-ref="$ctrl.createForm.orgUnit">
+                            </waltz-entity-icon-label>
                             &nbsp;
                             <a ng-click="$ctrl.onClearOrgUnit()"
                                class="clickable">
@@ -239,7 +259,8 @@
                     <div class="col-md-3">
                         <label>Application</label>
                         <span class="help-block">
-                            Select an application
+                            Select the application that will be the authoritative source for the organisational unit
+                            and data type combination.
                         </span>
                     </div>
                     <div class="col-md-6">
@@ -268,7 +289,7 @@
                     <div class="col-md-3">
                         <label>Rating</label>
                         <span class="help-block">
-                            Select a rating
+                            Select the rating assigned to this authoritative source
                         </span>
                     </div>
                     <div class="col-md-6">
