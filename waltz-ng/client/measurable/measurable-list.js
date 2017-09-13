@@ -58,12 +58,14 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function controller($q,
+function controller($location,
+                    $q,
                     $state,
                     $stateParams,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
+                    settingsService,
                     staticPanelStore,
                     svgStore) {
 
@@ -79,15 +81,17 @@ function controller($q,
     const countPromise = measurableRatingStore
         .countByMeasurable();
 
-    $q.all([measurablePromise, measurableCategoryPromise, countPromise])
-        .then(([measurables = [], categories = [], counts = []]) => {
+    const defaultCategoryPromise = settingsService.findOrDefault("settings.measurable.default-category");
+
+    $q.all([measurablePromise, measurableCategoryPromise, countPromise, defaultCategoryPromise])
+        .then(([measurables = [], categories = [], counts = [], defaultCategory]) => {
             vm.tabs = prepareTabs(categories, measurables, counts);
             vm.measurablesByCategoryThenExternalId = nest()
                 .key(d => d.categoryId)
                 .key(d => d.externalId)
                 .rollup(vs => vs[0])
                 .object(measurables);
-            vm.visibility.tab = $stateParams.category || findFirstNonEmptyTab(vm.tabs);
+            vm.visibility.tab = $stateParams.category || defaultCategory || findFirstNonEmptyTab(vm.tabs);
         });
 
     measurableCategoryPromise
@@ -112,16 +116,22 @@ function controller($q,
         }
     };
 
+    vm.onTabSelect = (tab) => {
+        $location.search('category', tab.category.id)
+    };
+
 }
 
 
 controller.$inject = [
+    '$location',
     '$q',
     '$state',
     '$stateParams',
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
+    'SettingsService',
     'StaticPanelStore',
     'SvgDiagramStore'
 ];
