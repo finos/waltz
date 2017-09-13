@@ -35,9 +35,6 @@ export default () => {
     module
         .directive('waltzRatingIndicator', require('./directives/rating-indicator'));
 
-    module
-        .config(require('./routes'));
-
     registerStore(module, authSourcesStore);
     registerComponents(module, [
         AuthSourceEditorPanel,

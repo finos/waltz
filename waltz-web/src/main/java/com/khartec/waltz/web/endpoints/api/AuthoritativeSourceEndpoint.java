@@ -19,16 +19,15 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Entry;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
 import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -56,22 +55,18 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "authoritative-source");
 
     private final AuthoritativeSourceService authoritativeSourceService;
-    private final ChangeLogService changeLogService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public AuthoritativeSourceEndpoint(
             AuthoritativeSourceService authoritativeSourceService,
-            UserRoleService userRoleService,
-            ChangeLogService changeLogService) {
+            UserRoleService userRoleService) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
-        checkNotNull(changeLogService, "changeLogService must not be null");
 
         this.authoritativeSourceService = authoritativeSourceService;
         this.userRoleService = userRoleService;
-        this.changeLogService = changeLogService;
     }
 
 
@@ -134,7 +129,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     private String insertRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
         AuthoritativeSourceCreateCommand command = readBody(request, AuthoritativeSourceCreateCommand.class);
-        authoritativeSourceService.insert(command);
+        authoritativeSourceService.insert(command, getUsername(request));
         return "done";
     }
 
@@ -142,28 +137,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     private String deleteRoute(Request request, Response response) {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
         long id = getId(request);
-        AuthoritativeSource authSource = authoritativeSourceService.getById(id);
-        if (authSource == null) {
-            return "done";
-        }
-
-        String msg = String.format(
-                "Removed %s as an %s authoritative source for %s",
-                authSource.applicationReference().name().orElse("an application"),
-                authSource.rating().name(),
-                authSource.dataType());
-
-        ChangeLog log = ImmutableChangeLog.builder()
-                .message(msg)
-                .severity(Severity.INFORMATION)
-                .userId(getUsername(request))
-                .parentReference(authSource.parentReference())
-                .childKind(EntityKind.APPLICATION)
-                .operation(Operation.REMOVE)
-                .build();
-
-        changeLogService.write(log);
-        authoritativeSourceService.remove(id);
+        authoritativeSourceService.remove(id, getUsername(request));
 
         return "done";
     }
@@ -172,7 +146,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     private String updateRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
         AuthoritativeSourceUpdateCommand command = readBody(request, AuthoritativeSourceUpdateCommand.class);
-        authoritativeSourceService.update(command);
+        authoritativeSourceService.update(command, getUsername(request));
         return "done";
     }
 
