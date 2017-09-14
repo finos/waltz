@@ -23,9 +23,14 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,20 +47,24 @@ public class ChangeInitiativeService {
     private final ChangeInitiativeDao baseDao;
     private final ChangeInitiativeSearchDao searchDao;
     private final EntityRelationshipDao relationshipDao;
+    private final ChangeLogService changeLogService;
 
     @Autowired
     public ChangeInitiativeService(
             ChangeInitiativeDao baseDao,
             ChangeInitiativeSearchDao searchDao,
-            EntityRelationshipDao relationshipDao) {
+            EntityRelationshipDao relationshipDao,
+            ChangeLogService changeLogService) {
 
         checkNotNull(baseDao, "baseDao cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
         checkNotNull(relationshipDao, "relationshipDao cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.baseDao = baseDao;
         this.searchDao = searchDao;
         this.relationshipDao = relationshipDao;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -99,14 +108,43 @@ public class ChangeInitiativeService {
                 .lastUpdatedAt(DateTimeUtilities.nowUtc())
                 .build();
 
+        ChangeLog logEntry = ImmutableChangeLog.builder()
+                .message(String.format(
+                        "Relationship to %s (%s) added",
+                        command.entityReference().name().orElse(""),
+                        command.entityReference().kind().name() + "/" + command.entityReference().id()))
+                .parentReference(mkRef(CHANGE_INITIATIVE, changeInitiativeId))
+                .userId(username)
+                .childKind(command.entityReference().kind())
+                .severity(Severity.INFORMATION)
+                .operation(Operation.ADD)
+                .build();
+
+        changeLogService.write(logEntry);
+
         return relationshipDao.save(entityRelationship) == 1;
     }
 
 
     public boolean removeEntityRelationship(long changeInitiativeId,
-                                            EntityRelationshipChangeCommand command) {
+                                            EntityRelationshipChangeCommand command,
+                                            String username) {
         checkNotNull(command, "command cannot be null");
         EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command);
+
+        ChangeLog logEntry = ImmutableChangeLog.builder()
+                .message(String.format(
+                        "Relationship to %s (%s) removed",
+                        command.entityReference().name().orElse(""),
+                        command.entityReference().kind().name() + "/" + command.entityReference().id()))
+                .parentReference(mkRef(CHANGE_INITIATIVE, changeInitiativeId))
+                .userId(username)
+                .childKind(command.entityReference().kind())
+                .severity(Severity.INFORMATION)
+                .operation(Operation.REMOVE)
+                .build();
+
+        changeLogService.write(logEntry);
         return relationshipDao.remove(key);
     }
 
