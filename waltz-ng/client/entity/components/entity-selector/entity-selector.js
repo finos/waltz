@@ -64,13 +64,11 @@ function controller(entitySearchStore) {
 
     vm.refresh = function(query) {
         if (!query) return;
-        console.log('es', query)
         return entitySearchStore.search(query, vm.options)
             .then((entities) => {
                 vm.entities = vm.selectionFilter
                     ? _.filter(entities, vm.selectionFilter)
                     : entities;
-                console.log('filter', entities, vm.entities);
             });
     };
 

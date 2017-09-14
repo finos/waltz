@@ -20,11 +20,12 @@ import {initialiseData} from "../../../common";
 import {mkLinkGridCell, kindToBaseState} from "../../../common/link-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKindNames} from "../../../common/services/display-names";
+import template from './related-apps-section.html';
 
 
 const bindings = {
     appRelationships: '<',
-    editRole: '@',
+    editRole: '@?',
     parentEntityRef: '<',
     sourceDataRatings: '<',
 };
@@ -36,7 +37,6 @@ const initialState = {
 };
 
 
-const template = require('./related-apps-section.html');
 
 
 const columnDefs = [
@@ -52,11 +52,9 @@ const columnDefs = [
 
 function mkGridData(appRelationships = []) {
     return _.map(appRelationships || [], ar => ({
-                relationshipDisplay: relationshipKindNames[ar.relationship],
-                app: Object.assign({}, ar.entity, mapToDisplayNames(ar.entity))
-            }
-        )
-    );
+        relationshipDisplay: relationshipKindNames[ar.relationship],
+        app: Object.assign({}, ar.entity, mapToDisplayNames(ar.entity))
+    }));
 }
 
 
