@@ -47,7 +47,8 @@ public enum RelationshipKind {
             tuple(MEASURABLE, MEASURABLE),
             tuple(MEASURABLE, CHANGE_INITIATIVE),
             tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE),
-            tuple(CHANGE_INITIATIVE, MEASURABLE)
+            tuple(CHANGE_INITIATIVE, MEASURABLE),
+            tuple(CHANGE_INITIATIVE, DATA_TYPE)
     )),
 
     SUPPORTS(fromArray(
