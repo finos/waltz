@@ -57,6 +57,8 @@ General default settings
     * (```UNKNOWN```) UNKNOWN is the code for the default data type
 * ```settings.data-type.unknown-id```
     * (```<id>```) The id of the unknown data type (optional) 
+* ```settings.measurable.default-category```
+    * (```<id>```) The id of the default category to show when looking a 'Other Viewpoints'  (optional)
 * ```server.gzip.enabled```
     * (```true|false```) enable or disable gzipping of content
 * ```server.gzip.minimum-size```
