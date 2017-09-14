@@ -53,9 +53,9 @@ Features can be enabled/disabled and configured via settings.  Currently availab
 
 General default settings
 
-* ```server.data-type.default-code```
+* ```settings.data-type.default-code```
     * (```UNKNOWN```) UNKNOWN is the code for the default data type
-* ```server.data-type.unknown-id```
+* ```settings.data-type.unknown-id```
     * (```<id>```) The id of the unknown data type (optional) 
 * ```server.gzip.enabled```
     * (```true|false```) enable or disable gzipping of content
