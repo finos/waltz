@@ -17,6 +17,8 @@
  */
 
 import _ from "lodash";
+import {color} from "d3-color";
+import {green, red} from "../../../common/colors";
 
 
 const bindings = {
@@ -61,6 +63,9 @@ const initialState = {
     options: defaultOptions,
     optionsVisible: false,
     onTabChange: () => console.log("No onTabChange provided for logical-flows-tabgroup"),
+    visibility: {
+        summaries: false
+    }
 };
 
 
@@ -170,9 +175,26 @@ function prepareGraphTweakers(logicalFlowUtilityService,
 }
 
 
+function prepareSummary(counts = [], unknownId, direction) {
+    return _
+        .chain(counts)
+        .map(d => ({ typeId: d.dataType.id, count: d[direction] }))
+        .reduce((acc, d) => {
+            if (d.typeId === Number(unknownId)) {
+                acc.UNKNOWN  += d.count;
+            } else {
+                acc.KNOWN += d.count;
+            }
+            return acc;
+        }, { KNOWN: 0, UNKNOWN : 0 })
+        .map((v, k) => ({ key: k, count: v }))
+        .value();
+}
+
 function controller($scope,
                     logicalFlowUtilityService,
-                    displayNameService) {
+                    displayNameService,
+                    settingsService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
@@ -190,6 +212,41 @@ function controller($scope,
             vm.enrichedDataTypeCounts = logicalFlowUtilityService.enrichDataTypeCounts(
                 vm.flowData.stats.dataTypeCounts,
                 displayNameService);
+
+            settingsService
+                .findOrDefault('settings.data-type.unknown-id', null)
+                .then(unknownCode => {
+                    if (unknownCode) {
+
+                        vm.visibility.summaries = true;
+                        vm.summaryConfig =  {
+                            colorProvider: (d) => {
+                                return d.data.key === 'KNOWN'
+                                    ? color(green)
+                                    : color(red);
+                            },
+                            valueProvider: (d) => d.count,
+                            idProvider: (d) => d.data.key,
+                            size: 40
+                        };
+
+                        const summaries = [
+                            { title: 'Intra', prop: 'intra'} ,
+                            { title: 'Inbound', prop: 'inbound'} ,
+                            { title: 'Outbound', prop: 'outbound'} ,
+                            { title: 'All', prop: 'total'}
+                        ];
+
+                        vm.summaries= _.map(summaries, d => {
+                            return {
+                                summary: prepareSummary(vm.enrichedDataTypeCounts, unknownCode, d.prop),
+                                title: d.title
+                            }
+                        });
+
+                    }
+                });
+
         }
         vm.filterChanged();
     };
@@ -256,7 +313,8 @@ function controller($scope,
 controller.$inject = [
     '$scope',
     'LogicalFlowUtilityService',
-    'DisplayNameService'
+    'DisplayNameService',
+    'SettingsService'
 ];
 
 

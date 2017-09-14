@@ -22,6 +22,7 @@ import {initialiseData} from "../../common/index";
 
 import template from './nav-search-overlay.html';
 
+const ESCAPE_KEYCODE = 27;
 
 const bindings = {
     query: '@',
@@ -80,8 +81,10 @@ function controller($element,
             const input = $element.find('input')[0];
             input.focus();
             $timeout(() => $document.on('click', documentClick), 200);
+            $timeout(() => $element.on('keydown', vm.onOverlayKeypress), 200);
         }  else {
             $document.off('click', documentClick);
+            $element.off('keydown', vm.onOverlayKeypress);
         }
     };
 
@@ -192,13 +195,20 @@ function controller($element,
     };
 
     vm.onKeypress = (evt) => {
-        if(evt.keyCode === 27) {
+        if(evt.keyCode === ESCAPE_KEYCODE) {
             if(vm.query) {
                 vm.clearSearch();
             }
             else {
                 vm.dismiss();
             }
+        }
+        evt.stopPropagation();
+    };
+
+    vm.onOverlayKeypress = (evt) => {
+        if(evt.keyCode === ESCAPE_KEYCODE) {
+            vm.dismiss();
         }
     };
 
