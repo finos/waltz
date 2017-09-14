@@ -61,6 +61,7 @@ function service(http, baseUrl, $auth) {
 
 
     const hasRole = ( { roles = [] }, role) => {
+        if (_.isEmpty(role)) return true;
         return _.includes(roles, role);
     };
 

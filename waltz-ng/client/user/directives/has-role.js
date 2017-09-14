@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BINDINGS = {
+const bindings = {
     role: '@waltzHasRole'
 };
 
@@ -37,7 +37,7 @@ export default () => ({
     restrict: 'A',
     transclude: true,
     scope: {},
-    bindToController: BINDINGS,
+    bindToController: bindings,
     controllerAs: 'ctrl',
     template: '<span ng-show="ctrl.show"><ng-transclude></ng-transclude></span>',
     controller

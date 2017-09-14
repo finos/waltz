@@ -21,9 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
-import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -42,17 +40,13 @@ public class ChangeInitiativeEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "change-initiative");
 
     private final ChangeInitiativeService service;
-    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public ChangeInitiativeEndpoint(ChangeInitiativeService service,
-                                    UserRoleService userRoleService) {
+    public ChangeInitiativeEndpoint(ChangeInitiativeService service) {
         checkNotNull(service, "service cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.service = service;
-        this.userRoleService = userRoleService;
     }
 
 
@@ -89,8 +83,6 @@ public class ChangeInitiativeEndpoint implements Endpoint {
 
 
     private Boolean changeEntityRelationship(Request request) throws java.io.IOException {
-        requireRole(userRoleService, request, Role.CHANGE_INITIATIVE_EDITOR);
-
         EntityRelationshipChangeCommand command = readBody(request, EntityRelationshipChangeCommand.class);
         switch (command.operation()) {
             case ADD:
