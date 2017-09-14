@@ -96,7 +96,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
             case ADD:
                 return service.addEntityRelationship(getId(request), command, getUsername(request));
             case REMOVE:
-                return service.removeEntityRelationship(getId(request), command);
+                return service.removeEntityRelationship(getId(request), command, getUsername(request));
             default:
                 throw new UnsupportedOperationException("Command operation: "
                         + command.operation() + " is not supported");

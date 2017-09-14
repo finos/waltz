@@ -1,0 +1,70 @@
+<waltz-section name="Related Data Types">
+    <waltz-section-actions>
+        <button class="btn btn-xs btn-primary clickable"
+                ng-if="!$ctrl.visibility.picker"
+                ng-click="$ctrl.onShowPicker()">
+            Edit
+        </button>
+        <button class="btn btn-xs btn-primary clickable"
+                ng-if="$ctrl.visibility.picker"
+                ng-click="$ctrl.onShowPicker()">
+            View
+        </button>
+    </waltz-section-actions>
+
+
+    <div class="row">
+        <div ng-class=" {
+                'col-sm-5' : $ctrl.visibility.picker,
+                'col-sm-12' : !$ctrl.visibility.picker
+            }">
+            <ul class="list-unstyled">
+                <li ng-repeat="dataType in $ctrl.relatedDataTypes">
+
+                    <waltz-entity-link entity-ref="dataType"
+                                       ng-if="!$ctrl.visibility.picker">
+                    </waltz-entity-link>
+                    <waltz-entity-icon-label entity-ref="dataType"
+                                             ng-if="$ctrl.visibility.picker">
+                    </waltz-entity-icon-label>
+                </li>
+            </ul>
+
+            <waltz-no-data ng-if="$ctrl.relatedDataTypes.length === 0">
+                <message><strong>No Data Types</strong> have been related</message>
+            </waltz-no-data>
+        </div>
+        <div class="col-sm-7" ng-if="$ctrl.visibility.picker">
+            <div style="border-left: 1px solid #eee; padding-left: 1em">
+                <h4>Edit related Data Type</h4>
+
+                <waltz-tree-picker items="$ctrl.dataTypes"
+                                   on-select="$ctrl.onSelectDataType">
+                </waltz-tree-picker>
+
+                <br>
+
+                <button class="btn btn-sm"
+                        ng-class="{
+                    'btn-danger' : $ctrl.editMode === 'REMOVE',
+                    'btn-success' : $ctrl.editMode === 'ADD'
+                }"
+                        ng-if="$ctrl.selectedDataType"
+                        ng-click="$ctrl.onAction()">
+            <span ng-bind="$ctrl.editMode === 'REMOVE' ? 'Remove' : 'Add'">
+            </span>
+                    <span ng-bind="$ctrl.selectedDataType.name">
+            </span>
+                </button>
+
+                <a class="clickable"
+                   ng-click="$ctrl.onShowPicker()">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+
+</waltz-section>
