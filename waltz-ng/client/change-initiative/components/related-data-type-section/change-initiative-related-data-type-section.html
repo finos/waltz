@@ -25,6 +25,8 @@
                                        ng-if="!$ctrl.visibility.picker">
                     </waltz-entity-link>
                     <waltz-entity-icon-label entity-ref="dataType"
+                                             class="clickable"
+                                             ng-click="$ctrl.onSelectDataType(dataType)"
                                              ng-if="$ctrl.visibility.picker">
                     </waltz-entity-icon-label>
                 </li>
