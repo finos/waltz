@@ -22,6 +22,7 @@ import {initialiseData} from "../../common/index";
 
 import template from './nav-search-overlay.html';
 
+const ESCAPE_KEYCODE = 27;
 
 const bindings = {
     query: '@',
@@ -194,7 +195,7 @@ function controller($element,
     };
 
     vm.onKeypress = (evt) => {
-        if(evt.keyCode === 27) {
+        if(evt.keyCode === ESCAPE_KEYCODE) {
             if(vm.query) {
                 vm.clearSearch();
             }
@@ -206,7 +207,7 @@ function controller($element,
     };
 
     vm.onOverlayKeypress = (evt) => {
-        if(evt.keyCode === 27) {
+        if(evt.keyCode === ESCAPE_KEYCODE) {
             vm.dismiss();
         }
     };
