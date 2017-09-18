@@ -115,9 +115,10 @@ function controller($element,
         let groups = [];
 
         const prepareResults = (gs, q) => {
+            const queryLower = _.lowerCase(q);
             return _
                 .chain(gs)
-                .filter(g => _.includes(_.lowerCase(g.name), q))
+                .filter(g => _.includes(_.lowerCase(g.name), queryLower))
                 .map(g => ({
                     kind: 'APP_GROUP',
                     id: g.id,
