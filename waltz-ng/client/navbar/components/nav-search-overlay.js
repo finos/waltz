@@ -76,7 +76,7 @@ function controller($element,
         }
     };
 
-    vm.$onChanges = c => {
+    vm.$onChanges = (c) => {
         if(vm.visible) {
             const input = $element.find('input')[0];
             input.focus();
@@ -111,31 +111,6 @@ function controller($element,
         }
     };
 
-    const searchAppGroups = (q) => {
-        let groups = [];
-
-        const prepareResults = (gs, q) => {
-            return _
-                .chain(gs)
-                .filter(g => _.includes(_.lowerCase(g.name), q))
-                .map(g => ({
-                    kind: 'APP_GROUP',
-                    id: g.id,
-                    name: g.name,
-                    description: g.description,
-                    qualifier: g.kind === 'PUBLIC' ? 'Public group' : 'Private Group'
-                }))
-                .value();
-        };
-
-        serviceBroker
-            .loadViewData(CORE_API.AppGroupStore.findPublicGroups)
-            .then(r => groups = _.union(groups, r.data))
-            .then(() => serviceBroker.loadViewData(CORE_API.AppGroupStore.findPrivateGroups))
-            .then(r => groups = _.union(groups, r.data))
-            .then(r => vm.results.APP_GROUP = prepareResults(groups, q));
-
-    };
 
     // helper fn, to reduce boilerplate
     const handleSearch = (query, searchAPI, entityKind) => {
@@ -143,6 +118,9 @@ function controller($element,
             let qualifier = null;
 
             switch (entityKind) {
+                case 'APP_GROUP':
+                    qualifier = r.kind === 'PUBLIC' ? 'Public group' : 'Private Group'
+                    break;
                 case 'APPLICATION':
                     qualifier = r.assetCode;
                     break;
@@ -183,8 +161,7 @@ function controller($element,
         handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');
         handleSearch(query, CORE_API.ActorStore.search, 'ACTOR');
         handleSearch(query, CORE_API.PhysicalSpecificationStore.search, 'PHYSICAL_SPECIFICATION');
-
-        searchAppGroups(query);
+        handleSearch(query, CORE_API.AppGroupStore.search, 'APP_GROUP');
     };
 
     vm.doSearch = () => doSearch(vm.query);
