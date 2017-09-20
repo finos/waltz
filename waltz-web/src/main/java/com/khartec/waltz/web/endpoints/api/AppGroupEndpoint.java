@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupDetail;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -78,6 +80,7 @@ public class AppGroupEndpoint implements Endpoint {
         String addChangeInitiativePath = mkPath(idPath, "change-initiatives");
         String removeChangeInitiativePath = mkPath(idPath, "change-initiatives", ":changeInitiativeId");
 
+        String searchPath = mkPath(BASE_URL, "search", ":query");
 
         DatumRoute<AppGroupDetail> getDetailByIdRoute = (request, response) ->
                 appGroupService.getGroupDetailById(getId(request));
@@ -173,6 +176,9 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.removeChangeInitiative(getUsername(request), groupId, changeInitiativeId);
         };
 
+        ListRoute<AppGroup> searchRoute = (request, response) ->
+                appGroupService.search(request.params("query"), mkForEntity(EntityKind.APP_GROUP));
+
 
         getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);
 
@@ -195,6 +201,7 @@ public class AppGroupEndpoint implements Endpoint {
         postForDatum(updateGroupOverviewPath, updateGroupOverviewRoute);
         postForDatum(BASE_URL, createNewGroupRoute);
 
+        getForList(searchPath, searchRoute);
     }
 
 }
