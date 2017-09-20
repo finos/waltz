@@ -17,7 +17,8 @@
  */
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
-import {initialiseData} from "../common/index";
+import {formats, initialiseData} from "../common/index";
+import moment from "moment";
 
 const exactScope = {
     value: 'EXACT',
@@ -78,7 +79,7 @@ function mkCreateCommand(attestationRun){
         },
         targetEntityKind: attestationRun.targetEntityKind,
         involvementKindIds: involvementKindIds,
-        dueDate: attestationRun.dueDate
+        dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly)
     };
 }
 
