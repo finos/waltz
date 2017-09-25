@@ -1,17 +1,27 @@
-<div>
+<div class="waltz-app-data-type-usage-list">
     <table class="table table-condensed small">
+        <colgroup>
+            <col width="50%">
+            <col ng-repeat="k in ctrl.allUsageKinds" width="{{ 50 / ctrl.allUsageKinds.length }}%">
+        </colgroup>
         <thead>
+
         <tr>
             <th>Type</th>
-            <td ng-repeat="usageKind in ctrl.allUsageKinds"
-                align="center"
+            <th ng-repeat="usageKind in ctrl.allUsageKinds"
+                class="wadtul-rotate-45"
+                align=""
                 uib-popover-html="usageKind.nameDescription"
                 popover-append-to-body="true"
                 popover-trigger="mouseenter">
-                <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}">
-                </waltz-icon>
-                <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
-            </td>
+                <div>
+                    <span>
+                        <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
+                        <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}">
+                        </waltz-icon>
+                    </span>
+                </div>
+            </th>
         </tr>
         </thead>
         <tbody ng-repeat="(dataTypeCode, usages) in ctrl.consolidatedUsages">
