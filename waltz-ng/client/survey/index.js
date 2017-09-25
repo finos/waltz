@@ -16,6 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import {registerComponents, registerStores} from "../common/module-utils";
+
+import surveyInstanceStore from './services/survey-instance-store';
+import surveyRunStore from './services/survey-run-store';
+
+import surveySection from './components/survey-section';
 
 export default () => {
     const module = angular.module('waltz.survey', []);
@@ -23,17 +29,23 @@ export default () => {
     module
         .config(require('./routes'));
 
+    registerComponents(module, [
+        surveySection
+    ]);
+
     module
         .component('waltzSurveyDropdownEditor', require('./components/dropdown/survey-dropdown-editor'))
         .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
         .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'))
         .component('waltzSurveyRunOverview', require('./components/survey-run-overview'))
-        .component('waltzSurveyTemplateOverview', require('./components/survey-template-overview'))
-        .component('waltzSurveySection', require('./components/survey-section'));
+        .component('waltzSurveyTemplateOverview', require('./components/survey-template-overview'));
+
+    registerStores(module, [
+        surveyInstanceStore,
+        surveyRunStore
+    ]);
 
     module
-        .service('SurveyInstanceStore', require('./services/survey-instance-store'))
-        .service('SurveyRunStore', require('./services/survey-run-store'))
         .service('SurveyTemplateStore', require('./services/survey-template-store'))
         .service('SurveyQuestionStore', require('./services/survey-question-store'));
 
