@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
+import { CORE_API } from '../../../common/services/core-api-utils';
+import { initialiseData } from "../../../common";
+import { mergeKeyedLists, toGroupedMap } from "../../../common/map-utils";
 
 import template from './measurable-rating-app-section.html';
 
@@ -34,21 +35,16 @@ import template from './measurable-rating-app-section.html';
 
 const bindings = {
     parentEntityRef: '<',
-    application: '<',
-    categories: '<',
-    measurables: '<',
-    ratings: '<',
-    perspectiveDefinitions: '<',
-    perspectiveRatings: '<',
 };
 
 
 
 const initialState = {
-    ratings: [],
-    perspectiveDefinitions: [],
-    perspectiveRatings: [],
+    application: null,
     categories: [],
+    selector: {},
+    ratings: [],
+    perspectiveRatings: [],
     measurables: [],
     visibility: {
         overlay: false,
@@ -59,7 +55,7 @@ const initialState = {
 
 
 
-function mkTabs(categories = [], measurables = [], ratings = [], perspectiveDefinitions = []) {
+function mkTabs(categories = [], measurables = [], ratings = []) {
 
     const measurablesByCategory = _.groupBy(
         measurables,
@@ -77,7 +73,6 @@ function mkTabs(categories = [], measurables = [], ratings = [], perspectiveDefi
             category,
             measurables: usedMeasurables,
             ratings: ratingsForMeasure,
-            perspectiveDefinitions
         };
     });
 
@@ -110,28 +105,53 @@ function mkOverridesMap(perspectiveRatings = [], measurables = []) {
 }
 
 
-function controller() {
-    const vm = this;
+function controller($q, serviceBroker) {
+    const vm = initialiseData(this, initialState);;
 
     vm.$onInit = () => {
-        initialiseData(vm, initialState);
+
+        vm.selector = {  entityReference: vm.parentEntityRef, scope: 'EXACT'  };
+
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+            .then(r => vm.application = r.data);
+
+        const ratingsPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
+            .then(r => vm.ratings = r.data);
+
+        const categoriesPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => vm.categories = r.data);
+
+        const measurablesPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef])
+            .then(r => vm.measurables = r.data);
+
+        const perspectiveRatingsPromise = serviceBroker
+            .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef])
+            .then(r => vm.perspectiveRatings = r.data);
+
+        $q.all([perspectiveRatingsPromise, measurablesPromise])
+            .then(() => vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables));
+
+
+        $q.all([measurablesPromise, ratingsPromise, categoriesPromise])
+            .then(() => {
+                vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings);
+                const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
+                vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
+            });
+
     };
 
-    vm.$onChanges = () => {
-        if (vm.perspectiveRatings && vm.measurables) {
-            vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables);
-        }
-
-        if (vm.measurables && vm.ratings && vm.categories) {
-            vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings, vm.perspectiveDefinitions);
-            const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
-            vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
-        }
-    };
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q',
+    'ServiceBroker'
+];
 
 
 const component = {

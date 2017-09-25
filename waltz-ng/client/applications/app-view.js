@@ -72,10 +72,6 @@ function controller($q,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
-                    measurableStore,
-                    measurableCategoryStore,
-                    measurableRatingStore,
-                    perspectiveRatingStore,
                     surveyInstanceStore,
                     surveyRunStore)
 {
@@ -117,7 +113,6 @@ function controller($q,
         loadFirstWave()
             .then(() => loadSecondWave())
             .then(() => loadThirdWave())
-            .then(() => loadFourthWave())
             .then(() => postLoadActions());
     }
 
@@ -136,17 +131,10 @@ function controller($q,
 
     function loadSecondWave() {
         const promises = [
-            measurableCategoryStore
-                .findAll()
-                .then(cs => vm.measurableCategories = cs),
 
-            measurableRatingStore
-                .findByAppSelector({ entityReference, scope: 'EXACT' })
-                .then(rs => vm.ratings = rs),
-
-            measurableStore
-                .findMeasurablesRelatedToPath(entityReference)
-                .then(ms => vm.measurables = ms),
+            entityStatisticStore
+                .findStatsForEntity(entityReference)
+                .then(stats => vm.entityStatistics = stats),
         ];
 
         return $q.all(promises);
@@ -154,26 +142,6 @@ function controller($q,
 
 
     function loadThirdWave() {
-        const promises = [
-
-            entityStatisticStore
-                .findStatsForEntity(entityReference)
-                .then(stats => vm.entityStatistics = stats),
-
-            serviceBroker
-                .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
-                .then(r => vm.perspectiveDefinitions = r.data),
-
-            perspectiveRatingStore
-                .findForEntity(entityReference)
-                .then(prs => vm.perspectiveRatings = prs),
-
-        ];
-
-        return $q.all(promises);
-    }
-
-    function loadFourthWave() {
         const promises = [
             surveyRunStore
                 .findByEntityReference(vm.entityRef)
@@ -188,6 +156,7 @@ function controller($q,
         return $q.all(promises);
     }
 
+
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
         vm.entityRef = Object.assign({}, vm.entityRef, {name: vm.app.name});
@@ -195,8 +164,6 @@ function controller($q,
 
     // load everything in priority order
     loadAll();
-
-
 }
 
 
@@ -209,10 +176,6 @@ controller.$inject = [
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore',
-    'PerspectiveRatingStore',
     'SurveyInstanceStore',
     'SurveyRunStore'
 ];
