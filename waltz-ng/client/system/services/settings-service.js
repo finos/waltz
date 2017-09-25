@@ -44,6 +44,21 @@ function service(serviceBroker) {
             });
     };
 
+    const findOrDie = (name, msg) => {
+        const defaultMsg = `
+Cannot find setting: [${name}] in settings table.  
+Please see docs/features/configuration/settings.md for more details about this table.
+`;
+        return findOrDefault(name, null)
+            .then(r => {
+                if (_.isNull(r)) {
+                    throw (msg || defaultMsg);
+                } else {
+                    return r;
+                }
+            })
+    }
+
 
     const isDevModeEnabled = () => {
         return findOrDefault(namedSettings.devExtEnabled, false)
@@ -54,6 +69,7 @@ function service(serviceBroker) {
     return {
         findAll,
         findOrDefault,
+        findOrDie,
         isDevModeEnabled
     };
 }

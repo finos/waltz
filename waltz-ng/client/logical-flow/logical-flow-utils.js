@@ -16,34 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../../common/index";
+import {checkIsEntityRef, checkIsLogicalFlow} from "../common/checks";
+import {sameRef} from "../common/entity-utils";
 
 
-const initialState = {
-    parentEntityRef: {
-        id: 396,
-        kind: 'APPLICATION'
-    }
-};
+export const INBOUND = 'INBOUND';
+export const OUTBOUND = 'OUTBOUND';
+export const NEITHER = 'NEITHER';
 
-function controller($stateParams) {
-    const vm = initialiseData(this, initialState);
+
+export function isLogicalFlowInbound(flow, ref) {
+    checkIsLogicalFlow(flow);
+    checkIsEntityRef(ref);
+    return sameRef(flow.target, ref);
 }
 
 
-controller.$inject = [
-    '$stateParams'
-];
+export function isLogicalFlowOutbound(flow, ref) {
+    checkIsLogicalFlow(flow);
+    checkIsEntityRef(ref);
+    return sameRef(flow.source, ref);
+}
 
 
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export function categorizeDirection(flow, ref) {
+    if (isLogicalFlowInbound(flow, ref)) return INBOUND;
+    else if (isLogicalFlowOutbound(flow, ref)) return OUTBOUND;
+    else return NEITHER;
+}
