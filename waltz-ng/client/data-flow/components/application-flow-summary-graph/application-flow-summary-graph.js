@@ -121,8 +121,6 @@ function drawTitleBar(svg) {
 
 
 function enrichData(data = []) {
-    console.log('ed', data);
-
     return _.chain(data)
         .flatMap((vs, k) => {
             return _.map(vs, (authCounts, rating) => {

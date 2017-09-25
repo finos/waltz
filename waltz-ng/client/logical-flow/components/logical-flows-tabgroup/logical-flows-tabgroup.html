@@ -16,62 +16,8 @@
 
                     </div>
                     <div class="col-sm-12 col-md-8">
-                        <br>
-                        <h4>Data Categories</h4>
-                        <table class="table table-condensed small table-striped">
-                            <colgroup>
-                                <col width="40%">
-                                <col width="15%">
-                                <col width="15%">
-                                <col width="15%">
-                                <col width="15%">
-                            </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th style="text-align:right;">Intra</th>
-                                <th style="text-align:right;">Inbound</th>
-                                <th style="text-align:right;">Outbound</th>
-                                <th style="text-align:right;">Total</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="row in $ctrl.enrichedDataTypeCounts | orderBy:'dataType.name'">
-                                <td>
-                                    <span ng-bind="row.dataType.name"></span>
-                                </td>
-                                <td align="right" style="padding-right: 1.5em">
-                                    <span ng-bind="row.intra"></span>
-                                </td>
-                                <td align="right" style="padding-right: 1.5em">
-                                    <span ng-bind="row.inbound"></span>
-                                </td>
-                                <td align="right" style="padding-right: 1.5em">
-                                    <span ng-bind="row.outbound"></span>
-                                </td>
-                                <td align="right" style="padding-right: 1.5em">
-                                    <span ng-bind="row.total"></span>
-                                </td>
-                            </tr>
-                            </tbody>
-                            <tbody ng-if="$ctrl.visibility.summaries">
-                            <tr>
-                                <td>
-                                    Known / Unknown
-                                </td>
-                                <td align="right" ng-repeat="summary in $ctrl.summaries">
-                                    <div uib-popover-template="'wlft-summary-popup.html'"
-                                         popover-placement="bottom"
-                                         popver-append-to-body="true"
-                                         popover-trigger="mouseenter">
-                                        <waltz-pie data="summary.summary"
-                                                   config="$ctrl.summaryConfig">
-                                        </waltz-pie>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <waltz-logical-flows-data-type-summary-pane stats="$ctrl.flowData.stats">
+                        </waltz-logical-flows-data-type-summary-pane>
                     </div>
                 </div>
             </uib-tab>
