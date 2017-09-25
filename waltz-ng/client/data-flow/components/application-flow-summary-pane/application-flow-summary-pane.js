@@ -92,7 +92,6 @@ function calcStats(enrichedDecorators = []) {
 
 function controller($q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
-    vm.data = data;
 
     const reload = (unknownDataTypeId) => {
         const selector = {
