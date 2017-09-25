@@ -1,10 +1,10 @@
 <div>
-    <waltz-section name="{{ctrl.name}}"
+    <waltz-section name="Indicators"
                    icon="pie-chart"
                    id="entity-statistic-section">
 
         <div class="row col-sm-12 value"
-             ng-if="ctrl.entityStatisticsGrouped.length > 0">
+             ng-if="$ctrl.entityStatisticsGrouped.length > 0">
 
             <table class="table table-condensed waltz-entity-statistic"
                    style="border-collapse: separate;">
@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
 
-                <tbody ng-repeat-start="(group, stats) in ctrl.entityStatisticsGrouped">
+                <tbody ng-repeat-start="(group, stats) in $ctrl.entityStatisticsGrouped">
                     <tr class="category">
                         <td colspan="5">
                             <waltz-icon name="{{ stats.key | toIconName:'entityStatistic' }}">
@@ -72,7 +72,7 @@
             </table>
 
         </div>
-        <waltz-no-data ng-if="ctrl.entityStatisticsGrouped.length == 0">
+        <waltz-no-data ng-if="$ctrl.entityStatisticsGrouped.length == 0">
             <message>
                 <strong>
                     No Indicators
