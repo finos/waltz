@@ -16,34 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../../common/index";
+export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
+export const DEFAULT_DATA_TYPE = 'settings.data-type.default-code';
+export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
 
-
-const initialState = {
-    parentEntityRef: {
-        id: 396,
-        kind: 'APPLICATION'
-    }
-};
-
-function controller($stateParams) {
-    const vm = initialiseData(this, initialState);
-}
-
-
-controller.$inject = [
-    '$stateParams'
-];
-
-
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export const UNKNOWN_DATA_TYPE = 'settings.data-type.unknown-id';
