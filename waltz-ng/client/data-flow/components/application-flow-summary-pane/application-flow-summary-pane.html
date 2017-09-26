@@ -1,0 +1,110 @@
+
+<div class="waltz-application-flow-summary-pane">
+    <strong>Summary Chart</strong>
+
+    <!-- SUMMARY CHART -->
+    <div style="padding-top: 1em; padding-bottom: 0.6em">
+        <p class="small text-muted">
+            Chart showing incoming vs outgoing flow decorations which are mapped to a known data type and then
+            categorized by their authoritativeness.
+            <a class='clickable'
+               ng-click="$ctrl.visibility.stats = !$ctrl.visibility.stats">
+                <span ng-bind="$ctrl.visibility.stats ? 'Hide' : 'Show'"></span> stats
+            </a>
+        </p>
+        <waltz-application-flow-summary-graph summary-data="$ctrl.stats.chartData">
+        </waltz-application-flow-summary-graph>
+
+    </div>
+
+    <!-- STATS TABLES -->
+    <div class="small waltz-fade-if"
+         ng-if="$ctrl.visibility.stats">
+
+
+        <strong>By Mapping Status</strong>
+        <p class="small text-muted">
+            Incoming/Outgoing flow decorations mapped to a known data type.
+        </p>
+        <table class="table table-condensed small">
+            <colgroup>
+                <col width="20%">
+                <col width="20%">
+                <col width="20%">
+                <col width="40%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Direction</th>
+                <th>Total Known</th>
+                <th>Total Unknown</th>
+                <th/>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Inbound</td>
+                <td>
+                    <span ng-bind="$ctrl.stats.byDirectionAndMappingStatus['INBOUND']['KNOWN'].length || 0"></span>
+                </td>
+                <td>
+                    <span ng-bind="$ctrl.stats.byDirectionAndMappingStatus['INBOUND']['UNKNOWN'].length || 0"></span>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Outbound</td>
+                <td>
+                    <span ng-bind="$ctrl.stats.byDirectionAndMappingStatus['OUTBOUND']['KNOWN'].length || 0"></span>
+                </td>
+                <td>
+                    <span ng-bind="$ctrl.stats.byDirectionAndMappingStatus['OUTBOUND']['UNKNOWN'].length || 0"></span>
+                </td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <strong>By Authoritativeness Rating</strong>
+        <p class="small text-muted">
+            Incoming/Outgoing flow decorations by their authoritativeness.
+        </p>
+
+        <table class="table table-condensed small">
+            <colgroup>
+                <col width="20%">
+                <col width="20%">
+                <col width="20%">
+                <col width="20%">
+                <col width="20%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Direction</th>
+                <th ng-repeat="col in $ctrl.authoritativeCols">
+                    <waltz-enum-value key="col"
+                                      show-icon="false"
+                                      type="'AuthoritativenessRating'">
+                    </waltz-enum-value>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Inbound</td>
+                <td ng-repeat="col in $ctrl.authoritativeCols">
+                    <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['INBOUND'][col].length || 0"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Outbound</td>
+                <td ng-repeat="col in $ctrl.authoritativeCols">
+                    <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['OUTBOUND'][col].length || 0"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

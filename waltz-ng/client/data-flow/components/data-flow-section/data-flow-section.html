@@ -69,7 +69,12 @@
                 <!-- DATA TYPE SUMMARY -->
                 <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
                     <div class='row'>
-                        <div class="col-md-12">
+                        <div class="col-sm-6">
+                            <waltz-application-flow-summary-pane parent-entity-ref="$ctrl.parentEntityRef">
+
+                            </waltz-application-flow-summary-pane>
+                        </div>
+                        <div class="col-sm-6">
                             <strong>Data Types</strong>
                             <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
                                 <message>
