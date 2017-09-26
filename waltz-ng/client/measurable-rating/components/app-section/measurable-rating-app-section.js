@@ -38,7 +38,6 @@ const bindings = {
 };
 
 
-
 const initialState = {
     application: null,
     categories: [],
@@ -47,6 +46,7 @@ const initialState = {
     perspectiveRatings: [],
     measurables: [],
     visibility: {
+        editor: false,
         overlay: false,
         tab: null
     },
@@ -109,27 +109,34 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);;
 
     vm.$onInit = () => {
-
         vm.selector = {  entityReference: vm.parentEntityRef, scope: 'EXACT'  };
+        loadData();
+    };
 
+    vm.viewMode = () => {
+        loadData(true)
+        vm.visibility.editor = false;
+    };
+
+    const loadData = (force = false) => {
         serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id], { force })
             .then(r => vm.application = r.data);
 
         const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
+            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector], { force })
             .then(r => vm.ratings = r.data);
 
         const categoriesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableCategoryStore.findAll)
+            .loadViewData(CORE_API.MeasurableCategoryStore.findAll, [], { force })
             .then(r => vm.categories = r.data);
 
         const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef])
+            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
             .then(r => vm.measurables = r.data);
 
         const perspectiveRatingsPromise = serviceBroker
-            .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef])
+            .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef], { force })
             .then(r => vm.perspectiveRatings = r.data);
 
         $q.all([perspectiveRatingsPromise, measurablesPromise])
@@ -142,7 +149,6 @@ function controller($q, serviceBroker) {
                 const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });
-
     };
 
 }

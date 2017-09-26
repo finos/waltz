@@ -5,9 +5,16 @@
 
     <waltz-section-actions>
         <a waltz-has-role="RATING_EDITOR"
-           ui-sref='main.measurable-rating.edit ({kind: "APPLICATION", id: $ctrl.application.id})'
+           ng-if="$ctrl.visibility.editor === false"
+           ng-click="$ctrl.visibility.editor = true"
            class="btn btn-xs btn-primary">
             Edit
+        </a>
+        <a waltz-has-role="RATING_EDITOR"
+           ng-if="$ctrl.visibility.editor === true"
+           ng-click="$ctrl.viewMode()"
+           class="btn btn-xs btn-primary">
+            View
         </a>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
@@ -20,65 +27,73 @@
     </waltz-source-data-overlay>
 
 
-    <!-- TABS -->
-    <div class="row"
-         ng-if="$ctrl.measurables.length > 0">
-        <div class="col-sm-12">
-            <div class="waltz-tabs">
-                <input type="radio"
-                       ng-repeat-start="tab in $ctrl.tabs"
-                       ng-model="$ctrl.visibility.tab"
-                       ng-value="tab.category.id"
-                       ng-disabled="tab.ratings.length === 0"
-                       name="measurable_rating"
-                       id="{{ tab.category.id + '_' +$id}}">
-                <label for="{{ tab.category.id + '_' +$id}}"
-                       ng-repeat-end
-                       ng-bind="tab.category.name">
-                </label>
+    <div ng-if="$ctrl.visibility.editor === false">
+        <!-- TABS -->
+        <div class="row"
+             ng-if="$ctrl.measurables.length > 0">
+            <div class="col-sm-12">
+                <div class="waltz-tabs">
+                    <input type="radio"
+                           ng-repeat-start="tab in $ctrl.tabs"
+                           ng-model="$ctrl.visibility.tab"
+                           ng-value="tab.category.id"
+                           ng-disabled="tab.ratings.length === 0"
+                           name="measurable_rating"
+                           id="{{ tab.category.id + '_' +$id}}">
+                    <label for="{{ tab.category.id + '_' +$id}}"
+                           ng-repeat-end
+                           ng-bind="tab.category.name">
+                    </label>
 
-                <div ng-repeat="tab in $ctrl.tabs"
-                     ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
-                     class="wt-tab">
-                    <br>
-                    <waltz-measurable-rating-panel category="tab.category"
-                                                   entity-reference="$ctrl.parentEntityRef"
-                                                   measurables="tab.measurables"
-                                                   ratings="tab.ratings"
-                                                   overrides="$ctrl.overridesByMeasurableId">
-                    </waltz-measurable-rating-panel>
+                    <div ng-repeat="tab in $ctrl.tabs"
+                         ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
+                         class="wt-tab">
+                        <br>
+                        <waltz-measurable-rating-panel category="tab.category"
+                                                       entity-reference="$ctrl.parentEntityRef"
+                                                       measurables="tab.measurables"
+                                                       ratings="tab.ratings"
+                                                       overrides="$ctrl.overridesByMeasurableId">
+                        </waltz-measurable-rating-panel>
 
-                    <br>
-                    <waltz-markdown class="text-muted small"
-                                    text="tab.category.description">
-                    </waltz-markdown>
+                        <br>
+                        <waltz-markdown class="text-muted small"
+                                        text="tab.category.description">
+                        </waltz-markdown>
 
-                    <br>
-                    <hr>
+                        <br>
+                        <hr>
 
-                    <!--PERSPECTIVE RATINGS-->
-                    <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                    measurable-category="tab.category">
-                    </waltz-perspective-rating-panel>
+                        <!--PERSPECTIVE RATINGS-->
+                        <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                        measurable-category="tab.category">
+                        </waltz-perspective-rating-panel>
+                    </div>
+
                 </div>
+            </div>
+        </div>
 
+
+        <!-- NO DATA -->
+        <div class="row"
+             ng-if="$ctrl.measurables.length == 0">
+            <div class="col-md-12">
+                <waltz-no-data>
+                    <message>
+                        <strong>No data</strong>
+                        available for this application
+                    </message>
+                </waltz-no-data>
             </div>
         </div>
     </div>
 
 
-    <!-- NO DATA -->
-    <div class="row"
-         ng-if="$ctrl.measurables.length == 0">
-        <div class="col-md-12">
-            <waltz-no-data>
-                <message>
-                    <strong>No data</strong>
-                    available for this application
-                </message>
-            </waltz-no-data>
-        </div>
+    <div>
+        <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                            ng-if="$ctrl.visibility.editor">
+        </waltz-measurable-rating-edit-panel>
     </div>
-
 
 </waltz-section>
