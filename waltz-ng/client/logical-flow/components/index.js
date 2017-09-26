@@ -18,14 +18,16 @@
 
 import {registerComponents} from "../../common/module-utils";
 import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
-import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel'
+import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
+import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane';
 
 
 function setup(module) {
 
     registerComponents(module, [
         LogicalFlowEditPanel,
-        LogicalFlowTypeEditor
+        LogicalFlowTypeEditor,
+        LogicalFlowsDataTypeSummaryPane
     ]);
 
     module

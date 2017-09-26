@@ -26,8 +26,10 @@
 @import "../client/change-initiative/directives/change-initiative-selector";
 @import "../client/common/common";
 @import "../client/complexity/components/complexity-bar-chart";
+@import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
 @import "../client/data-types/components/data-type-tree";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
+@import "../client/data-type-usage/directives/app-data-type-usage-list";
 @import "../client/entity/components/immediate-hierarchy-navigator/immediate-hierarchy-navigator";
 @import "../client/entity-named-note/components/panel/entity-named-notes-panel";
 @import "../client/entity/components/entity-selector/entity-selector";
@@ -375,5 +377,23 @@ a.subtle-link:hover {
     }
     thead {
         border-bottom: 1px solid $waltz-border-color-lighter;
+    }
+}
+
+.waltz-rotate-45 {
+    height: 7em;
+    white-space: nowrap;
+
+    div {
+        transform:
+            /* Magic Numbers */
+            translate(25px, 0px)
+            /* 45 is really 360 - 45 */
+            rotate(315deg);
+        width: 10px;
+
+        :first-of-type(span) {
+            padding: 5px 5px;
+        }
     }
 }

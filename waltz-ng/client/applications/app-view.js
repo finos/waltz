@@ -68,7 +68,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     serviceBroker,
-                    entityStatisticStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
@@ -156,10 +155,6 @@ function controller($q,
     function loadThirdWave() {
         const promises = [
 
-            entityStatisticStore
-                .findStatsForEntity(entityReference)
-                .then(stats => vm.entityStatistics = stats),
-
             serviceBroker
                 .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
                 .then(r => vm.perspectiveDefinitions = r.data),
@@ -205,7 +200,6 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ServiceBroker',
-    'EntityStatisticStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',
