@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
 import template from "./app-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 
@@ -68,16 +67,13 @@ function controller($q,
                     $state,
                     $stateParams,
                     serviceBroker,
-                    entityStatisticStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
                     historyStore,
                     measurableStore,
                     measurableCategoryStore,
                     measurableRatingStore,
-                    perspectiveRatingStore,
-                    surveyInstanceStore,
-                    surveyRunStore)
+                    perspectiveRatingStore)
 {
 
     const id = $stateParams.id;
@@ -117,7 +113,6 @@ function controller($q,
         loadFirstWave()
             .then(() => loadSecondWave())
             .then(() => loadThirdWave())
-            .then(() => loadFourthWave())
             .then(() => postLoadActions());
     }
 
@@ -156,10 +151,6 @@ function controller($q,
     function loadThirdWave() {
         const promises = [
 
-            entityStatisticStore
-                .findStatsForEntity(entityReference)
-                .then(stats => vm.entityStatistics = stats),
-
             serviceBroker
                 .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
                 .then(r => vm.perspectiveDefinitions = r.data),
@@ -168,21 +159,6 @@ function controller($q,
                 .findForEntity(entityReference)
                 .then(prs => vm.perspectiveRatings = prs),
 
-        ];
-
-        return $q.all(promises);
-    }
-
-    function loadFourthWave() {
-        const promises = [
-            surveyRunStore
-                .findByEntityReference(vm.entityRef)
-                .then(surveyRuns => vm.surveyRuns = surveyRuns),
-
-            // only get back completed instances
-            surveyInstanceStore
-                .findByEntityReference(vm.entityRef)
-                .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}))
         ];
 
         return $q.all(promises);
@@ -205,16 +181,13 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'ServiceBroker',
-    'EntityStatisticStore',
     'FlowDiagramStore',
     'FlowDiagramEntityStore',
     'HistoryStore',
     'MeasurableStore',
     'MeasurableCategoryStore',
     'MeasurableRatingStore',
-    'PerspectiveRatingStore',
-    'SurveyInstanceStore',
-    'SurveyRunStore'
+    'PerspectiveRatingStore'
 ];
 
 
