@@ -12,7 +12,7 @@
             </button>
         </waltz-section-actions>
 
-        <div ng-if="$ctrl.entriesLoaded && $ctrl.entries.length > 0">
+        <div ng-if="$ctrl.entries.length > 0">
             <waltz-change-log-table entries="$ctrl.entries"
                                     on-initialise="$ctrl.changeLogTableInitialised">
             </waltz-change-log-table>
@@ -33,18 +33,11 @@
             </div>
 
         </div>
-        <waltz-no-data ng-if="$ctrl.entriesLoaded && $ctrl.entries.length == 0">
+        <waltz-no-data ng-if="$ctrl.entries.length == 0">
             <message>
                 <strong>No changes yet</strong>
             </message>
         </waltz-no-data>
-
-        <div ng-if="! $ctrl.entriesLoaded">
-            <a class="clickable"
-               ng-click="$ctrl.loadEntries()">
-                Show Changes
-            </a>
-        </div>
 
     </waltz-section>
 </div>
