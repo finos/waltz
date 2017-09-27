@@ -27,8 +27,7 @@ const bindings = {
 
 
 const initialState = {
-    entries: [],
-    entriesLoaded: false
+    entries: []
 };
 
 const template = require('./change-log-section.html');
@@ -37,10 +36,9 @@ const template = require('./change-log-section.html');
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.loadEntries = () => {
+    const loadEntries = () => {
         const dataLoadHandler = (result) => {
             vm.entries = result.data;
-            vm.entriesLoaded = true;
         };
 
         if (vm.parentEntityRef) {
@@ -60,7 +58,13 @@ function controller(serviceBroker) {
         }
     };
 
-    vm.refresh = () => vm.loadEntries();
+    vm.$onChanges = (changes) => {
+        if (vm.parentEntityRef || vm.userName) {
+            loadEntries();
+        }
+    };
+
+    vm.refresh = () => loadEntries();
 
     vm.changeLogTableInitialised = (api) => {
         vm.exportChangeLog = () => api.exportFn("change-log.csv");
