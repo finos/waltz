@@ -20,7 +20,6 @@
                               scope="CHILDREN"
                               applications="ctrl.applications"
                               children="ctrl.children"
-                              complexity="ctrl.complexity"
                               measurable="ctrl.measurable"
                               parents="ctrl.parents"
                               server-stats="ctrl.techStats.serverStats">
@@ -82,9 +81,7 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              apps="ctrl.applications"
-                              csv-name="{{ ctrl.measurable.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityReference">
     </waltz-complexity-section>
 
 

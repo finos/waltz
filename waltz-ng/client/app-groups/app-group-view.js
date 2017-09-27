@@ -27,7 +27,6 @@ const initialState = {
     assetCostData: null,
     capabilities: [],
     changeInitiatives: [],
-    complexity: [],
     dataFlows : null,
     flowOptions: null,
     groupDetail: null,
@@ -51,7 +50,6 @@ function controller($q,
                     $stateParams,
                     serviceBroker,
                     appGroupStore,
-                    complexityStore,
                     historyStore,
                     logicalFlowViewService,
                     sourceDataRatingStore,
@@ -88,17 +86,14 @@ function controller($q,
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
-            complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             serviceBroker.loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [ idSelector ])
         ]))
         .then(([
             appsResponse,
-            complexity,
             techStatsResponse
         ]) => {
             vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
-            vm.complexity = complexity;
-            vm.techStats = techStatsResponse.data
+            vm.techStats = techStatsResponse.data;
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
@@ -136,7 +131,6 @@ controller.$inject = [
     '$stateParams',
     'ServiceBroker',
     'AppGroupStore',
-    'ComplexityStore',
     'HistoryStore',
     'LogicalFlowViewService',
     'SourceDataRatingStore',

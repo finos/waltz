@@ -16,14 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData, isEmpty} from "../../common";
-import {mkLinkGridCell} from "../../common/link-utils";
+import {initialiseData, isEmpty} from "../../../common";
+import {mkLinkGridCell} from "../../../common/link-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './complexity-section.html';
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
-    complexity: '<',
-    apps: '<',
-    loadAll: '<',
-    csvName: '@'
+    parentEntityRef: '<',
+    csvName: '@?'
 };
 
 
@@ -35,6 +36,7 @@ const initialState = {
         summary: true,
         detail: false
     },
+    csvName: 'complexity.csv',
     exportGrid: () => {}
 };
 
@@ -48,9 +50,27 @@ function mkGridData(complexity = [], apps = []) {
 }
 
 
-function controller() {
+
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        if (! vm.parentEntityRef) return;
+        const selector = mkSelectionOptions(vm.parentEntityRef);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ selector ])
+            .then(r => vm.apps = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ComplexityStore.findBySelector,
+                [ selector ])
+            .then(r => vm.complexity = r.data);
+    };
 
     vm.onSummarySelect = (d) => vm.summarySelection = d;
 
@@ -90,14 +110,15 @@ function controller() {
 
 
 controller.$inject = [
+    'ServiceBroker'
 ];
 
 
-const component = {
-    template: require('./complexity-section.html'),
+export const component = {
+    template,
     bindings,
     controller
 };
 
+export const id = 'waltzComplexitySection';
 
-export default component;

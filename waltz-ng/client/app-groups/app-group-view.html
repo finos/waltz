@@ -17,7 +17,6 @@
     <waltz-app-group-summary parent-entity-ref="ctrl.entityRef"
                              applications="ctrl.applications"
                              total-cost="ctrl.assetCostData.total"
-                             complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
                              members="ctrl.groupDetail.members"
@@ -63,9 +62,7 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              apps="ctrl.applications"
-                              csv-name="{{ ctrl.groupDetail.appGroup.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 
