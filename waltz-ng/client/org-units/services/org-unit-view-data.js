@@ -71,13 +71,6 @@ function initialiseDataFlows(service, id, holder) {
 }
 
 
-function loadComplexity(store, id, holder) {
-    return store
-        .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
-        .then(r => holder.complexity = r);
-}
-
-
 function loadTechStats(serviceBroker, id, holder) {
     const selector = mkSelector(id);
 
@@ -89,7 +82,6 @@ function loadTechStats(serviceBroker, id, holder) {
 
 function service($q,
                  serviceBroker,
-                 complexityStore,
                  logicalFlowViewService,
                  orgUnitStore) {
 
@@ -127,7 +119,6 @@ function service($q,
     function loadSecondWave(orgUnitId) {
         return $q.all([
             initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
-            loadComplexity(complexityStore, orgUnitId, rawData)
         ]);
     }
 
@@ -164,7 +155,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'ComplexityStore',
     'LogicalFlowViewService',
     'OrgUnitStore'
 ];

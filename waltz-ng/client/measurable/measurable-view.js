@@ -41,9 +41,7 @@ function logHistory(measurable, historyStore) {
 function controller($q,
                     $stateParams,
                     serviceBroker,
-                    complexityStore,
                     historyStore,
-                    involvedSectionService,
                     logicalFlowViewService) {
 
     const id = $stateParams.id;
@@ -96,21 +94,14 @@ function controller($q,
                 .then(flowView => vm.logicalFlowView = flowView),
         ]);
 
-    const loadWave3 = () =>
-        $q.all([
-            complexityStore
-                .findBySelector(childrenSelector)
-                .then(complexity => vm.complexity = complexity),
-        ]);
 
-    const loadWave4 = () => logHistory(vm.measurable, historyStore);
+    const loadWave3 = () => logHistory(vm.measurable, historyStore);
 
     // -- BOOT ---
 
     loadWave1()
         .then(loadWave2)
-        .then(loadWave3)
-        .then(loadWave4);
+        .then(loadWave3);
 
 
     // -- INTERACTION ---
@@ -127,9 +118,7 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ServiceBroker',
-    'ComplexityStore',
     'HistoryStore',
-    'InvolvedSectionService',
     'LogicalFlowViewService'
 ];
 

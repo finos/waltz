@@ -17,7 +17,6 @@
                           scope="CHILDREN"
                           person="ctrl.person"
                           managers="ctrl.managers"
-                          complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
                           directs="ctrl.directs"
                           applications="ctrl.apps"
@@ -107,10 +106,7 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              ng-if="ctrl.hasInvolvements"
-                              apps="ctrl.apps"
-                              csv-name="{{ ctrl.person.displayName }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 

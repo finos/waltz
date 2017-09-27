@@ -30,7 +30,6 @@ const initModel = {
         all: []
     },
     apps: [],
-    complexity: [],
     assetCostData: {},
     serverStats: null,
     dataFlows: [],
@@ -79,7 +78,6 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 
 function service($q,
                  serviceBroker,
-                 complexityStore,
                  logicalFlowViewService) {
 
     const state = { model: initModel };
@@ -180,13 +178,6 @@ function service($q,
     }
 
 
-    function loadComplexity(personId) {
-        return complexityStore
-            .findBySelector(personId, 'PERSON', 'CHILDREN')
-            .then(complexity => state.model.complexity = complexity);
-    }
-
-
     function loadFlows(personId) {
         return logicalFlowViewService
             .initialise(personId, 'PERSON', 'CHILDREN')
@@ -225,13 +216,9 @@ function service($q,
     }
 
 
-    function loadThirdWave(employeeId) {
+    function loadThirdWave() {
         const personId = state.model.person.id;
-        return $q
-            .all([
-                loadTechStats(personId),
-                loadComplexity(personId),
-            ]);
+        return loadTechStats(personId);
     }
 
 
@@ -240,7 +227,7 @@ function service($q,
 
         return loadFirstWave(employeeId)
             .then(() => loadSecondWave(employeeId))
-            .then(() => loadThirdWave(employeeId));
+            .then(() => loadThirdWave());
     }
 
 
@@ -265,7 +252,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'ComplexityStore',
     'LogicalFlowViewService'
 ];
 

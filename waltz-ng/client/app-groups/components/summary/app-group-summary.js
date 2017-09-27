@@ -29,7 +29,6 @@ const bindings = {
     appGroup: '<',
     applications: '<',
     totalCost: '<',
-    complexity: '<',
     serverStats: '<',
     editable: '=',
     flows: '=',
@@ -57,6 +56,12 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
                 [selector])
             .then(r => vm.totalCost = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ComplexityStore.findBySelector,
+                [ selector ])
+            .then(r => vm.complexity = r.data);
     };
 
     vm.$onChanges = () => {

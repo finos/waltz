@@ -22,7 +22,6 @@
                              flows="ctrl.viewData.dataFlows.stats"
                              server-stats="ctrl.viewData.techStats.serverStats"
                              immediate-hierarchy="ctrl.viewData.immediateHierarchy"
-                             complexity="ctrl.viewData.complexity"
                              load-org-unit-descendants="ctrl.loadOrgUnitDescendants">
     </waltz-org-unit-overview>
 
@@ -52,9 +51,7 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.viewData.complexity"
-                              apps="ctrl.viewData.apps"
-                              csv-name="{{ ctrl.viewData.orgUnit.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 
