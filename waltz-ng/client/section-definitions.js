@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,10 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-
-
-const flowDiagramsWidget = {
+export const flowDiagramsWidget = {
     template: `
         <waltz-flow-diagrams-section parent-entity-ref="$ctrl.parentEntityRef"
                                      can-create="true">
@@ -29,8 +26,7 @@ const flowDiagramsWidget = {
     icon: 'picture-o'
 };
 
-
-const costsWidget = {
+export const costsWidget = {
     template: `
         <waltz-app-costs-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-app-costs-section> `,
@@ -39,8 +35,7 @@ const costsWidget = {
     icon: 'money'
 };
 
-
-const peopleWidget = {
+export const peopleWidget = {
     template: `
         <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-involved-people-section> `,
@@ -49,7 +44,7 @@ const peopleWidget = {
     icon: 'users'
 };
 
-const technologyWidget = {
+export const technologyWidget = {
     template: `
         <waltz-technology-section parent-entity-ref="$ctrl.parentEntityRef" >
         </waltz-technology-section>`,
@@ -58,8 +53,7 @@ const technologyWidget = {
     icon: 'server'
 };
 
-
-const entityNamedNoteWidget = {
+export const entityNamedNoteWidget = {
     template: `
         <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-entity-named-notes-section>`,
@@ -68,8 +62,7 @@ const entityNamedNoteWidget = {
     icon: 'sticky-note-o'
 };
 
-
-const changesWidget = {
+export const changesWidget = {
     template: `
         <waltz-change-log-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-change-log-section>`,
@@ -78,7 +71,7 @@ const changesWidget = {
     name: 'Changes'
 };
 
-const flowWidget = {
+export const flowWidget = {
     template: `
         <waltz-data-flow-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-data-flow-section>`,
@@ -87,7 +80,7 @@ const flowWidget = {
     icon: 'random'
 };
 
-const bookmarkWidget = {
+export const bookmarkWidget = {
     template: `
         <waltz-bookmarks-section parent-entity-ref="$ctrl.parentEntityRef"
                                  show-filter="true">
@@ -97,56 +90,20 @@ const bookmarkWidget = {
     icon: 'rocket'
 };
 
-
-const initData = {
-    id: 134,
-    parentEntityRef: {
-        kind: 'APPLICATION',
-        id: 28083
-    },
-    visibility: {
-        flows: false
-    },
-    widgets: [],
-    availableWidgets: [
-        flowWidget,
-        flowDiagramsWidget,
-        bookmarkWidget,
-        entityNamedNoteWidget,
-        technologyWidget,
-        peopleWidget,
-        costsWidget,
-        changesWidget]
+export const measurableRatingsWidget = {
+    template: `
+        <waltz-measurable-rating-app-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-measurable-rating-app-section>`,
+    id: 'ratings-section',
+    name: 'Ratings',
+    icon: 'puzzle-piece'
 };
 
-
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.$onInit = () => {
-        // vm.addWidget(bookmarkWidget);
-        // vm.addWidget(technologyWidget);
-    };
-
-    vm.addWidget = w => {
-        vm.widgets =  _.reject(vm.widgets, x => x.id === w.id)
-        vm.widgets.unshift(w);
-    };
-
-}
-
-
-controller.$inject = ['$compile', 'ServiceBroker'];
-
-
-const view = {
-    template: require('./playpen1.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+export const indicatorsWidget = {
+    template: `
+        <waltz-entity-statistic-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-statistic-section>`,
+    id: 'entity-statistic-section',
+    name: 'Indicators',
+    icon: 'pie-chart'
 };
-
-
-export default view;

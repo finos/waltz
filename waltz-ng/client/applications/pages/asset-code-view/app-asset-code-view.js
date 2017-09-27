@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './app-asset-code-view.html';
+
 
 function controller($state,
                     $stateParams,
@@ -43,7 +45,7 @@ controller.$inject = [
 
 
 export default  {
-    template: require('./app-asset-code-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

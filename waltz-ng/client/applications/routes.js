@@ -16,9 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AppEdit from "./app-edit";
-import AppRegistration from "./app-registration";
-import {appResolver, appByAssetCodeResolver, orgUnitsResolver} from "./resolvers";
+import { appResolver, appByAssetCodeResolver, orgUnitsResolver } from "./resolvers";
+
+import AppViewAssetCode from "./pages/asset-code-view/app-asset-code-view";
+import AppEdit from "./pages/edit/app-edit";
+import AppRegistration from "./pages/registration/app-registration";
+import AppView from "./pages/view/app-view";
 
 
 const base = {
@@ -35,7 +38,7 @@ const appRegistrationState = {
 const appViewState = {
     url: '/{id:int}',
     views: {
-        'content@': require('./app-view')
+        'content@': AppView
     }
 };
 
@@ -43,7 +46,7 @@ const appViewState = {
 const appViewByAssetCodeState = {
     url: '/asset-code/{assetCode}',
     views: {
-        'content@': require('./app-asset-code-view')
+        'content@': AppViewAssetCode
     },
     resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
