@@ -26,10 +26,19 @@ export const flowDiagramsWidget = {
     icon: 'picture-o'
 };
 
+export const changeInitiativesWidget = {
+    template: `
+        <waltz-change-initiative-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-change-initiative-section>`,
+    id: 'change-initiatives-section',
+    name: 'Change Initiatives',
+    icon: 'paper-plane-o'
+};
+
 export const costsWidget = {
     template: `
         <waltz-app-costs-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-app-costs-section> `,
+        </waltz-app-costs-section>`,
     id: 'app-costs-widget',
     name: 'Costs',
     icon: 'money'
@@ -38,7 +47,7 @@ export const costsWidget = {
 export const peopleWidget = {
     template: `
         <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-involved-people-section> `,
+        </waltz-involved-people-section>`,
     id: 'people-widget',
     name: 'People',
     icon: 'users'
@@ -106,4 +115,13 @@ export const indicatorsWidget = {
     id: 'entity-statistic-section',
     name: 'Indicators',
     icon: 'pie-chart'
+};
+
+export const surveysWidget = {
+    template: `
+        <waltz-survey-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-survey-section>`,
+    id: 'survey-instance-list-section',
+    name: 'Surveys',
+    icon: 'wpforms'
 };

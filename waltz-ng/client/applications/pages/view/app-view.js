@@ -22,6 +22,7 @@ import { CORE_API } from "../../../common/services/core-api-utils";
 import {
     bookmarkWidget,
     changesWidget,
+    changeInitiativesWidget,
     costsWidget,
     entityNamedNoteWidget,
     flowDiagramsWidget,
@@ -29,6 +30,7 @@ import {
     indicatorsWidget,
     measurableRatingsWidget,
     peopleWidget,
+    surveysWidget,
     technologyWidget
 } from "../../../section-definitions";
 
@@ -38,15 +40,17 @@ import template from "./app-view.html";
 const initialState = {
     app: {},
     availableWidgets: [
-        measurableRatingsWidget,
-        flowWidget,
-        flowDiagramsWidget,
-        bookmarkWidget,
         entityNamedNoteWidget,
-        technologyWidget,
+        measurableRatingsWidget,
+        bookmarkWidget,
         peopleWidget,
-        indicatorsWidget,
+        changeInitiativesWidget,
+        flowDiagramsWidget,
+        flowWidget,
+        technologyWidget,
         costsWidget,
+        indicatorsWidget,
+        surveysWidget,
         changesWidget
     ],
     parentEntityRef: {},
