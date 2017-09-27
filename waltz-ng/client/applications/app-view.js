@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { CORE_API } from "../common/services/core-api-utils";
-import { CORE_API } from "../common/services/core-api-utils";
 
 import template from "./app-view.html";
 
