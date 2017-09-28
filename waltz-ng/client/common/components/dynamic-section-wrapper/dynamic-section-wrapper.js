@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,24 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './dyna-widget.html';
-import {initialiseData} from "../../common/index";
+import {initialiseData} from "../../../common/index";
 
+import template from './dynamic-section-wrapper.html';
+
+
+const bindings = {
+    parentEntityRef: '<',
+    widget: '<'
+};
 
 const initialState = {
-    additionalScope: {}
 };
 
 
 function controller($element, $compile, $scope) {
-
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
         const widgetScope = $scope.$new();
         widgetScope.parentEntityRef = vm.parentEntityRef;
-        widgetScope.createDiagramCommands = "x"; // () => console.log('wtf');
-        // Object.assign(widgetScope, vm.additionalScope);
 
         const linkFn = $compile(vm.widget.template);
         const content = linkFn(widgetScope);
@@ -49,13 +51,6 @@ controller.$inject=[
 ];
 
 
-const bindings = {
-    additionalScope: '<?',
-    widget: '<',
-    parentEntityRef: '<'
-};
-
-
 const component = {
     controller,
     template,
@@ -65,5 +60,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzDynaWidget'
+    id: 'waltzDynamicSectionWrapper'
 }

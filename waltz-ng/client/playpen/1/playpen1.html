@@ -53,10 +53,9 @@
 
     <div ng-repeat="widget in ctrl.widgets track by widget.id"
          class='waltz-animate-repeat'>
-        <waltz-dyna-widget widget="widget"
-                           additional-scope="ctrl.additionalScope"
-                           parent-entity-ref="ctrl.parentEntityRef">
-        </waltz-dyna-widget>
+        <waltz-dynamic-section-wrapper widget="widget"
+                                       parent-entity-ref="ctrl.parentEntityRef">
+        </waltz-dynamic-section-wrapper>
     </div>
 
 
