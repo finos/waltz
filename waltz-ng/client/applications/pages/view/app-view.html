@@ -1,0 +1,89 @@
+<!--
+  ~ /*
+  ~  * Waltz - Enterprise Architecture
+  ~  * Copyright (C) 2017  Khartec Ltd.
+  ~  *
+  ~  * This program is free software: you can redistribute it and/or modify
+  ~  * it under the terms of the GNU Lesser General Public License as published by
+  ~  * the Free Software Foundation, either version 3 of the License, or
+  ~  * (at your option) any later version.
+  ~  *
+  ~  * This program is distributed in the hope that it will be useful,
+  ~  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  * GNU Lesser General Public License for more details.
+  ~  *
+  ~  * You should have received a copy of the GNU Lesser General Public License
+  ~  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~  */
+  -->
+
+<div>
+
+    <waltz-page-header icon="desktop"
+                       name="{{ ctrl.app.name }}"
+                       small="{{ ctrl.app.assetCode }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Applications</li>
+            <li><span ng-bind="ctrl.app.name"></span></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <style>
+        .h-navigation ul {
+            list-style-type:none;
+            /*height:30px;*/
+            text-align:center;
+            width: 100%;
+            display: table;
+            margin-bottom: 0;
+        }
+
+        .h-navigation ul li {
+            margin-left:50px;
+            display: table-cell;
+        }
+
+    </style>
+
+
+    <!-- OVERVIEW -->
+    <waltz-app-overview parent-entity-ref="ctrl.parentEntityRef">
+    </waltz-app-overview>
+
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-2">
+                Navigation:
+            </div>
+            <div class="col-md-10 h-navigation">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="w in ctrl.availableWidgets">
+                        <a ng-click="ctrl.addWidget(w)"
+                           class="clickable">
+                            <waltz-icon name="{{ w.icon }}"></waltz-icon>
+                            <span ng-bind="w.name"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <br>
+
+    <!-- WIDGETS -->
+    <div ng-repeat="widget in ctrl.widgets track by widget.id"
+         class='waltz-animate-repeat'>
+        <waltz-dyna-widget widget="widget"
+                           additional-scope="ctrl.additionalScope"
+                           parent-entity-ref="ctrl.parentEntityRef">
+        </waltz-dyna-widget>
+    </div>
+
+</div>
