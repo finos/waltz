@@ -31,7 +31,6 @@ const bindings = {
     totalCost: '<',
     serverStats: '<',
     editable: '=',
-    flows: '=',
     members: '<'
 };
 
@@ -62,6 +61,12 @@ function controller(serviceBroker) {
                 CORE_API.ComplexityStore.findBySelector,
                 [ selector ])
             .then(r => vm.complexity = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.calculateStats,
+                [ selector ])
+            .then(r => vm.flowStats = r.data);
     };
 
     vm.$onChanges = () => {

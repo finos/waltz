@@ -10,13 +10,11 @@
                         <waltz-flow-cloud-diagram
                             width="300"
                             height="300"
-                            stats="$ctrl.flowData.stats">
+                            stats="$ctrl.stats">
                         </waltz-flow-cloud-diagram>
-
-
                     </div>
                     <div class="col-sm-12 col-md-8">
-                        <waltz-logical-flows-data-type-summary-pane stats="$ctrl.flowData.stats">
+                        <waltz-logical-flows-data-type-summary-pane stats="$ctrl.stats">
                         </waltz-logical-flows-data-type-summary-pane>
                     </div>
                 </div>
@@ -29,7 +27,7 @@
                 <br>
 
                 <!-- LOADING -->
-                <waltz-loading-notification show="$ctrl.flowData.loadingFlows"
+                <waltz-loading-notification show="$ctrl.visibility.loadingFlows"
                                             name="Loading Flow Data">
                 </waltz-loading-notification>
 
@@ -65,8 +63,8 @@
                             <hr>
 
                             <waltz-app-centric-flow-table app="$ctrl.selectedNode"
-                                                          flows="$ctrl.flowData.flows"
-                                                          decorators="$ctrl.flowData.decorators"
+                                                          flows="$ctrl.flows"
+                                                          decorators="$ctrl.decorators"
                                                           on-select="$ctrl.refocusApp">
                             </waltz-app-centric-flow-table>
 
@@ -81,7 +79,7 @@
                     </div>
                     <div class="col-sm-8" style="border-left: 1px solid #ccc">
                         <!-- NO DATA -->
-                        <div ng-if="$ctrl.filteredFlowData.entities.length == 0  && $ctrl.flowData.flows.length > 0">
+                        <div ng-if="$ctrl.filteredFlowData.entities.length == 0  && $ctrl.flows.length > 0">
                             <div class="alert alert-warning">
                                 <strong>No data to show</strong> given the current filter options.  Use the
                                 configure button above to adjust these options.
@@ -106,7 +104,7 @@
                         </div>
 
                         <!-- BOINGY -->
-                        <div ng-if="$ctrl.boingyEverShown && $ctrl.filteredFlowData.flows.length > 0">
+                        <div ng-if="$ctrl.visibility.boingyEverShown && $ctrl.filteredFlowData.flows.length > 0">
                             <div ng-if="$ctrl.filteredFlowData.entities.length < 400  || $ctrl.visibility.ignoreLimits">
 
                                 <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
@@ -132,18 +130,29 @@
                      heading="Table"
                      select="$ctrl.tabSelected('table', 2)">
                 <br>
-                <waltz-loading-notification show="$ctrl.flowData.loadingFlows"
+                <waltz-loading-notification show="$ctrl.visibility.loadingFlows"
                                             name="Loading Flow Data">
                 </waltz-loading-notification>
-                <div ng-if="$ctrl.filteredFlowData.flows.length > 0 && $ctrl.currentTabIndex == 2"
-                     style="height: 300px">
-                    <waltz-logical-flow-table flows="$ctrl.filteredFlowData.flows"
-                                              decorators="$ctrl.filteredFlowData.decorators"
-                                              on-initialise="$ctrl.onTableInitialise">
-                    </waltz-logical-flow-table>
+                <div ng-if="$ctrl.filteredFlowData.flows.length > 0 && $ctrl.currentTabIndex == 2">
+                    <div style="height: 300px">
+                        <waltz-logical-flow-table flows="$ctrl.filteredFlowData.flows"
+                                                  decorators="$ctrl.filteredFlowData.decorators"
+                                                  on-initialise="$ctrl.onTableInitialise">
+                        </waltz-logical-flow-table>
+                    </div>
+                    <div style="padding: 0.3em; border-top: 1px solid #eee"
+                         class="pull-right">
+                        <waltz-data-extract-link name="Export"
+                                                 styling="link"
+                                                 filename="logical-flows.csv"
+                                                 extract="logical-flows"
+                                                 method="POST"
+                                                 request-body="$ctrl.selector">
+                        </waltz-data-extract-link>
+                    </div>
                 </div>
 
-                <div ng-if="$ctrl.filteredFlowData.flows.length == 0 && $ctrl.flowData.flows.length > 0">
+                <div ng-if="$ctrl.filteredFlowData.flows.length == 0 && $ctrl.flows.length > 0">
                     <div class="alert alert-warning">
                         <strong>No data to show</strong> given the current filter options.  Use the
                         configure button above to adjust these options.
