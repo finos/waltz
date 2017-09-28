@@ -17,7 +17,9 @@
  */
 
 import _ from "lodash";
-import * as fields from "./formly/fields";
+import * as fields from "../../formly/fields";
+
+import template from './app-edit.html';
 
 
 function setupDropDowns(orgUnits) {
@@ -135,7 +137,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./app-edit.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

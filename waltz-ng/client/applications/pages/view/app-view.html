@@ -1,13 +1,35 @@
+<!--
+  ~ /*
+  ~  * Waltz - Enterprise Architecture
+  ~  * Copyright (C) 2017  Khartec Ltd.
+  ~  *
+  ~  * This program is free software: you can redistribute it and/or modify
+  ~  * it under the terms of the GNU Lesser General Public License as published by
+  ~  * the Free Software Foundation, either version 3 of the License, or
+  ~  * (at your option) any later version.
+  ~  *
+  ~  * This program is distributed in the hope that it will be useful,
+  ~  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  * GNU Lesser General Public License for more details.
+  ~  *
+  ~  * You should have received a copy of the GNU Lesser General Public License
+  ~  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~  */
+  -->
+
 <div>
 
-    <waltz-page-header name="Playpen"
-                       small="1"
-                       icon="rocket">
+    <waltz-page-header icon="desktop"
+                       name="{{ ctrl.app.name }}"
+                       small="{{ ctrl.app.assetCode }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>Playpen</li>
+            <li>Applications</li>
+            <li><span ng-bind="ctrl.app.name"></span></li>
         </ol>
     </waltz-page-header>
+
 
     <style>
         .h-navigation ul {
@@ -26,8 +48,13 @@
 
     </style>
 
-    <waltz-app-overview parent-entity-ref="ctrl.parentEntityRef"></waltz-app-overview>
 
+    <!-- OVERVIEW -->
+    <waltz-app-overview parent-entity-ref="ctrl.parentEntityRef">
+    </waltz-app-overview>
+
+
+    <!-- NAVIGATION -->
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
             <div class="col-md-2">
@@ -50,14 +77,12 @@
 
     <br>
 
-
+    <!-- WIDGETS -->
     <div ng-repeat="widget in ctrl.widgets track by widget.id"
          class='waltz-animate-repeat'>
         <waltz-dynamic-section-wrapper widget="widget"
                                        parent-entity-ref="ctrl.parentEntityRef">
         </waltz-dynamic-section-wrapper>
     </div>
-
-
 
 </div>
