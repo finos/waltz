@@ -19,7 +19,9 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {mkLinkGridCell} from '../../../common/link-utils';
+import {mkSelectionOptions} from '../../../common/selector-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
+import template from './measurable-ratings-browser-section.html';
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -28,12 +30,9 @@ import {CORE_API} from '../../../common/services/core-api-utils';
  * This component ...
  */
 
-import template from './measurable-ratings-browser-section.html';
-
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@',
+    parentEntityRef: '<'
 };
 
 
@@ -159,10 +158,7 @@ function controller($q, serviceBroker) {
 
 
     vm.$onInit = () => {
-        vm.selector = {
-            entityReference: vm.parentEntityRef,
-            scope: vm.scope
-        };
+        vm.selector = mkSelectionOptions(vm.parentEntityRef);
 
         return $q.all([
             loadMeasurableRatings(serviceBroker, vm.selector, vm),
