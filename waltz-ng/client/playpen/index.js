@@ -27,7 +27,6 @@ import {registerComponents} from '../common/module-utils';
 import * as EntityDataSourcingPanel from './4/entity-data-sourcing-panel/entity-data-sourcing-panel';
 import * as FlowExplorer from './4/flow-explorer/flow-explorer';
 import * as FooWidget from './4/foo-widget/foo-widget';
-import DynaWidget from './1/dyna-widget';
 
 export default () => {
 
@@ -66,7 +65,6 @@ export default () => {
     ]);
 
     registerComponents(module, [
-        DynaWidget,
         FlowExplorer,
         FooWidget,
         EntityDataSourcingPanel]);

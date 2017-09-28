@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { registerComponents } from '../module-utils';
+
+import * as DynamicSectionWrapper from './dynamic-section-wrapper/dynamic-section-wrapper'
+
 export default (module) => {
     module
         .component('waltzBooleanRenderer', require('./boolean-renderer'))
@@ -29,5 +33,10 @@ export default (module) => {
         .component('waltzGridSref', require('./grid-sref/grid-sref'))
         .component('waltzGridWithSearch', require('./grid/grid-with-search'))
         .component('waltzDatePickerFormInput', require('./date-picker/date-picker-form-input'));
+
+
+    registerComponents(module, [
+        DynamicSectionWrapper
+    ]);
 
 };
