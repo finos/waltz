@@ -41,8 +41,7 @@ function logHistory(measurable, historyStore) {
 function controller($q,
                     $stateParams,
                     serviceBroker,
-                    historyStore,
-                    logicalFlowViewService) {
+                    historyStore) {
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
@@ -88,10 +87,7 @@ function controller($q,
                 .then(r => vm.applications = r.data),
             serviceBroker
                 .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [childrenSelector])
-                .then(r => vm.techStats = r.data),
-            logicalFlowViewService
-                .initialise(childrenSelector)
-                .then(flowView => vm.logicalFlowView = flowView),
+                .then(r => vm.techStats = r.data)
         ]);
 
 
@@ -102,15 +98,6 @@ function controller($q,
     loadWave1()
         .then(loadWave2)
         .then(loadWave3);
-
-
-    // -- INTERACTION ---
-
-
-    vm.loadFlowDetail = () => logicalFlowViewService
-        .loadDetail()
-        .then(flowView => vm.logicalFlowView = flowView);
-
 }
 
 
@@ -118,8 +105,7 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ServiceBroker',
-    'HistoryStore',
-    'LogicalFlowViewService'
+    'HistoryStore'
 ];
 
 

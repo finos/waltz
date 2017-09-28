@@ -7,7 +7,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.person">People</a></li>
-            <li>{{ ctrl.person.displayName }}</li>
+            <li><span ng-bind="ctrl.person.displayName"></span></li>
         </ol>
     </waltz-page-header>
 
@@ -19,8 +19,7 @@
                           managers="ctrl.managers"
                           server-stats="ctrl.techStats.serverStats"
                           directs="ctrl.directs"
-                          applications="ctrl.apps"
-                          flows="ctrl.dataFlows.stats">
+                          applications="ctrl.apps">
     </waltz-person-summary>
 
     <br>
@@ -112,9 +111,7 @@
 
     <!-- FLOWS -->
     <waltz-logical-flows-tabgroup-section ng-if="ctrl.hasInvolvements"
-                                          flow-data="ctrl.dataFlows"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.apps">
+                                          parent-entity-ref="ctrl.entityRef">
     </waltz-logical-flows-tabgroup-section>
 
 

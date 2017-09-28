@@ -55,8 +55,6 @@ function controller($scope,
     }, true);
 
 
-    vm.loadFlowDetail = () => viewService.loadFlowDetail();
-
     vm.exportApps = () => {
 
         const header = [

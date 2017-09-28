@@ -17,16 +17,13 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {determineStatMethod} from "../../logical-flow-utils";
 
 
 const bindings = {
-    flowData: '<',
-    applications: '<',
-    onLoadDetail: '<',
-    options: '<',  // { graphTweakers ... }
-    optionsVisible: '<',
-    onTabChange: '<',
-    onTableInitialise: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -50,18 +47,20 @@ const defaultOptions = {
 
 const initialState = {
     applications: [],
+    flows: [],
+    decorators: [],
     selectedNode: null,
     isolatedNode: null,
-    boingyEverShown: false,
     dataTypes: [],
-    flowData: null,
     filterOptions: defaultFilterOptions,
-    onLoadDetail: () => console.log("No onLoadDetail provided for logical-flows-tabgroup"),
     options: defaultOptions,
     optionsVisible: false,
-    onTabChange: () => console.log("No onTabChange provided for logical-flows-tabgroup"),
     visibility: {
-        summaries: false
+        boingyEverShown: false,
+        ignoreLimits: false,
+        summaries: false,
+        loadingFlows: false,
+        loadingStats: false
     }
 };
 
@@ -173,6 +172,8 @@ function prepareGraphTweakers(logicalFlowUtilityService,
 
 
 function controller($scope,
+                    $q,
+                    serviceBroker,
                     logicalFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
@@ -183,22 +184,59 @@ function controller($scope,
             d => { d.fx = null; d.fy = null; });
     }
 
-    vm.$onChanges = () => {
-        if (vm.flowData) {
-            vm.dataTypes = getDataTypeIds(vm.flowData.decorators);
-        }
-        vm.filterChanged();
+    const loadDetail = () => {
+        vm.visibility.loadingFlows = true;
+
+        const flowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findBySelector,
+                [ vm.selector ])
+            .then(r => vm.flows = r.data);
+
+        const decoratorPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelector,
+                [ vm.selector ])
+            .then(r => {
+                vm.decorators = r.data;
+                vm.dataTypes = getDataTypeIds(vm.decorators);
+            });
+
+        const appsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ vm.selector ])
+            .then(r => vm.applications = r.data);
+
+        return $q
+            .all([flowPromise, decoratorPromise, appsPromise])
+            .then(() => {
+                vm.filterChanged();
+                vm.visibility.loadingFlows = false;
+            });
+    };
+
+    const loadStats = () => {
+        vm.loadingStats = true;
+        serviceBroker
+            .loadViewData(
+                determineStatMethod(vm.parentEntityRef.kind),
+                [ vm.selector ])
+            .then(r => {
+                vm.loadingStats = false;
+                vm.stats = r.data;
+            });
     };
 
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
         vm.filterOptions = filterOptions;
 
-        if (! vm.flowData) return;
+        if (! (vm.flows && vm.decorators)) return;
 
         vm.filteredFlowData = calculateFlowData(
-            vm.flowData.flows,
+            vm.flows,
             vm.applications,
-            vm.flowData.decorators,
+            vm.decorators,
             filterOptions,
             vm.isolatedNode);
 
@@ -209,23 +247,15 @@ function controller($scope,
             node => $scope.$applyAsync(() => vm.selectedNode = node));
     };
 
-    vm.loadDetail = () => {
-        if (vm.onLoadDetail) {
-            vm.onLoadDetail();
-        } else {
-            console.log("No handler for detail provided ('on-load-detail')");
-        }
-    };
 
     vm.tabSelected = (tabName, index) => {
         if(index > 0) {
-            vm.loadDetail();
+            loadDetail();
         }
         if(index === 1) {
-            vm.boingyEverShown = true;
+            vm.visibility.boingyEverShown = true;
         }
         vm.currentTabIndex = index;
-        vm.onTabChange(tabName, index);
     };
 
     vm.isolate = (node) => {
@@ -246,11 +276,20 @@ function controller($scope,
         vm.isolate(node);
     };
 
+    vm.$onChanges = () => {
+        if (vm.parentEntityRef) {
+            vm.selector = mkSelectionOptions(vm.parentEntityRef);
+            loadStats();
+        }
+    };
+
 }
 
 
 controller.$inject = [
     '$scope',
+    '$q',
+    'ServiceBroker',
     'LogicalFlowUtilityService'
 ];
 

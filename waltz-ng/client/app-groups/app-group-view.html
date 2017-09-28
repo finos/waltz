@@ -20,7 +20,6 @@
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
                              members="ctrl.groupDetail.members"
-                             flows="ctrl.dataFlows.stats"
                              editable="ctrl.isGroupEditable()">
     </waltz-app-group-summary>
 
@@ -38,10 +37,7 @@
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section ratings="ctrl.sourceDataRatings"
-                                          flow-data="ctrl.dataFlows"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.applications">
+    <waltz-logical-flows-tabgroup-section parent-entity-ref="ctrl.entityRef">
     </waltz-logical-flows-tabgroup-section>
 
 

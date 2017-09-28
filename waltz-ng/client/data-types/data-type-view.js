@@ -19,11 +19,13 @@
 import {initialiseData} from "../common";
 
 import template from './data-type-view.html';
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
     dataFlow: null,
     entityRef: null,
+    flowData: {}
 };
 
 
@@ -31,7 +33,7 @@ function controller($scope,
                     dataType,
                     viewDataService,
                     historyStore,
-                    logicalDataFlowService,
+                    serviceBroker,
                     tourService) {
 
     const vm = initialiseData(this, initialState);
@@ -68,13 +70,17 @@ function controller($scope,
         .then(() => tourService.initialiseForKey('main.data-type.view', true))
         .then(tour => vm.tour = tour);
 
+    serviceBroker
+        .loadViewData(
+            CORE_API.LogicalFlowStore.findBySelector,
+            [ selector ])
+        .then(r => vm.flowData.flows = r.data);
 
-    logicalDataFlowService
-        .initialise(selector)
-        .then(flowData => vm.flowData = flowData)
-        .then(() => logicalDataFlowService.loadDetail())
-        .then(flowData => vm.flowData = flowData);
-
+    serviceBroker
+        .loadViewData(
+            CORE_API.LogicalFlowDecoratorStore.findBySelector,
+            [ selector ])
+        .then(r => vm.flowData.decorators = r.data);
 }
 
 
@@ -83,7 +89,7 @@ controller.$inject = [
     'dataType',
     'DataTypeViewDataService',
     'HistoryStore',
-    'LogicalFlowViewService',
+    'ServiceBroker',
     'TourService'
 ];
 

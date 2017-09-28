@@ -27,7 +27,6 @@ const initialState = {
     assetCostData: null,
     capabilities: [],
     changeInitiatives: [],
-    dataFlows : null,
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -40,7 +39,6 @@ const initialState = {
         capabilityRatingOverlay: false,
         changeInitiativeOverlay: false,
         costOverlay: false,
-        flowOverlay: false,
         techOverlay: false
     }
 };
@@ -51,7 +49,6 @@ function controller($q,
                     serviceBroker,
                     appGroupStore,
                     historyStore,
-                    logicalFlowViewService,
                     sourceDataRatingStore,
                     userService) {
 
@@ -71,10 +68,6 @@ function controller($q,
 
 
     // -- LOAD ---
-
-    logicalFlowViewService
-        .initialise(id, 'APP_GROUP', 'EXACT')
-        .then(flows => vm.dataFlows = flows);
 
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
@@ -112,12 +105,6 @@ function controller($q,
         return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
-
-    vm.loadFlowDetail = () => logicalFlowViewService
-        .loadDetail()
-        .then(flowData => vm.dataFlows = flowData);
-
-
     // -- HELPER ---
 
     const isUserAnOwner = member =>
@@ -132,7 +119,6 @@ controller.$inject = [
     'ServiceBroker',
     'AppGroupStore',
     'HistoryStore',
-    'LogicalFlowViewService',
     'SourceDataRatingStore',
     'UserService'
 ];

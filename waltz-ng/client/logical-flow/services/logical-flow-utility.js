@@ -22,7 +22,6 @@ import {authoritativeRatingColorScale} from "../../common/colors";
 
 
 function pickWorst(ratings = []) {
-
     const sortedByBadness = [ 'DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION' ];
     const worst = _.find(sortedByBadness, x => _.includes(ratings, x));
 

@@ -4,13 +4,6 @@
                    id="logical-flows-section">
 
         <waltz-section-actions>
-            <waltz-data-extract-link name="Export"
-                                     filename="logical-flows.csv"
-                                     extract="logical-flows"
-                                     method="POST"
-                                     request-body="$ctrl.selector"
-                                     ng-if="$ctrl.visibility.exportButton">
-            </waltz-data-extract-link>
             <button class="btn btn-xs waltz-btn-transparent"
                     ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
                 <waltz-icon name="map-signs"></waltz-icon>
@@ -22,13 +15,7 @@
         </waltz-source-data-overlay>
 
         <div ng-if="$ctrl.hasFlows">
-            <waltz-logical-flows-tabgroup flow-data="$ctrl.flowData"
-                                          on-load-detail="$ctrl.onLoadDetail"
-                                          applications="$ctrl.applications"
-                                          options="$ctrl.flowOptions"
-                                          options-visible="$ctrl.visibility.flowConfigOverlay"
-                                          on-tab-change="$ctrl.tabChanged"
-                                          on-table-initialise="$ctrl.tableInitialised">
+            <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef">
             </waltz-logical-flows-tabgroup>
         </div>
         <div ng-if="!$ctrl.hasFlows">
