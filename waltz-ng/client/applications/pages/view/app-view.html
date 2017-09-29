@@ -22,31 +22,14 @@
 
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
-                       small="{{ ctrl.app.assetCode }}">
+                       small="{{ ctrl.app.assetCode }}"
+                       widgets="ctrl.availableWidgets">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Applications</li>
             <li><span ng-bind="ctrl.app.name"></span></li>
         </ol>
     </waltz-page-header>
-
-
-    <style>
-        .h-navigation ul {
-            list-style-type:none;
-            /*height:30px;*/
-            text-align:center;
-            width: 100%;
-            display: table;
-            margin-bottom: 0;
-        }
-
-        .h-navigation ul li {
-            margin-left:50px;
-            display: table-cell;
-        }
-
-    </style>
 
 
     <!-- OVERVIEW -->
@@ -56,23 +39,9 @@
 
     <!-- NAVIGATION -->
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-2">
-                Navigation:
-            </div>
-            <div class="col-md-10 h-navigation">
-                <ul class="list-unstyled list-inline">
-                    <li ng-repeat="w in ctrl.availableWidgets">
-                        <a ng-click="ctrl.addWidget(w)"
-                           class="clickable">
-                            <waltz-icon name="{{ w.icon }}"></waltz-icon>
-                            <span ng-bind="w.name"></span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
+        <waltz-dynamic-section-navigation widgets="ctrl.availableWidgets"
+                                          on-select="ctrl.addWidget">
+        </waltz-dynamic-section-navigation>
     </div>
 
     <br>
