@@ -16,9 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ListView from "./list-view";
-import UnitView from "./unit-view";
 import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
+
+import ListView from "./pages/list-view/list-view";
+import UnitView from "./pages/unit-view/unit-view";
 
 
 const baseState = {

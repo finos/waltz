@@ -180,35 +180,3 @@ export function invokeFunction(fn) {
     return null;
 }
 
-/**
- * Smooth scrolling: will scroll to a destination offset smoothly
- * @param $interval
- * @param $window
- * @param destinationOffset
- * @param direction
- * @param scrollAmount
- * @returns {Promise}
- */
-export function scrollTo($interval,
-                         $window,
-                         destinationOffset,
-                         direction = -1,
-                         scrollAmount = 50) {
-    const jump = scrollAmount * direction;
-    const offsetCondition = direction < 0
-        ? () => $window.pageYOffset <= destinationOffset
-        : () => $window.pageYOffset >= destinationOffset;
-
-    const promise = new Promise((resolve, reject) => {
-        const timerPromise = $interval(() => {
-            $window.scrollBy(0, jump);
-            if (offsetCondition()) {
-                $interval.cancel(timerPromise);
-                resolve();
-            }
-        }, 10);
-    });
-    return promise;
-}
-
-
