@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { initialiseData, scrollTo } from "../../../common";
+import { initialiseData } from "../../../common";
 import { invokeFunction } from "../../index";
 
 import template from "./dynamic-section-navigation.html";
@@ -24,24 +24,25 @@ import template from "./dynamic-section-navigation.html";
 
 const bindings = {
     widgets: '<',
-    onSelect: '<'
+    onSelect: '<',
+    offset: '@?'
 };
 
 
 const initialState = {
+    offset: 250,
     widgetStickyVisible: false,
-    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w)
+    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
 };
 
 
-function controller($interval,
-                    $scope,
+function controller($scope,
                     $window) {
     const vm = initialiseData(this, initialState);
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
-            vm.widgetStickyVisible = $window.pageYOffset > 250;
+            vm.widgetStickyVisible = $window.pageYOffset > vm.offset;
         });
     };
 
@@ -61,7 +62,7 @@ function controller($interval,
     // -- INTERACT --
 
     vm.scrollAndSelectWidget = (widget) => {
-        scrollTo($interval, $window, 200);
+        $window.scrollTo(0, vm.offset);
         invokeFunction(vm.onSelect, widget);
     };
 
@@ -69,7 +70,6 @@ function controller($interval,
 
 
 controller.$inject = [
-    '$interval',
     '$scope',
     '$window'
 ];

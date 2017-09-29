@@ -16,26 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const flowDiagramsWidget = {
+export const appsSection = {
     template: `
-        <waltz-flow-diagrams-section parent-entity-ref="$ctrl.parentEntityRef"
-                                     can-create="true">
-        </waltz-flow-diagrams-section>`,
-    id: 'flow-diagrams-widget',
-    name: 'Flow Diagrams',
-    icon: 'picture-o'
+        <waltz-apps-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-apps-section>`,
+    id: 'apps-section',
+    name: 'Applications',
+    icon: 'desktop'
 };
 
-export const changeInitiativesWidget = {
+
+export const assetCostsSection = {
     template: `
-        <waltz-change-initiative-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-change-initiative-section>`,
-    id: 'change-initiatives-section',
-    name: 'Change Initiatives',
-    icon: 'paper-plane-o'
+        <waltz-asset-costs-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-asset-costs-section>`,
+    id: 'costs-section',
+    name: 'Costs',
+    icon: 'money'
 };
 
-export const costsWidget = {
+
+export const appCostsSection = {
     template: `
         <waltz-app-costs-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-app-costs-section>`,
@@ -44,52 +45,18 @@ export const costsWidget = {
     icon: 'money'
 };
 
-export const peopleWidget = {
+
+export const authSourcesSection = {
     template: `
-        <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-involved-people-section>`,
-    id: 'people-widget',
-    name: 'People',
-    icon: 'users'
+        <waltz-auth-sources-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-auth-sources-section>`,
+    id: 'authoritative-sources-section',
+    name: 'Authoritative Sources',
+    icon: 'shield'
 };
 
-export const technologyWidget = {
-    template: `
-        <waltz-technology-section parent-entity-ref="$ctrl.parentEntityRef" >
-        </waltz-technology-section>`,
-    id: 'technology-widget',
-    name: 'Technology',
-    icon: 'server'
-};
 
-export const entityNamedNoteWidget = {
-    template: `
-        <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-entity-named-notes-section>`,
-    id: 'entity-named-notes-widget',
-    name: 'Notes',
-    icon: 'sticky-note-o'
-};
-
-export const changesWidget = {
-    template: `
-        <waltz-change-log-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-change-log-section>`,
-    id: 'changes-widget',
-    icon: 'history',
-    name: 'Changes'
-};
-
-export const flowWidget = {
-    template: `
-        <waltz-data-flow-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-data-flow-section>`,
-    id: 'data-flow-widget',
-    name: 'Data Flows',
-    icon: 'random'
-};
-
-export const bookmarkWidget = {
+export const bookmarksSection = {
     template: `
         <waltz-bookmarks-section parent-entity-ref="$ctrl.parentEntityRef"
                                  show-filter="true">
@@ -99,16 +66,58 @@ export const bookmarkWidget = {
     icon: 'rocket'
 };
 
-export const measurableRatingsWidget = {
+
+export const changeInitiativesSection = {
     template: `
-        <waltz-measurable-rating-app-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-measurable-rating-app-section>`,
-    id: 'ratings-section',
-    name: 'Ratings',
-    icon: 'puzzle-piece'
+        <waltz-change-initiative-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-change-initiative-section>`,
+    id: 'change-initiatives-section',
+    name: 'Change Initiatives',
+    icon: 'paper-plane-o'
 };
 
-export const indicatorsWidget = {
+
+export const changeLogSection = {
+    template: `
+        <waltz-change-log-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-change-log-section>`,
+    id: 'changes-widget',
+    icon: 'history',
+    name: 'Changes'
+};
+
+
+export const complexitySection = {
+    template: `
+        <waltz-complexity-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-complexity-section>`,
+    id: 'complexity-section',
+    icon: 'sort-numeric-asc',
+    name: 'Application Complexity'
+};
+
+
+export const dataFlowSection = {
+    template: `
+        <waltz-data-flow-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-data-flow-section>`,
+    id: 'data-flow-widget',
+    name: 'Data Flows',
+    icon: 'random'
+};
+
+
+export const entityNamedNotesSection = {
+    template: `
+        <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-named-notes-section>`,
+    id: 'entity-named-notes-widget',
+    name: 'Notes',
+    icon: 'sticky-note-o'
+};
+
+
+export const entityStatisticSection = {
     template: `
         <waltz-entity-statistic-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-entity-statistic-section>`,
@@ -117,11 +126,83 @@ export const indicatorsWidget = {
     icon: 'pie-chart'
 };
 
-export const surveysWidget = {
+
+export const flowDiagramsSection = {
+    template: `
+        <waltz-flow-diagrams-section parent-entity-ref="$ctrl.parentEntityRef"
+                                     can-create="true">
+        </waltz-flow-diagrams-section>`,
+    id: 'flow-diagrams-widget',
+    name: 'Flow Diagrams',
+    icon: 'picture-o'
+};
+
+
+export const involvedPeopleSection = {
+    template: `
+        <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-involved-people-section>`,
+    id: 'people-widget',
+    name: 'People',
+    icon: 'users'
+};
+
+
+export const logicalFlowTabgroupSection = {
+    template: `
+        <waltz-logical-flows-tabgroup-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-logical-flows-tabgroup-section>`,
+    id: 'logical-flows-section',
+    name: 'Logical Data Flows',
+    icon: 'random'
+};
+
+
+export const measurableRatingAppSection = {
+    template: `
+        <waltz-measurable-rating-app-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-measurable-rating-app-section>`,
+    id: 'ratings-section',
+    name: 'Ratings',
+    icon: 'puzzle-piece'
+};
+
+
+export const measurableRatingsBrowserSection = {
+    template: `
+        <waltz-measurable-ratings-browser-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-measurable-ratings-browser-section>`,
+    id: 'ratings-explorer-section',
+    name: 'Viewpoint Ratings',
+    icon: 'star-half-o'
+};
+
+
+export const surveySection = {
     template: `
         <waltz-survey-section parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-survey-section>`,
     id: 'survey-instance-list-section',
     name: 'Surveys',
     icon: 'wpforms'
+};
+
+
+export const technologySection = {
+    template: `
+        <waltz-technology-section parent-entity-ref="$ctrl.parentEntityRef" >
+        </waltz-technology-section>`,
+    id: 'technology-widget',
+    name: 'Technology',
+    icon: 'server'
+};
+
+
+export const technologySummarySection = {
+    template: `
+        <waltz-technology-summary-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-technology-summary-section>`,
+    id: 'technologies-section',
+    name: 'Technologies',
+    icon: 'server'
 };
