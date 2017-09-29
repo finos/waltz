@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import { initialiseData, scrollTo } from "../../../common";
-import { invokeFunction } from '../../index';
+import { invokeFunction } from "../../index";
 
 import template from "./dynamic-section-navigation.html";
 

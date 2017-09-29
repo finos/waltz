@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { registerComponents } from '../module-utils';
+import { registerComponents } from "../module-utils";
 
-import * as DynamicSectionNavigation from './dynamic-section-navigation/dynamic-section-navigation'
-import * as DynamicSectionWrapper from './dynamic-section-wrapper/dynamic-section-wrapper'
+import * as DynamicSectionNavigation from "./dynamic-section-navigation/dynamic-section-navigation";
+import * as DynamicSectionWrapper from "./dynamic-section-wrapper/dynamic-section-wrapper";
 
 
 export default (module) => {
