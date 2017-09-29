@@ -30,13 +30,10 @@ const initModel = {
         all: []
     },
     apps: [],
-    complexity: [],
     assetCostData: {},
     serverStats: null,
-    dataFlows: [],
     visibility: {
         techOverlay: false,
-        flowOverlay: false,
         costOverlay: false,
         applicationOverlay: false,
     }
@@ -78,9 +75,7 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
 
 
 function service($q,
-                 serviceBroker,
-                 complexityStore,
-                 logicalFlowViewService) {
+                 serviceBroker) {
 
     const state = { model: initModel };
 
@@ -94,7 +89,6 @@ function service($q,
             .loadViewData(CORE_API.PersonStore.getByEmployeeId, [ employeeId ])
             .then(r => state.model.person = r.data);
     }
-
 
     function loadRelatedPeople(employeeId) {
         const directsPromise = serviceBroker
@@ -180,20 +174,6 @@ function service($q,
     }
 
 
-    function loadComplexity(personId) {
-        return complexityStore
-            .findBySelector(personId, 'PERSON', 'CHILDREN')
-            .then(complexity => state.model.complexity = complexity);
-    }
-
-
-    function loadFlows(personId) {
-        return logicalFlowViewService
-            .initialise(personId, 'PERSON', 'CHILDREN')
-            .then(flows => state.model.dataFlows = flows);
-    }
-
-
     function loadTechStats(personId) {
         const selector = toSelector(personId);
 
@@ -213,9 +193,6 @@ function service($q,
     function loadSecondWave(employeeId) {
         const personId = state.model.person.id;
 
-        // load flows in parallel to avoid delays
-        loadFlows(personId);
-
         return $q
             .all([
                 loadRelatedPeople(employeeId),
@@ -225,13 +202,9 @@ function service($q,
     }
 
 
-    function loadThirdWave(employeeId) {
+    function loadThirdWave() {
         const personId = state.model.person.id;
-        return $q
-            .all([
-                loadTechStats(personId),
-                loadComplexity(personId),
-            ]);
+        return loadTechStats(personId);
     }
 
 
@@ -240,33 +213,19 @@ function service($q,
 
         return loadFirstWave(employeeId)
             .then(() => loadSecondWave(employeeId))
-            .then(() => loadThirdWave(employeeId));
+            .then(() => loadThirdWave());
     }
-
-
-    // -- INTERACTION ---
-
-
-    function loadFlowDetail() {
-        return logicalFlowViewService
-            .loadDetail()
-            .then(flowData => state.model.dataFlows = flowData);
-    }
-
 
     return {
         load,
-        state,
-        loadFlowDetail
+        state
     };
 }
 
 
 service.$inject = [
     '$q',
-    'ServiceBroker',
-    'ComplexityStore',
-    'LogicalFlowViewService'
+    'ServiceBroker'
 ];
 
 export default service;

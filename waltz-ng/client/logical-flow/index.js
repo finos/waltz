@@ -34,7 +34,6 @@ export default () => {
     registerStore(module, logicalFlowStore);
 
     module
-        .service('LogicalFlowViewService', require('./services/logical-flow-view-service'))
         .service('LogicalFlowUtilityService', require('./services/logical-flow-utility'));
 
     return module.name;

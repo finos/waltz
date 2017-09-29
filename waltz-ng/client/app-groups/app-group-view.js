@@ -27,8 +27,6 @@ const initialState = {
     assetCostData: null,
     capabilities: [],
     changeInitiatives: [],
-    complexity: [],
-    dataFlows : null,
     flowOptions: null,
     groupDetail: null,
     initiallySelectedIds: [],
@@ -41,7 +39,6 @@ const initialState = {
         capabilityRatingOverlay: false,
         changeInitiativeOverlay: false,
         costOverlay: false,
-        flowOverlay: false,
         techOverlay: false
     }
 };
@@ -51,9 +48,7 @@ function controller($q,
                     $stateParams,
                     serviceBroker,
                     appGroupStore,
-                    complexityStore,
                     historyStore,
-                    logicalFlowViewService,
                     sourceDataRatingStore,
                     userService) {
 
@@ -74,10 +69,6 @@ function controller($q,
 
     // -- LOAD ---
 
-    logicalFlowViewService
-        .initialise(id, 'APP_GROUP', 'EXACT')
-        .then(flows => vm.dataFlows = flows);
-
     appGroupStore.getById(id)
         .then(groupDetail => vm.groupDetail = groupDetail)
         .then(groupDetail => {
@@ -88,17 +79,14 @@ function controller($q,
         .then(groupDetail => _.map(groupDetail.applications, 'id'))
         .then(appIds => $q.all([
             serviceBroker.loadViewData(CORE_API.ApplicationStore.findBySelector, [ idSelector ]),
-            complexityStore.findBySelector(id, 'APP_GROUP', 'EXACT'),
             serviceBroker.loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [ idSelector ])
         ]))
         .then(([
             appsResponse,
-            complexity,
             techStatsResponse
         ]) => {
             vm.applications = _.map(appsResponse.data, a => _.assign(a, {management: 'IT'}));
-            vm.complexity = complexity;
-            vm.techStats = techStatsResponse.data
+            vm.techStats = techStatsResponse.data;
         })
         .then(result => Object.assign(vm, result))
         .then(() => sourceDataRatingStore.findAll())
@@ -117,12 +105,6 @@ function controller($q,
         return _.some(vm.groupDetail.members, isUserAnOwner );
     };
 
-
-    vm.loadFlowDetail = () => logicalFlowViewService
-        .loadDetail()
-        .then(flowData => vm.dataFlows = flowData);
-
-
     // -- HELPER ---
 
     const isUserAnOwner = member =>
@@ -136,9 +118,7 @@ controller.$inject = [
     '$stateParams',
     'ServiceBroker',
     'AppGroupStore',
-    'ComplexityStore',
     'HistoryStore',
-    'LogicalFlowViewService',
     'SourceDataRatingStore',
     'UserService'
 ];

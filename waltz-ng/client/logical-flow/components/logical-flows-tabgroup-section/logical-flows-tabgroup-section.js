@@ -17,21 +17,17 @@
  */
 
 import _ from 'lodash';
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {determineStatMethod} from "../../logical-flow-utils";
 
 
 const bindings = {
-    flowData: '<',
-    applications: '<',
-    onLoadDetail: '<',
-    selector: '<'
+    parentEntityRef: '<'
 };
 
 
 const initialState = {
     export: () => console.log('lfts: default do-nothing export function'),
-    flowData: null,
-    applications: [],
-    onLoadDetail: () => console.log('onLoadDetail not provided to logical flows tabgroup section'),
     visibility: {
         exportButton: false,
         sourcesOverlay: false
@@ -39,29 +35,45 @@ const initialState = {
 };
 
 
-function calcHasFlows(flowData) {
-    const counts = _.get(flowData, 'stats.flowCounts') || {}
+function calcHasFlows(stats) {
+    const counts = _.get(stats, 'flowCounts', {});
     const total = _.sum(_.values(counts));
     return total > 0;
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = _.defaultsDeep(this, initialState);
 
-    vm.tabChanged = (name, index) => {
-        vm.visibility.flowConfigButton = index > 0;
-        vm.visibility.exportButton = index == 2;
-        if(index === 0) vm.visibility.flowConfigOverlay = false;
+    const load = (selector) => {
+        vm.loadingStats = true;
+
+        serviceBroker
+            .loadViewData(
+                determineStatMethod(vm.parentEntityRef.kind),
+                [ selector ])
+            .then(r => {
+                vm.loadingStats = false;
+                vm.stats = r.data;
+                vm.hasFlows = calcHasFlows(vm.stats);
+            });
     };
 
-    vm.$onChanges = c => {
-        vm.hasFlows = calcHasFlows(vm.flowData);
-    }
+    vm.$onInit = () => {
+    };
+
+    vm.$onChanges = (c) => {
+        if (vm.parentEntityRef) {
+            vm.selector = mkSelectionOptions(vm.parentEntityRef);
+            load(vm.selector);
+        }
+    };
+
 }
 
 
 controller.$inject = [
+    "ServiceBroker"
 ];
 
 

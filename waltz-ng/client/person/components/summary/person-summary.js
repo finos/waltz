@@ -21,6 +21,7 @@ import {calcComplexitySummary} from "../../../complexity/services/complexity-uti
 import template from './person-summary.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -30,9 +31,7 @@ const bindings = {
     directs: '<',
     managers: '<',
     applications: '<',
-    complexity: '<',
-    serverStats: '<',
-    flows: '<'
+    serverStats: '<'
 };
 
 
@@ -63,17 +62,27 @@ function controller(serviceBroker) {
                     r.data,
                     { kind: 'ORG_UNIT' }));
         }
-        if (vm.parentEntityRef) {
 
-            const selector = {
-                entityReference: vm.parentEntityRef,
-                scope: vm.scope
-            };
+        if (vm.parentEntityRef) {
+            const selector = mkSelectionOptions(vm.parentEntityRef);
+
+            serviceBroker
+                .loadViewData(
+                    CORE_API.ComplexityStore.findBySelector,
+                    [ selector ])
+                .then(r => vm.complexity = r.data);
+
             serviceBroker
                 .loadViewData(
                     CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                    [selector])
+                    [ selector ])
                 .then(r => vm.totalCost = r.data);
+
+            serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.calculateStats,
+                    [ selector ])
+                .then(r => vm.flowStats = r.data);
 
         }
         vm.complexitySummary = calcComplexitySummary(vm.complexity);

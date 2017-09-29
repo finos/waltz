@@ -27,7 +27,8 @@ const bindings = {
     extract: '@',
     method: '@',
     filename: '@',
-    requestBody: '<'
+    requestBody: '<',
+    styling: '@?'
 };
 
 
@@ -35,8 +36,19 @@ const initialState = {
     name: 'Export',
     filename: 'extract.csv',
     method: 'GET',
-    requestBody: null
+    requestBody: null,
+    styling: 'button'
 };
+
+
+function calcClasses(styling = 'button') {
+    switch(styling) {
+        case "link":
+            return ["clickable"];
+        default:
+            return ["btn", "btn-xs", "btn-primary"];
+    }
+}
 
 
 function controller($http, BaseExtractUrl) {
@@ -44,15 +56,18 @@ function controller($http, BaseExtractUrl) {
 
     vm.$onChanges = () => {
         vm.url = `${BaseExtractUrl}/${vm.extract}`;
+        vm.classes = calcClasses(vm.styling);
     };
 
     vm.export = () => {
         switch (vm.method) {
             case 'GET':
-                return $http.get(vm.url)
+                return $http
+                    .get(vm.url)
                     .then(r => downloadFile(r.data, vm.filename));
             case 'POST':
-                return $http.post(vm.url, vm.requestBody)
+                return $http
+                    .post(vm.url, vm.requestBody)
                     .then(r => downloadFile(r.data, vm.filename));
             default:
                 throw 'Unrecognised method: ' + vm.method;

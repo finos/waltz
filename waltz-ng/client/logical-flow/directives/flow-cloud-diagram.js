@@ -21,7 +21,7 @@ import {max, min} from 'd3-array';
 
 
 const BINDINGS = {
-    stats: '='
+    stats: '<'
 };
 
 

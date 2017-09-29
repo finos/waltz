@@ -41,10 +41,7 @@ function logHistory(measurable, historyStore) {
 function controller($q,
                     $stateParams,
                     serviceBroker,
-                    complexityStore,
-                    historyStore,
-                    involvedSectionService,
-                    logicalFlowViewService) {
+                    historyStore) {
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
@@ -63,7 +60,6 @@ function controller($q,
             serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
                 .then(result => {
                     const all = result.data;
-                    vm.allMeasurables = all;
                     const withParents = populateParents(all);
                     vm.measurable = _.find(withParents, { id });
                     vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.measurable.name});
@@ -77,50 +73,25 @@ function controller($q,
 
     const loadWave2 = () =>
         $q.all([
-            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll, [])
-                .then(result => {
-                    const cs = result.data;
-                    vm.measurableCategories = cs;
-                    vm.measurableCategory = _.find(cs, { id: vm.measurable.categoryId });
-                }),
             serviceBroker
-                .loadViewData(CORE_API.MeasurableRatingStore.statsForRelatedMeasurables, [id])
-                .then(r => vm.relatedStats = r.data),
+                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })),
             serviceBroker
                 .loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
                 .then(r => vm.applications = r.data),
             serviceBroker
                 .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [childrenSelector])
-                .then(r => vm.techStats = r.data),
-            logicalFlowViewService
-                .initialise(childrenSelector)
-                .then(flowView => vm.logicalFlowView = flowView),
+                .then(r => vm.techStats = r.data)
         ]);
 
-    const loadWave3 = () =>
-        $q.all([
-            complexityStore
-                .findBySelector(childrenSelector)
-                .then(complexity => vm.complexity = complexity),
-        ]);
 
-    const loadWave4 = () => logHistory(vm.measurable, historyStore);
+    const loadWave3 = () => logHistory(vm.measurable, historyStore);
 
     // -- BOOT ---
 
     loadWave1()
         .then(loadWave2)
-        .then(loadWave3)
-        .then(loadWave4);
-
-
-    // -- INTERACTION ---
-
-
-    vm.loadFlowDetail = () => logicalFlowViewService
-        .loadDetail()
-        .then(flowView => vm.logicalFlowView = flowView);
-
+        .then(loadWave3);
 }
 
 
@@ -128,10 +99,7 @@ controller.$inject = [
     '$q',
     '$stateParams',
     'ServiceBroker',
-    'ComplexityStore',
-    'HistoryStore',
-    'InvolvedSectionService',
-    'LogicalFlowViewService'
+    'HistoryStore'
 ];
 
 

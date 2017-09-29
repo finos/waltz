@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData, isEmpty} from "../../common";
-import {responsivefy} from "../../common/d3-utils";
+import {initialiseData, isEmpty} from "../../../common";
+import {responsivefy} from "../../../common/d3-utils";
 import _ from "lodash";
 import {scaleLinear, scaleBand} from "d3-scale";
 import {select} from "d3-selection";
@@ -190,11 +190,11 @@ controller.$inject = [
 ];
 
 
-const component = {
+export const component = {
     bindings,
     template,
     controller
 };
 
 
-export default component;
+export const id = "waltzComplexityBarChart";

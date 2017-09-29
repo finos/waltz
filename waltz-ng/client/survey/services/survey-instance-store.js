@@ -1,4 +1,5 @@
 import {checkIsEntityRef} from "../../common/checks";
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -124,4 +125,74 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'SurveyInstanceStore';
+
+
+export const SurveyInstanceStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'get survey instance for a given id'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'finds survey instances for a given entity reference'
+    },
+    findForUser: {
+        serviceName,
+        serviceFnName: 'findForUser',
+        description: 'finds survey instances for a given user id'
+    },
+    findForSurveyRun: {
+        serviceName,
+        serviceFnName: 'findForSurveyRun',
+        description: 'finds survey instances for a given survey run id'
+    },
+    findRecipients: {
+        serviceName,
+        serviceFnName: 'findRecipients',
+        description: 'finds recipients for a given survey instance id'
+    },
+    findResponses: {
+        serviceName,
+        serviceFnName: 'findResponses',
+        description: 'finds responses for a given survey instance id'
+    },
+    saveResponse: {
+        serviceName,
+        serviceFnName: 'saveResponse',
+        description: 'save response for a given survey instance question'
+    },
+    updateStatus: {
+        serviceName,
+        serviceFnName: 'updateStatus',
+        description: 'update status for a given survey instance id'
+    },
+    updateDueDate: {
+        serviceName,
+        serviceFnName: 'updateDueDate',
+        description: 'update due date for a given survey instance id'
+    },
+    updateRecipient: {
+        serviceName,
+        serviceFnName: 'updateRecipient',
+        description: 'update recipient for a given survey instance id'
+    },
+    addRecipient: {
+        serviceName,
+        serviceFnName: 'addRecipient',
+        description: 'add recipient to a given survey instance id'
+    },
+    deleteRecipient: {
+        serviceName,
+        serviceFnName: 'deleteRecipient',
+        description: 'delete recipient from a given survey instance id'
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};

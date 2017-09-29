@@ -20,7 +20,6 @@
                               scope="CHILDREN"
                               applications="ctrl.applications"
                               children="ctrl.children"
-                              complexity="ctrl.complexity"
                               measurable="ctrl.measurable"
                               parents="ctrl.parents"
                               server-stats="ctrl.techStats.serverStats">
@@ -28,13 +27,14 @@
 
     <br>
 
+
     <!-- ENTITY DIAGRAMS -->
     <waltz-entity-svg-diagrams-section parent-entity-ref="ctrl.entityReference">
     </waltz-entity-svg-diagrams-section>
 
+
     <!-- FLOW DIAGRAMS -->
-    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityReference"
-                                 can-create="false">
+    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityReference">
     </waltz-flow-diagrams-section>
 
 
@@ -50,11 +50,9 @@
                                               applications="ctrl.applications">
     </waltz-measurable-rating-explorer-section>
 
+
     <!-- RELATED -->
-    <waltz-related-measurables-section parent-entity-ref='ctrl.entityReference'
-                                       stats="ctrl.relatedStats"
-                                       measurables="ctrl.allMeasurables"
-                                       categories="ctrl.measurableCategories">
+    <waltz-related-measurables-section parent-entity-ref='ctrl.entityReference'>
     </waltz-related-measurables-section>
 
 
@@ -69,12 +67,8 @@
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section flow-data="ctrl.logicalFlowView"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.applications"
-                                          selector="ctrl.selector">
+    <waltz-logical-flows-tabgroup-section parent-entity-ref="ctrl.entityReference">
     </waltz-logical-flows-tabgroup-section>
-
 
 
     <!-- AUTH SOURCES -->
@@ -88,15 +82,12 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              apps="ctrl.applications"
-                              csv-name="{{ ctrl.measurable.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityReference">
     </waltz-complexity-section>
 
 
     <!-- APPS -->
-    <waltz-apps-section parent-entity-ref="ctrl.entityReference"
-                        scope="CHILDREN">
+    <waltz-apps-section parent-entity-ref="ctrl.entityReference">
     </waltz-apps-section>
 
 
@@ -107,8 +98,7 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section parent-entity-ref='ctrl.entityReference'
-                                      scope="CHILDREN">
+    <waltz-technology-summary-section parent-entity-ref="ctrl.entityReference">
     </waltz-technology-summary-section>
 
 

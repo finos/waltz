@@ -31,9 +31,7 @@ const bindings = {
     scope: '@?',
     orgUnitDescendants: '<',
     apps: '<',
-    complexity: '<',
     immediateHierarchy: '<',
-    flows: '<',
     serverStats: '<',
     orgUnit: '<',
     loadOrgUnitDescendants: '<'
@@ -79,6 +77,18 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
                 [ selector ])
             .then(r => vm.totalCost = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ComplexityStore.findBySelector,
+                [ selector ])
+            .then(r => vm.complexity = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.calculateStats,
+                [ selector ])
+            .then(r => vm.flowStats = r.data);
     };
 
     vm.$onChanges = () => {

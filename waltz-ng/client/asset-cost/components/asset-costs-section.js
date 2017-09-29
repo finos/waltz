@@ -21,16 +21,17 @@ import {assetCostKindNames} from '../../common/services/display-names';
 import {initialiseData} from '../../common';
 import {CORE_API} from '../../common/services/core-api-utils';
 import template from './asset-costs-section.html';
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: '<',
-    scope: '@?',
     csvName: '@?',
 };
 
 
 const initialState = {
     scope: 'CHILDREN',
+    csvName: 'asset-costs.csv',
     visibility: {
         summary: true,
         detail: false
@@ -49,8 +50,6 @@ function processSelection(d) {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    let selector = null;
-
     vm.onSummarySelect = (d) => vm.summarySelection = processSelection(d);
 
     vm.showSummary = () => {
@@ -65,27 +64,21 @@ function controller(serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findAppCostsByAppIdSelector,
-                [ selector ])
+                [ mkSelectionOptions(vm.parentEntityRef) ])
             .then(r => vm.allCosts = r.data);
-
     };
 
     vm.$onInit = () => {
-        selector = {
-            entityReference: vm.parentEntityRef,
-            scope: vm.scope
-        };
-
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findTopAppCostsByAppIdSelector,
-                [ selector ])
+                [ mkSelectionOptions(vm.parentEntityRef) ])
             .then(r => vm.topCosts = r.data);
 
         serviceBroker
             .loadAppData(
                 CORE_API.StaticPanelStore.findByGroup,
-                ['SECTION.ASSET_COSTS.ABOUT'])
+                [ 'SECTION.ASSET_COSTS.ABOUT' ])
             .then(rs => vm.staticPanels = rs.data);
     };
 }

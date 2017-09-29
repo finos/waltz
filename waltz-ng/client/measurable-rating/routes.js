@@ -16,24 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EditView from "./measurable-rating-edit";
-
-
 const baseState = {};
-
-
-const editState = {
-    url: 'measurable-rating/edit/{kind:string}/{id:int}',
-    views: {
-        'content@': EditView
-    }
-};
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.measurable-rating', baseState)
-        .state('main.measurable-rating.edit', editState);
+        .state('main.measurable-rating', baseState);
 }
 
 

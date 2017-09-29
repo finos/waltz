@@ -17,7 +17,7 @@
  */
 import * as _ from "lodash";
 import {CORE_API} from '../common/services/core-api-utils';
-import {groupRelationships, enrichRelationships} from "./change-initiative-utils";
+import {enrichRelationships, groupRelationships} from "./change-initiative-utils";
 import template from './change-initiative-view.html';
 
 
@@ -38,11 +38,8 @@ function controller($q,
                     applicationStore,
                     appGroupStore,
                     historyStore,
-                    involvedSectionService,
                     serviceBroker,
-                    sourceDataRatingStore,
-                    surveyInstanceStore,
-                    surveyRunStore) {
+                    sourceDataRatingStore) {
 
     const {id} = $stateParams;
     const vm = Object.assign(this, initialState);
@@ -105,16 +102,6 @@ function controller($q,
         .loadViewData(CORE_API.ChangeInitiativeStore.findRelatedForId, [id])
         .then(result => loadRelatedEntities(id, result.data))
         .then(related => vm.related = related);
-
-    surveyRunStore
-        .findByEntityReference(vm.entityRef)
-        .then(surveyRuns => vm.surveyRuns = surveyRuns);
-
-    // only get back completed instances
-    surveyInstanceStore
-        .findByEntityReference(vm.entityRef)
-        .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}));
-
 }
 
 
@@ -124,11 +111,8 @@ controller.$inject = [
     'ApplicationStore',
     'AppGroupStore',
     'HistoryStore',
-    'InvolvedSectionService',
     'ServiceBroker',
-    'SourceDataRatingStore',
-    'SurveyInstanceStore',
-    'SurveyRunStore'
+    'SourceDataRatingStore'
 ];
 
 

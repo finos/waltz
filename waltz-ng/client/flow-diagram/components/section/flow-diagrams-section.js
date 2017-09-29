@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {initialiseData} from "../../../common/index";
+
 /**
  * @name waltz-flow-diagrams-section
  *
@@ -26,14 +28,37 @@
 
 const bindings = {
     parentEntityRef: '<',
-    canCreate: '<'
 };
 
+const initialState = {
+    canCreate: false
+};
 
 const template = require('./flow-diagrams-section.html');
 
 
-function controller($q, serviceBroker) {
+function determineIfCreateAllowed(kind) {
+    switch (kind) {
+        case 'PHYSICAL_SPECIFICATION':
+        case 'PHYSICAL_FLOW':
+        case 'APPLICATION':
+        case 'ACTOR':
+            return true;
+        default:
+            return false;
+    }
+}
+
+
+function controller() {
+
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        if (vm.parentEntityRef) {
+            vm.canCreate = determineIfCreateAllowed(vm.parentEntityRef.kind);
+        }
+    };
 }
 
 

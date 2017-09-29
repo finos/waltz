@@ -1,0 +1,83 @@
+<div style="padding-top: 0.6em">
+    <strong>Data Type Categories</strong>
+
+    <p class="text-muted small">
+        The charts below show the number of flow decorations that have been
+        aligned to known data types.
+        <a ng-click="$ctrl.visibility.detail = !$ctrl.visibility.detail"
+           class="clickable">
+            <span ng-bind="$ctrl.visibility.detail ? 'Hide' : 'Show'">
+            </span>
+            breakdown by data type.
+        </a>
+    </p>
+
+    <div class="row" ng-if="!$ctrl.visibility.detail">
+        <div class="col-md-6" ng-repeat="summary in $ctrl.summaries">
+            <waltz-pie-table data="summary.summary"
+                             title="{{ summary.title }}"
+                             config="$ctrl.overviewConfig">
+            </waltz-pie-table>
+        </div>
+    </div>
+
+    <div ng-if="$ctrl.visibility.detail"
+         class="waltz-fade-if">
+        <table class="table table-condensed small table-striped">
+            <colgroup>
+                <col width="40%">
+                <col width="15%">
+                <col width="15%">
+                <col width="15%">
+                <col width="15%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Category</th>
+                <th style="text-align:right;">Intra</th>
+                <th style="text-align:right;">Inbound</th>
+                <th style="text-align:right;">Outbound</th>
+                <th style="text-align:right;">Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="row in $ctrl.enrichedDataTypeCounts | orderBy:'dataType.name'">
+                <td>
+                    <span ng-bind="row.dataType.name"></span>
+                </td>
+                <td align="right" style="padding-right: 1.5em">
+                    <span ng-bind="row.intra"></span>
+                </td>
+                <td align="right" style="padding-right: 1.5em">
+                    <span ng-bind="row.inbound"></span>
+                </td>
+                <td align="right" style="padding-right: 1.5em">
+                    <span ng-bind="row.outbound"></span>
+                </td>
+                <td align="right" style="padding-right: 1.5em">
+                    <span ng-bind="row.total"></span>
+                </td>
+            </tr>
+            </tbody>
+            <tbody ng-if="$ctrl.visibility.summaries">
+            <tr>
+                <td>
+                    Known / Unknown
+                </td>
+                <td align="right"
+                    ng-repeat="summary in $ctrl.summaries">
+                    <div uib-popover-template="'wlft-summary-popup.html'"
+                         popover-placement="bottom"
+                         popver-append-to-body="true"
+                         popover-trigger="mouseenter">
+                        <waltz-pie data="summary.summary"
+                                   config="$ctrl.summaryConfig">
+                        </waltz-pie>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

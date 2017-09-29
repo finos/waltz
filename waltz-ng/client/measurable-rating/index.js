@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import {registerComponent, registerStores} from '../common/module-utils';
+import { registerComponents, registerStores } from '../common/module-utils';
 
 import measurableRatingStore from './services/measurable-rating-store';
 
-import measurableRatingsBrowserSection from './components/browser-section/measurable-ratings-browser-section';
+import MeasurableRatingsBrowserSection from './components/browser-section/measurable-ratings-browser-section';
+import MeasurableRatingEditPanel from './components/edit-panel/measurable-rating-edit-panel';
+
 
 export default () => {
     const module = angular.module('waltz.measurable.rating', []);
@@ -43,7 +45,10 @@ export default () => {
         .component('waltzRelatedMeasurablesSection', require('./components/related-measurables-section/related-measurables-section'))
         ;
 
-    registerComponent(module, measurableRatingsBrowserSection);
+    registerComponents(module, [
+        MeasurableRatingsBrowserSection,
+        MeasurableRatingEditPanel
+    ]);
 
 
     return module.name;

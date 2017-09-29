@@ -20,6 +20,7 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import entityStatisticStore from "./services/entity-statistic-store";
+import entityStatisticSection from "./components/section/entity-statistic-section";
 import entityStatisticSummarySection from "./components/entity-statistic-summary-section";
 
 export default () => {
@@ -37,12 +38,12 @@ export default () => {
         .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
 
     module
-        .directive('waltzEntityStatisticSection', require('./directives/entity-statistic-section'))
         .directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'))
         .directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'))
         .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
 
     registerComponents(module, [
+        entityStatisticSection,
         entityStatisticSummarySection
     ]);
 

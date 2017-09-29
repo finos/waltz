@@ -16,18 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { registerComponents } from '../common/module-utils';
+
+import routes from './routes';
+import services from './services';
+
 import AppCostsSection from './components/app-costs-section/app-costs-section';
 import AppOverview from './components/overview/app-overview';
-import { registerComponents } from '../common/module-utils';
 
 export default () => {
 
     const module = angular.module('waltz.applications', []);
 
-    require('./services')(module);
+    services(module);
 
     module
-        .config(require('./routes'));
+        .config(routes);
 
     module
         .directive('waltzAppSelector', require('./directives/app-selector'))
@@ -42,10 +46,10 @@ export default () => {
         .component('waltzAppTable', require('./components/app-table'))
         .component('waltzRelatedAppsSection', require('./components/related-apps-section/related-apps-section'));
 
-    registerComponents(
-        module, [
+    registerComponents(module, [
             AppCostsSection,
-            AppOverview ]);
+            AppOverview
+    ]);
 
     return module.name;
 };
