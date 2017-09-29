@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "../../../../style/_animations";
 @import "../../../../style/_variables";
 @import "../../../../style/_util";
 
 
 .waltz-dynamic-section-navigation ul {
     list-style-type:none;
-    /*height:30px;*/
     text-align:center;
     width: 100%;
     display: table;
@@ -50,10 +50,10 @@
     padding-left: 36px;
     padding-right: 36px;
 
-    @include transition(opacity 0.2s);
+    @include transition(opacity $animation-speed);
 }
 
 .waltz-dynamic-section-navigation.wdsn-sticky.wdsn-sticky-visible {
     opacity: 1;
-    @include transition(opacity 0.2s);
+    @include transition(opacity $animation-speed);
 }
