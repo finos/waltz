@@ -39,7 +39,6 @@ const bindings = {
     entityReference: '<',
     ratings: '<',
     measurables: '<',
-    perspectiveDefinitions: '<',
     overrides: '<'
 };
 

@@ -16,16 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common/index";
-import {mkLinkGridCell} from "../../common/link-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
 import _ from "lodash";
 
 const initialState = {
-    surveyInstancesAndRuns: []
+    surveys: []
 };
 
 const bindings = {
-    surveyInstances: '<',
-    surveyRuns: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -44,26 +43,45 @@ function mkTableData(surveyRuns = [], surveyInstances = []) {
 }
 
 
-function controller() {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        if (vm.surveyInstances && vm.surveyRuns) {
-            vm.surveys = mkTableData(vm.surveyRuns, vm.surveyInstances);
+        if (vm.parentEntityRef) {
+            const runsPromise = serviceBroker
+                .loadViewData(CORE_API.SurveyRunStore.findByEntityReference, [vm.parentEntityRef])
+                .then(r => r.data);
+
+            const instancesPromise = serviceBroker
+                .loadViewData(CORE_API.SurveyInstanceStore.findByEntityReference, [vm.parentEntityRef])
+                .then(r => r.data);
+
+            $q.all([runsPromise, instancesPromise])
+                .then(([runs, instances]) =>
+                    vm.surveys = mkTableData(runs, _.filter(instances, {'status': 'COMPLETED'})));
         }
     };
 
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q',
+    'ServiceBroker'
+];
 
 
-export default {
+const component = {
     bindings,
     template,
     controller
 };
+
+export default {
+    component,
+    id: 'waltzSurveySection'
+};
+
 
 

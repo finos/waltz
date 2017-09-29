@@ -17,11 +17,9 @@
     <waltz-app-group-summary parent-entity-ref="ctrl.entityRef"
                              applications="ctrl.applications"
                              total-cost="ctrl.assetCostData.total"
-                             complexity="ctrl.complexity"
                              server-stats="ctrl.techStats.serverStats"
                              app-group="ctrl.groupDetail.appGroup"
                              members="ctrl.groupDetail.members"
-                             flows="ctrl.dataFlows.stats"
                              editable="ctrl.isGroupEditable()">
     </waltz-app-group-summary>
 
@@ -33,17 +31,13 @@
 
     <!-- RATINGS -->
     <waltz-measurable-ratings-browser-section id="ratings-explorer-section"
-                                              parent-entity-ref="ctrl.entityRef"
-                                              scope="EXACT">
+                                              parent-entity-ref="ctrl.entityRef">
     </waltz-measurable-ratings-browser-section>
 
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section flow-data="ctrl.dataFlows"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.applications"
-                                          selector="ctrl.selector">
+    <waltz-logical-flows-tabgroup-section parent-entity-ref="ctrl.entityRef">
     </waltz-logical-flows-tabgroup-section>
 
 
@@ -53,8 +47,7 @@
 
 
     <!-- APPS -->
-    <waltz-apps-section parent-entity-ref='ctrl.entityRef'
-                        scope="EXACT">
+    <waltz-apps-section parent-entity-ref='ctrl.entityRef'>
     </waltz-apps-section>
 
 
@@ -64,21 +57,17 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              apps="ctrl.applications"
-                              csv-name="{{ ctrl.groupDetail.appGroup.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
-                                      scope="EXACT">
+    <waltz-technology-summary-section parent-entity-ref="ctrl.entityRef">
     </waltz-technology-summary-section>
 
 
     <!-- COSTS -->
     <waltz-asset-costs-section parent-entity-ref='ctrl.entityRef'
-                               scope="EXACT"
                                csv-name="{{ ctrl.groupDetail.appGroup.name }}_costs.csv">
     </waltz-asset-costs-section>
 

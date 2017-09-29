@@ -16,35 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
+export const DEFAULT_DATA_TYPE = 'settings.data-type.default-code';
+export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
 
-function controller($state,
-                    $stateParams,
-                    resolvedAppsByAssetCode) {
-
-    const vm = this;
-
-    vm.resolvedAppsByAssetCode = resolvedAppsByAssetCode || [];
-    vm.assetCode = $stateParams.assetCode;
-
-    const goToApp = app => $state.go('main.app.view', { id: app.id }, { location: false });
-
-    // if single app for asset code, navigate to the app now
-    if (vm.resolvedAppsByAssetCode.length == 1) {
-        goToApp(resolvedAppsByAssetCode[0]);
-    }
-}
-
-
-controller.$inject = [
-    '$state',
-    '$stateParams',
-    'resolvedAppsByAssetCode'
-];
-
-
-export default  {
-    template: require('./app-asset-code-view.html'),
-    controller,
-    controllerAs: 'ctrl'
-};
-
+export const UNKNOWN_DATA_TYPE = 'settings.data-type.unknown-id';

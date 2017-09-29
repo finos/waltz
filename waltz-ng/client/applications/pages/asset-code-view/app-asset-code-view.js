@@ -16,24 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, BaseApiUrl) {
+import template from './app-asset-code-view.html';
 
-    const BASE = `${BaseApiUrl}/app-view`;
 
-    const getById = (id) => $http
-        .get(`${BASE}/${id}`)
-        .then(result => result.data);
+function controller($state,
+                    $stateParams,
+                    resolvedAppsByAssetCode) {
 
-    return {
-        getById
-    };
+    const vm = this;
 
+    vm.resolvedAppsByAssetCode = resolvedAppsByAssetCode || [];
+    vm.assetCode = $stateParams.assetCode;
+
+    const goToApp = app => $state.go('main.app.view', { id: app.id }, { location: false });
+
+    // if single app for asset code, navigate to the app now
+    if (vm.resolvedAppsByAssetCode.length == 1) {
+        goToApp(resolvedAppsByAssetCode[0]);
+    }
 }
 
-store.$inject = [
-    '$http',
-    'BaseApiUrl',
+
+controller.$inject = [
+    '$state',
+    '$stateParams',
+    'resolvedAppsByAssetCode'
 ];
 
 
-export default store;
+export default  {
+    template,
+    controller,
+    controllerAs: 'ctrl'
+};
+

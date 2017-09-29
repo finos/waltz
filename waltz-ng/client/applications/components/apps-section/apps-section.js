@@ -18,12 +18,12 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {mkSelectionOptions} from '../../../common/selector-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@'
+    parentEntityRef: '<'
 };
 
 
@@ -56,10 +56,7 @@ function controller(serviceBroker) {
     };
 
     vm.$onInit = () => {
-        const selectorOptions = {
-            entityReference: vm.parentEntityRef,
-            scope: vm.scope
-        };
+        const selectorOptions = mkSelectionOptions(vm.parentEntityRef);
 
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])

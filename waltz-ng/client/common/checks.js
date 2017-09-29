@@ -45,6 +45,13 @@ const measurableRatingShape = {
 };
 
 
+const logicalFlowShape = {
+    source: myApiCheck.shape(entityRefShape),
+    target: myApiCheck.shape(entityRefShape),
+    id: apiCheck.number
+};
+
+
 const measurableShape = {
     id: apiCheck.number,
     categoryId: apiCheck.number,
@@ -171,6 +178,10 @@ export function checkNotEmpty(x, msg = 'is empty') {
 
 export const checkIsEntityRef = ref =>
     check(myApiCheck.shape(entityRefShape), ref);
+
+
+export const checkIsLogicalFlow = flow =>
+    check(myApiCheck.shape(logicalFlowShape), flow);
 
 
 export const checkIsPerspectiveDefinition = ref =>

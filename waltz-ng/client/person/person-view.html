@@ -7,7 +7,7 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.person">People</a></li>
-            <li>{{ ctrl.person.displayName }}</li>
+            <li><span ng-bind="ctrl.person.displayName"></span></li>
         </ol>
     </waltz-page-header>
 
@@ -17,11 +17,9 @@
                           scope="CHILDREN"
                           person="ctrl.person"
                           managers="ctrl.managers"
-                          complexity="ctrl.complexity"
                           server-stats="ctrl.techStats.serverStats"
                           directs="ctrl.directs"
-                          applications="ctrl.apps"
-                          flows="ctrl.dataFlows.stats">
+                          applications="ctrl.apps">
     </waltz-person-summary>
 
     <br>
@@ -107,19 +105,13 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.complexity"
-                              ng-if="ctrl.hasInvolvements"
-                              apps="ctrl.apps"
-                              csv-name="{{ ctrl.person.displayName }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 
     <!-- FLOWS -->
     <waltz-logical-flows-tabgroup-section ng-if="ctrl.hasInvolvements"
-                                          flow-data="ctrl.dataFlows"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.apps"
-                                          selector="ctrl.selector">
+                                          parent-entity-ref="ctrl.entityRef">
     </waltz-logical-flows-tabgroup-section>
 
 
@@ -144,8 +136,7 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
-                                      scope="CHILDREN"
+    <waltz-technology-summary-section parent-entity-ref="ctrl.entityRef"
                                       ng-if="ctrl.hasInvolvements">
     </waltz-technology-summary-section>
 

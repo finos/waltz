@@ -64,20 +64,6 @@ function loadApps(serviceBroker, selector, holder) {
 }
 
 
-function initialiseDataFlows(service, id, holder) {
-    return service
-        .initialise(id, "ORG_UNIT", "CHILDREN")
-        .then(dataFlows => holder.dataFlows = dataFlows);
-}
-
-
-function loadComplexity(store, id, holder) {
-    return store
-        .findBySelector(id, 'ORG_UNIT', 'CHILDREN')
-        .then(r => holder.complexity = r);
-}
-
-
 function loadTechStats(serviceBroker, id, holder) {
     const selector = mkSelector(id);
 
@@ -89,8 +75,6 @@ function loadTechStats(serviceBroker, id, holder) {
 
 function service($q,
                  serviceBroker,
-                 complexityStore,
-                 logicalFlowViewService,
                  orgUnitStore) {
 
     const rawData = {};
@@ -104,11 +88,11 @@ function service($q,
         reset(rawData);
         return loadFirstWave(orgUnitId)
             .then(() => loadSecondWave(orgUnitId))
-            .then(() => rawData.combinedApps = _.concat(rawData.apps, rawData.endUserApps))
-            .then(() => loadThirdWave(orgUnitId))
-            .then(() => rawData);
+            .then(() => {
+                rawData.combinedApps = _.concat(rawData.apps, rawData.endUserApps)
+                return rawData;
+            });
     }
-
 
     function loadFirstWave(orgUnitId) {
         const selector = mkSelector(orgUnitId);
@@ -123,26 +107,10 @@ function service($q,
         ]);
     }
 
-
     function loadSecondWave(orgUnitId) {
-        return $q.all([
-            initialiseDataFlows(logicalFlowViewService, orgUnitId, rawData),
-            loadComplexity(complexityStore, orgUnitId, rawData)
-        ]);
-    }
-
-
-    function loadThirdWave(orgUnitId) {
         return $q.all([
             loadTechStats(serviceBroker, orgUnitId, rawData)
         ]);
-    }
-
-
-    function loadFlowDetail() {
-        return logicalFlowViewService
-            .loadDetail()
-            .then(dataFlows => rawData.dataFlows = dataFlows);
     }
 
     function loadOrgUnitDescendants(orgUnitId) {
@@ -154,7 +122,6 @@ function service($q,
     return {
         data: rawData,
         loadAll,
-        loadFlowDetail,
         loadOrgUnitDescendants
     };
 
@@ -164,8 +131,6 @@ function service($q,
 service.$inject = [
     '$q',
     'ServiceBroker',
-    'ComplexityStore',
-    'LogicalFlowViewService',
     'OrgUnitStore'
 ];
 

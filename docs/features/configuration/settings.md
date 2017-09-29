@@ -53,10 +53,12 @@ Features can be enabled/disabled and configured via settings.  Currently availab
 
 General default settings
 
-* ```server.data-type.default-code```
+* ```settings.data-type.default-code```
     * (```UNKNOWN```) UNKNOWN is the code for the default data type
-* ```server.data-type.unknown-id```
+* ```settings.data-type.unknown-id```
     * (```<id>```) The id of the unknown data type (optional) 
+* ```settings.measurable.default-category```
+    * (```<id>```) The id of the default category to show when looking a 'Other Viewpoints'  (optional)
 * ```server.gzip.enabled```
     * (```true|false```) enable or disable gzipping of content
 * ```server.gzip.minimum-size```

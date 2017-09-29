@@ -17,19 +17,18 @@
  */
 
 import _ from 'lodash';
+import {initialiseData} from "../../common/index";
 
 
 const initialState = {
     parentEntityRef: {
-        id: 1,
-        kind: 'CHANGE_INITIATIVE'
+        id: 645,
+        kind: 'MEASURABLE'
     }
 };
 
 function controller($stateParams) {
-    const vm = Object.assign(this, initialState);
-
-
+    const vm = initialiseData(this, initialState);
 }
 
 

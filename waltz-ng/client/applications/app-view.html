@@ -23,13 +23,7 @@
 
 
     <!-- RATINGS -->
-    <waltz-measurable-rating-app-section parent-entity-ref="ctrl.entityRef"
-                                         application='ctrl.app'
-                                         measurables="ctrl.measurables"
-                                         categories="ctrl.measurableCategories"
-                                         ratings="ctrl.ratings"
-                                         perspective-definitions="ctrl.perspectiveDefinitions"
-                                         perspective-ratings="ctrl.perspectiveRatings">
+    <waltz-measurable-rating-app-section parent-entity-ref="ctrl.entityRef">
     </waltz-measurable-rating-app-section>
 
 
@@ -50,8 +44,7 @@
 
 
     <!-- FLOW DIAGRAMS -->
-    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityRef"
-                                 can-create="true">
+    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityRef">
     </waltz-flow-diagrams-section>
 
 
@@ -71,14 +64,12 @@
 
 
     <!-- INDICATORS -->
-    <waltz-entity-statistic-section name="Indicators"
-                                    entity-statistics="ctrl.entityStatistics">
+    <waltz-entity-statistic-section parent-entity-ref="ctrl.entityRef">
     </waltz-entity-statistic-section>
 
 
     <!-- surveys -->
-    <waltz-survey-section survey-runs="ctrl.surveyRuns"
-                          survey-instances="ctrl.surveyInstances">
+    <waltz-survey-section parent-entity-ref="ctrl.entityRef">
     </waltz-survey-section>
 
 

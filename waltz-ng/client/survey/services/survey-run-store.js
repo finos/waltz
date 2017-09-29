@@ -1,4 +1,5 @@
 import {checkIsEntityRef} from "../../common/checks";
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -108,4 +109,69 @@ store.$inject = [
 ];
 
 
-export default store;
+const serviceName = 'SurveyRunStore';
+
+
+export const SurveyRunStore_API = {
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'create survey run'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'get survey run for a given id'
+    },
+    findByTemplateId: {
+        serviceName,
+        serviceFnName: 'findByTemplateId',
+        description: 'find survey runs for a given template id'
+    },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'find survey runs for a given entity'
+    },
+    findForUser: {
+        serviceName,
+        serviceFnName: 'findForUser',
+        description: 'find survey runs for a given user'
+    },
+    update: {
+        serviceName,
+        serviceFnName: 'update',
+        description: 'update a survey run'
+    },
+    updateStatus: {
+        serviceName,
+        serviceFnName: 'updateStatus',
+        description: `update a survey run's status`
+    },
+    updateDueDate: {
+        serviceName,
+        serviceFnName: 'updateDueDate',
+        description: `update a survey run's due date`
+    },
+    generateSurveyRunRecipients: {
+        serviceName,
+        serviceFnName: 'generateSurveyRunRecipients',
+        description: 'generate recipient for a given survey run id'
+    },
+    createSurveyRunInstancesAndRecipients: {
+        serviceName,
+        serviceFnName: 'createSurveyRunInstancesAndRecipients',
+        description: 'create a survey run, instances and recipients'
+    },
+    getCompletionRate: {
+        serviceName,
+        serviceFnName: 'getCompletionRate',
+        description: 'get completion rate for a given survey run id'
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};

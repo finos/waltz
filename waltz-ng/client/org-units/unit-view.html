@@ -19,10 +19,8 @@
                              org-unit="ctrl.viewData.orgUnit"
                              org-unit-descendants="ctrl.viewData.orgUnitDescendants"
                              apps="ctrl.viewData.apps"
-                             flows="ctrl.viewData.dataFlows.stats"
                              server-stats="ctrl.viewData.techStats.serverStats"
                              immediate-hierarchy="ctrl.viewData.immediateHierarchy"
-                             complexity="ctrl.viewData.complexity"
                              load-org-unit-descendants="ctrl.loadOrgUnitDescendants">
     </waltz-org-unit-overview>
 
@@ -34,17 +32,14 @@
 
     <!-- RATINGS -->
     <waltz-measurable-ratings-browser-section id="ratings-explorer-section"
-                                               parent-entity-ref="ctrl.entityRef"
-                                               scope="CHILDREN">
+                                               parent-entity-ref="ctrl.entityRef">
     </waltz-measurable-ratings-browser-section>
 
 
     <!-- FLOWS -->
-    <waltz-logical-flows-tabgroup-section flow-data="ctrl.viewData.dataFlows"
-                                          on-load-detail="ctrl.loadFlowDetail"
-                                          applications="ctrl.viewData.apps"
-                                          selector="ctrl.selector">
+    <waltz-logical-flows-tabgroup-section parent-entity-ref="ctrl.entityRef">
     </waltz-logical-flows-tabgroup-section>
+
 
 
     <waltz-auth-sources-section parent-entity-ref="ctrl.entityRef">
@@ -52,9 +47,7 @@
 
 
     <!-- COMPLEXITY -->
-    <waltz-complexity-section complexity="ctrl.viewData.complexity"
-                              apps="ctrl.viewData.apps"
-                              csv-name="{{ ctrl.viewData.orgUnit.name }}_application_complexity.csv">
+    <waltz-complexity-section parent-entity-ref="ctrl.entityRef">
     </waltz-complexity-section>
 
 
@@ -64,8 +57,7 @@
 
 
     <!-- APPS -->
-    <waltz-apps-section parent-entity-ref="ctrl.entityRef"
-                        scope="CHILDREN">
+    <waltz-apps-section parent-entity-ref="ctrl.entityRef">
     </waltz-apps-section>
 
 
@@ -76,8 +68,7 @@
 
 
     <!-- TECHNOLOGIES -->
-    <waltz-technology-summary-section parent-entity-ref='ctrl.entityRef'
-                                      scope="CHILDREN">
+    <waltz-technology-summary-section parent-entity-ref="ctrl.entityRef">
     </waltz-technology-summary-section>
 
 

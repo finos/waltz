@@ -17,21 +17,20 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../common";
+import {mkSelectionOptions} from '../../common/selector-utils';
 import {CORE_API} from '../../common/services/core-api-utils';
 
-import template from  './technology-summary-section.html';
+import template from './technology-summary-section.html';
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@?'
+    parentEntityRef: '<'
 };
 
 
 const initialState = {
     stats: {},
-    hasAnyData: false,
-    scope: 'CHILDREN'
+    hasAnyData: false
 };
 
 
@@ -39,10 +38,7 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const selector = {
-            entityReference: vm.parentEntityRef,
-            scope: vm.scope
-        };
+        const selector = mkSelectionOptions(vm.parentEntityRef);
 
         serviceBroker
             .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])

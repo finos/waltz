@@ -30,7 +30,6 @@ const bindings = {
     scope: '@?',
     applications: '<',
     children: '<',
-    complexity: '<',
     measurable: '<',
     parents: '<',
     serverStats: '<'
@@ -94,10 +93,15 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
                 [selector])
             .then(r => vm.totalCost = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ComplexityStore.findBySelector,
+                [ selector ])
+            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
     };
 
     vm.$onChanges = (c) => {
-        if (c.complexity) vm.complexitySummary = calcComplexitySummary(vm.complexity);
         if (c.serverStats) vm.enrichedServerStats = enrichServerStats(vm.serverStats);
         if (c.children || c.measurable) vm.childRefs = prepareChildRefs(vm.children, vm.measurable);
         if (c.parents || c.measurable) vm.parentRefs = prepareParentRefs(vm.parents, vm.measurable);

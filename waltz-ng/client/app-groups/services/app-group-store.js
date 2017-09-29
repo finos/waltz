@@ -96,6 +96,11 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const search = (query) => $http
+        .get(`${BASE}/search/${query}`)
+        .then(x => x.data);
+
+
     return {
         findMyGroupSubscriptions,
 
@@ -116,7 +121,9 @@ export function store($http, BaseApiUrl) {
         removeApplication,
 
         addChangeInitiative,
-        removeChangeInitiative
+        removeChangeInitiative,
+
+        search
     };
 
 }
@@ -205,5 +212,10 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'removeChangeInitiative',
         description: 'executes removeChangeInitiative'
+    },
+    search: {
+        serviceName,
+        serviceFnName: 'search',
+        description: 'find app groups for the given search terms'
     }
 };

@@ -30,8 +30,10 @@ import {
     lifecyclePhaseField,
     overallRatingField,
     businessCriticalityField
-} from "./formly/fields";
+} from "../../formly/fields";
 
+
+import template from './app-registration.html';
 
 // ----- CONTROLLER -----
 
@@ -132,7 +134,7 @@ controller.$inject = [
 ];
 
 export default {
-    template: require('./app-registration.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

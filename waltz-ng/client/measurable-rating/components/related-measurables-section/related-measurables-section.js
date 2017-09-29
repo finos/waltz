@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from './related-measurables-section.html';
 
@@ -10,13 +11,8 @@ import template from './related-measurables-section.html';
  * @description
  * This component ...
  */
-
-
 const bindings = {
-    parentEntityRef: '<',
-    stats: '<',
-    measurables: '<',
-    categories: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -26,7 +22,6 @@ const initialState = {};
 function calcRelatedMeasurables(ratingTallies = [], allMeasurables = []) {
     const relatedMeasurableIds = _.map(ratingTallies, 'id');
     const measurablesById = _.keyBy(allMeasurables, 'id');
-
     return _
         .chain(allMeasurables)
         .filter(m => _.includes(relatedMeasurableIds, m.id))
@@ -45,20 +40,49 @@ function calcRelatedMeasurables(ratingTallies = [], allMeasurables = []) {
 }
 
 
-function controller() {
-    const vm = this;
+function controller($q, serviceBroker) {
+    const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => initialiseData(vm, initialState);
+    vm.$onChanges = () => {
 
-    vm.$onChanges = (c) => {
-        vm.relatedMeasurables = calcRelatedMeasurables(vm.stats, vm.measurables);
+        if (! vm.parentEntityRef) {
+            return;
+        }
+
+        const categoriesPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => vm.categories = r.data);
+
+        const measurablesPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => vm.measurables = r.data);
+
+        const statsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingStore.statsForRelatedMeasurables,
+                [ vm.parentEntityRef.id ])
+            .then(r => vm.stats = r.data);
+
+        const promises = [
+            categoriesPromise,
+            measurablesPromise,
+            statsPromise
+        ];
+
+        $q.all(promises)
+          .then(() => vm.relatedMeasurables = calcRelatedMeasurables(vm.stats, vm.measurables));
+
     };
 
-    vm.onSelect = m => vm.selectedMeasurable = m;
+    vm.onSelect = (m) => vm.selectedMeasurable = m;
+
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q',
+    'ServiceBroker'
+];
 
 
 const component = {

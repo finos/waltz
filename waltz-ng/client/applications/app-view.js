@@ -15,21 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
+import { CORE_API } from "../common/services/core-api-utils";
+
 import template from "./app-view.html";
-import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
-    app: {},
-    surveyRuns: [],
-    visibility: {},
-    physicalFlowsProducesCount: 0,
-    physicalFlowsConsumesCount: 0,
-    physicalFlowsUnusedSpecificationsCount: 0,
-    physicalFlowProducesExportFn: () => {},
-    physicalFlowConsumesExportFn: () => {},
-    physicalFlowUnusedSpecificationsExportFn: () => {}
+    app: {}
 };
 
 
@@ -43,150 +35,24 @@ const addToHistory = (historyStore, app) => {
 };
 
 
-function loadFlowDiagrams(appId, $q, flowDiagramStore, flowDiagramEntityStore) {
-    const ref = {
-        id: appId,
-        kind: 'APPLICATION'
-    };
-
-    const selector = {
-        entityReference: ref,
-        scope: 'EXACT'
-    };
-
-    const promises = [
-        flowDiagramStore.findForSelector(selector),
-        flowDiagramEntityStore.findForSelector(selector)
-    ];
-    return $q
-        .all(promises)
-        .then(([flowDiagrams, flowDiagramEntities]) => ({ flowDiagrams, flowDiagramEntities }));
-}
-
-
-function controller($q,
-                    $state,
-                    $stateParams,
+function controller($stateParams,
                     serviceBroker,
-                    entityStatisticStore,
-                    flowDiagramStore,
-                    flowDiagramEntityStore,
-                    historyStore,
-                    measurableStore,
-                    measurableCategoryStore,
-                    measurableRatingStore,
-                    perspectiveRatingStore,
-                    surveyInstanceStore,
-                    surveyRunStore)
-{
+                    historyStore) {
 
     const id = $stateParams.id;
     const entityReference = { id, kind: 'APPLICATION' };
     const vm = Object.assign(this, initialState);
 
-    const goToAppFn = d => $state.go('main.app.view', { id: d.id });
-    vm.flowTweakers = {
-        source: {
-            onSelect: goToAppFn,
-        },
-        target: {
-            onSelect: goToAppFn,
-        }
-    };
     vm.entityRef = entityReference;
 
-    vm.onPhysicalFlowsInitialise = (e) => {
-        vm.physicalFlowProducesExportFn = e.exportProducesFn;
-        vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
-        vm.physicalFlowUnusedSpecificationsExportFn = e.exportUnusedSpecificationsFn;
-    };
-
-    vm.exportPhysicalFlowProduces = () => {
-        vm.physicalFlowProducesExportFn();
-    };
-
-    vm.exportPhysicalFlowConsumes = () => {
-        vm.physicalFlowConsumesExportFn();
-    };
-
-    vm.exportPhysicalFlowUnusedSpecifications = () => {
-        vm.physicalFlowUnusedSpecificationsExportFn();
-    };
 
     function loadAll() {
-        loadFirstWave()
-            .then(() => loadSecondWave())
-            .then(() => loadThirdWave())
-            .then(() => loadFourthWave())
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.getById, [id])
+            .then(r => vm.app = r.data)
             .then(() => postLoadActions());
     }
 
-
-    function loadFirstWave() {
-        return serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.getById, [id])
-            .then(r => vm.app = r.data);
-    }
-
-    vm.loadFlowDiagrams = () => {
-        loadFlowDiagrams(id, $q, flowDiagramStore, flowDiagramEntityStore)
-            .then(r => Object.assign(vm, r));
-    };
-
-
-    function loadSecondWave() {
-        const promises = [
-            measurableCategoryStore
-                .findAll()
-                .then(cs => vm.measurableCategories = cs),
-
-            measurableRatingStore
-                .findByAppSelector({ entityReference, scope: 'EXACT' })
-                .then(rs => vm.ratings = rs),
-
-            measurableStore
-                .findMeasurablesRelatedToPath(entityReference)
-                .then(ms => vm.measurables = ms),
-        ];
-
-        return $q.all(promises);
-    }
-
-
-    function loadThirdWave() {
-        const promises = [
-
-            entityStatisticStore
-                .findStatsForEntity(entityReference)
-                .then(stats => vm.entityStatistics = stats),
-
-            serviceBroker
-                .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
-                .then(r => vm.perspectiveDefinitions = r.data),
-
-            perspectiveRatingStore
-                .findForEntity(entityReference)
-                .then(prs => vm.perspectiveRatings = prs),
-
-        ];
-
-        return $q.all(promises);
-    }
-
-    function loadFourthWave() {
-        const promises = [
-            surveyRunStore
-                .findByEntityReference(vm.entityRef)
-                .then(surveyRuns => vm.surveyRuns = surveyRuns),
-
-            // only get back completed instances
-            surveyInstanceStore
-                .findByEntityReference(vm.entityRef)
-                .then(surveyInstances => vm.surveyInstances = _.filter(surveyInstances, {'status': 'COMPLETED'}))
-        ];
-
-        return $q.all(promises);
-    }
 
     function postLoadActions() {
         addToHistory(historyStore, vm.app);
@@ -195,26 +61,13 @@ function controller($q,
 
     // load everything in priority order
     loadAll();
-
-
 }
 
 
 controller.$inject = [
-    '$q',
-    '$state',
     '$stateParams',
     'ServiceBroker',
-    'EntityStatisticStore',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore',
-    'HistoryStore',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore',
-    'PerspectiveRatingStore',
-    'SurveyInstanceStore',
-    'SurveyRunStore'
+    'HistoryStore'
 ];
 
 

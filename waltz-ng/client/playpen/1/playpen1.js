@@ -15,15 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from 'lodash';
-import {CORE_API} from '../../common/services/core-api-utils';
 
 
 const flowDiagramsWidget = {
     template: `
         <waltz-flow-diagrams-section parent-entity-ref="$ctrl.parentEntityRef"
-                                     can-create="true"
-                                     create-diagram-commands="$ctrl.createDiagramCommands">
+                                     can-create="true">
         </waltz-flow-diagrams-section>`,
     id: 'flow-diagrams-widget',
     name: 'Flow Diagrams',
@@ -133,32 +132,6 @@ function controller()
     vm.addWidget = w => {
         vm.widgets =  _.reject(vm.widgets, x => x.id === w.id)
         vm.widgets.unshift(w);
-    };
-
-    vm.additionalScope = {
-        createDiagramCommands: () => {
-            const app = vm.parentEntityRef;
-            const title = `${app.name} flows`;
-            const annotation = {
-                id: +new Date()+'',
-                kind: 'ANNOTATION',
-                entityReference: app,
-                note: `${app.name} data flows`
-            };
-
-            const modelCommands = [
-                { command: 'ADD_NODE', payload: app },
-                { command: 'ADD_ANNOTATION', payload: annotation },
-                { command: 'SET_TITLE', payload: title }
-            ];
-
-            const moveCommands = [
-                { command: 'MOVE', payload: { id: `ANNOTATION/${annotation.id}`, dx: 100, dy: -50 }},
-                { command: 'MOVE', payload: { id: `APPLICATION/${app.id}`, dx: 300, dy: 200 }},
-            ];
-
-            return _.concat(modelCommands, moveCommands);
-        }
     };
 
 }
