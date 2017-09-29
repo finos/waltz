@@ -174,3 +174,14 @@ export function invokeFunction(fn) {
 }
 
 
+export function scrollTo($interval, $window, yOffset, amount = 50, direction = -1) {
+    const jump = amount * direction;
+    const timerPromise = $interval(() => {
+        $window.scrollBy(0, jump);
+        if ($window.pageYOffset <= yOffset)
+            $interval.cancel(timerPromise);
+    }, 10);
+    return timerPromise;
+}
+
+

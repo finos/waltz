@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,38 +15,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import angular from "angular";
-import { initialiseData, scrollTo } from "../../common";
+import _ from "lodash";
+import { initialiseData, scrollTo } from "../../../common";
+import { invokeFunction } from '../../index';
+
+import template from "./dynamic-section-navigation.html";
+
 
 const bindings = {
-    name: '@',
-    icon: '@',
-    small: '@',
-    tour: '<'
+    widgets: '<',
+    onSelect: '<'
 };
-
-
-const transclude = true;
 
 
 const initialState = {
-    stickyVisible: false
+    widgetStickyVisible: false,
+    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w)
 };
 
 
-function controller($document,
-                    $interval,
+function controller($interval,
                     $scope,
                     $window) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        $document[0].title = `Waltz: ${vm.name}`;
-    };
-
     const scrollListener = () => {
         $scope.$applyAsync(() => {
-            vm.stickyVisible = $window.pageYOffset > 60
+            vm.widgetStickyVisible = $window.pageYOffset > 250;
         });
     };
 
@@ -62,36 +57,32 @@ function controller($document,
             .off("scroll", scrollListener);
     };
 
-    vm.startTour = () => {
-        if (vm.tour) {
-            vm.tour.start();
-        }
-    };
 
-    vm.scrollToTop = () => {
-        scrollTo($interval, $window, 0);
+    // -- INTERACT --
+
+    vm.scrollAndSelectWidget = (widget) => {
+        scrollTo($interval, $window, 200);
+        invokeFunction(vm.onSelect, widget);
     };
 
 }
 
 
-controller.$inject=[
-    '$document',
+controller.$inject = [
     '$interval',
     '$scope',
     '$window'
 ];
 
 
-const template = require('./page-header.html');
-
-
 const component = {
-    bindings,
     template,
-    controller,
-    transclude
+    bindings,
+    controller
 };
 
-export default component;
 
+export default {
+    component,
+    id: 'waltzDynamicSectionNavigation'
+};
