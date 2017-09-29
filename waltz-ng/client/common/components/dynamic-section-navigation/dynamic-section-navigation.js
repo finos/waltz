@@ -24,24 +24,25 @@ import template from "./dynamic-section-navigation.html";
 
 const bindings = {
     widgets: '<',
-    onSelect: '<'
+    onSelect: '<',
+    offset: '@?'
 };
 
 
 const initialState = {
+    offset: 250,
     widgetStickyVisible: false,
-    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w)
+    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
 };
 
 
-function controller($interval,
-                    $scope,
+function controller($scope,
                     $window) {
     const vm = initialiseData(this, initialState);
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
-            vm.widgetStickyVisible = $window.pageYOffset > 250;
+            vm.widgetStickyVisible = $window.pageYOffset > vm.offset;
         });
     };
 
@@ -61,7 +62,7 @@ function controller($interval,
     // -- INTERACT --
 
     vm.scrollAndSelectWidget = (widget) => {
-        $window.scrollTo(0, 0);
+        $window.scrollTo(0, vm.offset);
         invokeFunction(vm.onSelect, widget);
     };
 
@@ -69,7 +70,6 @@ function controller($interval,
 
 
 controller.$inject = [
-    '$interval',
     '$scope',
     '$window'
 ];

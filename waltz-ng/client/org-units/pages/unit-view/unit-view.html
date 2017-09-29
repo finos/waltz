@@ -1,0 +1,63 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2017  Khartec Ltd.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.viewData.orgUnit.name }}"
+                       icon="sitemap"
+                       tour="ctrl.tour"
+                       small="Organisational Unit">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.org-unit.list">Organisational Units</a></li>
+            <li><span ng-bind="ctrl.viewData.orgUnit.name"></span></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <!-- OVERVIEW -->
+    <waltz-org-unit-overview parent-entity-ref="ctrl.parentEntityRef"
+                             org-unit="ctrl.viewData.orgUnit"
+                             org-unit-descendants="ctrl.viewData.orgUnitDescendants"
+                             apps="ctrl.viewData.apps"
+                             server-stats="ctrl.viewData.techStats.serverStats"
+                             immediate-hierarchy="ctrl.viewData.immediateHierarchy"
+                             load-org-unit-descendants="ctrl.loadOrgUnitDescendants">
+    </waltz-org-unit-overview>
+
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation widgets="ctrl.availableWidgets"
+                                          on-select="ctrl.addWidget"
+                                          offset="650">
+        </waltz-dynamic-section-navigation>
+    </div>
+
+    <br>
+
+    <!-- WIDGETS -->
+    <div ng-repeat="widget in ctrl.widgets track by widget.id"
+         class='waltz-animate-repeat'>
+        <waltz-dynamic-section-wrapper widget="widget"
+                                       parent-entity-ref="ctrl.parentEntityRef">
+        </waltz-dynamic-section-wrapper>
+    </div>
+
+</div>

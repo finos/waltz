@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,9 +18,9 @@
 
 import _ from "lodash";
 import angular from "angular";
-import {termSearch} from "../common";
-import {buildHierarchies} from '../common/hierarchy-utils';
-import {buildPropertySummer} from "../common/tally-utils";
+import {termSearch} from "../../../common";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
+import {buildPropertySummer} from "../../../common/tally-utils";
 
 
 const FIELDS_TO_SEARCH = ['name', 'description'];
