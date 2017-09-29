@@ -59,7 +59,6 @@ function controller($q,
             serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
                 .then(result => {
                     const all = result.data;
-                    vm.allMeasurables = all;
                     const withParents = populateParents(all);
                     vm.measurable = _.find(withParents, { id });
                     vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.measurable.name});
@@ -73,15 +72,9 @@ function controller($q,
 
     const loadWave2 = () =>
         $q.all([
-            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll, [])
-                .then(result => {
-                    const cs = result.data;
-                    vm.measurableCategories = cs;
-                    vm.measurableCategory = _.find(cs, { id: vm.measurable.categoryId });
-                }),
             serviceBroker
-                .loadViewData(CORE_API.MeasurableRatingStore.statsForRelatedMeasurables, [id])
-                .then(r => vm.relatedStats = r.data),
+                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })),
             serviceBroker
                 .loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
                 .then(r => vm.applications = r.data),
