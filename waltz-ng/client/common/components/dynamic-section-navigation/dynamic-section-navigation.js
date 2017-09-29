@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { initialiseData, scrollTo } from "../../../common";
+import { initialiseData } from "../../../common";
 import { invokeFunction } from "../../index";
 
 import template from "./dynamic-section-navigation.html";
@@ -61,7 +61,7 @@ function controller($interval,
     // -- INTERACT --
 
     vm.scrollAndSelectWidget = (widget) => {
-        scrollTo($interval, $window, 200);
+        $window.scrollTo(0, 0);
         invokeFunction(vm.onSelect, widget);
     };
 

@@ -16,7 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import { initialiseData, scrollTo } from "../../common";
+import { initialiseData } from "../../common";
+
+import template from "./page-header.html";
+
 
 const bindings = {
     name: '@',
@@ -35,7 +38,6 @@ const initialState = {
 
 
 function controller($document,
-                    $interval,
                     $scope,
                     $window) {
     const vm = initialiseData(this, initialState);
@@ -69,7 +71,7 @@ function controller($document,
     };
 
     vm.scrollToTop = () => {
-        scrollTo($interval, $window, 0);
+        $window.scrollTo(0, 0);
     };
 
 }
@@ -77,13 +79,9 @@ function controller($document,
 
 controller.$inject=[
     '$document',
-    '$interval',
     '$scope',
     '$window'
 ];
-
-
-const template = require('./page-header.html');
 
 
 const component = {
