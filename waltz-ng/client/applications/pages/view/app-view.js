@@ -20,18 +20,18 @@ import _ from  "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
 
 import {
-    bookmarkWidget,
-    changesWidget,
-    changeInitiativesWidget,
-    costsWidget,
-    entityNamedNoteWidget,
-    flowDiagramsWidget,
-    flowWidget,
-    indicatorsWidget,
-    measurableRatingsWidget,
-    peopleWidget,
-    surveysWidget,
-    technologyWidget
+    bookmarksSection,
+    changeLogSection,
+    changeInitiativesSection,
+    appCostsSection,
+    entityNamedNotesSection,
+    flowDiagramsSection,
+    dataFlowSection,
+    entityStatisticSection,
+    measurableRatingAppSection,
+    involvedPeopleSection,
+    surveySection,
+    technologySection
 } from "../../../section-definitions";
 
 import template from "./app-view.html";
@@ -40,18 +40,18 @@ import template from "./app-view.html";
 const initialState = {
     app: {},
     availableWidgets: [
-        entityNamedNoteWidget,
-        measurableRatingsWidget,
-        bookmarkWidget,
-        peopleWidget,
-        changeInitiativesWidget,
-        flowDiagramsWidget,
-        flowWidget,
-        technologyWidget,
-        costsWidget,
-        indicatorsWidget,
-        surveysWidget,
-        changesWidget
+        entityNamedNotesSection,
+        measurableRatingAppSection,
+        bookmarksSection,
+        involvedPeopleSection,
+        changeInitiativesSection,
+        flowDiagramsSection,
+        dataFlowSection,
+        technologySection,
+        appCostsSection,
+        entityStatisticSection,
+        surveySection,
+        changeLogSection
     ],
     parentEntityRef: {},
     widgets: []
