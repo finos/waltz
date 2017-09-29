@@ -22,8 +22,8 @@ import {initialiseData} from "../../common/index";
 
 const initialState = {
     parentEntityRef: {
-        id: 396,
-        kind: 'APPLICATION'
+        id: 645,
+        kind: 'MEASURABLE'
     }
 };
 
