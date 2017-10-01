@@ -268,11 +268,11 @@ controller.$inject = [
 ];
 
 
-const component = {
+export const component = {
     template,
     bindings,
     controller
 };
 
 
-export default component;
+export const id = "waltzSourceAndTargetPanel";
