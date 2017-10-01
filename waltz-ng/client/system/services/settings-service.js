@@ -21,8 +21,6 @@ import namedSettings from "../named-settings";
 import {CORE_API} from "../../common/services/core-api-utils";
 
 
-let settingsPromise = null;
-
 function service(serviceBroker) {
 
     const findAll = (force = false) => {
@@ -31,8 +29,7 @@ function service(serviceBroker) {
                 CORE_API.SettingsStore.findAll,
                 [],
                 { force })
-            .then(r => r.data)
-        return settingsPromise;
+            .then(r => r.data);
     };
 
 
