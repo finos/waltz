@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2017  Khartec Ltd.
+ * Copyright (C) 2016  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,50 +15,43 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+import template from './dynamic-sections-view.html';
 import {initialiseData} from "../../../common/index";
-
-import template from './dynamic-section-wrapper.html';
 
 
 const bindings = {
     parentEntityRef: '<',
-    widget: '<'
+    sections: '<'
 };
+
 
 const initialState = {
 };
 
 
-function controller($element, $compile, $scope) {
+function controller(dynamicSectionManager) {
+
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const widgetScope = $scope.$new();
-        widgetScope.parentEntityRef = vm.parentEntityRef;
+        vm.sections = dynamicSectionManager.findUserSectionsForKind(vm.parentEntityRef.kind);
+    }
 
-        const linkFn = $compile(vm.widget.template);
-        const content = linkFn(widgetScope);
-        $element.append(content);
-    };
 }
 
-
-controller.$inject=[
-    '$element',
-    '$compile',
-    '$scope'
-];
-
+controller.$inject = ['DynamicSectionManager'];
 
 const component = {
     controller,
-    template,
-    bindings
+    bindings,
+    template
 };
 
 
+const id = 'waltzDynamicSectionsView';
+
+
 export default {
-    component,
-    id: 'waltzDynamicSectionWrapper'
-}
+    id,
+    component
+};

@@ -22,8 +22,7 @@
 
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
-                       small="{{ ctrl.app.assetCode }}"
-                       widgets="ctrl.availableWidgets">
+                       small="{{ ctrl.app.assetCode }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Applications</li>
@@ -39,19 +38,15 @@
 
     <!-- NAVIGATION -->
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-dynamic-section-navigation widgets="ctrl.availableWidgets"
-                                          on-select="ctrl.addWidget">
+        <waltz-dynamic-section-navigation sections="ctrl.availableSections"
+                                          on-select="ctrl.addSection">
         </waltz-dynamic-section-navigation>
     </div>
 
     <br>
 
-    <!-- WIDGETS -->
-    <div ng-repeat="widget in ctrl.widgets track by widget.id"
-         class='waltz-animate-repeat'>
-        <waltz-dynamic-section-wrapper widget="widget"
-                                       parent-entity-ref="ctrl.parentEntityRef">
-        </waltz-dynamic-section-wrapper>
-    </div>
+    <waltz-dynamic-sections-view sections="ctrl.sections"
+                                 parent-entity-ref="ctrl.parentEntityRef">
+    </waltz-dynamic-sections-view>
 
 </div>

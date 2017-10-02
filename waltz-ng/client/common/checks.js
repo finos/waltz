@@ -129,6 +129,14 @@ const serviceBrokerOptionsShape = {
     cacheRefreshListener: myApiCheck.shape(serviceBrokerCacheRefreshListenerShape).optional
 };
 
+const dynamicSectionShape = {
+    id: apiCheck.number,
+    priority: apiCheck.number,
+    componentId: apiCheck.string,
+    icon: apiCheck.string,
+    applicableEntityKinds: myApiCheck.arrayOf(apiCheck.string)
+};
+
 // -- COMMANDS --
 
 const createActorCommandShape = {
@@ -243,6 +251,10 @@ export const checkIsAuthSourceCreateCommand = (target) => {
 
 export const checkIsServiceBrokerOptions = (options) => {
     check(myApiCheck.shape(serviceBrokerOptionsShape), options);
+};
+
+export const checkIsDynamicSection = (section) => {
+    check(myApiCheck.shape(dynamicSectionShape), section);
 };
 
 export const checkIsStringList = xs =>

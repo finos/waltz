@@ -16,45 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from  "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
-
-import {
-    bookmarksSection,
-    changeLogSection,
-    changeInitiativesSection,
-    appCostsSection,
-    entityNamedNotesSection,
-    flowDiagramsSection,
-    dataFlowSection,
-    entityStatisticSection,
-    measurableRatingAppSection,
-    involvedPeopleSection,
-    surveySection,
-    technologySection
-} from "../../../section-definitions";
 
 import template from "./app-view.html";
 
 
 const initialState = {
     app: {},
-    availableWidgets: [
-        entityNamedNotesSection,
-        measurableRatingAppSection,
-        bookmarksSection,
-        involvedPeopleSection,
-        changeInitiativesSection,
-        flowDiagramsSection,
-        dataFlowSection,
-        technologySection,
-        appCostsSection,
-        entityStatisticSection,
-        surveySection,
-        changeLogSection
-    ],
+    availableSections: [],
     parentEntityRef: {},
-    widgets: []
+    sections: []
 };
 
 
@@ -69,6 +40,7 @@ const addToHistory = (historyStore, app) => {
 
 
 function controller($stateParams,
+                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
     const vm = Object.assign(this, initialState);
@@ -87,26 +59,24 @@ function controller($stateParams,
         vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, {name: app.name});
     }
 
-
     // -- BOOT --
     vm.$onInit = () => {
         const id = $stateParams.id;
         const entityReference = { id, kind: 'APPLICATION' };
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('APPLICATION');
+        vm.sections = dynamicSectionManager.findUserSectionsForKind('APPLICATION');
         vm.parentEntityRef = entityReference;
-
         loadAll(id);
     };
 
     // -- INTERACT --
-    vm.addWidget = w => {
-        vm.widgets =  _.reject(vm.widgets, x => x.id === w.id)
-        vm.widgets.unshift(w);
-    };
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'APPLICATION');
 }
 
 
 controller.$inject = [
     '$stateParams',
+    'DynamicSectionManager',
     'ServiceBroker',
     'HistoryStore'
 ];
