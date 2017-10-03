@@ -113,7 +113,7 @@ function controller($location,
                 {'questionId': questionId},
                 questionResponse,
                 {
-                    dateResponse : questionResponse.dateResponse
+                    dateResponse : questionResponse && questionResponse.dateResponse
                                     ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
                                     : null
                 })
