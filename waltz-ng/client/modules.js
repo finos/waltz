@@ -70,6 +70,7 @@ const dependencies = [
     require('./data-type-usage')(),
     require('./data-types')(),
     require('./databases')(),
+    require('./dynamic-section')(),
     require('./end-user-apps')(),
     require('./entity')(),
     require('./entity-named-note')(),

@@ -16,46 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import { initialiseData } from "../../../common/index";
-import {
-    appsSection,
-    assetCostsSection,
-    authSourcesSection,
-    bookmarksSection,
-    changeLogSection,
-    complexitySection,
-    entityNamedNotesSection,
-    entityStatisticSection,
-    involvedPeopleSection,
-    logicalFlowTabgroupSection,
-    measurableRatingsBrowserSection,
-    technologySummarySection
-} from "../../../section-definitions";
-
 
 import template from "./unit-view.html";
 
 
-
-
 const initialState = {
-    availableWidgets: [
-        entityNamedNotesSection,
-        measurableRatingsBrowserSection,
-        logicalFlowTabgroupSection,
-        authSourcesSection,
-        complexitySection,
-        involvedPeopleSection,
-        appsSection,
-        entityStatisticSection,
-        technologySummarySection,
-        assetCostsSection,
-        bookmarksSection,
-        changeLogSection
-    ],
+    availableSections: [],
     parentEntityRef: {},
-    widgets: []
+    sections: []
 };
 
 
@@ -76,6 +45,7 @@ function initTour(tourService, holder = {}) {
 
 
 function controller($stateParams,
+                    dynamicSectionManager,
                     viewDataService,
                     historyStore,
                     tourService) {
@@ -91,11 +61,16 @@ function controller($stateParams,
         scope: 'CHILDREN'
     };
 
-    viewDataService
-        .loadAll(id)
-        .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
-        .then(() => initTour(tourService, vm))
-        .then(() => vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, {name: vm.viewData.orgUnit.name}));
+    vm.$onInit = () => {
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('ORG_UNIT');
+        vm.sections = dynamicSectionManager.findUserSectionsForKind('ORG_UNIT');
+        viewDataService
+            .loadAll(id)
+            .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
+            .then(() => initTour(tourService, vm))
+            .then(() => vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, {name: vm.viewData.orgUnit.name}));
+    };
+
 
 
     // -- INTERACTIONS ---
@@ -107,16 +82,17 @@ function controller($stateParams,
         .loadOrgUnitDescendants(id)
         .then(descendants => vm.viewData.orgUnitDescendants = descendants);
 
-    vm.addWidget = w => {
-        vm.widgets =  _.reject(vm.widgets, x => x.id === w.id);
-        vm.widgets.unshift(w);
-    };
+
+    // -- DYNAMIC SECTIONS
+
+    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, 'ORG_UNIT');
 
 }
 
 
 controller.$inject = [
     '$stateParams',
+    'DynamicSectionManager',
     'OrgUnitViewDataService',
     'HistoryStore',
     'TourService'
