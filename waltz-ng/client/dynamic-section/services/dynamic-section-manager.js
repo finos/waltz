@@ -18,15 +18,13 @@
 
 import _ from 'lodash';
 import {checkNotEmpty} from "../../common/checks";
-import {dynamicSections} from "../dynamic-section-definitions";
-import {indexSectionsByApplicableKind} from "../dynamic-section-utils";
+import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section-definitions";
 
 const SOFT_SECTION_LIMIT = 3;
 
 export function service($location, $stateParams, localStorage) {
 
-    const sectionsByKind = indexSectionsByApplicableKind(dynamicSections);
-    const sectionsById = _.keyBy(dynamicSections, 'id');
+    const sectionsById = _.keyBy(_.values(dynamicSections), 'id');
 
     const mkStorageKey = (kind) => `waltz-user-section-ids-${kind}`;
 
@@ -56,7 +54,7 @@ export function service($location, $stateParams, localStorage) {
 
     function findAvailableSectionsForKind(kind) {
         checkNotEmpty(kind);
-        return sectionsByKind[kind] || [];
+        return dynamicSectionsByKind[kind] || [];
     }
 
     function findUserSectionsForKind(kind) {
