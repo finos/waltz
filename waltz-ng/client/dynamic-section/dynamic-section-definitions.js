@@ -16,139 +16,150 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const dynamicSections = [
-    {
+export const dynamicSections = {
+    appsSection: {
         componentId: 'apps-section',
         name: 'Applications',
         icon: 'desktop',
         id: 1,
-        priority: 10,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    assetCostsSection: {
         componentId: 'assets-costs-section',
         name: 'Costs',
         icon: 'money',
         id: 2,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    appCostsSection: {
         componentId: 'app-costs-section',
         name: 'Costs',
         icon: 'money',
         id: 3,
-        priority: 80,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    authSourcesSection: {
         componentId: 'auth-sources-section',
         name: 'Authoritative Sources',
         icon: 'shield',
         id: 4,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    bookmarksSection: {
         componentId: 'bookmarks-section',
         name: 'Bookmarks',
         icon: 'rocket',
         id: 5,
-        priority: 20,
-        applicableEntityKinds: ['APPLICATION', 'APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    changeInitiativeSection: {
         componentId: 'change-initiative-section',
         name: 'Change Initiatives',
         icon: 'paper-plane-o',
         id: 6,
-        priority: 20,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    changeLogSection: {
         componentId: 'change-log-section',
         icon: 'history',
         name: 'Changes',
         id: 7,
         priority: 1000,
-        applicableEntityKinds: ['APPLICATION', 'APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    complexitySection: {
         componentId: 'complexity-section',
         icon: 'sort-numeric-asc',
         name: 'Application Complexity',
         id: 8,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    dataFlowSection: {
         componentId: 'data-flow-section',
         name: 'Data Flows',
         icon: 'random',
         id: 9,
-        priority: 60,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    entityNamedNotesSection: {
         componentId: 'entity-named-notes-section',
         name: 'Notes',
         icon: 'sticky-note-o',
         id: 10,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    entityStatisticSection: {
         componentId: 'entity-statistic-section',
         name: 'Indicators',
         icon: 'pie-chart',
         id: 11,
-        priority: 90,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    flowDiagramsSection: {
         componentId: 'flow-diagrams-section',
         name: 'Flow Diagrams',
         icon: 'picture-o',
         id: 12,
-        priority: 40,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    involvedPeopleSection: {
         componentId: 'involved-people-section',
         name: 'People',
         icon: 'users',
         id: 13,
-        priority: 30,
-        applicableEntityKinds: ['APPLICATION', 'APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    logicalFlowsTabgroupSection: {
         componentId: 'logical-flows-tabgroup-section',
         name: 'Logical Data Flows',
         icon: 'random',
         id: 14,
-        priority: 50,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    measurableRatingAppSection: {
         componentId: 'measurable-rating-app-section',
         name: 'Ratings',
         icon: 'puzzle-piece',
         id: 15,
-        priority: 10,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    measurableRatingsBrowserSection: {
         componentId: 'measurable-ratings-browser-section',
         name: 'Viewpoint Ratings',
         icon: 'star-half-o',
         id: 16,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'CHANGE_INITIATIVE']
-    }, {
+    },
+    surveySection: {
         componentId: 'survey-section',
         name: 'Surveys',
         icon: 'wpforms',
         id: 17,
-        priority: 100,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    technologySection: {
         componentId: 'technology-section',
         name: 'Technology',
         icon: 'server',
         id: 18,
-        priority: 70,
-        applicableEntityKinds: ['APPLICATION']
-    }, {
+    },
+    technologySummarySection: {
         componentId: 'technology-summary-section',
         name: 'Technologies',
         icon: 'server',
         id: 19,
-        priority: 20,
-        applicableEntityKinds: ['APP_GROUP', 'ORG_UNIT', 'MEASURABLE', 'CHANGE_INITIATIVE']
     }
-];
+};
+
+
+export const dynamicSectionsByKind = {
+    'APPLICATION': [
+        dynamicSections.measurableRatingAppSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.flowDiagramsSection,
+        dynamicSections.dataFlowSection,
+        dynamicSections.technologySection,
+        dynamicSections.appCostsSection,
+        dynamicSections.entityStatisticSection,
+        dynamicSections.surveySection,
+        dynamicSections.changeLogSection
+    ],
+    'ORG_UNIT': [
+        dynamicSections.measurableRatingsBrowserSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.complexitySection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.appsSection,
+        dynamicSections.entityStatisticSection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection
+    ]
+};

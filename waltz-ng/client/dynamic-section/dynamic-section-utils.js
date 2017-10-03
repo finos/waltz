@@ -18,10 +18,6 @@
 
 
 import {checkIsDynamicSection} from "../common/checks";
-import _ from "lodash";
-import {ascending} from "d3-array";
-import {nest} from "d3-collection";
-
 
 export function sectionToTemplate(section) {
     checkIsDynamicSection(section);
@@ -30,20 +26,4 @@ export function sectionToTemplate(section) {
     return `<${tagName} parent-entity-ref="$ctrl.parentEntityRef"></${tagName}>`;
 }
 
-
-export function indexSectionsByApplicableKind(dynamicSections = []) {
-    const allSections = _
-        .chain(dynamicSections)
-        .flatMap(s => _.map(
-            s.applicableEntityKinds,
-            k => Object.assign({}, s, { applicableEntityKind: k })))
-        .value();
-
-    return nest()
-        .key(d => d.applicableEntityKind)
-        .sortValues((a, b) => ascending(a.priority || 100, b.priority || 100))
-        .object(allSections);
-
-
-}
 

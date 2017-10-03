@@ -131,10 +131,8 @@ const serviceBrokerOptionsShape = {
 
 const dynamicSectionShape = {
     id: apiCheck.number,
-    priority: apiCheck.number,
     componentId: apiCheck.string,
-    icon: apiCheck.string,
-    applicableEntityKinds: myApiCheck.arrayOf(apiCheck.string)
+    icon: apiCheck.string
 };
 
 // -- COMMANDS --
