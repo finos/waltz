@@ -31,17 +31,16 @@ const initialState = {
 };
 
 
-function controller(dynamicSectionManager) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        vm.sections = dynamicSectionManager.findUserSectionsForKind(vm.parentEntityRef.kind);
-    }
+    };
 
 }
 
-controller.$inject = ['DynamicSectionManager'];
+controller.$inject = [];
 
 const component = {
     controller,

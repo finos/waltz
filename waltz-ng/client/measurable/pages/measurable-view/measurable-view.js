@@ -17,15 +17,16 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../common";
-import {getParents, populateParents} from "../common/hierarchy-utils";
+import {initialiseData} from "../../../common";
+import {getParents, populateParents} from "../../../common/hierarchy-utils";
 
 import template from "./measurable-view.html";
-import {CORE_API} from "../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
-
+    sections: [],
+    availableSections: []
 };
 
 
@@ -40,6 +41,7 @@ function logHistory(measurable, historyStore) {
 
 function controller($q,
                     $stateParams,
+                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
 
@@ -88,15 +90,27 @@ function controller($q,
 
     // -- BOOT ---
 
+
     loadWave1()
         .then(loadWave2)
         .then(loadWave3);
+
+    vm.$onInit = () => {
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('MEASURABLE');
+        vm.sections = dynamicSectionManager.findUserSectionsForKind('MEASURABLE');
+    };
+
+    // -- DYNAMIC SECTIONS
+
+    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, 'MEASURABLE');
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'MEASURABLE');
 }
 
 
 controller.$inject = [
     '$q',
     '$stateParams',
+    'DynamicSectionManager',
     'ServiceBroker',
     'HistoryStore'
 ];

@@ -1,0 +1,44 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.measurable.name }}"
+                       icon="puzzle-piece"
+                       tour="ctrl.tour"
+                       small="{{ ctrl.measurableCategory.name }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.measurable.list ({category: ctrl.measurableCategory.id })"
+                   ng-bind="ctrl.measurableCategory.name">
+                </a>
+            </li>
+            <li><span ng-bind="ctrl.measurable.name"></span></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <waltz-measurable-summary parent-entity-ref='ctrl.entityReference'
+                              scope="CHILDREN"
+                              applications="ctrl.applications"
+                              children="ctrl.children"
+                              measurable="ctrl.measurable"
+                              parents="ctrl.parents"
+                              server-stats="ctrl.techStats.serverStats">
+    </waltz-measurable-summary>
+
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation sections="ctrl.availableSections"
+                                          on-select="ctrl.addSection"
+                                          offset="650">
+        </waltz-dynamic-section-navigation>
+    </div>
+
+    <br>
+
+    <waltz-dynamic-sections-view sections="ctrl.sections"
+                                 parent-entity-ref="ctrl.entityReference"
+                                 on-remove="ctrl.removeSection">
+    </waltz-dynamic-sections-view>
+
+</div>

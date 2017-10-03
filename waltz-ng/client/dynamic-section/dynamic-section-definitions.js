@@ -137,6 +137,18 @@ export const dynamicSections = {
         icon: 'pie-chart',
         id: 20
     },
+    measurableRatingExplorerSection: {
+        componentId: 'measurable-rating-explorer-section',
+        name: 'Ratings',
+        icon: 'star-half-o',
+        id: 21
+    },
+    relatedMeasurablesSection: {
+        componentId: 'related-measurables-section',
+        name: 'Related Viewpoints',
+        icon: 'link',
+        id: 22
+    }
 };
 
 
@@ -165,6 +177,22 @@ export const dynamicSectionsByKind = {
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection
+    ],
+    'MEASURABLE': [
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.measurableRatingExplorerSection,
+        dynamicSections.relatedMeasurablesSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.flowDiagramsSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.appsSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
         dynamicSections.changeLogSection
     ]
 };
