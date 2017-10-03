@@ -1,85 +1,80 @@
 <div>
-    <waltz-section name="Indicators"
-                   icon="pie-chart"
-                   id="entity-statistic-section">
+    <div class="row col-sm-12 value"
+         ng-if="$ctrl.entityStatisticsGrouped.length > 0">
 
-        <div class="row col-sm-12 value"
-             ng-if="$ctrl.entityStatisticsGrouped.length > 0">
+        <table class="table table-condensed waltz-entity-statistic"
+               style="border-collapse: separate;">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Outcome</th>
+                    <th>Reason</th>
+                    <th>Last Refresh</th>
+                </tr>
+            </thead>
 
-            <table class="table table-condensed waltz-entity-statistic"
-                   style="border-collapse: separate;">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Outcome</th>
-                        <th>Reason</th>
-                        <th>Last Refresh</th>
-                    </tr>
-                </thead>
+            <tbody ng-repeat-start="(group, stats) in $ctrl.entityStatisticsGrouped">
+                <tr class="category">
+                    <td colspan="5">
+                        <waltz-icon name="{{ stats.key | toIconName:'entityStatistic' }}">
+                        </waltz-icon>
+                        <strong class="small" ng-bind="stats.key | toDisplayName:'entityStatistic'">
+                        </strong>
+                    </td>
+                </tr>
+            </tbody>
 
-                <tbody ng-repeat-start="(group, stats) in $ctrl.entityStatisticsGrouped">
-                    <tr class="category">
-                        <td colspan="5">
-                            <waltz-icon name="{{ stats.key | toIconName:'entityStatistic' }}">
-                            </waltz-icon>
-                            <strong class="small" ng-bind="stats.key | toDisplayName:'entityStatistic'">
-                            </strong>
-                        </td>
-                    </tr>
-                </tbody>
+            <tbody ng-repeat-end
+                   ng-repeat="stat in stats.values"
+                   class="small text-muted">
+                <tr ng-repeat="statValue in stat.values">
+                    <td></td>
+                    <td>
+                        <span ng-if="$first"
+                              ng-bind="statValue.definition.name"
+                              uib-tooltip="{{statValue.definition.description}}">
+                        </span>
+                    </td>
+                    <td ng-switch="statValue.definition.type">
+                        <waltz-entity-statistic-boolean-renderer statistic="statValue.definition"
+                                                                 value="statValue.value"
+                                                                 ng-switch-when="BOOLEAN">
+                        </waltz-entity-statistic-boolean-renderer>
 
-                <tbody ng-repeat-end
-                       ng-repeat="stat in stats.values"
-                       class="small text-muted">
-                    <tr ng-repeat="statValue in stat.values">
-                        <td></td>
-                        <td>
-                            <span ng-if="$first"
-                                  ng-bind="statValue.definition.name"
-                                  uib-tooltip="{{statValue.definition.description}}">
-                            </span>
-                        </td>
-                        <td ng-switch="statValue.definition.type">
-                            <waltz-entity-statistic-boolean-renderer statistic="statValue.definition"
-                                                                     value="statValue.value"
-                                                                     ng-switch-when="BOOLEAN">
-                            </waltz-entity-statistic-boolean-renderer>
+                        <waltz-entity-statistic-percentage-renderer statistic="statValue.definition"
+                                                                    value="statValue.value"
+                                                                    ng-switch-when="PERCENTAGE">
+                        </waltz-entity-statistic-percentage-renderer>
 
-                            <waltz-entity-statistic-percentage-renderer statistic="statValue.definition"
-                                                                        value="statValue.value"
-                                                                        ng-switch-when="PERCENTAGE">
-                            </waltz-entity-statistic-percentage-renderer>
+                        <waltz-entity-statistic-numeric-renderer statistic="statValue.definition"
+                                                                 value="statValue.value"
+                                                                 ng-switch-when="NUMERIC">
+                        </waltz-entity-statistic-numeric-renderer>
+                        <kbd ng-switch-default ng-bind="statValue.value.outcome">
+                        </kbd>
+                    </td>
+                    <td>
+                        <span ng-bind="statValue.value.reason">
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="statValue.value.createdAt">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+            </tbody>
 
-                            <waltz-entity-statistic-numeric-renderer statistic="statValue.definition"
-                                                                     value="statValue.value"
-                                                                     ng-switch-when="NUMERIC">
-                            </waltz-entity-statistic-numeric-renderer>
-                            <kbd ng-switch-default ng-bind="statValue.value.outcome">
-                            </kbd>
-                        </td>
-                        <td>
-                            <span ng-bind="statValue.value.reason">
-                            </span>
-                        </td>
-                        <td>
-                            <waltz-from-now timestamp="statValue.value.createdAt">
-                            </waltz-from-now>
-                        </td>
-                    </tr>
-                </tbody>
+        </table>
 
-            </table>
+    </div>
 
-        </div>
-        <waltz-no-data ng-if="$ctrl.entityStatisticsGrouped.length == 0">
-            <message>
-                <strong>
-                    No Indicators
-                </strong>
-                for this application.
-            </message>
-        </waltz-no-data>
-
-    </waltz-section>
+    <waltz-no-data ng-if="$ctrl.entityStatisticsGrouped.length == 0">
+        <message>
+            <strong>
+                No Indicators
+            </strong>
+            for this application.
+        </message>
+    </waltz-no-data>
 </div>

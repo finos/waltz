@@ -1,48 +1,41 @@
 <div>
-    <waltz-section name="Surveys"
-                   icon="wpforms"
-                   small="( {{$ctrl.surveys.length}} )"
-                   id="survey-instance-list-section">
+    <div ng-if="$ctrl.surveys.length > 0">
+        <table class="table table-condensed table-striped small">
+            <colgroup>
+                <col width="30%">
+                <col width="35%">
+                <col width="10%">
+                <col width="10%">
+                <col width="15%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Issued</th>
+                <th>Submitted</th>
+                <th>Submitted By</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
+                <td>
+                    <a ng-bind="row.surveyRun.name"
+                       class="clickable"
+                       ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
+                </td>
+                <td><waltz-markdown text="row.surveyRun.description"></waltz-markdown></td>
+                <td><waltz-from-now timestamp="row.surveyRun.issuedOn"></waltz-from-now></td>
+                <td><waltz-from-now timestamp="row.surveyInstance.submittedAt"></waltz-from-now></td>
+                <td><span ng-bind="row.surveyInstance.submittedBy"></span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-        <div ng-if="$ctrl.surveys.length > 0">
-            <table class="table table-condensed table-striped small">
-                <colgroup>
-                    <col width="30%">
-                    <col width="35%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="15%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Issued</th>
-                    <th>Submitted</th>
-                    <th>Submitted By</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
-                    <td>
-                        <a ng-bind="row.surveyRun.name"
-                           class="clickable"
-                           ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
-                    </td>
-                    <td><waltz-markdown text="row.surveyRun.description"></waltz-markdown></td>
-                    <td><waltz-from-now timestamp="row.surveyRun.issuedOn"></waltz-from-now></td>
-                    <td><waltz-from-now timestamp="row.surveyInstance.submittedAt"></waltz-from-now></td>
-                    <td><span ng-bind="row.surveyInstance.submittedBy"></span></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <waltz-no-data ng-if="$ctrl.surveys.length == 0">
-            <message>
-                <strong>No surveys</strong>
-            </message>
-        </waltz-no-data>
-
-    </waltz-section>
+    <waltz-no-data ng-if="$ctrl.surveys.length == 0">
+        <message>
+            <strong>No surveys</strong>
+        </message>
+    </waltz-no-data>
 </div>

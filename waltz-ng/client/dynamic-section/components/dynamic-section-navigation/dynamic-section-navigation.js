@@ -16,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { invokeFunction } from "../../index";
+import { initialiseData, invokeFunction } from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
 
@@ -62,8 +61,8 @@ function controller($scope,
     // -- INTERACT --
 
     vm.scrollAndSelectSection = (section) => {
-        $window.scrollTo(0, vm.offset);
         invokeFunction(vm.onSelect, section);
+        $window.scrollTo(0, vm.offset);
     };
 
 }

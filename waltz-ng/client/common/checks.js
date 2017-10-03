@@ -132,6 +132,7 @@ const serviceBrokerOptionsShape = {
 const dynamicSectionShape = {
     id: apiCheck.number,
     componentId: apiCheck.string,
+    name: apiCheck.string,
     icon: apiCheck.string
 };
 

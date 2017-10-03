@@ -15,45 +15,37 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './dynamic-sections-view.html';
+
+import template from './dynamic-section.html';
 import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
     parentEntityRef: '<',
-    sections: '<',
-    onRemove: '<'
+    section: '<',
+    onRemove: '<',
 };
 
 
 const initialState = {
-    onRemove: (s) => console.log('wdsv: onRemove, default impl', s)
+    onRemove: (s) => console.log('wds: default on remove', s)
 };
 
 
-function controller(dynamicSectionManager) {
-
+function controller() {
     const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-        vm.sections = dynamicSectionManager.findUserSectionsForKind(vm.parentEntityRef.kind);
-    }
-
 }
 
-controller.$inject = ['DynamicSectionManager'];
 
-const component = {
+controller.$inject = [
+];
+
+
+export const component = {
     controller,
+    template,
     bindings,
-    template
+    transclude: true
 };
 
-
-const id = 'waltzDynamicSectionsView';
-
-
-export default {
-    id,
-    component
-};
+export const id = 'waltzDynamicSection';

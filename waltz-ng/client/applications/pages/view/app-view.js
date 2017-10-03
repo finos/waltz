@@ -71,6 +71,7 @@ function controller($stateParams,
 
     // -- INTERACT --
     vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'APPLICATION');
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'APPLICATION');
 }
 
 

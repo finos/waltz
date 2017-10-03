@@ -1,30 +1,26 @@
 <div>
-    <waltz-section name="Logical Data Flows"
-                   icon="random"
-                   id="logical-flows-section">
 
-        <waltz-section-actions>
-            <button class="btn btn-xs waltz-btn-transparent"
-                    ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
-                <waltz-icon name="map-signs"></waltz-icon>
-            </button>
-        </waltz-section-actions>
+    <waltz-section-actions>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
 
-        <waltz-source-data-overlay visible="$ctrl.visibility.sourcesOverlay"
-                                   entities="['LOGICAL_DATA_FLOW']">
-        </waltz-source-data-overlay>
+    <waltz-source-data-overlay visible="$ctrl.visibility.sourcesOverlay"
+                               entities="['LOGICAL_DATA_FLOW']">
+    </waltz-source-data-overlay>
 
-        <div ng-if="$ctrl.hasFlows">
-            <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef">
-            </waltz-logical-flows-tabgroup>
-        </div>
-        <div ng-if="!$ctrl.hasFlows">
-            <waltz-no-data>
-                <message>
-                    <strong>No related flows found.</strong>
-                </message>
-            </waltz-no-data>
+    <div ng-if="$ctrl.hasFlows">
+        <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-logical-flows-tabgroup>
+    </div>
+    <div ng-if="!$ctrl.hasFlows">
+        <waltz-no-data>
+            <message>
+                <strong>No related flows found.</strong>
+            </message>
+        </waltz-no-data>
 
-        </div>
-    </waltz-section>
+    </div>
 </div>
