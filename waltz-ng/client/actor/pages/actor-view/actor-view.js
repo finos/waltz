@@ -16,13 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../common";
+import {initialiseData} from "../../../common";
 
 import template from "./actor-view.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
+    sections: [],
+    availableSections: [],
     logs: [],
 };
 
@@ -52,27 +54,42 @@ function addToHistory(historyStore, actor) {
 
 
 function controller($stateParams,
-                    actorStore,
+                    dynamicSectionManager,
+                    serviceBroker,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
 
     const id = $stateParams.id;
     vm.entityRef = { kind: 'ACTOR', id };
-    Object.assign(vm, { id, entityRef: vm.entityRef });
 
-    actorStore
-        .getById(id)
-        .then(a => vm.actor = a)
-        .then(() => vm.entityRef = Object.assign({}, vm.entityRef, { name: vm.actor.name }))
-        .then(() => addToHistory(historyStore, vm.actor));
+    vm.$onInit = () => {
 
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('ACTOR');
+        vm.sections = dynamicSectionManager.findUserSectionsForKind('ACTOR');
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ActorStore.getById,
+                [ id ])
+            .then(r => {
+                vm.actor = r.data;
+                vm.entityRef = Object.assign({}, vm.entityRef, { name: vm.actor.name });
+                addToHistory(historyStore, vm.actor);
+            });
+    };
+
+
+    // -- INTERACT --
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'ACTOR');
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'ACTOR');
 }
 
 
 controller.$inject = [
     '$stateParams',
-    'ActorStore',
+    'DynamicSectionManager',
+    'ServiceBroker',
     'HistoryStore',
 ];
 
