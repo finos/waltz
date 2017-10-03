@@ -24,7 +24,7 @@ export const dynamicSections = {
         id: 1,
     },
     assetCostsSection: {
-        componentId: 'assets-costs-section',
+        componentId: 'asset-costs-section',
         name: 'Costs',
         icon: 'money',
         id: 2,
@@ -58,7 +58,6 @@ export const dynamicSections = {
         icon: 'history',
         name: 'Changes',
         id: 7,
-        priority: 1000,
     },
     complexitySection: {
         componentId: 'complexity-section',
@@ -131,7 +130,13 @@ export const dynamicSections = {
         name: 'Technologies',
         icon: 'server',
         id: 19,
-    }
+    },
+    entityStatisticSummarySection: {
+        componentId: 'entity-statistic-summary-section',
+        name: 'Indicators',
+        icon: 'pie-chart',
+        id: 20
+    },
 };
 
 
@@ -156,7 +161,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,
-        dynamicSections.entityStatisticSection,
+        dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,

@@ -1,0 +1,35 @@
+@import "../../../../style/util";
+@import "../../../../style/variables";
+
+
+.waltz-dynamic-section {
+    border: 1px solid $waltz-border-color-lighter;
+    border-radius: 3px;
+    margin-bottom: 24px;
+    background: #fff;
+    display: block;
+    @include waltz-box-shadow()
+}
+
+
+.waltz-dynamic-section-header {
+    border-radius: 3px 3px 0px 0px;
+    margin-top: 0px;
+    color: $waltz-section-font-color;
+}
+
+
+.waltz-dynamic-section-header-title {
+    background: $waltz-section-background-color;
+    margin-top: 0px;
+    padding: 4px 4px 4px 12px;
+    font-weight: 400;
+    font-size: 22px;
+    border-bottom: 1px solid $waltz-border-color-lighter;
+}
+
+
+.waltz-dynamic-section-body {
+    margin-top: 12px;
+    padding-bottom: 12px;
+}

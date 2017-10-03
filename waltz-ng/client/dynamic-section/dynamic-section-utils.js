@@ -23,7 +23,15 @@ export function sectionToTemplate(section) {
     checkIsDynamicSection(section);
 
     const tagName = "waltz-" + section.componentId;
-    return `<${tagName} parent-entity-ref="$ctrl.parentEntityRef"></${tagName}>`;
+
+    return `
+        <waltz-dynamic-section parent-entity-ref="$ctrl.parentEntityRef"
+                               class="waltz-dynamic-section ${tagName}"
+                               section="$ctrl.section"
+                               on-remove="$ctrl.onRemove">
+            <${tagName} parent-entity-ref="$ctrl.parentEntityRef"></${tagName}>
+        </waltz-dynamic-section>
+    `;
 }
 
 

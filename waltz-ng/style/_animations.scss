@@ -61,7 +61,7 @@ $animation-speed: 0.2s;
 .waltz-animate-repeat.ng-move,
 .waltz-animate-repeat.ng-enter,
 .waltz-animate-repeat.ng-leave {
-    transition:all ease 0.5s;
+    transition:all ease $animation-speed;
 }
 
 .waltz-animate-repeat.ng-leave.ng-leave-active,
