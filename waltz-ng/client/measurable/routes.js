@@ -17,8 +17,8 @@
  */
 
 import _ from 'lodash';
-import UnitView from "./measurable-view";
-import ListView from "./measurable-list";
+import UnitView from "./pages/measurable-view/measurable-view";
+import ListView from "./pages/list-view/measurable-list";
 
 import {CORE_API} from '../common/services/core-api-utils';
 
