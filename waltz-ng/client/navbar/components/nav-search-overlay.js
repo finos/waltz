@@ -77,6 +77,10 @@ function controller($element,
     };
 
     vm.$onChanges = (c) => {
+        if (c.visible) {
+            vm.selectedCategory = null;
+        }
+
         if(vm.visible) {
             const input = $element.find('input')[0];
             input.focus();
@@ -130,7 +134,7 @@ function controller($element,
                 default:
                     qualifier = r.externalId || '';
                     break;
-            };
+            }
 
             return {
                 id: r.id,
@@ -169,14 +173,14 @@ function controller($element,
     vm.clearSearch = () => {
         vm.results = {};
         vm.query = '';
+        vm.selectedCategory = null;
     };
 
     vm.onKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
             if(vm.query) {
                 vm.clearSearch();
-            }
-            else {
+            } else {
                 vm.dismiss();
             }
         }
@@ -188,7 +192,6 @@ function controller($element,
             vm.dismiss();
         }
     };
-
 }
 
 

@@ -19,6 +19,8 @@
 import {registerComponents} from "../../common/module-utils";
 import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
 import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
+import * as SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
+import * as SourceAndTargetPanel from './source-and-target-panel/source-and-target-panel';
 import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane';
 
 
@@ -27,7 +29,9 @@ function setup(module) {
     registerComponents(module, [
         LogicalFlowEditPanel,
         LogicalFlowTypeEditor,
-        LogicalFlowsDataTypeSummaryPane
+        LogicalFlowsDataTypeSummaryPane,
+        SourceAndTargetGraph,
+        SourceAndTargetPanel
     ]);
 
     module
@@ -35,8 +39,6 @@ function setup(module) {
         .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
         .component('waltzRatedSummaryTable', require('./rated-flow-summary/rated-summary-table'))
         .component('waltzRatedSummaryCell', require('./rated-flow-summary/rated-summary-cell'))
-        .component('waltzSourceAndTargetGraph', require('./source-and-target-graph/source-and-target-graph'))
-        .component('waltzSourceAndTargetPanel', require('./source-and-target-panel/source-and-target-panel'))
         .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
         .component('waltzLogicalFlowDiagram', require('./boingy-graph/boingy-graph'))
         .component('waltzLogicalFlowCounterpartSelector', require('./edit/logical-flow-counterpart-selector'))

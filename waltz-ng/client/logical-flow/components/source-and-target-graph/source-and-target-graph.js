@@ -16,17 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
-import {mkLineWithArrowPath} from "../../../common/d3-utils";
-import {authoritativeRatingColorScale} from "../../../common/colors";
 import _ from "lodash";
 import {scalePoint} from "d3-scale";
 import {event, select} from "d3-selection";
 import "d3-selection-multi";
+
+import {initialiseData} from "../../../common";
+import {authoritativeRatingColorScale} from "../../../common/colors";
+import {mkLineWithArrowPath} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
-
-const template = require('./source-and-target-graph.html');
+import template from './source-and-target-graph.html';
 
 
 const bindings = {
@@ -228,7 +227,8 @@ function mkModel({ logicalFlows = [], decorators = [], entityRef, allTypes = []}
         targets,
         types,
         sourceToType,
-        typeToTarget
+        typeToTarget,
+        entityRef
     };
 }
 
@@ -509,7 +509,7 @@ function drawOutbound(section, model, scales, dimensions) {
 }
 
 
-function drawCenterBox(section, dimensions) {
+function drawCenterBox(section, dimensions, name = '') {
     const centerBox = section
         .selectAll('.center-box')
         .data([1], _.identity);
@@ -527,10 +527,16 @@ function drawCenterBox(section, dimensions) {
         .merge(newCenterBox)
         .attrs({
             x: -90,
-            y: 15,
+            y: 0,
             width: 180,
-            height: dimensions.graph.height - dimensions.margin.bottom - 6
+            height: dimensions.graph.height - dimensions.margin.bottom + 8
         });
+
+    section.append('text')
+        .attr('transform', 'translate(0,16)')
+        .attr('fill', '#888')
+        .attr('text-anchor', 'middle')
+        .text(_.truncate(name, { length: 24 }))
 }
 
 
@@ -544,7 +550,7 @@ function update(sections,
     setupSizing(sections, dimensions);
 
     drawTitleBar(sections.header, dimensions);
-    drawCenterBox(sections.types, dimensions);
+    drawCenterBox(sections.types, dimensions, model.entityRef.name);
 
     const scales = setupScales(model, dimensions);
 
@@ -619,11 +625,11 @@ controller.$inject = [
 ];
 
 
-const component = {
+export const component = {
     bindings,
     template,
     controller
 };
 
 
-export default component;
+export const id = "waltzSourceAndTargetGraph";

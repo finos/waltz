@@ -20,12 +20,10 @@
 import _ from "lodash";
 import {
     nameField,
-    aliasesField,
     assetCodeField,
     descriptionField,
     orgUnitField,
     parentAssetCodeField,
-    tagsField,
     typeField,
     lifecyclePhaseField,
     overallRatingField,
@@ -33,13 +31,14 @@ import {
 } from "../../formly/fields";
 
 
-import template from './app-registration.html';
+import template from "./app-registration.html";
 
 // ----- CONTROLLER -----
 
 const controller = function(applicationStore,
                             notification,
                             orgUnitStore) {
+    const vm = this;
 
     let allOrgUnits = [];
 
@@ -119,12 +118,24 @@ const controller = function(applicationStore,
             .then(onSuccess, onFailure);
     }
 
-    // -- exposed
+    // -- INIT --
+    vm.$onInit = () => {
+        nameField.model = model;
+        assetCodeField.model = model;
+        descriptionField.model = model;
+        orgUnitField.model = model;
+        parentAssetCodeField.model = model;
+        typeField.model = model;
+        lifecyclePhaseField.model = model;
+        overallRatingField.model = model;
+        businessCriticalityField.model = model;
 
-    this.fields = fields;
-    this.model = model;
-    this.onSubmit = onSubmit;
-    this.registrations = registrations;
+        vm.fields = fields;
+        vm.model = model;
+        vm.onSubmit = onSubmit;
+        vm.registrations = registrations;
+    };
+
 };
 
 controller.$inject = [

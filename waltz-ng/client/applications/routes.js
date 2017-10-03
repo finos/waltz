@@ -36,7 +36,8 @@ const appRegistrationState = {
 
 
 const appViewState = {
-    url: '/{id:int}',
+    url: '/{id:int}?{sections:string}',
+    reloadOnSearch: false,
     views: {
         'content@': AppView
     }
