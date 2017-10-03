@@ -16,13 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import actorView from './pages/actor-view/actor-view';
+
+
 const baseState = {
 };
 
 
 const viewState = {
     url: 'actor/{id:int}',
-    views: { 'content@': require('./actor-view') }
+    views: { 'content@': actorView }
 };
 
 

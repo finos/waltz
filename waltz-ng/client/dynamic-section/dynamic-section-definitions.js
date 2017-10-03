@@ -155,6 +155,7 @@ export const dynamicSections = {
 export const dynamicSectionsByKind = {
     'APPLICATION': [
         dynamicSections.measurableRatingAppSection,
+        dynamicSections.entityNamedNotesSection,
         dynamicSections.bookmarksSection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.changeInitiativeSection,
@@ -164,6 +165,17 @@ export const dynamicSectionsByKind = {
         dynamicSections.appCostsSection,
         dynamicSections.entityStatisticSection,
         dynamicSections.surveySection,
+        dynamicSections.changeLogSection
+    ],
+    'ACTOR': [
+        dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.flowDiagramsSection,
+        dynamicSections.dataFlowSection,
+        dynamicSections.appsSection,
+        dynamicSections.technologySummarySection,
         dynamicSections.changeLogSection
     ],
     'ORG_UNIT': [
