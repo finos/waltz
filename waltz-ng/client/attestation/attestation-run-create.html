@@ -52,12 +52,12 @@
                         Run description
                     </label>
                     <div class="col-sm-10">
-                <textarea id="description"
-                          class="form-control"
-                          placeholder="Description for this attestation run"
-                          ng-model="ctrl.attestationRun.description"
-                          rows="3">
-                </textarea>
+                        <textarea id="description"
+                                  class="form-control"
+                                  placeholder="Description for this attestation run"
+                                  ng-model="ctrl.attestationRun.description"
+                                  rows="3">
+                        </textarea>
                     </div>
                 </div>
 
@@ -66,12 +66,13 @@
                            class="col-sm-2 control-label">
                         Due Date
                     </label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-10 col-md-3">
                         <waltz-date-picker-form-input id="dueDate"
                                                       required="true"
                                                       place-holder="yyyy-MM-dd"
                                                       format="yyyy-MM-dd"
-                                                      model="ctrl.attestationRun.dueDate"/>
+                                                      model="ctrl.attestationRun.dueDate">
+                        </waltz-date-picker-form-input>
                     </div>
                 </div>
 

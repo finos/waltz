@@ -111,7 +111,8 @@
                         </waltz-markdown>
                     </label>
                     <div ng-switch="qi.question.fieldType"
-                         class="col-sm-7">
+                         class="col-sm-7"
+                         ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
                         <!-- input control -->
                         <!-- text -->
                         <input ng-switch-when="TEXT"
@@ -183,7 +184,8 @@
                                                       format="dd-MMM-yyyy"
                                                       model="ctrl.surveyResponses[qi.question.id].dateResponse"
                                                       on-change="ctrl.saveDateResponse"
-                                                      ng-required="qi.question.isMandatory"/>
+                                                      ng-required="qi.question.isMandatory">
+                        </waltz-date-picker-form-input>
                         <!-- dropdown -->
                         <select ng-switch-when="DROPDOWN"
                                 id="{{ qi.question.id }}"
