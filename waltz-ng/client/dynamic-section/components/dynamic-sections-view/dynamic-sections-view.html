@@ -1,0 +1,6 @@
+<div ng-repeat="section in $ctrl.sections track by section.id"
+     class='waltz-animate-repeat'>
+    <waltz-dynamic-section-wrapper section="section"
+                                   parent-entity-ref="$ctrl.parentEntityRef">
+    </waltz-dynamic-section-wrapper>
+</div>
