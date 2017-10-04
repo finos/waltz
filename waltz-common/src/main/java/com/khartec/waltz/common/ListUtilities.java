@@ -53,13 +53,6 @@ public class ListUtilities {
     }
 
 
-    public static <T> List<T> cons(T t, List<T> ts) {
-        ArrayList<T> newList = new ArrayList<>(ts);
-        newList.add(0, t);
-        return newList;
-    }
-
-
     @SafeVarargs
     public static <T> List<T> concat(List<T>... tss) {
         List<T> result = new ArrayList<>();
@@ -93,11 +86,6 @@ public class ListUtilities {
         return ts.stream()
                 .filter(predicate)
                 .collect(Collectors.toList());
-    }
-
-
-    public static <T> T first(List<T> ts) {
-        return CollectionUtilities.first(ts);
     }
 
 

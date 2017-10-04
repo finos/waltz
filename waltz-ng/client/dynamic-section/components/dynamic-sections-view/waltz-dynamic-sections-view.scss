@@ -1,4 +1,10 @@
 .waltz-dynamic-sections-view {
 
-
+    .wdsv-no-sections {
+        border: 3px dashed lighten($waltz-background-color, 5);
+        border-radius: 5px;
+        width: 100%;
+        color: lighten($waltz-font-color, 40);
+        background-color: lighten($waltz-background-color, 2);
+    }
 }

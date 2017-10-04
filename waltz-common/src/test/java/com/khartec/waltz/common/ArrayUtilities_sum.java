@@ -16,31 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+package com.khartec.waltz.common;
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
-    return r1.kind === r2.kind && r1.id === r2.id;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
+
+public class ArrayUtilities_sum {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotSumNull() {
+        ArrayUtilities.sum(null);
+    }
+
+
+    @Test
+    public void sumOfEmptyArrayIsZero() {
+        assertEquals(0, ArrayUtilities.sum(new int[]{}));
+    }
+
+
+    @Test
+    public void canSumSingleElementArray() {
+        assertEquals(2, ArrayUtilities.sum(new int[]{2}));
+    }
+
+
+    @Test
+    public void canSumMultiElementArray() {
+        assertEquals(14, ArrayUtilities.sum(new int[]{2,4,6,2}));
+    }
+
 }
-
-
-export function refToString(r) {
-    checkIsEntityRef(r);
-    return `${r.kind}/${r.id}`;
-}
-
-
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
-
-    checkIsEntityRef(ref);
-
-    return ref;
-}
-

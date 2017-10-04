@@ -16,31 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+package com.khartec.waltz.common;
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
-    return r1.kind === r2.kind && r1.id === r2.id;
+import org.junit.Test;
+
+import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
+public class ArrayUtilities_randomPick {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotRandomPickFromNothing() {
+        randomPick();
+    }
+
+
+    @Test
+    public void randomPickFromPoolOfOneReturnsThatOne() {
+        assertEquals("a", randomPick("a"));
+    }
+
+
+    @Test
+    public void randomPickFromPoolIsMemberOfPool() {
+        assertTrue(SetUtilities.fromArray("a", "b")
+                .contains(randomPick("a", "b")));
+    }
+
 }
-
-
-export function refToString(r) {
-    checkIsEntityRef(r);
-    return `${r.kind}/${r.id}`;
-}
-
-
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
-
-    checkIsEntityRef(ref);
-
-    return ref;
-}
-

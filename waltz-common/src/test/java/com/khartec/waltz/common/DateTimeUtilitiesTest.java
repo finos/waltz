@@ -16,31 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+package com.khartec.waltz.common;
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
-    return r1.kind === r2.kind && r1.id === r2.id;
+import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.Date;
+
+import static junit.framework.TestCase.assertNull;
+
+public class DateTimeUtilitiesTest {
+
+    @Test
+    public void dateTimeConversionsReturnNullIfGivenNull() {
+        assertNull(DateTimeUtilities.toSqlDate((Date) null));
+        assertNull(DateTimeUtilities.toSqlDate((LocalDate) null));
+        assertNull(DateTimeUtilities.toLocalDateTime(null));
+        assertNull(DateTimeUtilities.toLocalDate(null));
+    }
+
 }
-
-
-export function refToString(r) {
-    checkIsEntityRef(r);
-    return `${r.kind}/${r.id}`;
-}
-
-
-export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
-
-    checkIsEntityRef(ref);
-
-    return ref;
-}
-

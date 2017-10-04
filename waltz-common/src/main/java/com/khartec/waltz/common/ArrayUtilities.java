@@ -18,8 +18,6 @@
 
 package com.khartec.waltz.common;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -48,7 +46,6 @@ public class ArrayUtilities {
             if (! check.test(t)) return false;
         }
         return true;
-
     }
 
 
@@ -56,18 +53,6 @@ public class ArrayUtilities {
         Checks.checkNotEmpty(ts, "Cannot take random pick from an empty array");
         int idx = rnd.nextInt(ts.length);
         return ts[idx];
-    }
-
-
-    public static <T> T[] of(T[] ts, T... moreTs) {
-        List<T> init = ListUtilities.newArrayList(ts);
-        List<T> rest = ListUtilities.newArrayList(moreTs);
-
-        List<T> res = new ArrayList<>(ts.length + moreTs.length);
-        res.addAll(init);
-        res.addAll(rest);
-
-        return (T[]) res.toArray();
     }
 
 
