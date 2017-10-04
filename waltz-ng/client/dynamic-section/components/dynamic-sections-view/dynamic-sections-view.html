@@ -6,5 +6,10 @@
                                        parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-dynamic-section-wrapper>
     </div>
+
+    <div ng-if="$ctrl.sections.length == 0" class="wdsv-no-sections">
+        <h3 style="text-align: center">No Sections</h3>
+        <p style="text-align: center">Use the options above to show sections.</p>
+    </div>
 </div>
 
