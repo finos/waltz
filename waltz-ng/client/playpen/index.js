@@ -22,6 +22,7 @@ import playpenView1 from "./1/playpen1";
 import playpenView2 from "./2/playpen2";
 import playpenView3 from "./3/playpen3";
 import playpenView4 from "./4/playpen4";
+import dynaTestView from "./dyna-test-view/dyna-test-view";
 
 import {registerComponents} from '../common/module-utils';
 import * as EntityDataSourcingPanel from './4/entity-data-sourcing-panel/entity-data-sourcing-panel';
@@ -61,6 +62,11 @@ export default () => {
                     url: '/4?kind&{id:int}',
                     views: { 'content@': playpenView4 }
                 })
+                .state('main.playpen.dyna-test', {
+                    url: '/dyna-test/{kind:string}/{id:int}/{sectionId:int}',
+                    views: { 'content@': dynaTestView }
+                });
+
         }
     ]);
 
