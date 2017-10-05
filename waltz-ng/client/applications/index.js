@@ -23,6 +23,7 @@ import services from './services';
 
 import AppCostsSection from './components/app-costs-section/app-costs-section';
 import AppOverview from './components/overview/app-overview';
+import RelatedAppsSection from './components/related-apps-section/related-apps-section';
 
 export default () => {
 
@@ -43,12 +44,12 @@ export default () => {
         .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
         .component('waltzAppsSection', require('./components/apps-section/apps-section'))
         .component('waltzAppSummary', require('./components/app-summary'))
-        .component('waltzAppTable', require('./components/app-table'))
-        .component('waltzRelatedAppsSection', require('./components/related-apps-section/related-apps-section'));
+        .component('waltzAppTable', require('./components/app-table'));
 
     registerComponents(module, [
-            AppCostsSection,
-            AppOverview
+        AppCostsSection,
+        AppOverview,
+        RelatedAppsSection
     ]);
 
     return module.name;

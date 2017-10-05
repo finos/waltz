@@ -148,6 +148,24 @@ export const dynamicSections = {
         name: 'Related Viewpoints',
         icon: 'link',
         id: 22
+    },
+    changeInitiativeRelatedDataTypesSection: {
+        componentId: 'change-initiative-related-data-type-section',
+        name: 'Related Data Types',
+        icon: 'qrcode',
+        id: 23
+    },
+    relatedAppsSection: {
+        componentId: 'related-apps-section',
+        name: 'Related Applications',
+        icon: 'desktop',
+        id: 24
+    },
+    relatedAppGroupsSection: {
+        componentId: 'related-app-groups-section',
+        name: 'Related App Groups',
+        icon: 'object-group',
+        id: 25
     }
 };
 
@@ -176,6 +194,18 @@ export const dynamicSectionsByKind = {
         dynamicSections.dataFlowSection,
         dynamicSections.appsSection,
         dynamicSections.technologySummarySection,
+        dynamicSections.changeLogSection
+    ],
+    'CHANGE_INITIATIVE': [
+        dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.relatedMeasurablesSection,
+        dynamicSections.relatedAppsSection,
+        dynamicSections.relatedAppGroupsSection,
+        dynamicSections.changeInitiativeRelatedDataTypesSection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.surveySection,
         dynamicSections.changeLogSection
     ],
     'ORG_UNIT': [
