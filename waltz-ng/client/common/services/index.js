@@ -20,14 +20,15 @@ import BaseLookupService from "./BaseLookupService";
 import {
     applicationKindDisplayNames,
     applicationRatingNames,
-    assetCostKindNames,
     attestationTypeDisplayNames,
     capabilityRatingNames,
     changeInitiativeNames,
     criticalityDisplayNames,
+    dataFormatKindNames,
     endOfLifeStatusNames,
     entityNames,
     entityStatisticCategoryDisplayNames,
+    frequencyKindNames,
     investmentRatingNames,
     issuanceDisplayNames,
     lifecyclePhaseDisplayNames,
@@ -36,23 +37,21 @@ import {
     physicalSpecDefinitionFieldTypeNames,
     physicalSpecDefinitionTypeNames,
     relationshipKindNames,
+    releaseLifecycleStatusNames,
     rollupKindNames,
     severityNames,
     surveyInstanceStatusNames,
-    surveyRunStatusNames,
-    releaseLifecycleStatusNames,
     surveyQuestionFieldTypeNames,
-    usageKindDisplayNames,
+    surveyRunStatusNames,
     transportKindNames,
-    frequencyKindNames,
-    dataFormatKindNames
+    usageKindDisplayNames
 } from "./display-names";
 import {
     booleanTypeIconNames,
     entityIconNames,
     entityStatisticCategoryIconNames,
-    severityIconNames,
     ragIconNames,
+    severityIconNames,
     usageKindIconNames
 } from "./icon-names";
 
@@ -139,7 +138,6 @@ export default (module) => {
     displayNameService
         .register('applicationKind', applicationKindDisplayNames)
         .register('applicationRating', applicationRatingNames)
-        .register('assetCost', assetCostKindNames)
         .register('attestationType', attestationTypeDisplayNames)
         .register('capabilityRating', capabilityRatingNames)
         .register('changeInitiative', changeInitiativeNames)
