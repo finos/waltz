@@ -26,7 +26,7 @@ export function sectionToTemplate(section) {
 
     return `
         <waltz-dynamic-section parent-entity-ref="$ctrl.parentEntityRef"
-                               class="waltz-dynamic-section ${tagName}"
+                               class="waltz-dynamic-section ${tagName} waltz-dynamic-section-${section.id}"
                                section="$ctrl.section"
                                on-remove="$ctrl.onRemove">
             <${tagName} parent-entity-ref="$ctrl.parentEntityRef"></${tagName}>
