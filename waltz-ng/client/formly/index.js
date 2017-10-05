@@ -80,6 +80,11 @@ export default () => {
                 name: 'tags-input',
                 template: require('./tags-input-template.html')
             });
+
+            formlyConfigProvider.setType({
+                name: 'org-unit-input',
+                template: require('./org-unit-input-template.html')
+            });
         }
     ]);
 
