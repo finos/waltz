@@ -20,7 +20,6 @@ package com.khartec.waltz.data.asset_cost;
 
 import com.khartec.waltz.model.cost.Cost;
 import com.khartec.waltz.model.cost.CostBand;
-import com.khartec.waltz.model.cost.CostKind;
 import com.khartec.waltz.model.cost.ImmutableCost;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
@@ -43,6 +42,9 @@ import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 
 @Repository
 public class AssetCostStatsDao {
+
+    private static final String COST_KIND_CUMULATIVE = "CUMULATIVE";
+
 
     private final DSLContext dsl;
 
@@ -100,7 +102,7 @@ public class AssetCostStatsDao {
                 .where(optionsCondition)
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
-                        .kind(CostKind.CUMULATIVE)
+                        .kind(COST_KIND_CUMULATIVE)
                         .year(year)
                         .build());
     }
