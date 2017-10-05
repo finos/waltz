@@ -124,6 +124,7 @@ const controller = function(applicationStore,
         assetCodeField.model = model;
         descriptionField.model = model;
         orgUnitField.model = model;
+        orgUnitField.templateOptions.ouRef = null;
         parentAssetCodeField.model = model;
         typeField.model = model;
         lifecyclePhaseField.model = model;

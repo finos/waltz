@@ -62,16 +62,14 @@ export const descriptionField = {
 
 export const orgUnitField = {
     key: 'organisationalUnitId',
-    type: 'ui-select',
+    type: 'org-unit-input',
+    formControl: { $dirty: false },
     templateOptions: {
-        optionsAttr: 'bs-options',
-        ngOptions: 'option[to.valueProp] as option in to.options | filter: $select.search',
         label: 'Owning Organisational Unit',
-        valueProp: 'code',
-        labelProp: 'name',
-        placeholder: 'Owning Area',
-        //  description: 'Template includes the allow-clear option on the ui-select-match element',
-        options:[]
+        onSelect: (id, item) => {
+            orgUnitField.model[orgUnitField.key] = item.id;
+            orgUnitField.formControl =  { $dirty: true };
+        }
     }
 };
 
