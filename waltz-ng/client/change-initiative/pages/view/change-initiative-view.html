@@ -1,0 +1,100 @@
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.changeInitiative.name }}"
+                       icon="paper-plane-o"
+                       small="{{ ctrl.changeInitiative.kind | toDisplayName:'changeInitiative' }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Change Initiative</li>
+            <li><span ng-bind="ctrl.changeInitiative.name"></span></li>
+        </ol>
+
+    </waltz-page-header>
+
+    <!-- Overview -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="waltz-display-section">
+                    <!-- NAME, EXTERNAL ID -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Name
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.name"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            External Id
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.externalId"></span>
+                        </div>
+                    </div>
+
+                    <!-- KIND, PHASE -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Type
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.kind | toDisplayName:'changeInitiative'"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Phase
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
+                        </div>
+                    </div>
+
+                    <!-- START, END -->
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Start
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.startDate"></span>
+                        </div>
+
+                        <div class="col-sm-2 waltz-display-field-label">
+                            End
+                        </div>
+                        <div class="col-sm-4">
+                            <span ng-bind="ctrl.changeInitiative.endDate"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Description
+                        </div>
+                        <div class="col-sm-10">
+                            <waltz-markdown text="ctrl.changeInitiative.description">
+                            </waltz-markdown>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation sections="ctrl.availableSections"
+                                          on-select="ctrl.addSection">
+        </waltz-dynamic-section-navigation>
+    </div>
+
+    <br>
+
+    <waltz-dynamic-sections-view sections="ctrl.sections"
+                                 parent-entity-ref="ctrl.entityRef"
+                                 on-remove="ctrl.removeSection">
+    </waltz-dynamic-sections-view>
+
+</div>

@@ -23,7 +23,7 @@ public class ObjectUtilities {
     public static <T> T dump(T x) {
         System.out.println("dump: " + x);
         return x;
-    };
+    }
 
 
     public static <T> T  firstNotNull(T... ts) {

@@ -21,25 +21,26 @@ import {initialiseData} from "../../../common/index";
 
 const bindings = {
     parentEntityRef: '<',
-    sections: '<'
+    sections: '<',
+    onRemove: '<'
 };
 
 
 const initialState = {
+    onRemove: (s) => console.log('wdsv: onRemove, default impl', s)
 };
 
 
-function controller(dynamicSectionManager) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        vm.sections = dynamicSectionManager.findUserSectionsForKind(vm.parentEntityRef.kind);
-    }
+    };
 
 }
 
-controller.$inject = ['DynamicSectionManager'];
+controller.$inject = [];
 
 const component = {
     controller,

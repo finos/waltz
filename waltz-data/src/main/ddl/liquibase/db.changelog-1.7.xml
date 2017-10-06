@@ -32,4 +32,60 @@
                     columnName="currency" />
     </changeSet>
 
+
+    <changeSet id="20171005-2530-1"
+               author="rovats">
+        <comment>2530: Adding cost kinds to enum-value table</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="CostKind"/>
+            <column name="key"
+                    value="APPLICATION_DEVELOPMENT"/>
+            <column name="display_name"
+                    value="Application Development"/>
+            <column name="description"
+                    value="Application development costs"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="CostKind"/>
+            <column name="key"
+                    value="INFRASTRUCTURE"/>
+            <column name="display_name"
+                    value="Infrastructure"/>
+            <column name="description"
+                    value="Infrastructure costs"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="CostKind"/>
+            <column name="key"
+                    value="PERSON"/>
+            <column name="display_name"
+                    value="Person Costs"/>
+            <column name="description"
+                    value="Person costs"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="CostKind"/>
+            <column name="key"
+                    value="CUMULATIVE"/>
+            <column name="display_name"
+                    value="Cumulative"/>
+            <column name="description"
+                    value="Cumulative costs"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="CostKind"/>
+            <column name="key"
+                    value="OTHER"/>
+            <column name="display_name"
+                    value="Other"/>
+            <column name="description"
+                    value="Other costs"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

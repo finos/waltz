@@ -1,0 +1,41 @@
+@import "../../../../style/variables";
+
+.waltz-dynamic-sections-view {
+
+    $wdsv-background: lighten($waltz-background-color, 4);
+    $wdsv-border: lighten($waltz-background-color, 8);
+
+    .wdsv-arrow_box {
+        border: 3px solid $wdsv-border;
+        background-color: $wdsv-background;
+        width: 100%;
+        position: relative;
+        border-radius: 10px;
+        color: lighten($waltz-font-color, 32);
+
+        &:after, &:before {
+            bottom: 100%;
+            left: 50%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        &:after {
+            border-bottom-color: $wdsv-background;
+            border-width: 30px;
+            margin-left: -30px;
+        }
+
+        &:before {
+            border-bottom-color: $wdsv-border;
+            border-width: 32px;
+            margin-left: -32px;
+        }
+
+    }
+
+}

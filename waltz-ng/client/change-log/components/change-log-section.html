@@ -1,43 +1,37 @@
 <div>
-    <waltz-section name="Changes"
-                   icon="history"
-                   id="change-log-section">
+    <waltz-section-actions>
+        <button ng-click="$ctrl.exportChangeLog()"
+                class="btn btn-xs btn-primary"
+                ng-if="$ctrl.entries.length > 0">
+            <waltz-icon name="cloud-download"></waltz-icon>
+            Export
+        </button>
+    </waltz-section-actions>
 
-        <waltz-section-actions>
-            <button ng-click="$ctrl.exportChangeLog()"
-                    class="btn btn-xs btn-primary"
-                    ng-if="$ctrl.entries.length > 0">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </button>
-        </waltz-section-actions>
+    <div ng-if="$ctrl.entries.length > 0">
+        <waltz-change-log-table entries="$ctrl.entries"
+                                on-initialise="$ctrl.changeLogTableInitialised">
+        </waltz-change-log-table>
 
-        <div ng-if="$ctrl.entries.length > 0">
-            <waltz-change-log-table entries="$ctrl.entries"
-                                    on-initialise="$ctrl.changeLogTableInitialised">
-            </waltz-change-log-table>
+        <br>
 
-            <br>
-
-            <div class="pull-right"
-                 ng-if="$ctrl.parentEntityRef">
-                <a class="clickable"
-                   ui-sref="main.change-log.view ($ctrl.parentEntityRef)">
-                    Show all changes
-                </a>
-                |
-                <a class="clickable"
-                   ng-click="$ctrl.refresh()">
-                    Refresh now
-                </a>
-            </div>
-
+        <div class="pull-right"
+             ng-if="$ctrl.parentEntityRef">
+            <a class="clickable"
+               ui-sref="main.change-log.view ($ctrl.parentEntityRef)">
+                Show all changes
+            </a>
+            |
+            <a class="clickable"
+               ng-click="$ctrl.refresh()">
+                Refresh now
+            </a>
         </div>
-        <waltz-no-data ng-if="$ctrl.entries.length == 0">
-            <message>
-                <strong>No changes yet</strong>
-            </message>
-        </waltz-no-data>
 
-    </waltz-section>
+    </div>
+    <waltz-no-data ng-if="$ctrl.entries.length == 0">
+        <message>
+            <strong>No changes yet</strong>
+        </message>
+    </waltz-no-data>
 </div>

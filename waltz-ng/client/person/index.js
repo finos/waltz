@@ -21,6 +21,8 @@ import {registerComponents, registerStore} from '../common/module-utils';
 
 import PersonStore from './services/person-store';
 import PersonSummary from './components/summary/person-summary';
+import PersonAppsSection from './components/person-apps-section/person-apps-section';
+import PersonHierarchySection from './components/person-hierarchy-section/person-hierarchy-section';
 
 
 export default () => {
@@ -36,11 +38,12 @@ export default () => {
         .directive('waltzManagerList', require('./directives/manager-list'))
         .directive('waltzPersonDirectsList', require('./directives/person-directs-list'));
 
-    module
-        .service('PersonViewDataService', require('./person-view-data'));
-
     registerStore(module, PersonStore);
-    registerComponents(module, [ PersonSummary ])
+    registerComponents(module, [
+        PersonAppsSection,
+        PersonHierarchySection,
+        PersonSummary
+    ]);
 
     return module.name;
 };

@@ -1,0 +1,38 @@
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <div ng-if="$ctrl.groups.length > 0">
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="group in $ctrl.groups">
+                        <td>
+                            <a ui-sref="main.app-group.view ({id: group.id})">
+                                <span ng-bind="group.name"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <span ng-bind="group.kind"></span>
+                        </td>
+                        <td>
+                            <span ng-bind="group.description | limitTo: 50"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <waltz-no-data ng-if="$ctrl.groups.length == 0">
+                <message>
+                    <strong>No Groups have been associated with this change initiative</strong>
+                </message>
+            </waltz-no-data>
+
+        </div>
+    </div>
+</div>

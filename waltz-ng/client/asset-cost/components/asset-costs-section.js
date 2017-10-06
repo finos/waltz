@@ -17,7 +17,6 @@
  */
 
 import _ from 'lodash';
-import {assetCostKindNames} from '../../common/services/display-names';
 import {initialiseData} from '../../common';
 import {CORE_API} from '../../common/services/core-api-utils';
 import template from './asset-costs-section.html';
@@ -39,18 +38,20 @@ const initialState = {
 };
 
 
-function processSelection(d) {
+function processSelection(displayNameService, d) {
     if (!d) return null;
 
-    const costTable = _.map(d.costs, (v, k) => ({ type: assetCostKindNames[k] || k, amount: v }));
+    const costTable = _.map(d.costs, (v, k) => ({ type: displayNameService.lookup("CostKind", k) || k, amount: v }));
     return Object.assign({}, d, { costTable });
 }
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker,
+                    displayNameService) {
+
     const vm = initialiseData(this, initialState);
 
-    vm.onSummarySelect = (d) => vm.summarySelection = processSelection(d);
+    vm.onSummarySelect = (d) => vm.summarySelection = processSelection(displayNameService, d);
 
     vm.showSummary = () => {
         vm.visibility.summary = true;
@@ -85,7 +86,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    'ServiceBroker',
+    'DisplayNameService'
 ];
 
 

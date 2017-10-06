@@ -16,26 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.khartec.waltz.common;
 
-function controller($state,
-                    $stateParams,
-                    personStore) {
+import org.junit.Test;
 
-    const personId = $stateParams.id;
+import static junit.framework.TestCase.assertEquals;
 
-    personStore.getById(personId)
-        .then(p => $state.go('main.person.view', { empId: p.employeeId }, { location: false }));
+public class ArrayUtilities_sum {
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotSumNull() {
+        ArrayUtilities.sum(null);
+    }
+
+
+    @Test
+    public void sumOfEmptyArrayIsZero() {
+        assertEquals(0, ArrayUtilities.sum(new int[]{}));
+    }
+
+
+    @Test
+    public void canSumSingleElementArray() {
+        assertEquals(2, ArrayUtilities.sum(new int[]{2}));
+    }
+
+
+    @Test
+    public void canSumMultiElementArray() {
+        assertEquals(14, ArrayUtilities.sum(new int[]{2,4,6,2}));
+    }
+
 }
-
-
-controller.$inject = [
-    '$state',
-    '$stateParams',
-    'PersonStore'
-];
-
-
-export default  {
-    controller,
-    controllerAs: 'ctrl'
-};

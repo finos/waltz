@@ -86,7 +86,7 @@ function controller($stateParams,
     // -- DYNAMIC SECTIONS
 
     vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, 'ORG_UNIT');
-
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'ORG_UNIT');
 }
 
 

@@ -1,6 +1,4 @@
-<waltz-section name="Costs"
-               icon="money"
-               id="costs-section">
+<div>
     <waltz-source-data-section-addon ratings="$ctrl.sourceDataRatings"
                                      entities="['ASSET_COST']">
     </waltz-source-data-section-addon>
@@ -46,8 +44,10 @@
                                 <tbody>
                                 <tr ng-repeat="item in $ctrl.currentCosts">
                                     <td>
-                                        <span ng-bind="item.cost.kind | toDisplayName:'assetCost'">
-                                        </span>
+                                        <waltz-enum-value type="'CostKind'"
+                                                          show-icon="false"
+                                                          key="item.cost.kind">
+                                        </waltz-enum-value>
                                     </td>
                                     <td>
                                         <waltz-currency-amount amount="item.cost.amount"></waltz-currency-amount>
@@ -86,4 +86,4 @@
 
     </div>
 
-</waltz-section>
+</div>

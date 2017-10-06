@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash';
-import {select, event} from 'd3-selection';
+import {event, select} from 'd3-selection';
 
 import {determineCounterpart, sanitizeRelationships} from '../../measurable-relationship-utils';
 import {initialiseData} from '../../../common';
@@ -398,7 +398,7 @@ function controller($element, $q, $timeout, serviceBroker) {
 
     const loadData = () => {
         const p1 = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findAll)
+            .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => vm.measurables = r.data);
 
         const p2 = serviceBroker

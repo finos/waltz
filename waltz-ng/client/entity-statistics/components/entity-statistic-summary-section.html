@@ -1,65 +1,60 @@
 <div>
-    <waltz-section name="Indicators"
-                   icon="pie-chart"
-                   id="entity-statistics-section">
+    <div class="row"
+         ng-if="$ctrl.definitions.length > 0">
+        <div class="col-md-5">
+            <div style="border-right: 2px solid #f9f9f9;">
+                <waltz-entity-statistic-tree definitions="$ctrl.definitions"
+                                             on-selection="$ctrl.onDefinitionSelection">
+                </waltz-entity-statistic-tree>
 
-        <div class="row"
-             ng-if="$ctrl.definitions.length > 0">
-            <div class="col-md-5">
-                <div style="border-right: 2px solid #f9f9f9;">
-                    <waltz-entity-statistic-tree definitions="$ctrl.definitions"
-                                                 on-selection="$ctrl.onDefinitionSelection">
-                    </waltz-entity-statistic-tree>
+                <hr>
 
-                    <hr>
-
-                    <div class="small text-muted waltz-paragraph">
-                        Various indicators are collected for applications.
-                        Use the tree control above to select one.  Click on it's
-                        'explore' link to see more about that indicator.
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-7">
-                <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading" >
-                    <div class="alert alert-info">
-                        <waltz-icon size="lg"
-                                    name="info">
-                        </waltz-icon>
-
-                        <span style="padding-left: 24px">
-                            Select an <strong>indicator</strong>
-                            from the tree on the left to see
-                            details.
-                        </span>
-                    </div>
-                </div>
-                <div ng-if="$ctrl.activeSummary != null && $ctrl.loading"
-                     style="height: 230px">
-                </div>
-                <div ng-if="$ctrl.activeSummary != null && ! $ctrl.loading"
-                     class="waltz-fade-if">
-                    <waltz-entity-statistic-summary-card summary="$ctrl.activeSummary"
-                                                         definition="$ctrl.activeDefinition"
-                                                         parent-ref="$ctrl.parentEntityRef"
-                                                         sub-title="{{$ctrl.activeDefinition.category | toDisplayName:'entityStatistic'}}">
-                    </waltz-entity-statistic-summary-card>
+                <div class="small text-muted waltz-paragraph">
+                    Various indicators are collected for applications.
+                    Use the tree control above to select one.  Click on it's
+                    'explore' link to see more about that indicator.
                 </div>
             </div>
         </div>
 
-        <div class="row"
-             ng-if="$ctrl.definitions.length == 0">
-            <div class="col-md-12">
-                <waltz-no-data>
-                    <message>
-                        <strong>
-                            No Indicators
-                        </strong>
-                    </message>
-                </waltz-no-data>
+        <div class="col-md-7">
+            <div ng-if="$ctrl.activeSummary == null && ! $ctrl.loading" >
+                <div class="alert alert-info">
+                    <waltz-icon size="lg"
+                                name="info">
+                    </waltz-icon>
+
+                    <span style="padding-left: 24px">
+                        Select an <strong>indicator</strong>
+                        from the tree on the left to see
+                        details.
+                    </span>
+                </div>
+            </div>
+            <div ng-if="$ctrl.activeSummary != null && $ctrl.loading"
+                 style="height: 230px">
+            </div>
+            <div ng-if="$ctrl.activeSummary != null && ! $ctrl.loading"
+                 class="waltz-fade-if">
+                <waltz-entity-statistic-summary-card summary="$ctrl.activeSummary"
+                                                     definition="$ctrl.activeDefinition"
+                                                     parent-ref="$ctrl.parentEntityRef"
+                                                     sub-title="{{$ctrl.activeDefinition.category | toDisplayName:'entityStatistic'}}">
+                </waltz-entity-statistic-summary-card>
             </div>
         </div>
-    </waltz-section>
+    </div>
+
+    <div class="row"
+         ng-if="$ctrl.definitions.length == 0">
+        <div class="col-md-12">
+            <waltz-no-data>
+                <message>
+                    <strong>
+                        No Indicators
+                    </strong>
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
 </div>

@@ -24,7 +24,7 @@ export const dynamicSections = {
         id: 1,
     },
     assetCostsSection: {
-        componentId: 'assets-costs-section',
+        componentId: 'asset-costs-section',
         name: 'Costs',
         icon: 'money',
         id: 2,
@@ -58,7 +58,6 @@ export const dynamicSections = {
         icon: 'history',
         name: 'Changes',
         id: 7,
-        priority: 1000,
     },
     complexitySection: {
         componentId: 'complexity-section',
@@ -131,6 +130,54 @@ export const dynamicSections = {
         name: 'Technologies',
         icon: 'server',
         id: 19,
+    },
+    entityStatisticSummarySection: {
+        componentId: 'entity-statistic-summary-section',
+        name: 'Indicators',
+        icon: 'pie-chart',
+        id: 20
+    },
+    measurableRatingExplorerSection: {
+        componentId: 'measurable-rating-explorer-section',
+        name: 'Ratings',
+        icon: 'star-half-o',
+        id: 21
+    },
+    relatedMeasurablesSection: {
+        componentId: 'related-measurables-section',
+        name: 'Related Viewpoints',
+        icon: 'link',
+        id: 22
+    },
+    changeInitiativeRelatedDataTypesSection: {
+        componentId: 'change-initiative-related-data-type-section',
+        name: 'Related Data Types',
+        icon: 'qrcode',
+        id: 23
+    },
+    relatedAppsSection: {
+        componentId: 'related-apps-section',
+        name: 'Related Applications',
+        icon: 'desktop',
+        id: 24
+    },
+    relatedAppGroupsSection: {
+        componentId: 'related-app-groups-section',
+        name: 'Related App Groups',
+        icon: 'object-group',
+        id: 25
+    },
+    personHierarchySection: {
+        componentId: 'person-hierarchy-section',
+        name: 'Hierarchy',
+        icon: 'address-book-o',
+        id: 26
+    },
+    personAppsSection: {
+        componentId: 'person-apps-section',
+        name: 'Application Portfolio',
+        icon: 'desktop',
+        id: 27
     }
 };
 
@@ -138,6 +185,7 @@ export const dynamicSections = {
 export const dynamicSectionsByKind = {
     'APPLICATION': [
         dynamicSections.measurableRatingAppSection,
+        dynamicSections.entityNamedNotesSection,
         dynamicSections.bookmarksSection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.changeInitiativeSection,
@@ -149,6 +197,29 @@ export const dynamicSectionsByKind = {
         dynamicSections.surveySection,
         dynamicSections.changeLogSection
     ],
+    'ACTOR': [
+        dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.flowDiagramsSection,
+        dynamicSections.dataFlowSection,
+        dynamicSections.appsSection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.changeLogSection
+    ],
+    'CHANGE_INITIATIVE': [
+        dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.relatedMeasurablesSection,
+        dynamicSections.relatedAppsSection,
+        dynamicSections.relatedAppGroupsSection,
+        dynamicSections.changeInitiativeRelatedDataTypesSection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.surveySection,
+        dynamicSections.changeLogSection
+    ],
     'ORG_UNIT': [
         dynamicSections.measurableRatingsBrowserSection,
         dynamicSections.logicalFlowsTabgroupSection,
@@ -156,10 +227,38 @@ export const dynamicSectionsByKind = {
         dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,
-        dynamicSections.entityStatisticSection,
+        dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection
+    ],
+    'MEASURABLE': [
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.measurableRatingExplorerSection,
+        dynamicSections.relatedMeasurablesSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.flowDiagramsSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.appsSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.changeLogSection
+    ],
+    'PERSON': [
+        dynamicSections.personHierarchySection,
+        dynamicSections.personAppsSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
         dynamicSections.changeLogSection
     ]
 };

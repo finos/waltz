@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from "../../../common";
-import { mergeKeyedLists, toGroupedMap } from "../../../common/map-utils";
+import {CORE_API} from '../../../common/services/core-api-utils';
+import {initialiseData} from "../../../common";
+import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
 
 import template from './measurable-rating-app-section.html';
 
@@ -128,7 +128,7 @@ function controller($q, serviceBroker) {
             .then(r => vm.ratings = r.data);
 
         const categoriesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableCategoryStore.findAll, [], { force })
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
 
         const measurablesPromise = serviceBroker
