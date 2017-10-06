@@ -39,9 +39,9 @@
  */
 
 import _ from 'lodash';
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from '../../../common';
-import { kindToViewState } from '../../../common/link-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
+import {initialiseData} from '../../../common';
+import {kindToViewState} from '../../../common/link-utils';
 
 import template from './measurable-rating-edit-panel.html';
 
@@ -114,11 +114,11 @@ function controller($q,
         // -- LOAD ---
 
         const categoryPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableCategoryStore.findAll, [], { force })
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
 
         const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findAll, [], { force })
+            .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => vm.measurables = r.data);
 
         const ratingsPromise = serviceBroker

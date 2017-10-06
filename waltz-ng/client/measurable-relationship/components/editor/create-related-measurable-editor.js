@@ -77,7 +77,7 @@ function controller(notification, serviceBroker) {
             vm.visibility.measurableSelector = true;
             const categoryId = readCategoryId(vm.type.id);
             serviceBroker
-                .loadViewData(CORE_API.MeasurableStore.findAll)
+                .loadAppData(CORE_API.MeasurableStore.findAll)
                 .then(r => {
                     vm.measurables = _.filter(r.data, {categoryId});
                     vm.nodes = prepareTree(vm.measurables);
