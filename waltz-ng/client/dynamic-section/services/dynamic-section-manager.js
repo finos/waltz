@@ -67,7 +67,7 @@ export function service($location, $stateParams, localStorage) {
 
         const openSections = getOpenSections(kind, SOFT_SECTION_LIMIT);
 
-        // resave to localstorage to eliminate 'working' ids
+        // re-save to localStorage to eliminate 'working' ids
         localStorage.set(
             mkStorageKey(kind),
             _.chain(openSections)
@@ -94,10 +94,23 @@ export function service($location, $stateParams, localStorage) {
         return getOpenSections(kind);
     }
 
+    function removeSection(section, kind) {
+        if (section == null) {
+            return getOpenSections(kind);
+        }
+
+        const sectionIds = localStorage.get(mkStorageKey(kind)) || [];
+        const updatedSectionIds = _.without(sectionIds, section.id);
+        localStorage.set(mkStorageKey(kind), updatedSectionIds);
+
+        return getOpenSections(kind);
+    }
+
     return {
         findAvailableSectionsForKind,
         findUserSectionsForKind,
-        openSection
+        openSection,
+        removeSection
     };
 }
 

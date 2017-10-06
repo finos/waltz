@@ -20,55 +20,80 @@ import {initialiseData} from "../../../common";
 import {mkLinkGridCell, kindToBaseState} from "../../../common/link-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKindNames} from "../../../common/services/display-names";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {sameRef} from "../../../common/entity-utils";
+
 import template from './related-apps-section.html';
 
 
 const bindings = {
-    appRelationships: '<',
     editRole: '@?',
     parentEntityRef: '<',
-    sourceDataRatings: '<',
 };
 
 
 const initialState = {
+    columnDefs: [
+        mkLinkGridCell('Name', 'app.name', 'app.id', 'main.app.view'),
+        { field: 'relationshipDisplay', name: 'Relationship'},
+        { field: 'app.assetCode'},
+        { field: 'app.kindDisplay', name: 'Kind'},
+        { field: 'app.overallRatingDisplay', name: 'Overall Rating'},
+        { field: 'app.businessCriticalityDisplay', name: 'Business Criticality'},
+        { field: 'app.lifecyclePhaseDisplay', name: 'Lifecycle Phase'},
+    ],
     appRelationships: [],
     sourceDataRatings: []
 };
 
 
+function mkGridData(relations = [], apps = []) {
+    const appsById = _.keyBy(apps, 'id');
 
-
-const columnDefs = [
-    mkLinkGridCell('Name', 'app.name', 'app.id', 'main.app.view'),
-    { field: 'relationshipDisplay', name: 'Relationship'},
-    { field: 'app.assetCode'},
-    { field: 'app.kindDisplay', name: 'Kind'},
-    { field: 'app.overallRatingDisplay', name: 'Overall Rating'},
-    { field: 'app.businessCriticalityDisplay', name: 'Business Criticality'},
-    { field: 'app.lifecyclePhaseDisplay', name: 'Lifecycle Phase'},
-];
-
-
-function mkGridData(appRelationships = []) {
-    return _.map(appRelationships || [], ar => ({
-        relationshipDisplay: relationshipKindNames[ar.relationship],
-        app: Object.assign({}, ar.entity, mapToDisplayNames(ar.entity))
+    return _.map(relations, r => ({
+        relationshipDisplay: relationshipKindNames[r.relationship],
+        app: appsById[r.entity.id]
     }));
 }
 
 
-function controller() {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges= () => {
-        vm.gridData = mkGridData(vm.appRelationships);
+
+    function loadData() {
+        const relationsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeInitiativeStore.findRelatedForId,
+                [ vm.parentEntityRef.id ])
+            .then(r => _
+                .chain(r.data)
+                .flatMap(rel => ([
+                    {entity: rel.a, relationship: rel.relationship},
+                    {entity: rel.b, relationship: rel.relationship}
+                ]))
+                .filter(rel => rel.entity.kind === 'APPLICATION')
+                .reject(rel => sameRef(rel.entity, vm.parentEntityRef))
+                .value());
+
+        const appsPromise = serviceBroker.loadViewData(
+            CORE_API.ApplicationStore.findBySelector,
+            [ mkSelectionOptions(vm.parentEntityRef) ])
+            .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
+
+        $q.all([appsPromise, relationsPromise])
+            .then(([apps, relations]) => {
+                vm.gridData = mkGridData(relations, apps);
+            });
+    }
+
+    vm.$onChanges= (c) => {
         if (vm.parentEntityRef) {
             vm.editRouteState = kindToBaseState(vm.parentEntityRef.kind) + '.app-relationship-edit';
+            loadData();
         }
     };
-
-    vm.columnDefs = columnDefs;
 
     vm.onInitialise = (cfg) => {
         vm.export = () => cfg.exportFn(`app-relationships.csv`);
@@ -76,7 +101,10 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q',
+    'ServiceBroker'
+];
 
 
 const component = {
@@ -85,5 +113,10 @@ const component = {
     controller
 };
 
+const id = 'waltzRelatedAppsSection';
 
-export default component;
+
+export default {
+    id,
+    component
+};

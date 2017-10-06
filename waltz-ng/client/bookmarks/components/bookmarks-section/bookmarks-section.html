@@ -1,9 +1,5 @@
 <div>
-    <waltz-section icon="bookmark-o"
-                   name="Bookmarks"
-                   small="( {{$ctrl.bookmarks.length}} )"
-                   id="bookmarks-section"
-                   class="waltz-bookmark-section">
+
         <waltz-section-actions>
             <a waltz-has-role="BOOKMARK_EDITOR"
                ng-if="!$ctrl.visibility.editor"
@@ -41,6 +37,5 @@
                                         on-dismiss="$ctrl.onDismiss">
             </waltz-bookmarks-edit-panel>
         </div>
-    </waltz-section>
 </div>
 

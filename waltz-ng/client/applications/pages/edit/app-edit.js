@@ -18,12 +18,18 @@
 
 import _ from "lodash";
 import * as fields from "../../formly/fields";
+import { CORE_API } from '../../../common/services/core-api-utils';
 
 import template from './app-edit.html';
 
 
-function setupDropDowns(orgUnits) {
-    fields.orgUnitField.templateOptions.options = _.map(orgUnits, (u) => ({ name: u.name, code: u.id}));
+function mkRef(orgUnit) {
+    return {
+        kind: 'ORG_UNIT',
+        id: orgUnit.id,
+        name: orgUnit.name,
+        description: orgUnit.description
+    };
 }
 
 
@@ -45,7 +51,7 @@ const fieldLayout = [
 
 
 function fieldValuesRender(field) {
-    const original = field.originalModel[field.key];
+    const original = field.originalModel ? field.originalModel[field.key] : undefined;
     const current = field.model[field.key];
 
     if (field.type === 'tags-input') {
@@ -70,18 +76,7 @@ function fieldDiff(field) {
 }
 
 
-function controller(app,
-                    orgUnits,
-                    appStore,
-                    notification,
-                    $state) {
-
-    setupDropDowns(orgUnits);
-
-    const formModel = {
-        app
-    };
-
+function setupFields(fields = [], formModel = {}) {
     fields.nameField.model = formModel.app;
     fields.descriptionField.model = formModel.app;
     fields.assetCodeField.model = formModel.app;
@@ -91,9 +86,35 @@ function controller(app,
     fields.lifecyclePhaseField.model = formModel.app;
     fields.overallRatingField.model = formModel.app;
     fields.businessCriticalityField.model = formModel.app;
+}
 
 
-    function onSubmit() {
+function controller(app,
+                    appStore,
+                    notification,
+                    $state,
+                    serviceBroker) {
+
+    const vm = this;
+
+
+
+    // -- BOOT --
+    vm.$onInit = () => {
+        vm.application = app;
+        vm.fieldLayout = fieldLayout
+        vm.formModel = Object.assign({}, { app });
+
+        serviceBroker
+            .loadViewData(CORE_API.OrgUnitStore.getById, [app.organisationalUnitId])
+            .then(r => mkRef(r.data))
+            .then(ouRef => fields.orgUnitField.templateOptions.ouRef = ouRef)
+            .then(() => setupFields(fields, vm.formModel));
+    };
+
+
+    // -- INTERACT --
+    vm.onSubmit = () => {
         const onSuccess = () => {
             notification.success('Application updated');
             $state.go('main.app.view', { id: app.id });
@@ -110,29 +131,23 @@ function controller(app,
             .value();
 
         const action = {
-            ...formModel,
+            app: vm.formModel.app,
             changes
         };
 
-        appStore.update(app.id, action)
+        appStore
+            .update(app.id, action)
             .then(onSuccess, onFailure);
-
     }
-
-    const ctrl = this;
-    ctrl.application = app;
-    ctrl.formModel = formModel;
-    ctrl.fieldLayout = fieldLayout;
-    ctrl.onSubmit = onSubmit;
-
 }
+
 
 controller.$inject = [
     'app',
-    'orgUnits',
     'ApplicationStore',
     'Notification',
-    '$state'
+    '$state',
+    'ServiceBroker'
 ];
 
 

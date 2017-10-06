@@ -1,86 +1,81 @@
 <div>
-    <waltz-section name="Technologies"
-                   icon="server"
-                   id="technology">
+    <div ng-if="$ctrl.hasAnyData()">
+        <waltz-section-actions>
+            <input type="search"
+                   placeholder="Search"
+                   style="border-radius: 6px; padding-left: 3px"
+                   ng-change="$ctrl.doSearch()"
+                   ng-model-options="{ debounce: 200 }"
+                   ng-model="$ctrl.qry">
 
-        <div ng-if="$ctrl.hasAnyData()">
-            <waltz-section-actions>
-                <input type="search"
-                       placeholder="Search"
-                       style="border-radius: 6px; padding-left: 3px"
-                       ng-change="$ctrl.doSearch()"
-                       ng-model-options="{ debounce: 200 }"
-                       ng-model="$ctrl.qry">
+            <button class="btn btn-xs waltz-btn-transparent"
+                    ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </waltz-section-actions>
 
-                <button class="btn btn-xs waltz-btn-transparent"
-                        ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
-                    <waltz-icon name="map-signs"></waltz-icon>
-                </button>
-            </waltz-section-actions>
-
-            <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
-                                       ratings="$ctrl.sourceDataRatings"
-                                       entities="['DATABASE', 'SERVER', 'SOFTWARE']">
-            </waltz-source-data-overlay>
+        <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                                   ratings="$ctrl.sourceDataRatings"
+                                   entities="['DATABASE', 'SERVER', 'SOFTWARE']">
+        </waltz-source-data-overlay>
 
 
-            <uib-tabset>
+        <uib-tabset>
 
-                <uib-tab heading="Overview">
-                    <waltz-technology-summary-pies servers="$ctrl.filteredServers"
-                                                   databases="$ctrl.filteredDatabases">
-                    </waltz-technology-summary-pies>
-                </uib-tab>
+            <uib-tab heading="Overview">
+                <waltz-technology-summary-pies servers="$ctrl.filteredServers"
+                                               databases="$ctrl.filteredDatabases">
+                </waltz-technology-summary-pies>
+            </uib-tab>
 
 
-                <uib-tab heading="Servers"
-                         select="showServerDetail = true"
-                         disable="$ctrl.servers.length == 0">
-                    <div ng-if="showServerDetail">
-                        <br>
-                        <div style="font-size: smaller; height: 300px"
-                             ui-grid-exporter
-                             ui-grid-resize-columns
-                             ui-grid="$ctrl.serverGridOptions">
-                        </div>
+            <uib-tab heading="Servers"
+                     select="showServerDetail = true"
+                     disable="$ctrl.servers.length == 0">
+                <div ng-if="showServerDetail">
+                    <br>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.serverGridOptions">
                     </div>
-                </uib-tab>
+                </div>
+            </uib-tab>
 
-                <uib-tab heading="Databases"
-                         select="showDatabaseDetail = true"
-                         disable="$ctrl.databases.length == 0">
-                    <div ng-if="showDatabaseDetail">
-                        <br>
-                        <div style="font-size: smaller; height: 300px"
-                             ui-grid-exporter
-                             ui-grid-resize-columns
-                             ui-grid="$ctrl.databaseGridOptions">
-                        </div>
+            <uib-tab heading="Databases"
+                     select="showDatabaseDetail = true"
+                     disable="$ctrl.databases.length == 0">
+                <div ng-if="showDatabaseDetail">
+                    <br>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.databaseGridOptions">
                     </div>
-                </uib-tab>
-            </uib-tabset>
+                </div>
+            </uib-tab>
+        </uib-tabset>
 
 
 
-            <div class="waltz-paragraph text-muted pull-right small">
-                <waltz-icon name="info-circle"></waltz-icon>
-                Associated software packages have been sourced from:
-                <ul class="list-inline"
-                    style="display: inline-block">
-                    <li ng-repeat="(source, usages) in $ctrl.softwareUsages">
-                        {{ source }}
-                        <span ng-if="!$last">,</span>
-                    </li>
-                </ul>
-            </div>
-
+        <div class="waltz-paragraph text-muted pull-right small">
+            <waltz-icon name="info-circle"></waltz-icon>
+            Associated software packages have been sourced from:
+            <ul class="list-inline"
+                style="display: inline-block">
+                <li ng-repeat="(source, usages) in $ctrl.softwareUsages">
+                    {{ source }}
+                    <span ng-if="!$last">,</span>
+                </li>
+            </ul>
         </div>
 
-        <waltz-no-data ng-if="! $ctrl.hasAnyData()">
-            <message>
-                <strong>No associated technology found</strong>
-            </message>
-        </waltz-no-data>
+    </div>
 
-    </waltz-section>
+    <waltz-no-data ng-if="! $ctrl.hasAnyData()">
+        <message>
+            <strong>No associated technology found</strong>
+        </message>
+    </waltz-no-data>
+
 </div>

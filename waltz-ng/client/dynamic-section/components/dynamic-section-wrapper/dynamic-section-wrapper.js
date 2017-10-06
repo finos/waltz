@@ -24,10 +24,13 @@ import {sectionToTemplate} from "../../dynamic-section-utils";
 
 const bindings = {
     parentEntityRef: '<',
-    section: '<'
+    section: '<',
+    onRemove: '<',
 };
 
+
 const initialState = {
+    onRemove: (s) => console.log('wdsw: onRemove, default impl:', s),
 };
 
 
@@ -37,6 +40,9 @@ function controller($element, $compile, $scope) {
     vm.$onInit = () => {
         const sectionScope = $scope.$new();
         sectionScope.parentEntityRef = vm.parentEntityRef;
+        sectionScope.section = vm.section;
+        sectionScope.onRemove = vm.onRemove;
+        sectionScope.canRemove = vm.canRemove;
 
         const linkFn = $compile(sectionToTemplate(vm.section));
         const content = linkFn(sectionScope);

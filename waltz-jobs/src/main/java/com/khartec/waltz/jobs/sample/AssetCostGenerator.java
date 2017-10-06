@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.jobs.sample;
 
-import com.khartec.waltz.model.cost.CostKind;
 import com.khartec.waltz.model.cost.ImmutableAssetCost;
 import com.khartec.waltz.model.cost.ImmutableCost;
 import com.khartec.waltz.schema.tables.records.AssetCostRecord;
@@ -50,8 +49,8 @@ public class AssetCostGenerator {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<AssetCostRecord> appDevCosts = generateRecords(applicationService, CostKind.APPLICATION_DEVELOPMENT, 100_0000);
-        List<AssetCostRecord> infraCosts = generateRecords(applicationService, CostKind.INFRASTRUCTURE, 5_000);
+        List<AssetCostRecord> appDevCosts = generateRecords(applicationService, "APPLICATION_DEVELOPMENT", 100_0000);
+        List<AssetCostRecord> infraCosts = generateRecords(applicationService, "INFRASTRUCTURE", 5_000);
 
         dsl.deleteFrom(ASSET_COST)
                 .where(ASSET_COST.YEAR.eq(year))
@@ -63,7 +62,7 @@ public class AssetCostGenerator {
     }
 
 
-    private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, CostKind kind, int mean) {
+    private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, String kind, int mean) {
         return applicationService.findAll()
                     .stream()
                     .filter(a -> a.assetCode().isPresent())
@@ -79,7 +78,7 @@ public class AssetCostGenerator {
                         AssetCostRecord record = new AssetCostRecord();
                         record.setAssetCode(c.assetCode());
                         record.setAmount(c.cost().amount());
-                        record.setKind(c.cost().kind().name());
+                        record.setKind(c.cost().kind());
                         record.setYear(c.cost().year());
                         return record;
                     })

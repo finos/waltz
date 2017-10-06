@@ -20,7 +20,7 @@ import {resetData} from "../common";
 import {kindToViewState} from "../common/link-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
-
+import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
 import template from './entity-statistic-view.html';
 
 
@@ -43,7 +43,8 @@ const initData = {
     visibility: {
         related: false
     },
-    reloading: false
+    reloading: false,
+    bookmarkSection: dynamicSections.bookmarksSection
 };
 
 

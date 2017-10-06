@@ -26,6 +26,7 @@ export function sameRef(r1, r2) {
 
 
 export function refToString(r) {
+    checkIsEntityRef(r);
     return `${r.kind}/${r.id}`;
 }
 

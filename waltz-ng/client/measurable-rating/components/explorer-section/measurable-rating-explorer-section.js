@@ -32,15 +32,11 @@ import {ragColorScale} from '../../../common/colors';
  */
 
 import template from './measurable-rating-explorer-section.html';
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '<',
-    applications: '<',
-    measurableCategory: '<',
-    ragNames: '<',
-    sourceDataRatings: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -137,7 +133,7 @@ function prepareColumnDefs(measurableCategory, measurables) {
 }
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const onSelect = (d) => {
@@ -154,52 +150,64 @@ function controller(serviceBroker) {
             vm.measurableCategory.ragNames);
     };
 
+    const loadData = () => {
+        const selector = mkSelectionOptions(vm.parentEntityRef);
 
-    vm.$onInit = () => {
-        serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
+        const appPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ selector ])
+            .then(r => vm.applications = r.data);
+
+        const ratingsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingStore.findByMeasurableSelector,
+                [ selector ])
+            .then(r => vm.ratings = r.data);
+
+        const measurablesPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(result => vm.measurables = result.data);
+
+        const categoriesPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(result => vm.measurableCategories = result.data);
+
+
+        return $q.all([appPromise, ratingsPromise, measurablesPromise, categoriesPromise]);
     };
 
-    vm.$onChanges = (c) => {
-        if(vm.parentEntityRef && vm.scope) {
-            const selector = { entityReference: vm.parentEntityRef, scope: vm.scope };
-            serviceBroker
-                .loadViewData(CORE_API.MeasurableRatingStore.findByMeasurableSelector, [selector])
-                .then(r => vm.ratings = r.data);
-        }
-
-
-        if (vm.measurableCategory && vm.measurables) {
-            vm.columnDefs = prepareColumnDefs(
-                vm.measurableCategory,
-                vm.measurables);
-        }
-
-        if (vm.ratings && vm.measurableCategory) {
-            vm.pie = preparePie(
-                vm.ratings,
-                vm.measurableCategory.ragNames,
-                onSelect);
-        }
-
-        if (vm.ratings
-            && vm.applications
-            && vm.measurables
-            && vm.measurableCategory) {
-            vm.tableData = prepareTableData(
-                vm.ratings,
-                vm.applications,
-                vm.measurables,
-                vm.measurableCategory.ragNames);
-        }
+    const processData = () => {
+        const measurable = _.find(vm.measurables, { id: vm.parentEntityRef.id });
+        const measurableCategory = _.find(vm.measurableCategories, { id: measurable.categoryId });
+        vm.columnDefs = prepareColumnDefs(
+            measurableCategory,
+            vm.measurables);
+        vm.pie = preparePie(
+            vm.ratings,
+            measurableCategory.ragNames,
+            onSelect);
+        vm.tableData = prepareTableData(
+            vm.ratings,
+            vm.applications,
+            vm.measurables,
+            measurableCategory.ragNames);
     };
+
+    vm.$onInit = () => loadData()
+        .then(() => processData());
+
+    vm.$onChanges = (c) => loadData()
+        .then(() => processData());
 
     vm.onGridInitialise = (cfg) =>
         vm.exportData = () => cfg.exportFn("measurable-ratings.csv");
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = [
+    '$q',
+    'ServiceBroker'];
 
 
 const component = {

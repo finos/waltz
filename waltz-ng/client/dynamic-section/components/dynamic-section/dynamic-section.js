@@ -16,14 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.cost;
+import template from './dynamic-section.html';
+import {initialiseData} from "../../../common/index";
 
-public enum CostKind {
 
-    APPLICATION_DEVELOPMENT,
-    INFRASTRUCTURE,
-    PERSON,
-    CUMULATIVE,
-    OTHER
+const bindings = {
+    parentEntityRef: '<',
+    section: '<',
+    onRemove: '<',
+};
 
+
+const initialState = {
+    onRemove: (s) => console.log('wds: default on remove', s)
+};
+
+
+function controller() {
+    const vm = initialiseData(this, initialState);
 }
+
+
+controller.$inject = [
+];
+
+
+export const component = {
+    controller,
+    template,
+    bindings,
+    transclude: true
+};
+
+export const id = 'waltzDynamicSection';

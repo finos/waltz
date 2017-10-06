@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ChangeInitiativeView from './pages/view/change-initiative-view';
+
 const baseState = {
     url: 'change-initiative'
 };
@@ -23,7 +25,7 @@ const baseState = {
 
 const viewState = {
     url: '/{id:int}',
-    views: { 'content@': require('./change-initiative-view') }
+    views: { 'content@': ChangeInitiativeView }
 };
 
 

@@ -20,7 +20,6 @@ import BaseLookupService from "./BaseLookupService";
 import {
     applicationKindDisplayNames,
     applicationRatingNames,
-    assetCostKindNames,
     attestationTypeDisplayNames,
     capabilityRatingNames,
     changeInitiativeNames,
@@ -140,7 +139,6 @@ export default (module) => {
     displayNameService
         .register('applicationKind', applicationKindDisplayNames)
         .register('applicationRating', applicationRatingNames)
-        .register('assetCost', assetCostKindNames)
         .register('attestationType', attestationTypeDisplayNames)
         .register('capabilityRating', capabilityRatingNames)
         .register('changeInitiative', changeInitiativeNames)

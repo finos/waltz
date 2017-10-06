@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 public abstract class Cost {
 
     public abstract BigDecimal amount();
-    public abstract CostKind kind();
+    public abstract String kind();
     public abstract int year();
 
 }

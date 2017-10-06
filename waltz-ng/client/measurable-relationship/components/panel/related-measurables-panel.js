@@ -264,7 +264,7 @@ function controller($q, $timeout, serviceBroker, notification) {
     const loadAll = () => {
         const promises = [
             serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
-            serviceBroker.loadViewData(CORE_API.MeasurableStore.findAll).then(r => r.data)
+            serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll).then(r => r.data)
         ];
         return $q
             .all(promises)

@@ -108,15 +108,6 @@ export const changeInitiativeNames = {
 };
 
 
-export const assetCostKindNames = {
-    APPLICATION_DEVELOPMENT: 'Application Development',
-    INFRASTRUCTURE: 'Infrastructure',
-    PERSON: 'Person Costs',
-    CUMULATIVE: 'Cumulative',
-    OTHER: 'Other'
-};
-
-
 export const entityStatisticCategoryDisplayNames = {
     COMPLIANCE: 'Compliance',
     DATA_QUALITY: 'Data Quality',

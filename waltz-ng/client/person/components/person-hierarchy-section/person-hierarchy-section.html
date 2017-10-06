@@ -1,0 +1,13 @@
+<div>
+
+    <div ng-if="$ctrl.managers.length > 0">
+        <h4>Managers</h4>
+        <waltz-person-directs-list directs="$ctrl.managers"></waltz-person-directs-list>
+    </div>
+
+
+    <div ng-if="$ctrl.directs.length > 0">
+        <h4>Directs</h4>
+        <waltz-person-directs-list directs="$ctrl.directs"></waltz-person-directs-list>
+    </div>
+</div>

@@ -1,6 +1,5 @@
-<waltz-section name="{{ $ctrl.name }}"
-               icon="paper-plane-o"
-               id="change-initiatives-section">
+<div>
+
     <waltz-section-actions>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.sourcesOverlay = ! $ctrl.visibility.sourcesOverlay">
@@ -13,72 +12,9 @@
     </waltz-source-data-overlay>
 
 
-    <div class="row"
-         ng-if="$ctrl.changeInitiatives.length > 0"
-         style="min-height: 100px">
-        <div class="col-md-7">
-            <waltz-change-initiative-browser change-initiatives="$ctrl.changeInitiatives"
-                                             scroll-height="300"
-                                             on-select="$ctrl.onSelect">
-            </waltz-change-initiative-browser>
-        </div>
-        <div class="col-md-5">
-            <div ng-if="$ctrl.selectedChangeInitiative"
-                 class="waltz-fade-if">
-                <h4>
-                    <span ng-bind="$ctrl.selectedChangeInitiative.name">
-                    </span>
-                    <small ng-bind="$ctrl.selectedChangeInitiative.kind | toDisplayName:'changeInitiative'">
-                    </small>
-                </h4>
-
-                <div ng-bind="$ctrl.selectedChangeInitiative.description"></div>
-
-                <br>
-
-                <div>
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Kind:
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="$ctrl.selectedChangeInitiative.kind | toDisplayName:'changeInitiative' "></span>
-                        </div>
-
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Phase:
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="$ctrl.selectedChangeInitiative.lifecyclePhase | toDisplayName:'lifecyclePhase' "></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Start:
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="$ctrl.selectedChangeInitiative.startDate"></span>
-                        </div>
-
-                        <div class="col-sm-2 waltz-display-field-label">
-                            End:
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="$ctrl.selectedChangeInitiative.endDate"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <br>
-
-                <a ui-sref="main.change-initiative.view ({ id: $ctrl.selectedChangeInitiative.id })"
-                   class="clickable">
-                    More &raquo;
-                </a>
-            </div>
-        </div>
-    </div>
-
+    <waltz-change-initiative-table ng-if='$ctrl.changeInitiatives.length > 0'
+                                   list="$ctrl.changeInitiatives">
+    </waltz-change-initiative-table>
 
     <waltz-no-data ng-if="$ctrl.changeInitiatives.length == 0">
         <message>
@@ -86,4 +22,4 @@
         </message>
     </waltz-no-data>
 
-</waltz-section>
+</div>
