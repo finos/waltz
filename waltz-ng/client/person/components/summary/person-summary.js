@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import template from './person-summary.html';
 import {initialiseData} from "../../../common/index";
@@ -25,13 +24,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@?',
-    person: '<',
-    directs: '<',
-    managers: '<',
-    applications: '<',
-    serverStats: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -41,27 +34,37 @@ const initialState = {
 };
 
 
-
-
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
+        const selector = mkSelectionOptions(vm.parentEntityRef);
 
+        serviceBroker
+            .loadViewData(
+                CORE_API.PersonStore.getById,
+                [ vm.parentEntityRef.id ])
+            .then(r => {
+                vm.person = r.data;
+                return serviceBroker
+                    .loadAppData(
+                        CORE_API.OrgUnitStore.getById,
+                        [vm.person.organisationalUnitId]);
+            })
+            .then(r => vm.organisationalUnit = Object.assign(
+                {},
+                r.data,
+                { kind: 'ORG_UNIT' }));
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ selector ])
+            .then(r => vm.applications = r.data);
 
     };
 
     vm.$onChanges = () => {
-        if (vm.person && vm.person.organisationalUnitId) {
-            serviceBroker
-                .loadAppData(
-                    CORE_API.OrgUnitStore.getById,
-                    [ vm.person.organisationalUnitId ])
-                .then(r => vm.organisationalUnit = Object.assign(
-                    {},
-                    r.data,
-                    { kind: 'ORG_UNIT' }));
-        }
 
         if (vm.parentEntityRef) {
             const selector = mkSelectionOptions(vm.parentEntityRef);
@@ -78,15 +81,10 @@ function controller(serviceBroker) {
                     [ selector ])
                 .then(r => vm.totalCost = r.data);
 
-            serviceBroker
-                .loadViewData(
-                    CORE_API.LogicalFlowStore.calculateStats,
-                    [ selector ])
-                .then(r => vm.flowStats = r.data);
+
 
         }
         vm.complexitySummary = calcComplexitySummary(vm.complexity);
-        vm.enrichedServerStats = enrichServerStats(vm.serverStats);
     }
 }
 

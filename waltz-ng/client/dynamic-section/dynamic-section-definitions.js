@@ -166,6 +166,18 @@ export const dynamicSections = {
         name: 'Related App Groups',
         icon: 'object-group',
         id: 25
+    },
+    personHierarchySection: {
+        componentId: 'person-hierarchy-section',
+        name: 'Hierarchy',
+        icon: 'address-book-o',
+        id: 26
+    },
+    personAppsSection: {
+        componentId: 'person-apps-section',
+        name: 'Application Portfolio',
+        icon: 'desktop',
+        id: 27
     }
 };
 
@@ -235,6 +247,18 @@ export const dynamicSectionsByKind = {
         dynamicSections.complexitySection,
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
+        dynamicSections.changeLogSection
+    ],
+    'PERSON': [
+        dynamicSections.personHierarchySection,
+        dynamicSections.personAppsSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
         dynamicSections.changeLogSection
     ]
 };
