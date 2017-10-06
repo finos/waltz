@@ -15,22 +15,63 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import HomePage from './pages/home/person-home';
+import PersonPage from './pages/view/person-view';
+import {CORE_API} from "../common/services/core-api-utils";
+
+
+function resolvePersonByEmpId($stateParams, serviceBroker) {
+    return serviceBroker
+        .loadViewData(
+            CORE_API.PersonStore.getByEmployeeId,
+            [ $stateParams.empId ])
+        .then(r => r.data);
+}
+
+resolvePersonByEmpId.$inject = [
+    '$stateParams',
+    'ServiceBroker'
+];
+
+function resolvePersonById($stateParams, serviceBroker) {
+    return serviceBroker
+        .loadViewData(
+            CORE_API.PersonStore.getById,
+            [ $stateParams.id ])
+        .then(r => r.data);
+}
+
+resolvePersonById.$inject = [
+    '$stateParams',
+    'ServiceBroker'
+];
+
+
+// --- ROUTES ---
 
 const personHome = {
     url: 'person',
-    views: {'content@': require('./person-home') }
+    views: {'content@': HomePage }
 };
 
 const personView = {
     url: '/:empId',
-    views: {'content@': require('./person-view') }
+    views: {'content@': PersonPage },
+    resolve: {
+        person: resolvePersonByEmpId
+    }
 };
 
 const personViewByPersonId = {
     url: '/id/:id',
-    views: {'content@': require('./person-id-view') }
+    views: {'content@': PersonPage },
+    resolve: {
+        person: resolvePersonById
+    }
 };
 
+
+// --- SETUP ---
 
 function setup($stateProvider) {
 
