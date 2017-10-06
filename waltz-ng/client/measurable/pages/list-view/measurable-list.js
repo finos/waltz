@@ -17,6 +17,7 @@
  */
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import {CORE_API} from '../../../common/services/core-api-utils';
 import {nest} from "d3-collection";
 
 
@@ -62,24 +63,22 @@ function controller($location,
                     $q,
                     $state,
                     $stateParams,
-                    measurableStore,
-                    measurableCategoryStore,
-                    measurableRatingStore,
-                    settingsService,
-                    staticPanelStore,
-                    svgStore) {
+                    serviceBroker,
+                    settingsService) {
 
     const vm = initialiseData(this, initialState);
 
-    const measurablePromise = measurableStore
-        .findAll();
+    const measurablePromise = serviceBroker
+        .loadAppData(CORE_API.MeasurableStore.findAll)
+        .then(r => r.data);
 
-    const measurableCategoryPromise = measurableCategoryStore
-        .findAll()
-        .then(cs => vm.categories = cs);
+    const measurableCategoryPromise = serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+        .then(r => vm.categories = r.data);
 
-    const countPromise = measurableRatingStore
-        .countByMeasurable();
+    const countPromise = serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingStore.countByMeasurable)
+        .then(r => r.data);
 
     const defaultCategoryPromise = settingsService.findOrDefault("settings.measurable.default-category");
 
@@ -95,12 +94,14 @@ function controller($location,
         });
 
     measurableCategoryPromise
-        .then((cs) => staticPanelStore.findByGroups(_.map(cs, c => `HOME.MEASURABLE.${c.id}`)))
-        .then(panels => vm.panelsByCategory = _.groupBy(panels, d => d.group.replace('HOME.MEASURABLE.', '')));
+        .then((cs) => serviceBroker
+            .loadViewData(CORE_API.StaticPanelStore.findByGroups, [_.map(cs, c => `HOME.MEASURABLE.${c.id}`)]))
+        .then(r => vm.panelsByCategory = _.groupBy(r.data, d => d.group.replace('HOME.MEASURABLE.', '')));
 
     measurableCategoryPromise
-        .then((cs) => svgStore.findByGroups(_.map(cs, c => `NAVAID.MEASURABLE.${c.id}`)))
-        .then(diagrams => vm.diagramsByCategory = _.groupBy(diagrams, d => d.group.replace('NAVAID.MEASURABLE.', '')));
+        .then((cs) => serviceBroker
+            .loadViewData(CORE_API.SvgDiagramStore.findByGroups, [_.map(cs, c => `NAVAID.MEASURABLE.${c.id}`)]))
+        .then(r => vm.diagramsByCategory = _.groupBy(r.data, d => d.group.replace('NAVAID.MEASURABLE.', '')));
 
     measurableCategoryPromise
         .then(cs => vm.categoriesById = _.keyBy(cs, 'id'));
@@ -128,12 +129,8 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'MeasurableStore',
-    'MeasurableCategoryStore',
-    'MeasurableRatingStore',
-    'SettingsService',
-    'StaticPanelStore',
-    'SvgDiagramStore'
+    'ServiceBroker',
+    'SettingsService'
 ];
 
 
