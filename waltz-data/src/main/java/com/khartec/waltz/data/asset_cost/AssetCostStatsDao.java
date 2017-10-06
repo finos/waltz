@@ -43,7 +43,7 @@ import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 @Repository
 public class AssetCostStatsDao {
 
-    private static final String COST_KIND_CUMULATIVE = "CUMULATIVE";
+    private static final String COST_KIND_TOTAL = "TOTAL";
 
 
     private final DSLContext dsl;
@@ -102,7 +102,7 @@ public class AssetCostStatsDao {
                 .where(optionsCondition)
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
-                        .kind(COST_KIND_CUMULATIVE)
+                        .kind(COST_KIND_TOTAL)
                         .year(year)
                         .build());
     }
