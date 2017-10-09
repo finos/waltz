@@ -18,6 +18,9 @@
 
 import {loadDataTypes, dataTypeByCodeResolver, dataTypeByIdResolver} from "./resolvers";
 
+import HomePage from './pages/home/data-type-list';
+import ViewPage from './pages/view/data-type-view';
+
 
 const baseState = {
     resolve: {
@@ -28,20 +31,20 @@ const baseState = {
 
 const listState = {
     url: 'data-types',
-    views: {'content@': require('./data-type-list') }
+    views: {'content@': HomePage }
 };
 
 
 const viewByCodeState = {
     url: 'data-types/code/{code}',
-    views: {'content@': require('./data-type-view') },
+    views: {'content@': ViewPage },
     resolve: {dataType: dataTypeByCodeResolver }
 };
 
 
 const viewState = {
     url: 'data-types/{id:int}',
-    views: {'content@': require('./data-type-view') },
+    views: {'content@': ViewPage },
     resolve: {dataType: dataTypeByIdResolver }
 };
 

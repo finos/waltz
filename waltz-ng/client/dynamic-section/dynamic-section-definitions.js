@@ -178,6 +178,18 @@ export const dynamicSections = {
         name: 'Application Portfolio',
         icon: 'desktop',
         id: 27
+    },
+    dataTypeOriginatorsSection: {
+        componentId: 'data-type-originators',
+        name: 'Originators',
+        icon: 'inbox',
+        id: 28
+    },
+    dataTypeFlowSection: {
+        componentId: 'data-type-flow-section',
+        name: 'Data Flows',
+        icon: 'random',
+        id: 29
     }
 };
 
@@ -259,6 +271,15 @@ export const dynamicSectionsByKind = {
         dynamicSections.assetCostsSection,
         dynamicSections.complexitySection,
         dynamicSections.technologySummarySection,
+        dynamicSections.changeLogSection
+    ],
+    'DATA_TYPE': [
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.dataTypeOriginatorsSection,
+        dynamicSections.dataTypeFlowSection,
         dynamicSections.changeLogSection
     ]
 };

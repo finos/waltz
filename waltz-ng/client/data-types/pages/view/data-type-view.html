@@ -1,0 +1,33 @@
+<div>
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.dataType.name }}"
+                       small="Data Type"
+                       tour="ctrl.tour"
+                       icon="qrcode">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.data-type.list">Data</a></li>
+            <li ng-bind="ctrl.dataType.name"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <!-- SUMMARY -->
+    <waltz-data-type-overview parent-entity-ref="ctrl.entityRef">
+    </waltz-data-type-overview>
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation sections="ctrl.availableSections"
+                                          on-select="ctrl.addSection">
+        </waltz-dynamic-section-navigation>
+    </div>
+
+    <br>
+
+    <waltz-dynamic-sections-view sections="ctrl.sections"
+                                 parent-entity-ref="ctrl.entityRef"
+                                 on-remove="ctrl.removeSection">
+    </waltz-dynamic-sections-view>
+
+</div>
