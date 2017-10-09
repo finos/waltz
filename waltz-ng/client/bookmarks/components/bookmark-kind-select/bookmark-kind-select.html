@@ -1,6 +1,7 @@
 <div>
     <ui-select ng-model="$ctrl.selected"
                on-select="$ctrl.onChange($item, $model)"
+               ng-disabled="$ctrl.disabledCondition"
                theme="bootstrap">
         <ui-select-match placeholder="Select a kind of bookmark...">
             <span ng-bind="$ctrl.selected | toDisplayName:'BookmarkKind'"></span>

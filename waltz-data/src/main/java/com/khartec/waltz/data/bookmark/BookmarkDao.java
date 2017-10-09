@@ -59,6 +59,7 @@ public class BookmarkDao {
                 .url(record.getUrl())
                 .kind(record.getKind())
                 .isPrimary(record.getIsPrimary())
+                .isRequired(record.getIsRequired())
                 .provenance(record.getProvenance())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getUpdatedAt().toLocalDateTime())

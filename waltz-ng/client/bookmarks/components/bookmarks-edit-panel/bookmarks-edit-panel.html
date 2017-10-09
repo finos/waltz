@@ -46,10 +46,14 @@
                 </td>
                 <td>
                     <span class="waltz-visibility-child-50">
-                        <a class="clickable wbep-action-remove" ng-click="$ctrl.remove(bookmark)">
+                        <a class="clickable wbep-action-remove"
+                           ng-if="! bookmark.isRequired"
+                           ng-click="$ctrl.remove(bookmark)">
                             Remove
                         </a>
-                        |
+                        <span ng-if="! bookmark.isRequired">
+                            |
+                        </span>
                         <a class="clickable wbep-action-edit" ng-click="$ctrl.edit(bookmark)">
                             Edit
                         </a>
