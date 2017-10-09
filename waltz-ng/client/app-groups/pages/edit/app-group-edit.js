@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {CORE_API} from '../common/services/core-api-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
 
 import template from './app-group-edit.html';
 

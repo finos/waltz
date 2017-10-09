@@ -1,0 +1,35 @@
+<div>
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.groupDetail.appGroup.name }}"
+                       icon="object-group"
+                       small="{{ ctrl.groupDetail.appGroup.kind }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>App Group</li>
+            <li><span ng-bind="ctrl.groupDetail.appGroup.name"></span></li>
+        </ol>
+
+    </waltz-page-header>
+
+
+    <!-- SUMMARY -->
+    <waltz-app-group-summary parent-entity-ref="ctrl.entityRef"
+                             editable="ctrl.isGroupEditable()">
+    </waltz-app-group-summary>
+
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation sections="ctrl.availableSections"
+                                          on-select="ctrl.addSection">
+        </waltz-dynamic-section-navigation>
+    </div>
+
+    <br>
+
+    <waltz-dynamic-sections-view sections="ctrl.sections"
+                                 parent-entity-ref="ctrl.entityRef"
+                                 on-remove="ctrl.removeSection">
+    </waltz-dynamic-sections-view>
+
+</div>

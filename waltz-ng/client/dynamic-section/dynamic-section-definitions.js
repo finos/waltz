@@ -281,5 +281,18 @@ export const dynamicSectionsByKind = {
         dynamicSections.dataTypeOriginatorsSection,
         dynamicSections.dataTypeFlowSection,
         dynamicSections.changeLogSection
+    ],
+    'APP_GROUP': [
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.measurableRatingsBrowserSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.appsSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection
     ]
 };

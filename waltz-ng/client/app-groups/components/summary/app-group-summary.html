@@ -1,4 +1,4 @@
-<div class="waltz-page-summary waltz-page-summary-attach" style="margin-bottom: 24px">
+<div class="waltz-page-summary waltz-page-summary-attach">
     <div class="row">
         <div class="col-sm-12">
             <span class="pull-right"
@@ -94,11 +94,16 @@
             </div>
         </div>
     </div>
-    <div class="pull-right small text-muted"
+    <div class="small text-muted"
          ng-if="$ctrl.owners.length > 0">
-        <strong>Group Owner/s:</strong>
-        <span ng-repeat="owner in $ctrl.owners"
-              ng-bind="owner.userId"></span>
+        &nbsp;
+        <div class="pull-right">
+            <strong>Group Owner/s:</strong>
+            <span ng-repeat="owner in $ctrl.owners">
+                <span ng-bind="owner.userId"></span>
+                &nbsp;
+            </span>
+        </div>
     </div>
 </div>
 
