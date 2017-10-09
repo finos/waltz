@@ -24,21 +24,50 @@
         </div>
         <br />
         <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Survey Subject
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Survey Subject
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                        </waltz-entity-link>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-10">
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
-                </waltz-entity-link>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Survey ID
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="ctrl.surveyInstance.id">
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
         <br />
         <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Status
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Status
+                    </div>
+                    <div class="col-sm-8"
+                         ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-10"
-                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Issued to
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="ctrl.surveyRun.issuanceKind | toDisplayName:'issuance'"></span>
+                    </div>
+                </div>
             </div>
         </div>
         <br />
@@ -60,15 +89,6 @@
             </div>
             <div class="col-sm-4">
                 <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
-            </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Issued to
-            </div>
-            <div class="col-sm-10">
-                <span ng-bind="ctrl.surveyRun.issuanceKind | toDisplayName:'issuance'"></span>
             </div>
         </div>
         <br />
