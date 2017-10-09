@@ -26,9 +26,7 @@ const bindings = {
     onRemove: '<',
 };
 
-
 const initialState = {
-    onRemove: (s) => console.log('wds: default on remove', s)
 };
 
 
