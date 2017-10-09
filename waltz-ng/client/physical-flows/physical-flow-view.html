@@ -39,6 +39,14 @@
                                       specification="ctrl.specification">
         </waltz-physical-flow-overview>
 
+
+        <div class="small text-muted"
+             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
+            Last updated by
+            <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
+            (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
+        </div>
+
     </div>
 
     <br>
