@@ -22,16 +22,11 @@ import {calcComplexitySummary} from "../../../complexity/services/complexity-uti
 import template from './app-group-summary.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    appGroup: '<',
-    applications: '<',
-    totalCost: '<',
-    serverStats: '<',
-    editable: '=',
-    members: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -40,44 +35,73 @@ const initialState = {
 };
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker, userService) {
 
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const selector = {
-            entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
-        };
+        const selector = mkSelectionOptions(vm.parentEntityRef);
+
+        const userPromise = userService
+            .whoami()
+            .then(u => vm.user = u);
+
+        const groupPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AppGroupStore.getById,
+                [ vm.parentEntityRef.id ])
+            .then(r => {
+                vm.appGroup = r.data.appGroup;
+                vm.members = r.data.members;
+                vm.owners = _.filter(vm.members, { role: 'OWNER' });
+            });
+
+        $q.all([userPromise, groupPromise])
+            .then(() => vm.editable = _
+                .chain(vm.owners)
+                .map('userId')
+                .includes(vm.user.userName)
+                .value());
 
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [selector])
+                [ selector ])
             .then(r => vm.totalCost = r.data);
 
         serviceBroker
             .loadViewData(
                 CORE_API.ComplexityStore.findBySelector,
                 [ selector ])
-            .then(r => vm.complexity = r.data);
+            .then(r => vm.complexitySummary = calcComplexitySummary(r.data))
 
         serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowStore.calculateStats,
                 [ selector ])
             .then(r => vm.flowStats = r.data);
-    };
 
-    vm.$onChanges = () => {
-        vm.complexitySummary = calcComplexitySummary(vm.complexity);
-        vm.enrichedServerStats = enrichServerStats(vm.serverStats);
-        vm.owners = _.filter(vm.members, { role: 'OWNER' });
+        serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [ selector ])
+            .then(r => vm.applications = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.TechnologyStatisticsService.findBySelector,
+                [ selector ])
+            .then(r => vm.enrichedServerStats = enrichServerStats(r.data.serverStats));
+
     };
 
 }
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = [
+    '$q',
+    'ServiceBroker',
+    'UserService'
+];
 
 
 const component = {

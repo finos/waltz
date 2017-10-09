@@ -19,6 +19,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ViewPage from './pages/view/app-group-view';
+import EditPage from './pages/edit/app-group-edit';
+
 const baseState = {
     url: 'app-group'
 };
@@ -26,13 +29,13 @@ const baseState = {
 
 const viewState = {
     url: '/{id:int}',
-    views: { 'content@': require('./app-group-view') }
+    views: { 'content@': ViewPage }
 };
 
 
 const editState = {
     url: '/{id:int}/edit',
-    views: { 'content@': require('./app-group-edit') }
+    views: { 'content@': EditPage }
 };
 
 

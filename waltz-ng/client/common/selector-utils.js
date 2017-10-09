@@ -19,6 +19,8 @@
  */
 
 
+import {checkIsEntityRef} from "./checks";
+
 export function getDefaultScopeForEntityKind(kind) {
     switch (kind) {
         case 'ACTOR':
@@ -37,6 +39,8 @@ export function getDefaultScopeForEntityKind(kind) {
 
 
 export function mkSelectionOptions(entityReference, scope) {
+    checkIsEntityRef(entityReference);
+
     return {
         entityReference,
         scope: scope || getDefaultScopeForEntityKind(entityReference.kind)
