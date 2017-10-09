@@ -23,6 +23,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 const bindings = {
     selected: '<',
+    disabledCondition: '<',
     onSelect: '&'
 };
 
