@@ -127,8 +127,6 @@ function controller($q,
 {
     const vm = initialiseData(this, initialState);
 
-    console.log('vm', vm.bookmarksSection)
-
     const flowId = $stateParams.id;
     vm.entityReference = {
         id: flowId,
