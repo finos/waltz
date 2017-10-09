@@ -17,8 +17,11 @@
  */
 
 import angular from "angular";
-import {initialiseData} from "../common";
-import {CORE_API} from "../common/services/core-api-utils";
+
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+
+import template from './data-type-list.html';
 
 
 const initialState = {
@@ -26,7 +29,6 @@ const initialState = {
         editor: false
     }
 };
-
 
 
 function controller($state,
@@ -78,7 +80,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./data-type-list.html'),
+    template,
     controllerAs: 'ctrl',
     controller
 };

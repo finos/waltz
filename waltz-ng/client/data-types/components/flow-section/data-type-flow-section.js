@@ -16,15 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../common";
-import {authoritativeRatingColorScale} from "../../common/colors";
 import _ from "lodash";
+
+import {initialiseData} from "../../../common";
+import {authoritativeRatingColorScale} from "../../../common/colors";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+
+import template from './data-type-flow-section.html';
 
 
 const bindings = {
-    data: '<',
-    dataTypes: '<',
-    typeId: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -37,9 +40,6 @@ const initialState = {
         showNoOpinion: false
     }
 };
-
-
-const template = require('./rated-flow-boingy-graph.html');
 
 
 function calculateEntities(flows = []) {
@@ -137,16 +137,15 @@ function filterData(flows = [],
 }
 
 
-function controller($scope) {
+function controller($q, $scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
     vm.filterChanged = () => {
-        const filteredData = filterData(
+        vm.flowData = filterData(
             vm.rawFlows,
             vm.rawDecorators,
             vm.filterOptions);
-        vm.flowData = filteredData;
     };
 
     vm.showAll = () => {
@@ -159,31 +158,38 @@ function controller($scope) {
         vm.filterChanged();
     };
 
-    vm.$onChanges = () => {
-        const rawFlows = vm.data
-            ? vm.data.flows
-            : [];
-        const rawDecorators = vm.data
-            ? vm.data.decorators
-            : [];
-
-        vm.graphTweakers = buildGraphTweakers(
-            rawDecorators,
-            onAppSelect);
-
-        vm.rawFlows = rawFlows;
-        vm.rawDecorators = rawDecorators;
-        vm.filterChanged();
-    };
-
     vm.refocusApp = app => {
         onAppSelect(app);
+    };
+
+    vm.$onInit = () => {
+        const selector = mkSelectionOptions(vm.parentEntityRef);
+        const flowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findBySelector,
+                [ selector ])
+            .then(r => vm.rawFlows = r.data);
+        const decoratorPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelector,
+                [ selector ])
+            .then(r => {
+                vm.rawDecorators = r.data;
+                vm.graphTweakers = buildGraphTweakers(
+                    vm.rawDecorators,
+                    onAppSelect);
+            });
+
+        $q.all([flowPromise, decoratorPromise])
+            .then(() => vm.filterChanged());
     };
 }
 
 
 controller.$inject = [
-    '$scope'
+    '$q',
+    '$scope',
+    'ServiceBroker'
 ];
 
 
@@ -194,4 +200,9 @@ const component = {
 };
 
 
-export default component;
+const id = 'waltzDataTypeFlowSection'
+
+export default {
+    component,
+    id
+};
