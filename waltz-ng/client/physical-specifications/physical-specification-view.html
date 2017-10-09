@@ -129,14 +129,13 @@
                 </message>
             </waltz-no-data>
         </div>
-
-
     </waltz-section>
 
 
     <!-- FLOW DIAGRAMS -->
-    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityReference">
-    </waltz-flow-diagrams-section>
+    <waltz-dynamic-section-wrapper section="ctrl.flowDiagramsSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
 
 
     <!-- ASSOCIATED FLOWS -->
@@ -183,13 +182,14 @@
     </waltz-section>
 
 
-    <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityReference">
-    </waltz-bookmarks-section>
+    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
 
 
-    <!-- CHANGE_LOG -->
-    <waltz-change-log-section parent-entity-ref="ctrl.entityReference">
-    </waltz-change-log-section>
+    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+
 
 </div>
