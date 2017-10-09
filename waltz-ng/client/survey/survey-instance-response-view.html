@@ -32,52 +32,80 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Survey Subject
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Survey Subject
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                        </waltz-entity-link>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-10">
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
-                </waltz-entity-link>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Status
-            </div>
-            <div class="col-sm-10"
-                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Due
-            </div>
-            <div class="col-sm-4">
-                <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
-            </div>
-            <div class="col-sm-2 waltz-display-field-label">
-                Issued
-            </div>
-            <div class="col-sm-4">
-                <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Survey ID
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="ctrl.surveyInstance.id">
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Participants
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Status
+                    </div>
+                    <div class="col-sm-8"
+                         ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-10">
-                <ul class="list-unstyled list-inline">
-                    <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Due
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Participants
+                    </div>
+                    <div class="col-sm-8">
+                        <ul class="list-unstyled list-inline">
+                            <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
                         <span>
                             <span ng-bind="p.displayName"></span>
                         </span>
-                        <span ng-hide="$last">, </span>
-                    </li>
-                </ul>
+                                <span ng-hide="$last">, </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Issued
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
