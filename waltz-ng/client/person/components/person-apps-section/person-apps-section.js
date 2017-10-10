@@ -158,7 +158,8 @@ function controller(serviceBroker) {
             "Overall Rating",
             "Risk Rating",
             "Business Criticality",
-            "Lifecycle Phase"
+            "Lifecycle Phase",
+            "Roles"
         ];
 
         const dataRows = _
@@ -171,7 +172,8 @@ function controller(serviceBroker) {
                     app.overallRating || '',
                     app.riskRating || '',
                     app.businessCriticality || '',
-                    app.lifecyclePhase || ''
+                    app.lifecyclePhase || '',
+                    _.join(app.roles, ", ")
                 ];
             })
             .value();
