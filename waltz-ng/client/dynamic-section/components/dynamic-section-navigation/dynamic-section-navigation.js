@@ -36,7 +36,6 @@ const initialState = {
     sections: [],
     offset: 250,
     stickyVisible: false,
-    sectionClasses: {},
     onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
 };
 
@@ -67,8 +66,9 @@ function controller($scope,
     };
 
     vm.$onChanges = () => {
+        const fadeFactor = 2.5;
         colorScale
-            .domain([0, vm.availableSections.length / 2.5]);
+            .domain([0, vm.availableSections.length / fadeFactor]);
 
         vm.sections = _.map(vm.availableSections, s => {
             const openOffset = _.findIndex(vm.openSections, os => os.id === s.id);
