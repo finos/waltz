@@ -1,11 +1,17 @@
-<div class="waltz-dynamic-section-navigation">
+<div class="waltz-dynamic-section-navigation wdsn-summary">
     <ul class="list-unstyled list-inline">
-        <li ng-repeat="section in $ctrl.sections">
-            <a ng-click="$ctrl.onSelect(section)"
-               class="clickable">
-                <waltz-icon name="{{ section.icon }}"></waltz-icon>
-                <span ng-bind="section.name"></span>
-            </a>
+        <li ng-repeat="section in $ctrl.sections track by section.id"
+            class="wdsn-option">
+            <div ng-style="section.style">
+                <a ng-click="$ctrl.onSelect(section)"
+                   class="clickable">
+                    <waltz-icon name="{{ section.icon }}">
+                    </waltz-icon>
+                    <span class='small'
+                          ng-bind="section.name">
+                    </span>
+                </a>
+            </div>
         </li>
     </ul>
 </div>
@@ -15,11 +21,15 @@
         'wdsn-sticky-visible' : $ctrl.stickyVisible
      }">
     <ul class="list-unstyled list-inline">
-        <li ng-repeat="section in $ctrl.sections">
+        <li ng-repeat="section in $ctrl.sections track by section.id"
+            class="wdsn-option">
             <a ng-click="$ctrl.scrollAndSelectSection(section)"
                class="clickable">
-                <waltz-icon name="{{ section.icon }}"></waltz-icon>
-                <span ng-bind="section.name"></span>
+                <waltz-icon name="{{ section.icon }}">
+                </waltz-icon>
+                <span class='small'
+                      ng-bind="section.name">
+                </span>
             </a>
         </li>
     </ul>
