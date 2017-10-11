@@ -17,8 +17,8 @@
  */
 
 import _ from 'lodash';
-import {CORE_API} from "../../common/services/core-api-utils";
-import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../common/hierarchy-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
 import template from './data-type-tree.html';
 
 const bindings = {
@@ -136,12 +136,17 @@ controller.$inject = [
 ];
 
 
-export const component = {
+const component = {
     bindings,
     template,
     controller
 };
 
 
-export const id = 'waltzDataTypeTree';
+const id = 'waltzDataTypeTree';
 
+
+export default {
+    id,
+    component
+}

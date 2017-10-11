@@ -88,4 +88,19 @@
         </insert>
     </changeSet>
 
+
+    <!-- 2677: asset_cost: remove currency column -->
+    <changeSet id="20171005-2677-1"
+               author="rovats">
+        <comment>2677: Bookmarks is_required column</comment>
+        <addColumn tableName="bookmark">
+            <column name="is_required"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

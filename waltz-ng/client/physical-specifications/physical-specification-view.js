@@ -16,10 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../common";
-import {toGraphId} from "../flow-diagram/flow-diagram-utils";
 import _ from "lodash";
 
+import {initialiseData} from "../common";
+import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
 
 import template from './physical-specification-view.html';
 
@@ -37,7 +37,10 @@ const initialState = {
     specDefinitions: [],
     specDefinitionCreate: {
         creating: false
-    }
+    },
+    bookmarksSection: dynamicSections.bookmarksSection,
+    flowDiagramsSection: dynamicSections.flowDiagramsSection,
+    changeLogSection: dynamicSections.changeLogSection
 };
 
 

@@ -40,16 +40,11 @@
         </waltz-physical-flow-overview>
 
 
-        <div class="small">
-            <a class="clickable pull-right"
-               ui-sref="main.attestation.view ( {
-                        id: ctrl.physicalFlow.id,
-                        kind: 'PHYSICAL_FLOW',
-                        name: ctrl.specification.owningEntity.name + ' → ' + ctrl.physicalFlow.target.name
-                } )">
-                view attestations
-            </a>
-            <br>
+        <div class="small text-muted"
+             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
+            Last updated by
+            <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
+            (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
         </div>
 
     </div>
@@ -128,13 +123,12 @@
     </waltz-section>
 
 
-    <!-- FLOW DIAGRAMS -->
-    <waltz-flow-diagrams-section parent-entity-ref="ctrl.entityReference">
-    </waltz-flow-diagrams-section>
+    <waltz-dynamic-section-wrapper section="ctrl.flowDiagramsSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
 
 
-    <!-- BOOKMARKS -->
-    <waltz-bookmarks-section parent-entity-ref="ctrl.entityReference">
-    </waltz-bookmarks-section>
-
+    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
 </div>

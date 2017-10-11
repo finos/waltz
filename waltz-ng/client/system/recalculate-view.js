@@ -20,7 +20,6 @@ const template = require('./recalculate-view.html');
 
 
 function controller(notification,
-                    attestationStore,
                     authSourceStore,
                     complexityStore,
                     dataTypeUsageStore) {
@@ -47,27 +46,11 @@ function controller(notification,
             .recalculateAll()
             .then(() => notification.success('Complexity recalculated'));
     };
-
-    vm.recalcFlowDiagramAttestations = () => {
-        notification.info('Flow diagram recalculation requested');
-        attestationStore
-            .recalculateForFlowDiagrams()
-            .then(() => notification.success('Flow diagram attestation recalculated'));
-    };
-
-
-    vm.recalcLogicalFlowDecoratorAttestations = () => {
-        notification.info('Logical flow decorator attestation recalculation requested');
-        attestationStore
-            .recalculateForLogicalFlowDecorators()
-            .then(() => notification.success('Logical flow decorator attestation recalculated'));
-    };
 }
 
 
 controller.$inject = [
     'Notification',
-    'AttestationStore',
     'AuthSourcesStore',
     'ComplexityStore',
     'DataTypeUsageStore'

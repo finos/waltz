@@ -17,16 +17,18 @@
  */
 
 import _ from 'lodash';
-import {initialiseData} from '../../common'
-import {CORE_API} from "../../common/services/core-api-utils";
+
+import {initialiseData} from '../../../common'
+import {CORE_API} from "../../../common/services/core-api-utils";
+
+import template from './data-type-originators.html';
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
+    parentEntityRef: '<',
     flowOriginators: '<'
 };
-
-
-const template = require('./data-type-originators.html');
 
 
 const initialState = {
@@ -54,9 +56,21 @@ function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(r => vm.dataTypes = r.data);
+    vm.$onInit = () => {
+        const dtPromise = serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.dataTypes = r.data);
+
+        const originatorPromise = serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeUsageStore.findForUsageKindByDataTypeIdSelector,
+                [ 'ORIGINATOR', mkSelectionOptions(vm.parentEntityRef) ])
+            .then(r => vm.flowOriginators = r.data);
+
+        dtPromise
+            .then(() => originatorPromise)
+            .then(() => vm.originators = prepareData(vm.dataTypes, vm.flowOriginators));
+    };
 
     vm.$onChanges = () => {
         vm.originators = prepareData(vm.dataTypes, vm.flowOriginators);
@@ -77,6 +91,10 @@ const component = {
 };
 
 
+const id = 'waltzDataTypeOriginators';
 
 
-export default component;
+export default {
+    component,
+    id
+};

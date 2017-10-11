@@ -62,7 +62,7 @@ export const dynamicSections = {
     complexitySection: {
         componentId: 'complexity-section',
         icon: 'sort-numeric-asc',
-        name: 'Application Complexity',
+        name: 'Complexity',
         id: 8,
     },
     dataFlowSection: {
@@ -97,7 +97,7 @@ export const dynamicSections = {
     },
     logicalFlowsTabgroupSection: {
         componentId: 'logical-flows-tabgroup-section',
-        name: 'Logical Data Flows',
+        name: 'Logical Flows',
         icon: 'random',
         id: 14,
     },
@@ -109,7 +109,7 @@ export const dynamicSections = {
     },
     measurableRatingsBrowserSection: {
         componentId: 'measurable-ratings-browser-section',
-        name: 'Viewpoint Ratings',
+        name: 'Ratings',
         icon: 'star-half-o',
         id: 16,
     },
@@ -151,19 +151,19 @@ export const dynamicSections = {
     },
     changeInitiativeRelatedDataTypesSection: {
         componentId: 'change-initiative-related-data-type-section',
-        name: 'Related Data Types',
+        name: 'Related Types',
         icon: 'qrcode',
         id: 23
     },
     relatedAppsSection: {
         componentId: 'related-apps-section',
-        name: 'Related Applications',
+        name: 'Related Apps',
         icon: 'desktop',
         id: 24
     },
     relatedAppGroupsSection: {
         componentId: 'related-app-groups-section',
-        name: 'Related App Groups',
+        name: 'Related Groups',
         icon: 'object-group',
         id: 25
     },
@@ -175,9 +175,21 @@ export const dynamicSections = {
     },
     personAppsSection: {
         componentId: 'person-apps-section',
-        name: 'Application Portfolio',
+        name: 'Applications',
         icon: 'desktop',
         id: 27
+    },
+    dataTypeOriginatorsSection: {
+        componentId: 'data-type-originators',
+        name: 'Originators',
+        icon: 'inbox',
+        id: 28
+    },
+    dataTypeFlowSection: {
+        componentId: 'data-type-flow-section',
+        name: 'Data Flows',
+        icon: 'random',
+        id: 29
     }
 };
 
@@ -259,6 +271,28 @@ export const dynamicSectionsByKind = {
         dynamicSections.assetCostsSection,
         dynamicSections.complexitySection,
         dynamicSections.technologySummarySection,
+        dynamicSections.changeLogSection
+    ],
+    'DATA_TYPE': [
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.dataTypeOriginatorsSection,
+        dynamicSections.dataTypeFlowSection,
+        dynamicSections.changeLogSection
+    ],
+    'APP_GROUP': [
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.measurableRatingsBrowserSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.appsSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.bookmarksSection,
         dynamicSections.changeLogSection
     ]
 };

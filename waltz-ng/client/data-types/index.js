@@ -19,7 +19,10 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import DataTypeStore from "./services/data-type-store";
-import * as DataTypeTree from './components/data-type-tree';
+import DataTypeTree from './components/tree/data-type-tree';
+import DataTypeOverview from './components/overview/data-type-overview';
+import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
+import DataTypeOriginators from './components/originators/data-type-originators';
 
 export default () => {
     const module = angular.module('waltz.data.types', []);
@@ -27,15 +30,16 @@ export default () => {
     module.config(require('./routes'));
 
     registerStores(module, [ DataTypeStore ]);
-    registerComponents(module, [ DataTypeTree ]);
+    registerComponents(module, [
+        DataTypeOriginators,
+        DataTypeFlowSection,
+        DataTypeOverview,
+        DataTypeTree
+    ]);
 
     module
         .service('DataTypeViewDataService', require('./services/data-type-view-data'));
 
-    module
-        .component('waltzDataTypeOverview', require('./components/data-type-overview'))
-        .component('waltzRatedFlowBoingyGraph', require('./components/rated-flow-boingy-graph'))
-        .component('waltzDataTypeOriginators', require('./components/data-type-originators'));
 
     return module.name;
 };
