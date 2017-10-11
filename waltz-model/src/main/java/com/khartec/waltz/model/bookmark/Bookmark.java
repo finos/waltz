@@ -50,4 +50,9 @@ public abstract class Bookmark implements IdProvider, ProvenanceProvider, LastUp
     @Value.Default
     public boolean isPrimary() { return false; }
 
+    @Value.Default
+    public boolean isRequired() {
+        return false;
+    }
+
 }

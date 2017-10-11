@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {nest} from 'd3-collection';
 import _ from 'lodash';
 
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from '../../../common';
+
 import template from './data-flow-section.html';
 
 

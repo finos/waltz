@@ -21,6 +21,7 @@ import _ from "lodash";
 
 
 import template from './physical-flow-view.html';
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 
 const initialState = {
@@ -38,8 +39,11 @@ const initialState = {
     tour: [],
     visibility: {
         diagramEditor: false
-    }
+    },
+    bookmarksSection: dynamicSections.bookmarksSection,
+    flowDiagramsSection: dynamicSections.flowDiagramsSection,
 };
+
 
 
 function mkHistoryObj(flow, spec) {

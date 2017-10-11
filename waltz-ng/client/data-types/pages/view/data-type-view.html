@@ -1,21 +1,20 @@
 <div>
-
     <!-- HEADER -->
-    <waltz-page-header icon="user"
+    <waltz-page-header name="{{ ctrl.dataType.name }}"
+                       small="Data Type"
                        tour="ctrl.tour"
-                       name="{{ ctrl.person.displayName }}">
+                       icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.person">People</a></li>
-            <li><span ng-bind="ctrl.person.displayName"></span></li>
+            <li><a ui-sref="main.data-type.list">Data</a></li>
+            <li ng-bind="ctrl.dataType.name"></li>
         </ol>
     </waltz-page-header>
 
 
     <!-- SUMMARY -->
-    <waltz-person-summary parent-entity-ref='ctrl.entityRef'>
-    </waltz-person-summary>
-
+    <waltz-data-type-overview parent-entity-ref="ctrl.entityRef">
+    </waltz-data-type-overview>
 
     <!-- NAVIGATION -->
     <div class="waltz-page-summary waltz-page-summary-attach">

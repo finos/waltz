@@ -19,16 +19,21 @@ import _ from "lodash";
 import { initialiseData, invokeFunction } from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
+import {scaleLinear} from "d3-scale";
+import {rgb} from "d3-color";
 
 
 const bindings = {
-    sections: '<',
+    availableSections: '<',
+    openSections: '<',
+    parentEntityRef: '<',
     onSelect: '<',
     offset: '@?'
 };
 
 
 const initialState = {
+    sections: [],
     offset: 250,
     stickyVisible: false,
     onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
@@ -38,6 +43,9 @@ const initialState = {
 function controller($scope,
                     $window) {
     const vm = initialiseData(this, initialState);
+
+    const colorScale = scaleLinear()
+        .range([rgb('#ffc46e'), rgb('#ffffff')]);
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
@@ -57,6 +65,25 @@ function controller($scope,
             .off("scroll", scrollListener);
     };
 
+    vm.$onChanges = () => {
+        const fadeFactor = 2.5;
+        colorScale
+            .domain([0, vm.availableSections.length / fadeFactor]);
+
+        vm.sections = _.map(vm.availableSections, s => {
+            const openOffset = _.findIndex(vm.openSections, os => os.id === s.id);
+
+            const color = openOffset > -1
+                ? rgb(colorScale(openOffset))
+                : rgb(255,255,255);
+
+            const style = {
+                'border-bottom': `2px solid ${color.toString()}`
+            };
+
+            return Object.assign({}, s, { style })
+        });
+    };
 
     // -- INTERACT --
 

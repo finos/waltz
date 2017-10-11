@@ -4,9 +4,13 @@
         <div class="waltz-visibility-parent waltz-dynamic-section-header-title">
             <span class="waltz-visibility-child-50 clickable"
                   ng-click="$ctrl.onRemove($ctrl.section)"
+                  ng-if="$ctrl.onRemove"
                   title="Close">
                 <waltz-icon name="times">
                 </waltz-icon>
+            </span>
+            <span ng-if="$ctrl.onRemove == null">
+                <waltz-icon fixed-width="true"></waltz-icon>
             </span>
 
             <span>
@@ -19,4 +23,5 @@
     <div class="container-fluid waltz-dynamic-section-body">
         <ng-transclude></ng-transclude>
     </div>
+
 </div>

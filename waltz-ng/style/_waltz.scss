@@ -27,7 +27,7 @@
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
 @import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
-@import "../client/data-types/components/data-type-tree";
+@import "../client/data-types/components/tree/data-type-tree";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/data-type-usage/directives/app-data-type-usage-list";
 @import "../client/dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
@@ -40,6 +40,7 @@
 @import "../client/entity-statistics/components/entity-statistic-summary-card";
 @import "../client/entity-statistics/components/history-chart/entity-statistic-history-chart";
 @import "../client/entity-svg-diagram/components/viewer/entity-svg-diagram-viewer";
+@import "../client/extensions/extensions";
 @import "../client/flow-diagram/flow-diagram";
 @import "../client/logical-flow/components/app-centric-flow-table/app-centric-flow-table";
 @import "../client/logical-flow/components/boingy-graph/boingy-graph";

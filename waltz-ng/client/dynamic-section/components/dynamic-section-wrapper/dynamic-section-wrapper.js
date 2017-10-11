@@ -30,7 +30,6 @@ const bindings = {
 
 
 const initialState = {
-    onRemove: (s) => console.log('wdsw: onRemove, default impl:', s),
 };
 
 
