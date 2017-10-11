@@ -34,9 +34,6 @@ export default () => {
     module
         .config(routes);
 
-    module
-        .service('AttestationStore', require('./services/attestation-store'));
-
     registerStores(module, [
         attestationInstanceStore,
         attestationRunStore

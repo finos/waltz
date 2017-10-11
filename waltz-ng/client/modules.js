@@ -59,6 +59,7 @@ const dependencies = [
     require('./applications')(),
     require('./app-groups')(),
     require('./asset-cost')(),
+    require('./attestation')(),
     require('./auth-sources')(),
     require('./bookmarks')(),
     require('./change-initiative')(),
