@@ -18,29 +18,23 @@
   ~  */
   -->
 
-<div ng-show="($ctrl.hasRole && $ctrl.availableTypes.length > 0) || $ctrl.notes.length > 0">
-    <waltz-section name="Additional Notes"
-                   icon="sticky-note-o"
-                   id="entity-notes-section">
-
-        <waltz-section-actions>
-            <button type="button"
-                    class="btn btn-xs btn-primary"
-                    ng-if="($ctrl.hasRole && $ctrl.availableTypes.length > 0)"
-                    ng-click="$ctrl.showEditor()">
-                Add Note
-            </button>
-        </waltz-section-actions>
+<div>
+    <waltz-section-actions ng-if="$ctrl.hasRole && $ctrl.availableTypes.length > 0">
+        <button type="button"
+                class="btn btn-xs btn-primary"
+                ng-if="($ctrl.hasRole && $ctrl.availableTypes.length > 0)"
+                ng-click="$ctrl.showEditor()">
+            Add Note
+        </button>
+    </waltz-section-actions>
 
 
-        <waltz-entity-named-notes-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                        notes="$ctrl.notes"
-                                        all-note-types="$ctrl.allNoteTypes"
-                                        on-save="$ctrl.saveNote"
-                                        on-delete="$ctrl.deleteNote"
-                                        creating-note="$ctrl.creatingNote"
-                                        on-editor-dismiss="$ctrl.editorDismiss">
-        </waltz-entity-named-notes-panel>
-
-    </waltz-section>
+    <waltz-entity-named-notes-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                    notes="$ctrl.notes"
+                                    all-note-types="$ctrl.allNoteTypes"
+                                    on-save="$ctrl.saveNote"
+                                    on-delete="$ctrl.deleteNote"
+                                    creating-note="$ctrl.creatingNote"
+                                    on-editor-dismiss="$ctrl.editorDismiss">
+    </waltz-entity-named-notes-panel>
 </div>
