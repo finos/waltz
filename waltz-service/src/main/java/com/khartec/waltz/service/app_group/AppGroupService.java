@@ -33,6 +33,7 @@ import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
@@ -174,6 +175,20 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
 
         appGroupEntryDao.addApplications(groupId, applicationIds);
+
+        List<Application> apps = applicationDao.findByIds(applicationIds);
+        List<ChangeLog> changeLogs = apps
+                .stream()
+                .map(app -> ImmutableChangeLog.builder()
+                        .message(String.format("Added application %s to group", app.name()))
+                        .userId(userId)
+                        .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                        .childKind(EntityKind.APPLICATION)
+                        .operation(Operation.ADD)
+                        .build())
+                .collect(Collectors.toList());
+        changeLogService.write(changeLogs);
+
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 
