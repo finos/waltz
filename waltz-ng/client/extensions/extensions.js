@@ -1,5 +1,6 @@
 // extensions initialisation
 
+import _ from "lodash";
 import {registerComponents} from '../common/module-utils';
 import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section/dynamic-section-definitions";
 
@@ -13,11 +14,11 @@ export const init = (module) => {
         dbChangeInitiativeSection
     ]);
 
-    _overrideChangeInitiativeSection();
+    overrideApplicationDynamicSections();
 };
 
 
-function _overrideChangeInitiativeSection() {
+function overrideApplicationDynamicSections() {
     dynamicSections.dbChangeInitiativesSection = {
         componentId: 'db-change-initiative-section',
         name: 'Change Initiatives',
@@ -25,18 +26,10 @@ function _overrideChangeInitiativeSection() {
         id: 10000
     };
 
-    dynamicSectionsByKind["APPLICATION"] = [
-        dynamicSections.measurableRatingAppSection,
-        dynamicSections.entityNamedNotesSection,
-        dynamicSections.bookmarksSection,
-        dynamicSections.involvedPeopleSection,
-        dynamicSections.dbChangeInitiativesSection, //overridden
-        dynamicSections.flowDiagramsSection,
-        dynamicSections.dataFlowSection,
-        dynamicSections.technologySection,
-        dynamicSections.appCostsSection,
-        dynamicSections.entityStatisticSection,
-        dynamicSections.surveySection,
-        dynamicSections.changeLogSection
-    ];
+    dynamicSectionsByKind["APPLICATION"] = _.map(
+        dynamicSectionsByKind["APPLICATION"],
+        ds => ds.id === dynamicSections.changeInitiativeSection.id
+                ? dynamicSections.dbChangeInitiativesSection
+                : ds
+    );
 }
