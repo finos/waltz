@@ -24,7 +24,7 @@
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
                 <jdbc.artifact>mariadb-java-client</jdbc.artifact>
-                <jdbc.version>1.5.9</jdbc.version>
+                <jdbc.version>1.6.5</jdbc.version>
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
                 <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
