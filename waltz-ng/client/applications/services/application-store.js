@@ -50,6 +50,9 @@ export function store($http, BaseApiUrl) {
         .post(`${BASE}/by-ids`, ids)
         .then(x => x.data);
 
+    const findAll = (ids) => $http
+        .get(`${BASE}/all`)
+        .then(x => x.data);
 
     const update = (id, action) => $http
         .post(`${BASE}/${id}`, action)
@@ -76,6 +79,7 @@ export function store($http, BaseApiUrl) {
         getAppTagsById,
         findRelatedById,
         findByIds,
+        findAll,
         findBySelector,
         findByAssetCode,
         countByOrganisationalUnit,
@@ -115,6 +119,11 @@ export const ApplicationStore_API = {
         serviceName,
         serviceFnName: 'findByIds',
         description: 'find apps for the given list of app ids'
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'find all apps'
     },
     findBySelector: {
         serviceName,

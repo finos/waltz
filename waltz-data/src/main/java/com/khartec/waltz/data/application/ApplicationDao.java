@@ -152,7 +152,8 @@ public class ApplicationDao {
                 .or(rel.PARENT_ASSET_CODE.eq(self.ASSET_CODE)) //  parent
                 .or(rel.ASSET_CODE.eq(self.PARENT_ASSET_CODE).and(self.PARENT_ASSET_CODE.ne(""))) // child
                 .where(self.ID.eq(appId))
-                .and(IS_ACTIVE)
+                .and(rel.ENTITY_LIFECYCLE_STATUS
+                        .eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.khartec.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
@@ -74,6 +76,7 @@ public class AppGroupEndpoint implements Endpoint {
         String deleteGroupPath = idPath;
 
         String addApplicationPath = mkPath(idPath, "applications");
+        String addApplicationListPath = mkPath(idPath, "applications", "list");
         String removeApplicationPath = mkPath(idPath, "applications", ":applicationId");
         String updateGroupOverviewPath = idPath;
 
@@ -143,6 +146,14 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.addApplication(getUsername(request), groupId, applicationId);
         };
 
+        ListRoute<EntityReference> addApplicationListRoute = (request, response) -> {
+            long groupId = getId(request);
+            List<Long> applicationIds = readIdsFromBody(request);
+            LOG.info("Adding applications: {}, to group: {} ", applicationIds,  groupId);
+            String userId = getUsername(request);
+            return appGroupService.addApplications(userId, groupId, applicationIds);
+        };
+
         ListRoute<EntityReference> removeApplicationRoute = (request, response) -> {
             long groupId = getId(request);
             long applicationId = getLong(request, "applicationId");
@@ -192,6 +203,7 @@ public class AppGroupEndpoint implements Endpoint {
         postForList(addOwnerPath, addOwnerRoute);
 
         postForList(addApplicationPath, addApplicationRoute);
+        postForList(addApplicationListPath, addApplicationListRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
 
         postForList(addChangeInitiativePath, addChangeInitiativeRoute);

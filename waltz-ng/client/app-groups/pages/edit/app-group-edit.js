@@ -25,6 +25,7 @@ import template from './app-group-edit.html';
 const initialState = {
     changeInitiatives: [],
     selectedChangeInitiative: null,
+    editor: 'SINGLE'
 };
 
 
@@ -132,6 +133,21 @@ function controller($q,
             .then(() => vm.focusApp = focusApp);
     };
 
+    vm.showSingleEditor = () => {
+        vm.editor = 'SINGLE'
+    };
+
+    vm.showBulkEditor = () => {
+        vm.editor = 'BULK';
+    };
+
+    vm.saveApplications = (results) => {
+        const appIds = _.map(results, r => r.entityRef.id);
+
+        return appGroupStore.addApplications(id, appIds)
+            .then(apps => vm.applications = apps, e => handleError(e))
+            .then(() => notification.success(`Added ${appIds.length} applications`));
+    };
 
     // add app via search
     vm.searchedApp = {};

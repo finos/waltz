@@ -169,6 +169,8 @@ public class ApplicationEndpoint implements Endpoint {
                     .findByIds(ids);
         };
 
+        ListRoute<Application> findAllRoute = (req, res) -> appService.findAll();
+
         DatumRoute<Application> getByIdRoute = (req, res) -> {
             String id = req.params("id");
             return appService
@@ -191,6 +193,7 @@ public class ApplicationEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "id", ":id", "tags"), getAppTagsRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelatedRoute);
         postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
+        getForList(mkPath(BASE_URL, "all"), findAllRoute);
         postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
         getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), findByAssetCodeRoute);
     }
