@@ -23,7 +23,7 @@ import services from './services';
 
 import AppCostsSection from './components/app-costs-section/app-costs-section';
 import AppOverview from './components/overview/app-overview';
-import * as BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
+import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
 import RelatedAppsSection from './components/related-apps-section/related-apps-section';
 
 export default () => {

@@ -174,10 +174,6 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
 
         appGroupEntryDao.addApplications(groupId, applicationIds);
-        List<Application> apps = applicationDao.findByIds(applicationIds);
-        apps.forEach(app ->
-                audit(groupId, userId, String.format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD));
-
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 

@@ -20,6 +20,7 @@ import _ from "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { initialiseData } from "../../../common";
 import { invokeFunction } from "../../../common/index";
+import { toEntityRef } from '../../../common/entity-utils';
 
 import template from "./bulk-application-selector.html";
 
@@ -45,16 +46,9 @@ const initialState = {
 
 
 function mkSummary(searchResults = []) {
-    const summary = _
-        .chain(searchResults)
-        .groupBy(r => r.entityRef == null ? 'notFound' : 'found')
-        .reduce((r, v, k) => {
-            r[k] = v.length;
-            return r;
-        }, {})
-        .value();
-    summary.total = searchResults.length;
-    return summary;
+    return Object.assign(
+        { total: searchResults.length },
+        _.countBy(searchResults, r => r.entityRef == null ? 'notFound' : 'found'));
 }
 
 
@@ -62,29 +56,18 @@ function findMatchedApps(apps = [], identifiers = []) {
     const appsByAssetCode = _.keyBy(apps, 'assetCode');
 
     return _.chain(identifiers)
-        .map(identifier => ({
-            identifier,
-            entityRef: mkRef(appsByAssetCode[identifier])
-        }))
+        .map(identifier => {
+            const app = appsByAssetCode[identifier];
+            return {
+                identifier,
+                entityRef: app ? toEntityRef(app, 'APPLICATION') : null
+            };
+        })
         .value();
 }
 
 
-function mkRef(app) {
-    if(!app) {
-        return null;
-    }
-
-    return {
-        kind: 'APPLICATION',
-        id: app.id,
-        name: app.name,
-        description: app.description
-    };
-}
-
-
-function controller($q, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.options = {
@@ -104,7 +87,7 @@ function controller($q, serviceBroker) {
 
 
     const filterResults = () => {
-        vm.filteredSearchResults = _.filter(vm.searchResults, r => vm.showNotFoundOnly ? r.entityRef == null : true);
+        return _.filter(vm.searchResults, r => vm.showNotFoundOnly ? r.entityRef == null : true);
     };
 
 
@@ -121,7 +104,7 @@ function controller($q, serviceBroker) {
         return searchRefs(identifiers)
             .then(results => {
                 vm.searchResults = results;
-                filterResults();
+                vm.filteredSearchResults = filterResults();
                 vm.visibility.loading = false;
                 vm.searchSummary = mkSummary(vm.searchResults);
             });
@@ -131,13 +114,12 @@ function controller($q, serviceBroker) {
 
     vm.toggleNotFound = () => {
         vm.showNotFoundOnly = !vm.showNotFoundOnly;
-        filterResults();
+        vm.filteredSearchResults = filterResults();
     }
 }
 
 
 controller.$inject = [
-    '$q',
     'ServiceBroker'
 ];
 
