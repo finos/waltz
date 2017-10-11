@@ -23,7 +23,6 @@ import {registerComponents, registerStore} from '../common/module-utils';
 import changeInitiativeStore from './services/change-initiative-store';
 import changeInitiativeSelector from './directives/change-initiative-selector';
 import * as changeInitiativeRelatedDataTypeSection from './components/related-data-type-section/change-initiative-related-data-type-section';
-import changeInitiativeBrowser from './components/change-initiative-browser/change-initiative-browser';
 import changeInitiativeRelatedAppsSection from './components/related-apps-section/related-apps-section';
 import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
 
@@ -39,7 +38,6 @@ function setup() {
         .directive("waltzChangeInitiativeSelector", changeInitiativeSelector);
 
     registerComponents(module, [
-        changeInitiativeBrowser,
         changeInitiativeSection,
         changeInitiativeRelatedAppsSection,
         changeInitiativeRelatedDataTypeSection
