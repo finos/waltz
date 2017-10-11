@@ -77,6 +77,7 @@ const dependencies = [
     require('./entity-tags')(),
     require('./enum-value')(),
     require('./examples')(),
+    require('./extensions')(),
     require('./flow-diagram')(),
     require('./formly')(),
     require('./history')(),
