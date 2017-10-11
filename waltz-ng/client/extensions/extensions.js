@@ -14,11 +14,11 @@ export const init = (module) => {
         dbChangeInitiativeSection
     ]);
 
-    overrideApplicationDynamicSections();
+    overrideChangeInitiativeSection();
 };
 
 
-function overrideApplicationDynamicSections() {
+function overrideChangeInitiativeSection() {
     dynamicSections.dbChangeInitiativesSection = {
         componentId: 'db-change-initiative-section',
         name: 'Change Initiatives',
@@ -26,10 +26,10 @@ function overrideApplicationDynamicSections() {
         id: 10000
     };
 
-    dynamicSectionsByKind["APPLICATION"] = _.map(
-        dynamicSectionsByKind["APPLICATION"],
-        ds => ds.id === dynamicSections.changeInitiativeSection.id
+    _.forIn(dynamicSectionsByKind, (v, k) => dynamicSectionsByKind[k] = _.map(
+            v,
+            ds => ds.id === dynamicSections.changeInitiativeSection.id
                 ? dynamicSections.dbChangeInitiativesSection
                 : ds
-    );
+        ));
 }
