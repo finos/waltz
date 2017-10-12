@@ -31,14 +31,23 @@ export function service($location, $stateParams, localStorage) {
     const updateWindowLocation = (ids) => {
         const sectionParamValue = _
             .chain(ids)
+            .compact()
             .take(3)
             .join(';')
             .value();
         $location.search('sections', sectionParamValue);
     };
 
+    const readFromLocalStorage = (kind) => {
+        return _.compact(localStorage.get(mkStorageKey(kind)) || []);
+    };
+
+    const writeToLocalStorage = (kind, sectionIds = []) => {
+        localStorage.set(mkStorageKey(kind), _.compact(sectionIds));
+    };
+
     const getOpenSections = (kind, limit) => {
-        const sectionIds = localStorage.get(mkStorageKey(kind)) || [];
+        const sectionIds = readFromLocalStorage(kind);
 
         updateWindowLocation(_.take(sectionIds, SOFT_SECTION_LIMIT));
 
@@ -49,6 +58,7 @@ export function service($location, $stateParams, localStorage) {
 
         return openSections;
     };
+
 
     // -- API ---
 
@@ -68,9 +78,10 @@ export function service($location, $stateParams, localStorage) {
         const openSections = getOpenSections(kind, SOFT_SECTION_LIMIT);
 
         // re-save to localStorage to eliminate 'working' ids
-        localStorage.set(
-            mkStorageKey(kind),
+        writeToLocalStorage(
+            kind,
             _.chain(openSections)
+                .compact()
                 .take(SOFT_SECTION_LIMIT)
                 .map('id')
                 .value());
@@ -83,13 +94,13 @@ export function service($location, $stateParams, localStorage) {
             return getOpenSections(kind)
         }
 
-        const userSectionIds = localStorage.get(mkStorageKey(kind)) || [];
+        const userSectionIds = readFromLocalStorage(kind);
         const workingIds =  _.reject(
             userSectionIds,
             activeSectionId => activeSectionId === section.id);
         workingIds.unshift(section.id); // push to front
 
-        localStorage.set(mkStorageKey(kind), workingIds);
+        writeToLocalStorage(kind, workingIds);
 
         return getOpenSections(kind);
     }
@@ -99,9 +110,10 @@ export function service($location, $stateParams, localStorage) {
             return getOpenSections(kind);
         }
 
-        const sectionIds = localStorage.get(mkStorageKey(kind)) || [];
+        const sectionIds = readFromLocalStorage(kind);
         const updatedSectionIds = _.without(sectionIds, section.id);
-        localStorage.set(mkStorageKey(kind), updatedSectionIds);
+        writeToLocalStorage(kind, updatedSectionIds);
+
 
         return getOpenSections(kind);
     }
