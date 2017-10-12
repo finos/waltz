@@ -17,19 +17,20 @@
  */
 import angular from "angular";
 
-import {registerStore} from '../common/module-utils'
-import * as entitySearchStore from './services/entity-search-store';
-import entityHierarchyNavigator from './components/entity-hierarchy-navigator/entity-hierarchy-navigator';
-import entityInvolvementEditor from './components/entity-involvement-editor/entity-involvement-editor';
-import entitySelector from './components/entity-selector/entity-selector';
-import immediateHierarchyNavigator from './components/immediate-hierarchy-navigator/immediate-hierarchy-navigator';
-import relatedEntityEditor from './components/related-entity-editor/related-entity-editor';
+import { registerStore } from "../common/module-utils";
+import * as EntitySearchStore from "./services/entity-search-store";
+
+import entityHierarchyNavigator from "./components/entity-hierarchy-navigator/entity-hierarchy-navigator";
+import entityInvolvementEditor from "./components/entity-involvement-editor/entity-involvement-editor";
+import entitySelector from "./components/entity-selector/entity-selector";
+import immediateHierarchyNavigator from "./components/immediate-hierarchy-navigator/immediate-hierarchy-navigator";
+import relatedEntityEditor from "./components/related-entity-editor/related-entity-editor";
 
 
 export default () => {
     const module = angular.module('waltz.entity', []);
 
-    registerStore(module, entitySearchStore);
+    registerStore(module, EntitySearchStore);
 
     module
         .component('waltzEntityHierarchyNavigator', entityHierarchyNavigator)

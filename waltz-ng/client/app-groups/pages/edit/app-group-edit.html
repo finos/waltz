@@ -164,12 +164,47 @@
 
                 <p class="waltz-paragraph">
                     Use the search box below to locate an application and add it
-                    to the group.  Once a selection is made related applications
-                    will also be shown.
+                    to the group.
                 </p>
 
-                <waltz-app-selector model="ctrl.searchedApp"></waltz-app-selector>
 
+                <!-- Single Selector -->
+                <div ng-if="ctrl.editor === 'SINGLE'">
+                    <span>
+                        Once a selection is made related applications
+                        will also be shown.
+                    </span>
+
+                    <waltz-app-selector model="ctrl.searchedApp">
+                    </waltz-app-selector>
+
+                    <div style="padding-top: 5px">
+                        <a class="clickable"
+                           ng-click="ctrl.showBulkEditor()">
+                            bulk editor
+                            <waltz-icon name="folder-o"></waltz-icon>
+                        </a>
+                    </div>
+
+                </div>
+
+
+                <!-- Bulk selector -->
+                <div ng-if="ctrl.editor === 'BULK'">
+                    <waltz-bulk-application-selector on-save="ctrl.saveApplications">
+                    </waltz-bulk-application-selector>
+
+                    <div>
+                        <a class="clickable"
+                           ng-click="ctrl.showSingleEditor()">
+                            single editor
+                            <waltz-icon name="crosshairs"></waltz-icon>
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Focus App -->
                 <div ng-if="ctrl.focusApp">
                     <hr>
 

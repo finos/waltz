@@ -68,4 +68,8 @@ public class ChangeLogService {
     }
 
 
+    public int[] write(List<ChangeLog> changeLogs) {
+        return changeLogDao.write(changeLogs);
+    }
+
 }

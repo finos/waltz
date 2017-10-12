@@ -24,6 +24,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
@@ -133,6 +134,25 @@ public class ChangeLogDao {
                 .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                 .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt()))
                 .execute();
+    }
+
+
+    public int[] write(List<ChangeLog> changeLogs) {
+        checkNotNull(changeLogs, "changeLogs must not be null");
+
+        Query[] queries = changeLogs
+                .stream()
+                .map(changeLog -> DSL.insertInto(CHANGE_LOG)
+                        .set(CHANGE_LOG.MESSAGE, changeLog.message())
+                        .set(CHANGE_LOG.PARENT_ID, changeLog.parentReference().id())
+                        .set(CHANGE_LOG.PARENT_KIND, changeLog.parentReference().kind().name())
+                        .set(CHANGE_LOG.USER_ID, changeLog.userId())
+                        .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
+                        .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(ck -> ck.name()).orElse(null))
+                        .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
+                        .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
+                .toArray(Query[]::new);
+        return dsl.batch(queries).execute();
     }
 
 

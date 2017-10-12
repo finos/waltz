@@ -22,6 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import org.jooq.DSLContext;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
@@ -71,6 +72,19 @@ public class AppGroupEntryDao {
                 .onDuplicateKeyIgnore()
                 .execute();
     }
+
+
+    public int[] addApplications(long groupId, List<Long> applicationIds) {
+        Query[] queries = applicationIds
+                .stream()
+                .map(id -> DSL.insertInto(APPLICATION_GROUP_ENTRY)
+                        .set(APPLICATION_GROUP_ENTRY.GROUP_ID, groupId)
+                        .set(APPLICATION_GROUP_ENTRY.APPLICATION_ID, id)
+                        .onDuplicateKeyIgnore())
+                .toArray(Query[]::new);
+        return dsl.batch(queries).execute();
+    }
+
 
     public int removeApplication(long groupId, long applicationId) {
         return dsl.delete(APPLICATION_GROUP_ENTRY)

@@ -22,13 +22,11 @@ import {initialiseData} from "../../../common/index";
 
 const bindings = {
     bookmarks: '<',
-    showFilter: '<?',
     parentEntityRef: '<'
 };
 
 
 const initialState = {
-    showFilter: false,
     bookmarkKind: null,
     filteredBookmarks: []
 };

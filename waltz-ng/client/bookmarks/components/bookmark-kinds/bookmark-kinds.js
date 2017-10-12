@@ -50,6 +50,7 @@ function createKinds(serviceBroker, bookmarks = []) {
                     code: k.key,
                     name: k.name,
                     icon: k.icon,
+                    description: k.description,
                     count: (bookmarksByKind[k.key] || []).length,
                     selected: false
                 }))
