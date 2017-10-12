@@ -1,8 +1,8 @@
-import {initialiseData} from '../../../common';
+import {initialiseData} from '../../../../common';
 
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies, switchToParentIds} from "../../../../common/hierarchy-utils";
 
-import template from './change-initiative-browser.html';
+import template from './db-change-initiative-browser.html';
 
 
 const bindings = {
@@ -57,5 +57,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzChangeInitiativeBrowser'
+    id: 'waltzDbChangeInitiativeBrowser'
 };
