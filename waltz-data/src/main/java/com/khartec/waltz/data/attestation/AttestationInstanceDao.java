@@ -96,8 +96,15 @@ public class AttestationInstanceDao {
     }
 
 
+    /**
+     * find historically completed attestations for all parent refs which are currently pending attestation
+     * by the provided user
+     * @param userId
+     * @return
+     */
     public List<AttestationInstance> findHistoricalForEntitiesByUserId(String userId) {
-        Select<Record3<String, Long, String>> outstandingAttestationParentRefs = dsl
+        // fetch the parent refs for attestations currently pending for the user
+        Select<Record3<String, Long, String>> currentlyPendingAttestationParentRefs = dsl
                 .selectDistinct(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND, ATTESTATION_INSTANCE.PARENT_ENTITY_ID, ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
@@ -105,13 +112,14 @@ public class AttestationInstanceDao {
                 .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
 
+        // get the historically completed atttestations based on the above list of parent refs
         return dsl.select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
-                .innerJoin(outstandingAttestationParentRefs)
-                .on(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)
-                        .and(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
-                        .and(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND).eq(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)))
+                .innerJoin(currentlyPendingAttestationParentRefs)
+                .on(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)
+                        .and(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
+                        .and(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND).eq(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)))
                 .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);

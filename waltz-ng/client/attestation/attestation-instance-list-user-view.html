@@ -1,4 +1,4 @@
-<div class="attestation-instance-list-user-view">
+<div class="waltz-attestation-instance-list-user-view">
     <waltz-page-header icon="check-square-o"
                        name="Attestations"
                        small="{{ctrl.user.userName}}">
@@ -28,7 +28,7 @@
 
         <!-- Pending attestations -->
         <div ng-repeat="run in ctrl.runsWithInstances"
-             class="waltz-display-section ailuv-run waltz-animate-repeat">
+             class="waltz-display-section wailuv-run waltz-animate-repeat">
             <h4 ng-bind="run.name"></h4>
             <div class="row">
                 <div class="col-sm-3">
@@ -116,7 +116,7 @@
                                    ng-click="ctrl.selectedAttestation = instance">
                                 </a>
                                 <div ng-if="instance.attestedAt"
-                                     class="ailuv-attested">
+                                     class="wailuv-attested">
                                     <waltz-icon name="check"
                                                 size="lg">
                                     </waltz-icon>
