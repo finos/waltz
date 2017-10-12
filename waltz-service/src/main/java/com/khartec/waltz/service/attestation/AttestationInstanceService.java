@@ -45,10 +45,10 @@ public class AttestationInstanceService {
     }
 
 
-    public List<AttestationInstance> findHistoricalForEntitiesByUserId(String userId) {
+    public List<AttestationInstance> findHistoricalForPendingByUserId(String userId) {
         checkNotNull(userId, "userId cannot be null");
 
-        return attestationInstanceDao.findHistoricalForEntitiesByUserId(userId);
+        return attestationInstanceDao.findHistoricalForPendingByUserId(userId);
     }
 
 

@@ -32,7 +32,7 @@ function controller($q,
             .then(r => r.data);
 
         const historicalInstancesPromise = serviceBroker
-                .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalByUser, [], {force: true})
+                .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalForPendingByUser, [], {force: true})
                 .then(r => r.data);
 
         $q.all([runsPromise, instancesPromise, historicalInstancesPromise])

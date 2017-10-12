@@ -102,7 +102,7 @@ public class AttestationInstanceDao {
      * @param userId
      * @return
      */
-    public List<AttestationInstance> findHistoricalForEntitiesByUserId(String userId) {
+    public List<AttestationInstance> findHistoricalForPendingByUserId(String userId) {
         // fetch the parent refs for attestations currently pending for the user
         Select<Record3<String, Long, String>> currentlyPendingAttestationParentRefs = dsl
                 .selectDistinct(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND, ATTESTATION_INSTANCE.PARENT_ENTITY_ID, ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)
