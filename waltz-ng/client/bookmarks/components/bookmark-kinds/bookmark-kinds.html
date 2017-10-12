@@ -6,7 +6,12 @@
                 'wbk-no-bookmarks': kind.count === 0,
                 'wbk-selected': kind.selected,
                 'clickable': kind.count > 0
-             }">
+             }"
+         uib-popover="{{kind.description}}"
+         popover-placement="right"
+         popover-trigger="mouseenter"
+         popover-popup-delay="300"
+         popover-append-to-body="true">
 
         <span>
 

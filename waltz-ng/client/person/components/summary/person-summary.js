@@ -84,7 +84,7 @@ function controller(serviceBroker) {
                 .then(r => vm.totalCost = r.data);
 
         }
-    }
+    };
 }
 
 
