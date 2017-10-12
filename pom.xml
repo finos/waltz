@@ -232,6 +232,10 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <version>1.4.5</version>
+                <configuration>
+                    <cveValidForHours>48</cveValidForHours>
+                    <!--<failBuildOnCVSS>7</failBuildOnCVSS>-->
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

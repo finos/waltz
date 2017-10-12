@@ -23,13 +23,11 @@ import template from './bookmarks-section.html';
 
 
 const bindings = {
-    parentEntityRef: '<',
-    showFilter: '@?'
+    parentEntityRef: '<'
 };
 
 
 const initialState = {
-    showFilter: false,
     visibility: {
         editor: false
     }

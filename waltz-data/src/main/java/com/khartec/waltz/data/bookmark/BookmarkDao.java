@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
@@ -54,9 +55,9 @@ public class BookmarkDao {
         return ImmutableBookmark.builder()
                 .id(record.getId())
                 .parent(parentRef)
-                .description(record.getDescription())
-                .title(record.getTitle())
-                .url(record.getUrl())
+                .description(Optional.ofNullable(record.getDescription()))
+                .title(Optional.ofNullable(record.getTitle()))
+                .url(Optional.ofNullable(record.getUrl()))
                 .kind(record.getKind())
                 .isPrimary(record.getIsPrimary())
                 .isRequired(record.getIsRequired())
@@ -110,9 +111,9 @@ public class BookmarkDao {
         checkNotEmpty(username, "username cannot be empty");
 
         BookmarkRecord insertedRecord = dsl.insertInto(BOOKMARK)
-                .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
-                .set(BOOKMARK.URL, bookmark.url().orElse(""))
-                .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
+                .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
+                .set(BOOKMARK.URL, bookmark.url().orElse(null))
+                .set(BOOKMARK.TITLE, bookmark.title().orElse(null))
                 .set(BOOKMARK.KIND, bookmark.kind())
                 .set(BOOKMARK.PARENT_ID, bookmark.parent().id())
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())

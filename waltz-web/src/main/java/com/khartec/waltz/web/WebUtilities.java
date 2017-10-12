@@ -48,6 +48,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
+import static java.util.stream.Collectors.toList;
 
 public class WebUtilities {
 
@@ -218,7 +219,12 @@ public class WebUtilities {
 
 
     public static List<Long> readIdsFromBody(Request req) throws IOException {
-        return readBody(req, List.class);
+        List list = readBody(req, List.class);
+
+        return (List<Long>) list
+                .stream()
+                .map(l -> Long.parseLong(l.toString()))
+                .collect(Collectors.toList());
     }
 
 
@@ -336,7 +342,7 @@ public class WebUtilities {
                         .key(entry.getKey())
                         .value(entry.getValue())
                         .build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 }
