@@ -81,6 +81,15 @@
                  ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
             </div>
             <div class="col-sm-2 waltz-display-field-label">
+                Survey ID
+            </div>
+            <div class="col-sm-4"
+                 ng-bind="ctrl.surveyInstance.id">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
                 Submitted
             </div>
             <div class="col-sm-4">
@@ -91,24 +100,21 @@
                     -
                 </span>
             </div>
-        </div>
-        <br>
-        <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Due
             </div>
             <div class="col-sm-4">
                 <waltz-from-now timestamp="ctrl.surveyRun.dueDate"></waltz-from-now>
             </div>
+        </div>
+        <br>
+        <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Issued
             </div>
             <div class="col-sm-4">
                 <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
             </div>
-        </div>
-        <br>
-        <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Participants
             </div>
