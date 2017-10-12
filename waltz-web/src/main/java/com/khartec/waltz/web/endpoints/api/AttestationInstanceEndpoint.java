@@ -36,6 +36,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findByRunIdPath = mkPath(BASE_URL, "run", ":id");
         String findUnattestedByUserPath = mkPath(BASE_URL, "unattested", "user");
         String findAllByUserPath = mkPath(BASE_URL, "all", "user");
+        String findHistoricalForPendingByUserPath = mkPath(BASE_URL, "historical", "user");
         String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
 
         DatumRoute<Boolean> attestInstanceRoute =
@@ -52,6 +53,9 @@ public class AttestationInstanceEndpoint implements Endpoint {
         ListRoute<AttestationInstance> findAllByRecipientRoute =
                 (req, res) -> attestationInstanceService.findByRecipient(getUsername(req), false);
 
+        ListRoute<AttestationInstance> findHistoricalForPendingByRecipientRoute =
+                (req, res) -> attestationInstanceService.findHistoricalForPendingByUserId(getUsername(req));
+
         ListRoute<AttestationInstance> findByRunIdRoute =
                 (req, res) -> attestationInstanceService.findByRunId(getId(req));
 
@@ -65,6 +69,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findUnattestedByUserPath, findUnattestedByRecipientRoute);
         getForList(findAllByUserPath, findAllByRecipientRoute);
+        getForList(findHistoricalForPendingByUserPath, findHistoricalForPendingByRecipientRoute);
         getForList(findByRunIdPath, findByRunIdRoute);
         getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
     }

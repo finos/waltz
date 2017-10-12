@@ -1,4 +1,4 @@
-<div class="attestation-instance-list-user-view">
+<div class="waltz-attestation-instance-list-user-view">
     <waltz-page-header icon="check-square-o"
                        name="Attestations"
                        small="{{ctrl.user.userName}}">
@@ -21,13 +21,14 @@
         <waltz-toggle class="pull-right"
                       state="ctrl.showAttested"
                       on-toggle="ctrl.toggleFilter()"
-                      label-on="Hide attested"
-                      label-off="Show attested">
+                      label-on="Hide previous attestations"
+                      label-off="Show previous attestations">
         </waltz-toggle>
         <br>
 
         <!-- Pending attestations -->
-        <div ng-repeat="run in ctrl.runsWithInstances" class="waltz-display-section ailuv-run">
+        <div ng-repeat="run in ctrl.runsWithInstances"
+             class="waltz-display-section wailuv-run waltz-animate-repeat">
             <h4 ng-bind="run.name"></h4>
             <div class="row">
                 <div class="col-sm-3">
@@ -78,10 +79,16 @@
 
                 <div class="col-sm-9">
                     <table class="table table-condensed">
+                        <colgroup>
+                            <col width="35%">
+                            <col width="45%">
+                            <col width="15%">
+                        </colgroup>
                         <thead>
                         <tr>
                             <th>Subject</th>
-                            <th width="40%"></th>
+                            <th>Last Attestation</th>
+                            <th></th>
                         </tr>
                         </thead>
 
@@ -92,20 +99,35 @@
                                 </waltz-entity-link>
                             </td>
                             <td>
+                                <span ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance
+                                                && instance.historic && instance.historic.length > 0">
+                                    <span ng-bind="instance.historic[0].attestedBy"></span>
+                                    (<waltz-from-now timestamp="instance.historic[0].attestedAt"></waltz-from-now>)
+                                </span>
+                                <span ng-if="instance.attestedAt">
+                                    <span ng-bind="instance.attestedBy"></span>
+                                    (<waltz-from-now timestamp="instance.attestedAt"></waltz-from-now>)
+                                </span>
+                            </td>
+                            <td>
                                 <a class="btn btn-primary btn-xs"
                                    ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance"
                                    ng-bind="'Attest ' + (instance.childEntityKind | toDisplayName:'entity' | lowercase)+'s'"
                                    ng-click="ctrl.selectedAttestation = instance">
                                 </a>
-                                <span ng-if="instance.attestedAt">
-                                <span ng-bind="(instance.childEntityKind | toDisplayName:'entity')+'s' + ' attested by ' + instance.attestedBy"></span>
-                                (<waltz-from-now timestamp="instance.attestedAt"></waltz-from-now>)
-                            </span>
+                                <div ng-if="instance.attestedAt"
+                                     class="wailuv-attested">
+                                    <waltz-icon name="check"
+                                                size="lg">
+                                    </waltz-icon>
+                                    <span ng-bind="(instance.childEntityKind | toDisplayName:'entity')+'s'">
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                         <tr ng-if="ctrl.selectedAttestation === instance"
                             class="waltz-fade-if">
-                            <td colspan="2"
+                            <td colspan="3"
                                 style="padding-right: 3em; border-top: none">
                                 <waltz-attestation-confirmation instance="ctrl.selectedAttestation"
                                                                 on-confirm="ctrl.attestEntity"
