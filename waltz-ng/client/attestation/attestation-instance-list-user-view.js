@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {nest} from "d3-collection";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common/index";
 
@@ -12,7 +13,6 @@ const initialState = {
 };
 
 
-
 function controller($q,
                     serviceBroker,
                     userService) {
@@ -23,7 +23,6 @@ function controller($q,
         .then(user => vm.user = user);
 
     const loadData = () => {
-
         const runsPromise = serviceBroker
             .loadViewData(CORE_API.AttestationRunStore.findByRecipient)
             .then(r => r.data);
@@ -32,12 +31,28 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findByUser, [vm.showAttested], {force: true})
             .then(r => r.data);
 
-        $q.all([runsPromise, instancesPromise])
-            .then(([runs, instances]) => {
-                const instancesByRunId = _.groupBy(instances, 'attestationRunId');
+        const historicalInstancesPromise = serviceBroker
+                .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalByUser, [], {force: true})
+                .then(r => r.data);
+
+        $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
+            .then(([runs, instances, historicInstances]) => {
+                const historicByParentRefByChildKind = nest()
+                    .key(d => d.parentEntity.kind)
+                    .key(d => d.parentEntity.id)
+                    .key(d => d.childEntityKind)
+                    .object(historicInstances);
+
+                const instancesWithHistoricByRunId = _.chain(instances)
+                    .map(i => Object.assign(
+                        {},
+                        i,
+                        { historic: _.get(historicByParentRefByChildKind, [i.parentEntity.kind, i.parentEntity.id, i.childEntityKind], []) } ))
+                    .groupBy('attestationRunId')
+                    .value();
 
                 vm.runsWithInstances =  _.chain(runs)
-                    .map(r => Object.assign({}, r, { instances: instancesByRunId[r.id]}))
+                    .map(r => Object.assign({}, r, { instances: instancesWithHistoricByRunId[r.id] }))
                     .filter(r => r.instances)
                     .sortBy(r => r.dueDate)
                     .value();

@@ -96,6 +96,28 @@ public class AttestationInstanceDao {
     }
 
 
+    public List<AttestationInstance> findHistoricalForEntitiesByUserId(String userId) {
+        Select<Record3<String, Long, String>> outstandingAttestationParentRefs = dsl
+                .selectDistinct(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND, ATTESTATION_INSTANCE.PARENT_ENTITY_ID, ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
+                .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
+                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
+
+        return dsl.select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(outstandingAttestationParentRefs)
+                .on(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)
+                        .and(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
+                        .and(outstandingAttestationParentRefs.field(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND).eq(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)))
+                .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
+                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc())
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<AttestationInstance> findByEntityReference(EntityReference ref) {
         return dsl.select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)

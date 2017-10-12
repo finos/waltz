@@ -39,6 +39,12 @@ export function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findHistoricalByUser = () => {
+        return $http
+            .get(`${base}/historical/user`)
+            .then(result => result.data);
+    };
+
     const findPersonsById = (id) => {
         return $http
             .get(`${base}/${id}/person`)
@@ -57,6 +63,7 @@ export function store($http, baseApiUrl) {
         attestInstance,
         findByRunId,
         findByUser,
+        findHistoricalByUser,
         findPersonsById,
         findByEntityRef
     };
@@ -87,6 +94,11 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: 'findByUser',
         description: 'find attestations for a user'
+    },
+    findHistoricalByUser: {
+        serviceName,
+        serviceFnName: 'findHistoricalByUser',
+        description: 'find historical attestations for entities for which this user has to attest'
     },
     findPersonsById: {
         serviceName,

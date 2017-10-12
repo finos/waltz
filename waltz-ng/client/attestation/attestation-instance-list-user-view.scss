@@ -2,9 +2,13 @@
 
     .ailuv-run {
         border-radius: $border-radius-base;
+        border: 3px solid  $waltz-section-background-color;
         margin-top: 0.7em;
         padding: 0.8em;
-        background: $waltz-section-background-color;
+        background: lighten($waltz-section-background-color, 3);
     }
 
+    .ailuv-attested {
+        color: $waltz-green;
+    }
 }

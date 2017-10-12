@@ -45,6 +45,13 @@ public class AttestationInstanceService {
     }
 
 
+    public List<AttestationInstance> findHistoricalForEntitiesByUserId(String userId) {
+        checkNotNull(userId, "userId cannot be null");
+
+        return attestationInstanceDao.findHistoricalForEntitiesByUserId(userId);
+    }
+
+
     public List<AttestationInstance> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
