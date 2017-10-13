@@ -17,6 +17,7 @@
  */
 
 import angular from "angular";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
@@ -24,41 +25,40 @@ const initialState = {
 };
 
 
-function controller($scope,
-                    $state,
-                    staticPanelStore,
-                    svgStore) {
+function controller($state,
+                    serviceBroker) {
 
     const vm = Object.assign(this, initialState);
 
-    $scope.$watch('ctrl.person', (person) => {
-        if (person) {
-            const navKey = { empId: person.employeeId };
-            $state.go('main.person.view', navKey);
-        }
-    });
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.SvgDiagramStore.findByGroup,
+                [ 'ORG_TREE' ])
+            .then(r => vm.diagrams = r.data);
 
-    svgStore
-        .findByGroup('ORG_TREE')
-        .then(xs => vm.diagrams = xs);
-
-    staticPanelStore
-        .findByGroup("HOME.PERSON")
-        .then(panels => vm.panels = panels);
+        serviceBroker
+            .loadAppData(
+                CORE_API.StaticPanelStore.findByGroup,
+                [ 'HOME.PERSON' ])
+            .then(r => vm.panels = r.data);
+    };
 
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.person.view', { empId: b.value });
         angular.element(b.block).addClass('clickable');
     };
 
+    vm.goToPerson = (key, person) => {
+        $state.go('main.person.id', { id: person.id });
+    };
+
 }
 
 
 controller.$inject = [
-    '$scope',
     '$state',
-    'StaticPanelStore',
-    'SvgDiagramStore'
+    'ServiceBroker'
 ];
 
 
