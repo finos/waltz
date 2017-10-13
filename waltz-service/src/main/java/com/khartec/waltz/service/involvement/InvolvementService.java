@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.ListUtilities.applyToFirst;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
@@ -190,14 +190,13 @@ public class InvolvementService {
             this.involvementKindIdToNameMap = loadInvolvementKindIdToNameMap();
         }
 
-        return String.format("[%s [%s]]", this.involvementKindIdToNameMap.get(id), id);
+        return String.format("%s / %s", this.involvementKindIdToNameMap.get(id), id);
     }
 
 
-    private List<String> resolveName(EntityReference ref) {
-        return map(
-                entityReferenceNameResolver.resolve(newArrayList(ref)),
-                EntityReferenceUtilities::pretty);
+    private String resolveName(EntityReference ref) {
+        return applyToFirst(entityReferenceNameResolver.resolve(newArrayList(ref)),
+                EntityReferenceUtilities::pretty).orElseGet(() -> ref.toString());
     }
 
 
