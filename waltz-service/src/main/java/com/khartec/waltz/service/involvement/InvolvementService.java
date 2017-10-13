@@ -172,7 +172,7 @@ public class InvolvementService {
         String message = String.format("Involvement kind (%s) %s for person: %s",
                 resolvePrettyInvolvementKind(command.involvementKindId()),
                 command.operation().name().toLowerCase(),
-                resolveNames(command.personEntityRef()));
+                resolveName(command.personEntityRef()));
 
         ImmutableChangeLog changeLog = ImmutableChangeLog.builder()
                 .parentReference(entityReference)
@@ -194,9 +194,9 @@ public class InvolvementService {
     }
 
 
-    private List<String> resolveNames(EntityReference... refs) {
+    private List<String> resolveName(EntityReference ref) {
         return map(
-                entityReferenceNameResolver.resolve(newArrayList(refs)),
+                entityReferenceNameResolver.resolve(newArrayList(ref)),
                 EntityReferenceUtilities::pretty);
     }
 
