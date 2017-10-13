@@ -18,46 +18,70 @@
 
 package com.khartec.waltz.service.involvement;
 
+import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+
 
 @Service
 public class InvolvementService {
 
 
+    private final ChangeLogService changeLogService;
     private final InvolvementDao dao;
+    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
+    private final InvolvementKindService involvementKindService;
     private final PersonDao personDao;
-    private EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
+
+    private Map<Long, String> involvementKindIdToNameMap;
 
 
     @Autowired
-    public InvolvementService(InvolvementDao dao,
+    public InvolvementService(ChangeLogService changeLogService,
+                              InvolvementDao dao,
                               EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
+                              EntityReferenceNameResolver entityReferenceNameResolver,
+                              InvolvementKindService involvementKindService,
                               PersonDao personDao) {
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "dao must not be null");
         checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
+        checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
+        checkNotNull(involvementKindService, "involvementKindService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
 
+        this.changeLogService = changeLogService;
         this.dao = dao;
         this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
+        this.involvementKindService = involvementKindService;
         this.personDao = personDao;
     }
 
@@ -105,17 +129,27 @@ public class InvolvementService {
     }
 
 
-    public boolean addEntityInvolvement(EntityReference entityReference,
+    public boolean addEntityInvolvement(String userId,
+                                        EntityReference entityReference,
                                         EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);
-        return dao.save(involvement) == 1;
+        boolean result = dao.save(involvement) == 1;
+        if (result) {
+            logChange(entityReference, userId, command);
+        }
+        return result;
     }
 
 
-    public boolean removeEntityInvolvement(EntityReference entityReference,
+    public boolean removeEntityInvolvement(String userId,
+                                           EntityReference entityReference,
                                            EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);
-        return dao.remove(involvement) == 1;
+        boolean result = dao.remove(involvement) == 1;
+        if (result) {
+            logChange(entityReference, userId, command);
+        }
+        return result;
     }
 
 
@@ -131,6 +165,47 @@ public class InvolvementService {
                 person.employeeId(),
                 command.involvementKindId(),
                 "waltz");
+    }
+
+
+    private void logChange(EntityReference entityReference, String userId, EntityInvolvementChangeCommand command) {
+        String message = String.format("Involvement kind (%s) %s for person: %s",
+                resolvePrettyInvolvementKind(command.involvementKindId()),
+                command.operation().name().toLowerCase(),
+                resolveNames(command.personEntityRef()));
+
+        ImmutableChangeLog changeLog = ImmutableChangeLog.builder()
+                .parentReference(entityReference)
+                .message(message)
+                .userId(userId)
+                .childKind(command.personEntityRef().kind())
+                .operation(command.operation())
+                .build();
+        changeLogService.write(changeLog);
+    }
+
+
+    private String resolvePrettyInvolvementKind(long id) {
+        if(involvementKindIdToNameMap == null) {
+            this.involvementKindIdToNameMap = loadInvolvementKindIdToNameMap();
+        }
+
+        return String.format("[%s [%s]]", this.involvementKindIdToNameMap.get(id), id);
+    }
+
+
+    private List<String> resolveNames(EntityReference... refs) {
+        return map(
+                entityReferenceNameResolver.resolve(newArrayList(refs)),
+                EntityReferenceUtilities::pretty);
+    }
+
+
+    private Map<Long, String> loadInvolvementKindIdToNameMap() {
+        return involvementKindService
+                .findAll()
+                .stream()
+                .collect(Collectors.toMap(ik -> ik.id().get(), ik -> ik.name()));
     }
 
 }
