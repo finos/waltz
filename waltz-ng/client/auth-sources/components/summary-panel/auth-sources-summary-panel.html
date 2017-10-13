@@ -1,5 +1,18 @@
 <div class="row">
-    <div class="col-sm-8">
+
+    <div class="col-sm-12"
+         ng-if="! $ctrl.visibility.chart">
+        <waltz-no-data>
+            <message>
+                <strong>No flow data</strong>
+                could be found, therefore unable to show authoritative source summary
+            </message>
+        </waltz-no-data>
+    </div>
+
+    <div class="col-sm-8"
+         ng-if="$ctrl.visibility.chart">
+
         <waltz-basic-info-tile name="Authoritative Inbound / Outbound Summary">
 
             <span id="inbound">

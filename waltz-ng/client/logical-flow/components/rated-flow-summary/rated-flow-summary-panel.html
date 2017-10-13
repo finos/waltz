@@ -1,37 +1,37 @@
 <div>
-    <div class="row"
-         ng-if="$ctrl.entityReference">
-        <div class="col-md-7">
-            <waltz-rated-summary-table decorator-entities="$ctrl.dataTypes"
-                                       exact-summaries="$ctrl.exactSummaries"
-                                       child-summaries="$ctrl.childSummaries"
-                                       on-click="$ctrl.onTableClick">
-            </waltz-rated-summary-table>
-        </div>
-        <div class="col-md-5">
-            <div class="waltz-fade-if"
-                 ng-if="$ctrl.infoPanel != null">
-                <waltz-rated-flow-summary-info-cell applications="$ctrl.infoPanel.applications"
-                                                    type="$ctrl.infoPanel.dataType"
-                                                    flows="$ctrl.infoPanel.flows"
-                                                    org-unit-id="$ctrl.entityReference"
-                                                    rating="$ctrl.infoPanel.rating">
-                </waltz-rated-flow-summary-info-cell>
+    <div ng-if="$ctrl.visibility.chart">
+        <div class="row">
+            <div class="col-md-7">
+                <waltz-rated-summary-table decorator-entities="$ctrl.dataTypes"
+                                           exact-summaries="$ctrl.exactSummaries"
+                                           child-summaries="$ctrl.childSummaries"
+                                           on-click="$ctrl.onTableClick">
+                </waltz-rated-summary-table>
             </div>
+            <div class="col-md-5">
+                <div class="waltz-fade-if"
+                     ng-if="$ctrl.infoPanel != null">
+                    <waltz-rated-flow-summary-info-cell applications="$ctrl.infoPanel.applications"
+                                                        type="$ctrl.infoPanel.dataType"
+                                                        flows="$ctrl.infoPanel.flows"
+                                                        org-unit-id="$ctrl.entityReference"
+                                                        rating="$ctrl.infoPanel.rating">
+                    </waltz-rated-flow-summary-info-cell>
+                </div>
 
-        </div>
-    </div>
-    <div class="row"
-         style="padding-top: 12px;"
-         ng-if="$ctrl.flowData.stats.flowCounts.inbound > 0">
-        <div class="col-md-12">
-            <div class="small text-muted">
-                This diagram summarises the data types sent to applications in this group.
             </div>
         </div>
+        <div class="row"
+             style="padding-top: 12px;">
+            <div class="col-md-12">
+                <div class="small text-muted">
+                    This diagram summarises the data types sent to applications in this group.
+                </div>
+            </div>
+        </div>
     </div>
 
-    <waltz-no-data ng-if="$ctrl.flowData.stats.flowCounts.inbound == 0">
+    <waltz-no-data ng-if="! $ctrl.visibility.chart">
         <message>
             No inbound data flows registered for this
             <span ng-bind="$ctrl.entityReference.kind | toDisplayName:'entity' | lowercase"></span>

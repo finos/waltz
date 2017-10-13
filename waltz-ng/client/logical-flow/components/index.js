@@ -21,6 +21,7 @@ import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
 import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
 import * as SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
 import * as SourceAndTargetPanel from './source-and-target-panel/source-and-target-panel';
+import * as RatedFlowSummaryPanel from './rated-flow-summary/rated-flow-summary-panel';
 import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane';
 
 
@@ -30,12 +31,12 @@ function setup(module) {
         LogicalFlowEditPanel,
         LogicalFlowTypeEditor,
         LogicalFlowsDataTypeSummaryPane,
+        RatedFlowSummaryPanel,
         SourceAndTargetGraph,
         SourceAndTargetPanel
     ]);
 
     module
-        .component('waltzRatedFlowSummaryPanel', require('./rated-flow-summary/rated-flow-summary-panel'))
         .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
         .component('waltzRatedSummaryTable', require('./rated-flow-summary/rated-summary-table'))
         .component('waltzRatedSummaryCell', require('./rated-flow-summary/rated-summary-cell'))
