@@ -61,7 +61,6 @@ function controller(entitySearchStore) {
         }
     };
 
-
     vm.refresh = function(query) {
         if (!query) return;
         return entitySearchStore.search(query, vm.options)
@@ -75,8 +74,8 @@ function controller(entitySearchStore) {
     vm.select = (item) => invokeFunction(vm.onSelect, vm.itemId, item);
 
     vm.mkTracker = (item) => item.kind + "_" + item.id;
-
 }
+
 
 controller.$inject = ['EntitySearchStore'];
 

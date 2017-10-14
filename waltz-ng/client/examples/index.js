@@ -40,10 +40,6 @@ export default () => {
                     url: '/directive-app-selector',
                     views: { 'content@': {template: require('./demo-directive-app-selector.html') } }
                 })
-                .state('main.examples.directive-person-selector', {
-                    url: '/directive-person-selector',
-                    views: { 'content@': {template: require('./demo-directive-person-selector.html') } }
-                })
                 .state('main.examples.directive-rating-indicator', {
                     url: '/directive-rating-indicator',
                     views: { 'content@': {
