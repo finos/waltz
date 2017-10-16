@@ -32,8 +32,6 @@
         li {
             margin-left: 50px;
             display: table-cell;
-
-
         }
 
         li:not(:first-child) {
@@ -68,11 +66,15 @@
         padding-left: 36px;
         padding-right: 36px;
 
+        pointer-events: none;
+
         @include transition(opacity $animation-speed);
     }
 
     &.wdsn-sticky-visible {
         opacity: 1;
+        cursor: pointer;
+        pointer-events: all;
         @include transition(opacity $animation-speed);
     }
 
