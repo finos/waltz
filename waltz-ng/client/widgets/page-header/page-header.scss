@@ -33,6 +33,7 @@
     z-index: 999;
     border-bottom: 2px solid $waltz-border-color-lighter;
     opacity: 0;
+    pointer-events: none;
 
     h2 {
         margin: 4px;
@@ -47,10 +48,14 @@
         display: inline-block;
     }
 
+
     @include transition(opacity 0.2s);
 }
 
 .waltz-page-header.wph-sticky.wph-sticky-visible {
     opacity: 1;
+
+    cursor: pointer;
+    pointer-events: all;
     @include transition(opacity 0.2s);
 }
