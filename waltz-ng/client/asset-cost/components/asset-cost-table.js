@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {assetCostKindNames, toGridOptions} from "./../../common/services/display-names";
+import {assetCostKindNames} from "./../../common/services/display-names";
 import {mkEntityLinkGridCell} from "../../common/link-utils";
 import template from './asset-cost-table.html';
 import {initialiseData} from "../../common/index";
@@ -47,11 +47,7 @@ function prepareColumns(uiGridConstants) {
     const kindCol = {
         field: 'cost.kind',
         displayName: 'Cost Type',
-        cellFilter: 'toDisplayName:"CostKind"',
-        filter: {
-            type: uiGridConstants.filter.SELECT,
-            selectOptions: toGridOptions(assetCostKindNames)
-        }
+        cellFilter: 'toDisplayName:"CostKind"'
     };
 
     const amountCol = {
