@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,9 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default  {
-    template: require('./no-data.html'),
-    transclude: {
-        message: 'message'
+import template from './sub-section.html';
+import {initialiseData} from "../common/index";
+
+
+const bindings = {
+    name: '@',
+    showBorder: '<'
+};
+
+
+const initialState = {
+    showBorder: true,
+    visibility: {
+        controls: false
     }
+};
+
+
+function controller($transclude) {
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        vm.visibility.controls = $transclude.isSlotFilled('controls');
+    };
+}
+
+
+controller.$inject = ['$transclude'];
+
+
+const component = {
+    template,
+    bindings,
+    controller,
+    transclude: {
+        content: 'content',
+        controls: '?controls'
+    }
+};
+
+
+export default {
+    id: 'waltzSubSection',
+    component
 };

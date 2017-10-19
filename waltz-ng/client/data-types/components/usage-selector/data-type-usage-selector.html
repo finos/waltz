@@ -1,0 +1,12 @@
+<waltz-multi-select-tree-control items="$ctrl.allDataTypes"
+                                 on-click="$ctrl.toggleTypeChecked"
+                                 on-check="$ctrl.typeChecked"
+                                 on-uncheck="$ctrl.typeUnchecked"
+                                 checked-item-ids="$ctrl.checkedItemIds"
+                                 expanded-item-ids="$ctrl.expandedItemIds">
+    <strong ng-bind="node.name">
+    </strong>
+    <span class="text-muted small"
+          ng-bind="node.description">
+    </span>
+</waltz-multi-select-tree-control>
