@@ -26,7 +26,9 @@
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
 @import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
-@import "../client/data-types/components/tree/data-type-tree";
+@import "../client/data-types/components/usage-count-tree/data-type-usage-count-tree";
+@import "../client/data-types/components/usage-panel/data-type-usage-panel";
+@import "../client/data-types/components/usage-tree/data-type-usage-tree";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/data-type-usage/directives/app-data-type-usage-list";
 @import "../client/dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
@@ -397,5 +399,12 @@ a.subtle-link:hover {
         :first-of-type(span) {
             padding: 5px 5px;
         }
+    }
+}
+
+a[disabled="disabled"] {
+    color: #888;
+    &:hover {
+        cursor: default;
     }
 }

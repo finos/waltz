@@ -1,0 +1,15 @@
+<div class="waltz-sub-section" ng-class="{ 'show-border': $ctrl.showBorder }">
+    <div class="wss-name"
+         ng-bind="$ctrl.name">
+    </div>
+
+    <div ng-transclude="content"
+         class="wss-content">
+    </div>
+
+    <div ng-if="$ctrl.visibility.controls"
+         class='wss-controls'
+         ng-transclude="controls">
+    </div>
+
+</div>

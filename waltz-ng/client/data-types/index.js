@@ -19,7 +19,10 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import DataTypeStore from "./services/data-type-store";
-import DataTypeTree from './components/tree/data-type-tree';
+import DataTypeUsageCountTree from './components/usage-count-tree/data-type-usage-count-tree';
+import DataTypeUsagePanel from './components/usage-panel/data-type-usage-panel';
+import DataTypeUsageSelector from './components/usage-selector/data-type-usage-selector';
+import DataTypeUsageTree from './components/usage-tree/data-type-usage-tree';
 import DataTypeOverview from './components/overview/data-type-overview';
 import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
 import DataTypeOriginators from './components/originators/data-type-originators';
@@ -34,7 +37,10 @@ export default () => {
         DataTypeOriginators,
         DataTypeFlowSection,
         DataTypeOverview,
-        DataTypeTree
+        DataTypeUsageCountTree,
+        DataTypeUsagePanel,
+        DataTypeUsageSelector,
+        DataTypeUsageTree
     ]);
 
     module
