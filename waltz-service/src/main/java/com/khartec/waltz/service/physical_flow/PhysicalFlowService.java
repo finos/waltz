@@ -215,6 +215,7 @@ public class PhysicalFlowService {
                 .basisOffset(command.flowAttributes().basisOffset())
                 .frequency(command.flowAttributes().frequency())
                 .transport(command.flowAttributes().transport())
+                .criticality(command.flowAttributes().criticality())
                 .description(mkSafe(command.flowAttributes().description()))
                 .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
