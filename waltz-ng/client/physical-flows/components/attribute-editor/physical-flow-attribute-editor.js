@@ -22,8 +22,10 @@ import {
     transportField,
     frequencyField,
     basisOffsetSelectField,
-    basisOffsetInputField
+    basisOffsetInputField,
+    criticalityField
 } from "../../formly/physical-flow-fields";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -59,7 +61,7 @@ function getBasisOffset(basisOffsetSelect, basisOffsetInput) {
 }
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const fields = [
@@ -75,6 +77,11 @@ function controller() {
                 { className: 'col-sm-6', fieldGroup: [basisOffsetSelectField] },
                 { className: 'col-sm-6', fieldGroup: [basisOffsetInputField] }
             ]
+        }, {
+            className: 'row',
+            fieldGroup: [
+                { className: 'col-sm-6', fieldGroup: [criticalityField] }
+            ]
         }
     ];
 
@@ -82,13 +89,35 @@ function controller() {
 
     const basisOffsetOptions = _.map(basisOffsetSelectField.templateOptions.options, 'code');
 
-    vm.$onChanges = (changes) => {
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {
+                const criticalityValuesByCode = _
+                    .chain(r.data)
+                    .filter({ type: 'physicalFlowCriticality'})
+                    .map(c => ({ code: c.key, name: c.name }))
+                    .keyBy('code')
+                    .value();
+                criticalityField.templateOptions.options = [
+                    criticalityValuesByCode['VERY_HIGH'],
+                    criticalityValuesByCode['HIGH'],
+                    criticalityValuesByCode['MEDIUM'],
+                    criticalityValuesByCode['LOW']
+                ];
+            });
+    };
+
+    vm.$onChanges = (c) => {
         if(vm.current) {
-            const isOtherBasisOffset = !_.includes(basisOffsetOptions, vm.current.basisOffset);
+            const isOtherBasisOffset = !_.includes(
+                basisOffsetOptions,
+                vm.current.basisOffset);
 
             vm.model = {
                 transport: vm.current.transport,
                 frequency: vm.current.frequency,
+                criticality: vm.current.criticality,
                 basisOffsetSelect: isOtherBasisOffset ? 'OTHER' : vm.current.basisOffset,
                 basisOffsetInput: isOtherBasisOffset ? vm.current.basisOffset : undefined
             };
@@ -98,9 +127,9 @@ function controller() {
 
     vm.onSubmit = () => {
         // get the submitted fields
-        const { frequency, transport } = vm.model;
+        const { frequency, transport, criticality } = vm.model;
         const basisOffset = getBasisOffset(vm.model.basisOffsetSelect, vm.model.basisOffsetInput);
-        invokeFunction(vm.onChange, { frequency, transport, basisOffset });
+        invokeFunction(vm.onChange, { frequency, transport, basisOffset, criticality });
     };
 
 
@@ -111,7 +140,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {

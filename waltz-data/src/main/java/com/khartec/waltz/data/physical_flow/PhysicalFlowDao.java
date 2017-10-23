@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -54,6 +55,7 @@ public class PhysicalFlowDao {
                 .specificationId(record.getSpecificationId())
                 .basisOffset(record.getBasisOffset())
                 .frequency(FrequencyKind.valueOf(record.getFrequency()))
+                .criticality(Criticality.valueOf(record.getCriticality()))
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
                 .transport(TransportKind.valueOf(record.getTransport()))
@@ -168,6 +170,7 @@ public class PhysicalFlowDao {
         record.setFrequency(flow.frequency().name());
         record.setTransport(flow.transport().name());
         record.setBasisOffset(flow.basisOffset());
+        record.setCriticality(flow.criticality().name());
 
         record.setSpecificationId(flow.specificationId());
 
@@ -250,6 +253,5 @@ public class PhysicalFlowDao {
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .where(dsl.renderInlined(matchesLogicalFlow));
     }
-
 
 }

@@ -20,6 +20,7 @@ package com.khartec.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.DescriptionProvider;
 import org.immutables.value.Value;
 
@@ -30,6 +31,7 @@ public abstract class FlowAttributes implements DescriptionProvider{
 
     public abstract TransportKind transport();
     public abstract FrequencyKind frequency();
+    public abstract Criticality criticality();
     public abstract int basisOffset();
 
 }
