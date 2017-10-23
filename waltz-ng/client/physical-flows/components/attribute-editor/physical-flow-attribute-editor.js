@@ -109,7 +109,6 @@ function controller(serviceBroker) {
     };
 
     vm.$onChanges = (c) => {
-        console.log("-", vm);
         if(vm.current) {
             const isOtherBasisOffset = !_.includes(
                 basisOffsetOptions,

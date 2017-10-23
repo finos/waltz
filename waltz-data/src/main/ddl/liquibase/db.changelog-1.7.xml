@@ -118,7 +118,7 @@
 
     <changeSet id="20171020-2728-2"
                author="davidwatkins73">
-        <comment>2530: Adding cost kinds to enum-value table</comment>
+        <comment>2728: Add physical_flow criticality column</comment>
         <insert tableName="enum_value">
             <column name="type"
                     value="physicalFlowCriticality"/>
