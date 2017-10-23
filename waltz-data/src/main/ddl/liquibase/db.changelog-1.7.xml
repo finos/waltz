@@ -103,4 +103,16 @@
     </changeSet>
 
 
+    <!-- 2742: Change Initiatives need a parent org unit -->
+    <changeSet id="201723-2742-1"
+               author="davidwatkins73">
+        <comment>2473: Change Initiatives need a parent org unit</comment>
+        <addColumn tableName="change_initiative">
+            <column name="organisational_unit_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

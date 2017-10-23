@@ -38,11 +38,11 @@ public abstract class Application implements
         DescriptionProvider,
         ProvenanceProvider,
         WaltzEntity,
-        EntityLifecycleStatusProvider {
+        EntityLifecycleStatusProvider,
+        OrganisationalUnitIdProvider {
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();
-    public abstract Long organisationalUnitId();
     public abstract ApplicationKind kind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
