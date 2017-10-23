@@ -56,6 +56,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .lastUpdate(ofNullable(record.getLastUpdate()))
                 .startDate(record.getStartDate())
                 .endDate(record.getEndDate())
+                .organisationalUnitId(record.getOrganisationalUnitId())
                 .build();
     };
 

@@ -29,7 +29,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.TableRecord;
 import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.Date;
@@ -44,6 +44,7 @@ import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.model.EntityKind.APP_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static java.util.stream.Collectors.toList;
 
@@ -87,6 +88,10 @@ public class ChangeInitiativeGenerator {
                 .from(PERSON)
                 .fetch(PERSON.EMPLOYEE_ID);
 
+        List<Long> orgUnitIds = dsl.select(ORGANISATIONAL_UNIT.ID)
+                    .from(ORGANISATIONAL_UNIT)
+                    .fetch(ORGANISATIONAL_UNIT.ID);
+
         List<TableRecord<?>> records = LongStream.range(0, 400)
                 .mapToObj(i -> {
                     String name = randomPick(p1)
@@ -94,7 +99,8 @@ public class ChangeInitiativeGenerator {
                             + randomPick(p2)
                             + " "
                             + randomPick(p3);
-                    return Tuple.tuple(i, name);
+                    Long ouId = randomPick(orgUnitIds.toArray(new Long[0]));
+                    return Tuple.tuple(i, name, ouId);
                 })
                 .map(t -> buildChangeInitiativeRecord(t))
                 .flatMap(r -> Stream.concat(Stream.of(r), buildLinks(r, groupIds, employeeIds)))
@@ -143,7 +149,7 @@ public class ChangeInitiativeGenerator {
         }
     }
 
-    private static ChangeInitiativeRecord buildChangeInitiativeRecord(Tuple2<Long, String> t) {
+    private static ChangeInitiativeRecord buildChangeInitiativeRecord(Tuple3<Long, String, Long> t) {
         Date.from(Instant.now());
         ChangeInitiativeRecord record = new ChangeInitiativeRecord();
         record.setDescription(t.v2);
@@ -154,6 +160,7 @@ public class ChangeInitiativeGenerator {
         record.setLifecyclePhase(randomPick(LifecyclePhase.values()).name());
         record.setId(t.v1);
         record.setStartDate(new Date(Instant.now().toEpochMilli()));
+        record.setOrganisationalUnitId(t.v3);
         record.setEndDate(new Date(
                 Instant.now()
                     .plusSeconds(rnd.nextInt(60 * 60 * 24 * 365 * 2))
