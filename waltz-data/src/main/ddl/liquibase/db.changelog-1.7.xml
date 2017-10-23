@@ -183,7 +183,7 @@
 
 
     <!-- 2742: Change Initiatives need a parent org unit -->
-    <changeSet id="201723-2742-1"
+    <changeSet id="20171023-2742-1"
                author="davidwatkins73">
         <comment>2472: Change Initiatives need a parent org unit</comment>
         <addColumn tableName="change_initiative">
