@@ -103,6 +103,85 @@
     </changeSet>
 
 
+    <!-- 2728: phys flow criticality -->
+    <changeSet id="20171020-2728-1"
+               author="davidwatkins73">
+        <comment>2728: Add physical_flow criticality column</comment>
+        <addColumn tableName="physical_flow">
+            <column name="criticality"
+                    type="${enum.type}"
+                    defaultValue="MEDIUM">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20171020-2728-2"
+               author="davidwatkins73">
+        <comment>2728: Add physical_flow criticality column</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="LOW"/>
+            <column name="display_name"
+                    value="Low"/>
+            <column name="description"
+                    value="Low criticality"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="MEDIUM"/>
+            <column name="display_name"
+                    value="Medium"/>
+            <column name="description"
+                    value="Medium criticality"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="HIGH"/>
+            <column name="display_name"
+                    value="High"/>
+            <column name="description"
+                    value="High criticality"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="VERY_HIGH"/>
+            <column name="display_name"
+                    value="Very High"/>
+            <column name="description"
+                    value="Very high criticality"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="NONE"/>
+            <column name="display_name"
+                    value="None"/>
+            <column name="description"
+                    value="Criticality Not specified"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="physicalFlowCriticality"/>
+            <column name="key"
+                    value="UNKNOWN"/>
+            <column name="display_name"
+                    value="Unknown"/>
+            <column name="description"
+                    value="Criticality not known"/>
+        </insert>
+    </changeSet>
+
+
     <!-- 2742: Change Initiatives need a parent org unit -->
     <changeSet id="201723-2742-1"
                author="davidwatkins73">

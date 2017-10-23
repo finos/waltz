@@ -55,4 +55,6 @@ public abstract class PhysicalFlow implements
     public abstract TransportKind transport();
 
     public abstract Optional<Long> specificationDefinitionId();
+
+    public abstract Criticality criticality();
 }
