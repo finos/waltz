@@ -48,8 +48,6 @@ import static com.khartec.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.common.ListUtilities.applyToFirst;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
-Kind;
-
 
 @Service
 public class InvolvementService {
