@@ -103,4 +103,81 @@
     </changeSet>
 
 
+    <!-- 2560: authoritative_source - unique index -->
+    <changeSet id="20171023-2560-1"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>2560: Auth Source unique index on [parent_kind, parent_id, data_type, application_id]</comment>
+        <sql>
+            DELETE FROM authoritative_source
+            WHERE id IN (
+                SELECT id
+                FROM authoritative_source dupes
+                    INNER JOIN (
+                        SELECT
+                            max(id) AS 'max_id',
+                            parent_kind,
+                            parent_id,
+                            data_type,
+                            application_id
+                        FROM authoritative_source
+                        GROUP BY parent_kind, parent_id, data_type, application_id
+                        HAVING count(*) > 1) m
+                    ON m.max_id != dupes.id
+                        AND m.parent_kind = dupes.parent_kind
+                        AND m.parent_id = dupes.parent_id
+                        AND m.data_type = dupes.data_type
+                        AND m.application_id = dupes.application_id
+            );
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20171023-2560-1"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>2560: Auth Source unique index on [parent_kind, parent_id, data_type, application_id]</comment>
+        <sql>
+            DELETE FROM authoritative_source
+            WHERE id IN (
+                -- inner select * from due to mysql limitation
+                -- https://stackoverflow.com/questions/17742214/you-cant-specify-target-table-name-for-update-in-from-clause
+                SELECT * FROM (
+                    SELECT dupes.id
+                    FROM authoritative_source dupes
+                    INNER JOIN (
+                        SELECT
+                            max(id) AS 'max_id',
+                            parent_kind,
+                            parent_id,
+                            data_type,
+                            application_id
+                        FROM authoritative_source
+                        GROUP BY parent_kind, parent_id, data_type, application_id
+                        HAVING count(*) > 1) m
+                    ON m.max_id != dupes.id
+                        AND m.parent_kind = dupes.parent_kind
+                        AND m.parent_id = dupes.parent_id
+                        AND m.data_type = dupes.data_type
+                        AND m.application_id = dupes.application_id
+                ) as tmp
+            );
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20171023-2560-2"
+               author="kamransaleem">
+        <comment>2560: Auth Source unique index on [parent_kind, parent_id, data_type, application_id]</comment>
+        <createIndex indexName="idx_auth_source_unique"
+                     tableName="authoritative_source"
+                     unique="true">
+            <column name="parent_kind" type="${enum.type}"/>
+            <column name="parent_id" type="${id.type}"/>
+            <column name="data_type" type="${code.type}"/>
+            <column name="application_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+
 </databaseChangeLog>
