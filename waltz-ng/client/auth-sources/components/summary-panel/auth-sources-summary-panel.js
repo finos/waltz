@@ -40,7 +40,10 @@ const initialState = {
                 'border-color': authoritativeRatingColorScale(r).toString(),
                 'background-color': authoritativeRatingColorScale(r).brighter(2).toString()
             }
-        }))
+        })),
+    visibility: {
+        chart: false
+    }
 };
 
 
@@ -79,7 +82,7 @@ function toStats(data = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const drawPie = (rawStats, options) => {
@@ -123,9 +126,17 @@ function controller(serviceBroker) {
         }
     };
 
+    const determineIfChartShouldBeVisible = (p1, p2) => {
+        $q.all([p1, p2])
+            .then(() => {
+                const inCount = _.sum(_.values(vm.inboundStats));
+                const outCount = _.sum(_.values(vm.outboundStats));
+                vm.visibility.chart = (inCount + outCount) > 0;
+            });
+    };
 
     const loadSummaryStats = () => {
-        serviceBroker
+        const inboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
                 [ { entityReference: vm.parentEntityRef, scope: 'CHILDREN' }])
@@ -134,7 +145,7 @@ function controller(serviceBroker) {
                 drawPie(vm.inboundStats, inboundOptions);
             });
 
-        serviceBroker
+        const outboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
                 [ { entityReference: vm.parentEntityRef, scope: 'CHILDREN' }])
@@ -142,15 +153,21 @@ function controller(serviceBroker) {
                 vm.outboundStats = toStats(r.data);
                 drawPie(vm.outboundStats, outboundOptions);
             });
+
+        determineIfChartShouldBeVisible(inboundPromise, outboundPromise);
     };
 
     vm.$onInit = () => {
         loadSummaryStats();
     };
-
 }
 
-controller.$inject = ['ServiceBroker'];
+
+controller.$inject = [
+    '$q',
+    'ServiceBroker'
+];
+
 
 export const component = {
     bindings,

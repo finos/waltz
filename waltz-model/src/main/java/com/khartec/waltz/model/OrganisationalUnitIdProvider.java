@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -17,9 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default  {
-    template: require('./no-data.html'),
-    transclude: {
-        message: 'message'
-    }
-};
+package com.khartec.waltz.model;
+
+public interface OrganisationalUnitIdProvider {
+
+    public Long organisationalUnitId();
+
+}

@@ -33,7 +33,6 @@ export default () => {
         .config(require('./routes'))
 
     module
-        .directive('waltzPersonSelector', require('./directives/person-selector'))
         .directive('waltzPersonLink', require('./directives/person-link'))
         .directive('waltzManagerList', require('./directives/manager-list'))
         .directive('waltzPersonDirectsList', require('./directives/person-directs-list'));

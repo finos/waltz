@@ -25,14 +25,19 @@
                             <br>
                             <label class="text-muted">Transport:</label>
                             <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
-                    </div>
-                    <div class="col-sm-6">
+                            <br>
+                            <label class="text-muted">Criticality:</label>
+                            <waltz-enum-value type="'physicalFlowCriticality'"
+                                              key="$ctrl.physicalFlow.criticality"
+                                              show-icon="false">
+                            </waltz-enum-value>
+                        </div>
+                        <div class="col-sm-6">
                             <label class="text-muted">Frequency:</label>
                             <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
                             <br>
                             <label class="text-muted">Basis Offset:</label>
                             <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
-
                         </div>
                     </div>
                 </div>

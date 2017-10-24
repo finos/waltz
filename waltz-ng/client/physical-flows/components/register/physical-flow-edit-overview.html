@@ -62,6 +62,12 @@
                                 <br>
                                 <label class="text-muted">Basis Offset:</label>
                                 <span ng-bind="$ctrl.flowAttributes.basisOffset | toBasisOffset"></span>
+                                <br>
+                                <label class="text-muted">Criticality:</label>
+                                <waltz-enum-value type="'physicalFlowCriticality'"
+                                                  key="$ctrl.flowAttributes.criticality"
+                                                  show-icon="false">
+                                </waltz-enum-value>
                             </div>
                         </div>
                     </div>

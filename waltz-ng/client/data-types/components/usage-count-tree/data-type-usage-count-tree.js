@@ -19,7 +19,7 @@
 import _ from 'lodash';
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
-import template from './data-type-tree.html';
+import template from './data-type-usage-count-tree.html';
 
 const bindings = {
     onSelection: '<'
@@ -143,7 +143,7 @@ const component = {
 };
 
 
-const id = 'waltzDataTypeTree';
+const id = 'waltzDataTypeUsageCountTree';
 
 
 export default {

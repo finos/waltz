@@ -37,7 +37,11 @@
         <div class="row">
             <div class="col-md-8">
                 <label>Search by name, role etc</label>
-                <waltz-person-selector model="ctrl.person"></waltz-person-selector>
+
+                <waltz-entity-selector item-id="1"
+                                       on-select="ctrl.goToPerson"
+                                       entity-kinds="['PERSON']">
+                </waltz-entity-selector>
             </div>
         </div>
 

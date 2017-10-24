@@ -16,36 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function controller(personStore, $q) {
-    const vm = this;
+import template from './sub-section.html';
+import {initialiseData} from "../common/index";
 
-    vm.people = [];
-    vm.refresh = (query) => {
-        if (!query) return $q.resolve([]);
-        return personStore
-            .search(query)
-            .then((people) => {
-                vm.people = people;
-            });
+
+const bindings = {
+    name: '@',
+    showBorder: '<'
+};
+
+
+const initialState = {
+    showBorder: true,
+    visibility: {
+        controls: false
+    }
+};
+
+
+function controller($transclude) {
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        vm.visibility.controls = $transclude.isSlotFilled('controls');
     };
 }
 
-controller.$inject = [
-    'PersonStore',
-    '$q'
-];
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template: require('./person-selector.html'),
-        scope: {},
-        bindToController: {
-            model: '='
-        },
-        controller,
-        controllerAs: 'ctrl'
-    };
+controller.$inject = ['$transclude'];
+
+
+const component = {
+    template,
+    bindings,
+    controller,
+    transclude: {
+        content: 'content',
+        controls: '?controls'
+    }
 };
 
+
+export default {
+    id: 'waltzSubSection',
+    component
+};

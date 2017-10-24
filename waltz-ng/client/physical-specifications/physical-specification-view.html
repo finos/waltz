@@ -19,19 +19,21 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
-                                               specification="ctrl.specification"
-                                               organisational-unit="ctrl.organisationalUnit">
-        </waltz-physical-specification-overview>
+        <div class="row">
+            <div class="col-md-7">
+                <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
+                                                       specification="ctrl.specification"
+                                                       organisational-unit="ctrl.organisationalUnit">
+                </waltz-physical-specification-overview>
+            </div>
+            <div class="col-md-5">
+                <waltz-data-type-usage-panel parent-entity-ref="ctrl.entityReference">
+                </waltz-data-type-usage-panel>
+            </div>
+        </div>
     </div>
 
     <br>
-
-
-    <!-- DATA TYPES -->
-    <waltz-physical-spec-data-type-section parent-entity-ref="ctrl.entityReference">
-    </waltz-physical-spec-data-type-section>
-
 
     <!-- SPEC DEFINITIONS -->
     <waltz-section name="Specification Definitions"

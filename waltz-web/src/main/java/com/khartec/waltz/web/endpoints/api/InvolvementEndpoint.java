@@ -120,12 +120,13 @@ public class InvolvementEndpoint implements Endpoint {
         EntityReference entityReference = getEntityReference(request);
         requireEditRoleForEntity(userRoleService, request, entityReference.kind());
         EntityInvolvementChangeCommand command = readBody(request, EntityInvolvementChangeCommand.class);
+        String username = getUsername(request);
 
         switch (command.operation()) {
             case ADD:
-                return service.addEntityInvolvement(entityReference, command);
+                return service.addEntityInvolvement(username, entityReference, command);
             case REMOVE:
-                return service.removeEntityInvolvement(entityReference, command);
+                return service.removeEntityInvolvement(username, entityReference, command);
             default:
                 throw new UnsupportedOperationException("Command operation: "
                         + command.operation() + " is not supported");

@@ -95,3 +95,17 @@ export const basisOffsetInputField = {
     },
     hideExpression: 'model.basisOffsetSelect !== "OTHER"'
 };
+
+
+export const criticalityField = {
+    type: 'select',
+    key: 'criticality',
+    templateOptions: {
+        valueProp: 'code',
+        labelProp: 'name',
+        options: [],
+        label: 'Criticality',
+        placeholder: '',
+        required: true
+    }
+};
