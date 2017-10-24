@@ -38,6 +38,7 @@ public abstract class ChangeInitiative implements
         IdProvider,
         DescriptionProvider,
         ProvenanceProvider,
+        OrganisationalUnitIdProvider,
         WaltzEntity {
 
     public abstract ChangeInitiativeKind kind();
