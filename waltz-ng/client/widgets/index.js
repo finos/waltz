@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import CurrencyAmount from './currency-amount'
+import CurrencyAmount from './currency-amount';
+import SubSection from './sub-section';
 import {registerComponents} from "../common/module-utils";
 
 
@@ -56,7 +57,10 @@ export default () => {
         .component('waltzToggle', require('./toggle'))
         .component('waltzTwistie', require('./twistie'));
 
+    registerComponents(module, [
+        CurrencyAmount,
+        SubSection
+    ]);
 
-    registerComponents(module, [ CurrencyAmount ])
     return module.name;
 };

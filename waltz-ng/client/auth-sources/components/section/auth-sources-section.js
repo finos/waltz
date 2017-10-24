@@ -68,10 +68,6 @@ function controller(serviceBroker) {
                 ['SECTION.AUTH_SOURCES.ABOUT'])
             .then(r => vm.descriptionPanels = r.data);
 
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.dataTypes = r.data);
-
         vm.visibility.tab = vm.parentEntityRef.kind === 'DATA_TYPE'
             ? 1
             : 0;

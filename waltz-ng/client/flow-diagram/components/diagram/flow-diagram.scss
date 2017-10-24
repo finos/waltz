@@ -16,11 +16,14 @@ $annotation-color: #a4a2a6;
         }
     }
 
-    .wfd-flow {
-        path {
-            stroke: #8d8899;
-            fill: #c7c0d5;
-        }
+    .wfd-flow-arrow {
+        stroke: #8d8899;
+        fill: none; //#c7c0d5;
+    }
+
+    .wfd-flow-arrow-head {
+        stroke: #8d8899;
+        fill: #ccc;
     }
 
     .wfd-node {

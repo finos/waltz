@@ -17,11 +17,14 @@
  */
 
 import _ from 'lodash';
-import {select, event} from 'd3-selection';
+import {select, event, selectAll} from 'd3-selection';
 import {drag} from 'd3-drag';
 import {zoom} from 'd3-zoom';
 import {initialiseData, perhaps} from '../../../common';
-import {mkLineWithArrowPath, responsivefy, wrapText} from '../../../common/d3-utils';
+import {
+    mkCurvedLine, mkCurvedLineWithArrowPath, mkLineWithArrowPath, responsivefy,
+    wrapText
+} from '../../../common/d3-utils';
 import {d3ContextMenu} from '../../../common/d3-context-menu';
 import {toGraphId, toNodeShape, drawNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
 
@@ -69,6 +72,7 @@ const styles = {
     FLOW: 'wfd-flow',
     FLOWS: 'wfd-flows',
     FLOW_ARROW: 'wfd-flow-arrow',
+    FLOW_ARROW_HEAD: 'wfd-flow-arrow-head',
     FLOW_BUCKET: 'wfd-flow-bucket',
     FLOW_BUCKETS: 'wfd-flow-buckets',
     NODE: 'wfd-node',
@@ -235,11 +239,36 @@ function drawFlows(state, group) {
     const newLinkElems = linkElems
         .enter()
         .append('g')
-        .classed(styles.FLOW, true);
+        .classed(styles.FLOW, true)
+        .attr('data-flow-id', d => d.id);
 
     newLinkElems
         .append('path')
         .classed(styles.FLOW_ARROW, true);
+
+    newLinkElems
+        .append('path')
+        .classed(styles.FLOW_ARROW_HEAD, true)
+        .attr('d', 'M -8,-4 8,0 -8,4 Z');
+
+    const newBucketElems = newLinkElems
+        .append('g')
+        .classed(styles.FLOW_BUCKET, true)
+        .on('contextmenu', contextMenus.flowBucket
+            ? d3ContextMenu(contextMenus.flowBucket)
+            : null)
+        .on('click.flowBucket', clickHandlers.flowBucket);
+
+    newBucketElems
+        .append('circle');
+
+    newBucketElems
+        .append('text')
+        .classed('fa-fw', true)
+        .attr('font-family', 'FontAwesome')
+        .attr('dx', -6)
+        .attr('dy', 5);
+
 
     newLinkElems
         .merge(linkElems)
@@ -251,100 +280,71 @@ function drawFlows(state, group) {
             const sourceShape = shapeFor(state, d.source);
             const targetShape = shapeFor(state, d.target);
 
-            return mkLineWithArrowPath(
+            return mkCurvedLine(
                 sourcePos.x + sourceShape.cx,
                 sourcePos.y + sourceShape.cy,
                 targetPos.x + targetShape.cx,
-                targetPos.y + targetShape.cy,
-                1.3 /* arrow in center */);
-        });
-}
-
-
-function drawFlowBuckets(state, group) {
-    if (! group) return;
-
-    const relevantFlows = _.filter(
-        state.model.flows || [],
-        f => f.data.kind === 'LOGICAL_DATA_FLOW');
-
-    const bucketElems = group
-        .selectAll(`.${styles.FLOW_BUCKET}`)
-        .data(relevantFlows, f => f.id);
-
-    bucketElems
-        .exit()
-        .remove();
-
-    const newBucketElems = bucketElems
-        .enter()
-        .append('g')
-        .classed(styles.FLOW_BUCKET, true)
-        .on('contextmenu', contextMenus.flowBucket
-            ? d3ContextMenu(contextMenus.flowBucket)
-            : null)
-        .on('click.flowBucket', clickHandlers.flowBucket);
-
-    newBucketElems
-        .append('circle');
-
-    const newBucketTextElems = newBucketElems
-        .append('text')
-        .classed('fa-fw', true)
-        .attr('font-family', 'FontAwesome')
-        .attr('dx', -6)
-        .attr('dy', 5);
-
-    newBucketElems
-        .merge(bucketElems)
-        .attr('transform', d => {
-            // position buckets near center of line
-            const p = determineBucketPosition(state, d);
-            return `translate(${p.x},${p.y})`;
+                targetPos.y + targetShape.cy);
         })
-        .select('circle')
-        .attr('r', d => _.size(state.model.decorations[d.id]) > 0
-            ? dimensions.flowBucket.r * 1.5
-            : dimensions.flowBucket.r );
-
-
-    group
-        .selectAll('text')
-        .merge(newBucketTextElems)
-        .text(d => {
-            const decorationCount = _.size(state.model.decorations[d.id]);
-            if (decorationCount === 0) {
-                return "\uf29c"; // question
-            } else if (decorationCount === 1) {
-                return "\uf016"; // one
-            } else {
-                return "\uf0c5"; // many
-            }
-        });
+        .call(decorateFlows, state);
 }
 
 
-function determineBucketPosition(state, flow) {
-    const sourcePos = positionFor(state, flow.source);
-    const targetPos = positionFor(state, flow.target);
+function decorateFlows(selection, state) {
+    selection.each(function() {
+        const linkPath = select(this);
+        const parentGroup = select(this.parentNode);
+        const bucketPt = calcBucketPt(linkPath);
 
-    const sourceShape = shapeFor(state, flow.source);
-    const targetShape = shapeFor(state, flow.target);
+        const bucketGroup = parentGroup
+            .select(`.${styles.FLOW_BUCKET}`)
+            .attr('transform', `translate(${bucketPt.x}, ${bucketPt.y})`);
 
-    const sx = sourcePos.x + sourceShape.cx;
-    const sy = sourcePos.y + sourceShape.cy;
-    const tx = targetPos.x + targetShape.cx;
-    const ty = targetPos.y + targetShape.cy;
+        bucketGroup
+            .select('circle')
+            .attr('r', d => _.size(state.model.decorations[d.id]) > 0
+                ? dimensions.flowBucket.r * 1.5
+                : dimensions.flowBucket.r );
 
-    const dx = tx - sx;
-    const dy = ty - sy;
+        bucketGroup
+            .select('text')
+            .text(d => {
+                const decorationCount = _.size(state.model.decorations[d.id]);
+                if (decorationCount === 0) {
+                    return "\uf29c"; // question
+                } else if (decorationCount === 1) {
+                    return "\uf016"; // one
+                } else {
+                    return "\uf0c5"; // many
+                }
+            });
 
-    const cx = sx + (dx / 1.8);
-    const cy = sy + (dy / 1.8);
+        parentGroup
+            .select(`.${styles.FLOW_ARROW_HEAD}`)
+            .call(mkArrowHeadPath, linkPath);
+    });
+}
 
-    return {
-        x: cx, y: cy
-    };
+function calcBucketPt(path) {
+    const distanceDownPath = path.node().getTotalLength() / 1.7;
+    return path
+        .node()
+        .getPointAtLength(distanceDownPath);
+}
+
+
+function mkArrowHeadPath(arrowHeadSelection, linkPath) {
+    const arrowPt1 = linkPath.node().getPointAtLength(linkPath.node().getTotalLength() / 1.4);
+    const arrowPt2 = linkPath.node().getPointAtLength(linkPath.node().getTotalLength() / 1.6);
+
+    const dx = arrowPt1.x - arrowPt2.x;
+    const dy = arrowPt1.y - arrowPt2.y;
+    const theta = Math.atan2(dy, dx); // (rotate marker)
+
+    arrowHeadSelection
+        .attr(
+            'transform',
+            `translate(${arrowPt1.x}, ${arrowPt1.y}) rotate(${theta * (180 / Math.PI)})`)
 }
 
 
@@ -378,13 +378,18 @@ function drawAnnotations(state, group, commandProcessor) {
     const determineAnnotationGeometry = (state, d) => {
         const ref = d.data.entityReference;
         if (ref.kind === 'LOGICAL_DATA_FLOW') {
-            const flowId = toGraphId(ref);
-            const flow = _.find(state.model.flows, { id: flowId });
-            return {
-                subjectPosition: determineBucketPosition(state, flow),
+            const geometry = {
+                subjectPosition: {x: 0, y: 0},
                 subjectShape: { cx: 0, cy: 0},
                 annotationPosition: positionFor(state, d.id)
             };
+
+            select(`[data-flow-id="${toGraphId(ref)}"] .${styles.FLOW_ARROW}`)
+                .each(function() {
+                    geometry.subjectPosition = calcBucketPt(select(this));
+                });
+
+            return geometry;
         } else {
             const subjectPosition = positionFor(state, toGraphId(ref));
             const subjectShape = shapeFor(state, toGraphId(ref));
@@ -451,9 +456,9 @@ function drawAnnotations(state, group, commandProcessor) {
 /**
  * Toggles layers by setting their css display style
  */
-function enableLayers(visibility, groups) {
-    if (groups.flowBuckets) { groups.flowBuckets.style('display', visibility.flowBuckets ? 'initial' : 'none'); }
-    if (groups.annotations) { groups.annotations.style('display', visibility.annotations ? 'initial' : 'none'); }
+function enableLayers(visibility) {
+    selectAll(`.${styles.FLOW_BUCKET}`).style('display', visibility.flowBuckets ? 'initial' : 'none');
+    selectAll(`.${styles.ANNOTATION}`).style('display', visibility.annotations ? 'initial' : 'none');
 }
 
 
@@ -468,10 +473,9 @@ function draw(state, commandProcessor = () => console.log('no command processor 
 
     drawNodes(state, groups.nodes, commandProcessor);
     drawFlows(state, groups.flows, commandProcessor);
-    drawFlowBuckets(state, groups.flowBuckets, commandProcessor);
     drawAnnotations(state, groups.annotations, commandProcessor);
 
-    enableLayers(state.visibility.layers, groups);
+    enableLayers(state.visibility.layers);
 }
 
 
@@ -494,10 +498,6 @@ function prepareGroups(holder) {
         .append('g')
         .classed(styles.FLOWS, true);
 
-    const flowBuckets = container
-        .append('g')
-        .classed(styles.FLOW_BUCKETS, true);
-
     const nodes = container
         .append('g')
         .classed(styles.NODES, true);
@@ -507,7 +507,6 @@ function prepareGroups(holder) {
         container,
         annotations,
         flows,
-        flowBuckets,
         nodes
     };
 }

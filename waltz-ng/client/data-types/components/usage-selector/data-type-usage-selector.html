@@ -1,0 +1,13 @@
+<waltz-multi-select-tree-control items="$ctrl.allDataTypes"
+                                 on-click="$ctrl.toggleTypeChecked"
+                                 on-check="$ctrl.typeChecked"
+                                 on-uncheck="$ctrl.typeUnchecked"
+                                 checked-item-ids="$ctrl.checkedItemIds"
+                                 expanded-item-ids="$ctrl.expandedItemIds">
+    <strong uib-popover="{{node.description}}"
+            popover-trigger="mouseenter"
+            popover-popup-delay="400"
+            popover-append-to-body="true"
+            ng-bind="node.name">
+    </strong>
+</waltz-multi-select-tree-control>

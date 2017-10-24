@@ -20,17 +20,19 @@ import _ from "lodash";
 import {isEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
+import template from './rated-flow-summary-panel.html';
+
 
 const bindings = {
     entityReference: '<'
 };
 
 
-const template = require('./rated-flow-summary-panel.html');
-
-
 const initialState = {
-    infoCell : null
+    infoCell : null,
+    visibility: {
+        chart: false
+    }
 };
 
 
@@ -101,6 +103,8 @@ function controller(serviceBroker)
     const vm = _.defaultsDeep(this, initialState);
 
     const processSummaries = (xs) => {
+        vm.visibility.chart = vm.visibility.chart || _.size(xs) > 0;
+
         if (vm.entityReference.kind === 'DATA_TYPE') {
             const relevantIds = [];
             const descend = (ptr) => {
@@ -203,4 +207,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzRatedFlowSummaryPanel'
+};

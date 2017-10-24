@@ -19,12 +19,11 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.EntityNameUtilities;
-import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.OrganisationalUnit;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,16 +58,15 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
-    private LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
-
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
     @Autowired
     public LogicalFlowExtractor(DSLContext dsl,
-                                LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory) {
+                                ApplicationIdSelectorFactory applicationIdSelectorFactory) {
         super(dsl);
-        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
+        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
 
-        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
+        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -84,39 +82,84 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
 
     private CSVSerializer extract(IdSelectionOptions options) {
 
-        Select<Record1<Long>> flowIdSelector = logicalFlowIdSelectorFactory.apply(options);
+        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
-        Application sourceApp = APPLICATION.as("sourceApp");
-        Application targetApp = APPLICATION.as("targetApp");
-        OrganisationalUnit sourceOrgUnit = ORGANISATIONAL_UNIT.as("sourceOrgUnit");
-        OrganisationalUnit targetOrgUnit = ORGANISATIONAL_UNIT.as("targetOrgUnit");
+        Field<Long> sourceFlowId = LOGICAL_FLOW.ID.as("sourceFlowId");
+        Field<Long> targetFlowId = LOGICAL_FLOW.ID.as("targetFlowId");
+
+        Select<Record1<Long>> sourceAppFlows = DSL.select(sourceFlowId)
+                .from(LOGICAL_FLOW)
+                .innerJoin(APPLICATION)
+                    .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(APPLICATION.ID.in(appIdSelector));
+
+        Select<Record1<Long>> targetAppFlows = DSL.select(targetFlowId)
+                .from(LOGICAL_FLOW)
+                .innerJoin(APPLICATION)
+                    .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
+                .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(APPLICATION.ID.in(appIdSelector));
+
+        Field<String> sourceAssetCodeField = DSL
+                .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(APPLICATION.ASSET_CODE)
+                                .from(APPLICATION)
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
+
+        Field<String> sourceOrgUnitNameField = DSL
+                .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(ORGANISATIONAL_UNIT.NAME)
+                                .from(APPLICATION)
+                                .innerJoin(ORGANISATIONAL_UNIT)
+                                    .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
+
+        Field<String> targetAssetCodeField = DSL
+                .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(APPLICATION.ASSET_CODE)
+                                .from(APPLICATION)
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
+
+        Field<String> targetOrgUnitNameField = DSL
+                .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(ORGANISATIONAL_UNIT.NAME)
+                                .from(APPLICATION)
+                                .innerJoin(ORGANISATIONAL_UNIT)
+                                    .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
         Result<Record> data = dsl
                 .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
-                .select(sourceApp.ASSET_CODE)
-                .select(targetApp.ASSET_CODE)
-                .select(sourceOrgUnit.NAME)
-                .select(targetOrgUnit.NAME)
+                .select(sourceAssetCodeField)
+                .select(targetAssetCodeField)
+                .select(sourceOrgUnitNameField)
+                .select(targetOrgUnitNameField)
                 .select(DATA_TYPE.NAME)
                 .select(LOGICAL_FLOW_DECORATOR.RATING)
                 .from(LOGICAL_FLOW)
-                .leftJoin(sourceApp).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceApp.ID).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .leftJoin(targetApp).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetApp.ID).and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .leftJoin(sourceOrgUnit).on(sourceApp.ORGANISATIONAL_UNIT_ID.eq(sourceOrgUnit.ID))
-                .leftJoin(targetOrgUnit).on(targetApp.ORGANISATIONAL_UNIT_ID.eq(targetOrgUnit.ID))
-                .join(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID).and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq("DATA_TYPE")))
-                .join(DATA_TYPE).on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID).and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq("DATA_TYPE")))
-                .where(LOGICAL_FLOW.ID.in(flowIdSelector))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
+                .leftJoin(sourceAppFlows)
+                    .on(sourceFlowId.eq(LOGICAL_FLOW.ID))
+                .leftJoin(targetAppFlows)
+                    .on(targetFlowId.eq(LOGICAL_FLOW.ID))
+                .join(LOGICAL_FLOW_DECORATOR)
+                    .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .join(DATA_TYPE)
+                    .on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(LOGICAL_FLOW.IS_REMOVED.isFalse())
+                .and(sourceFlowId.isNotNull()
+                        .or(targetFlowId.isNotNull()))
                 .fetch();
 
         CSVSerializer serializer = csvWriter -> {
             csvWriter.writeHeader(
                     "Source",
-                    "Source NAR",
+                    "Source Asset Code",
                     "Source Org Unit",
                     "Target",
-                    "Target NAR",
+                    "Target Asset Code",
                     "Target Org Unit",
                     "Data Type",
                     "Source Rating");
@@ -125,11 +168,11 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                 try {
                     csvWriter.write(
                             r.get(SOURCE_NAME_FIELD),
-                            r.get(sourceApp.ASSET_CODE),
-                            r.get(sourceOrgUnit.NAME),
+                            r.get(sourceAssetCodeField),
+                            r.get(sourceOrgUnitNameField),
                             r.get(TARGET_NAME_FIELD),
-                            r.get(targetApp.ASSET_CODE),
-                            r.get(targetOrgUnit.NAME),
+                            r.get(targetAssetCodeField),
+                            r.get(targetOrgUnitNameField),
                             r.get(DATA_TYPE.NAME),
                             r.get(LOGICAL_FLOW_DECORATOR.RATING));
                 } catch (IOException ioe) {

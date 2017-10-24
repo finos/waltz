@@ -18,22 +18,30 @@
 
 import _ from 'lodash';
 import {initialiseData} from "../../common/index";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const initialState = {
     parentEntityRef: {
-        id: 645,
-        kind: 'MEASURABLE'
+        id: 12,
+        kind: 'PHYSICAL_SPECIFICATION'
     }
 };
 
-function controller($stateParams) {
+function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    serviceBroker
+        .loadViewData(
+            CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
+            [ 12 ])
+        .then(r => vm.used = r.data);
 }
 
 
 controller.$inject = [
-    '$stateParams'
+    '$stateParams',
+    'ServiceBroker'
 ];
 
 

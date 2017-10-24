@@ -42,6 +42,7 @@ const initialState = {
     },
     bookmarksSection: dynamicSections.bookmarksSection,
     flowDiagramsSection: dynamicSections.flowDiagramsSection,
+    changeLogSection: dynamicSections.changeLogSection,
 };
 
 
