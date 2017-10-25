@@ -17,10 +17,11 @@
  */
 
 import _ from 'lodash';
-import {initialiseData} from "../../../common/index";
-import {UNKNOWN_DATA_TYPE} from "../../../system/services/settings-names";
-import {color} from "d3-color";
-import {green, red} from "../../../common/colors";
+import { CORE_API } from '../../../common/services/core-api-utils';
+import { initialiseData } from "../../../common/index";
+import { color } from "d3-color";
+import { green, red } from "../../../common/colors";
+import { findUnknownDataType } from '../../../data-types/data-type-utils';
 
 const template = require('./logical-flows-data-type-summary-pane.html');
 
@@ -54,8 +55,14 @@ function prepareSummary(counts = [], unknownId, direction) {
 }
 
 
-function controller(displayNameService, logicalFlowUtilityService, settingsService) {
+function controller(displayNameService, logicalFlowUtilityService, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    const loadUnknownDataType = () => {
+        return serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => findUnknownDataType(r.data));
+    };
 
     vm.$onChanges = () => {
 
@@ -65,10 +72,10 @@ function controller(displayNameService, logicalFlowUtilityService, settingsServi
             vm.stats.dataTypeCounts,
             displayNameService);
 
-        settingsService
-            .findOrDie(UNKNOWN_DATA_TYPE)
-            .then(unknownCode => {
-                if (unknownCode) {
+        loadUnknownDataType()
+            .then(unknownDataType => {
+                const unknownId = unknownDataType ? unknownDataType.id : null;
+                if (unknownId) {
 
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
@@ -94,7 +101,7 @@ function controller(displayNameService, logicalFlowUtilityService, settingsServi
 
                     vm.summaries= _.map(summaries, d => {
                         return {
-                            summary: prepareSummary(vm.enrichedDataTypeCounts, unknownCode, d.prop),
+                            summary: prepareSummary(vm.enrichedDataTypeCounts, unknownId, d.prop),
                             title: d.title
                         }
                     });
@@ -108,7 +115,7 @@ function controller(displayNameService, logicalFlowUtilityService, settingsServi
 controller.$inject = [
     'DisplayNameService',
     'LogicalFlowUtilityService',
-    'SettingsService',
+    'ServiceBroker',
 ];
 
 

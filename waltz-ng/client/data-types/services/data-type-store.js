@@ -25,6 +25,7 @@ function store($http, BaseApiUrl) {
         $http.get(BASE)
             .then(result => result.data);
 
+
     const search = (query) => $http
         .get(`${BASE}/search/${query}`)
         .then(r => r.data);
