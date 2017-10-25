@@ -15,6 +15,7 @@ export const init = (module) => {
     ]);
 
     overrideChangeInitiativeSection();
+    addAttestationSection();
 };
 
 
@@ -32,4 +33,16 @@ function overrideChangeInitiativeSection() {
                 ? dynamicSections.dbChangeInitiativesSection
                 : ds
         ));
+}
+
+
+function addAttestationSection() {
+    dynamicSections.dbAttestationSection = {
+        componentId: 'attestation-section',
+        name: 'Attestations',
+        icon: 'check-square-o',
+        id: 10100
+    };
+
+    dynamicSectionsByKind['APPLICATION'].push(dynamicSections.dbAttestationSection);
 }

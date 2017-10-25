@@ -258,6 +258,19 @@ textarea {
 }
 
 
+@mixin waltz-popover-width($width) {
+    .waltz-popover-width-#{$width} {
+        max-width: 600px;
+    }
+}
+
+@include waltz-popover-width(300);
+@include waltz-popover-width(400);
+@include waltz-popover-width(500);
+@include waltz-popover-width(600);
+@include waltz-popover-width(700);
+
+
 .waltz-sidebar {
   position: fixed;
   width: 16%;
