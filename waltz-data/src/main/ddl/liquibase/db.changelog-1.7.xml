@@ -292,7 +292,7 @@
             UPDATE data_type
             SET unknown = 1
             WHERE id = (
-                SELECT [value]
+                SELECT value
                 FROM settings
                 WHERE name = 'settings.data-type.unknown-id'
             )
