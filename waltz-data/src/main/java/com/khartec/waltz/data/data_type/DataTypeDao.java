@@ -51,6 +51,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .id(Optional.ofNullable(record.getId()))
                 .parentId(Optional.ofNullable(record.getParentId()))
                 .concrete(record.getConcrete())
+                .unknown(record.getUnknown())
                 .build();
     };
 
@@ -76,7 +77,8 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
 
-        return dsl.select(DATA_TYPE.ID, DATA_TYPE.CODE, DSL.val(EntityKind.DATA_TYPE.name()))
+        return dsl
+                .select(DATA_TYPE.ID, DATA_TYPE.CODE, DSL.val(EntityKind.DATA_TYPE.name()))
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);
