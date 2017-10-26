@@ -11,11 +11,11 @@
     </div>
 
     <div class="col-sm-8"
-         ng-if="$ctrl.visibility.chart">
+         ng-show="$ctrl.visibility.chart">
 
         <waltz-basic-info-tile name="Authoritative Inbound / Outbound Summary">
 
-            <span id="inbound">
+            <span id="wassp-inbound">
             </span>
 
             <span style="margin: 1.5em;">
@@ -57,7 +57,7 @@
                 </table>
             </span>
 
-            <span id="outbound">
+            <span id="wassp-outbound">
             </span>
 
         </waltz-basic-info-tile>
