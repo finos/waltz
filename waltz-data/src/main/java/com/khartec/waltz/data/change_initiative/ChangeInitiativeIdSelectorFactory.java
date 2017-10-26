@@ -1,13 +1,14 @@
 package com.khartec.waltz.data.change_initiative;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,23 +16,28 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static org.jooq.impl.DSL.selectDistinct;
 
 @Service
 public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory {
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
+    private final DSLContext dsl;
 
 
     @Autowired
     public ChangeInitiativeIdSelectorFactory(DSLContext dsl,
-                                             ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+                                             OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory) {
         super(dsl, EntityKind.CHANGE_INITIATIVE);
 
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
+        checkNotNull(organisationalUnitIdSelectorFactory, "organisationalUnitIdSelectorFactory cannot be null");
 
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
+        this.dsl = dsl;
+        this.organisationalUnitIdSelectorFactory = organisationalUnitIdSelectorFactory;
     }
 
 
@@ -39,27 +45,46 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
-                return mkForAppGroup(options);
+            case APPLICATION:
+            case MEASURABLE:
+                return mkForRef(options);
+            case PERSON:
+                return mkForPerson(options);
             case CHANGE_INITIATIVE:
                 return mkForChangeInitiative(options);
             case ORG_UNIT:
-            case MEASURABLE:
-                return mkForApps(options);
+                return mkForOrgUnit(options);
             default:
-                throw new UnsupportedOperationException("Cannot create Change Initiatives selector from kind: "+options.entityReference().kind());
+                String msg = String.format(
+                        "Cannot create Change Initiative Id selector from kind: %s",
+                        options.entityReference().kind());
+                throw new UnsupportedOperationException(msg);
         }
-
     }
 
 
-    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
-        switch (options.scope()) {
-            case EXACT:
-                return mkForAppGroupExact(options.entityReference().id());
-            default:
-                throw new UnsupportedOperationException("Cannot create Change Initiative selector from "
-                        + options.entityReference().kind().name() + " with scope: " + options.scope());
-        }
+    private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
+        SelectConditionStep<Record1<String>> empIdSelector = DSL
+                .selectDistinct(PERSON.EMPLOYEE_ID)
+                .from(PERSON)
+                .where(PERSON.ID.eq(options.entityReference().id()));
+
+        return dsl.selectDistinct(CHANGE_INITIATIVE.ID)
+                .from(CHANGE_INITIATIVE)
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(INVOLVEMENT.EMPLOYEE_ID.in(empIdSelector));
+    }
+
+
+    private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
+        Select<Record1<Long>> ouSelector = organisationalUnitIdSelectorFactory.apply(options);
+
+        return dsl
+                .selectDistinct(CHANGE_INITIATIVE.ID)
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouSelector));
     }
 
 
@@ -69,32 +94,24 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
     }
 
 
-    private Select<Record1<Long>> mkForApps(IdSelectionOptions options) {
-        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(options);
+    private Select<Record1<Long>> mkForRef(IdSelectionOptions options) {
+        EntityReference ref = options.entityReference();
 
         Select<Record1<Long>> aToB = selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.in(appIds));
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
 
         Select<Record1<Long>> bToA = selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.in(appIds));
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
         return aToB.union(bToA);
     }
 
 
-    private Select<Record1<Long>> mkForAppGroupExact(long id) {
-        return selectDistinct(ENTITY_RELATIONSHIP.ID_B)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.ID_A.eq(id))
-                    .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APP_GROUP.name()))
-                    .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                    .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(RelationshipKind.RELATES_TO.name()));
-    }
 
 }

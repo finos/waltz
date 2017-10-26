@@ -24,12 +24,8 @@ import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.app_group.AppGroupMemberDao;
 import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
@@ -39,6 +35,7 @@ import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +48,8 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class AppGroupService {
@@ -60,7 +59,7 @@ public class AppGroupService {
     private final AppGroupEntryDao appGroupEntryDao;
     private final ApplicationDao applicationDao;
     private final EntityRelationshipDao entityRelationshipDao;
-    private final ChangeInitiativeDao changeInitiativeDao;
+    private final ChangeInitiativeService changeInitiativeService;
     private final ChangeLogService changeLogService;
 
 
@@ -70,22 +69,22 @@ public class AppGroupService {
                            AppGroupEntryDao appGroupEntryDao,
                            ApplicationDao applicationDao,
                            EntityRelationshipDao entityRelationshipDao,
-                           ChangeInitiativeDao changeInitiativeDao,
+                           ChangeInitiativeService changeInitiativeService,
                            ChangeLogService changeLogService) {
-        this.applicationDao = applicationDao;
         checkNotNull(appGroupDao, "appGroupDao cannot be null");
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
-        checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
+        checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.appGroupDao = appGroupDao;
         this.appGroupMemberDao = appGroupMemberDao;
         this.appGroupEntryDao = appGroupEntryDao;
+        this.applicationDao = applicationDao;
         this.entityRelationshipDao = entityRelationshipDao;
-        this.changeInitiativeDao = changeInitiativeDao;
+        this.changeInitiativeService = changeInitiativeService;
         this.changeLogService = changeLogService;
     }
 
@@ -151,7 +150,7 @@ public class AppGroupService {
     public List<AppGroupSubscription> deleteGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
-        entityRelationshipDao.removeAnyInvolving(EntityReference.mkRef(EntityKind.APP_GROUP, groupId));
+        entityRelationshipDao.removeAnyInvolving(mkRef(EntityKind.APP_GROUP, groupId));
         audit(groupId, userId, String.format("Removed group %d", groupId), null, Operation.REMOVE);
         return findGroupSubscriptionsForUser(userId);
     }
@@ -266,7 +265,9 @@ public class AppGroupService {
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.ADD);
 
-        return getChangeInitiatives(groupId);
+        return changeInitiativeService.findForSelector(mkOpts(
+                mkRef(EntityKind.APP_GROUP, groupId),
+                HierarchyQueryScope.EXACT));
     }
 
 
@@ -285,7 +286,9 @@ public class AppGroupService {
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.REMOVE);
 
-        return getChangeInitiatives(groupId);
+        return changeInitiativeService.findForSelector(mkOpts(
+                mkRef(EntityKind.APP_GROUP, groupId),
+                HierarchyQueryScope.EXACT));
     }
 
 
@@ -316,13 +319,6 @@ public class AppGroupService {
                 .build();
     }
 
-
-    private Collection<ChangeInitiative> getChangeInitiatives(long groupId) {
-        return changeInitiativeDao.findForEntityReference(ImmutableEntityReference.builder()
-                .id(groupId)
-                .kind(EntityKind.APP_GROUP)
-                .build());
-    }
 
 
     private void audit(long groupId, String userId, String message, EntityKind childKind, Operation operation) {

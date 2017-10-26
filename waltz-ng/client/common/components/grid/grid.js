@@ -76,14 +76,14 @@ function controller(uiGridExporterConstants,
         minRowsToShow: vm.minRowsToShow,
         onRegisterApi: function(gridApi){
             vm.gridApi = gridApi;
+            vm.onInitialise({
+                exportFn: vm.exportData,
+                gridApi: vm.gridApi
+            });
         },
         rowTemplate: vm.rowTemplate
     };
 
-    // callback
-    vm.onInitialise({
-        exportFn: vm.exportData
-    });
 }
 
 
