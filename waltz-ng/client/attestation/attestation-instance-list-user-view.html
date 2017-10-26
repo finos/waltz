@@ -39,7 +39,13 @@
                             Description
                         </div>
                         <div class="col-sm-8">
-                            <span ng-bind="run.description"></span>
+                            <span ng-bind="run.description | truncate:150"
+                                  uib-popover="{{ run.description }}"
+                                  popover-class="waltz-popover-width-700"
+                                  popover-append-to-body="true"
+                                  popover-placement="right"
+                                  popover-trigger="mouseenter">
+                            </span>
                         </div>
                     </div>
 

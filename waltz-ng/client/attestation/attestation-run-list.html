@@ -45,7 +45,15 @@
                            class="clickable"
                            ui-sref="main.attestation.run.view ({id: r.id})"></a>
                     </td>
-                    <td><span ng-bind="r.description"></span></td>
+                    <td>
+                        <div ng-bind="r.description | truncate:150"
+                             uib-popover="{{ r.description }}"
+                             popover-class="waltz-popover-width-700"
+                             popover-append-to-body="true"
+                             popover-placement="right"
+                             popover-trigger="mouseenter">
+                        </div>
+                    </td>
                     <td>
                         <div uib-popover="{{
                                 ctrl.responseSummaries[r.id].completeCount + ' completed'
