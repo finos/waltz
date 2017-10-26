@@ -18,45 +18,53 @@
   ~  */
   -->
 
+
+<div ng-if="$ctrl.diagrams.length === 0">
+    <waltz-no-data>
+        <message>
+            <div>
+                No <strong>diagrams</strong> associated with this item
+            </div>
+        </message>
+    </waltz-no-data>
+</div>
+
 <div ng-if="$ctrl.diagrams.length > 0">
-    <waltz-section name="{{ $ctrl.diagrams.length == 1 ? 'Diagram' : 'Diagrams' }}"
-                   icon="sticky-note-o"
-                   id="entity-notes-section">
 
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="waltz-tabs"
-                     ng-if="$ctrl.diagrams.length > 1">
-                    <!-- TAB HEADERS -->
-                    <input type="radio"
-                           ng-repeat-start="diagram in $ctrl.diagrams track by diagram.id"
-                           ng-model="$ctrl.visibility.tab"
-                           ng-value="diagram.id"
-                           name="{{ $parent.$id }}"
-                           id="{{ diagram.id + '_' + $id }}">
-                    <label for="{{ diagram.id + '_' + $id }}"
-                           ng-repeat-end>
-                        <span ng-bind="diagram.name || 'Diagram'">
-                        </span>
-                    </label>
 
-                    <!-- TAB CONTENT -->
-                    <div ng-repeat="diagram in $ctrl.diagrams track by diagram.id"
-                         ng-class="{ 'wt-active': diagram.id == $ctrl.visibility.tab }"
-                         class="wt-tab">
-                        <waltz-entity-svg-diagram-viewer svg="diagram.svg">
-                        </waltz-entity-svg-diagram-viewer>
-                        <waltz-markdown text="diagram.description">
-                        </waltz-markdown>
-                    </div>
-                </div>
-                <div ng-if="$ctrl.diagrams.length == 1">
-                    <waltz-entity-svg-diagram-viewer svg="$ctrl.diagrams[0].svg">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="waltz-tabs"
+                 ng-if="$ctrl.diagrams.length > 1">
+                <!-- TAB HEADERS -->
+                <input type="radio"
+                       ng-repeat-start="diagram in $ctrl.diagrams track by diagram.id"
+                       ng-model="$ctrl.visibility.tab"
+                       ng-value="diagram.id"
+                       name="{{ $parent.$id }}"
+                       id="{{ diagram.id + '_' + $id }}">
+                <label for="{{ diagram.id + '_' + $id }}"
+                       ng-repeat-end>
+                    <span ng-bind="diagram.name || 'Diagram'">
+                    </span>
+                </label>
+
+                <!-- TAB CONTENT -->
+                <div ng-repeat="diagram in $ctrl.diagrams track by diagram.id"
+                     ng-class="{ 'wt-active': diagram.id == $ctrl.visibility.tab }"
+                     class="wt-tab">
+                    <waltz-entity-svg-diagram-viewer svg="diagram.svg">
                     </waltz-entity-svg-diagram-viewer>
-                    <waltz-markdown text="$ctrl.diagrams[0].description">
+                    <waltz-markdown text="diagram.description">
                     </waltz-markdown>
                 </div>
             </div>
+            <div ng-if="$ctrl.diagrams.length == 1">
+                <waltz-entity-svg-diagram-viewer svg="$ctrl.diagrams[0].svg">
+                </waltz-entity-svg-diagram-viewer>
+                <waltz-markdown text="$ctrl.diagrams[0].description">
+                </waltz-markdown>
+            </div>
         </div>
-    </waltz-section>
+    </div>
 </div>
