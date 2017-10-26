@@ -76,7 +76,7 @@ function controller(serviceBroker) {
             changeInitiatives,
             ci => enrichChangeInitiative(ci));
         const roots = buildHierarchies(vm.allChangeInitiatives);
-        vm.changeInitiatives = roots; //_.map(roots, r => _.omit(r, ['children', 'parent']));
+        vm.changeInitiatives = roots;
         vm.gridOptions.data = roots;
     };
 
