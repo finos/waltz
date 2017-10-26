@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,5 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
-export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
+import _ from "lodash";
+
+
+export function findUnknownDataType(dataTypes = []) {
+    const unknownDataType = _.find(dataTypes, dt => dt.unknown);
+    if (! unknownDataType) {
+        throw 'Unknown data type not found!'
+    }
+    return unknownDataType;
+}

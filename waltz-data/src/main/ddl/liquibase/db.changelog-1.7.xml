@@ -273,4 +273,44 @@
     </changeSet>
 
 
+    <!-- 2623 - Unknown Data Type flag in data_type -->
+    <changeSet id="20171024-2623-1"
+               author="kamransaleem">
+        <comment>2623: Unknown Data Type represented in data_type table</comment>
+        <addColumn tableName="data_type">
+            <column name="unknown"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20171024-2623-2"
+               author="kamransaleem">
+        <sql>
+            UPDATE data_type
+            SET unknown = 1
+            WHERE id = (
+                SELECT value
+                FROM settings
+                WHERE name = 'settings.data-type.unknown-id'
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="20171024-2623-3"
+               author="kamransaleem">
+        <sql>
+            UPDATE settings
+            SET name = 'deprecated_1.7_settings.data-type.unknown-id'
+            WHERE name = 'settings.data-type.unknown-id';
+
+            UPDATE settings
+            SET name = 'deprecated_1.7_settings.data-type.default-code'
+            WHERE name = 'settings.data-type.default-code';
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

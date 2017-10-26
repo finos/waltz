@@ -38,4 +38,7 @@ public abstract class DataType implements
     public boolean concrete() {
         return true;
     }
+
+    @Value.Default
+    public boolean unknown() { return false; }
 }
