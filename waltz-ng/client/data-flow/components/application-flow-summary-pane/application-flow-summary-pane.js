@@ -17,13 +17,14 @@
  */
 
 import _ from 'lodash';
-import {initialiseData} from '../../../common';
+import { initialiseData } from '../../../common';
+
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { findUnknownDataType } from '../../../data-types/data-type-utils';
+import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
+import { nest } from "d3-collection";
 
 import template from './application-flow-summary-pane.html';
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {UNKNOWN_DATA_TYPE} from "../../../system/services/settings-names";
-import {categorizeDirection} from "../../../logical-flow/logical-flow-utils";
-import {nest} from "d3-collection";
 
 
 const bindings = {
@@ -90,7 +91,7 @@ function calcStats(enrichedDecorators = []) {
 }
 
 
-function controller($q, serviceBroker, settingsService) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const reload = (unknownDataTypeId) => {
@@ -123,10 +124,17 @@ function controller($q, serviceBroker, settingsService) {
             });
     };
 
+
+    const loadUnknownDataType = () => {
+        return serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => findUnknownDataType(r.data));
+    };
+
+
     vm.$onInit = () => {
-        settingsService
-            .findOrDie(UNKNOWN_DATA_TYPE)
-            .then(unknownDataTypeId => reload(unknownDataTypeId));
+        loadUnknownDataType()
+            .then(unknownDataType => reload(unknownDataType.id))
     }
 }
 
@@ -134,7 +142,6 @@ function controller($q, serviceBroker, settingsService) {
 controller.$inject = [
     '$q',
     'ServiceBroker',
-    'SettingsService'
 ];
 
 
