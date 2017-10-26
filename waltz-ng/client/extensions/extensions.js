@@ -16,6 +16,7 @@ export const init = (module) => {
 
     overrideChangeInitiativeSection();
     addAttestationSection();
+    addEntitySvgDiagramsSection();
 };
 
 
@@ -41,8 +42,20 @@ function addAttestationSection() {
         componentId: 'attestation-section',
         name: 'Attestations',
         icon: 'check-square-o',
-        id: 10100
+        id: 10001
     };
 
     dynamicSectionsByKind['APPLICATION'].push(dynamicSections.dbAttestationSection);
+}
+
+
+function addEntitySvgDiagramsSection() {
+    dynamicSections.dbEntitySvgDiagramsSection = {
+        componentId: 'entity-svg-diagrams-section',
+        name: 'Diagrams',
+        icon: 'sticky-note-o',
+        id: 10002
+    };
+
+    dynamicSectionsByKind['MEASURABLE'].splice(1, 0, dynamicSections.dbEntitySvgDiagramsSection);
 }

@@ -1,5 +1,5 @@
 import {initialiseData} from "../../../common/index";
-import {CORE_API, getApiReference} from '../../../common/services/core-api-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
 import template from "./entity-svg-diagrams-section.html";
 
 
