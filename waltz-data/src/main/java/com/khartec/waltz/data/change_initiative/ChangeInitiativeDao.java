@@ -37,7 +37,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static java.util.Optional.ofNullable;
 
 @Repository
@@ -47,6 +47,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         ChangeInitiativeRecord record = r.into(CHANGE_INITIATIVE);
         return ImmutableChangeInitiative.builder()
                 .id(record.getId())
+                .parentId(ofNullable(record.getParentId()))
                 .name(record.getName())
                 .description(ofNullable(record.getDescription()).orElse(""))
                 .externalId(ofNullable(record.getExternalId()))
@@ -77,29 +78,6 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-    public Collection<ChangeInitiative> findForEntityReference(EntityReference ref) {
-
-        Select<Record> refSideA = dsl.select(CHANGE_INITIATIVE.fields())
-                .from(CHANGE_INITIATIVE)
-                .innerJoin(ENTITY_RELATIONSHIP)
-                .on(ENTITY_RELATIONSHIP.ID_B.eq(CHANGE_INITIATIVE.ID))
-                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()));
-
-        Select<Record> refSideB = dsl.select(CHANGE_INITIATIVE.fields())
-                .from(CHANGE_INITIATIVE)
-                .innerJoin(ENTITY_RELATIONSHIP)
-                .on(ENTITY_RELATIONSHIP.ID_A.eq(CHANGE_INITIATIVE.ID))
-                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
-
-        return refSideA.union(refSideB)
-                .fetch(TO_DOMAIN_MAPPER);
-
-    }
-
 
     @Override
     public List<EntityReference> findByIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
@@ -111,4 +89,21 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
     }
 
 
+    public Collection<ChangeInitiative> findForSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .selectFrom(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<ChangeInitiative> findHierarchyForSelector(Select<Record1<Long>> selector) {
+        SelectConditionStep<Record1<Long>> hierarchySelector = dsl
+                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ID.in(selector)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
+
+        return findForSelector(hierarchySelector);
+    }
 }

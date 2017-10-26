@@ -20,13 +20,16 @@ package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Collection;
+import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 
 public class ChangeInitiativeHarness {
@@ -35,19 +38,38 @@ public class ChangeInitiativeHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        DSLContext dsl = ctx.getBean(DSLContext.class);
         ChangeInitiativeDao dao = ctx.getBean(ChangeInitiativeDao.class);
 
         ChangeInitiative changeInitiative = dao.getById(1L);
         System.out.println(changeInitiative);
 
 
-        Collection<ChangeInitiative> changeInitiatives = dao.findForEntityReference(ImmutableEntityReference.builder()
-                .kind(EntityKind.APP_GROUP)
-                .id(2)
-                .build());
 
-        System.out.println(changeInitiatives);
+        SelectConditionStep<Record1<Long>> ouHier = dsl
+                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ID.eq(210L)
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
 
+
+        SelectConditionStep<Record1<Long>> baseIdSelector = dsl
+                .selectDistinct(CHANGE_INITIATIVE.ID)
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouHier));
+
+
+        SelectConditionStep<Record1<Long>> ciHier = dsl
+                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ID.in(baseIdSelector)
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
+
+
+        dsl.select(CHANGE_INITIATIVE.NAME)
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.ID.in(ciHier))
+                .forEach(System.out::println);
 
     }
 

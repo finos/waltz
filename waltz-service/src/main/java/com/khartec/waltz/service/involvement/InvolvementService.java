@@ -26,7 +26,6 @@ import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
@@ -37,7 +36,6 @@ import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -121,13 +119,6 @@ public class InvolvementService {
         checkNotNull(ref, "ref cannot be null");
         return time("IS.findPeopleByEntityReference", () -> dao.findPeopleByEntityReference(ref));
     }
-
-
-    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
-        checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return time("IS.findDirectChangeInitiativesByEmployeeId", () -> dao.findDirectChangeInitiativesByEmployeeId(employeeId));
-    }
-
 
     public boolean addEntityInvolvement(String userId,
                                         EntityReference entityReference,
