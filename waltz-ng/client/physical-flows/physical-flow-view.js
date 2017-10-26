@@ -41,8 +41,9 @@ const initialState = {
         diagramEditor: false
     },
     bookmarksSection: dynamicSections.bookmarksSection,
-    flowDiagramsSection: dynamicSections.flowDiagramsSection,
     changeLogSection: dynamicSections.changeLogSection,
+    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
+    flowDiagramsSection: dynamicSections.flowDiagramsSection
 };
 
 
