@@ -51,7 +51,7 @@ const h = 130;
 const w = 60;
 
 const inboundOptions = {
-    selector: '#inbound',
+    selector: '#wassp-inbound',
     transform: `translate(${w}, ${h / 2})`,
     startAngle: Math.PI,
     endAngle: 2 * Math.PI
@@ -59,7 +59,7 @@ const inboundOptions = {
 
 
 const outboundOptions = {
-    selector: '#outbound',
+    selector: '#wassp-outbound',
     transform: `translate(0, ${h / 2})`,
     startAngle: Math.PI,
     endAngle: 0
