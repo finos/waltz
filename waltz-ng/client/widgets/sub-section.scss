@@ -18,29 +18,26 @@
         border-bottom: 1px solid #eee;
     }
 
-    .wss-content {
-        padding-bottom: 4px;
-    }
-
-    .wss-controls {
-        font-size: smaller;
-        height: 2.0em;
-        margin: 0;
-        padding-bottom: 3px;
-        display: block;
-        width: 100%;
-        border-top: 1px solid #ddd;
-        background-color: #fafafa;
-        > * {
-            padding-top: 4px;
-            padding-right: 4px;
-            float: right;
-        }
-    }
 }
 
 
 .waltz-sub-section-content {
     margin-left: 16px;
     margin-top: 6px;
+}
+
+
+.waltz-sub-section-controls {
+    font-size: smaller;
+    height: 2.0em;
+    margin: 0;
+    display: block;
+    width: 100%;
+    border-top: 1px solid #ddd;
+    background-color: #fafafa;
+    > * {
+        padding-top: 4px;
+        padding-right: 4px;
+        float: right;
+    }
 }

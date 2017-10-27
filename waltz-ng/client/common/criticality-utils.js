@@ -15,43 +15,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import template from './sub-section.html';
-import {initialiseData} from "../common/index";
+import _ from 'lodash';
 
 
-const bindings = {
-    name: '@',
-    showBorder: '<',
-};
+const criticalities = [
+    'UNKNOWN',
+    'NONE',
+    'LOW',
+    'MEDIUM',
+    'HIGH',
+    'VERY_HIGH',
+];
 
 
-const initialState = {
-    showBorder: true,
-};
+const cmp = (a, b) => a > b ? +1 : a < b ? -1 : 0;
 
 
-function controller() {
-    const vm = initialiseData(this, initialState);
-
-    vm.$onChanges = () => {};
-}
-
-
-controller.$inject = [];
-
-
-const component = {
-    template,
-    bindings,
-    controller,
-    transclude: {
-        content: 'content',
+export function compareCriticalities(a, b) {
+    const aIdx = _.indexOf(criticalities, a);
+    if (aIdx == -1) {
+        throw "Not a recognized criticality" + a;
     }
-};
+    const bIdx = _.indexOf(criticalities, b);
+    if (bIdx == -1) {
+        throw "Not a recognized criticality" + a;
+    }
 
-
-export default {
-    id: 'waltzSubSection',
-    component
-};
+    return cmp(aIdx, bIdx);
+}

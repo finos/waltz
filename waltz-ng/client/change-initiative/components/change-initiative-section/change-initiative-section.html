@@ -96,18 +96,22 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="waltz-sub-section-controls">
+                            <span>
+                                <a ng-click="$ctrl.onClearSelection()"
+                                   class="clickable">
+                                    Close
+                                </a>
+                                &nbsp;|&nbsp;
+                                <a ui-sref="main.change-initiative.view ({id: $ctrl.selectedChange.id})"
+                                   class="clickable">
+                                    More
+                                </a>
+                            </span>
+
+                        </div>
                     </content>
-                    <controls>
-                        <a ng-click="$ctrl.onClearSelection()"
-                           class="clickable">
-                            Close
-                        </a>
-                        &nbsp;|&nbsp;
-                        <a ui-sref="main.change-initiative.view ({id: $ctrl.selectedChange.id})"
-                           class="clickable">
-                            More
-                        </a>
-                    </controls>
+
                 </waltz-sub-section>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<div>
+<div class="container-fluid">
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
@@ -34,10 +34,20 @@
         </waltz-section-actions>
 
 
-        <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
-                                      logical-flow="ctrl.logicalFlow"
-                                      specification="ctrl.specification">
-        </waltz-physical-flow-overview>
+        <div class="row">
+            <div class="col-md-7">
+                <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
+                                              logical-flow="ctrl.logicalFlow"
+                                              specification="ctrl.specification">
+                </waltz-physical-flow-overview>
+            </div>
+            <div class="col-md-5">
+                <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                                             help-text="Data types referenced by the specification">
+                </waltz-data-type-usage-panel>
+            </div>
+        </div>
+
 
 
         <div class="small text-muted"
@@ -97,9 +107,6 @@
                 </a>
             </div>
         </waltz-section-actions>
-
-        <waltz-physical-spec-data-type-list parent-entity-ref="ctrl.entityReference">
-        </waltz-physical-spec-data-type-list>
 
         <div class="row">
             <div class="col-sm-12">

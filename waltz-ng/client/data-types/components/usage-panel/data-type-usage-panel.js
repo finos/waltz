@@ -22,19 +22,22 @@ import template from './data-type-usage-panel.html';
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: '<',
+    helpText: '@'
 };
 
 
 const initialState = {
+    helpText: null,
     isDirty: false,
     visibility: {
-        editor: false
+        editor: false,
+        controls: false
     }
 };
 
 
-function controller(notification, serviceBroker) {
+function controller(notification, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => serviceBroker
@@ -43,6 +46,12 @@ function controller(notification, serviceBroker) {
             [ vm.parentEntityRef.id ],
             { force })
         .then(r => vm.used = r.data);
+
+    vm.$onInit = () => {
+        userService
+            .whoami()
+            .then(u => vm.visibility.controls = userService.hasRole(u, 'LOGICAL_DATA_FLOW_EDITOR'));
+    };
 
     vm.$onChanges = (c) => {
         if (! vm.parentEntityRef) return;
@@ -82,7 +91,8 @@ function controller(notification, serviceBroker) {
 
 controller.$inject = [
     'Notification',
-    'ServiceBroker'
+    'ServiceBroker',
+    'UserService'
 ];
 
 
