@@ -43,18 +43,18 @@
                 </span>
 
                 <span ng-if="$ctrl.visibility.editor">
-                <!-- WHILST EDITING -->
-                <a ng-click="$ctrl.onSave()"
-                   class="clickable"
-                   ng-disabled="! $ctrl.isDirty">
-                    Save
-                </a>
-                |
-                <a ng-click="$ctrl.onHideEdit()"
-                   class="clickable">
-                    Cancel
-                </a>
-            </span>
+                    <!-- WHILST EDITING -->
+                    <a ng-click="$ctrl.onSave()"
+                       class="clickable"
+                       ng-disabled="! $ctrl.isDirty">
+                        Save
+                    </a>
+                    |
+                    <a ng-click="$ctrl.onHideEdit()"
+                       class="clickable">
+                        Cancel
+                    </a>
+                </span>
             </div>
 
         </content>
