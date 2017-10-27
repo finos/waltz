@@ -1,11 +1,13 @@
 package com.khartec.waltz.data.attestation;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.ImmutableAttestationInstance;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,7 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE_RECIPIENT;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
 @Repository
@@ -151,5 +154,29 @@ public class AttestationInstanceDao {
                 .from(ATTESTATION_INSTANCE)
                 .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int cleanupOrphans() {
+
+        Select<Record1<Long>> orphanAttestationIds = DSL.selectDistinct(ATTESTATION_INSTANCE.ID)
+                .from(ATTESTATION_INSTANCE)
+                .leftJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
+                .and(APPLICATION.ID.isNull()
+                        .or(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.REMOVED.name()))
+                        .or(APPLICATION.IS_REMOVED.eq(true)));
+
+        dsl.deleteFrom(ATTESTATION_INSTANCE_RECIPIENT)
+                .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.in(orphanAttestationIds))
+                .execute();
+
+        int numberOfInstancesDeleted = dsl.deleteFrom(ATTESTATION_INSTANCE)
+                .where(ATTESTATION_INSTANCE.ID.in(orphanAttestationIds))
+                .execute();
+
+        return numberOfInstancesDeleted;
     }
 }

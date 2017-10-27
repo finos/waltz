@@ -32,9 +32,8 @@ public class OrphanHarness {
 
         OrphanDao orphanDao = ctx.getBean(OrphanDao.class);
 
-        List<OrphanRelationship> applicationsWithNonExistingOrgUnit = orphanDao.findApplicationsWithNonExistentOrgUnit();
-        List<OrphanRelationship> orphanAuthoritativeSources = orphanDao.findOrphanAuthoritiveSourceByDataType();
-        System.out.println(applicationsWithNonExistingOrgUnit.size());
+        List<OrphanRelationship> orphanAttestatations = orphanDao.findOrphanAttestatations();
+        System.out.println(orphanAttestatations.size());
     }
 
 }

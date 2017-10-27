@@ -59,13 +59,20 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const cleanupOrphans = () => {
+        return $http
+            .get(`${base}/cleanup-orphans`)
+            .then(r => r.data);
+    };
+
     return {
         attestInstance,
         findByRunId,
         findByUser,
         findHistoricalForPendingByUser,
         findPersonsById,
-        findByEntityRef
+        findByEntityRef,
+        cleanupOrphans
     };
 }
 
@@ -109,5 +116,10 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: 'findByEntityRef',
         description: 'find instances for an entity'
-    }
+    },
+    cleanupOrphans: {
+        serviceName,
+        serviceFnName: 'cleanupOrphans',
+        description: 'clean up orphan attestations and recipients for applications that no longer exist'
+    },
 };
