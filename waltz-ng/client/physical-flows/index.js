@@ -17,8 +17,9 @@
  */
 
 import angular from 'angular';
-import {registerStore} from '../common/module-utils';
+import {registerComponents, registerStore} from '../common/module-utils';
 import * as PhysicalFlowStore from './service/physical-flow-store';
+import PhysicalFlowOverview from './components/overview/physical-flow-overview';
 
 
 function setup() {
@@ -30,7 +31,6 @@ function setup() {
     registerStore(module, PhysicalFlowStore);
 
     module
-        .component('waltzPhysicalFlowOverview', require('./components/overview/physical-flow-overview'))
         .component('waltzPhysicalFlowEditOverview', require('./components/register/physical-flow-edit-overview'))
         .component("waltzPhysicalFlowEditSpecification", require('./components/register/physical-flow-edit-specification'))
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
@@ -38,6 +38,9 @@ function setup() {
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'))
         .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
 
+    registerComponents(module, [
+        PhysicalFlowOverview
+    ]);
     return module.name;
 }
 
