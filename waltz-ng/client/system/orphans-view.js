@@ -46,7 +46,8 @@ function controller($q,
                 orphanStore.findOrphanAuthoritativeSourcesByApp(),
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
                 orphanStore.findOrphanChangeInitiatives(),
-                orphanStore.findOrphanLogicalFlows()
+                orphanStore.findOrphanLogicalFlows(),
+                orphanStore.findOrphanAttestations()
             ])
             .then( ([apps,
                 measurableRatings,
@@ -54,7 +55,8 @@ function controller($q,
                 authSourcesByApp,
                 authSourcesByDataType,
                 changeInitiatives,
-                logicalFlows
+                logicalFlows,
+                attestations
             ]) => {
                 const orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
@@ -63,7 +65,8 @@ function controller($q,
                     {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
                     {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
                     {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
-                    {description: 'Logical Flows referencing non-existent applications', values: logicalFlows}
+                    {description: 'Logical Flows referencing non-existent applications', values: logicalFlows},
+                    {description: 'Attestations referencing non-existent applications', values: attestations}
                 ];
                 vm.orphans = orphans;
             });
@@ -82,6 +85,12 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AuthSourcesStore.cleanupOrphans, [])
             .then(r => notification.success(`Cleaned up ${r.data} auth sources/s`));
+    };
+
+    vm.cleanupAttestations = () => {
+        serviceBroker
+            .execute(CORE_API.AttestationInstanceStore.cleanupOrphans, [])
+            .then(r => notification.success(`Cleaned up ${r.data} attestations/s`));
     };
 }
 

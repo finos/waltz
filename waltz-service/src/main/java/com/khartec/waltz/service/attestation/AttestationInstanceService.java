@@ -81,6 +81,11 @@ public class AttestationInstanceService {
     }
 
 
+    public int cleanupOrphans() {
+        return attestationInstanceDao.cleanupOrphans();
+    }
+
+
     private void logChange (String username, AttestationInstance instance) {
 
         changeLogService.write(ImmutableChangeLog.builder()

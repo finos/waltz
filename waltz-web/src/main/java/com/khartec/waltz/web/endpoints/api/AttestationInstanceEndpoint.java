@@ -2,30 +2,45 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
 public class AttestationInstanceEndpoint implements Endpoint {
+    private static final Logger LOG = LoggerFactory.getLogger(AttestationInstanceEndpoint.class);
     private static final String BASE_URL = mkPath("api", "attestation-instance");
+
     private final AttestationInstanceService attestationInstanceService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AttestationInstanceEndpoint (AttestationInstanceService attestationInstanceService) {
+    public AttestationInstanceEndpoint (AttestationInstanceService attestationInstanceService,
+                                        UserRoleService userRoleService) {
         checkNotNull(attestationInstanceService, "attestationInstanceService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.attestationInstanceService = attestationInstanceService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -38,6 +53,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findAllByUserPath = mkPath(BASE_URL, "all", "user");
         String findHistoricalForPendingByUserPath = mkPath(BASE_URL, "historical", "user");
         String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
+        String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
@@ -72,6 +88,17 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForList(findHistoricalForPendingByUserPath, findHistoricalForPendingByRecipientRoute);
         getForList(findByRunIdPath, findByRunIdRoute);
         getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
+        getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+    }
+
+
+    private int cleanupOrphansRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.ADMIN);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested orphan attestation cleanup", username);
+        return attestationInstanceService.cleanupOrphans();
     }
 
 }

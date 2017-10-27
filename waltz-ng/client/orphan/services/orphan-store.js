@@ -56,6 +56,11 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findOrphanAttestations = () => $http
+        .get(`${BASE}/attestation`)
+        .then(result => result.data);
+
+
     return {
         findAppsWithNonExistentOrgUnits,
         findOrphanMeasurableRatings,
@@ -63,7 +68,8 @@ function service($http, BaseApiUrl) {
         findOrphanAuthoritativeSourcesByOrgUnit,
         findOrphanAuthoritativeSourcesByDataType,
         findOrphanChangeInitiatives,
-        findOrphanLogicalFlows
+        findOrphanLogicalFlows,
+        findOrphanAttestations
     };
 
 }
