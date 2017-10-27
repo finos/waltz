@@ -35,11 +35,6 @@ function store($http, BaseApiUrl) {
         .then(r => r.data);
 
 
-    const findChangeInitiativesForEmployeeId = (employeeId) =>
-        $http.get(`${BASE}/employee/${employeeId}/change-initiative/direct`)
-            .then(result => result.data);
-
-
     const findByEmployeeId = (employeeId) =>
         $http.get(`${BASE}/employee/${employeeId}`)
             .then(result => result.data);
@@ -74,7 +69,6 @@ function store($http, BaseApiUrl) {
         findEndUserAppsByIdSelector,
         findByEmployeeId,
         findByEntityReference,
-        findChangeInitiativesForEmployeeId,
         findPeopleByEntityReference,
         changeInvolvement
     };
@@ -107,11 +101,6 @@ export const InvolvementStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'find involvements by entity reference'
-    },
-    findChangeInitiativesForEmployeeId: {
-        serviceName,
-        serviceFnName: 'findChangeInitiativesForEmployeeId',
-        description: 'find change initiatives by employee id'
     },
     findPeopleByEntityReference: {
         serviceName,

@@ -55,7 +55,8 @@ public class ChangeInitiativeEndpoint implements Endpoint {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getRelationshipsForIdPath = mkPath(getByIdPath, "related");
-        String findForRefPath = mkPath(BASE_URL, "ref", ":kind", ":id");
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
+        String findHierarchyForSelectorPath = mkPath(BASE_URL, "hierarchy", "selector");
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String changeEntityRelationshipPath = mkPath(BASE_URL, "id", ":id", "entity-relationship");
 
@@ -65,8 +66,11 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         ListRoute<EntityRelationship> getRelationshipsForIdRoute = (request, response) ->
                 service.getRelatedEntitiesForId(getId(request));
 
-        ListRoute<ChangeInitiative> findForRefRoute = (request, response) ->
-                service.findForEntityReference(getEntityReference(request));
+        ListRoute<ChangeInitiative> findForSelectorRoute = (request, response) ->
+                service.findForSelector(readIdSelectionOptionsFromBody(request));
+
+        ListRoute<ChangeInitiative> findHierarchyForSelectorRoute = (request, response) ->
+                service.findHierarchyForSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<ChangeInitiative> searchRoute = (request, response) ->
                 service.search(request.params("query"));
@@ -76,8 +80,9 @@ public class ChangeInitiativeEndpoint implements Endpoint {
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(getRelationshipsForIdPath, getRelationshipsForIdRoute);
-        getForList(findForRefPath, findForRefRoute);
         getForList(searchPath, searchRoute);
+        postForList(findForSelectorPath, findForSelectorRoute);
+        postForList(findHierarchyForSelectorPath, findHierarchyForSelectorRoute);
         postForDatum(changeEntityRelationshipPath, changeEntityRelationshipRoute);
     }
 
