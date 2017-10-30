@@ -29,7 +29,7 @@ public class SearchUtilities
         String[] terms = safeQuery.split(" ");
 
         // ensure the first term is at least 3 characters
-        if(terms[0].length() < 3) return new ArrayList<>();
+        if(terms.length == 1 && terms[0].length() < 3) return new ArrayList<>();
 
         return Stream.of(terms)
                 .filter(StringUtilities::notEmpty)
