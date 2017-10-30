@@ -23,7 +23,6 @@ import {registerComponents, registerStore} from '../common/module-utils';
 import changeInitiativeStore from './services/change-initiative-store';
 import changeInitiativeSelector from './directives/change-initiative-selector';
 import * as changeInitiativeRelatedDataTypeSection from './components/related-data-type-section/change-initiative-related-data-type-section';
-import changeInitiativeRelatedAppsSection from './components/related-apps-section/related-apps-section';
 import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
 
 
@@ -39,7 +38,6 @@ function setup() {
 
     registerComponents(module, [
         changeInitiativeSection,
-        changeInitiativeRelatedAppsSection,
         changeInitiativeRelatedDataTypeSection
     ]);
 
