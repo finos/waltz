@@ -39,6 +39,12 @@
                 <waltz-no-data>
                     <message>
                         <strong>No data points</strong> available.
+                        <a class='clickable small'
+                           title="Refocus on this statistic"
+                           ng-if="! ($ctrl.definition.children | isEmpty)"
+                           ng-click="$ctrl.goToStatistic($ctrl.definition)">
+                            Explore &raquo;
+                        </a>
                     </message>
                 </waltz-no-data>
             </div>
