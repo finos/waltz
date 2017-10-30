@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {checkIsEntityRelationshipChangeCommand} from "../../common/checks";
+import {checkIsEntityRelationshipChangeCommand, checkIsIdSelector} from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
@@ -23,19 +23,20 @@ function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/change-initiative`;
 
 
-    const findByRef = (kind, id) => $http
-            .get(`${BASE}/ref/${kind}/${id}`)
+    const findBySelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/selector`, selector)
             .then(r => r.data);
+    };
 
 
-    const findByParentId = (id) => $http
-        .get(`${BASE}/children/${id}`)
-        .then(r => r.data);
-
-
-    const findParentsById = (id) => $http
-        .get(`${BASE}/parents/${id}`)
-        .then(r => r.data);
+    const findHierarchyBySelector = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/hierarchy/selector`, selector)
+            .then(r => r.data);
+    };
 
 
     const getById = (id) => $http
@@ -62,9 +63,8 @@ function store($http, BaseApiUrl) {
 
 
     return {
-        findByParentId,
-        findParentsById,
-        findByRef,
+        findBySelector,
+        findHierarchyBySelector,
         findRelatedForId,
         getById,
         search,
@@ -79,20 +79,15 @@ const serviceName = 'ChangeInitiativeStore';
 
 
 export const ChangeInitiativeStore_API = {
-    findByParentId: {
+    findBySelector: {
         serviceName,
-        serviceFnName: 'findByParentId',
-        description: 'finds change initiatives by parent id'
+        serviceFnName: 'findBySelector',
+        description: 'finds change initiatives by id selector'
     },
-    findParentsById: {
+    findHierarchyBySelector: {
         serviceName,
-        serviceFnName: 'findParentsById',
-        description: 'finds parent change initiatives by id'
-    },
-    findByRef: {
-        serviceName,
-        serviceFnName: 'findByRef',
-        description: 'finds change initiatives by an entity reference'
+        serviceFnName: 'findHierarchyBySelector',
+        description: 'finds change initiatives (and parents) by id selector'
     },
     getById: {
         serviceName,

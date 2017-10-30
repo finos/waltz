@@ -59,6 +59,7 @@
                     <th>Beta Tester</th>
                     <th>Lineage</th>
                     <th>Survey</th>
+                    <th>Survey Template</th>
                     <th>Change Initiative</th>
                 </tr>
                 </thead>
@@ -133,6 +134,11 @@
                     </td>
                     <td align="left">
                         <span ng-if='ctrl.hasRole(user, "SURVEY_ADMIN")'>
+                            <waltz-icon name='check'></waltz-icon>
+                        </span>
+                    </td>
+                    <td align="left">
+                        <span ng-if='ctrl.hasRole(user, "SURVEY_TEMPLATE_ADMIN")'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -238,6 +244,12 @@
                                 <td>SURVEY_ADMIN</td>
                                 <td>
                                     <input type="checkbox" ng-model="ctrl.roleSelections.SURVEY_ADMIN">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>SURVEY_TEMPLATE_ADMIN</td>
+                                <td>
+                                    <input type="checkbox" ng-model="ctrl.roleSelections.SURVEY_TEMPLATE_ADMIN">
                                 </td>
                             </tr>
                             <tr>

@@ -22,6 +22,7 @@ import _ from "lodash";
 
 import template from './physical-flow-view.html';
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import {toEntityRef} from "../common/entity-utils";
 
 
 const initialState = {
@@ -148,7 +149,10 @@ function controller($q,
 
     const specPromise = physicalFlowPromise
         .then(physicalFlow => physicalSpecificationStore.getById(physicalFlow.specificationId))
-        .then(spec => vm.specification = spec);
+        .then(spec => {
+            vm.specification = spec;
+            vm.specificationReference = toEntityRef(spec, 'PHYSICAL_SPECIFICATION');
+        });
 
 
     // spec definitions

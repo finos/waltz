@@ -20,9 +20,11 @@ package com.khartec.waltz.service.change_initiative;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
+import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
@@ -44,37 +46,47 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 @Service
 public class ChangeInitiativeService {
 
-    private final ChangeInitiativeDao baseDao;
+    private final ChangeInitiativeDao changeInitiativeDao;
     private final ChangeInitiativeSearchDao searchDao;
     private final EntityRelationshipDao relationshipDao;
     private final ChangeLogService changeLogService;
+    private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory;
 
     @Autowired
     public ChangeInitiativeService(
-            ChangeInitiativeDao baseDao,
+            ChangeInitiativeDao changeInitiativeDao,
             ChangeInitiativeSearchDao searchDao,
             EntityRelationshipDao relationshipDao,
+            ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory,
             ChangeLogService changeLogService) {
 
-        checkNotNull(baseDao, "baseDao cannot be null");
+        checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
         checkNotNull(relationshipDao, "relationshipDao cannot be null");
+        checkNotNull(changeInitiativeIdSelectorFactory, "changeInitiativeIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
-        this.baseDao = baseDao;
+        this.changeInitiativeDao = changeInitiativeDao;
         this.searchDao = searchDao;
         this.relationshipDao = relationshipDao;
+        this.changeInitiativeIdSelectorFactory = changeInitiativeIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 
 
     public ChangeInitiative getById(Long id) {
-        return baseDao.getById(id);
+        return changeInitiativeDao.getById(id);
     }
 
 
-    public Collection<ChangeInitiative> findForEntityReference(EntityReference ref) {
-        return baseDao.findForEntityReference(ref);
+
+    public Collection<ChangeInitiative> findForSelector(IdSelectionOptions selectionOptions) {
+        return changeInitiativeDao.findForSelector(changeInitiativeIdSelectorFactory.apply(selectionOptions));
+    }
+
+
+    public Collection<ChangeInitiative> findHierarchyForSelector(IdSelectionOptions selectionOptions) {
+        return changeInitiativeDao.findHierarchyForSelector(changeInitiativeIdSelectorFactory.apply(selectionOptions));
     }
 
 

@@ -60,6 +60,11 @@ function service(http, baseUrl, $auth) {
             });
 
 
+    /**
+     * @param user object with roles array property
+     * @param role
+     * @returns {boolean}
+     */
     const hasRole = ( { roles = [] }, role) => {
         if (_.isEmpty(role)) return true;
         return _.includes(roles, role);

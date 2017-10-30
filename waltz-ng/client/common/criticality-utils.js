@@ -15,38 +15,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.khartec.waltz.model.user;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import _ from 'lodash';
 
 
-public enum Role {
-    ADMIN,
-    APP_EDITOR,
-    ANONYMOUS,
-    ATTESTATION_ADMIN,
-    AUTHORITATIVE_SOURCE_EDITOR,
-    BETA_TESTER,
-    BOOKMARK_EDITOR,
-    CAPABILITY_EDITOR,
-    CHANGE_INITIATIVE_EDITOR,
-    LINEAGE_EDITOR,
-    LOGICAL_DATA_FLOW_EDITOR,
-    ORG_UNIT_EDITOR,
-    RATING_EDITOR,
-    SURVEY_ADMIN,
-    SURVEY_TEMPLATE_ADMIN,
-    USER_ADMIN
-    ;
+const criticalities = [
+    'UNKNOWN',
+    'NONE',
+    'LOW',
+    'MEDIUM',
+    'HIGH',
+    'VERY_HIGH',
+];
 
 
-    public static Set<String> allNames() {
-        return Stream
-                .of(Role.values())
-                .map(r -> r.name())
-                .collect(Collectors.toSet());
+const cmp = (a, b) => a > b ? +1 : a < b ? -1 : 0;
+
+
+export function compareCriticalities(a, b) {
+    const aIdx = _.indexOf(criticalities, a);
+    if (aIdx == -1) {
+        throw "Not a recognized criticality" + a;
     }
+    const bIdx = _.indexOf(criticalities, b);
+    if (bIdx == -1) {
+        throw "Not a recognized criticality" + a;
+    }
+
+    return cmp(aIdx, bIdx);
 }

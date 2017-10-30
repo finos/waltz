@@ -1,7 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyQuestionDropdownEntryService;
@@ -128,6 +127,6 @@ public class SurveyQuestionEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.SURVEY_ADMIN);
+        requireRole(userRoleService, request, Role.SURVEY_TEMPLATE_ADMIN);
     }
 }

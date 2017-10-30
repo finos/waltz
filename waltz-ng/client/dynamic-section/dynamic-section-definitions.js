@@ -236,6 +236,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.measurableRatingsBrowserSection,
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.authSourcesSection,
+        dynamicSections.changeInitiativeSection,
         dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,

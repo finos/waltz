@@ -13,24 +13,30 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
-               waltz-has-role="SURVEY_ADMIN"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
                ng-if="ctrl.template.status === 'DRAFT'"
                ui-sref="main.survey.template.edit ({id: ctrl.template.id })">
                 Edit
             </a>
             <a class="btn btn-primary btn-xs"
-               waltz-has-role="SURVEY_ADMIN"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
                ng-click="ctrl.cloneTemplate()">
                 Clone
             </a>
             <a class="btn btn-success btn-xs"
-               waltz-has-role="SURVEY_ADMIN"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
                ng-if="ctrl.template.status !== 'ACTIVE'"
                ng-click="ctrl.markTemplateAsActive()">
                 Mark as Active
             </a>
+            <a class="btn btn-warning btn-xs"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
+               ng-if="ctrl.template.status === 'ACTIVE'"
+               ng-click="ctrl.markTemplateAsDraft()">
+                Mark as Draft
+            </a>
             <a class="btn btn-danger btn-xs"
-               waltz-has-role="SURVEY_ADMIN"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
                ng-if="ctrl.template.status === 'ACTIVE'"
                ng-click="ctrl.markTemplateAsObsolete()">
                 Mark as Obsolete
