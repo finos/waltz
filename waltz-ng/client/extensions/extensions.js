@@ -14,7 +14,7 @@ export const init = (module) => {
         dbChangeInitiativeSection
     ]);
 
-    overrideChangeInitiativeSection();
+    // overrideChangeInitiativeSection();
     addAttestationSection();
     addEntitySvgDiagramsSection();
 };
