@@ -90,16 +90,6 @@ public class ChangeInitiativeService {
     }
 
 
-    public Collection<ChangeInitiative> findByParentId(long parentId) {
-        return baseDao.findByParentId(parentId);
-    }
-
-
-    public Collection<ChangeInitiative> findParentsById(long id) {
-        return baseDao.findParentsById(id);
-    }
-
-
     public Collection<ChangeInitiative> search(String query) {
         return search(query, EntitySearchOptions.mkForEntity(CHANGE_INITIATIVE));
     }
