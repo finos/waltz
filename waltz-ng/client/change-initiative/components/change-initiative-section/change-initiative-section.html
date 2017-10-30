@@ -11,10 +11,111 @@
                                entities="['CHANGE_INITIATIVE']">
     </waltz-source-data-overlay>
 
+    <div class="row"
+         ng-if="$ctrl.changeInitiatives.length > 0">
 
-    <waltz-change-initiative-table ng-if='$ctrl.changeInitiatives.length > 0'
-                                   list="$ctrl.changeInitiatives">
-    </waltz-change-initiative-table>
+        <div class="col-md-7">
+            <div class="small">
+                <div ui-grid="$ctrl.gridOptions"
+                     ui-grid-exporter
+                     class="waltz-grid">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+
+            <div style="padding-top: 1em;"
+                 class="small"
+                 ng-if="$ctrl.selectedChange">
+                <waltz-sub-section name="Detail">
+                    <content>
+                        <div class="waltz-sub-section-content">
+
+                            <div class="row">
+                                <div class="col-sm-3 waltz-display-field-label">
+                                    Name
+                                </div>
+                                <div class="col-sm-9">
+                                    <span ng-bind="$ctrl.selectedChange.name"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 waltz-display-field-label">
+                                    Start&nbsp;/&nbsp;End
+                                </div>
+                                <div class="col-sm-9">
+                                    <span ng-bind="$ctrl.selectedChange.startDate"></span>
+                                    /
+                                    <span ng-bind="$ctrl.selectedChange.endDate"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3 waltz-display-field-label">
+                                    Description
+                                </div>
+                                <div class="col-sm-9">
+                                    <span ng-bind="$ctrl.selectedChange.description"></span>
+                                </div>
+                            </div>
+                            <div class="row"
+                                 ng-if="$ctrl.selectedChange.children.length > 0">
+                                <div class="col-sm-12">
+                                    <div  style="border-top: 1px solid #eee; padding-top: 1em; margin-top: 1em;">
+                                        <div class="waltz-display-field-label">
+                                            Children
+                                        </div>
+                                        <table class="table table-condensed small">
+                                            <colgroup>
+                                                <col width="10%">
+                                                <col width="70%">
+                                                <col width="20%">
+                                            </colgroup>
+                                            <tbody>
+                                            <tr ng-repeat="child in $ctrl.selectedChange.children"
+                                                uib-popover="{{child.description}}"
+                                                popover-trigger="mouseenter"
+                                                popover-popup-delay="300"
+                                                popover-placement="left"
+                                                popover-append-to-body="true">
+                                                <td>
+                                                    <a ui-sref="main.change-initiative.view ({ id: child.id })"
+                                                       class="clickable">
+                                                        <span ng-bind="child.externalId"></span>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span ng-bind="child.name"></span>
+                                                </td>
+                                                <td><span ng-bind="child.lifecyclePhaseName"></span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="waltz-sub-section-controls">
+                            <span>
+                                <a ng-click="$ctrl.onClearSelection()"
+                                   class="clickable">
+                                    Close
+                                </a>
+                                &nbsp;|&nbsp;
+                                <a ui-sref="main.change-initiative.view ({id: $ctrl.selectedChange.id})"
+                                   class="clickable">
+                                    More
+                                </a>
+                            </span>
+
+                        </div>
+                    </content>
+
+                </waltz-sub-section>
+            </div>
+        </div>
+    </div>
 
     <waltz-no-data ng-if="$ctrl.changeInitiatives.length == 0">
         <message>

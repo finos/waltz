@@ -2,9 +2,13 @@
     <waltz-icon name="{{ $ctrl.icon }}"
                 ng-if="$ctrl.showIcon">
     </waltz-icon>
-    <span ng-bind="$ctrl.name"
+    <span ng-if="$ctrl.showPopover"
+          ng-bind="$ctrl.name"
           uib-popover="{{ $ctrl.description }}"
           popover-append-to-body="true"
           popover-trigger="mouseenter">
+    </span>
+    <span ng-if="!$ctrl.showPopover"
+          ng-bind="$ctrl.name">
     </span>
 </span>

@@ -20,6 +20,7 @@ import _ from "lodash";
 import {CORE_API} from '../../../common/services/core-api-utils';
 
 import template from './app-group-edit.html';
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const initialState = {
@@ -177,7 +178,9 @@ function controller($q,
         .then(() => notification.warning('Removed Change Initiative: ' + changeInitiative.name));
 
     serviceBroker
-        .loadViewData(CORE_API.ChangeInitiativeStore.findByRef, ['APP_GROUP', id])
+        .loadViewData(
+            CORE_API.ChangeInitiativeStore.findBySelector,
+            [ mkSelectionOptions({ kind: 'APP_GROUP', id }, 'EXACT') ])
         .then(result => vm.changeInitiatives = result.data);
 
 }

@@ -19,7 +19,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
@@ -56,9 +55,8 @@ public class ChangeInitiativeEndpoint implements Endpoint {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getRelationshipsForIdPath = mkPath(getByIdPath, "related");
-        String findForRefPath = mkPath(BASE_URL, "ref", ":kind", ":id");
-        String findByParentIdPath = mkPath(BASE_URL, "children", ":id");
-        String findParentByIdPath = mkPath(BASE_URL, "parents", ":id");
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
+        String findHierarchyForSelectorPath = mkPath(BASE_URL, "hierarchy", "selector");
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String changeEntityRelationshipPath = mkPath(BASE_URL, "id", ":id", "entity-relationship");
 
@@ -68,14 +66,11 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         ListRoute<EntityRelationship> getRelationshipsForIdRoute = (request, response) ->
                 service.getRelatedEntitiesForId(getId(request));
 
-        ListRoute<ChangeInitiative> findForRefRoute = (request, response) ->
-                service.findForEntityReference(getEntityReference(request));
+        ListRoute<ChangeInitiative> findForSelectorRoute = (request, response) ->
+                service.findForSelector(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<ChangeInitiative> findByParentIdRoute = (request, response) ->
-                service.findByParentId(getId(request));
-
-        ListRoute<ChangeInitiative> findParentByIdRoute = (request, response) ->
-                service.findParentsById(getId(request));
+        ListRoute<ChangeInitiative> findHierarchyForSelectorRoute = (request, response) ->
+                service.findHierarchyForSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<ChangeInitiative> searchRoute = (request, response) ->
                 service.search(request.params("query"));
@@ -85,10 +80,9 @@ public class ChangeInitiativeEndpoint implements Endpoint {
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(getRelationshipsForIdPath, getRelationshipsForIdRoute);
-        getForList(findForRefPath, findForRefRoute);
-        getForList(findByParentIdPath, findByParentIdRoute);
-        getForList(findParentByIdPath, findParentByIdRoute);
         getForList(searchPath, searchRoute);
+        postForList(findForSelectorPath, findForSelectorRoute);
+        postForList(findHierarchyForSelectorPath, findHierarchyForSelectorRoute);
         postForDatum(changeEntityRelationshipPath, changeEntityRelationshipRoute);
     }
 

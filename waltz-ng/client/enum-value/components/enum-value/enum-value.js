@@ -24,12 +24,14 @@ import template from './enum-value.html';
 const bindings = {
     type: '<',
     key: '<',
-    showIcon: '<?'
+    showIcon: '<?',
+    showPopover: '<?'
 };
 
 
 const initialState = {
-    showIcon: true
+    showIcon: true,
+    showPopover: true
 };
 
 

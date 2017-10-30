@@ -19,15 +19,12 @@
 package com.khartec.waltz.data.involvement;
 
 import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.ImmutableInvolvement;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -38,7 +35,6 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +45,6 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
@@ -198,17 +193,6 @@ public class InvolvementDao {
                                     r.getValue(INVOLVEMENT.ENTITY_ID),
                                     r.getValue(entityName)),
                             mapping(PersonDao.personMapper::map, toList())));
-    }
-
-
-    public Collection<ChangeInitiative> findDirectChangeInitiativesByEmployeeId(String employeeId) {
-        return dsl.selectDistinct()
-                .from(CHANGE_INITIATIVE)
-                .innerJoin(INVOLVEMENT)
-                .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
-                .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
-                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 
 

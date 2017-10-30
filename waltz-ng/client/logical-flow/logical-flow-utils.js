@@ -85,3 +85,29 @@ export function determineStatMethod(kind) {
         : CORE_API.LogicalFlowStore.calculateStats;
 }
 
+
+/**
+ * Given a service broker and logical flow returns a json
+ * object with `source` and `target` keys containing the
+ * relevant entities.  An additional property of `entityReference`
+ * is added to each entity for convenience.
+ *
+ * @param serviceBroker
+ * @param logicalFlow
+ */
+export function resolveSourceAndTarget(serviceBroker, logicalFlow) {
+    const load = (node) => {
+        const serviceCall = node.kind === 'APPLICATION'
+            ? CORE_API.ApplicationStore.getById
+            : CORE_API.ActorStore.getById;
+
+        return serviceBroker
+            .loadViewData(serviceCall, [ node.id ])
+            .then(r => Object.assign({}, r.data, { entityReference: node }));
+    };
+
+    const results = {};
+    const sourcePromise = load(logicalFlow.source).then(r => results.source = r);
+    const targetPromise = load(logicalFlow.source).then(r => results.target = r);
+    return sourcePromise.then(() => targetPromise).then(() => results);
+}

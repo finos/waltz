@@ -1,0 +1,17 @@
+@import "./variables";
+
+.waltz-field-table {
+    tr {
+        margin-left: 2px;
+    }
+    .wft-label {
+        color: $waltz-field-label-color;
+        font-weight: lighter;
+    }
+
+    .wft-danger {
+        background-color: #ffe4dd;
+        border: 1px solid #ffb1a6;
+    }
+}
+

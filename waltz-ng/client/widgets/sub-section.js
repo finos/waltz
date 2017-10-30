@@ -22,28 +22,23 @@ import {initialiseData} from "../common/index";
 
 const bindings = {
     name: '@',
-    showBorder: '<'
+    showBorder: '<',
 };
 
 
 const initialState = {
     showBorder: true,
-    visibility: {
-        controls: false
-    }
 };
 
 
-function controller($transclude) {
+function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        vm.visibility.controls = $transclude.isSlotFilled('controls');
-    };
+    vm.$onChanges = () => {};
 }
 
 
-controller.$inject = ['$transclude'];
+controller.$inject = [];
 
 
 const component = {
@@ -52,7 +47,6 @@ const component = {
     controller,
     transclude: {
         content: 'content',
-        controls: '?controls'
     }
 };
 
