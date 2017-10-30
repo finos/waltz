@@ -19,10 +19,10 @@
 
         <div class="row">
             <div class="col-sm-8"
-                 ng-if="!(ctrl.statistic.summary.tallies | isEmpty)"
                  style="border-right: 2px solid #eee">
                 <!-- CURRENT -->
-                <div class="row">
+                <div class="row"
+                     ng-if="!(ctrl.statistic.summary.tallies | isEmpty)">
                     <div class="col-md-12">
                         <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
                                                              summary="ctrl.statistic.summary"
@@ -34,7 +34,7 @@
                 </div>
 
                 <!-- HISTORY -->
-                <div class="row" ng-if="ctrl.history">
+                <div class="row" ng-if="ctrl.history && !(ctrl.statistic.summary.tallies | isEmpty)">
                     <div class="col-md-12">
                         <hr>
                         <h3>History</h3>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="col-sm-8"
-                 ng-if="ctrl.statistic.summary.tallies | isEmpty">
+                 ng-if="(ctrl.statistic.summary.tallies | isEmpty) && ! ctrl.visibility.related">
                 <waltz-no-data ng-if="! ctrl.reloading">
                     <message>
                         <strong>No data points</strong> have been captured for
@@ -72,7 +72,7 @@
 
             <!-- NAV -->
             <div class="col-sm-4"
-                 ng-style="{'border-left': ctrl.statistic.summary.tallies.length == 0 ? '2px solid #eee' : 'none'}">
+                 ng-style="{'border-left': (ctrl.statistic.summary.tallies.length == 0 && ! ctrl.visibility.related) ? '2px solid #eee' : 'none'}">
 
                 <!-- NAV TAXONOMY -->
                 <h4>

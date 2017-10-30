@@ -19,18 +19,23 @@
         <div class="row">
             <!-- SUMMARY -->
             <div class="col-sm-8"
-                 ng-if="!(ctrl.statistic.summary.tallies | isEmpty)"
                  style="border-right: 2px solid #eee">
-                <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
-                                                     summary="ctrl.statistic.summary"
-                                                     values="ctrl.statistic.values"
-                                                     applications="ctrl.applications"
-                                                     org-units="ctrl.orgUnits">
-                </waltz-entity-statistic-detail-panel>
+                <!-- CURRENT -->
+                <div class="row"
+                     ng-if="!(ctrl.statistic.summary.tallies | isEmpty)">
+                    <div class="col-md-12">
+                        <waltz-entity-statistic-detail-panel definition='ctrl.statistic.definition'
+                                                             summary="ctrl.statistic.summary"
+                                                             values="ctrl.statistic.values"
+                                                             applications="ctrl.applications"
+                                                             org-units="ctrl.orgUnits">
+                        </waltz-entity-statistic-detail-panel>
+                    </div>
+                </div>
 
 
                 <!-- HISTORY -->
-                <div ng-if="ctrl.history">
+                <div ng-if="ctrl.history && !(ctrl.statistic.summary.tallies | isEmpty)">
                     <hr>
                     <h3>History</h3>
                     <waltz-entity-statistic-history-panel history="ctrl.history"
@@ -52,7 +57,7 @@
                 </div>
             </div>
             <div class="col-sm-8"
-                 ng-if="ctrl.statistic.summary.tallies | isEmpty">
+                 ng-if="(ctrl.statistic.summary.tallies | isEmpty) && ! ctrl.visibility.related">
                 <waltz-no-data ng-if="! ctrl.reloading">
                     <message>
                         <strong>No data points</strong> have been captured for
@@ -64,7 +69,7 @@
 
             <!-- NAV -->
             <div class="col-sm-4"
-                 ng-style="{'border-left': ctrl.statistic.summary.tallies.length == 0 ? '2px solid #eee' : 'none'}">
+                 ng-style="{'border-left': (ctrl.statistic.summary.tallies.length == 0 && ! ctrl.visibility.related) ? '2px solid #eee' : 'none'}">
                 <h4>
                     <waltz-icon name="user" size="lg"></waltz-icon>
                     <span ng-bind="ctrl.person.displayName"></span>
