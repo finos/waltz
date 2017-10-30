@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../common/index";
-import {timeFormat} from "d3-time-format";
 import _ from "lodash";
 
 const initialState = {
-    surveyInstancesAndRuns: []
+    surveyInstancesAndRuns: [],
+    showSurveyTemplateButton: false
 };
 
 const template = require('./survey-instance-list-user-view.html');
@@ -54,7 +54,9 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     userService.whoami()
-        .then(user => vm.user = user);
+        .then(user => vm.user = user)
+        .then(() => vm.showSurveyTemplateButton = userService.hasRole(vm.user, 'SURVEY_ADMIN')
+            || userService.hasRole(vm.user, 'SURVEY_TEMPLATE_ADMIN'));
 
     const surveyRunsPromise = surveyRunStore.findForUser();
     const surveyInstancesPromise = surveyInstanceStore.findForUser();

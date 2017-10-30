@@ -37,6 +37,7 @@ public enum Role {
     ORG_UNIT_EDITOR,
     RATING_EDITOR,
     SURVEY_ADMIN,
+    SURVEY_TEMPLATE_ADMIN,
     USER_ADMIN
     ;
 
