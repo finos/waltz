@@ -102,6 +102,19 @@ function controller($state,
         })
     };
 
+    vm.markTemplateAsDraft = () => {
+        if (confirm('Existing survey responses might become incompatible if questions are modified. ' +
+                    'Are you sure you want to mark this template as draft?')) {
+            surveyTemplateStore.updateStatus(templateId, {
+                newStatus: 'DRAFT'
+            })
+            .then(updateCount => {
+                vm.template.status = 'DRAFT';
+                notification.success('Survey template successfully marked as Draft');
+            });
+        }
+    };
+
     vm.markTemplateAsObsolete = () => {
         surveyTemplateStore.updateStatus(templateId, {
             newStatus: 'OBSOLETE'
@@ -109,7 +122,7 @@ function controller($state,
         .then(updateCount => {
             vm.template.status = 'OBSOLETE';
             notification.success('Survey template successfully marked as Obsolete');
-        })
+        });
     };
 
     vm.cloneTemplate = () => {
