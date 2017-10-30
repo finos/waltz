@@ -78,6 +78,7 @@ export const entityNames = {
     APP_RATING: 'Application Rating',
     APPLICATION: 'Application',
     ASSET_COST: 'Asset Cost',
+    ATTESTATION: 'Attestation',
     AUTHORITATIVE_SOURCE: "Authoritative Source",
     BOOKMARK: 'Bookmark',
     CHANGE_INITIATIVE: 'Change Initiative',
