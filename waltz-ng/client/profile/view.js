@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+
+
 const initialState = {
+    changeLogSection: dynamicSections.changeLogSection,
     contribution: {
         score: 0,
         directScores: [],
@@ -63,7 +67,8 @@ function controller($stateParams,
 
     const personPromise = personStore
         .findByUserId(userId)
-        .then(p => vm.person = p);
+        .then(p => vm.person = p)
+        .then(() => vm.personRef = { kind: 'PERSON', id: vm.person.id });
 
     personPromise
         .then(loadManagerAndDirects);

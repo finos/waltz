@@ -83,6 +83,8 @@
 
             </div>
 
+            <br>
+
             <waltz-section name="Contribution Scores">
                 <!-- User score -->
                 <div class="row">
@@ -160,7 +162,8 @@
                 <div ng-if="ctrl.user.roles.length > 0">
                     This user has the following permissions:
                     <ul class="list-inline">
-                        <li ng-repeat="perm in ctrl.user.roles | orderBy">
+                        <li ng-repeat="perm in ctrl.user.roles | orderBy"
+                            style="padding-top: 5px; padding-bottom: 5px;">
                             <span class='label label-info'
                                   ng-bind="perm"></span>
                         </li>
@@ -172,9 +175,9 @@
             </waltz-section>
 
             <!-- CHANGE LOG -->
-            <waltz-change-log-section user-name="ctrl.userId">
-            </waltz-change-log-section>
-
+            <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+                                           parent-entity-ref="ctrl.personRef">
+            </waltz-dynamic-section-wrapper>
         </div>
     </div>
 </div>
