@@ -269,6 +269,30 @@ public class LogicalFlowDao {
     }
 
 
+    public int cleanupSelfReferencingFlows() {
+
+        Condition selfReferencing = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(LOGICAL_FLOW.TARGET_ENTITY_KIND));
+
+        Condition notRemoved = LOGICAL_FLOW.IS_REMOVED.eq(false);
+
+        Condition requiringCleanup = notRemoved
+                .and(selfReferencing);
+
+        List<Long> flowIds = dsl.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(requiringCleanup)
+                .fetch(LOGICAL_FLOW.ID);
+
+        LOG.info("Logical flow cleanupSelfReferencingFlows. The following flows will be marked as removed as one or both endpoints no longer exist: {}", flowIds);
+
+        return dsl
+                .update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.IS_REMOVED, true)
+                .where(requiringCleanup)
+                .execute();
+    }
+
     // -- HELPERS ---
 
     private Condition isSourceOrTargetCondition(EntityReference ref) {

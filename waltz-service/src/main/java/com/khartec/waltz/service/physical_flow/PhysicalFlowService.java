@@ -289,6 +289,10 @@ public class PhysicalFlowService {
     }
 
 
+    public int cleanupOrphans() {
+        return physicalFlowDao.cleanupOrphans();
+    }
+
     private LogicalFlow ensureLogicalDataFlowExists(long logicalFlowId, String username) {
         LogicalFlow logicalFlow = logicalFlowService.getById(logicalFlowId);
         if (logicalFlow == null) {

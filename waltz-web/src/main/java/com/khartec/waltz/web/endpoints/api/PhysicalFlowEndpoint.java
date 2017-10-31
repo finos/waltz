@@ -26,6 +26,8 @@ import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -40,8 +42,8 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PhysicalFlowEndpoint.class);
     private static final String BASE_URL = mkPath("api", "physical-flow");
-
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
@@ -117,6 +119,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 ":id",
                 "spec-definition");
 
+        String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
+
 
         ListRoute<PhysicalFlow> findByEntityRefRoute =
                 (request, response) -> physicalFlowService.findByEntityReference(getEntityReference(request));
@@ -162,6 +166,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
 
         deleteForDatum(deletePath, this::deleteFlow);
+        getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
     }
 
 
@@ -199,6 +204,16 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 .build();
 
         return physicalFlowService.delete(deleteCommand, username);
+    }
+
+
+    private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.ADMIN);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested physical flow cleanup", username);
+        return physicalFlowService.cleanupOrphans();
     }
 
 }

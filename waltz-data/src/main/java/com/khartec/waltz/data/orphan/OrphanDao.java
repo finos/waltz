@@ -204,4 +204,33 @@ public class OrphanDao {
 
     }
 
+
+    public List<OrphanRelationship> findOrphanPhysicalFlows() {
+        Select<Record1<Long>> allLogicalFlowIds = DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(LOGICAL_FLOW.IS_REMOVED.eq(false));
+
+        Select<Record1<Long>> allPhysicalSpecs = DSL.select(PHYSICAL_SPECIFICATION.ID)
+                .from(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.IS_REMOVED.eq(false));
+
+        Condition notRemoved = PHYSICAL_FLOW.IS_REMOVED.eq(false);
+
+        return dsl.select(PHYSICAL_FLOW.ID, PHYSICAL_FLOW.LOGICAL_FLOW_ID, DSL.val(EntityKind.LOGICAL_DATA_FLOW.name()))
+                .from(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.notIn(allLogicalFlowIds)
+                        .and(notRemoved))
+                .unionAll(
+                        DSL.select(PHYSICAL_FLOW.ID, PHYSICAL_FLOW.ID, DSL.val(EntityKind.PHYSICAL_SPECIFICATION.name()))
+                        .from(PHYSICAL_FLOW)
+                        .where(PHYSICAL_FLOW.SPECIFICATION_ID.notIn(allPhysicalSpecs)
+                                .and(notRemoved))
+                )
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(mkRef(EntityKind.PHYSICAL_FLOW, r.value1()))
+                        .entityB(mkRef(EntityKind.valueOf(r.value3()), r.value2()))
+                        .orphanSide(OrphanSide.A)
+                        .build());
+    }
+
 }
