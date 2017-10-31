@@ -45,7 +45,7 @@ function controller($stateParams,
     vm.entityRef = entityRef;
 
     serviceBroker
-        .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.entityRef])
+        .loadViewData(CORE_API.ChangeLogStore.findByEntityReference, [vm.entityRef, null])
         .then(result => vm.entries = result.data);
 }
 

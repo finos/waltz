@@ -30,6 +30,7 @@ const initialState = {
     entries: []
 };
 
+
 const template = require('./change-log-section.html');
 
 
