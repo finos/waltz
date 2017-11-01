@@ -313,4 +313,13 @@
     </changeSet>
 
 
+    <!-- 2768 -->
+    <changeSet id="20171030-2768-1"
+               author="rovats">
+        <comment>2768: Application: Drop unique constraint on name</comment>
+        <dropUniqueConstraint tableName="application"
+                              constraintName="unique_name"
+                              uniqueColumns="name" />
+    </changeSet>
+
 </databaseChangeLog>

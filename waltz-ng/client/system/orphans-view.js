@@ -47,6 +47,7 @@ function controller($q,
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
                 orphanStore.findOrphanChangeInitiatives(),
                 orphanStore.findOrphanLogicalFlows(),
+                orphanStore.findOrphanPhysicalFlows(),
                 orphanStore.findOrphanAttestations()
             ])
             .then( ([apps,
@@ -56,6 +57,7 @@ function controller($q,
                 authSourcesByDataType,
                 changeInitiatives,
                 logicalFlows,
+                physicalFlows,
                 attestations
             ]) => {
                 const orphans = [
@@ -66,6 +68,7 @@ function controller($q,
                     {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
                     {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
                     {description: 'Logical Flows referencing non-existent applications', values: logicalFlows},
+                    {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows},
                     {description: 'Attestations referencing non-existent applications', values: attestations}
                 ];
                 vm.orphans = orphans;
@@ -80,6 +83,21 @@ function controller($q,
             .execute(CORE_API.LogicalFlowStore.cleanupOrphans, [])
             .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
     };
+
+
+    vm.cleanupSelfReferencingLogicalFlows = () => {
+        serviceBroker
+            .execute(CORE_API.LogicalFlowStore.cleanupSelfReferences, [])
+            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+    };
+
+
+    vm.cleanupPhysicalFlows = () => {
+        serviceBroker
+            .execute(CORE_API.PhysicalFlowStore.cleanupOrphans, [])
+            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+    };
+
 
     vm.cleanupAuthSources = () => {
         serviceBroker

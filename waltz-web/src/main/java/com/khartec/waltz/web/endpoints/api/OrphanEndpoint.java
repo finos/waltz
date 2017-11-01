@@ -63,6 +63,7 @@ public class OrphanEndpoint implements Endpoint {
         String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
         String findOrphanChangeInitiativesPath = mkPath(BASE_URL, "change-initiative");
         String findOrphanLogicalDataFlowsPath = mkPath(BASE_URL, "logical-flow");
+        String findOrphanPhysicalFlowsPath = mkPath(BASE_URL, "physical-flow");
         String findOrphanAttestationsPath = mkPath(BASE_URL, "attestation");
 
 
@@ -108,6 +109,12 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
+        ListRoute<OrphanRelationship> findOrphanPhysicalFlowsRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanPhysicalFlows();
+        };
+
+
         ListRoute<OrphanRelationship> findOrphanAttestationsRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
             return orphanService.findOrphanAttestatations();
@@ -121,6 +128,7 @@ public class OrphanEndpoint implements Endpoint {
         getForList(findOrphanAuthoritativeSourcesByDataTypePath, findOrphanAuthoritativeSourcesByDataTypeRoute);
         getForList(findOrphanChangeInitiativesPath, findOrphanChangeInitiativesRoute);
         getForList(findOrphanLogicalDataFlowsPath, findOrphanLogicalDataFlowsRoute);
+        getForList(findOrphanPhysicalFlowsPath, findOrphanPhysicalFlowsRoute);
         getForList(findOrphanAttestationsPath, findOrphanAttestationsRoute);
     }
 }

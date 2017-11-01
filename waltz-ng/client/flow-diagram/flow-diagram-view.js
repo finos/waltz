@@ -19,11 +19,18 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 const template = require('./flow-diagram-view.html');
 
 const initialState = {
-    visibility: {}
+    visibility: {},
+    appsSection: dynamicSections.appsSection,
+    bookmarksSection: dynamicSections.bookmarksSection,
+    changeLogSection: dynamicSections.changeLogSection,
+    entityStatisticSummarySection: dynamicSections.entityStatisticSummarySection,
+    measurableRatingsBrowserSection: dynamicSections.measurableRatingsBrowserSection,
+    technologySummarySection: dynamicSections.technologySummarySection
 };
 
 
