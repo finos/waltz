@@ -64,7 +64,13 @@ export function service($location, $stateParams, localStorage) {
 
     function findAvailableSectionsForKind(kind) {
         checkNotEmpty(kind);
-        return dynamicSectionsByKind[kind] || [];
+        const sections = dynamicSectionsByKind[kind] || [];
+        const changeSection = _.filter(sections, { id: dynamicSections.changeLogSection.id });
+        return _.chain(sections)
+            .reject({ id: dynamicSections.changeLogSection.id })
+            .sortBy('name')
+            .union(changeSection)
+            .value();
     }
 
     function findUserSectionsForKind(kind) {
