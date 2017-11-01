@@ -113,9 +113,12 @@ const contextMenus = Object.assign({}, DEFAULT_CONTEXT_MENUS);
 const clickHandlers = Object.assign({}, DEFAULT_CLICK_HANDLERS);
 
 
+let dragStartPos = null;
+
 
 function dragStarted(d) {
-    select(this)
+    dragStartPos = { x: event.x, y: event.y };
+    return select(this)
         .raise()
         .classed("wfd-active", true);
 }
@@ -133,7 +136,12 @@ function dragger(commandProcessor) {
 
 
 function dragEnded(d) {
-    select(this)
+    const noMove = dragStartPos.x == event.x && dragStartPos.y == event.y;
+    if (noMove) {
+        clickHandlers.node(d);
+    }
+
+    return select(this)
         .classed("wfd-active", false);
 }
 

@@ -1,0 +1,187 @@
+
+<div>
+    <!-- TITLE -->
+    <h4>
+        <span ng-bind="$ctrl.diagram.name"></span>
+        <small>
+            <span class="text-muted">
+                <waltz-last-updated entity="$ctrl.diagram">
+                </waltz-last-updated>
+            </span>
+
+        </small>
+    </h4>
+    <div>
+        <a ng-click="$ctrl.visibility.menuPopup = ! $ctrl.visibility.menuPopup"
+           class="clickable">
+            <waltz-icon name="filter">
+            </waltz-icon>
+            Show relationships and filters
+        </a>
+        |
+        <div waltz-has-role="LINEAGE_EDITOR">
+            <a class="clickable"
+               ng-click="$ctrl.onEditDiagram($ctrl.diagram)">
+                <waltz-icon name="edit">
+                </waltz-icon>
+                Edit
+            </a>
+        </div>
+        |
+        <a ui-sref="main.flow-diagram.view ({id: $ctrl.diagram.id })"
+           class="clickable">
+            <waltz-icon name="link">
+            </waltz-icon>
+            Permalink
+        </a>
+        |
+        <a ng-click="$ctrl.onDismissDiagram()"
+           class="clickable">
+            <waltz-icon name="close">
+            </waltz-icon>
+            Close
+        </a>
+    </div>
+
+
+    <!-- DIAGRAM -->
+    <waltz-flow-diagram context-menus="$ctrl.contextMenus"
+                        click-handlers="$ctrl.clickHandlers">
+    </waltz-flow-diagram>
+
+    <div>
+        <h5>Help</h5>
+        <div class="help-block small small">
+            This diagram may be moved and re-sized by holding down
+            <kbd>ctrl</kbd>
+            and dragging and/or zooming.  The node colour indicates the
+            type; green for applications, red for end user applications
+            and purple for actors.
+        </div>
+    </div>
+
+
+    <!-- BUCKET POPUP -->
+    <div ng-if="$ctrl.visibility.contextPopup && $ctrl.contextPopup.entityReference.kind == 'LOGICAL_DATA_FLOW'"
+         class="waltz-fade-if wfdpv-context-popup small"
+         ng-style="$ctrl.contextPopup.styling">
+        <h5>
+            Data Flows
+        </h5>
+        <waltz-no-data ng-if="$ctrl.contextPopup.entity.physical.length == 0">
+            <message>No Physical Flows associated</message>
+        </waltz-no-data>
+
+        <table class="table table-condesed small">
+            <tr ng-repeat="flow in $ctrl.contextPopup.entity.physical">
+                <td>
+                    <a ui-sref="main.physical-flow.view ({id: flow.physicalFlow.id })">
+                        <span ng-bind="flow.physicalSpecification.name"></span>
+                    </a>
+                </td>
+                <td><span ng-bind="flow.physicalSpecification.format | toDisplayName:'dataFormatKind'"></span></td>
+                <td><span ng-bind="flow.physicalFlow.transport | toDisplayName:'transportKind'"></span></td>
+                <td><span ng-bind="flow.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span></td>
+            </tr>
+        </table>
+
+        <div class='waltz-popup-actions'>
+            <a ng-click="$ctrl.visibility.contextPopup = false"
+               class="clickable">
+                <waltz-icon name="close"></waltz-icon>
+                Close
+            </a>
+        </div>
+    </div>
+
+    <!-- NODE POPUP -->
+    <div ng-if="$ctrl.visibility.contextPopup && $ctrl.contextPopup.entityReference.kind == 'APPLICATION'"
+         class="waltz-fade-if wfdpv-context-popup small"
+         ng-style="$ctrl.contextPopup.styling">
+        <h5>
+            <span ng-bind="$ctrl.contextPopup.entity.name">
+            </span>
+        </h5>
+        <table class="waltz-field-table small">
+            <tr>
+                <td>
+                    <span class="wft-label">Asset Code:</span>
+                </td>
+                <td>
+                    <span ng-bind="$ctrl.contextPopup.entity.assetCode">
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="wft-label">Criticality:</span>
+                </td>
+                <td>
+                    <span ng-bind="$ctrl.contextPopup.entity.businessCriticality | toDisplayName:'criticality'">
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="wft-label">Description:</span>
+                </td>
+                <td>
+                    <span ng-bind="$ctrl.contextPopup.entity.description"></span>
+                </td>
+            </tr>
+        </table>
+
+        <div class='waltz-popup-actions'>
+            <a ng-click="$ctrl.visibility.contextPopup = false"
+               class="clickable">
+                <waltz-icon name="close"></waltz-icon>
+                Close
+            </a>
+            |
+            <a class='clickable'
+               ui-sref="main.app.view ({id : $ctrl.nodePopup.application.id })">
+                Go to app &raquo;
+            </a>
+        </div>
+    </div>
+
+    <!-- MENU POPUP -->
+    <div ng-if="$ctrl.visibility.menuPopup"
+         class="waltz-fade-if wfdpv-menu-popup">
+
+        <waltz-flow-diagram-associations read-only="true"
+                                         diagram-id="$ctrl.diagram.id">
+        </waltz-flow-diagram-associations>
+
+        <hr>
+
+        <div>
+            <h5>Layers</h5>
+            <div class="small">
+                <waltz-toggle style='display:block'
+                              label-on="Annotations"
+                              label-off="Annotations"
+                              state="$ctrl.visibility.layers.annotations"
+                              on-toggle="$ctrl.toggleLayer('annotations')">
+                </waltz-toggle>
+                <waltz-toggle style='display:block'
+                              label-on="Physical Flows"
+                              label-off="Physical Flows"
+                              state="$ctrl.visibility.layers.flowBuckets"
+                              on-toggle="$ctrl.toggleLayer('flowBuckets')">
+                </waltz-toggle>
+            </div>
+            <div class="help-block small small">
+                Toggle the layers to show more/less detail.
+            </div>
+        </div>
+
+        <div class='waltz-popup-actions'>
+            <a class="clickable"
+               ng-click="$ctrl.visibility.menuPopup = false">
+                <waltz-icon name="close"></waltz-icon>
+                Close
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+@import "../../../../../style/waltz-popups";
+
+
+.wfdpv-menu-popup {
+    @extend .waltz-popup;
+    width: 30%;
+    top: 80px;
+}
+
+.wfdpv-context-popup {
+    @extend .waltz-popup;
+}
