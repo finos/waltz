@@ -95,6 +95,23 @@
                     Cleanup Logical Flows
                 </button>
 
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupSelfReferencingLogicalFlows()">
+                    Cleanup circular flows
+                </button>
+
+                <hr>
+
+                <h4>Cleanup Physical Flows</h4>
+                <p class="small text-muted">
+                    Marks orphan physical flows as removed
+                </p>
+
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupPhysicalFlows()">
+                    Cleanup Physical Flows
+                </button>
+
                 <hr>
 
                 <h4>Cleanup Auth Sources</h4>

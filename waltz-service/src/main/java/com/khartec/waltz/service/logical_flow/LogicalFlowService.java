@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.service.logical_flow;
 
-import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
@@ -42,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -253,6 +251,12 @@ public class LogicalFlowService {
     public Integer cleanupOrphans() {
         return logicalFlowDao.cleanupOrphans();
     }
+
+
+    public int cleanupSelfReferencingFlows() {
+        return logicalFlowDao.cleanupSelfReferencingFlows();
+    }
+
 
     public Collection<LogicalFlow> findUpstreamFlowsForEntityReferences(List<EntityReference> references) {
         if (isEmpty(references)) {
