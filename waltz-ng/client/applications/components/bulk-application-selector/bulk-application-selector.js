@@ -99,7 +99,7 @@ function controller(serviceBroker) {
         vm.showNotFoundOnly = false;
 
         const separatorsRegExp = /,|;|\n|\|/;
-        const identifiers = _.split(vm.bulkEntriesString, separatorsRegExp);
+        const identifiers = _.map(_.split(vm.bulkEntriesString, separatorsRegExp), s => _.trim(s));
 
         return searchRefs(identifiers)
             .then(results => {
