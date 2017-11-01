@@ -315,11 +315,20 @@
 
     <!-- 2768 -->
     <changeSet id="20171030-2768-1"
-               author="rovats">
+               author="rovats"
+               dbms="mysql">
         <comment>2768: Application: Drop unique constraint on name</comment>
         <dropUniqueConstraint tableName="application"
                               constraintName="unique_name"
                               uniqueColumns="name" />
+    </changeSet>
+
+    <changeSet id="20171030-2768-2"
+               author="rovats"
+               dbms="mssql">
+        <comment>2768: Application: Drop unique constraint on name</comment>
+        <dropIndex tableName="application"
+                   indexName="unique_name" />
     </changeSet>
 
 </databaseChangeLog>
