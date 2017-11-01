@@ -76,6 +76,11 @@ public class OrphanService {
     }
 
 
+    public List<OrphanRelationship> findOrphanPhysicalFlows() {
+        return orphanDao.findOrphanPhysicalFlows();
+    }
+
+
     public List<OrphanRelationship> findOrphanAttestatations() {
         return orphanDao.findOrphanAttestatations();
     }

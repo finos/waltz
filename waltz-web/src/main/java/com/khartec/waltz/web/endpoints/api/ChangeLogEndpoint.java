@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -54,7 +55,11 @@ public class ChangeLogEndpoint implements Endpoint {
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
-                    return service.findByParentReference(ref, getLimit(request));
+                    if(ref.kind() == EntityKind.PERSON) {
+                        return service.findByPersonReference(ref, getLimit(request));
+                    } else {
+                        return service.findByParentReference(ref, getLimit(request));
+                    }
                 });
 
 

@@ -79,6 +79,10 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/cleanup-orphans`)
         .then(r => r.data);
 
+    const cleanupSelfReferences = () => $http
+        .get(`${BASE}/cleanup-self-references`)
+        .then(r => r.data);
+
     return {
         findBySelector,
         findByEntityReference,
@@ -88,7 +92,8 @@ export function store($http, BaseApiUrl) {
         removeFlow,
         getById,
         addFlow,
-        cleanupOrphans
+        cleanupOrphans,
+        cleanupSelfReferences
     };
 }
 
@@ -147,6 +152,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'cleanupOrphans',
         description: 'mark flows as removed if either endpoint is missing'
+    },
+    cleanupSelfReferences: {
+        serviceName,
+        serviceFnName: 'cleanupSelfReferences',
+        description: 'mark flows as removed where the flow source and target are the same'
     },
 };
 

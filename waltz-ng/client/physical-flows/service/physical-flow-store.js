@@ -103,6 +103,10 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const cleanupOrphans = () => $http
+        .get(`${base}/cleanup-orphans`)
+        .then(r => r.data);
+
 
     return {
         findBySpecificationId,
@@ -115,7 +119,8 @@ export function store($http, baseApiUrl) {
         searchReports,
         create,
         deleteById,
-        updateSpecDefinitionId
+        updateSpecDefinitionId,
+        cleanupOrphans
     };
 }
 
@@ -185,5 +190,10 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: 'updateSpecDefinitionId',
         description: 'executes updateSpecDefinitionId'
+    },
+    cleanupOrphans: {
+        serviceName,
+        serviceFnName: 'cleanupOrphans',
+        description: 'cleans up orphaned physical flows'
     }
 };

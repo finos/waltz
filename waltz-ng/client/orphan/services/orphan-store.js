@@ -56,6 +56,11 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findOrphanPhysicalFlows = () => $http
+        .get(`${BASE}/physical-flow`)
+        .then(result => result.data);
+
+
     const findOrphanAttestations = () => $http
         .get(`${BASE}/attestation`)
         .then(result => result.data);
@@ -69,6 +74,7 @@ function service($http, BaseApiUrl) {
         findOrphanAuthoritativeSourcesByDataType,
         findOrphanChangeInitiatives,
         findOrphanLogicalFlows,
+        findOrphanPhysicalFlows,
         findOrphanAttestations
     };
 

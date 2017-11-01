@@ -56,6 +56,13 @@ public class ChangeLogService {
     }
 
 
+    public List<ChangeLog> findByPersonReference(EntityReference ref,
+                                                 Optional<Integer> limit) {
+        checkNotNull(ref, "ref must not be null");
+        return changeLogDao.findByPersonReference(ref, limit);
+    }
+
+
     public List<ChangeLog> findByUser(String userName,
                                       Optional<Integer> limit) {
         checkNotEmpty(userName, "Username cannot be empty");

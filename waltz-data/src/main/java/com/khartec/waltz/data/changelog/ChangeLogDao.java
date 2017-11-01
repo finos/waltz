@@ -38,6 +38,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.schema.Tables.PERSON;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
@@ -81,6 +82,20 @@ public class ChangeLogDao {
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()))
+                .orderBy(CHANGE_LOG.CREATED_AT.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
+                .fetch(mapper);
+    }
+
+
+    public List<ChangeLog> findByPersonReference(EntityReference ref,
+                                                 Optional<Integer> limit) {
+        checkNotNull(ref, "ref must not be null");
+
+        return dsl.select(CHANGE_LOG.fields())
+                .from(CHANGE_LOG)
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(CHANGE_LOG.USER_ID))
+                .where(PERSON.ID.eq(ref.id()))
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(mapper);

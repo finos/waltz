@@ -26,6 +26,9 @@ import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_flow.TransportKind;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +49,7 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 @Repository
 public class PhysicalFlowDao {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PhysicalFlowDao.class);
 
     public static final RecordMapper<Record, PhysicalFlow> TO_DOMAIN_MAPPER = r -> {
         PhysicalFlowRecord record = r.into(PHYSICAL_FLOW);
@@ -197,6 +201,36 @@ public class PhysicalFlowDao {
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .and(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID.isNull()
                         .or(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID.ne(newSpecDefinitionId)))
+                .execute();
+    }
+
+
+    public int cleanupOrphans() {
+        Select<Record1<Long>> allLogicalFlowIds = DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(LOGICAL_FLOW.IS_REMOVED.eq(false));
+
+        Select<Record1<Long>> allPhysicalSpecs = DSL.select(PHYSICAL_SPECIFICATION.ID)
+                .from(PHYSICAL_SPECIFICATION)
+                .where(PHYSICAL_SPECIFICATION.IS_REMOVED.eq(false));
+
+        Condition missingLogical = PHYSICAL_FLOW.LOGICAL_FLOW_ID.notIn(allLogicalFlowIds);
+        Condition missingSpec = PHYSICAL_FLOW.SPECIFICATION_ID.notIn(allPhysicalSpecs);
+        Condition notRemoved = PHYSICAL_FLOW.IS_REMOVED.eq(false);
+
+        Condition requiringCleanup = notRemoved.and(missingLogical.or(missingSpec));
+
+        List<Long> ids = dsl.select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .where(requiringCleanup)
+                .fetch(PHYSICAL_FLOW.ID);
+
+        LOG.info("Physical flow cleanupOrphans. The following flows will be marked as removed as one or both endpoints no longer exist: {}", ids);
+
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.IS_REMOVED, true)
+                .where(requiringCleanup)
                 .execute();
     }
 

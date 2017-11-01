@@ -73,6 +73,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
+        String cleanupSelfReferencesPath = mkPath(BASE_URL, "cleanup-self-references");
         String addFlowPath = mkPath(BASE_URL);
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
@@ -94,6 +95,7 @@ public class LogicalFlowEndpoint implements Endpoint {
                 -> logicalFlowService.getById(getId(request));
 
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+        getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
         getForDatum(getByIdPath, getByIdRoute);
         postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);
@@ -111,6 +113,16 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested logical flow cleanup", username);
         return logicalFlowService.cleanupOrphans();
+    }
+
+
+    private int cleanupSelfReferencingFlowsRoute(Request request, Response response) throws IOException {
+        ensureUserHasAdminRights(request);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested self referencing logical flow cleanup", username);
+        return logicalFlowService.cleanupSelfReferencingFlows();
     }
 
 
