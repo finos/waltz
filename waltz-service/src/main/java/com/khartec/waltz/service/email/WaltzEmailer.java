@@ -47,7 +47,7 @@ public class WaltzEmailer {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
             message.setSubject(subject);
             message.setFrom(fromEmail);
-            message.setTo(to);
+            message.setBcc(to);
             message.addAttachment("waltz.png", IOUtilities.getFileResource("/images/waltz.png"));
             message.addAttachment("client-logo", IOUtilities.getFileResource("/templates/images/client-logo.png"));
 
