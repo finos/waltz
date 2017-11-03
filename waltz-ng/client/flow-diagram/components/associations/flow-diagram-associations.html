@@ -1,7 +1,8 @@
-<h5>Associated Viewpoints</h5>
+<script src="flow-diagram-associations.js"></script><h5>Associated Viewpoints</h5>
 <div class="small">
     <!-- CURRENT ASSOCIATIONS -->
-    <table class="table table-condesed table-striped small">
+    <table class="table table-condensed small"
+           style="background-color: white">
         <!-- IF NONE -->
         <tr ng-if="$ctrl.associatedMeasurables.length == 0">
             <td colspan="2">No associations</td>
@@ -62,8 +63,9 @@
 
             <br>
 
-            <div class="waltz-scroll-region-200">
-                <table class="table small table-condensed table-striped">
+            <div class="waltz-scroll-region-200"
+                 style="background-color: white">
+                <table class="table small table-condensed" >
                     <tr ng-repeat="suggestion in $ctrl.suggestedMeasurables">
                         <td>
                             <a ng-bind="suggestion.name"
@@ -103,7 +105,7 @@
             <div ng-if="$ctrl.searchResults.length > 0"
                  ng-class="{ 'waltz-scroll-region-200' : $ctrl.searchResults.length > 10 }"
                  class="waltz-fade-if">
-                <table class="table small table-condensed table-striped">
+                <table class="table small table-condensed">
                     <tr ng-repeat="result in $ctrl.searchResults">
                         <td>
                             <a ng-bind="result.name"
