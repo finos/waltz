@@ -18,8 +18,8 @@
             </waltz-icon>
             Show relationships and filters
         </a>
-        |
         <div waltz-has-role="LINEAGE_EDITOR">
+            |
             <a class="clickable"
                ng-click="$ctrl.onEditDiagram($ctrl.diagram)">
                 <waltz-icon name="edit">
@@ -139,7 +139,7 @@
             </a>
             |
             <a class='clickable'
-               ui-sref="main.app.view ({id : $ctrl.nodePopup.application.id })">
+               ui-sref="main.app.view ({id : $ctrl.contextPopup.entity.id })">
                 Go to app &raquo;
             </a>
         </div>
