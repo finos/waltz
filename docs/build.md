@@ -4,9 +4,9 @@ Waltz is built using [Maven](https://maven.apache.org/).
 
 ## Prerequisites
 
-- Git
+- [Git](https://git-scm.com/)
 - [Maven 3](https://maven.apache.org/)
-- JDK 8
+- [JDK 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
 - [Liquibase](http://www.liquibase.org/) (recommended but not essential)
 - [Node](https://nodejs.org/en/)
 - [Sass](http://sass-lang.com/)
