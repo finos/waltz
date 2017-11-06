@@ -33,7 +33,7 @@ When you run the first build (using `mvn package`) the schema will be generated 
 Waltz uses maven profiles to target the build against the correct database.  Generic db vendor settings are located in  
 the profiles section of `<REPO>/waltz-schema/pom.xml` and should not need to be changed.
 
-Specific database connection details should be configure in the 
+Specific database connection details should be configured in the 
 `~/.m2/settings.xml` file.  An example (for both MariaDB and Microsoft 
 SQL Server) would look like:
 
