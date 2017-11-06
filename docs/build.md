@@ -1,19 +1,19 @@
 # Building
 
-Waltz is built using maven.
+Waltz is built using [Maven](https://maven.apache.org/).
 
 ## Prerequisites
 
 - Git
-- Maven 3
+- [Maven 3](https://maven.apache.org/)
 - JDK 8
-- Liquibase (recommended but not essential)
-- Node
-- Sass
+- [Liquibase](http://www.liquibase.org/) (recommended but not essential)
+- [Node](https://nodejs.org/en/)
+- [Sass](http://sass-lang.com/)
 - Database - either
-  - MariaDB
-  - Microsoft SQL Server
-- _jOOQ Pro_ (if using Microsoft SQL Server) 
+  - [MariaDB](https://mariadb.org/)
+  - [Microsoft SQL Server](https://www.microsoft.com/en-gb/sql-server/)
+- [_jOOQ Pro_](https://www.jooq.org/download/) (if using Microsoft SQL Server) 
 
 ## Obtaining the code
 
