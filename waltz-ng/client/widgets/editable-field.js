@@ -23,10 +23,11 @@ const template = require('./editable-field.html');
 const bindings = {
     initialVal: '<',
     onSave: '<',
-    fieldType: '@',
+    fieldType: '@',  // person | text | textarea | boolean | date
     dateFormat: '@',
     itemId: '<',
     buttonLabel: '@',
+    saveLabel: '@?',
     editRole: '@'
 };
 
@@ -37,6 +38,7 @@ const initialState = {
     saving: false,
     fieldType: 'text',
     buttonLabel: 'Edit',
+    saveLabel:  'Save',
     onSave: () => console.log("WEF: No on-save method provided")
 };
 

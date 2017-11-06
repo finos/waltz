@@ -182,8 +182,19 @@ public class WebUtilities {
      * @return
      */
     public static EntityKind getKind(Request request) {
+       return getKind(request, "kind");
+    }
+
+
+    /**
+     * Expect parameter to be called: <code>kind</code>
+     * @param request
+     * @param paramName
+     * @return
+     */
+    public static EntityKind getKind(Request request, String paramName) {
         checkNotNull(request, "request must not be null");
-        return EntityKind.valueOf(request.params("kind"));
+        return EntityKind.valueOf(request.params(paramName));
     }
 
 
@@ -193,11 +204,22 @@ public class WebUtilities {
      * @return
      */
     public static EntityReference getEntityReference(Request request) {
+        return getEntityReference(request, "kind", "id");
+    }
+
+
+    /**
+     * Expects parameters :kind and :id
+     * @param request
+     * @return
+     */
+    public static EntityReference getEntityReference(Request request, String kindParamName, String idParamName) {
         checkNotNull(request, "request must not be null");
         return mkRef(
-                getKind(request),
-                getId(request));
+                getKind(request, kindParamName),
+                getLong(request, idParamName));
     }
+
 
 
     /**

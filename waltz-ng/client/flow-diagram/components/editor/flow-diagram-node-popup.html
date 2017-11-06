@@ -11,13 +11,14 @@
                            selection-filter="$ctrl.nodeSelectionFilter">
     </waltz-entity-selector>
 </div>
-<hr>
 
-<a class="btn btn-success clickable"
-   ng-click="$ctrl.send()">
-    Add
-</a>
-<a class='clickable'
-   ng-click="$ctrl.onDismiss()">
-    Cancel
-</a>
+<div class="waltz-popup-actions">
+    <a class="btn btn-success clickable"
+       ng-click="$ctrl.send()">
+        Add
+    </a>
+    <a class='clickable'
+       ng-click="$ctrl.onDismiss()">
+        Cancel
+    </a>
+</div>

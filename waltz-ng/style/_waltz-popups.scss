@@ -1,0 +1,21 @@
+@import './util';
+
+
+.waltz-popup {
+    border: 3px solid #ddd;
+    border-radius: 1.5px;
+    padding: 12px;
+    opacity: 0.93;
+    position: absolute;
+    background: #fafafa;
+    z-index: 100;
+    display: inline-block;
+    @include waltz-box-shadow();
+}
+
+
+.waltz-popup-actions {
+    border-top: 2px solid #ccc;
+    padding-top: 16px;
+    margin-top: 8px;
+}
