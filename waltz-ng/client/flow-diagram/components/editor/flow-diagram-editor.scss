@@ -1,17 +1,16 @@
+@import "../../../../style/waltz-popups";
+
 .waltz-flow-diagram-editor {
 
     position: relative;
 
     .wfde-pop {
-        position: absolute;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        padding: 4px 12px 8px 12px;
+        @extend .waltz-popup;
+        //padding: 4px 12px 8px 12px;
         min-width: 40%;
         left: 20px;
         top: 10px;
         z-index: 1000;
-        background-color: rgba(245, 245, 245, 0.9);
     }
 
     .wfde-dim svg {

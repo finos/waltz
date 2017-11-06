@@ -1,0 +1,80 @@
+<div>
+    <h4>Flow Diagrams</h4>
+    <div ng-if="$ctrl.diagrams.length > 0">
+
+        <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 9 }"
+             style="padding-bottom: 6px">
+            <input type="search"
+                   placeholder="Filter..."
+                   ng-if="$ctrl.diagrams.length > 5"
+                   class="form-search form-control input-sm"
+                   style="margin-bottom: 0.5em;"
+                   ng-model="$ctrl.qry">
+
+            <table class="table table-condensed table-hover small">
+                <thead>
+                <tr>
+                    <th>Diagram</th>
+                    <th>Last Modified</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="diagram in $ctrl.diagrams | filter:$ctrl.qry">
+                    <td>
+                        <a ng-bind="diagram.name"
+                           class="clickable"
+                           ng-click="$ctrl.onSelectDiagram(diagram)">
+                        </a>
+                    </td>
+                    <td>
+                    <span class="small">
+                        <waltz-last-updated entity="diagram">
+                        </waltz-last-updated>
+                    </span>
+                    </td>
+                    <td>
+                        <div waltz-has-role="LINEAGE_EDITOR">
+                            <a class="clickable"
+                               ng-click="$ctrl.onEditDiagram(diagram)">
+                                Edit
+                            </a>
+                            |
+                            <a class="clickable"
+                               ng-click="$ctrl.onCloneDiagram(diagram)">
+                                Clone
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody ng-if="$ctrl.canCreate">
+                <tr waltz-has-role="LINEAGE_EDITOR">
+                    <td colspan="3">
+                        <div style="margin-top: 2px">
+                            <a class="clickable"
+                               ng-click="$ctrl.onCreateDiagram()">
+                                <waltz-icon name="plus"></waltz-icon>
+                                Create new diagram
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <waltz-no-data ng-if="$ctrl.diagrams.length == 0">
+        <message>
+            No diagrams.
+            <span waltz-has-role="LINEAGE_EDITOR">
+                <a ng-click="$ctrl.onCreateDiagram()"
+                   class="clickable">
+                    Create one?
+                </a>
+            </span>
+        </message>
+    </waltz-no-data>
+
+</div>

@@ -32,9 +32,12 @@ import flowDiagramNodePopup from './components/editor/flow-diagram-node-popup';
 import flowDiagramPhysicalFlowPopup from './components/editor/flow-diagram-physical-flow-popup';
 import flowDiagramAnnotationPopup from './components/editor/flow-diagram-annotation-popup';
 import flowDiagramEditor from './components/editor/flow-diagram-editor';
-import flowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
+import FlowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
+import FlowDiagramsPanelBrowse from './components/diagrams-panel/browse/flow-diagrams-panel-browse';
+import FlowDiagramsPanelView from './components/diagrams-panel/view/flow-diagrams-panel-view';
 import flowDiagramsSection from './components/section/flow-diagrams-section';
-import * as FlowDiagramAssociations from './components/associations/flow-diagram-associations';
+import FlowDiagramAssociations from './components/associations/flow-diagram-associations';
+import FlowDiagramInfoPopup from './components/editor/flow-diagram-info-popup';
 
 import {registerComponents, registerServices, registerStores} from '../common/module-utils'
 
@@ -52,7 +55,6 @@ export default () => {
         .component('waltzFlowDiagramPhysicalFlowPopup', flowDiagramPhysicalFlowPopup)
         .component('waltzFlowDiagramAnnotationPopup', flowDiagramAnnotationPopup)
         .component('waltzFlowDiagramEditor', flowDiagramEditor)
-        .component('waltzFlowDiagramsPanel', flowDiagramsPanel)
         .component('waltzFlowDiagramsSection', flowDiagramsSection)
         ;
 
@@ -66,7 +68,11 @@ export default () => {
     ]);
 
     registerComponents(module, [
-        FlowDiagramAssociations
+        FlowDiagramAssociations,
+        FlowDiagramsPanel,
+        FlowDiagramsPanelBrowse,
+        FlowDiagramsPanelView,
+        FlowDiagramInfoPopup
     ]);
 
     registerStores(module, [

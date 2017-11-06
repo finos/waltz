@@ -27,11 +27,13 @@ import {initialiseData} from '../../../common';
  */
 
 import template from './flow-diagram-editor.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
+    parentEntityRef: '<',
     onCancel: '<',
-    onBackToList: '<'
+    onView: '<'
 };
 
 
@@ -40,7 +42,8 @@ const initialState = {
         disjointNodePopup: false,
         logicalFlowPopup: false,
         annotationPopup: false,
-        physicalFlowPopup: false
+        physicalFlowPopup: false,
+        diagramInfoPopup: false
     },
     popup: {
         title: '',
@@ -86,7 +89,7 @@ function prepareUpdateAnnotationPopup(graphNode) {
 }
 
 
-function mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService) {
+function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
     return (d) => {
         return [
             {
@@ -146,6 +149,7 @@ function mkDisjointNodeMenu($timeout, vm, flowDiagramStateService) {
                         };
                         vm.popup = popup;
                         vm.visibility.disjointNodePopup = true;
+                        vm.visibility.anyPopup = true;
                     });
                 }
             },
@@ -256,19 +260,19 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
 
 function controller($q,
                     $scope,
-                    $state,
                     $timeout,
                     flowDiagramStateService,
                     logicalFlowStore,
                     notification,
                     physicalFlowStore,
                     physicalSpecificationStore,
-                    preventNavigationService) {
+                    preventNavigationService,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
         canvas: mkDisjointNodeMenu($timeout, vm, flowDiagramStateService),
-        node: mkNodeMenu($state, $timeout, logicalFlowStore, vm, flowDiagramStateService),
+        node: mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService),
         flowBucket: mkFlowBucketMenu($q, $timeout, vm,  flowDiagramStateService, physicalFlowStore, physicalSpecificationStore),
         annotation: mkAnnotationMenu(flowDiagramStateService.processCommands, $timeout, vm),
     };
@@ -285,6 +289,7 @@ function controller($q,
         vm.visibility.disjointNodePopup = false;
         vm.visibility.logicalFlowPopup = false;
         vm.visibility.physicalFlowPopup = false;
+        vm.visibility.diagramInfoPopup = false;
         vm.visibility.anyPopup = false;
     };
 
@@ -300,26 +305,47 @@ function controller($q,
         vm.id = state.diagramId;
     };
 
-    vm.onTitleChange = (t) => {
+    vm.onOpenDiagramInfoPopup = () => {
+        vm.visibility.diagramInfoPopup = true;
+        vm.visibility.anyPopup = true;
+    };
+
+    vm.onSaveTitle = (id, t) => {
         flowDiagramStateService.processCommands([{
             command: 'SET_TITLE',
-            payload: t
+            payload: t.newVal
         }]);
-    }
+        vm.title = t.newVal;
+    };
+
+    vm.doRemove = () => {
+        if (confirm("Are you sure you wish to delete this diagram ?")) {
+            serviceBroker
+                .execute(
+                    CORE_API.FlowDiagramStore.deleteForId,
+                    [ vm.id] )
+                .then(() => {
+                    flowDiagramStateService.reset();
+                    vm.onCancel();
+                    notification.warning('Diagram deleted');
+                });
+        }
+    };
+
 }
 
 
 controller.$inject = [
     '$q',
     '$scope',
-    '$state',
     '$timeout',
     'FlowDiagramStateService',
     'LogicalFlowStore',
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
-    'PreventNavigationService'
+    'PreventNavigationService',
+    'ServiceBroker'
 ];
 
 
