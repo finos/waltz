@@ -1,13 +1,15 @@
 <div>
     <h4>Flow Diagrams</h4>
     <div ng-if="$ctrl.diagrams.length > 0">
-        <input type="search"
-               placeholder="Filter..."
-               ng-if="$ctrl.diagrams.length > 5"
-               class="form-search form-control input-sm"
-               ng-model="$ctrl.qry">
+
         <div ng-class="{ 'waltz-scroll-region-400' : $ctrl.diagrams.length > 9 }"
              style="padding-bottom: 6px">
+            <input type="search"
+                   placeholder="Filter..."
+                   ng-if="$ctrl.diagrams.length > 5"
+                   class="form-search form-control input-sm"
+                   style="margin-bottom: 0.5em;"
+                   ng-model="$ctrl.qry">
 
             <table class="table table-condensed table-hover small">
                 <thead>

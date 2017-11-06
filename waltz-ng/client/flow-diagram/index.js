@@ -37,6 +37,7 @@ import FlowDiagramsPanelBrowse from './components/diagrams-panel/browse/flow-dia
 import FlowDiagramsPanelView from './components/diagrams-panel/view/flow-diagrams-panel-view';
 import flowDiagramsSection from './components/section/flow-diagrams-section';
 import FlowDiagramAssociations from './components/associations/flow-diagram-associations';
+import FlowDiagramInfoPopup from './components/editor/flow-diagram-info-popup';
 
 import {registerComponents, registerServices, registerStores} from '../common/module-utils'
 
@@ -70,7 +71,8 @@ export default () => {
         FlowDiagramAssociations,
         FlowDiagramsPanel,
         FlowDiagramsPanelBrowse,
-        FlowDiagramsPanelView
+        FlowDiagramsPanelView,
+        FlowDiagramInfoPopup
     ]);
 
     registerStores(module, [

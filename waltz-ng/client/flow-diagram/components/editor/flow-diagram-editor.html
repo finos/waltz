@@ -4,13 +4,18 @@
     <div class="row">
         <div class="col-md-12">
             <h4>
-                <span ng-bind="$ctrl.title"></span>
-                <small>Editor</small>
+                <waltz-editable-field type="text"
+                                      on-save="$ctrl.onSaveTitle"
+                                      save-label="Ok"
+                                      initial-val="$ctrl.title">
+                </waltz-editable-field>
             </h4>
 
             <div>
                 <button class="btn btn-xs btn-success"
                         ng-click="$ctrl.doSave()">
+                    <waltz-icon name="cloud-upload">
+                    </waltz-icon>
                     Save
                 </button>
                 |
@@ -18,8 +23,15 @@
                    class="clickable">
                     <waltz-icon name="edit">
                     </waltz-icon>
-                    Edit diagram information
+                    Relationships
                 </a>
+                |
+                <button class="btn btn-xs btn-danger"
+                        ng-click="$ctrl.doRemove()">
+                    <waltz-icon name="trash">
+                    </waltz-icon>
+                    Delete
+                </button>
                 |
                 <a ng-click="$ctrl.onCancel()"
                    class="clickable">
@@ -119,32 +131,9 @@
     <div class="wfde-pop waltz-fade-if"
          ng-if="$ctrl.visibility.diagramInfoPopup">
 
-        <form>
-            <label>Title</label>
-            <input type="text"
-                   class="form-control input-sm"
-                   ng-model="$ctrl.title"
-                   ng-change="$ctrl.onTitleChange($ctrl.title)">
-        </form>
+        <waltz-flow-diagram-info-popup on-dismiss="$ctrl.onDismissPopup">
+        </waltz-flow-diagram-info-popup>
 
-        <hr>
-
-        <waltz-flow-diagram-associations ng-if="$ctrl.id"
-                                         read-only="false"
-                                         diagram-id="$ctrl.id">
-        </waltz-flow-diagram-associations>
-
-        <strong ng-if="!$ctrl.id">
-            Cannot add additional viewpoints until
-            the diagram has been saved
-        </strong>
-
-        <div class="waltz-popup-actions">
-            <button ng-click="$ctrl.onDismissPopup()"
-                   class="btn btn-xs btn-primary">
-                Done
-            </button>
-        </div>
     </div>
 
 </div>

@@ -137,26 +137,6 @@ function controller(
             });
     };
 
-    vm.dismissDiagramEditor = () => {
-        if (vm.selected.diagram) {
-            vm.onDiagramSelect(vm.selected.diagram);
-        } else {
-            hideDiagram();
-            flowDiagramStateService.reset();
-        }
-    };
-
-    vm.deleteDiagram = (id) => {
-        serviceBroker
-            .execute(
-                CORE_API.FlowDiagramStore.deleteForId,
-                [id])
-            .then(() => {
-                flowDiagramStateService.reset();
-                notification.warning('Diagram deleted');
-            });
-    };
-
 }
 
 

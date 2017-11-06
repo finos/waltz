@@ -74,7 +74,7 @@
                     ng-disabled="$ctrl.saving"
                     ng-click="$ctrl.save()">
                 <waltz-icon name="check"></waltz-icon>
-                Save
+                <span ng-bind="$ctrl.saveLabel"></span>
             </button>
             <button class="btn btn-xs"
                     ng-click="$ctrl.cancel()"

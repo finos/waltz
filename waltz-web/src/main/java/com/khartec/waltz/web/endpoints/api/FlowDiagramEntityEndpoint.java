@@ -48,12 +48,11 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
         this.userRoleService = userRoleService;
     }
 
-
     @Override
     public void register() {
         String findByDiagramIdPath = mkPath(BASE_URL, "id", ":id");
-        String removeMeasurablePath = mkPath(findByDiagramIdPath, "MEASURABLE", ":measurableId");
-        String addMeasurablePath = mkPath(findByDiagramIdPath, "MEASURABLE", ":measurableId");
+        String removeRelationshipPath = mkPath(findByDiagramIdPath, ":entityKind", ":entityId");
+        String addRelationshipPath = mkPath(findByDiagramIdPath, ":entityKind", ":entityId");
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForSelectorPath = mkPath(BASE_URL, "selector");
 
@@ -64,21 +63,21 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
         ListRoute<FlowDiagramEntity> findByEntityRoute = (req, res)
                 -> flowDiagramEntityService.findByEntityReference(getEntityReference(req));
 
-        ListRoute<FlowDiagramEntity> addMeasurableRoute = (req, res) -> {
+        ListRoute<FlowDiagramEntity> addRelationshipRoute = (req, res) -> {
             requireRole(userRoleService, req, Role.LINEAGE_EDITOR);
             long diagramId = getId(req);
-            flowDiagramEntityService.addMeasurable(
+            flowDiagramEntityService.addRelationship(
                     diagramId,
-                    getLong(req, "measurableId"));
+                    getEntityReference(req, "entityKind", "entityId"));
             return flowDiagramEntityService.findByDiagramId(diagramId);
         };
 
-        ListRoute<FlowDiagramEntity> removeMeasurableRoute = (req, res) -> {
+        ListRoute<FlowDiagramEntity> removeRelationshipRoute = (req, res) -> {
             requireRole(userRoleService, req, Role.LINEAGE_EDITOR);
             long diagramId = getId(req);
-            flowDiagramEntityService.removeMeasurable(
+            flowDiagramEntityService.removeRelationship(
                     diagramId,
-                    getLong(req, "measurableId"));
+                    getEntityReference(req, "entityKind", "entityId"));
             return flowDiagramEntityService.findByDiagramId(diagramId);
         };
 
@@ -86,8 +85,8 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
         getForList(findByEntityPath, findByEntityRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
 
-        postForList(addMeasurablePath, addMeasurableRoute);
-        deleteForList(removeMeasurablePath, removeMeasurableRoute);
+        postForList(addRelationshipPath, addRelationshipRoute);
+        deleteForList(removeRelationshipPath, removeRelationshipRoute);
     }
 
 }

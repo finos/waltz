@@ -17,6 +17,8 @@
  */
 
 
+import {checkIsEntityRef} from "../../common/checks";
+
 export function store($http, base) {
     const BASE = `${base}/flow-diagram-entity`;
 
@@ -32,22 +34,27 @@ export function store($http, base) {
         .post(`${BASE}/selector`, options)
         .then(r => r.data);
 
-    const addMeasurable = (diagramId, measurableId) => $http
-        .post(`${BASE}/id/${diagramId}/MEASURABLE/${measurableId}`, {})
-        .then(r => r.data);
+    const addRelationship = (diagramId, ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${BASE}/id/${diagramId}/${ref.kind}/${ref.id}`, {})
+            .then(r => r.data);
+    };
 
-    const removeMeasurable = (diagramId, measurableId) => $http
-        .delete(`${BASE}/id/${diagramId}/MEASURABLE/${measurableId}`)
-        .then(r => r.data);
-
+    const removeRelationship = (diagramId, ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .delete(`${BASE}/id/${diagramId}/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
 
 
     return {
         findByDiagramId,
         findByEntityReference,
         findForSelector,
-        addMeasurable,
-        removeMeasurable
+        addRelationship,
+        removeRelationship
     };
 }
 
@@ -78,14 +85,14 @@ export const FlowDiagramEntityStore_API = {
         serviceFnName: 'findForSelector',
         description: 'findForSelector'
     },
-    addMeasurable: {
+    addRelationship: {
         serviceName,
-        serviceFnName: 'addMeasurable',
-        description: 'addMeasurable (by id)'
+        serviceFnName: 'addRelationship',
+        description: 'addRelationship (diagramId, ref)'
     },
-    removeMeasurable: {
+    removeRelationship: {
         serviceName,
-        serviceFnName: 'removeMeasurable',
-        description: 'removeMeasurable (by Id'
+        serviceFnName: 'removeRelationship',
+        description: 'removeRelationship (diagramId, ref)'
     }
 };

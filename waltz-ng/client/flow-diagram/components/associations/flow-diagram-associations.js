@@ -20,6 +20,7 @@ import _ from 'lodash';
 import template from './flow-diagram-associations.html';
 import {initialiseData, termSearch} from '../../../common';
 import {CORE_API} from '../../../common/services/core-api-utils';
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -163,8 +164,8 @@ function controller($q, serviceBroker) {
     vm.onRemove = (m) => {
         serviceBroker
             .execute(
-                CORE_API.FlowDiagramEntityStore.removeMeasurable,
-                [vm.diagramId, m.id])
+                CORE_API.FlowDiagramEntityStore.removeRelationship,
+                [ vm.diagramId, toEntityRef(m, 'MEASURABLE') ])
             .then(() => loadMappings());
     };
 
@@ -173,8 +174,8 @@ function controller($q, serviceBroker) {
         hideAll();
         serviceBroker
             .execute(
-                CORE_API.FlowDiagramEntityStore.addMeasurable,
-                [vm.diagramId, m.id])
+                CORE_API.FlowDiagramEntityStore.addRelationship,
+                [ vm.diagramId, toEntityRef(m, 'MEASURABLE') ])
             .then(() => loadMappings());
     }
 }

@@ -27,6 +27,7 @@ import {initialiseData} from '../../../common';
  */
 
 import template from './flow-diagram-editor.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -265,7 +266,8 @@ function controller($q,
                     notification,
                     physicalFlowStore,
                     physicalSpecificationStore,
-                    preventNavigationService) {
+                    preventNavigationService,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.contextMenus = {
@@ -303,18 +305,33 @@ function controller($q,
         vm.id = state.diagramId;
     };
 
-
-    vm.onTitleChange = (t) => {
-        flowDiagramStateService.processCommands([{
-            command: 'SET_TITLE',
-            payload: t
-        }]);
-    };
-
     vm.onOpenDiagramInfoPopup = () => {
         vm.visibility.diagramInfoPopup = true;
         vm.visibility.anyPopup = true;
     };
+
+    vm.onSaveTitle = (id, t) => {
+        flowDiagramStateService.processCommands([{
+            command: 'SET_TITLE',
+            payload: t.newVal
+        }]);
+        vm.title = t.newVal;
+    };
+
+    vm.doRemove = () => {
+        if (confirm("Are you sure you wish to delete this diagram ?")) {
+            serviceBroker
+                .execute(
+                    CORE_API.FlowDiagramStore.deleteForId,
+                    [ vm.id] )
+                .then(() => {
+                    flowDiagramStateService.reset();
+                    vm.onCancel();
+                    notification.warning('Diagram deleted');
+                });
+        }
+    };
+
 }
 
 
@@ -327,7 +344,8 @@ controller.$inject = [
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
-    'PreventNavigationService'
+    'PreventNavigationService',
+    'ServiceBroker'
 ];
 
 
