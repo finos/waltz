@@ -19,18 +19,18 @@ const bindings = {
 
 const externalIdCellTemplate = `
     <div class="ui-grid-cell-contents" style="vertical-align: baseline; ">
-        <a ng-click="grid.appScope.$ctrl.onSelectViaGrid(row.entity)"
+        <a ng-click="grid.appScope.onSelectViaGrid(row.entity)"
            class="clickable">
             <span ng-bind="row.entity.externalId"></span>
             &nbsp;
-            <waltz-icon name="{{row.entity.children.length > 0 ? 'sitemap' : 'fw'}}" rotate="270"></waltz-icon>
+            <waltz-icon name="{{row.entity.icon}}" rotate="270"></waltz-icon>
         </a>
     </div>
 `;
 
 const nameCellTemplate = `
     <div class="ui-grid-cell-contents">
-        <a ng-click="grid.appScope.$ctrl.onSelectViaGrid(row.entity)"
+        <a ng-click="grid.appScope.onSelectViaGrid(row.entity)"
            class="clickable">
             <span ng-bind="row.entity.name"></span>
         </a>
@@ -51,31 +51,34 @@ const initialState = {
             { field: 'kindName', name: 'Kind' },
             { field: 'lifecyclePhaseName', name: 'Phase' }
         ],
-        data: [],
-        enableGridMenu: false,
-        enableColumnMenus: false,
+        data: []
     }
 };
 
-
-function enrichChangeInitiative(ci) {
-    const extensions = {
-        kindName: changeInitiativeNames[ci.kind],
-        lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase]
-    };
-
-    return Object.assign({}, ci, extensions);
-}
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const processChangeInitiativeHierarchy = (changeInitiatives) => {
-        vm.allChangeInitiatives = _.map(
-            changeInitiatives,
-            ci => enrichChangeInitiative(ci));
-        const roots = buildHierarchies(vm.allChangeInitiatives);
+        const cisByParentId = _.groupBy(changeInitiatives, 'parentId');
+        const roots = _
+            .chain(changeInitiatives)
+            .filter(ci => !ci.parentId)
+            .map(ci => {
+                const children = cisByParentId[ci.id] || [];
+                const icon = children.length > 0 ? 'sitemap' : 'fw';
+                const extensions = {
+                    kindName: changeInitiativeNames[ci.kind],
+                    lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase],
+                    icon,
+                    parent: null,
+                    children
+                };
+                return Object.assign({}, ci, extensions);
+            })
+            .value();
+
         vm.changeInitiatives = roots;
         vm.gridOptions.data = roots;
     };
@@ -87,8 +90,8 @@ function controller(serviceBroker) {
 
     vm.onClearSelection = () => vm.selectedChange = null;
 
-    vm.$onChanges = () => {
-        if(vm.parentEntityRef) {
+    vm.$onChanges = (changes) => {
+        if(vm.parentEntityRef && changes.parentEntityRef.previousValue.id !== changes.parentEntityRef.currentValue.id) {
             serviceBroker
                 .loadViewData(
                     CORE_API.ChangeInitiativeStore.findHierarchyBySelector,

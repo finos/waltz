@@ -15,12 +15,11 @@
          ng-if="$ctrl.changeInitiatives.length > 0">
 
         <div class="col-md-7">
-            <div class="small">
-                <div ui-grid="$ctrl.gridOptions"
-                     ui-grid-exporter
-                     class="waltz-grid">
-                </div>
-            </div>
+            <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
+                                    entries="$ctrl.gridOptions.data"
+                                    scope-provider="$ctrl"
+                                    search-placeholder-text="Search...">
+            </waltz-grid-with-search>
         </div>
 
         <div class="col-md-5">
