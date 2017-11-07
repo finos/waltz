@@ -23,6 +23,7 @@ import _ from "lodash";
 export const amber = rgb('#D9923F');
 export const green = rgb('#5BB65D');
 export const red = rgb('#DA524B');
+export const pink = rgb('#ffcffc');
 export const grey = rgb('#939393');
 export const lightGrey = rgb('#d1d1d1');
 export const blue = rgb('#5271CC');
@@ -83,7 +84,7 @@ export const authoritativeRatingBackgroundColorScale = scaleOrdinal()
 
 export const environmentColorScale = scaleOrdinal()
     .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT', 'DR'])
-    .range([green, amber, gold, purple, red, blue]);
+    .range([green, amber, gold, purple, pink, blue]);
 
 
 export const operatingSystemColorScale = scaleOrdinal()
@@ -107,6 +108,10 @@ export const flowDirectionColorScale = scaleOrdinal()
 
 
 const variableColorList = [
+    {
+        color: pink,
+        keys: ['UAT']
+    },
     {
         color: red,
         keys: [
@@ -160,7 +165,8 @@ const variableColorList = [
             'A',
             'AMBER',
             'YELLOW',
-            'OKAY'
+            'OKAY',
+            'PREPROD'
         ]
     }, {
         color: blue,
@@ -173,7 +179,8 @@ const variableColorList = [
             'NOT_STARTED',
             'BLUE',
             'MEDIUM',
-            'VIRTUAL'
+            'VIRTUAL',
+            'DR'
         ]
     }, {
         color: blue.darker(),
@@ -183,7 +190,7 @@ const variableColorList = [
         keys: ['LOW']
     }, {
         color: purple,
-        keys: ['OTHER']
+        keys: ['OTHER', 'UAT']
     }, {
     },{
         color: gold,
