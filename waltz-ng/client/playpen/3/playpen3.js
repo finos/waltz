@@ -23,19 +23,13 @@ import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
     parentEntityRef: {
-        id: 12,
-        kind: 'PHYSICAL_SPECIFICATION'
+        id: 16,
+        kind: 'FLOW_DIAGRAM'
     }
 };
 
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    serviceBroker
-        .loadViewData(
-            CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
-            [ 12 ])
-        .then(r => vm.used = r.data);
 }
 
 
