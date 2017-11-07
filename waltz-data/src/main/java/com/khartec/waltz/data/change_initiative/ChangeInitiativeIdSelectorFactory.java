@@ -14,10 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static org.jooq.impl.DSL.selectDistinct;
@@ -54,12 +53,22 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 return mkForChangeInitiative(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             default:
                 String msg = String.format(
                         "Cannot create Change Initiative Id selector from kind: %s",
                         options.entityReference().kind());
                 throw new UnsupportedOperationException(msg);
         }
+    }
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return dsl.selectDistinct(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
+                .from(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
     }
 
 
@@ -89,7 +98,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
 
     private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
-        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a change initiative ref");
+        ensureScopeIsExact(options);
         return DSL.select(DSL.val(options.entityReference().id()));
     }
 
