@@ -23,6 +23,7 @@ const bindings = {
     columnDefs: '<',
     entries: '<',
     searchPlaceholderText: '@',
+    scopeProvider: '<?',
     onInitialise: '<',
     onChange: '<'
 };
@@ -34,6 +35,7 @@ const initialState = {
     columnDefs: [],
     entries: [],
     filteredEntries: [],
+    scopeProvider: null,
     searchFields: [],
     searchPlaceholderText: 'Search...',
     onInitialise: (gridApi) => console.log('Default onInitialise handler for grid-search: ', gridApi),

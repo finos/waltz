@@ -23,7 +23,8 @@ const bindings = {
     columnDefs: '<',
     rowData: '<',
     rowTemplate: '<',
-    onInitialise: '<'
+    onInitialise: '<',
+    scopeProvider: '<?'
 };
 
 
@@ -38,6 +39,7 @@ const initialState = {
     rowData: [],
     minRowsToShow: 10,
     rowTemplate: null,
+    scopeProvider: null,
     onInitialise: (e) => {}
 };
 
@@ -69,6 +71,7 @@ function controller(uiGridExporterConstants,
     };
 
     vm.gridOptions = {
+        appScopeProvider: vm.scopeProvider,
         columnDefs: vm.columnDefs,
         data: vm.rowData,
         enableGridMenu: false,
