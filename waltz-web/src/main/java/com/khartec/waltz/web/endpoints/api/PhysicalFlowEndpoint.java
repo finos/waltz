@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.SetAttributeCommand;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
@@ -119,6 +120,12 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 ":id",
                 "spec-definition");
 
+        String updateAttributePath = mkPath(
+                BASE_URL,
+                "id",
+                ":id",
+                "attribute");
+
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
 
@@ -164,6 +171,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForList(searchReportsPath, searchReportsRoute);
         postForDatum(createPath, this::createFlow);
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
+        postForDatum(updateAttributePath, this::updateAttribute);
 
         deleteForDatum(deletePath, this::deleteFlow);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
@@ -190,6 +198,15 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 = readBody(request, PhysicalFlowSpecDefinitionChangeCommand.class);
 
         return physicalFlowService.updateSpecDefinitionId(username, flowId, command);
+    }
+
+    private int updateAttribute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        String username = getUsername(request);
+        SetAttributeCommand command
+                = readBody(request, SetAttributeCommand.class);
+
+        return physicalFlowService.updateAttribute(username, command);
     }
 
 

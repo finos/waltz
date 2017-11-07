@@ -19,12 +19,12 @@ import template from './physical-flow-overview.html';
 import {initialiseData} from "../../../common/index";
 import {resolveSourceAndTarget} from "../../../logical-flow/logical-flow-utils";
 import {compareCriticalities} from "../../../common/criticality-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {
-    logicalFlow: '<',
-    specification: '<',
-    physicalFlow: '<'
+    parentEntityRef: '<'
 };
 
 
@@ -36,23 +36,51 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        if (vm.logicalFlow && vm.physicalFlow && vm.logicalFlow.source.kind === 'APPLICATION') {
-            resolveSourceAndTarget(serviceBroker, vm.logicalFlow)
-                .then(sourceAndTarget => {
-                    const criticalityComparison = compareCriticalities(
-                        sourceAndTarget.source.businessCriticality,
-                        vm.physicalFlow.criticality);
+    const load = () => {
+        const physicalFlowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.getById,
+                [vm.parentEntityRef.id],
+                {force: true})
+            .then(r => vm.physicalFlow = r.data);
 
-                    if (criticalityComparison === -1) {
-                        vm.hasCriticalityMismatch = true;
-                        vm.criticalityMismatchMessage = "Criticality mismatch: this flow has a higher criticality rating than the source"
-                    } else {
-                        vm.hasCriticalityMismatch = false;
-                    }
-                });
-        }
+        const logicalFlowPromise = physicalFlowPromise
+            .then(physicalFlow => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.getById,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.logicalFlow = r.data);
+
+        physicalFlowPromise
+            .then(physicalFlow => serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalSpecificationStore.getById,
+                    [physicalFlow.specificationId]))
+            .then(r => {
+                vm.specification = r.data;
+                vm.specificationReference = toEntityRef(r.data, 'PHYSICAL_SPECIFICATION');
+            });
+
+        logicalFlowPromise.then(() => {
+            if (vm.logicalFlow.source.kind === 'APPLICATION') {
+                resolveSourceAndTarget(serviceBroker, vm.logicalFlow)
+                    .then(sourceAndTarget => {
+                        const criticalityComparison = compareCriticalities(
+                            sourceAndTarget.source.businessCriticality,
+                            vm.physicalFlow.criticality);
+
+                        if (criticalityComparison === -1) {
+                            vm.hasCriticalityMismatch = true;
+                            vm.criticalityMismatchMessage = "Criticality mismatch: this flow has a higher criticality rating than the source"
+                        } else {
+                            vm.hasCriticalityMismatch = false;
+                        }
+                    });
+            }
+        })
+
     };
+
 }
 
 

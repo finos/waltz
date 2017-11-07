@@ -17,8 +17,10 @@
  */
 
 import angular from 'angular';
+
 import {registerComponents, registerStore} from '../common/module-utils';
 import * as PhysicalFlowStore from './service/physical-flow-store';
+import PhysicalFlowEditor from './components/flow-editor/physical-flow-editor';
 import PhysicalFlowOverview from './components/overview/physical-flow-overview';
 
 
@@ -39,6 +41,7 @@ function setup() {
         .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
 
     registerComponents(module, [
+        PhysicalFlowEditor,
         PhysicalFlowOverview
     ]);
     return module.name;

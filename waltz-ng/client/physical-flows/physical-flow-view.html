@@ -36,10 +36,39 @@
 
         <div class="row">
             <div class="col-md-7">
-                <waltz-physical-flow-overview physical-flow="ctrl.physicalFlow"
-                                              logical-flow="ctrl.logicalFlow"
-                                              specification="ctrl.specification">
-                </waltz-physical-flow-overview>
+                <waltz-sub-section name="Overview">
+                    <content>
+                        <div class="waltz-sub-section-content">
+                            <div ng-if="! ctrl.visibility.overviewEditor">
+                                <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference">
+                                </waltz-physical-flow-overview>
+                            </div>
+                            <div ng-if="ctrl.visibility.overviewEditor">
+                                <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
+                                </waltz-physical-flow-editor>
+                            </div>
+
+                        </div>
+                        <div class="waltz-sub-section-controls"
+                             waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                            <span>
+                                <a ng-click="ctrl.visibility.overviewEditor = true"
+                                   ng-if="! ctrl.visibility.overviewEditor"
+                                   class="clickable">
+                                    Edit
+                                </a>
+
+                                <a ng-click="ctrl.visibility.overviewEditor = false"
+                                   ng-if="ctrl.visibility.overviewEditor"
+                                   class="clickable">
+                                    Done
+                                </a>
+                            </span>
+                        </div>
+
+                    </content>
+                </waltz-sub-section>
+
             </div>
             <div class="col-md-5">
                 <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
@@ -60,40 +89,6 @@
     </div>
 
     <br>
-
-    <!-- MENTIONS -->
-    <waltz-section name="Mentions"
-                   icon="comments-o"
-                   small="as a contributor to other flows"
-                   id="mentions-section">
-
-        <div class="waltz-section-actions">
-            <button type="button"
-                    ng-disabled="ctrl.mentions.length == 0 "
-                    ng-click="ctrl.exportMentions()"
-                    class="btn btn-xs btn-primary">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </button>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div ng-if="ctrl.mentions.length > 0">
-                    <waltz-physical-specification-mentions mentions="ctrl.mentions"
-                                                           on-initialise="ctrl.onMentionsPanelInitialise">
-                    </waltz-physical-specification-mentions>
-                </div>
-                <waltz-no-data ng-if="ctrl.mentions.length == 0">
-                    <message>
-                        <strong>No mentions.</strong> This flow has not been mentioned as a contributor to any other flow.
-                    </message>
-                </waltz-no-data>
-
-            </div>
-        </div>
-
-    </waltz-section>
-
 
     <!-- SPEC DEFINITION -->
     <waltz-section name="Specification Definition"
