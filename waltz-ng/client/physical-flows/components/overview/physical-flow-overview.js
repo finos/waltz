@@ -81,6 +81,11 @@ function controller(serviceBroker) {
 
     };
 
+
+    vm.$onInit = () => {
+        load();
+    };
+
 }
 
 
