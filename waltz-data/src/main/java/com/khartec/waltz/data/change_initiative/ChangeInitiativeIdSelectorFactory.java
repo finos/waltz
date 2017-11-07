@@ -72,7 +72,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         ensureScopeIsExact(options);
         return dsl.selectDistinct(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
                 .from(FLOW_DIAGRAM_ENTITY)
-                .join(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
     }
@@ -116,7 +116,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
         Select<Record1<Long>> aToB = selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
-                .join(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
@@ -124,7 +124,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
         Select<Record1<Long>> bToA = selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
-                .join(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
