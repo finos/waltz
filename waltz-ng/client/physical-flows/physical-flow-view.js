@@ -23,11 +23,10 @@ import _ from "lodash";
 import template from './physical-flow-view.html';
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../common/entity-utils";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
-    mentions: [],
-    mentionsExportFn: () => {},
     physicalFlow: null,
     selected: {
         entity: null,
@@ -39,7 +38,8 @@ const initialState = {
     selectableSpecDefinitions: [],
     tour: [],
     visibility: {
-        diagramEditor: false
+        diagramEditor: false,
+        overviewEditor: false
     },
     bookmarksSection: dynamicSections.bookmarksSection,
     flowDiagramsSection: dynamicSections.flowDiagramsSection,
@@ -118,13 +118,13 @@ function controller($q,
                     $state,
                     $stateParams,
                     historyStore,
-                    logicalFlowStore,
                     notification,
                     physicalFlowStore,
                     physicalSpecDefinitionStore,
                     physicalSpecDefinitionFieldStore,
                     physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
+                    serviceBroker,
                     tourService)
 {
     const vm = initialiseData(this, initialState);
@@ -138,21 +138,28 @@ function controller($q,
 
     // -- LOAD ---
 
-    const physicalFlowPromise = physicalFlowStore
-        .getById(flowId)
-        .then(flow => vm.physicalFlow = flow);
+    const physicalFlowPromise = serviceBroker
+        .loadViewData(
+            CORE_API.PhysicalFlowStore.getById,
+            [ flowId ])
+        .then(r => vm.physicalFlow = r.data);
 
     physicalFlowPromise
-        .then(physicalFlow => logicalFlowStore.getById(physicalFlow.logicalFlowId))
-        .then(logicalFlow => vm.logicalFlow = logicalFlow);
+        .then(physicalFlow => serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.getById,
+                [vm.physicalFlow.logicalFlowId]))
+        .then(r => vm.logicalFlow = r.data);
 
     const specPromise = physicalFlowPromise
-        .then(physicalFlow => physicalSpecificationStore.getById(physicalFlow.specificationId))
-        .then(spec => {
-            vm.specification = spec;
-            vm.specificationReference = toEntityRef(spec, 'PHYSICAL_SPECIFICATION');
+        .then(physicalFlow => serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalSpecificationStore.getById,
+                [physicalFlow.specificationId]))
+        .then(r => {
+            vm.specification = r.data;
+            vm.specificationReference = toEntityRef(r.data, 'PHYSICAL_SPECIFICATION');
         });
-
 
     // spec definitions
     const loadSpecDefinitions = () => physicalSpecDefinitionStore
@@ -245,13 +252,13 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'HistoryStore',
-    'LogicalFlowStore',
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecDefinitionStore',
     'PhysicalSpecDefinitionFieldStore',
     'PhysicalSpecDefinitionSampleFileStore',
     'PhysicalSpecificationStore',
+    'ServiceBroker',
     'TourService'
 ];
 

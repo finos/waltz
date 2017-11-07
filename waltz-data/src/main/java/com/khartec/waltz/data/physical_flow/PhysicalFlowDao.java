@@ -288,4 +288,36 @@ public class PhysicalFlowDao {
                 .where(dsl.renderInlined(matchesLogicalFlow));
     }
 
+    public int updateCriticality(long flowId, Criticality criticality) {
+        return updateEnum(flowId, PHYSICAL_FLOW.CRITICALITY, criticality.name());
+    }
+
+    public int updateFrequency(long flowId, FrequencyKind frequencyKind) {
+        return updateEnum(flowId, PHYSICAL_FLOW.FREQUENCY, frequencyKind.name());
+    }
+
+    public int updateTransport(long flowId, TransportKind transportKind) {
+        return updateEnum(flowId, PHYSICAL_FLOW.TRANSPORT, transportKind.name());
+    }
+
+    public int updateBasisOffset(long flowId, int basis) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.BASIS_OFFSET, basis)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
+
+
+    // ---
+
+    private int updateEnum(long flowId, TableField<PhysicalFlowRecord, String> field, String value) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(field, value)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
+
+
 }

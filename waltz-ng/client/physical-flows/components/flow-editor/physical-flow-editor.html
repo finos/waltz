@@ -1,0 +1,45 @@
+<div class="waltz-physical-flow-editor">
+    <table class="waltz-field-table"
+           style="width: 100%">
+        <colgroup>
+            <col width="30%">
+            <col width="70%">
+        </colgroup>
+        <tr>
+            <td>
+                <label class="wft-label">Criticality</label>
+            </td>
+            <td>
+                <waltz-editable-enum initial-val="$ctrl.physicalFlow.criticality"
+                                     enum-kind="physicalFlowCriticality"
+                                     on-save="$ctrl.onSaveCriticality"
+                                     edit-role="LOGICAL_DATA_FLOW_EDITOR">
+                </waltz-editable-enum>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="wft-label">Transport</label>
+            </td>
+            <td>
+                <waltz-editable-enum initial-val="$ctrl.physicalFlow.transport"
+                                     enum-kind="transportKind"
+                                     on-save="$ctrl.onSaveTransport"
+                                     edit-role="LOGICAL_DATA_FLOW_EDITOR">
+                </waltz-editable-enum>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="wft-label">Frequency</label>
+            </td>
+            <td>
+                <waltz-editable-enum initial-val="$ctrl.physicalFlow.frequency"
+                                     enum-kind="frequencyKind"
+                                     on-save="$ctrl.onSaveFrequency"
+                                     edit-role="LOGICAL_DATA_FLOW_EDITOR">
+                </waltz-editable-enum>
+            </td>
+        </tr>
+    </table>
+</div>
