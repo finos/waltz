@@ -21,24 +21,6 @@
                     <div class="row small">
                         <div class="col-sm-12">
                             <table class="waltz-field-table small">
-                                <tr>
-                                    <td>
-                                        <span class="wft-label">Format:</span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="wft-label">
-                                            Transport:
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
-                                    </td>
-                                </tr>
                                 <tr ng-class="{
                                         'wft-danger' : $ctrl.hasCriticalityMismatch
                                     }"
@@ -58,6 +40,24 @@
                                         <span ng-show="$ctrl.hasCriticalityMismatch">
                                             <waltz-icon name="warning"></waltz-icon>
                                         </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="wft-label">Format:</span>
+                                    </td>
+                                    <td>
+                                        <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="wft-label">
+                                            Transport:
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
                                     </td>
                                 </tr>
                                 <tr>

@@ -17,7 +17,7 @@
  */
 import _ from 'lodash';
 
-import template from './flow-diagram-associations.html';
+import template from './flow-diagram-measurable-associations.html';
 import {initialiseData, termSearch} from '../../../common';
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {toEntityRef} from "../../../common/entity-utils";
@@ -187,7 +187,7 @@ controller.$inject = [
 ];
 
 
-const id = 'waltzFlowDiagramAssociations';
+const id = 'waltzFlowDiagramMeasurableAssociations';
 
 
 const component = {

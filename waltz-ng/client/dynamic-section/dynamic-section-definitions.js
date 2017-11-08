@@ -237,6 +237,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.changeInitiativeRelatedDataTypesSection,
         dynamicSections.technologySummarySection,
         dynamicSections.surveySection,
+        dynamicSections.flowDiagramsSection,
         dynamicSections.changeLogSection
     ],
     'ORG_UNIT': [

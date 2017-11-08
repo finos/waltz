@@ -18,6 +18,7 @@
 import angular from "angular";
 import CurrencyAmount from './currency-amount';
 import SubSection from './sub-section';
+import EditableEnum from './editable-enum/editable-enum';
 import {registerComponents} from "../common/module-utils";
 
 
@@ -59,6 +60,7 @@ export default () => {
 
     registerComponents(module, [
         CurrencyAmount,
+        EditableEnum,
         SubSection
     ]);
 

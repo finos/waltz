@@ -20,10 +20,10 @@ import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 
 const bindings = {
-    appScopeProvider: '<',
     columnDefs: '<',
     entries: '<',
     searchPlaceholderText: '@',
+    scopeProvider: '<?',
     onInitialise: '<',
     onChange: '<'
 };
@@ -35,6 +35,7 @@ const initialState = {
     columnDefs: [],
     entries: [],
     filteredEntries: [],
+    scopeProvider: null,
     searchFields: [],
     searchPlaceholderText: 'Search...',
     onInitialise: (gridApi) => console.log('Default onInitialise handler for grid-search: ', gridApi),

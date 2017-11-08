@@ -1,0 +1,64 @@
+<h5>
+    <waltz-icon name="paper-plane-o"></waltz-icon>
+    Associated Change Initiatives
+</h5>
+<div class="small">
+    <!-- CURRENT ASSOCIATIONS -->
+    <table class="table table-condensed small"
+           style="background-color: white">
+        <!-- IF NONE -->
+        <tr ng-if="$ctrl.associations.length == 0">
+            <td colspan="2">No associated change initiatives</td>
+        </tr>
+
+        <!-- LIST -->
+        <tbody>
+        <tr ng-repeat="association in $ctrl.associations track by association.id">
+            <td>
+                <a ng-if="$ctrl.readOnly"
+                   class="clickable"
+                   ui-sref="main.change-initiative.view ({id: association.id })"
+                   ng-bind="association.name">
+                </a>
+                <div ng-if="!$ctrl.readOnly"
+                     ng-bind="association.name"></div>
+                <div class="small text-muted"
+                     ng-bind="association.kind | toDisplayName:'changeInitiative'">
+                </div>
+            </td>
+            <td ng-if="!$ctrl.readOnly">
+                <a ng-click="$ctrl.onRemove(association)"
+                   class="clickable">
+                    <waltz-icon name="trash"
+                                title="remove"></waltz-icon>
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+
+        <!-- FOOTER-->
+        <tfoot ng-hide="$ctrl.readOnly || $ctrl.visibility.suggestions || $ctrl.visibility.search">
+        <tr>
+            <td colspan="2">
+                <a class="clickable"
+                   ng-click="$ctrl.onShowAdd()">
+                    <waltz-icon name="plus"></waltz-icon>
+                    Add
+                </a>
+            </td>
+        </tr>
+        </tfoot>
+
+    </table>
+
+    <div ng-if="$ctrl.visibility.add"
+         class="waltz-fade-if">
+        <!-- ADD NEW VIA SEARCH -->
+
+        <waltz-entity-selector entity-kinds="['CHANGE_INITIATIVE']"
+                               on-select="$ctrl.onAdd"
+                               selection-filter="$ctrl.searchFilter">
+        </waltz-entity-selector>
+    </div>
+</div>

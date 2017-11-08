@@ -1,9 +1,16 @@
 <div>
 
-    <waltz-flow-diagram-associations ng-if="$ctrl.id"
-                                     read-only="false"
-                                     diagram-id="$ctrl.id">
-    </waltz-flow-diagram-associations>
+    <waltz-flow-diagram-measurable-associations ng-if="$ctrl.id"
+                                                read-only="false"
+                                                diagram-id="$ctrl.id">
+    </waltz-flow-diagram-measurable-associations>
+
+    <hr>
+
+    <waltz-flow-diagram-change-initiative-associations ng-if="$ctrl.id"
+                                                       read-only="false"
+                                                       diagram-id="$ctrl.id">
+    </waltz-flow-diagram-change-initiative-associations>
 
     <strong ng-if="!$ctrl.id">
         Cannot add additional viewpoints until
@@ -11,9 +18,9 @@
     </strong>
 
     <div class="waltz-popup-actions">
-        <button ng-click="$ctrl.onDismiss()"
-                class="btn btn-xs btn-primary">
+        <a ng-click="$ctrl.onDismiss()"
+           class="clickable">
             Done
-        </button>
+        </a>
     </div>
 </div>

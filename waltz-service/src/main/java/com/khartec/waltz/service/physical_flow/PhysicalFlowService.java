@@ -307,6 +307,21 @@ public class PhysicalFlowService {
     }
 
 
+    public int updateAttribute(String username, SetAttributeCommand command) {
+
+        int rc = doUpdateAttribute(command);
+
+        if (rc != 0) {
+            String message = String.format("Updated attribute %s to %s", command.name(), command.value());
+            logChange(username, command.entityReference(), message, Operation.UPDATE);
+        }
+
+        return rc;
+    }
+
+
+    // -- HELPERS
+
     private void logChange(String userId,
                            EntityReference ref,
                            String message,
@@ -324,4 +339,23 @@ public class PhysicalFlowService {
         changeLogService.write(logEntry);
     }
 
+
+    private int doUpdateAttribute(SetAttributeCommand command) {
+        long flowId = command.entityReference().id();
+        switch(command.name()) {
+            case "criticality":
+                return physicalFlowDao.updateCriticality(flowId, Criticality.valueOf(command.value()));
+            case "frequency":
+                return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(command.value()));
+            case "transport":
+                return physicalFlowDao.updateTransport(flowId, TransportKind.valueOf(command.value()));
+            case "basisOffset":
+                return physicalFlowDao.updateBasisOffset(flowId, Integer.parseInt(command.value()));
+            default:
+                String errMsg = String.format(
+                        "Cannot update attribute %s on flow as unknown attribute name",
+                        command.name());
+                throw new UnsupportedOperationException(errMsg);
+        }
+    }
 }
