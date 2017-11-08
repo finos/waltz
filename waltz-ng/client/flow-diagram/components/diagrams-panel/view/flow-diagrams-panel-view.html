@@ -149,9 +149,15 @@
     <div ng-if="$ctrl.visibility.menuPopup"
          class="waltz-fade-if wfdpv-menu-popup">
 
-        <waltz-flow-diagram-associations read-only="true"
-                                         diagram-id="$ctrl.diagram.id">
-        </waltz-flow-diagram-associations>
+        <waltz-flow-diagram-measurable-associations read-only="true"
+                                                    diagram-id="$ctrl.diagram.id">
+        </waltz-flow-diagram-measurable-associations>
+
+        <hr>
+
+        <waltz-flow-diagram-change-initiative-associations read-only="true"
+                                                           diagram-id="$ctrl.diagram.id">
+        </waltz-flow-diagram-change-initiative-associations>
 
         <hr>
 

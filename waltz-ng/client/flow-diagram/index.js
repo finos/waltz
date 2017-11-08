@@ -36,7 +36,8 @@ import FlowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
 import FlowDiagramsPanelBrowse from './components/diagrams-panel/browse/flow-diagrams-panel-browse';
 import FlowDiagramsPanelView from './components/diagrams-panel/view/flow-diagrams-panel-view';
 import flowDiagramsSection from './components/section/flow-diagrams-section';
-import FlowDiagramAssociations from './components/associations/flow-diagram-associations';
+import FlowDiagramMeasurableAssociations from './components/measurable-associations/flow-diagram-measurable-associations';
+import FlowDiagramChangeInitiativeAssociations from './components/change-initiative-associations/flow-diagram-change-initiative-associations';
 import FlowDiagramInfoPopup from './components/editor/flow-diagram-info-popup';
 
 import {registerComponents, registerServices, registerStores} from '../common/module-utils'
@@ -68,7 +69,8 @@ export default () => {
     ]);
 
     registerComponents(module, [
-        FlowDiagramAssociations,
+        FlowDiagramMeasurableAssociations,
+        FlowDiagramChangeInitiativeAssociations,
         FlowDiagramsPanel,
         FlowDiagramsPanelBrowse,
         FlowDiagramsPanelView,

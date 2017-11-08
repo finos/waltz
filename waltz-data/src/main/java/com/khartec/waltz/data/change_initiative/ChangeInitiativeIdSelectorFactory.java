@@ -5,19 +5,18 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
-import org.jooq.SelectConditionStep;
+import com.khartec.waltz.model.application.LifecyclePhase;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static org.jooq.impl.DSL.selectDistinct;
@@ -27,6 +26,10 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
     private final DSLContext dsl;
+
+    private final Condition liveCis = CHANGE_INITIATIVE.START_DATE.le(toSqlDate(nowUtc().toLocalDate()))
+            .and(CHANGE_INITIATIVE.END_DATE.ge(toSqlDate(nowUtc().toLocalDate())))
+            .and(CHANGE_INITIATIVE.LIFECYCLE_PHASE.notEqual(LifecyclePhase.RETIRED.name()));
 
 
     @Autowired
@@ -54,12 +57,24 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 return mkForChangeInitiative(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
+            case FLOW_DIAGRAM:
+                return mkForFlowDiagram(options);
             default:
                 String msg = String.format(
                         "Cannot create Change Initiative Id selector from kind: %s",
                         options.entityReference().kind());
                 throw new UnsupportedOperationException(msg);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return dsl.selectDistinct(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
+                .from(FLOW_DIAGRAM_ENTITY)
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
     }
 
 
@@ -74,7 +89,8 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.in(empIdSelector));
+                .and(INVOLVEMENT.EMPLOYEE_ID.in(empIdSelector))
+                .and(liveCis);
     }
 
 
@@ -84,12 +100,13 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         return dsl
                 .selectDistinct(CHANGE_INITIATIVE.ID)
                 .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouSelector));
+                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouSelector))
+                .and(liveCis);
     }
 
 
     private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
-        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a change initiative ref");
+        ensureScopeIsExact(options);
         return DSL.select(DSL.val(options.entityReference().id()));
     }
 
@@ -99,19 +116,21 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
         Select<Record1<Long>> aToB = selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
+                .and(liveCis);
 
         Select<Record1<Long>> bToA = selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
+                .and(liveCis);
 
         return aToB.union(bToA);
     }
-
-
 
 }

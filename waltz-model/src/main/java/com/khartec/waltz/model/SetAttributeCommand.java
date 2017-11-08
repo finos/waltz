@@ -16,36 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../../common/index";
-import {CORE_API} from "../../common/services/core-api-utils";
+package com.khartec.waltz.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.command.Command;
+import org.immutables.value.Value;
 
-const initialState = {
-    parentEntityRef: {
-        id: 16,
-        kind: 'FLOW_DIAGRAM'
-    }
-};
+@Value.Immutable
+@JsonSerialize(as = ImmutableSetAttributeCommand.class)
+@JsonDeserialize(as = ImmutableSetAttributeCommand.class)
+public abstract class SetAttributeCommand implements Command, NameProvider {
 
-function controller($stateParams, serviceBroker) {
-    const vm = initialiseData(this, initialState);
+    public abstract EntityReference entityReference();
+    public abstract String value();
+
 }
-
-
-controller.$inject = [
-    '$stateParams',
-    'ServiceBroker'
-];
-
-
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

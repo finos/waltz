@@ -103,6 +103,13 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const updateAttribute = (flowId, command) => {
+        return $http
+            .post(`${base}/id/${flowId}/attribute`, command)
+            .then(r => r.data);
+    };
+
+
     const cleanupOrphans = () => $http
         .get(`${base}/cleanup-orphans`)
         .then(r => r.data);
@@ -120,6 +127,7 @@ export function store($http, baseApiUrl) {
         create,
         deleteById,
         updateSpecDefinitionId,
+        updateAttribute,
         cleanupOrphans
     };
 }
@@ -190,6 +198,11 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: 'updateSpecDefinitionId',
         description: 'executes updateSpecDefinitionId'
+    },
+    updateAttribute: {
+        serviceName,
+        serviceFnName: 'updateAttribute',
+        description: 'executes updateAttribute'
     },
     cleanupOrphans: {
         serviceName,

@@ -1,19 +1,19 @@
 # Building
 
-Waltz is built using maven.
+Waltz is built using [Maven](https://maven.apache.org/).
 
 ## Prerequisites
 
-- Git
-- Maven 3
-- JDK 8
-- Liquibase (recommended but not essential)
-- Node
-- Sass
+- [Git](https://git-scm.com/)
+- [Maven 3](https://maven.apache.org/)
+- [JDK 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
+- [Node](https://nodejs.org/en/)
+- [Sass](http://sass-lang.com/)
 - Database - either
-  - MariaDB
-  - Microsoft SQL Server
-- _jOOQ Pro_ (if using Microsoft SQL Server) 
+  - [MariaDB](https://mariadb.org/)
+  - [Microsoft SQL Server](https://www.microsoft.com/en-gb/sql-server/)
+- [Liquibase](http://www.liquibase.org/) (recommended but not essential)
+- [_jOOQ Pro_](https://www.jooq.org/download/) (if using Microsoft SQL Server) 
 
 ## Obtaining the code
 
@@ -33,7 +33,7 @@ When you run the first build (using `mvn package`) the schema will be generated 
 Waltz uses maven profiles to target the build against the correct database.  Generic db vendor settings are located in  
 the profiles section of `<REPO>/waltz-schema/pom.xml` and should not need to be changed.
 
-Specific database connection details should be configure in the 
+Specific database connection details should be configured in the 
 `~/.m2/settings.xml` file.  An example (for both MariaDB and Microsoft 
 SQL Server) would look like:
 

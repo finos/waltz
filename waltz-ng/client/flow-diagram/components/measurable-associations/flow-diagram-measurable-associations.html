@@ -1,11 +1,14 @@
-<script src="flow-diagram-associations.js"></script><h5>Associated Viewpoints</h5>
+<h5>
+    <waltz-icon name="puzzle-piece"></waltz-icon>
+    Associated Viewpoints
+</h5>
 <div class="small">
     <!-- CURRENT ASSOCIATIONS -->
     <table class="table table-condensed small"
            style="background-color: white">
         <!-- IF NONE -->
         <tr ng-if="$ctrl.associatedMeasurables.length == 0">
-            <td colspan="2">No associations</td>
+            <td colspan="2">No associated viewpoints</td>
         </tr>
 
         <!-- LIST -->
@@ -41,7 +44,7 @@
                 <a class="clickable"
                    ng-click="$ctrl.onShowSuggestions()">
                     <waltz-icon name="plus"></waltz-icon>
-                    Add new association
+                    Add
                 </a>
             </td>
         </tr>
