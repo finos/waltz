@@ -5,15 +5,15 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
@@ -26,10 +26,6 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
     private final DSLContext dsl;
-
-    private final Condition liveCis = CHANGE_INITIATIVE.START_DATE.le(toSqlDate(nowUtc().toLocalDate()))
-            .and(CHANGE_INITIATIVE.END_DATE.ge(toSqlDate(nowUtc().toLocalDate())))
-            .and(CHANGE_INITIATIVE.LIFECYCLE_PHASE.notEqual(LifecyclePhase.RETIRED.name()));
 
 
     @Autowired
@@ -72,7 +68,6 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         ensureScopeIsExact(options);
         return dsl.selectDistinct(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
                 .from(FLOW_DIAGRAM_ENTITY)
-                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
     }
@@ -89,8 +84,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_INITIATIVE.ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()))
-                .and(INVOLVEMENT.EMPLOYEE_ID.in(empIdSelector))
-                .and(liveCis);
+                .and(INVOLVEMENT.EMPLOYEE_ID.in(empIdSelector));
     }
 
 
@@ -100,8 +94,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         return dsl
                 .selectDistinct(CHANGE_INITIATIVE.ID)
                 .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouSelector))
-                .and(liveCis);
+                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouSelector));
     }
 
 
@@ -116,19 +109,15 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
 
         Select<Record1<Long>> aToB = selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
-                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
-                .and(liveCis);
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
 
         Select<Record1<Long>> bToA = selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
-                .innerJoin(CHANGE_INITIATIVE).on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
-                .and(liveCis);
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
         return aToB.union(bToA);
     }
