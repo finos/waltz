@@ -48,17 +48,17 @@ const initialState = {
 
 
 function determinePopupPosition(evt) {
-    const top = evt.clientY > 600
-        ? evt.offsetY - 120
-        : evt.offsetY + 50;
+    const top = evt.clientY > 550
+        ? 8
+        : 45;
 
     const left = evt.clientX > 400
-        ? evt.offsetX - 100
-        : evt.offsetX + 50;
+        ? 2
+        : 50;
 
     return {
-        top: `${top}px`,
-        left: `${left}px`
+        top: `${top}vh`,
+        left: `${left}vw`
     };
 }
 
