@@ -20,7 +20,6 @@ import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 
 const bindings = {
-    appScopeProvider: '<',
     columnDefs: '<',
     entries: '<',
     searchPlaceholderText: '@',
