@@ -38,8 +38,8 @@ Table: `Complexity Score`
 |---|---|---|
 | entity_kind | Kind of entity being scored | `APPLICATION` |
 | entity_id | Id of entity being score | `123456` |
-| complexity_kind | type of complexity being measured | `INFRASTRUCTURE` |
-| score | (decimal 10,3) amount |  `100.99` |
+| complexity_kind | type of complexity being measured | `MEASURABLE` |
+| score | (decimal 10,3) amount |  `0.7` |
 
 
 Valid complexity kinds:
