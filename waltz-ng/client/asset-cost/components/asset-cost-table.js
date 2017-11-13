@@ -25,8 +25,7 @@ import template from './asset-cost-table.html';
 
 const DEFAULT_OPTIONS = {
     showAssetCode: true,
-    showAppName: false,
-    showOrgUnit: false
+    showAppName: false
 };
 
 
@@ -77,11 +76,6 @@ function prepareColumns(uiGridConstants, options) {
 
     const appCol = mkEntityLinkGridCell('Application', 'application', 'none');
 
-    const orgCol = {
-        field: 'orgUnit.name',
-        displayName: 'Org Unit'
-    };
-
     const assetCodeCol = {
         field: 'assetCode'
     };
@@ -91,7 +85,6 @@ function prepareColumns(uiGridConstants, options) {
         amountCol,
         yearCol,
         appCol,
-        orgCol,
         assetCodeCol
     }, options);
 }
@@ -101,7 +94,6 @@ function determineColumns(colDefinitions, options) {
     const cols = [
         options.showAssetCode ? colDefinitions.assetCodeCol : null,
         options.showAppName ? colDefinitions.appCol : null,
-        options.showOrgUnit ? colDefinitions.orgCol : null,
         colDefinitions.yearCol,
         colDefinitions.kindCol,
         colDefinitions.amountCol
