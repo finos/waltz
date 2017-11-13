@@ -104,8 +104,8 @@
         </h5>
         <table class="waltz-field-table small">
             <tr>
-                <td>
-                    <span class="wft-label">Asset Code:</span>
+                <td class="wft-label">
+                    <span>Asset Code:</span>
                 </td>
                 <td>
                     <span ng-bind="$ctrl.contextPopup.entity.assetCode">
@@ -113,8 +113,8 @@
                 </td>
             </tr>
             <tr>
-                <td>
-                    <span class="wft-label">Criticality:</span>
+                <td class="wft-label">
+                    <span>Criticality:</span>
                 </td>
                 <td>
                     <span ng-bind="$ctrl.contextPopup.entity.businessCriticality | toDisplayName:'criticality'">
@@ -122,11 +122,11 @@
                 </td>
             </tr>
             <tr>
-                <td>
-                    <span class="wft-label">Description:</span>
+                <td class="wft-label">
+                    <span>Description:</span>
                 </td>
                 <td>
-                    <span ng-bind="$ctrl.contextPopup.entity.description"></span>
+                    <waltz-markdown text="$ctrl.contextPopup.entity.description"></waltz-markdown>
                 </td>
             </tr>
         </table>
