@@ -1,7 +1,15 @@
 <div>
-    <div style="font-size: smaller; height: 250px"
-         ui-grid-exporter
-         ui-grid="$ctrl.gridOptions">
+    <waltz-grid-with-search entries="$ctrl.costs"
+                            column-defs="$ctrl.columnDefs"
+                            on-initialise="$ctrl.onGridInitialise">
+    </waltz-grid-with-search>
+
+    <div class="pull-right" style="margin-bottom: 4px">
+        <a class="clickable waltz-visibility-child-30"
+           ng-click="$ctrl.exportAssetCosts()">
+            <waltz-icon name="download"></waltz-icon>
+            Export asset costs
+        </a>
     </div>
 </div>
 

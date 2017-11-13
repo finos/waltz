@@ -17,10 +17,10 @@
  */
 
 import _ from "lodash";
-import {assetCostKindNames} from "./../../common/services/display-names";
-import {mkEntityLinkGridCell} from "../../common/link-utils";
+import { mkEntityLinkGridCell } from "../../common/link-utils";
+import { initialiseData } from "../../common/index";
+
 import template from './asset-cost-table.html';
-import {initialiseData} from "../../common/index";
 
 
 const DEFAULT_OPTIONS = {
@@ -33,17 +33,17 @@ const DEFAULT_OPTIONS = {
 const bindings = {
     costs: '<',
     options: '<?',
-    selectedBucket: '<?',
     csvName: '@?'
 };
 
 
 const initialState = {
-
+    columnDefs: [],
+    options: DEFAULT_OPTIONS
 };
 
 
-function prepareColumns(uiGridConstants) {
+function prepareColumns(uiGridConstants, options) {
     const kindCol = {
         field: 'cost.kind',
         displayName: 'Cost Type',
@@ -86,14 +86,14 @@ function prepareColumns(uiGridConstants) {
         field: 'assetCode'
     };
 
-    return {
+    return determineColumns({
         kindCol,
         amountCol,
         yearCol,
         appCol,
         orgCol,
         assetCodeCol
-    };
+    }, options);
 }
 
 
@@ -111,108 +111,28 @@ function determineColumns(colDefinitions, options) {
 }
 
 
-function prepareGridOptions(colDefinitions, options, uiGridConstants, $animate) {
-
-    const columns = determineColumns(colDefinitions, options);
-
-    const gridOptions = {
-        enableSorting: true,
-        enableFiltering: true,
-        exporterMenuPdf: false,
-        enableHorizontalScrollbar: uiGridConstants.scrollbars.NEVER,
-        columnDefs: columns,
-        data: [],
-        onRegisterApi: (gridApi) => $animate.enabled(gridApi.grid.element, false)
-    };
-
-    return gridOptions;
-}
-
-function setupExportOptions(options, csvName) {
-    Object.assign(options, {
-        enableGridMenu: true,
-        exporterCsvFilename: csvName || "asset_costs.csv"
-    });
-}
-
-function setupYearFilter(costs, uiGridConstants) {
-    const yearOptions = _.chain(costs)
-        .map(c => c.cost.year)
-        .uniq()
-        .map(y => ({ label: y, value: y }))
-        .value();
-
-    return {
-        type: uiGridConstants.filter.SELECT,
-        selectOptions: yearOptions
-    };
-}
-
-
-function setupOrgFilter(costs, uiGridConstants) {
-    const orgOptions = _.chain(costs)
-        .filter('orgUnit') // may be null
-        .map(c => c.orgUnit.name)
-        .uniq()
-        .map(n => ({ label: n, value: n }))
-        .value();
-
-    return {
-        type: uiGridConstants.filter.SELECT,
-        selectOptions: orgOptions
-    };
-}
-
-
-function controller(uiGridConstants, $animate) {
+function controller(uiGridConstants) {
 
     const vm = initialiseData(this, initialState);
 
-    const options = _.defaults(vm.options || {}, DEFAULT_OPTIONS);
-
-    const colDefinitions = prepareColumns(uiGridConstants);
-    const gridOptions = prepareGridOptions(colDefinitions, options, uiGridConstants, $animate);
-
-    setupExportOptions(gridOptions, vm.csvName);
-
-    /* setup year and org filters */
-    const configureWithCosts = (costs) => {
-        vm.gridOptions.data = costs;
-        colDefinitions.yearCol = setupYearFilter(costs, uiGridConstants);
-        colDefinitions.orgCol = setupOrgFilter(costs, uiGridConstants);
-    };
-
-
-    const filterAmount = ({ max, min }) => {
-        const minFilter = colDefinitions.amountCol.filters[0];
-        const maxFilter = colDefinitions.amountCol.filters[1];
-
-        minFilter.term = min;
-        if (max === Number.MAX_VALUE) {
-            maxFilter.term = null;
-        } else {
-            maxFilter.term = max;
+    vm.$onChanges = () => {
+        if(vm.costs) {
+            vm.columnDefs = prepareColumns(uiGridConstants, vm.options);
         }
     };
 
-    const applyFilter = (filterOptions) => {
-        if (! filterOptions) return;
-        filterAmount(filterOptions);
+    vm.onGridInitialise = (opts) => {
+        vm.gridExportFn = opts.exportFn;
     };
 
-
-    vm.$onChanges = () => {
-        configureWithCosts(vm.costs);
-        applyFilter(vm.filterOptions);
+    vm.exportAssetCosts = () => {
+        vm.gridExportFn(vm.csvName);
     };
-
-    vm.gridOptions = gridOptions;
 }
 
 
 controller.$inject = [
-    'uiGridConstants',
-    '$animate'
+    'uiGridConstants'
 ];
 
 
