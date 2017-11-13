@@ -1,0 +1,13 @@
+<span ng-if="$ctrl.subscriptionStatus != 'NOT_APPLICABLE'">
+    <button ng-if="$ctrl.subscriptionStatus === 'UNSUBSCRIBED'"
+            ng-click="$ctrl.onSubscribe()"
+            class="btn btn-xs btn-success wsa-action">
+        Subscribe
+    </button>
+    <button ng-if="$ctrl.subscriptionStatus === 'SUBSCRIBED'"
+            ng-click="$ctrl.onUnsubscribe()"
+            class="btn btn-xs btn-warning wsa-action">
+        Unsubscribe
+    </button>
+
+</span>

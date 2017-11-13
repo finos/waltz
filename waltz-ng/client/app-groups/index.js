@@ -20,6 +20,7 @@
 import angular from 'angular';
 import AppGroupSummary from './components/summary/app-group-summary'
 import RelatedAppGroupsSection from './components/related-app-groups-section/related-app-groups-section';
+import SubscriptionButtons from './components/subscription-buttons/subscription-buttons';
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as AppGroupStore from './services/app-group-store';
 
@@ -37,6 +38,7 @@ export default () => {
 
     registerComponents(module, [
         AppGroupSummary,
+        SubscriptionButtons,
         RelatedAppGroupsSection ]);
 
     registerStores(module, [ AppGroupStore ]);
