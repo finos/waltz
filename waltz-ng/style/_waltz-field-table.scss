@@ -5,8 +5,10 @@
         margin-left: 2px;
     }
     .wft-label {
+        vertical-align: top;
         color: $waltz-field-label-color;
         font-weight: lighter;
+        padding-right: 12px;
     }
 
     .wft-danger {
