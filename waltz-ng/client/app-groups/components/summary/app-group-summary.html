@@ -1,14 +1,19 @@
 <div class="waltz-page-summary waltz-page-summary-attach">
+    <span class="waltz-section-actions">
+        <a ng-if="$ctrl.editable"
+           ui-sref="main.app-group.edit ({ id:$ctrl.appGroup.id })"
+           class="btn btn-xs btn-primary wsa-action">
+            <waltz-icon name="edit"></waltz-icon>
+            Edit Group
+        </a>
+        <waltz-subscription-buttons subscription-status="$ctrl.subscriptionStatus"
+                                    on-subscribe="$ctrl.onSubscribe"
+                                    on-unsubscribe="$ctrl.onUnsubscribe">
+        </waltz-subscription-buttons>
+    </span>
+
     <div class="row">
         <div class="col-sm-12">
-            <span class="pull-right"
-                  ng-if="$ctrl.editable">
-                <a ui-sref="main.app-group.edit ({ id:$ctrl.appGroup.id })"
-                   class="btn btn-xs btn-primary">
-                    <waltz-icon name="edit"></waltz-icon>
-                    Edit Group
-                </a>
-            </span>
 
             <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
                  class="waltz-paragraph"
