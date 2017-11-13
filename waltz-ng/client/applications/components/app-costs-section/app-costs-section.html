@@ -69,7 +69,8 @@
                          style="padding-top: 1em">
                         <div class="col-md-12">
                             <div ng-if="showTableTab">
-                                <waltz-asset-cost-table costs="$ctrl.costs">
+                                <waltz-asset-cost-table costs="$ctrl.costs"
+                                                        csv-name='{{$ctrl.parentEntityRef.name}}-costs.csv'>
                                 </waltz-asset-cost-table>
                             </div>
                             <p class="small">
