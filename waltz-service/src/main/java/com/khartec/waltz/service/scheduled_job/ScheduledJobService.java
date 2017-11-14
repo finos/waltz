@@ -60,7 +60,7 @@ public class ScheduledJobService {
     @Scheduled(fixedRate = 50_000)
     public void run() {
         runIfNeeded(JobKey.HIERARCHY_REBUILD_CHANGE_INITIATIVE,
-                    (jk) -> entityHierarchyService.buildFor(EntityKind.CHANGE_INITIATIVE));
+                (jk) -> entityHierarchyService.buildFor(EntityKind.CHANGE_INITIATIVE));
 
         runIfNeeded(JobKey.HIERARCHY_REBUILD_DATA_TYPE,
                 (jk) -> entityHierarchyService.buildFor(EntityKind.DATA_TYPE));
