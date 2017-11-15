@@ -83,7 +83,7 @@ function mkCharts(apps = [], endUserApps = []) {
                 lifecycleLabelProvider),
             byKind: mkChartData(
                 apps,
-                'kind',
+                'applicationKind',
                 PIE_SIZE,
                 randomColorProvider,
                 applicationKindLabelProvider)

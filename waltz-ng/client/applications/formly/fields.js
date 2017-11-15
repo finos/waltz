@@ -76,7 +76,7 @@ export const orgUnitField = {
 
 export const typeField = {
     type: 'select',
-    key: 'kind',
+    key: 'applicationKind',
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',

@@ -72,7 +72,7 @@ function controller(serviceBroker) {
                 .then(r => r.data)
                 .then(endUserApps => vm.endUserApps = _.map(
                     endUserApps,
-                    a => _.assign(a, { platform: a.kind }, DEFAULT_APP_SETTINGS)))
+                    a => _.assign(a, { platform: a.applicationKind }, DEFAULT_APP_SETTINGS)))
                 .then(refresh);
         }
     };
