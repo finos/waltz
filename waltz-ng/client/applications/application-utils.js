@@ -25,7 +25,7 @@ import {
 
 export function mapToDisplayNames(app) {
     return {
-        kindDisplay: applicationKindDisplayNames[app.kind] || app.kind,
+        kindDisplay: applicationKindDisplayNames[app.applicationKind] || app.applicationKind,
         overallRatingDisplay: investmentRatingNames[app.overallRating] || app.overallRating,
         businessCriticalityDisplay: criticalityDisplayNames[app.businessCriticality] || app.businessCriticality,
         riskRatingDisplay: criticalityDisplayNames[app.riskRating] || app.riskRating,

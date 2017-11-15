@@ -43,7 +43,7 @@ public abstract class Application implements
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();
-    public abstract ApplicationKind kind();
+    public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
 

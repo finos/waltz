@@ -35,7 +35,7 @@ public abstract class EndUserApplication implements
         ProvenanceProvider {
 
     public abstract Long organisationalUnitId();
-    public abstract String kind();
+    public abstract String applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract Criticality riskRating();
 
