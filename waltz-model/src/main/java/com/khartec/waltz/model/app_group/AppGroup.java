@@ -29,7 +29,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAppGroup.class)
 public abstract class AppGroup implements IdProvider, NameProvider, DescriptionProvider, WaltzEntity {
 
-    public abstract AppGroupKind kind();
+    public abstract AppGroupKind appGroupKind();
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
