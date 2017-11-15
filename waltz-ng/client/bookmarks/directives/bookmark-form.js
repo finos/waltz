@@ -25,7 +25,7 @@ function controller($scope) {
     this.confirmLabel = this.confirmLabel || 'Save';
 
     this.onKindSelect = (code) => {
-        this.bookmark.kind = code;
+        this.bookmark.bookmarkKind = code;
     };
 
     this.togglePrimary = () => {

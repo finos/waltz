@@ -37,7 +37,7 @@ public abstract class Bookmark implements IdProvider, ProvenanceProvider, LastUp
 
     public abstract Optional<Long> id();
     public abstract EntityReference parent();
-    public abstract String kind();
+    public abstract String bookmarkKind();
     public abstract Optional<String> title();
     public abstract Optional<String> url();
     public abstract Optional<String> description();
