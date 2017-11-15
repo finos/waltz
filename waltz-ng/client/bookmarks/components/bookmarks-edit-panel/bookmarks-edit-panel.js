@@ -48,7 +48,7 @@ function controller(notification, serviceBroker) {
 
     vm.create = () => {
         vm.selectedBookmark = {
-            kind: 'DOCUMENTATION',
+            bookmarkKind: 'DOCUMENTATION',
             lastUpdatedBy: "ignored, server will set"
         };
         vm.visibility.form = true;
@@ -68,7 +68,7 @@ function controller(notification, serviceBroker) {
     vm.resetForm = () => {
         vm.visibility.form = false;
         vm.bookmark = {
-            kind: 'DOCUMENTATION',
+            bookmarkKind: 'DOCUMENTATION',
             parent: vm.parentEntityRef
         };
     };
