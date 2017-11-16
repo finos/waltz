@@ -44,7 +44,7 @@ const initialState = {
 
 function prepareColumns(uiGridConstants, options) {
     const kindCol = {
-        field: 'cost.kind',
+        field: 'cost.costKind',
         displayName: 'Cost Type',
         cellFilter: 'toDisplayName:"CostKind"'
     };
