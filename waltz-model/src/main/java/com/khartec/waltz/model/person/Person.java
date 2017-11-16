@@ -33,7 +33,7 @@ public abstract class Person implements IdProvider, WaltzEntity {
     public abstract String employeeId();
     public abstract String displayName();
     public abstract String email();
-    public abstract PersonKind kind();
+    public abstract PersonKind personKind();
     public abstract Optional<String> title();
     public abstract Optional<String> mobilePhone();
     public abstract Optional<String> officePhone();
