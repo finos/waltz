@@ -51,7 +51,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .name(record.getName())
                 .description(ofNullable(record.getDescription()).orElse(""))
                 .externalId(ofNullable(record.getExternalId()))
-                .kind(ChangeInitiativeKind.valueOf(record.getKind()))
+                .changeInitiativeKind(ChangeInitiativeKind.valueOf(record.getKind()))
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
                 .provenance(record.getProvenance())
                 .lastUpdate(ofNullable(record.getLastUpdate()))

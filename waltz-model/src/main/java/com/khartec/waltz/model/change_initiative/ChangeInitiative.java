@@ -41,7 +41,7 @@ public abstract class ChangeInitiative implements
         OrganisationalUnitIdProvider,
         WaltzEntity {
 
-    public abstract ChangeInitiativeKind kind();
+    public abstract ChangeInitiativeKind changeInitiativeKind();
     public abstract LifecyclePhase lifecyclePhase();
 
     public abstract Optional<Date> lastUpdate();

@@ -69,7 +69,7 @@ function controller(serviceBroker) {
                 const children = cisByParentId[ci.id] || [];
                 const icon = children.length > 0 ? 'sitemap' : 'fw';
                 const extensions = {
-                    kindName: changeInitiativeNames[ci.kind],
+                    kindName: changeInitiativeNames[ci.changeInitiativeKind],
                     lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase],
                     icon,
                     parent: null,
