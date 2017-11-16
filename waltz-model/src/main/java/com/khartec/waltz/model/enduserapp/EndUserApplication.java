@@ -28,6 +28,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableEndUserApplication.class)
 @JsonDeserialize(as = ImmutableEndUserApplication.class)
 public abstract class EndUserApplication implements
+        EntityKindProvider,
         IdProvider,
         DescriptionProvider,
         ExternalIdProvider,
@@ -43,6 +44,9 @@ public abstract class EndUserApplication implements
     public String provenance() {
         return "waltz";
     }
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.END_USER_APPLICATION; }
 
     public EntityReference toEntityReference() {
         return ImmutableEntityReference.builder()

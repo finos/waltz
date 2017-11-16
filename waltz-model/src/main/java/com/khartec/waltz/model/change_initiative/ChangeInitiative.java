@@ -32,6 +32,7 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutableChangeInitiative.class)
 @JsonDeserialize(as = ImmutableChangeInitiative.class)
 public abstract class ChangeInitiative implements
+        EntityKindProvider,
         ExternalIdProvider,
         ParentIdProvider,
         NameProvider,
@@ -48,6 +49,9 @@ public abstract class ChangeInitiative implements
 
     public abstract Date startDate();
     public abstract Date endDate();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.CHANGE_INITIATIVE; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
