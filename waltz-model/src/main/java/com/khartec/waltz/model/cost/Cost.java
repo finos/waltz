@@ -20,6 +20,8 @@ package com.khartec.waltz.model.cost;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityKindProvider;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
@@ -27,10 +29,13 @@ import java.math.BigDecimal;
 @Value.Immutable
 @JsonSerialize(as = ImmutableCost.class)
 @JsonDeserialize(as = ImmutableCost.class)
-public abstract class Cost {
+public abstract class Cost implements EntityKindProvider {
 
     public abstract BigDecimal amount();
     public abstract String costKind();
     public abstract int year();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.ASSET_COST; }
 
 }

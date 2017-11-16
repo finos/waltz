@@ -27,6 +27,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableActor.class)
 @JsonDeserialize(as = ImmutableActor.class)
 public abstract class Actor implements
+        EntityKindProvider,
         IdProvider,
         NameProvider,
         DescriptionProvider,
@@ -34,6 +35,9 @@ public abstract class Actor implements
         WaltzEntity {
 
     public abstract boolean isExternal();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.ACTOR; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
