@@ -2,7 +2,7 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.changeInitiative.name }}"
                        icon="paper-plane-o"
-                       small="{{ ctrl.changeInitiative.kind | toDisplayName:'changeInitiative' }}">
+                       small="{{ ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative' }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Change Initiative</li>
@@ -39,7 +39,7 @@
                             Type
                         </div>
                         <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.kind | toDisplayName:'changeInitiative'"></span>
+                            <span ng-bind="ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative'"></span>
                         </div>
 
                         <div class="col-sm-2 waltz-display-field-label">
