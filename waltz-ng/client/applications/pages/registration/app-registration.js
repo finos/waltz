@@ -52,7 +52,7 @@ const controller = function(applicationStore,
 
     const model = {
         lifecyclePhase: 'PRODUCTION',
-        kind: 'IN_HOUSE'
+        applicationKind: 'IN_HOUSE'
     };
 
 
@@ -80,7 +80,7 @@ const controller = function(applicationStore,
         const onSuccess = (result) => {
             notification.success('New Application registered');
             const { registered, message, id, originalRequest } = result;
-            const { name, organisationalUnitId, kind, lifecyclePhase } = originalRequest;
+            const { name, organisationalUnitId, applicationKind, lifecyclePhase } = originalRequest;
 
             registrations.push({
                 success: registered,
@@ -88,7 +88,7 @@ const controller = function(applicationStore,
                 app: {
                     id,
                     name,
-                    kind,
+                    applicationKind,
                     lifecyclePhase,
                     organisationalUnit: _.find(allOrgUnits, {id: organisationalUnitId})
                 }

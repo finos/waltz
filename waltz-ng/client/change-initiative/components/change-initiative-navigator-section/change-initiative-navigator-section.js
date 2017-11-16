@@ -90,7 +90,7 @@ const initialState = {
 
 function enrichChangeInitiative(ci) {
     const extensions = {
-        kindName: changeInitiativeNames[ci.kind],
+        kindName: changeInitiativeNames[ci.changeInitiativeKind],
         lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase]
     };
 

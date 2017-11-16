@@ -71,14 +71,14 @@ public class AssetCostGenerator {
                             .cost(ImmutableCost.builder()
                                     .amount(generateAmount(mean))
                                     .year(year)
-                                    .kind(kind)
+                                    .costKind(kind)
                                     .build())
                             .build())
                     .map(c -> {
                         AssetCostRecord record = new AssetCostRecord();
                         record.setAssetCode(c.assetCode());
                         record.setAmount(c.cost().amount());
-                        record.setKind(c.cost().kind());
+                        record.setKind(c.cost().costKind());
                         record.setYear(c.cost().year());
                         return record;
                     })

@@ -58,7 +58,7 @@ public class BookmarkDao {
                 .description(Optional.ofNullable(record.getDescription()))
                 .title(Optional.ofNullable(record.getTitle()))
                 .url(Optional.ofNullable(record.getUrl()))
-                .kind(record.getKind())
+                .bookmarkKind(record.getKind())
                 .isPrimary(record.getIsPrimary())
                 .isRequired(record.getIsRequired())
                 .provenance(record.getProvenance())
@@ -114,7 +114,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
                 .set(BOOKMARK.URL, bookmark.url().orElse(null))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(null))
-                .set(BOOKMARK.KIND, bookmark.kind())
+                .set(BOOKMARK.KIND, bookmark.bookmarkKind())
                 .set(BOOKMARK.PARENT_ID, bookmark.parent().id())
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
@@ -138,7 +138,7 @@ public class BookmarkDao {
         checkNotEmpty(username, "username cannot be empty");
 
         int rc = dsl.update(BOOKMARK)
-                .set(BOOKMARK.KIND, bookmark.kind())
+                .set(BOOKMARK.KIND, bookmark.bookmarkKind())
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))

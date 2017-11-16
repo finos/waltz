@@ -35,7 +35,7 @@ const initialState = {
 function filterBookmarks(bookmarks = [], kind = null) {
     if (_.isEmpty(bookmarks)) return [];
 
-    const byKind = _.groupBy(bookmarks, 'kind');
+    const byKind = _.groupBy(bookmarks, 'bookmarkKind');
 
     const groupsToShow = kind
         ? { kind : byKind[kind] }

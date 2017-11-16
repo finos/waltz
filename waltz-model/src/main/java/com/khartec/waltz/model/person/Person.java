@@ -28,12 +28,15 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePerson.class)
 @JsonDeserialize(as = ImmutablePerson.class)
-public abstract class Person implements IdProvider, WaltzEntity {
+public abstract class Person implements
+        EntityKindProvider,
+        IdProvider,
+        WaltzEntity {
 
     public abstract String employeeId();
     public abstract String displayName();
     public abstract String email();
-    public abstract PersonKind kind();
+    public abstract PersonKind personKind();
     public abstract Optional<String> title();
     public abstract Optional<String> mobilePhone();
     public abstract Optional<String> officePhone();
@@ -46,6 +49,9 @@ public abstract class Person implements IdProvider, WaltzEntity {
     public String userId() { //TODO change as part of 247
         return email();
     }
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.PERSON; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

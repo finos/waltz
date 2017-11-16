@@ -28,6 +28,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableDataType.class)
 @JsonDeserialize(as = ImmutableDataType.class)
 public abstract class DataType implements
+        EntityKindProvider,
         NameProvider,
         DescriptionProvider,
         CodeProvider,
@@ -38,6 +39,9 @@ public abstract class DataType implements
     public boolean concrete() {
         return true;
     }
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.DATA_TYPE; }
 
     @Value.Default
     public boolean unknown() { return false; }

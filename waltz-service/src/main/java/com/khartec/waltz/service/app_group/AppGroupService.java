@@ -231,7 +231,7 @@ public class AppGroupService {
         long groupId = appGroupDao.insert(ImmutableAppGroup.builder()
                 .description("New group created by: " + userId)
                 .name("New group created by: "+userId)
-                .kind(AppGroupKind.PRIVATE)
+                .appGroupKind(AppGroupKind.PRIVATE)
                 .build());
 
         appGroupMemberDao.register(groupId, userId, AppGroupMemberRole.OWNER);
