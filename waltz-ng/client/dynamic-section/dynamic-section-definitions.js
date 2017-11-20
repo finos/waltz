@@ -273,6 +273,7 @@ export const dynamicSectionsByKind = {
     'PERSON': [
         dynamicSections.personHierarchySection,
         dynamicSections.personAppsSection,
+        dynamicSections.bookmarksSection,
         dynamicSections.changeInitiativeSection,
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.authSourcesSection,

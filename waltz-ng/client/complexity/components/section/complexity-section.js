@@ -29,14 +29,16 @@ const bindings = {
 
 
 const initialState = {
-    summarySelection: null,
+    csvName: 'complexity.csv',
     gridData: [],
     gridDataCount: 0,
+    staticPanels: null,
+    summarySelection: null,
     visibility: {
         summary: true,
         detail: false
     },
-    csvName: 'complexity.csv',
+
     exportGrid: () => {}
 };
 
@@ -54,6 +56,14 @@ function mkGridData(complexity = [], apps = []) {
 function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.StaticPanelStore.findByGroup,
+                [ 'SECTION.COMPLEXITY.ABOUT' ])
+            .then(rs => vm.staticPanels = rs.data);
+    };
 
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;

@@ -174,12 +174,12 @@ export const AppGroupStore_API = {
     subscribe: {
         serviceName,
         serviceFnName: 'subscribe',
-        description: 'executes subscribe'
+        description: 'executes subscribe (params: id)'
     },
     unsubscribe: {
         serviceName,
         serviceFnName: 'unsubscribe',
-        description: 'executes unsubscribe'
+        description: 'executes unsubscribe (params: id)'
     },
     addOwner: {
         serviceName,

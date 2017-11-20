@@ -38,12 +38,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jndi.JndiPropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.sql.DataSource;
 
 
 @Configuration
 @EnableMBeanExport(defaultDomain = "${database.schema}_${database.user}_${database.schemata:schema}") // TODO: replace
+@EnableScheduling
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
