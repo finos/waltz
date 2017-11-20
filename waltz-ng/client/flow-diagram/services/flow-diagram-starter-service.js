@@ -200,7 +200,9 @@ export function service($q, serviceBroker) {
                 return mkForPhysSpec(entityRef);
             default:
                 console.warn("Don't know how to create starter flow diagram commands for entity ref", entityRef);
-                return [];
+                return Promise.resolve([
+                    { command: 'SET_TITLE', payload: `${entityRef.name} flows` }
+                ]);
         }
     };
 

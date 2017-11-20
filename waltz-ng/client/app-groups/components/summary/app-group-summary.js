@@ -31,13 +31,37 @@ const bindings = {
 
 
 const initialState = {
-
+    editable: false,
+    isSubscribed: false,
 };
+
+
+function determineSubscriptionStatus(isOwner = false, isSubscriber = false) {
+    if (isOwner) {
+        // we don't want owners to 'abandon' their app groups
+        return 'NOT_APPLICABLE';
+    } else {
+        return isSubscriber ? 'SUBSCRIBED' : 'UNSUBSCRIBED';
+    }
+}
 
 
 function controller($q, serviceBroker, userService) {
 
     const vm = initialiseData(this, initialState);
+
+    const reloadPermissionsEtc = () => {
+        const containsCurrentUser = (otherUsers) => _
+            .chain(otherUsers)
+            .map('userId')
+            .includes(vm.user.userName)
+            .value();
+
+        const isOwner = containsCurrentUser(vm.owners);
+        const isSubscriber = containsCurrentUser(vm.members);
+        vm.subscriptionStatus = determineSubscriptionStatus(isOwner, isSubscriber);
+        vm.editable = isOwner;
+    };
 
     vm.$onInit = () => {
         const selector = mkSelectionOptions(vm.parentEntityRef);
@@ -57,11 +81,9 @@ function controller($q, serviceBroker, userService) {
             });
 
         $q.all([userPromise, groupPromise])
-            .then(() => vm.editable = _
-                .chain(vm.owners)
-                .map('userId')
-                .includes(vm.user.userName)
-                .value());
+            .then(() => {
+                reloadPermissionsEtc();
+            });
 
         serviceBroker
             .loadViewData(
@@ -92,6 +114,22 @@ function controller($q, serviceBroker, userService) {
                 CORE_API.TechnologyStatisticsService.findBySelector,
                 [ selector ])
             .then(r => vm.enrichedServerStats = enrichServerStats(r.data.serverStats));
+
+        vm.onSubscribe = () => {
+            serviceBroker
+                .execute(
+                    CORE_API.AppGroupStore.subscribe,
+                    [vm.parentEntityRef.id])
+                .then(r => vm.subscriptionStatus = 'SUBSCRIBED');
+        };
+
+        vm.onUnsubscribe = () => {
+            serviceBroker
+                .execute(
+                    CORE_API.AppGroupStore.unsubscribe,
+                    [vm.parentEntityRef.id])
+                .then(() => vm.subscriptionStatus = 'UNSUBSCRIBED');
+        };
 
     };
 

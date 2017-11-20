@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {select} from 'd3-selection';
-import {pie, arc} from 'd3-shape';
+import { select } from 'd3-selection';
+import { pie, arc } from 'd3-shape';
+import { easeElasticOut } from 'd3-ease';
 import "d3-selection-multi";
 
 import _ from "lodash";
@@ -44,10 +45,46 @@ const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
 
 
 const DEFAULT_SIZE = 80;
+const FOCUS_DURATION = 1000;
+const BLUR_DURATION = 50;
+
+function mkPieArc(radius, focused = false) {
+    if(focused) {
+        return arc()
+            .outerRadius(radius - 10 + 3)
+            .innerRadius(radius / 2.5)
+            .padAngle(0.07)
+            .cornerRadius(0);
+    } else {
+        return arc()
+            .outerRadius(radius - 10)
+            .innerRadius(radius / 2.5)
+            .padAngle(0.07)
+            .cornerRadius(0);
+    }
+}
+
+const expandArc = (selection, radius) => {
+    const arcPath = select(selection);
+    const pieArc = mkPieArc(radius, true);
+    arcPath
+        .transition()
+        .ease(easeElasticOut.amplitude(2))
+        .duration(FOCUS_DURATION)
+        .attr("d", d => pieArc(d));
+};
+
+const unexpandArc = (selection, radius) => {
+    const arcPath = select(selection);
+    const pieArc = mkPieArc(radius, false);
+    arcPath
+        .transition()
+        .duration(BLUR_DURATION)
+        .attr("d", d => pieArc(d));
+};
 
 
 function renderArcs(holder, config, data, onSelect) {
-
     const {
         colorProvider,
         valueProvider = (d) => d.count,
@@ -57,12 +94,7 @@ function renderArcs(holder, config, data, onSelect) {
 
     const radius = size / 2;
 
-    const pieArc = arc()
-            .outerRadius(radius - 10)
-            .innerRadius(radius / 2.5)
-            .padAngle(0.07)
-            .cornerRadius(0)
-            ;
+    const pieArc = mkPieArc(radius, false);
 
     const pieLayout = pie()
         .value(valueProvider);
@@ -156,13 +188,17 @@ function controller($element, $scope) {
 
         if (changes.selectedSegmentKey) {
             svg.selectAll('.arc')
-                .classed('wp-selected', d => {
-                    return d.data.key === vm.selectedSegmentKey;
+                .classed('wp-selected', function(d) {
+                    const isSelected = d.data.key === vm.selectedSegmentKey;
+                    if(isSelected) {
+                        expandArc(this, vm.config.size / 2);
+                    } else {
+                        unexpandArc(this, vm.config.size / 2);
+                    }
+                    return isSelected;
                 });
         }
     };
-
-
 }
 
 

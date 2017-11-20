@@ -16,9 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 import template from './flow-diagrams-panel.html';
@@ -94,11 +92,10 @@ function controller(
         flowDiagramStateService
             .reset();
 
-        showEditableDiagram();
-
         flowDiagramStarterService
             .mkCommands(vm.parentEntityRef)
             .then(starterCommands => {
+                showEditableDiagram();
                 flowDiagramStateService.processCommands(starterCommands);
                 notification.warning("Flow diagrams are not automatically saved. Remember to save your work.")
             });

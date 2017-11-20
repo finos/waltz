@@ -49,7 +49,9 @@ public abstract class BaseDataExtractor {
         response.header("Content-disposition", "attachment; filename="+suggestedFilename);
 
         StringWriter bodyWriter = new StringWriter();
-        CsvListWriter csvWriter = new CsvListWriter(bodyWriter, CsvPreference.EXCEL_PREFERENCE);
+        CsvPreference csvPreference = CsvPreference.EXCEL_PREFERENCE;
+        CsvListWriter csvWriter = new CsvListWriter(bodyWriter, csvPreference);
+        csvWriter.write("sep=" + Character.toString((char) csvPreference.getDelimiterChar()));
 
         extractor.accept(csvWriter);
 
