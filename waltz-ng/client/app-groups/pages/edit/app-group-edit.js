@@ -143,11 +143,28 @@ function controller($q,
     };
 
     vm.saveApplications = (results) => {
-        const appIds = _.map(results, r => r.entityRef.id);
+        const appIdsToAdd = _.chain(results)
+            .filter(r => r.action === 'ADD')
+            .map(r => r.entityRef.id)
+            .value();
 
-        return appGroupStore.addApplications(id, appIds)
-            .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => notification.success(`Added ${appIds.length} applications`));
+        const appIdsToRemove = _.chain(results)
+            .filter(r => r.action === 'REMOVE')
+            .map(r => r.entityRef.id)
+            .value();
+
+
+        if(appIdsToAdd.length > 0) {
+            appGroupStore.addApplications(id, appIdsToAdd)
+                .then(apps => vm.applications = apps, e => handleError(e))
+                .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
+        }
+
+        if(appIdsToRemove.length > 0) {
+            appGroupStore.removeApplications(id, appIdsToRemove)
+                .then(apps => vm.applications = apps, e => handleError(e))
+                .then(() => notification.success(`Removed ${appIdsToRemove.length} applications`));
+        }
     };
 
     // add app via search
