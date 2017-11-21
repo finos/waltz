@@ -1,0 +1,190 @@
+<script type="text/ng-template" id="w-cell.html">
+    <div class="w-table"
+         ng-click="$ctrl.focusBoth(colDomainValue.id, yDomainValue.id)">
+        <div class="w-row">
+            <div class="w-cell">
+                <h5 ng-bind="colDomainValue.name"></h5>
+                <div ng-if="colDomainValue.mappings.direct.length > 0">
+                    <h5>Direct</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in colDomainValue.mappings.direct">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                                <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+
+                <div ng-if="colDomainValue.mappings.inherited.length > 0"
+                     class="small text-muted">
+                    <h5>Inherited</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in colDomainValue.mappings.inherited">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                            <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+
+                <div ng-if="colDomainValue.mappings.heirs.length > 0"
+                     class="small text-muted">
+                    <h5>Heirs</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in colDomainValue.mappings.heirs">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                            <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="w-cell">
+                <h5 ng-bind="rowDomainValue.name"></h5>
+
+                <div ng-if="rowDomainValue.mappings.direct.length > 0">
+                    <h5>Direct</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in rowDomainValue.mappings.direct">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                            <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div ng-if="rowDomainValue.mappings.inherited.length > 0" class="small text-muted">
+                    <h5>Inherited</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in rowDomainValue.mappings.inherited">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                            <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+
+                <div ng-if="yDomainValue.mappings.heirs.length > 0" class="small text-muted">
+                    <h5>Heirs</h5>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="ref in yDomainValue.mappings.heirs">
+                            <span ng-bind="ref.app.name"></span>
+                            (
+                            <span ng-bind="ref.app.id"></span>
+                            )
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script id="w-row.html" type="text/ng-template">
+    <div class="w-cell w-header-cell"
+         style="width: 15%;">
+        <span ng-if="rowDomainValue.children.length == 0">
+            <span ng-bind="rowDomainValue.name"></span>
+        </span>
+
+        <a class="clickable"
+           ng-click="$ctrl.focusRow(rowDomainValue.id)"
+           ng-if="rowDomainValue.children.length > 0">
+            <span ng-bind="rowDomainValue.name"></span>
+        </a>
+    </div>
+    <div class="w-cell"
+         ng-style="$ctrl.chart.cols.colStyle"
+         ng-repeat="colDomainValue in $ctrl.chart.cols.domain"
+         ng-include="'w-cell.html'">
+    </div>
+</script>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="w-table">
+            <div class="w-header">
+                <div class="w-row">
+                     <div class="w-cell w-header-cell"
+                          style="width: 15%;">
+                         Data <Type></Type>
+                     </div>
+                     <div class="w-cell w-header-cell"
+                          ng-style="$ctrl.chart.colStyle"
+                          ng-repeat="colDomainValue in $ctrl.chart.cols.domain">
+                         <span ng-if="colDomainValue.children.length == 0">
+                             <span ng-bind="colDomainValue.name"></span>
+                         </span>
+                         <a class="clickable"
+                            ng-click="$ctrl.focusCol(colDomainValue.id)"
+                            ng-if="colDomainValue.children.length > 0">
+                            <span ng-bind="colDomainValue.name"></span>
+                         </a>
+                     </div>
+                 </div>
+            </div>
+            <div class="w-body">
+                <div class="w-row"
+                     ng-repeat="rowDomainValue in $ctrl.chart.rows.domain"
+                     ng-include="'w-row.html'">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<hr>
+
+<div class="row">
+
+    <div class="col-md-6">
+        <div ng-if="$ctrl.chart.rows.active">
+            <label>EDM</label>z
+            <ul class="list-inline">
+                <li ng-if="$ctrl.chart.rows.active">
+                    <a ng-click="$ctrl.focusRow($ctrl.chart.rows.active.parentId)"
+                       class="clickable label label-info"
+                       ng-bind="$ctrl.chart.rows.active.name"></a>
+                </li>
+                <li ng-repeat="rowParent in $ctrl.chart.rows.parents">
+                    <a class="clickable label label-info"
+                       ng-click="$ctrl.focusRow(rowParent.parentId)"
+                       ng-bind="rowParent.name"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row col-md-6">
+        <div ng-if="$ctrl.chart.cols.active">
+            <label>Function</label>
+            <ul class="list-inline">
+                <li>
+                    <a ng-click="$ctrl.focusCol($ctrl.chart.cols.active.parentId)"
+                       class="clickable label label-info"
+                       ng-bind="$ctrl.chart.cols.active.name"></a>
+                </li>
+                <li ng-repeat="colParent in $ctrl.chart.cols.parents">
+                    <a class="clickable label label-info"
+                       ng-click="$ctrl.focusCol(colParent.parentId)"
+                       ng-bind="colParent.name"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

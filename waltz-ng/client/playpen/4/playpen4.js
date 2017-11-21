@@ -18,67 +18,22 @@
 import _ from 'lodash';
 import {CORE_API} from '../../common/services/core-api-utils';
 import {refToString} from '../../common/entity-utils';
+import {initialiseData} from "../../common/index";
 
 const initialState = {
-    // parentEntityRef: { kind: 'APPLICATION', id: /*25747*/ 25991 },
-    fooData: []
-
+    parentEntityRef: { kind: 'ORG_UNIT', id: 20 },
+    foo: 'baa'
 };
 
 
 
 function controller(serviceBroker, $stateParams) {
 
-    const vm = Object.assign(this, initialState);
+    const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        vm.parentEntityRef = { kind: $stateParams.kind, id: $stateParams.id };
-        const ref = vm.parentEntityRef;
-        const selector = {
-            entityReference: ref,
-            scope: 'EXACT'
-        };
-
-        // vm.addData();
-        // vm.addData();
-        // vm.addNoData();
-        // vm.addData();
-        // vm.addData();
-
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowStore.findByEntityReference,
-                [ref]);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, 'DATA_TYPE']);
     };
 
-
-    vm.addData = () => {
-        const more = {
-            DISCOURAGED: _.random(0, 30),
-            SECONDARY: _.random(0, 30),
-            PRIMARY: _.random(0, 30),
-            NO_OPINION: _.random(0, 30)
-        };
-        vm.fooData = _.concat(vm.fooData, [more])
-    };
-
-    vm.addNoData = () => {
-        const more = {
-            // DISCOURAGED: 0,
-            // SECONDARY: 0,
-            // PRIMARY: 0,
-            // NO_OPINION: 0
-        };
-        vm.fooData = _.concat(vm.fooData, [more])
-    };
 }
 
 
