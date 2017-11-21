@@ -304,7 +304,6 @@ function controller($element, $q, serviceBroker) {
                         .chain(vm.chart.cols.domain)
                         .flatMap(d => getApps(d.mappings))
                         .uniqBy('id')
-                        .tap(t => console.log('tap', t))
                         .value();
 
                     const applications = _.unionBy(rowApplications, colApplications, 'id');
@@ -327,7 +326,6 @@ function controller($element, $q, serviceBroker) {
 
         vm.focusBoth(null, null);
 
-        global.chart = vm.chart;
     };
 
 }

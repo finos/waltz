@@ -25,6 +25,7 @@ import * as NonAuthSourcesPanel from './components/non-auth-sources-panel/non-au
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
 import AuthSourcesNavigator from './components/navigator/auth-sources-navigator';
+import AuthSourcesNavigatorChart from './components/navigator-chart/auth-sources-navigator-chart';
 import * as TreePicker from './components/tree-picker/tree-picker';
 import {registerComponents, registerStore} from '../common/module-utils';
 
@@ -40,6 +41,7 @@ export default () => {
     registerComponents(module, [
         AuthSourceEditorPanel,
         AuthSourcesNavigator,
+        AuthSourcesNavigatorChart,
         AuthSourcesTable,
         AuthSourcesSection,
         AuthSourcesSummaryPanel,

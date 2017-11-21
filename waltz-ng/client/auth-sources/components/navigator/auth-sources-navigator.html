@@ -113,6 +113,17 @@
 
 <div class="row">
     <div class="col-md-12">
+        <waltz-auth-sources-navigator-chart chart="$ctrl.chart">
+        </waltz-auth-sources-navigator-chart>
+    </div>
+</div>
+
+<hr>
+<hr>
+<hr>
+
+<div class="row">
+    <div class="col-md-12">
         <div class="w-table">
             <div class="w-header">
                 <div class="w-row">
@@ -154,7 +165,7 @@
 
     <div class="col-md-6">
         <div ng-if="$ctrl.chart.rows.active">
-            <label>EDM</label>z
+            <label>EDM</label>
             <ul class="list-inline">
                 <li ng-if="$ctrl.chart.rows.active">
                     <a ng-click="$ctrl.focusRow($ctrl.chart.rows.active.parentId)"
