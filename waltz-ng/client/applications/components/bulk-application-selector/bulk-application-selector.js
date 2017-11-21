@@ -64,7 +64,6 @@ function determineAction(existingRef, searchedRef) {
     if (!searchedRef) return;
 
     if (!existingRef) {
-        // either add or searchedRef is null to so it's no action
         return 'ADD';
     } else if (sameRef(existingRef, searchedRef)) {
         return 'NO_CHANGE';
