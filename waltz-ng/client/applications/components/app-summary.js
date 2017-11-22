@@ -21,10 +21,11 @@ import {tallyBy} from "../../common/tally-utils";
 import {notEmpty} from "../../common";
 import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
 import {
-    criticalityDisplayNames,
-    lifecyclePhaseDisplayNames,
-    applicationKindDisplayNames
-} from "../../common/services/display-names";
+    criticality,
+    lifecyclePhase,
+    applicationKind,
+    getEnumName
+} from "../../common/services/enums";
 
 
 const bindings = {
@@ -47,9 +48,9 @@ const PIE_SIZE = 70;
 
 
 const defaultLabelProvider = (d) => d.key;
-const lifecycleLabelProvider = d => lifecyclePhaseDisplayNames[d.key] || d.key;
-const criticalityLabelProvider = d => d ? (criticalityDisplayNames[d.key] || d.key) : d;
-const applicationKindLabelProvider = d => applicationKindDisplayNames[d.key] || d.key;
+const lifecycleLabelProvider = d => getEnumName(lifecyclePhase, d.key);
+const criticalityLabelProvider = d => d ? getEnumName(criticality, d.key) : d;
+const applicationKindLabelProvider = d => getEnumName(applicationKind, d.key);
 
 const randomColorProvider = d => variableScale(d.data.key);
 const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);

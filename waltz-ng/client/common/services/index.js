@@ -17,44 +17,7 @@
  */
 import _ from "lodash";
 import BaseLookupService from "./BaseLookupService";
-import {
-    applicationKindDisplayNames,
-    applicationRatingNames,
-    attestationTypeDisplayNames,
-    capabilityRatingNames,
-    changeInitiativeNames,
-    criticalityDisplayNames,
-    dataFormatKindNames,
-    endOfLifeStatusNames,
-    entityNames,
-    entityStatisticCategoryDisplayNames,
-    frequencyKindNames,
-    investmentRatingNames,
-    issuanceDisplayNames,
-    lifecyclePhaseDisplayNames,
-    lifecycleStatusNames,
-    orgUnitKindNames,
-    physicalSpecDefinitionFieldTypeNames,
-    physicalSpecDefinitionTypeNames,
-    relationshipKindNames,
-    releaseLifecycleStatusNames,
-    rollupKindNames,
-    severityNames,
-    surveyInstanceStatusNames,
-    surveyQuestionFieldTypeNames,
-    surveyRunStatusNames,
-    transportKindNames,
-    usageKindDisplayNames
-} from "./display-names";
-import {
-    booleanTypeIconNames,
-    entityIconNames,
-    entityStatisticCategoryIconNames,
-    ragIconNames,
-    severityIconNames,
-    usageKindIconNames
-} from "./icon-names";
-
+import {enums} from "./enums"
 import preventNavigationService from './prevent-navigation-service';
 import serviceBroker from './service-broker';
 import {CORE_API} from './core-api-utils';
@@ -135,43 +98,12 @@ export default (module) => {
         .service('PreventNavigationService', preventNavigationService)
         .service('ServiceBroker', serviceBroker);
 
-    displayNameService
-        .register('applicationKind', applicationKindDisplayNames)
-        .register('applicationRating', applicationRatingNames)
-        .register('attestationType', attestationTypeDisplayNames)
-        .register('capabilityRating', capabilityRatingNames)
-        .register('changeInitiative', changeInitiativeNames)
-        .register('criticality', criticalityDisplayNames)
-        .register('dataFormatKind', dataFormatKindNames)
-        .register('endOfLifeStatus', endOfLifeStatusNames)
-        .register('entity', entityNames)
-        .register('entityStatistic', entityStatisticCategoryDisplayNames)
-        .register('frequencyKind', frequencyKindNames)
-        .register('investmentRating', investmentRatingNames)
-        .register('issuance', issuanceDisplayNames)
-        .register('lifecyclePhase', lifecyclePhaseDisplayNames)
-        .register('lifecycleStatus', lifecycleStatusNames)
-        .register('orgUnitKind', orgUnitKindNames)
-        .register('physicalSpecDefinitionFieldType', physicalSpecDefinitionFieldTypeNames)
-        .register('physicalSpecDefinitionType', physicalSpecDefinitionTypeNames)
-        .register('relationshipKind', relationshipKindNames)
-        .register('rollupKind', rollupKindNames)
-        .register('severity', severityNames)
-        .register('surveyInstanceStatus', surveyInstanceStatusNames)
-        .register('surveyRunStatus', surveyRunStatusNames)
-        .register('releaseLifecycleStatus', releaseLifecycleStatusNames)
-        .register('surveyQuestionFieldType', surveyQuestionFieldTypeNames)
-        .register('usageKind', usageKindDisplayNames)
-        .register('transportKind', transportKindNames);
-
-    iconNameService
-        .register('BOOLEAN', booleanTypeIconNames)
-        .register('entity', entityIconNames)
-        .register('entityStatistic', entityStatisticCategoryIconNames)
-        .register('severity', severityIconNames)
-        .register('rag', ragIconNames)
-        .register('usageKind', usageKindIconNames);
-
+    const keyFn = x => x.key;
+    _.each(enums, (xs, type) => {
+        displayNameService.register(type, toMap(xs, keyFn, x => x.name));
+        descriptionService.register(type, toMap(xs, keyFn, x => x.description));
+        iconNameService.register(type, toMap(xs, keyFn, x => x.icon));
+    });
 
     loadFromServer.$inject = [
         'InvolvementKindService',

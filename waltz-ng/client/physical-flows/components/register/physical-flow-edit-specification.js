@@ -19,7 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {toEntityRef} from '../../../common/entity-utils';
-import {toOptions, dataFormatKindNames} from "../../../common/services/display-names";
+import {toOptions, dataFormatKind} from "../../../common/services/enums";
 
 
 const bindings = {
@@ -49,7 +49,7 @@ const initialState = {
         canSubmit: false,
         message: null
     },
-    formatOptions: toOptions(dataFormatKindNames, true)
+    formatOptions: toOptions(dataFormatKind, true)
 };
 
 

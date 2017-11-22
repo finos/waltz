@@ -19,7 +19,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkLinkGridCell, kindToBaseState} from "../../../common/link-utils";
 import {mapToDisplayNames} from "../../application-utils";
-import {relationshipKindNames} from "../../../common/services/display-names";
+import {relationshipKind} from "../../../common/services/enums";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {sameRef} from "../../../common/entity-utils";
@@ -52,7 +52,7 @@ function mkGridData(relations = [], apps = []) {
     const appsById = _.keyBy(apps, 'id');
 
     return _.map(relations, r => ({
-        relationshipDisplay: relationshipKindNames[r.relationship],
+        relationshipDisplay: relationshipKind[r.relationship],
         app: appsById[r.entity.id]
     }));
 }
