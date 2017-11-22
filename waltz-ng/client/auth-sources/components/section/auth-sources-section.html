@@ -41,6 +41,7 @@
         <!-- AUTH SOURCES -->
         <uib-tab index="2"
                  heading="Authoritative Sources"
+                 ng-if="$ctrl.visibility.authSourcesList"
                  select="$ctrl.tabSelected('authSources', 2)">
             <div class="waltz-panel-content">
                 <waltz-auth-sources-table ng-if="$ctrl.authSources.length > 0"
