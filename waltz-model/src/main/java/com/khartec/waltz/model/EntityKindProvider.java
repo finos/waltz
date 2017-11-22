@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,25 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.flow_diagram;
+package com.khartec.waltz.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
-import org.immutables.value.Value;
+public interface EntityKindProvider {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableFlowDiagram.class)
-@JsonDeserialize(as = ImmutableFlowDiagram.class)
-public abstract class FlowDiagram implements
-        EntityKindProvider,
-        IdProvider,
-        NameProvider,
-        DescriptionProvider,
-        LastUpdatedProvider {
-
-    public abstract String layoutData();
-
-    @Value.Default
-    public EntityKind kind() { return EntityKind.FLOW_DIAGRAM; }
+    EntityKind kind();
 }

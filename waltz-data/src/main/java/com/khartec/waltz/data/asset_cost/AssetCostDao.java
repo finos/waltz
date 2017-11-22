@@ -52,7 +52,7 @@ public class AssetCostDao {
         return ImmutableCost.builder()
                 .amount(record.getAmount())
                 .year(record.getYear())
-                .kind(record.getKind())
+                .costKind(record.getKind())
                 .build();
     };
 

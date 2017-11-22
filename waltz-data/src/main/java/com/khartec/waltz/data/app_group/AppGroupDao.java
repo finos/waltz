@@ -48,7 +48,7 @@ public class AppGroupDao {
                 .name(record.getName())
                 .description(mkSafe(record.getDescription()))
                 .id(record.getId())
-                .kind(AppGroupKind.valueOf(record.getKind()))
+                .appGroupKind(AppGroupKind.valueOf(record.getKind()))
                 .build();
     };
 
@@ -142,7 +142,7 @@ public class AppGroupDao {
         return dsl.update(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
                 .set(APPLICATION_GROUP.NAME, appGroup.name())
-                .set(APPLICATION_GROUP.KIND, appGroup.kind().name())
+                .set(APPLICATION_GROUP.KIND, appGroup.appGroupKind().name())
                 .where(APPLICATION_GROUP.ID.eq(appGroup.id().get()))
                 .execute();
     }
@@ -151,7 +151,7 @@ public class AppGroupDao {
         return dsl.insertInto(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
                 .set(APPLICATION_GROUP.NAME, appGroup.name())
-                .set(APPLICATION_GROUP.KIND, appGroup.kind().name())
+                .set(APPLICATION_GROUP.KIND, appGroup.appGroupKind().name())
                 .returning(APPLICATION_GROUP.ID)
                 .fetchOne()
                 .getId();

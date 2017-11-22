@@ -17,6 +17,11 @@
  */
 import _ from "lodash";
 
+export const actionDisplayNames = {
+  ADD: 'Add',
+  REMOVE: 'Remove',
+  NO_CHANGE: 'No change'
+};
 
 export const applicationKindDisplayNames = {
     CUSTOMISED: 'Customised',

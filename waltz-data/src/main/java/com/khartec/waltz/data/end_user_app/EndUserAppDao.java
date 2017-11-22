@@ -48,7 +48,7 @@ public class EndUserAppDao {
                 .name(record.getName())
                 .description(mkSafe(record.getDescription()))
                 .externalId(ofNullable(record.getExternalId()))
-                .kind(record.getKind())
+                .applicationKind(record.getKind())
                 .id(record.getId())
                 .organisationalUnitId(record.getOrganisationalUnitId())
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))

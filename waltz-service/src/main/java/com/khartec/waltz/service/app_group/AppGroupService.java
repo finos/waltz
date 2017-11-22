@@ -207,6 +207,28 @@ public class AppGroupService {
     }
 
 
+    public List<EntityReference> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
+        verifyUserCanUpdateGroup(userId, groupId);
+
+        appGroupEntryDao.removeApplications(groupId, applicationIds);
+
+        List<Application> apps = applicationDao.findByIds(applicationIds);
+        List<ChangeLog> changeLogs = apps
+                .stream()
+                .map(app -> ImmutableChangeLog.builder()
+                        .message(String.format("Removed application %s from group", app.name()))
+                        .userId(userId)
+                        .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                        .childKind(EntityKind.APPLICATION)
+                        .operation(Operation.REMOVE)
+                        .build())
+                .collect(Collectors.toList());
+        changeLogService.write(changeLogs);
+
+        return appGroupEntryDao.getEntriesForGroup(groupId);
+    }
+
+
     public int addOwner(String userId, long groupId, String ownerId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         audit(groupId, userId, String.format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, Operation.ADD);
@@ -231,7 +253,7 @@ public class AppGroupService {
         long groupId = appGroupDao.insert(ImmutableAppGroup.builder()
                 .description("New group created by: " + userId)
                 .name("New group created by: "+userId)
-                .kind(AppGroupKind.PRIVATE)
+                .appGroupKind(AppGroupKind.PRIVATE)
                 .build());
 
         appGroupMemberDao.register(groupId, userId, AppGroupMemberRole.OWNER);
@@ -330,5 +352,4 @@ public class AppGroupService {
                 .operation(operation)
                 .build());
     }
-
 }

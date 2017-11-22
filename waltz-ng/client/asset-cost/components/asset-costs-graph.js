@@ -66,7 +66,7 @@ function processCosts(costs = []) {
     return _.chain(costs)
         .reduce((acc, x) => {
             const bucket = acc[x.application.id] || {total: 0, entityRef: x.application, costs: {}};
-            bucket.costs[x.cost.kind] = x.cost.amount;
+            bucket.costs[x.cost.costKind] = x.cost.amount;
             bucket.total += x.cost.amount;
 
             acc[x.application.id] = bucket;

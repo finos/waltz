@@ -32,6 +32,7 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutableApplication.class)
 @JsonDeserialize(as = ImmutableApplication.class)
 public abstract class Application implements
+        EntityKindProvider,
         IdProvider,
         IsRemovedProvider,
         NameProvider,
@@ -43,9 +44,13 @@ public abstract class Application implements
 
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();
-    public abstract ApplicationKind kind();
+    public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
+
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.APPLICATION; }
 
 
     @Value.Default

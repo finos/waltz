@@ -78,7 +78,7 @@ public class AppGenerator {
                     .name(animal)
                     .assetCode("wltz-0" + i)
                     .description("All about " + animal)
-                    .kind(randomPick(ApplicationKind.values()))
+                    .applicationKind(randomPick(ApplicationKind.values()))
                     .lifecyclePhase(phase)
                     .overallRating(randomPick(RagRating.R, RagRating.A, RagRating.A, RagRating.G, RagRating.G))
                     .organisationalUnitId(organisationalUnit.id().get())

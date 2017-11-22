@@ -28,6 +28,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableMeasurable.class)
 @JsonDeserialize(as = ImmutableMeasurable.class)
 public abstract class Measurable implements
+        EntityKindProvider,
         IdProvider,
         NameProvider,
         DescriptionProvider,
@@ -39,6 +40,9 @@ public abstract class Measurable implements
 
     public abstract long categoryId();
     public abstract boolean concrete();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.MEASURABLE; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
