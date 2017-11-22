@@ -75,8 +75,9 @@ public class AppGroupEndpoint implements Endpoint {
 
         String deleteGroupPath = idPath;
 
+        String applicationListPath = mkPath(idPath, "applications", "list");
+        String deleteApplicationListPath = mkPath(idPath, "applications", "list", "remove");
         String addApplicationPath = mkPath(idPath, "applications");
-        String addApplicationListPath = mkPath(idPath, "applications", "list");
         String removeApplicationPath = mkPath(idPath, "applications", ":applicationId");
         String updateGroupOverviewPath = idPath;
 
@@ -161,6 +162,14 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.removeApplication(getUsername(request), groupId, applicationId);
         };
 
+        ListRoute<EntityReference> removeApplicationListRoute = (request, response) -> {
+            long groupId = getId(request);
+            List<Long> applicationIds = readIdsFromBody(request);
+            LOG.info("Removing applications: {}, from group: {} ", applicationIds,  groupId);
+            String userId = getUsername(request);
+            return appGroupService.removeApplications(userId, groupId, applicationIds);
+        };
+
         DatumRoute<AppGroupDetail> updateGroupOverviewRoute = (request, response) -> {
             String userId = getUsername(request);
             AppGroup appGroup = readBody(request, AppGroup.class);
@@ -203,8 +212,9 @@ public class AppGroupEndpoint implements Endpoint {
         postForList(addOwnerPath, addOwnerRoute);
 
         postForList(addApplicationPath, addApplicationRoute);
-        postForList(addApplicationListPath, addApplicationListRoute);
+        postForList(applicationListPath, addApplicationListRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
+        postForList(deleteApplicationListPath, removeApplicationListRoute);
 
         postForList(addChangeInitiativePath, addChangeInitiativeRoute);
         deleteForList(removeChangeInitiativePath, removeChangeInitiativeRoute);

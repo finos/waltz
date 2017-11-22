@@ -18,6 +18,7 @@
 import _ from "lodash";
 import BaseLookupService from "./BaseLookupService";
 import {
+    actionDisplayNames,
     applicationKindDisplayNames,
     applicationRatingNames,
     attestationTypeDisplayNames,
@@ -136,6 +137,7 @@ export default (module) => {
         .service('ServiceBroker', serviceBroker);
 
     displayNameService
+        .register('action', actionDisplayNames)
         .register('applicationKind', applicationKindDisplayNames)
         .register('applicationRating', applicationRatingNames)
         .register('attestationType', attestationTypeDisplayNames)

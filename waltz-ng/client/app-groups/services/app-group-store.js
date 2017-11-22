@@ -81,6 +81,11 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const removeApplications = (groupId, applicationIds) => $http
+            .post(`${BASE}/id/${groupId}/applications/list/remove`, applicationIds)
+            .then(result => result.data);
+
+
     const addChangeInitiative = (groupId, changeInitiativeId) => $http
         .post(`${BASE}/id/${groupId}/change-initiatives`, changeInitiativeId)
         .then(result => result.data);
@@ -126,6 +131,7 @@ export function store($http, BaseApiUrl) {
         removeApplication,
 
         addApplications,
+        removeApplications,
 
         addChangeInitiative,
         removeChangeInitiative,
@@ -214,6 +220,11 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'addApplications',
         description: 'executes addApplications'
+    },
+    removeApplications: {
+        serviceName,
+        serviceFnName: 'removeApplications',
+        description: 'executes removeApplications'
     },
     addChangeInitiative: {
         serviceName,
