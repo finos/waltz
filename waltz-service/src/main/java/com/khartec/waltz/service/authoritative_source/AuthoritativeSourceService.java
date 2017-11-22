@@ -239,7 +239,7 @@ public class AuthoritativeSourceService {
         switch(parentRef.kind()) {
             case ORG_UNIT:
                 Select<Record1<Long>> ouSelector = organisationalUnitIdSelectorFactory.apply(
-                        mkOpts(parentRef, HierarchyQueryScope.CHILDREN));
+                        mkOpts(parentRef, HierarchyQueryScope.PARENTS));
                 customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(ouSelector);
                 break;
             case DATA_TYPE:
