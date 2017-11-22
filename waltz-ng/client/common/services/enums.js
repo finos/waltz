@@ -1,6 +1,31 @@
 import _ from "lodash";
 
 
+export const action = {
+    ADD: {
+        key: 'ADD',
+        name: 'Add',
+        icon: null,
+        description: null,
+        position: 1
+    },
+    REMOVE: {
+        key: 'REMOVE',
+        name: 'Remove',
+        icon: null,
+        description: null,
+        position: 1
+    },
+    NO_CHANGE: {
+        key: 'NO_CHANGE',
+        name: 'No change',
+        icon: null,
+        description: null,
+        position: 1
+    },
+};
+
+
 export const applicationKind = {
     CUSTOMISED: {
         key: 'CUSTOMISED',
@@ -1187,6 +1212,7 @@ export const issuance = {
 
 
 export const enums = {
+    action,
     applicationKind,
     applicationRating,
     attestationType,
