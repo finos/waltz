@@ -20,7 +20,7 @@ import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {sameRef} from '../../../common/entity-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
-import {entityNames} from '../../../common/services/display-names';
+import {entity, getEnumName} from '../../../common/services/enums';
 import {sanitizeRelationships} from '../../measurable-relationship-utils';
 
 import template from './related-measurables-panel.html';
@@ -66,7 +66,7 @@ function mkGridData(ref,
     const categoriesById = _.keyBy(categories, 'id');
 
     const toGenericCell = r => {
-        return Object.assign({}, r, { type: entityNames[r.kind] });
+        return Object.assign({}, r, { type: getEnumName(entity, r.kind) });
     };
 
     const toMeasurableCell = r => {

@@ -18,7 +18,7 @@
 
 import template from './editable-enum.html';
 import {initialiseData} from "../../common/index";
-import {toOptions} from "../../common/services/display-names";
+import {toOptions} from "../../common/services/enums";
 
 const bindings = {
     initialVal: "<",

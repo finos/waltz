@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
-import {endOfLifeStatusNames} from "../../common/services/display-names";
+import {endOfLifeStatus} from "../../common/services/enums";
 
 
 const bindings = {
@@ -61,7 +61,7 @@ const PIE_CONFIG = {
     endOfLifeStatus: {
         size: PIE_SIZE,
         colorProvider: (d) => variableScale(d.data.key),
-        labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
+        labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
     }
 };
 
