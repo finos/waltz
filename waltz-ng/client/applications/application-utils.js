@@ -16,19 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {
-    criticalityDisplayNames,
-    investmentRatingNames,
-    lifecyclePhaseDisplayNames,
-    applicationKindDisplayNames
-} from "../common/services/display-names";
+    criticality,
+    investmentRating,
+    lifecyclePhase,
+    applicationKind,
+    getEnumName
+} from "../common/services/enums"
 
 
 export function mapToDisplayNames(app) {
     return {
-        kindDisplay: applicationKindDisplayNames[app.applicationKind] || app.applicationKind,
-        overallRatingDisplay: investmentRatingNames[app.overallRating] || app.overallRating,
-        businessCriticalityDisplay: criticalityDisplayNames[app.businessCriticality] || app.businessCriticality,
-        riskRatingDisplay: criticalityDisplayNames[app.riskRating] || app.riskRating,
-        lifecyclePhaseDisplay: lifecyclePhaseDisplayNames[app.lifecyclePhase] || app.lifecyclePhase
+        kindDisplay: getEnumName(applicationKind, app.applicationKind),
+        overallRatingDisplay: getEnumName(investmentRating, app.overallRating),
+        businessCriticalityDisplay: getEnumName(criticality, app.businessCriticality),
+        riskRatingDisplay: getEnumName(criticality, app.riskRating),
+        lifecyclePhaseDisplay: getEnumName(lifecyclePhase, app.lifecyclePhase)
     }
 }

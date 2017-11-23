@@ -16,7 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applicationKindDisplayNames, lifecyclePhaseDisplayNames, toOptions} from "../../common/services/display-names";
+import {
+    applicationKind,
+    lifecyclePhase,
+    toOptions
+} from "../../common/services/enums";
+
 
 export const nameField = {
     type: 'input',
@@ -80,7 +85,7 @@ export const typeField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions(applicationKindDisplayNames),
+        options: toOptions(applicationKind),
         label: 'Type',
         placeholder: 'Type of application',
         required: true
@@ -94,7 +99,7 @@ export const lifecyclePhaseField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions(lifecyclePhaseDisplayNames),
+        options: toOptions(lifecyclePhase),
         label: 'Current Lifecycle Phase',
         placeholder: '',
         required: true

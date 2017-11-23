@@ -24,9 +24,10 @@ import { mkSelectionOptions } from "../../../common/selector-utils";
 import { buildHierarchies } from "../../../common/hierarchy-utils";
 
 import {
-    changeInitiativeNames,
-    lifecyclePhaseDisplayNames,
-} from "../../../common/services/display-names";
+    changeInitiative,
+    lifecyclePhase,
+    getEnumName
+} from "../../../common/services/enums";
 
 import template from './change-initiative-navigator-section.html';
 
@@ -90,8 +91,8 @@ const initialState = {
 
 function enrichChangeInitiative(ci) {
     const extensions = {
-        kindName: changeInitiativeNames[ci.changeInitiativeKind],
-        lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase]
+        kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
+        lifecyclePhaseName: getEnumName(lifecyclePhase, ci.lifecyclePhase)
     };
 
     return Object.assign({}, ci, extensions);

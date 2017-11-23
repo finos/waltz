@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {toOptions, frequencyKindNames, transportKindNames} from "../../common/services/display-names";
+import {toOptions, frequencyKind, transportKind} from "../../common/services/enums";
 
 
 export const transportField = {
@@ -25,7 +25,7 @@ export const transportField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions(transportKindNames, true),
+        options: toOptions(transportKind, true),
         label: 'Transport',
         placeholder: '',
         required: true
@@ -39,7 +39,7 @@ export const frequencyField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions(frequencyKindNames, true),
+        options: toOptions(frequencyKind, true),
         label: 'Frequency',
         placeholder: '',
         required: true
