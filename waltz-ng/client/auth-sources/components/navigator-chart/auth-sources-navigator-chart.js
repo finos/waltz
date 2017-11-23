@@ -52,6 +52,7 @@ const blockText = {
 };
 const colWidth = 32;
 const rowGroupPadding = 4;
+const minHeight = 350;
 
 const blockScaleX = scaleLinear().domain([0,32]).range([0, width]);
 
@@ -110,7 +111,7 @@ function calcTotalRequiredHeight(chartData) {
     const groupsPadding = chartData.rowGroups.length * rowGroupPadding;
 
     const total = top + groupsHeight + groupsPadding + margin.top + margin.bottom;
-    return total;
+    return _.max([total, minHeight]);
 }
 
 
@@ -363,6 +364,22 @@ function draw(navigator, chartData, svg, blockScaleX) {
 
     drawColHeaders(navigator, svg, chartData, colScale);
     drawRowGroups(navigator, svg, chartData, colScale);
+
+    const yHistory = svg.select('.yHistory')
+        .selectAll('text')
+        .data(chartData.rows.active ? [chartData.rows.active] : [], d => d.id);
+
+    yHistory.exit().remove();
+
+    yHistory
+        .enter()
+        .append('text')
+        .text(d => `Up to ${d.name}`)
+        .attr('text-anchor', 'end')
+        .attr('y', blockWidth)
+        .attr('dy', blockHeight)
+        .attr('transform', `rotate(270 0,${blockHeight}) `)
+        .on('click', d => navigator.focusRowGroup(d.parentId));
 }
 
 
