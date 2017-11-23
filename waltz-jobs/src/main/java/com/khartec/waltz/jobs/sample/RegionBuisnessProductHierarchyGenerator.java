@@ -42,8 +42,8 @@ import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static java.util.stream.Collectors.*;
 
-public class AuthSourceHierarchyGenerator {
-    private static final String AUTH_SOURCE_CATEGORY_EXTERNAL_ID = "AUTH_SOURCE";
+public class RegionBusinessProductHierarchyGenerator {
+    private static final String CATEGORY_EXTERNAL_ID = "REGION_BUSINESS_PRODUCT";
 
     private static String[] businesses = new String[]{
             "Asset Management",
@@ -60,16 +60,16 @@ public class AuthSourceHierarchyGenerator {
     }
 
     private static void generateHierarchy(DSLContext dsl) throws IOException {
-        System.out.println("Deleting existing auth source hierarchy ...");
+        System.out.println("Deleting existing  hierarchy ...");
         int deletedCount = dsl
                 .deleteFrom(MEASURABLE)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.in(DSL
                         .select(MEASURABLE_CATEGORY.ID)
                         .from(MEASURABLE_CATEGORY)
-                        .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(AUTH_SOURCE_CATEGORY_EXTERNAL_ID))))
+                        .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(CATEGORY_EXTERNAL_ID))))
                 .and(MEASURABLE.PROVENANCE.eq("demo"))
                 .execute();
-        System.out.println("Deleted: " + deletedCount + " existing auth source hierarchy");
+        System.out.println("Deleted: " + deletedCount + " existing hierarchy");
 
         Set<String> topLevelRegions = readRegions();
         Set<String> products = readProducts();
@@ -79,7 +79,7 @@ public class AuthSourceHierarchyGenerator {
         final long measurableCategoryId = dsl
                 .select(MEASURABLE_CATEGORY.ID)
                 .from(MEASURABLE_CATEGORY)
-                .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(AUTH_SOURCE_CATEGORY_EXTERNAL_ID))
+                .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(CATEGORY_EXTERNAL_ID))
                 .fetchAny()
                 .value1();
 
@@ -114,7 +114,7 @@ public class AuthSourceHierarchyGenerator {
             });
         });
 
-        System.out.println("Inserted: " + insertCount + " new nodes for auth source hierarchy");
+        System.out.println("Inserted: " + insertCount + " new nodes for hierarchy");
     }
 
 
@@ -170,14 +170,14 @@ public class AuthSourceHierarchyGenerator {
         Record1<Long> longRecord1 = dsl
                 .select(MEASURABLE_CATEGORY.ID)
                 .from(MEASURABLE_CATEGORY)
-                .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(AUTH_SOURCE_CATEGORY_EXTERNAL_ID))
+                .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(CATEGORY_EXTERNAL_ID))
                 .fetchAny();
 
         if(longRecord1 == null) {
             MeasurableCategoryRecord mcr = new MeasurableCategoryRecord();
-            mcr.setName("Auth Sources");
-            mcr.setDescription("Auth Source Hierarchy");
-            mcr.setExternalId(AUTH_SOURCE_CATEGORY_EXTERNAL_ID);
+            mcr.setName("Region Business Products");
+            mcr.setDescription("Region Business Products Hierarchy");
+            mcr.setExternalId(CATEGORY_EXTERNAL_ID);
             mcr.setRatingNameR("Poor");
             mcr.setRatingNameA("Adequate");
             mcr.setRatingNameG("Good");
