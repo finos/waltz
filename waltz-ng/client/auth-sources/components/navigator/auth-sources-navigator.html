@@ -1,6 +1,6 @@
 <script type="text/ng-template" id="w-cell.html">
     <div class="w-table"
-         ng-click="$ctrl.focusBoth(colDomainValue.id, yDomainValue.id)">
+         ng-click="$ctrl.focusBoth(colDomainValue.id, rowDomainValue.id)">
         <div class="w-row">
             <div class="w-cell">
                 <h5 ng-bind="colDomainValue.name"></h5>
@@ -113,12 +113,15 @@
 
 <div class="row">
     <div class="col-md-12">
-        <waltz-auth-sources-navigator-chart chart="$ctrl.chart">
+        <waltz-auth-sources-navigator-chart navigator="$ctrl.chartNavigator"
+                                            chart="$ctrl.chart">
         </waltz-auth-sources-navigator-chart>
     </div>
 </div>
 
 <hr>
+
+
 <hr>
 <hr>
 
@@ -160,42 +163,3 @@
 
 
 <hr>
-
-<div class="row">
-
-    <div class="col-md-6">
-        <div ng-if="$ctrl.chart.rows.active">
-            <label>EDM</label>
-            <ul class="list-inline">
-                <li ng-if="$ctrl.chart.rows.active">
-                    <a ng-click="$ctrl.focusRow($ctrl.chart.rows.active.parentId)"
-                       class="clickable label label-info"
-                       ng-bind="$ctrl.chart.rows.active.name"></a>
-                </li>
-                <li ng-repeat="rowParent in $ctrl.chart.rows.parents">
-                    <a class="clickable label label-info"
-                       ng-click="$ctrl.focusRow(rowParent.parentId)"
-                       ng-bind="rowParent.name"></a>
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="row col-md-6">
-        <div ng-if="$ctrl.chart.cols.active">
-            <label>Function</label>
-            <ul class="list-inline">
-                <li>
-                    <a ng-click="$ctrl.focusCol($ctrl.chart.cols.active.parentId)"
-                       class="clickable label label-info"
-                       ng-bind="$ctrl.chart.cols.active.name"></a>
-                </li>
-                <li ng-repeat="colParent in $ctrl.chart.cols.parents">
-                    <a class="clickable label label-info"
-                       ng-click="$ctrl.focusCol(colParent.parentId)"
-                       ng-bind="colParent.name"></a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-</div>

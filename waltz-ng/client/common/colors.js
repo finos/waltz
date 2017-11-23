@@ -224,7 +224,7 @@ const variableScaleMap = _.reduce(
     },
     {});
 
-const randomColorScale = scaleOrdinal(schemeCategory20c);
+export const randomColorScale = scaleOrdinal(schemeCategory20c);
 
 
 export const variableScale = (x = '') => {

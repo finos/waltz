@@ -16,7 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {buildHierarchies, getParents, groupHierarchyByKey, indexHierarchyByKey} from "../../common/hierarchy-utils";
+import {
+    buildHierarchies, getParents, groupHierarchyByKey,
+    indexHierarchyByKey
+} from "../../common/hierarchy-utils";
+
 
 /**
  * Given a set of mappings converts them into a standard format using
@@ -44,7 +48,6 @@ function normalizeMappings(mappings = [],
         })
         .value();
 }
-
 
 
 function populateRelated(hierarchyData) {
@@ -157,15 +160,158 @@ function prepareDataSet(allDomainEntities = [], mappings = []) {
     return hierarchyData;
 }
 
-class AuthSourceNavigatorUtil {
+
+
+function recalcDomain(dataSet, focusId) {
+    const potentialParents = _
+        .chain(dataSet.nodesByParent[focusId] || [])
+        .sortBy('name')
+        .map()
+        .value();
+
+    return potentialParents;
+}
+
+
+function focus(dataSet, id) {
+    const domain = recalcDomain(dataSet, id);
+    if (domain.length == 0) {
+        return;
+    } else {
+        const active = dataSet.nodesById[id];
+        return {
+            domain,
+            active,
+            parents: getParents(active),
+        };
+    }
+}
+
+
+function scoreMapping(app, directs = [], heirs = [], ancestors = []) {
+    if (_.includes(directs, app.id)) { return 'DIRECT'; }
+    else if (_.includes(heirs, app.id)) { return 'HEIR'; }
+    else if (_.includes(ancestors, app.id)) { return 'ANCESTOR'; }
+    else { return app.hasMappings ? 'NONE' : 'UNKNOWN'; }
+}
+
+
+function determineRating(colMappings, appId) {
+    const findRatings = rs => _
+        .chain(rs)
+        .filter(r => r.app.id === appId)
+        .map('rating')
+        .value();
+
+    const directRatings = findRatings(colMappings.direct, appId);
+    const heirRatings = findRatings(colMappings.heirs, appId);
+    const ancestorRatings = findRatings(colMappings.inherited, appId);
+
+    const ratings = _.concat(directRatings, heirRatings, ancestorRatings);
+    return _.head(ratings) || 'Z';
+}
+
+function calcRowGroups(chart) {
+
+    const rowGroups = _
+        .chain(chart.rows.domain)
+        .map(rowDomainValue => {
+            const getApps = mappings => _
+                .chain(mappings)
+                .values()
+                .flatten()
+                .map('app')
+                .value();
+
+            const rowApplications = getApps(rowDomainValue.mappings);
+            const colApplications = _
+                .chain(chart.cols.domain)
+                .flatMap(d => getApps(d.mappings))
+                .uniqBy('id')
+                .value();
+
+            const applications = _.unionBy(rowApplications, colApplications, 'id');
+
+            const directAppIds = _.map(rowDomainValue.mappings.direct, 'app.id');
+            const ancestorAppIds = _.map(rowDomainValue.mappings.inherited, 'app.id');
+            const heirAppIds = _.map(rowDomainValue.mappings.heirs, 'app.id');
+
+            const applicationsWithMappings = _
+                .chain(applications)
+                .sortBy('name')
+                .map(app => {
+                    const rowType = scoreMapping(app, directAppIds, heirAppIds, ancestorAppIds);
+                    if (rowType === 'NONE') {
+                        return null;
+                    }
+
+                    const mappings = _.map(chart.cols.domain, colDomainValue => {
+                        const colType = scoreMapping(
+                            app,
+                            _.map(colDomainValue.mappings.direct, 'app.id'),
+                            _.map(colDomainValue.mappings.heirs, 'app.id'),
+                            _.map(colDomainValue.mappings.inherited, 'app.id'));
+
+                        const rating = determineRating(colDomainValue.mappings, app.id);
+
+                        return {
+                            colId: colDomainValue.id,
+                            groupId: rowDomainValue.id,
+                            rowType,
+                            colType,
+                            rating
+                        };
+                    });
+                    return {
+                        app,
+                        mappings
+                    };
+                })
+                .compact()
+                .reject(row => _.every(row.mappings, m => m.colType === 'NONE'))
+                .compact()
+                .value();
+
+            return {
+                domain: rowDomainValue,
+                rows: applicationsWithMappings
+            };
+        })
+        .value();
+    return rowGroups;
+};
+
+
+function prepareMeasurableMappings(ratings, appsById) {
+    // only interested in ratings for the auth sources
+    const authRatings = _.filter(ratings, m => appsById[m.entityReference.id]);
+
+    return normalizeMappings(
+        authRatings,
+        m => m.measurableId,
+        m => appsById[m.entityReference.id],
+        m => m.rating);
+}
+
+export default class AuthSourcesNavigatorUtil {
 
     constructor(dataTypes = [],
                 measurables = [],
                 authSources = [],
-                ratings = [],
-                apps = []) {
+                ratings = []) {
 
         this.dataTypesByCode = _.keyBy(dataTypes, 'code');
+
+        const appIdsWithRatings = _.chain(ratings)
+            .map('entityReference.id')
+            .uniq()
+            .value();
+
+        const apps = _.map(authSources, authSource => {
+            const appRef = authSource.applicationReference;
+            return Object.assign({}, appRef, { hasMappings: _.includes(appIdsWithRatings, appRef.id) });
+        });
+
         this.appsById = _.keyBy(apps, 'id');
 
         const authSourceMappings = normalizeMappings(
@@ -173,17 +319,75 @@ class AuthSourceNavigatorUtil {
             m => this.dataTypesByCode[m.dataType].id,
             m => this.appsById[m.applicationReference.id],
             m => 'Z');
-        const measurableMappings = normalizeMappings(
+
+        const measurableMappings = prepareMeasurableMappings(
             ratings,
-            m => m.measurableId,
-            m => this.appsById[m.entityReference.id],
-            m => m.rating);
+            this.appsById);
 
         this.dataTypeDataSet = prepareDataSet(dataTypes, authSourceMappings);
         this.measurableDataSet = prepareDataSet(measurables, measurableMappings);
+
+        global.ds = this;
+
+        this.chart = {};
+
+        this.listeners = [];
     }
 
 
+    addListener(callback) {
+        this.listeners.push(callback);
+        callback(this.chart);
+    }
 
+
+    notifyListeners() {
+        _.each(this.listeners, cb => cb(this.chart));
+    }
+
+
+    focusRowGroup(id, recalc = true) {
+        const result = focus(this.dataTypeDataSet, id);
+        if (result) {
+            const chartDelta = {
+                rows: result
+            };
+            this.chart = Object.assign({}, this.chart, chartDelta);
+
+            if (recalc) this._recalcRowGroups();
+        }
+
+        return this.chart;
+    }
+
+
+    focusCol(id, recalc = true) {
+        const result = focus(this.measurableDataSet, id);
+        if (result) {
+            const numDomainValues = result.domain.length || 1;
+            const chartDelta = {
+                cols: result,
+                colStyle: { width: `${70 / numDomainValues}%` }
+            };
+            this.chart = Object.assign({}, this.chart, chartDelta);
+
+            if (recalc) this._recalcRowGroups();
+        }
+        return this.chart;
+    }
+
+
+    focusBoth(xId, yId) {
+        this.focusCol(xId, false);
+        this.focusRowGroup(yId, false);
+        this._recalcRowGroups();
+        return this.chart;
+    }
+
+
+    _recalcRowGroups() {
+        this.chart.rowGroups = calcRowGroups(this.chart);
+        this.notifyListeners();
+    }
 
 }
