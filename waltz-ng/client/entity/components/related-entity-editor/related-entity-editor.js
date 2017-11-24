@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {entityNames} from "../../../common/services/display-names";
+import {entity, getEnumName} from "../../../common/services/enums";
 
 
 const bindings = {
@@ -52,7 +52,7 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if(changes.targetEntityKind) {
-            vm.targetEntityDisplayName = _.toLower(entityNames[vm.targetEntityKind]) + "s";
+            vm.targetEntityDisplayName = _.toLower(getEnumName(entity, vm.targetEntityKind)) + "s";
         }
     };
 

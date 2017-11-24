@@ -18,7 +18,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
-import {entityIconNames} from '../../../common/services/icon-names'
+import {entity} from '../../../common/services/enums'
 
 
 /**
@@ -44,8 +44,8 @@ const transclude = {
 
 
 const initialState = {
-    actorIcon: entityIconNames.ACTOR,
-    applicationIcon: entityIconNames.APPLICATION,
+    actorIcon: entity.ACTOR.icon,
+    applicationIcon: entity.APPLICATION.icon,
     visibility: {
         addingApplication: true,
     }

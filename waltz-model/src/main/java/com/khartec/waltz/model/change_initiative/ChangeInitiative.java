@@ -32,6 +32,7 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutableChangeInitiative.class)
 @JsonDeserialize(as = ImmutableChangeInitiative.class)
 public abstract class ChangeInitiative implements
+        EntityKindProvider,
         ExternalIdProvider,
         ParentIdProvider,
         NameProvider,
@@ -41,13 +42,16 @@ public abstract class ChangeInitiative implements
         OrganisationalUnitIdProvider,
         WaltzEntity {
 
-    public abstract ChangeInitiativeKind kind();
+    public abstract ChangeInitiativeKind changeInitiativeKind();
     public abstract LifecyclePhase lifecyclePhase();
 
     public abstract Optional<Date> lastUpdate();
 
     public abstract Date startDate();
     public abstract Date endDate();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.CHANGE_INITIATIVE; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

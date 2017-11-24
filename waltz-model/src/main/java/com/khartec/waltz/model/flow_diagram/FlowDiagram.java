@@ -20,20 +20,21 @@ package com.khartec.waltz.model.flow_diagram;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableFlowDiagram.class)
 @JsonDeserialize(as = ImmutableFlowDiagram.class)
 public abstract class FlowDiagram implements
+        EntityKindProvider,
         IdProvider,
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider {
 
     public abstract String layoutData();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.FLOW_DIAGRAM; }
 }

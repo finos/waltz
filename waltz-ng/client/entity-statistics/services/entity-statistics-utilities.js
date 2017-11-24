@@ -33,6 +33,7 @@ function filterBySameMeasurableCategory(all, id) {
 
 
 function utils(appGroupStore,
+               changeInitiativeStore,
                flowDiagramStore,
                measurableStore,
                orgUnitStore) {
@@ -54,6 +55,10 @@ function utils(appGroupStore,
                 return flowDiagramStore
                     .getById(id)
                     .then(fd => [fd]);
+            case 'CHANGE_INITIATIVE':
+                return changeInitiativeStore
+                    .getById(id)
+                    .then(ci => [ci]);
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;
         }
@@ -67,6 +72,7 @@ function utils(appGroupStore,
 
 utils.$inject = [
     'AppGroupStore',
+    'ChangeInitiativeStore',
     'FlowDiagramStore',
     'MeasurableStore',
     'OrgUnitStore'

@@ -20,20 +20,28 @@ import _ from "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { initialiseData } from "../../../common";
 import { invokeFunction } from "../../../common/index";
-import { toEntityRef } from '../../../common/entity-utils';
+import { sameRef, toEntityRef } from '../../../common/entity-utils';
 
 import template from "./bulk-application-selector.html";
 
 
 const bindings = {
+    existingRefs: '<',
     onSave: '<'
 };
 
+const MODES = {
+    ADD: 'ADD',
+    REPLACE: 'REPLACE'
+};
 
 const initialState = {
     bulkEntriesString: '',
+    existingRefs: [],
     searchResults: [],
     filteredSearchResults: [],
+    mode: 'ADD', //ADD | REPLACE
+    removedResults: [],
     searchSummary: {},
     showNotFoundOnly: false,
     visibility: {
@@ -52,36 +60,47 @@ function mkSummary(searchResults = []) {
 }
 
 
-function findMatchedApps(apps = [], identifiers = []) {
-    const appsByAssetCode = _.keyBy(apps, 'assetCode');
+function determineAction(existingRef, searchedRef) {
+    if (!searchedRef) return;
 
-    return _.chain(identifiers)
+    if (!existingRef) {
+        return 'ADD';
+    } else if (sameRef(existingRef, searchedRef)) {
+        return 'NO_CHANGE';
+    }
+}
+
+
+function findMatchedApps(apps = [], identifiers = [], existingRefs = []) {
+    const appsByAssetCode = _.keyBy(apps, 'assetCode');
+    const existingRefsById = _.keyBy(existingRefs, 'id');
+
+    const newAndExistingApps = _.chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier];
+            const entityRef = app ? toEntityRef(app, 'APPLICATION') : null;
+
             return {
                 identifier,
-                entityRef: app ? toEntityRef(app, 'APPLICATION') : null
+                entityRef,
+                action: entityRef ? determineAction(existingRefsById[entityRef.id], entityRef) : null
             };
         })
         .value();
+
+    return newAndExistingApps;
 }
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.options = {
-        entityKinds: ['APPLICATION'],
-        limit: 1
-    };
-
-
     const searchRefs = (identifiers) => {
         return serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findAll)
             .then(r => {
                 const allApps = r.data;
-                return findMatchedApps(allApps, identifiers);
+                return findMatchedApps(allApps, identifiers, vm.existingRefs);
             });
     };
 
@@ -103,19 +122,31 @@ function controller(serviceBroker) {
 
         return searchRefs(identifiers)
             .then(results => {
-                vm.searchResults = results;
+                vm.searchResults = results
                 vm.filteredSearchResults = filterResults();
                 vm.visibility.loading = false;
                 vm.searchSummary = mkSummary(vm.searchResults);
+
+                const resultsById = _.keyBy(results, 'entityRef.id');
+                vm.removedResults = _.chain(vm.existingRefs)
+                    .filter(r => !resultsById[r.id])
+                    .map(entityRef => ({entityRef, action: 'REMOVE'}))
+                    .value();
             });
     };
 
-    vm.save = () => invokeFunction(vm.onSave, vm.searchResults);
+    vm.save = () => {
+        let selectionResults = _.filter(vm.searchResults, r => r.action === 'ADD');
+        if(vm.mode === MODES.REPLACE) {
+            selectionResults = _.concat(selectionResults, vm.removedResults);
+        }
+        invokeFunction(vm.onSave, selectionResults);
+    };
 
     vm.toggleNotFound = () => {
         vm.showNotFoundOnly = !vm.showNotFoundOnly;
         vm.filteredSearchResults = filterResults();
-    }
+    };
 }
 
 

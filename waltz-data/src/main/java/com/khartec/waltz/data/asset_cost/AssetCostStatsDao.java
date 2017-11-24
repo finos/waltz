@@ -102,7 +102,7 @@ public class AssetCostStatsDao {
                 .where(optionsCondition)
                 .fetchOne(r -> ImmutableCost.builder()
                         .amount(r.value1())
-                        .kind(COST_KIND_TOTAL)
+                        .costKind(COST_KIND_TOTAL)
                         .year(year)
                         .build());
     }

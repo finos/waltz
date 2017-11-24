@@ -18,7 +18,7 @@
 
 import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
-import {endOfLifeStatusNames} from "../../common/services/display-names";
+import {endOfLifeStatus} from "../../common/services/enums";
 
 
 const bindings = {
@@ -34,7 +34,7 @@ const PIE_SIZE = 70;
 const EOL_STATUS_CONFIG = {
     size: PIE_SIZE,
     colorProvider: (d) => variableScale(d.data.key),
-    labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
+    labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
 };
 
 

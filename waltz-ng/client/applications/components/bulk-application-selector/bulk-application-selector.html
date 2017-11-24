@@ -56,7 +56,8 @@
                 <thead>
                     <tr>
                         <th>Identifier</th>
-                        <th>Result</th>
+                        <th>Application</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,6 +65,7 @@
                         ng-class="{
                                     'text-danger': !result.entityRef,
                                     'bg-danger': !result.entityRef,
+                                    'bg-warning': result.action === 'ADD',
                                   }">
                         <td>
                             <span ng-bind="result.identifier">
@@ -78,10 +80,53 @@
                                 Not found
                             </span>
                         </td>
+                        <td>
+                            <span ng-bind="result.action | toDisplayName:'action'"></span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
 
+        </div>
+
+
+        <div ng-if="$ctrl.mode === 'REPLACE'"
+             class="waltz-fade-if">
+            <br>
+
+            The following applications are not in the replacement list of identifiers and will be removed
+            from this Application Group if you select 'Replace'.
+
+            <div ng-if="$ctrl.removedResults.length === 0"
+                 class="text-warning">
+                No applications will be removed.
+            </div>
+
+            <div ng-if="$ctrl.removedResults.length > 0"
+                 ng-class="{'waltz-scroll-region-250': $ctrl.removedResults.length > 15 }">
+
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Application</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="result in $ctrl.removedResults"
+                        class="bg-warning">
+                        <td>
+                            <waltz-entity-link entity-ref="result.entityRef">
+                            </waltz-entity-link>
+                        </td>
+                        <td>
+                            <span ng-bind="result.action | toDisplayName:'action'"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
         </div>
 
     </div>
@@ -89,24 +134,47 @@
 
     <div ng-if="!$ctrl.visibility.loading"
          style="padding-top: 5px"
-         class="pull-right">
-        <button ng-if="$ctrl.visibility.editor"
-                class="btn btn-xs btn-primary"
-                ng-click="$ctrl.resolve()">
-            Search
-        </button>
+         >
 
-        <button ng-if="!$ctrl.visibility.editor"
-                class="btn btn-xs btn-success"
-                ng-click="$ctrl.save()"
-                ng-disabled="$ctrl.searchSummary.notFound">
-            Save
-        </button>
-        <a ng-if="!$ctrl.visibility.editor"
-           class="clickable"
-           ng-click="$ctrl.visibility.editor = true">
-            Back
-        </a>
+        <span class="pull-left"
+              ng-if="! $ctrl.visibility.editor">
+            Mode: &nbsp;
+            <span uib-tooltip="Only add new applications">
+                <input type="radio"
+                       name="mode"
+                       value="ADD"
+                       ng-model="$ctrl.mode"
+                       ng-change="$ctrl.modeChange($ctrl.mode)"> Add only
+            </span>
+            &nbsp;
+            <span uib-tooltip="Replace existing applications, i.e. add new ones and remove those not in the new list">
+                <input type="radio"
+                       name="mode"
+                       value="REPLACE"
+                       ng-model="$ctrl.mode"
+                       ng-change="$ctrl.modeChange($ctrl.mode)"> Replace
+            </span>
+        </span>
+
+        <span class="pull-right">
+            <button ng-if="$ctrl.visibility.editor"
+                    class="btn btn-xs btn-primary"
+                    ng-click="$ctrl.resolve()">
+                Search
+            </button>
+
+            <button ng-if="!$ctrl.visibility.editor"
+                    class="btn btn-xs btn-success"
+                    ng-click="$ctrl.save()"
+                    ng-disabled="$ctrl.searchSummary.notFound">
+                Save
+            </button>
+            <a ng-if="!$ctrl.visibility.editor"
+               class="clickable"
+               ng-click="$ctrl.visibility.editor = true">
+                Back
+            </a>
+        </span>
     </div>
 
 </div>

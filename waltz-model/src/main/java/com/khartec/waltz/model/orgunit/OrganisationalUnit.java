@@ -29,12 +29,16 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutableOrganisationalUnit.class)
 @JsonDeserialize(as = ImmutableOrganisationalUnit.class)
 public abstract class OrganisationalUnit implements
+        EntityKindProvider,
         IdProvider,
         ParentIdProvider,
         NameProvider,
         DescriptionProvider,
         WaltzEntity {
 
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.ORG_UNIT; }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

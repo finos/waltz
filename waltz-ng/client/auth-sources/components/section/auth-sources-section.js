@@ -17,12 +17,8 @@
  */
 
 import template from './auth-sources-section.html';
-import _ from 'lodash';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {arc, pie} from "d3-shape";
-import {select} from "d3-selection";
-import {authoritativeRatingColorScale, authoritativeSourceColorScale} from "../../../common/colors";
 
 const bindings = {
     parentEntityRef: '<',
@@ -35,7 +31,8 @@ const initialState = {
     showNonAuthSources: true,
     visibility: {
         tab: 0,
-        sourceDataRatingsOverlay: false
+        sourceDataRatingsOverlay: false,
+        authSourcesList: false
     }
 };
 
@@ -71,6 +68,8 @@ function controller(serviceBroker) {
         vm.visibility.tab = vm.parentEntityRef.kind === 'DATA_TYPE'
             ? 1
             : 0;
+
+        vm.visibility.authSourcesList = (vm.parentEntityRef.kind === 'ORG_UNIT')
     };
 
     vm.tabSelected = (name, idx) => {

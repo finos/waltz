@@ -89,7 +89,7 @@ public class BookmarkService {
                 .message(String.format("%s bookmark: %s / %s",
                         verb,
                         bookmark.title().orElse("?"),
-                        bookmark.kind()))
+                        bookmark.bookmarkKind()))
                 .parentReference(bookmark.parent())
                 .userId(username)
                 .severity(Severity.INFORMATION)

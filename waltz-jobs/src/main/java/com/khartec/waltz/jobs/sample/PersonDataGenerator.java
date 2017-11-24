@@ -55,7 +55,7 @@ public class PersonDataGenerator {
 
         ImmutablePerson root = ImmutablePerson.builder()
                 .employeeId(person.getPassportNumber())
-                .kind(PersonKind.EMPLOYEE)
+                .personKind(PersonKind.EMPLOYEE)
                 .userPrincipalName(person.getUsername())
                 .title(randomPick(jobTitles[0]))
                 .departmentName("CEO")
@@ -99,7 +99,7 @@ public class PersonDataGenerator {
             ImmutablePerson p = ImmutablePerson.builder()
                     .managerEmployeeId(parent.employeeId())
                     .employeeId(person.getPassportNumber())
-                    .kind(PersonKind.EMPLOYEE)
+                    .personKind(PersonKind.EMPLOYEE)
                     .userPrincipalName(person.getUsername())
                     .title(jobTitle)
                     .departmentName(randomPick(departmentNames))

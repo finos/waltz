@@ -18,7 +18,7 @@
  */
 
 import {lifecyclePhaseColorScale} from "../../common/colors";
-import {lifecyclePhaseDisplayNames} from '../../common/services/display-names';
+import {lifecyclePhase} from '../../common/services/enums';
 import {toKeyCounts} from "../../common";
 
 
@@ -37,7 +37,7 @@ const DEFAULT_SIZE = 80;
 const config = {
     colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
     size: DEFAULT_SIZE,
-    labelProvider: d => lifecyclePhaseDisplayNames[d.key] || 'Unknown'
+    labelProvider: d => lifecyclePhase[d.key] ? lifecyclePhase[d.key].name : 'Unknown'
 };
 
 
