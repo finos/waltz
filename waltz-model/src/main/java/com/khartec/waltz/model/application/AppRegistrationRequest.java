@@ -36,7 +36,7 @@ public abstract class AppRegistrationRequest {
     public abstract String name();
     public abstract Optional<String> description();
     public abstract long organisationalUnitId();
-    public abstract ApplicationKind kind();
+    public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract Optional<String> assetCode();
     public abstract Optional<String> parentAssetCode();

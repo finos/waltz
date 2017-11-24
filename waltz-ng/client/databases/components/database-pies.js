@@ -18,7 +18,7 @@
 
 import {environmentColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts, notEmpty} from "../../common";
-import {endOfLifeStatusNames} from "../../common/services/display-names";
+import {endOfLifeStatus} from "../../common/services/enums";
 
 
 const bindings = {
@@ -62,7 +62,7 @@ function controller($scope) {
         endOfLifeStatus: {
             size: PIE_SIZE,
             colorProvider: (d) => variableScale(d.data.key),
-            labelProvider: (d) => endOfLifeStatusNames[d.key] || "Unknown"
+            labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
         }
     };
 

@@ -52,7 +52,7 @@ public class PersonDao {
                 .employeeId(record.getEmployeeId())
                 .displayName(record.getDisplayName())
                 .email(record.getEmail())
-                .kind(PersonKind.valueOf(record.getKind()))
+                .personKind(PersonKind.valueOf(record.getKind()))
                 .userPrincipalName(Optional.ofNullable(record.getUserPrincipalName()))
                 .departmentName(Optional.ofNullable(record.getDepartmentName()))
                 .managerEmployeeId(Optional.ofNullable(record.getManagerEmployeeId()))
@@ -143,7 +143,7 @@ public class PersonDao {
                     r.setDisplayName(p.displayName());
                     r.setEmployeeId(p.employeeId());
                     r.setEmail(p.email());
-                    r.setKind(p.kind().name());
+                    r.setKind(p.personKind().name());
                     r.setDepartmentName(p.departmentName().orElse(""));
                     r.setManagerEmployeeId(p.managerEmployeeId().orElse(""));
                     r.setTitle(p.title().orElse(""));

@@ -16,11 +16,11 @@
                     <col width="20%">
                 </colgroup>
 
-                <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'kind' ">
+                <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'bookmarkKind' ">
                 <tr ng-repeat="bookmark in bookmarksByKind.bookmarks"
                     class="waltz-visibility-parent">
                     <td style="vertical-align:middle; text-align: center; width: 10%">
-                        <waltz-icon name="{{ bookmark.kind | toIconName:'BookmarkKind' }}"
+                        <waltz-icon name="{{ bookmark.bookmarkKind | toIconName:'BookmarkKind' }}"
                                     size="lg">
                         </waltz-icon>
                     </td>

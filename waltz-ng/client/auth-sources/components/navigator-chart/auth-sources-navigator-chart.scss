@@ -1,0 +1,36 @@
+.waltz-auth-sources-navigator-chart {
+    border: 1px solid #fafafa;
+
+    text {
+        font-family: Arial;
+        font-size: x-small;
+    }
+
+    .wasnc-rowGroupHover {
+        .wasnc-appMapping {
+            stroke-width: 1.5;
+            cursor: pointer;
+        }
+        &.wasnc-rowGroup {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    }
+
+    .wasnc-history {
+        font-style: italic;
+        text-decoration: underline;
+    }
+
+    .wasnc-colHover {
+        &.wasnc-appMapping {
+            stroke-width: 1.5;
+            cursor: pointer;
+        }
+
+        &.wasnc-colHeader {
+            font-weight: bold;
+            cursor: pointer;
+        }
+    }
+}

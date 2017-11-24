@@ -3,13 +3,13 @@ import _ from 'lodash';
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from '../../../common';
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
 
 import template from './change-initiative-section.html';
 import {
-    changeInitiativeNames,
-    lifecyclePhaseDisplayNames,
-} from "../../../common/services/display-names";
+    changeInitiative,
+    lifecyclePhase,
+    getEnumName
+} from "../../../common/services/enums";
 
 
 const bindings = {
@@ -69,8 +69,8 @@ function controller(serviceBroker) {
                 const children = cisByParentId[ci.id] || [];
                 const icon = children.length > 0 ? 'sitemap' : 'fw';
                 const extensions = {
-                    kindName: changeInitiativeNames[ci.kind],
-                    lifecyclePhaseName: lifecyclePhaseDisplayNames[ci.lifecyclePhase],
+                    kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
+                    lifecyclePhaseName: getEnumName(lifecyclePhase, ci.lifecyclePhase),
                     icon,
                     parent: null,
                     children

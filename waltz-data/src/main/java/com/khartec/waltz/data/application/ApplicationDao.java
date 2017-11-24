@@ -60,7 +60,7 @@ public class ApplicationDao {
                 .id(appRecord.getId())
                 .isRemoved(appRecord.getIsRemoved())
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
-                .kind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
+                .applicationKind(readEnum(appRecord.getKind(), ApplicationKind.class, (s) -> ApplicationKind.IN_HOUSE))
                 .lifecyclePhase(readEnum(appRecord.getLifecyclePhase(), LifecyclePhase.class, (s) -> LifecyclePhase.DEVELOPMENT))
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
                 .businessCriticality(readEnum(appRecord.getBusinessCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
@@ -171,7 +171,7 @@ public class ApplicationDao {
         record.setAssetCode(request.assetCode().orElse(""));
         record.setParentAssetCode(request.parentAssetCode().orElse(""));
         record.setOrganisationalUnitId(request.organisationalUnitId());
-        record.setKind(request.kind().name());
+        record.setKind(request.applicationKind().name());
         record.setLifecyclePhase(request.lifecyclePhase().name());
         record.setOverallRating(request.overallRating().name());
         record.setUpdatedAt(Timestamp.from(Instant.now()));
@@ -216,7 +216,7 @@ public class ApplicationDao {
         record.setParentAssetCode(application.parentAssetCode().orElse(""));
         record.setOrganisationalUnitId(application.organisationalUnitId());
         record.setLifecyclePhase(application.lifecyclePhase().name());
-        record.setKind(application.kind().name());
+        record.setKind(application.applicationKind().name());
         record.setOverallRating(application.overallRating().name());
         record.setProvenance(application.provenance());
         record.setBusinessCriticality(application.businessCriticality().name());

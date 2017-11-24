@@ -42,12 +42,13 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 @Repository
 public class MeasurableRatingDao {
 
-    private static final RecordMapper<? super MeasurableRatingRecord, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
+    private static final RecordMapper<? super Record, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
         MeasurableRatingRecord r = record.into(MEASURABLE_RATING);
         return ImmutableMeasurableRating.builder()
                 .entityReference(EntityReference.mkRef(
@@ -128,6 +129,14 @@ public class MeasurableRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+    public Collection<MeasurableRating> findByCategory(long id) {
+        return dsl
+                .select(MEASURABLE_RATING.fields())
+                .from(MEASURABLE_RATING)
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(id))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 
     public boolean create(SaveMeasurableRatingCommand command) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
@@ -190,5 +199,6 @@ public class MeasurableRatingDao {
                         related.RATING)
                 .fetch(TO_TALLY_MAPPER);
     }
+
 
 }

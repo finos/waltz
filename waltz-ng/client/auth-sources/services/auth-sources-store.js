@@ -172,7 +172,7 @@ export const AuthSourcesStore_API = {
     findAuthSources: {
         serviceName,
         serviceFnName: 'findAuthSources',
-        description: 'findAuthSources'
+        description: 'findAuthSources (entityRef)'
     },
     cleanupOrphans: {
         serviceName,

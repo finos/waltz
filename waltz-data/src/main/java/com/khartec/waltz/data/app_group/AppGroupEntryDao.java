@@ -92,4 +92,12 @@ public class AppGroupEntryDao {
                 .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId))
                 .execute();
     }
+
+
+    public int removeApplications(long groupId, List<Long> applicationIds) {
+        return dsl.delete(APPLICATION_GROUP_ENTRY)
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds))
+                .execute();
+    }
 }

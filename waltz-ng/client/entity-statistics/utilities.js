@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {rollupKindNames} from "../common/services/display-names";
+import {rollupKind} from "../common/services/enums";
 import {notEmpty} from "../common";
 
 
@@ -64,7 +64,7 @@ function mkValueHeading(definition) {
     if (!definition) {
         return "";
     }
-    return rollupKindNames[definition.rollupKind] || '-';
+    return rollupKind[definition.rollupKind] ? rollupKind[definition.rollupKind].name : '-';
 }
 
 

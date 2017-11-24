@@ -20,7 +20,7 @@ import {enrichServerStats} from "../../../server-info/services/server-utilities"
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {refToString, sameRef} from '../../../common/entity-utils';
-import {entityNames} from '../../../common/services/display-names';
+import {entity, getEnumName} from '../../../common/services/enums';
 import template from './measurable-summary.html';
 import {initialiseData} from "../../../common/index";
 
@@ -73,7 +73,7 @@ function prepareRelationshipStats(stats = [], entityReference) {
         .uniqBy(refToString)
         .reject(r => sameRef(r, entityReference))
         .countBy(r => r.kind)
-        .map((v,k) => { return { kind: k, name: entityNames[k], count: v }})
+        .map((v,k) => { return { kind: k, name: getEnumName(entity, k), count: v }})
         .orderBy('name')
         .value();
 }

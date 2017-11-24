@@ -21,7 +21,7 @@ import {initialiseData} from '../../../common';
 import {downloadTextFile} from "../../../common/file-utils";
 import {sameRef} from '../../../common/entity-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
-import {entityNames, relationshipKindNames} from '../../../common/services/display-names';
+import {entity, relationshipKind, getEnumName} from '../../../common/services/enums';
 import {sanitizeRelationships} from '../../measurable-relationship-utils';
 
 import template from './related-measurables-panel.html';
@@ -35,6 +35,7 @@ import template from './related-measurables-panel.html';
  * If the user has 'CAPABILITY_EDITOR' role then edit facilities
  * are provided.
  */
+
 
 const bindings = {
     parentEntityRef: '<'
@@ -66,7 +67,7 @@ function mkGridData(ref,
     const categoriesById = _.keyBy(categories, 'id');
 
     const toGenericCell = r => {
-        return Object.assign({}, r, { type: entityNames[r.kind] });
+        return Object.assign({}, r, { type: getEnumName(entity, r.kind) });
     };
 
     const toMeasurableCell = r => {
@@ -128,14 +129,14 @@ function mkExportData(relationships = [], categories = [], measurables = []) {
     ]];
 
     const exportData = _.map(relationships, r => [
-            r.a.name,
-            getType(r.a.id, r.a.kind),
-            r.b.name,
-            getType(r.b.id, r.b.kind),
-            relationshipKindNames[r.relationship],
-            r.description,
-            r.lastUpdatedAt,
-            r.lastUpdatedBy
+        r.a.name,
+        getType(r.a.id, r.a.kind),
+        r.b.name,
+        getType(r.b.id, r.b.kind),
+        getEnumName(relationshipKind, r.relationship),
+        r.description,
+        r.lastUpdatedAt,
+        r.lastUpdatedBy
     ]);
 
     return columnNames.concat(exportData);

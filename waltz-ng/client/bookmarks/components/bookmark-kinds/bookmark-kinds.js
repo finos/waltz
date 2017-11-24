@@ -36,7 +36,7 @@ const initialState = {
 
 
 function createKinds(serviceBroker, bookmarks = []) {
-    const bookmarksByKind = _.groupBy(bookmarks, 'kind');
+    const bookmarksByKind = _.groupBy(bookmarks, 'bookmarkKind');
 
     return serviceBroker
         .loadAppData(CORE_API.EnumValueStore.findAll)

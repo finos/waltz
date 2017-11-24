@@ -1,0 +1,32 @@
+Name,kind
+ABS,PRODUCT
+Corporate,PRODUCT
+CDS,PRODUCT
+Loans,PRODUCT
+Muni,PRODUCT
+Sovereign,PRODUCT
+IR Swap,PRODUCT
+FRA,PRODUCT
+CapFloor,PRODUCT
+Cross Currency,PRODUCT
+Option,PRODUCT
+Forward,PRODUCT
+Exotic,PRODUCT
+Metals,PRODUCT
+Energy,PRODUCT
+Agricultural,PRODUCT
+Environmental,PRODUCT
+Freight,PRODUCT
+Multi Commodity Exotic,PRODUCT
+Spot,PRODUCT
+NDF,PRODUCT
+NDO,PRODUCT
+Forward,PRODUCT
+Vanilla Option,PRODUCT
+Simple Exotic,PRODUCT
+Complex Exotic,PRODUCT
+Swap,PRODUCT
+Portfolio Swap,PRODUCT
+Contract For Difference,PRODUCT
+Option,PRODUCT
+Forward,PRODUCT
