@@ -356,7 +356,6 @@ export default class AuthSourcesNavigatorUtil {
 
             if (recalc) this._recalcRowGroups();
         }
-
         return this.chart;
     }
 

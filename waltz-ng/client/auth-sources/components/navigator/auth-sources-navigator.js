@@ -23,10 +23,10 @@ import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import AuthSourcesNavigatorUtil from '../../services/auth-source-navigator-utils';
+import {AUTH_SOURCE_NAVIGATOR_CATEGORY_ID} from "../../../system/services/settings-names";
 
 const bindings = {
     parentEntityRef: '<',
-    measurableCategoryId: '<'
 };
 
 
@@ -34,41 +34,52 @@ const initialState = {
 };
 
 
-function controller($element, $timeout, serviceBroker) {
+function controller($element, $timeout, $q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = async () => {
-        console.log('vm', vm)
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+    const load = (categoryId) => {
 
-        const authSources = await serviceBroker
-            .loadViewData(CORE_API.AuthSourcesStore.findAuthSources, [ vm.parentEntityRef ])
-            .then(r => r.data);
-        const dataTypes = await serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => r.data);
-        const allMeasurables = await serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => _.filter(r.data, { categoryId: vm.measurableCategoryId }));
-        const allRatings = await serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findByCategory, [ vm.measurableCategoryId ])
-            .then(r => r.data);
+        const promises = [
+            serviceBroker
+                .loadViewData(CORE_API.AuthSourcesStore.findAuthSources, [ vm.parentEntityRef ])
+                .then(r => r.data),
+            serviceBroker
+                .loadAppData(CORE_API.DataTypeStore.findAll)
+                .then(r => r.data),
+            serviceBroker
+                .loadAppData(CORE_API.MeasurableStore.findAll)
+                .then(r => r.data),
+            serviceBroker
+                .loadViewData(CORE_API.MeasurableRatingStore.findByCategory, [ categoryId ])
+                .then(r => r.data)
+        ];
 
-        const navigator = new AuthSourcesNavigatorUtil(dataTypes, allMeasurables, authSources, allRatings);
-
-        vm.chartNavigator = navigator;
-
-        vm.focusBoth = (xId, yId) => {
-            vm.chart = navigator.focusBoth(xId, yId);
-        };
-
-        $timeout(() => vm.focusBoth(null, null));
+        $q.all(promises)
+            .then(([authSources, dataTypes, allMeasurables, allRatings]) => {
+                const measurables = _.filter(allMeasurables, { categoryId })
+                const navigator = new AuthSourcesNavigatorUtil(dataTypes, measurables, authSources, allRatings);
+                navigator.focusBoth(null, null);
+                vm.chartNavigator = navigator;
+            });
     };
 
+
+    vm.$onInit = () => {
+        settingsService
+            .findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
+            .then(categoryId => load(+categoryId))
+        ;
+    };
 }
 
 
-controller.$inject = ['$element', '$timeout', 'ServiceBroker'];
+controller.$inject = [
+    '$element',
+    '$timeout',
+    '$q',
+    'ServiceBroker',
+    'SettingsService'
+];
 
 
 const component = {

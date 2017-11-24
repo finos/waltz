@@ -64,7 +64,8 @@ const styles = {
     colHover: 'wasnc-colHover',
     appMapping: 'wasnc-appMapping',
     rowGroup: 'wasnc-rowGroup',
-    appRow: 'wasnc-appRow'
+    appRow: 'wasnc-appRow',
+    history: 'wasnc-history'
 };
 
 
@@ -72,7 +73,7 @@ const regionInfo = [
     {
         name: 'xHeader',
         x: 5,
-        y: 1,
+        y: 0,
         w: blocks - 5
     }, {
         name: 'yHeader',
@@ -81,18 +82,18 @@ const regionInfo = [
         w: 4
     }, {
         name: 'xHistory',
-        x: 5,
+        x: 10,
         y: 0,
         w: blocks - 5
     }, {
         name: 'yHistory',
         x: 0,
-        y: 2,
+        y: 1,
         w: 1
     }, {
         name: 'rowGroups',
         x: 2,
-        y: 2,
+        y: 1,
         w: blocks - 1
     }
 ];
@@ -120,7 +121,6 @@ function applyBlockTextAttrs(selection) {
         .attr('dy', blockText.dy)
         .attr('dx', blockText.dx);
 }
-
 
 
 /**
@@ -341,6 +341,50 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
 }
 
 
+function drawHistory(navigator, svg, chartData) {
+    const xHistory = svg
+        .select('.xHistory')
+        .selectAll('text')
+        .data(chartData.cols.active
+            ? [chartData.cols.active]
+            : [],
+            d => d.id);
+
+    xHistory.exit().remove();
+
+    xHistory
+        .enter()
+        .append('text')
+        .text(d => `.. up to ${d.name}`)
+        .classed(styles.history, true)
+        .classed('clickable', true)
+        .attr('transform', `rotate(315 0,${blockHeight}) `)
+        .on('click', d => navigator.focusCol(d.parentId));
+
+    const yHistory = svg
+        .select('.yHistory')
+        .selectAll('text')
+        .data(
+            chartData.rows.active
+                ? [chartData.rows.active]
+                : [],
+            d => d.id);
+
+    yHistory.exit().remove();
+
+    yHistory
+        .enter()
+        .append('text')
+        .text(d => `.. up to ${d.name}`)
+        .classed('clickable', true)
+        .classed(styles.history, true)
+        .attr('text-anchor', 'end')
+        .attr('y', blockWidth)
+        .attr('dy', blockHeight)
+        .attr('transform', `rotate(270 0,${blockHeight}) `)
+        .on('click', d => navigator.focusRowGroup(d.parentId));
+}
+
 function draw(navigator, chartData, svg, blockScaleX) {
     console.log('draw', chartData);
     global.chart = chartData;
@@ -364,22 +408,8 @@ function draw(navigator, chartData, svg, blockScaleX) {
 
     drawColHeaders(navigator, svg, chartData, colScale);
     drawRowGroups(navigator, svg, chartData, colScale);
+    drawHistory(navigator, svg, chartData);
 
-    const yHistory = svg.select('.yHistory')
-        .selectAll('text')
-        .data(chartData.rows.active ? [chartData.rows.active] : [], d => d.id);
-
-    yHistory.exit().remove();
-
-    yHistory
-        .enter()
-        .append('text')
-        .text(d => `Up to ${d.name}`)
-        .attr('text-anchor', 'end')
-        .attr('y', blockWidth)
-        .attr('dy', blockHeight)
-        .attr('transform', `rotate(270 0,${blockHeight}) `)
-        .on('click', d => navigator.focusRowGroup(d.parentId));
 }
 
 
