@@ -43,7 +43,7 @@ import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATE
 import static java.util.stream.Collectors.*;
 
 public class BusinessRegionProductHierarchyGenerator {
-    private static final String CATEGORY_EXTERNAL_ID = "REGION_BUSINESS_PRODUCT";
+    private static final String CATEGORY_EXTERNAL_ID = "BUSINESS_REGION_PRODUCT";
 
     private static String[] businesses = new String[]{
             "Asset Management",
