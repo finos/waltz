@@ -235,6 +235,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.relatedAppsSection,
         dynamicSections.relatedAppGroupsSection,
         dynamicSections.changeInitiativeRelatedDataTypesSection,
+        dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
         dynamicSections.surveySection,
         dynamicSections.flowDiagramsSection,
