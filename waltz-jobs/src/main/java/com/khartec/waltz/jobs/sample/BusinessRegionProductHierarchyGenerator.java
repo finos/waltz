@@ -42,7 +42,7 @@ import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static java.util.stream.Collectors.*;
 
-public class RegionBusinessProductHierarchyGenerator {
+public class BusinessRegionProductHierarchyGenerator {
     private static final String CATEGORY_EXTERNAL_ID = "REGION_BUSINESS_PRODUCT";
 
     private static String[] businesses = new String[]{
@@ -84,34 +84,36 @@ public class RegionBusinessProductHierarchyGenerator {
                 .value1();
 
         AtomicInteger insertCount = new AtomicInteger(0);
-        topLevelRegions.forEach((region) -> {
-            final long regionId = dsl
-                    .insertInto(MEASURABLE)
-                    .set(createMeasurable(null, region, measurableCategoryId, true))
-                    .returning(MEASURABLE.ID)
-                    .fetchOne()
-                    .getId();
-            insertCount.incrementAndGet();
 
-            Stream.of(businesses).forEach(business -> {
+
+        Stream.of(businesses).forEach(business -> {
                 final long businessId = dsl
                         .insertInto(MEASURABLE)
-                        .set(createMeasurable(regionId, business, measurableCategoryId, true))
+                        .set(createMeasurable(null, business, measurableCategoryId, true))
                         .returning(MEASURABLE.ID)
                         .fetchOne()
                         .getId();
 
                 insertCount.incrementAndGet();
 
-                products.forEach(product -> {
-                    dsl
+                topLevelRegions.forEach((region) -> {
+                    final long regionId = dsl
                             .insertInto(MEASURABLE)
-                            .set(createMeasurable(businessId, product, measurableCategoryId, true))
-                            .execute();
-
+                            .set(createMeasurable(businessId, region, measurableCategoryId, true))
+                            .returning(MEASURABLE.ID)
+                            .fetchOne()
+                            .getId();
                     insertCount.incrementAndGet();
+
+                    products.forEach(product -> {
+                        dsl
+                                .insertInto(MEASURABLE)
+                                .set(createMeasurable(regionId, product, measurableCategoryId, true))
+                                .execute();
+
+                        insertCount.incrementAndGet();
+                    });
                 });
-            });
         });
 
         System.out.println("Inserted: " + insertCount + " new nodes for hierarchy");
