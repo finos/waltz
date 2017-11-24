@@ -196,4 +196,7 @@ public class MeasurableRatingService {
     }
 
 
+    public Collection<MeasurableRating> findByCategory(long id) {
+        return measurableRatingDao.findByCategory(id);
+    }
 }
