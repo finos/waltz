@@ -18,4 +18,4 @@
 
 export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
 export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
-export const AUTH_SOURCE_NAVIGATOR_CATEGORY_ID = "settings.auth-source-navigator.category-id"
+export const AUTH_SOURCE_NAVIGATOR_CATEGORY_ID = "settings.auth-source-navigator.category-id";
