@@ -3,7 +3,8 @@
 
     text {
         font-family: Arial;
-        font-size: x-small;
+        fill: #666;
+        font-size: xx-small;
     }
 
     .wasnc-rowGroupHover {
@@ -12,9 +13,13 @@
             cursor: pointer;
         }
         &.wasnc-rowGroup {
-            font-weight: bold;
+            text {
+                font-weight: bolder;
+                fill: #222;
+            }
             cursor: pointer;
         }
+
     }
 
     .wasnc-history {
@@ -29,7 +34,10 @@
         }
 
         &.wasnc-colHeader {
-            font-weight: bold;
+            text {
+                font-weight: bolder;
+                fill: #222;
+            }
             cursor: pointer;
         }
     }

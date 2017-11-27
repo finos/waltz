@@ -26,6 +26,7 @@ import {ragColorScale} from '../../../common/colors';
 import _ from 'lodash';
 import { select } from 'd3-selection';
 import {scaleBand, scaleLinear} from 'd3-scale';
+import {truncateText} from "../../../common/d3-utils";
 
 
 const bindings = {
@@ -254,7 +255,8 @@ function drawAppRows(selector, colScale, navigator, svg) {
         .append('text')
         .text(d => d.app.name)
         .attr('y', blockHeight)
-        .call(applyBlockTextAttrs);
+        .call(applyBlockTextAttrs)
+        .call(truncateText, blockWidth * 4);
 
     appRows.exit().remove();
 
@@ -271,7 +273,8 @@ function drawRowGroupLabel(selection) {
         .append('text')
         .attr('y', blockHeight)
         .text(d => d.domain.name)
-        .call(applyBlockTextAttrs);
+        .call(applyBlockTextAttrs)
+        .call(truncateText, blockWidth * 3 - 10)
 }
 
 
@@ -335,7 +338,8 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
     newHeaders
         .append('text')
         .text(d => d.name)
-        .attr('y', 16);
+        .attr('y', 16)
+        .call(truncateText, blockWidth * 4)
 
     return newHeaders.merge(headers);
 }
@@ -359,7 +363,8 @@ function drawHistory(navigator, svg, chartData) {
         .classed(styles.history, true)
         .classed('clickable', true)
         .attr('transform', `rotate(315 0,${blockHeight}) `)
-        .on('click', d => navigator.focusCol(d.parentId));
+        .on('click', d => navigator.focusCol(d.parentId))
+        .call(truncateText, blockWidth * 4);
 
     const yHistory = svg
         .select('.yHistory')
