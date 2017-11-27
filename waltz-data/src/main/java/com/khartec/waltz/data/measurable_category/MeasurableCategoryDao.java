@@ -70,6 +70,7 @@ public class MeasurableCategoryDao {
     public Collection<MeasurableCategory> findAll() {
         return dsl
                 .selectFrom(MEASURABLE_CATEGORY)
+                .orderBy(MEASURABLE_CATEGORY.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
