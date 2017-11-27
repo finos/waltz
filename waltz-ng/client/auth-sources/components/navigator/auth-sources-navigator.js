@@ -31,13 +31,14 @@ const bindings = {
 
 
 const initialState = {
+    categoryId: null,
 };
 
 
 function controller($element, $timeout, $q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
-    const load = (categoryId) => {
+    const loadChartData = () => {
 
         const promises = [
             serviceBroker
@@ -50,25 +51,36 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                 .loadAppData(CORE_API.MeasurableStore.findAll)
                 .then(r => r.data),
             serviceBroker
-                .loadViewData(CORE_API.MeasurableRatingStore.findByCategory, [ categoryId ])
+                .loadViewData(CORE_API.MeasurableRatingStore.findByCategory, [ vm.category.id ])
                 .then(r => r.data)
         ];
 
         $q.all(promises)
             .then(([authSources, dataTypes, allMeasurables, allRatings]) => {
-                const measurables = _.filter(allMeasurables, { categoryId })
+                const measurables = _.filter(allMeasurables, { categoryId: vm.category.id });
                 const navigator = new AuthSourcesNavigatorUtil(dataTypes, measurables, authSources, allRatings);
                 navigator.focusBoth(null, null);
                 vm.chartNavigator = navigator;
             });
     };
 
-
     vm.$onInit = () => {
-        settingsService
-            .findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
-            .then(categoryId => load(+categoryId))
-        ;
+        const promises = [
+            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
+            settingsService.findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
+        ];
+
+        $q.all(promises)
+            .then(([categories, defaultCategoryId]) => {
+                vm.categories = categories;
+                vm.categoriesById = _.keyBy(categories, 'id');
+                vm.category = vm.categoriesById[defaultCategoryId];
+                loadChartData();
+            })
+    };
+
+    vm.onCategoryChange = () => {
+        loadChartData();
     };
 }
 
