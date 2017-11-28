@@ -32,6 +32,9 @@ const bindings = {
 
 const initialState = {
     categoryId: null,
+    visibility: {
+        chart: false
+    }
 };
 
 
@@ -59,7 +62,8 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
             .then(([authSources, dataTypes, allMeasurables, allRatings]) => {
                 const measurables = _.filter(allMeasurables, { categoryId: vm.category.id });
                 const navigator = new AuthSourcesNavigatorUtil(dataTypes, measurables, authSources, allRatings);
-                navigator.focusBoth(null, null);
+                const chart = navigator.focusBoth(null, null);
+                vm.visibility.chart = chart.rowGroups.length > 0;
                 vm.chartNavigator = navigator;
             });
     };
