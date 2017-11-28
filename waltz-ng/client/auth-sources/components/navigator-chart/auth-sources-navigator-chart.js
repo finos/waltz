@@ -218,18 +218,11 @@ function drawAppMappings(selector, colScale, navigator, svg) {
         .append('rect')
         .attr('stroke', d => ragColorScale(d.rating))
         .attr('fill', d => ragColorScale(d.rating).brighter(2))
+        .attr('rx', 1)
         .attr('y', 1)
         .attr('x', (colScale.bandwidth() / 2) * -1)
         .attr('width', colScale.bandwidth())
         .attr('height', blockHeight - 2);
-
-    // newAppMappings
-    //     .append('text')
-    //     .attr('text-anchor', 'middle')
-    //     .attr('y', blockHeight)
-    //     .attr('dy', blockText.dy)
-    //     .style('font-size', 'xx-small');
-    //     .text(d => `${d.rowType.charAt(0)}\\${d.colType.charAt(0)}::${d.rating}`)
 
     return newAppMappings
         .merge(appMappings)
@@ -317,12 +310,12 @@ function drawRowGroups(navigator, svg, chartData, colScale) {
 
 
 function drawColHeaders(navigator, svg, chartData, colScale) {
-    const cols = chartData.cols;
+    const colsDomain = _.get(chartData, 'cols.domain',[]);
 
     const headers = svg
         .select(".xHeader")
         .selectAll(`.${styles.colHeader}`)
-        .data(cols.domain, d => d.id);
+        .data(colsDomain, d => d.id);
 
     headers.exit().remove();
 
@@ -346,11 +339,13 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
 
 
 function drawHistory(navigator, svg, chartData) {
+    const colHistoryDatum = _.get(chartData, 'cols.active');
+
     const xHistory = svg
         .select('.xHistory')
         .selectAll('text')
-        .data(chartData.cols.active
-            ? [chartData.cols.active]
+        .data(colHistoryDatum
+            ? [ colHistoryDatum ]
             : [],
             d => d.id);
 
@@ -394,19 +389,23 @@ function draw(navigator, chartData, svg, blockScaleX) {
     console.log('draw', chartData);
     global.chart = chartData;
 
+
     if (! svg) return;
+
 
     const height = calcTotalRequiredHeight(chartData);
 
     svg.attr('viewBox', `0 0 1024 ${height}`);
 
-    const colDomain = chartData.cols.domain || [];
-    const colsWidth = colWidth * colDomain.length;
+    const colDomain = _.get(chartData, "cols.domain", []);
+    const colsWidth = colWidth * colDomain.length || 1;  // 'or 1' to prevent colScale from blowing up
     const colsStartX = blockScaleX(5);
+
+    console.log('colsWidth', colsWidth);
 
     const colScale = scaleBand()
         .domain(_.map(colDomain, 'id'))
-        .range([colsStartX, colsStartX + colsWidth ])
+        .range([colsStartX, colsStartX + colsWidth])
         .paddingInner([0.1])
         .paddingOuter([0.3])
         .align([0.5]);
@@ -414,7 +413,6 @@ function draw(navigator, chartData, svg, blockScaleX) {
     drawColHeaders(navigator, svg, chartData, colScale);
     drawRowGroups(navigator, svg, chartData, colScale);
     drawHistory(navigator, svg, chartData);
-
 }
 
 
