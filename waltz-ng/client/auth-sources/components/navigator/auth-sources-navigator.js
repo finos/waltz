@@ -62,7 +62,7 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
             .then(([authSources, dataTypes, allMeasurables, allRatings]) => {
                 const measurables = _.filter(allMeasurables, { categoryId: vm.category.id });
                 const navigator = new AuthSourcesNavigatorUtil(dataTypes, measurables, authSources, allRatings);
-                const chart = navigator.focusBoth(null, null);
+                const chart = navigator.refresh();
                 vm.visibility.chart = chart.rowGroups.length > 0;
                 vm.chartNavigator = navigator;
             });
@@ -70,8 +70,11 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
 
     vm.$onInit = () => {
         const promises = [
-            serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
-            settingsService.findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
+            serviceBroker
+                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .then(r => r.data),
+            settingsService
+                .findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
         ];
 
         $q.all(promises)
@@ -80,7 +83,7 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                 vm.categoriesById = _.keyBy(categories, 'id');
                 vm.category = vm.categoriesById[defaultCategoryId];
                 loadChartData();
-            })
+            });
     };
 
     vm.onCategoryChange = () => {

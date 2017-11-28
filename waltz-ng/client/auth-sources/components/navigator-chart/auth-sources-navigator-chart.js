@@ -212,7 +212,7 @@ function drawAppMappings(selector, colScale, navigator, svg) {
         .attr('transform', d => `translate(${colScale(d.colId)} , 0)`)
         .on('mouseover', d => highlightColumn(d.colId, true, svg))
         .on('mouseout', d => highlightColumn(d.colId, false, svg))
-        .on('click', d => navigator.focusBoth(d.colId, d.groupId));
+        .on('click', d => navigator.refresh({ xId: d.colId, yId: d.groupId }));
 
     newAppMappings
         .append('rect')
@@ -300,7 +300,7 @@ function drawRowGroups(navigator, svg, chartData, colScale) {
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
         .on('mouseout.hover', function() { select(this).classed(styles.rowGroupHover, false)})
-        .on('click.focus', d => navigator.focusRowGroup(d.domain.id))
+        .on('click.focus', d => navigator.refresh({ yId: d.domain.id }))
         .call(drawRowGroupLabel);
 
     rowGroups
@@ -326,7 +326,7 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
         .attr('transform', d => `translate(${colScale(d.id)}, 0) rotate(315 0,14)`)
         .on('mouseover', d => highlightColumn(d.id, true, svg))
         .on('mouseout', d => highlightColumn(d.id, false, svg))
-        .on('click', d => navigator.focusCol(d.id));
+        .on('click', d => navigator.refresh( { xId: d.id }));
 
     newHeaders
         .append('text')
@@ -358,7 +358,7 @@ function drawHistory(navigator, svg, chartData) {
         .classed(styles.history, true)
         .classed('clickable', true)
         .attr('transform', `rotate(315 0,${blockHeight}) `)
-        .on('click', d => navigator.focusCol(d.parentId))
+        .on('click', d => navigator.refresh({ xId: d.parentId }))
         .call(truncateText, blockWidth * 4);
 
     const yHistory = svg
@@ -382,16 +382,15 @@ function drawHistory(navigator, svg, chartData) {
         .attr('y', blockWidth)
         .attr('dy', blockHeight)
         .attr('transform', `rotate(270 0,${blockHeight}) `)
-        .on('click', d => navigator.focusRowGroup(d.parentId));
+        .on('click', d => navigator.refresh( { yId: d.parentId }));
 }
+
 
 function draw(navigator, chartData, svg, blockScaleX) {
     console.log('draw', chartData);
     global.chart = chartData;
 
-
     if (! svg) return;
-
 
     const height = calcTotalRequiredHeight(chartData);
 
@@ -400,8 +399,6 @@ function draw(navigator, chartData, svg, blockScaleX) {
     const colDomain = _.get(chartData, "cols.domain", []);
     const colsWidth = colWidth * colDomain.length || 1;  // 'or 1' to prevent colScale from blowing up
     const colsStartX = blockScaleX(5);
-
-    console.log('colsWidth', colsWidth);
 
     const colScale = scaleBand()
         .domain(_.map(colDomain, 'id'))

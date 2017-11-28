@@ -307,6 +307,11 @@ export default class AuthSourcesNavigatorUtil {
                 authSources = [],
                 ratings = []) {
 
+        this.options = {
+            xId: null,
+            yId: null
+        };
+
         this.dataTypesByCode = _.keyBy(dataTypes, 'code');
 
         const appIdsWithRatings = _.chain(ratings)
@@ -351,21 +356,31 @@ export default class AuthSourcesNavigatorUtil {
     }
 
 
-    focusRowGroup(id, recalc = true) {
+    refresh(newOptions) {
+        _.merge(this.options, newOptions)
+
+        this._focusCol(this.options.xId, false);
+        this._focusRowGroup(this.options.yId, false);
+        this.chart.rowGroups = calcRowGroups(this.chart);
+        this.notifyListeners();
+
+        return this.chart;
+    }
+
+
+    _focusRowGroup(id) {
         const result = focus(this.dataTypeDataSet, id);
         if (result) {
             const chartDelta = {
                 rows: result
             };
             this.chart = Object.assign({}, this.chart, chartDelta);
-
-            if (recalc) this._recalcRowGroups();
         }
         return this.chart;
     }
 
 
-    focusCol(id, recalc = true) {
+    _focusCol(id) {
         const result = focus(this.measurableDataSet, id);
         if (result) {
             const numDomainValues = result.domain.length || 1;
@@ -374,24 +389,8 @@ export default class AuthSourcesNavigatorUtil {
                 colStyle: { width: `${70 / numDomainValues}%` }
             };
             this.chart = Object.assign({}, this.chart, chartDelta);
-
-            if (recalc) this._recalcRowGroups();
         }
         return this.chart;
-    }
-
-
-    focusBoth(xId, yId) {
-        this.focusCol(xId, false);
-        this.focusRowGroup(yId, false);
-        this._recalcRowGroups();
-        return this.chart;
-    }
-
-
-    _recalcRowGroups() {
-        this.chart.rowGroups = calcRowGroups(this.chart);
-        this.notifyListeners();
     }
 
 }
