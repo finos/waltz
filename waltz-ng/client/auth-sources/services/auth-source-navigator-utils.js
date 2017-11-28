@@ -175,7 +175,7 @@ function recalcDomain(dataSet, focusId) {
 function focus(dataSet, id) {
     const domain = recalcDomain(dataSet, id);
     if (domain.length == 0) {
-        return;
+        return null;
     } else {
         const active = dataSet.nodesById[id];
         return {
@@ -223,8 +223,14 @@ function calcRowGroups(chart) {
                 .value();
 
             const rowApplications = getApps(rowDomainValue.mappings);
+
+            const colsDomain = _.get(chart, "cols.domain", []);
+            if (colsDomain.length == 0){
+                return null;
+            }
+
             const colApplications = _
-                .chain(chart.cols.domain)
+                .chain(colsDomain)
                 .flatMap(d => getApps(d.mappings))
                 .uniqBy('id')
                 .value();
@@ -244,7 +250,7 @@ function calcRowGroups(chart) {
                         return null;
                     }
 
-                    const mappings = _.map(chart.cols.domain, colDomainValue => {
+                    const mappings = _.map(colsDomain, colDomainValue => {
                         const colType = scoreMapping(
                             app,
                             _.map(colDomainValue.mappings.direct, 'app.id'),
@@ -276,6 +282,7 @@ function calcRowGroups(chart) {
                 rows: applicationsWithMappings
             };
         })
+        .compact()
         .reject(rowGroup => rowGroup.rows.length == 0)
         .value();
     return rowGroups;
