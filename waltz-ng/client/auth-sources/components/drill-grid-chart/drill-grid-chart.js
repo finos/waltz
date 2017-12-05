@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './auth-sources-navigator-chart.html';
+import template from './drill-grid-chart.html';
 import {initialiseData} from "../../../common";
 
 import {ragColorScale} from '../../../common/colors';
@@ -30,12 +30,11 @@ import {truncateText} from "../../../common/d3-utils";
 
 
 const bindings = {
-    navigator: '<'
+    drillGrid: '<'
 };
 
 
 const initialState = {
-
 };
 
 
@@ -55,7 +54,9 @@ const colWidth = 32;
 const rowGroupPadding = 4;
 const minHeight = 350;
 
-const blockScaleX = scaleLinear().domain([0,32]).range([0, width]);
+const blockScaleX = scaleLinear()
+    .domain([0,32])
+    .range([0, width]);
 
 
 const styles = {
@@ -149,20 +150,6 @@ function calculateRowGroupOffsets(rowGroups = []) {
 }
 
 
-const opacityScores = {
-    DIRECT: 1,
-    HEIR: 0.7,
-    ANCESTOR: 0.6,
-    UNKNOWN: 0.4
-};
-
-
-const calcOpacity = d => {
-    const total = (opacityScores[d.rowType] || 0.5) + (opacityScores[d.colType] || 0.5);
-    return total / 2;
-};
-
-
 const highlightColumn = (colId, flag, svg) => {
     svg.selectAll(`.${styles.appMapping}`)
         .filter(d => d.colId === colId)
@@ -197,7 +184,7 @@ function init(svg, scaleX) {
 }
 
 
-function drawAppMappings(selector, colScale, navigator, svg) {
+function drawAppMappings(selector, colScale, drillGrid, svg) {
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
         .data(d => d.mappings, d => d.colId);
@@ -212,7 +199,7 @@ function drawAppMappings(selector, colScale, navigator, svg) {
         .attr('transform', d => `translate(${colScale(d.colId)} , 0)`)
         .on('mouseover', d => highlightColumn(d.colId, true, svg))
         .on('mouseout', d => highlightColumn(d.colId, false, svg))
-        .on('click', d => navigator.refresh({ xId: d.colId, yId: d.groupId }));
+        .on('click', d => drillGrid.refresh({ xId: d.colId, yId: d.groupId }));
 
     newAppMappings
         .append('rect')
@@ -225,12 +212,11 @@ function drawAppMappings(selector, colScale, navigator, svg) {
         .attr('height', blockHeight - 2);
 
     return newAppMappings
-        .merge(appMappings)
-        .style('opacity', calcOpacity);
+        .merge(appMappings);
 }
 
 
-function drawAppRows(selector, colScale, navigator, svg) {
+function drawAppRows(selector, colScale, drillGrid, svg) {
     const appRows = selector
         .selectAll(`.${styles.appRow}`)
         .data(d => d.rows, d => d.app.id);
@@ -255,7 +241,7 @@ function drawAppRows(selector, colScale, navigator, svg) {
 
     appRows
         .merge(newAppRows)
-        .call(drawAppMappings, colScale, navigator, svg);
+        .call(drawAppMappings, colScale, drillGrid, svg);
 
     return appRows;
 }
@@ -271,7 +257,7 @@ function drawRowGroupLabel(selection) {
 }
 
 
-function drawRowGroups(navigator, svg, chartData, colScale) {
+function drawRowGroups(drillGrid, svg, chartData, colScale) {
 
     const groupOffsets = calculateRowGroupOffsets(chartData.rowGroups);
 
@@ -300,22 +286,22 @@ function drawRowGroups(navigator, svg, chartData, colScale) {
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
         .on('mouseout.hover', function() { select(this).classed(styles.rowGroupHover, false)})
-        .on('click.focus', d => navigator.refresh({ yId: d.domain.id }))
+        .on('click.focus', d => drillGrid.refresh({ yId: d.domain.id }))
         .call(drawRowGroupLabel);
 
     rowGroups
         .merge(newRowGroups)
-        .call(drawAppRows, colScale, navigator, svg);
+        .call(drawAppRows, colScale, drillGrid, svg);
 }
 
 
-function drawColHeaders(navigator, svg, chartData, colScale) {
-    const colsDomain = _.get(chartData, 'cols.domain',[]);
+function drawColHeaders(drillGrid, svg, chartData, colScale) {
+    const colsDomain = _.get(chartData, 'xAxis.current.domain',[]);
 
     const headers = svg
         .select(".xHeader")
         .selectAll(`.${styles.colHeader}`)
-        .data(colsDomain, d => d.id);
+        .data(colsDomain, refToString);
 
     headers.exit().remove();
 
@@ -326,28 +312,28 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
         .attr('transform', d => `translate(${colScale(d.id)}, 0) rotate(315 0,14)`)
         .on('mouseover', d => highlightColumn(d.id, true, svg))
         .on('mouseout', d => highlightColumn(d.id, false, svg))
-        .on('click', d => navigator.refresh( { xId: d.id }));
+        .on('click', d => drillGrid.refresh( { xId: d.id }));
 
     newHeaders
         .append('text')
         .text(d => d.name)
         .attr('y', 16)
-        .call(truncateText, blockWidth * 4)
+        .call(truncateText, blockWidth * 4);
 
     return newHeaders.merge(headers);
 }
 
 
-function drawHistory(navigator, svg, chartData) {
-    const colHistoryDatum = _.get(chartData, 'cols.active');
+function drawHistory(drillGrid, svg, chartData) {
+    const colHistoryDatum = _.get(chartData, 'xAxis.current.active');
 
     const xHistory = svg
         .select('.xHistory')
         .selectAll('text')
         .data(colHistoryDatum
-            ? [ colHistoryDatum ]
-            : [],
-            d => d.id);
+                ? [ colHistoryDatum ]
+                : [],
+            refToString);
 
     xHistory.exit().remove();
 
@@ -358,17 +344,17 @@ function drawHistory(navigator, svg, chartData) {
         .classed(styles.history, true)
         .classed('clickable', true)
         .attr('transform', `rotate(315 0,${blockHeight}) `)
-        .on('click', d => navigator.refresh({ xId: d.parentId }))
+        .on('click', d => drillGrid.refresh({ xId: d.parentId }))
         .call(truncateText, blockWidth * 4);
 
+    const yActive = chartData.yAxis.current.active;
     const yHistory = svg
         .select('.yHistory')
         .selectAll('text')
-        .data(
-            chartData.rows.active
-                ? [chartData.rows.active]
+        .data(yActive
+                ? [yActive]
                 : [],
-            d => d.id);
+            refToString);
 
     yHistory.exit().remove();
 
@@ -382,21 +368,26 @@ function drawHistory(navigator, svg, chartData) {
         .attr('y', blockWidth)
         .attr('dy', blockHeight)
         .attr('transform', `rotate(270 0,${blockHeight}) `)
-        .on('click', d => navigator.refresh( { yId: d.parentId }));
+        .on('click', d => drillGrid.refresh( { yId: d.parentId }));
 }
 
 
-function draw(navigator, chartData, svg, blockScaleX) {
-    console.log('draw', chartData);
-    global.chart = chartData;
+function refToString(ref) {
+    if (_.isString(ref)) return ref;
+    return `${ref.kind}/${ref.id}`;
+}
 
+
+function draw(drillGrid, chartData, svg, blockScaleX) {
     if (! svg) return;
 
+    console.log('draw', { drillGrid, chartData });
     const height = calcTotalRequiredHeight(chartData);
 
     svg.attr('viewBox', `0 0 1024 ${height}`);
+    svg.attr('height', height);
 
-    const colDomain = _.get(chartData, "cols.domain", []);
+    const colDomain = _.get(chartData, "xAxis.current.domain", []);
     const colsWidth = colWidth * colDomain.length || 1;  // 'or 1' to prevent colScale from blowing up
     const colsStartX = blockScaleX(5);
 
@@ -407,9 +398,9 @@ function draw(navigator, chartData, svg, blockScaleX) {
         .paddingOuter([0.3])
         .align([0.5]);
 
-    drawColHeaders(navigator, svg, chartData, colScale);
-    drawRowGroups(navigator, svg, chartData, colScale);
-    drawHistory(navigator, svg, chartData);
+    drawColHeaders(drillGrid, svg, chartData, colScale);
+    drawRowGroups(drillGrid, svg, chartData, colScale);
+    drawHistory(drillGrid, svg, chartData);
 }
 
 
@@ -429,8 +420,8 @@ function controller($element) {
     };
 
     vm.$onChanges = (c) => {
-        if (c.navigator && vm.navigator) {
-            vm.navigator.addListener((chart) => draw(vm.navigator, chart, svg, blockScaleX));
+        if (c.drillGrid && vm.drillGrid) {
+            vm.drillGrid.addListener((chart) => draw(vm.drillGrid, chart, svg, blockScaleX));
         }
     };
 }
@@ -447,6 +438,6 @@ const component = {
 
 
 export default {
-    id: 'waltzAuthSourcesNavigatorChart',
+    id: 'waltzDrillGridChart',
     component
 }

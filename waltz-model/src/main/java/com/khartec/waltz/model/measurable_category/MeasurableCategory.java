@@ -32,6 +32,11 @@ public abstract class MeasurableCategory implements
         DescriptionProvider,
         ExternalIdProvider,
         LastUpdatedProvider,
-        RagNamesProvider {
+        RagNamesProvider,
+        EntityKindProvider {
+
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.MEASURABLE_CATEGORY; }
 
 }

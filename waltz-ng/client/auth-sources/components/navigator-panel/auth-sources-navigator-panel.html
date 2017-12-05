@@ -1,0 +1,50 @@
+<div>
+    <div class="row">
+        <div class="col-md-8">
+            <p class="help-block">
+                <pre>{{ $ctrl.xAxis.kind|json}} / {{ $ctrl.xAxis.name}}</pre>
+                <pre>{{ $ctrl.yAxis.kind|json}} / {{ $ctrl.yAxis.name}}</pre>
+            </p>
+        </div>
+        <div class="col-md-4">
+            <label>Switch viewpoint</label>
+            <div>
+                Rows:
+                <select ng-model="$ctrl.xAxis"
+                        ng-change="$ctrl.onAxisChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </div>
+            <div>
+                Cols:
+                <select ng-model="$ctrl.yAxis"
+                        ng-change="$ctrl.onAxisChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br>
+            <waltz-no-data ng-if="! $ctrl.visibility.chart">
+                <message>
+                    <strong>No data</strong> to show.
+                    <ul>
+                        <li ng-repeat="message in $ctrl.messages">
+                            <span ng-bind="message"></span>
+                        </li>
+                    </ul>
+                </message>
+            </waltz-no-data>
+
+            <div ng-show="$ctrl.visibility.chart">
+                <waltz-drill-grid-chart drill-grid="$ctrl.drillGrid">
+                </waltz-drill-grid-chart>
+            </div>
+
+        </div>
+    </div>
+
+</div>
