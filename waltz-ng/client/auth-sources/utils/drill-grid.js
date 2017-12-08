@@ -39,6 +39,7 @@ export default class DrillGrid {
         this.yAxis = yAxis;
         this.rowGroups = [];
         this.listeners = [];
+        this.refresh();
     }
 
 
@@ -49,39 +50,34 @@ export default class DrillGrid {
 
 
     notifyListeners() {
+        console.log('notify')
         _.each(this.listeners, cb => cb(this));
     }
 
 
     refresh(newOptions) {
         _.merge(this.options, newOptions);
+        console.log('refresh', { newOptions, options: this.options })
 
-        this._focusCol(this.options.xId, false);
-        this._focusRowGroup(this.options.yId, false);
+        this.yAxis.focus(this.options.yId);
+        this.xAxis.focus(this.options.xId);
 
-        this.rowGroups = _.map(
-            this.yAxis.current.domain,
-            yDatum => new RowGroup(yDatum, this.xAxis));
+        this.rowGroups = _
+            .chain(this.yAxis.current.domain)
+            .map(yDatum => new RowGroup(yDatum, this.xAxis))
+            .reject(rg => rg.isEmpty())
+            .value();
+
         this.notifyListeners();
 
         return this;
     }
 
 
-    hasRowGroups() {
-        return (this.rowGroups || []).length > 0
+    isEmpty() {
+        return (this.rowGroups || []).length == 0
     }
 
 
-    _focusRowGroup(id) {
-        this.yAxis.focus(id);
-        return this;
-    }
-
-
-    _focusCol(id) {
-        this.xAxis.focus(id);
-        return this;
-    }
 
 }

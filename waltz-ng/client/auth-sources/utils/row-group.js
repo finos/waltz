@@ -20,8 +20,25 @@
 import _ from 'lodash';
 
 
-
-function scoreMapping(app, directs = [], heirs = [], ancestors = []) {
+/**
+ * Given three lists of app ids representing direct mappings, heirs and ancestors
+ * this function returns a value describing the type of mapping that describes
+ * the given applications association:
+ *
+ * - DIRECT
+ * - HEIR
+ * - ANCESTOR
+ * - NONE (app has other mappings)
+ * - UNKNOWN (app has no mappings at all)
+ *
+ *
+ * @param app ({ id, hasMappings } )
+ * @param directs
+ * @param heirs
+ * @param ancestors
+ * @returns {*}
+ */
+function determineMappingType(app, directs = [], heirs = [], ancestors = []) {
     if (_.includes(directs, app.id)) { return 'DIRECT'; }
     else if (_.includes(heirs, app.id)) { return 'HEIR'; }
     else if (_.includes(ancestors, app.id)) { return 'ANCESTOR'; }
@@ -29,65 +46,82 @@ function scoreMapping(app, directs = [], heirs = [], ancestors = []) {
 }
 
 
-function determineRating(colMappings, appId) {
+/**
+ * determines a rating (RAGZ) for a given set of mappings.
+ *
+ * @param mappings { direct, heirs, inherited }
+ * @param appId
+ * @returns {string}
+ */
+function determineRating(mappings, appId) {
     const findRatings = rs => _
         .chain(rs)
         .filter(r => r.app.id === appId)
         .map('rating')
         .value();
 
-    const directRatings = findRatings(colMappings.direct, appId);
-    const heirRatings = findRatings(colMappings.heirs, appId);
-    const ancestorRatings = findRatings(colMappings.inherited, appId);
-
-    const ratings = _.concat(directRatings, heirRatings, ancestorRatings);
-    return _.head(ratings) || 'Z';
+    return _.head(findRatings(mappings.direct))
+        || _.head(findRatings(mappings.heirs))
+        || _.head(findRatings(mappings.inherited))
+        || 'Z';
 }
 
 
+/**
+ * Given a collection of mappings, extracts a unique list of application references
+ * @param mappings
+ */
+function getAppsFromMappings(mappings) {
+    return _
+        .chain(mappings)
+        .values()
+        .flatten()
+        .map(m => m.app)
+        .uniqBy(a => a.id)
+        .value();
+}
+
+
+const Strategies = {
+    basic: {
+
+    }
+}
 
 // -- CLASS ---
 
 export default class RowGroup {
 
     constructor(yDatum, xAxis) {
-        const getApps = mappings => _
-            .chain(mappings)
-            .values()
-            .flatten()
-            .map(m => m.app)
-            .value();
 
-        const rowApplications = getApps(yDatum.mappings);
-
-        const colsDomain = xAxis.current.domain || [];
-        if (colsDomain.length == 0){
+        const xDomain = xAxis.current.domain || [];
+        if (xDomain.length == 0){
             return null;
         }
+        const rowApplications = getAppsFromMappings(yDatum.mappings);
+        const colApplications = _.flatMap(
+            xDomain,
+            xDatum => getAppsFromMappings(xDatum.mappings));
 
-        const colApplications = _
-            .chain(colsDomain)
-            .flatMap(d => getApps(d.mappings))
-            .uniqBy('id')
-            .value();
-
-        const applications = _.unionBy(rowApplications, colApplications, 'id');
+        const appsWithBothDimensions = _.intersectionBy(rowApplications, colApplications, 'id'); //_.unionBy(rowApplications, colApplications, 'id');
+        const appsWithOnlyRowDimension = _.differenceBy(rowApplications, appsWithBothDimensions, 'id');
 
         const directAppIds = _.map(yDatum.mappings.direct, 'app.id');
         const ancestorAppIds = _.map(yDatum.mappings.inherited, 'app.id');
         const heirAppIds = _.map(yDatum.mappings.heirs, 'app.id');
 
-        const applicationsWithMappings = _
-            .chain(applications)
+        const rows = _
+            .chain(appsWithBothDimensions)
             .sortBy('name')
             .map(app => {
-                const rowType = scoreMapping(app, directAppIds, heirAppIds, ancestorAppIds);
+                const rowType = determineMappingType(app, directAppIds, heirAppIds, ancestorAppIds);
                 if (rowType === 'NONE') {
+                    console.log('should never happen')
                     return null;
                 }
 
-                const mappings = _.map(colsDomain, xDatum => {
-                    const colType = scoreMapping(
+                const mappings = _.map(xDomain, xDatum => {
+                    const colType = determineMappingType(
                         app,
                         _.map(xDatum.mappings.direct, 'app.id'),
                         _.map(xDatum.mappings.heirs, 'app.id'),
@@ -98,13 +132,13 @@ export default class RowGroup {
                     return {
                         colId: xDatum.id,
                         groupId: yDatum.id,
-                        rowType,
                         colType,
                         rating
                     };
                 });
                 return {
                     app,
+                    rowType,
                     mappings
                 };
             })
@@ -113,10 +147,13 @@ export default class RowGroup {
             .compact()
             .value();
 
-        return {
-            domain: yDatum,
-            rows: applicationsWithMappings
-        };
+        this.group = yDatum;
+        this.rows = rows;
+        this.rowOnlyApplications = appsWithOnlyRowDimension;
     }
 
+
+    isEmpty() {
+        return _.isEmpty(this.rows)
+    }
 }

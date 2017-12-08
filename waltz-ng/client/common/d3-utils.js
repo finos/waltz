@@ -162,20 +162,21 @@ export function wrapText(selection, width) {
 
 
 export function truncateText(selection, maxWidth = 130) {
-    selection.each(function() {
-        const self = select(this);
-        setTimeout(() => {
-            let textLength = self.node().getComputedTextLength();
-            let text = self.text();
+    return selection
+        .each(function() {
+            const self = select(this);
+            setTimeout(() => {
+                let textLength = self.node().getComputedTextLength();
+                let text = self.text();
 
-            let iterations = 0;
-            while (textLength > (maxWidth) && text.length > 0) {
-                iterations++;
-                text = text.slice(0, -1);
-                self.text(text + '...');
-                textLength = self.node().getComputedTextLength();
-            }
-        }, 10)
-    })
+                let iterations = 0;
+                while (textLength > (maxWidth) && text.length > 0) {
+                    iterations++;
+                    text = text.slice(0, -1);
+                    self.text(text + '...');
+                    textLength = self.node().getComputedTextLength();
+                }
+            }, 10)
+        });
 }
 

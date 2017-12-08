@@ -21,7 +21,7 @@ import {refToString} from '../../common/entity-utils';
 import {initialiseData} from "../../common/index";
 
 const initialState = {
-    parentEntityRef: { kind: 'ORG_UNIT', id: 210 },
+    parentEntityRef: { kind: 'ORG_UNIT', id: 20 },
     foo: 'baa'
 };
 

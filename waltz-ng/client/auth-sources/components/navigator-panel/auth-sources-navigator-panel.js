@@ -32,20 +32,26 @@ const bindings = {
     parentEntityRef: '<',
 };
 
+const REG = 7;
+const PROD = 4;
+const FUN = 1;
+const BUS = 6;
+
 
 const initialState = {
     xAxis: {
         kind: 'MEASURABLE_CATEGORY',
-        id: 7
+        id: PROD
     },
     yAxis: {
         kind: 'MEASURABLE_CATEGORY',
-        id: 1
+        id: FUN
     },
     visibility: {
         chart: false
     }
 };
+
 
 function prepareMappings(rawMappings, domain, axisDefinition, relevantAppsById) {
     if (axisDefinition.kind === 'DATA_TYPE') {
@@ -142,8 +148,6 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
 
         $q.all(promises)
             .then(([colDomain, rowDomain, rawColMappings, rawRowMappings]) => {
-                console.log('load', { colDomain, rowDomain, rawColMappings, rawRowMappings });
-
                 const messages = [];
                 let canShow = true;
 
@@ -182,7 +186,8 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                     new HierarchicalAxis(colData),
                     new HierarchicalAxis(rowData));
 
-                drillGrid.refresh();
+
+                vm.visibility.chart = ! drillGrid.isEmpty();
                 vm.drillGrid = drillGrid;
             });
     };
@@ -203,7 +208,6 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
             .then(([apps, categories, defaultCategoryId]) => {
                 console.log('asnp, disabled default category id ', { defaultCategoryId })
                 vm.allApps = apps;
-                console.log('allApps', { all: vm.allApps });
                 vm.categories = categories;
                 vm.categoriesById = _.keyBy(categories, 'id');
 
