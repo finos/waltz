@@ -24,11 +24,16 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
 
@@ -42,11 +47,39 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
             return emptyList();
         }
 
-        return dsl
-                .selectFrom(MEASURABLE)
-                .where(JooqUtilities.MSSQL.mkContains(terms))
+        Condition externalIdCondition = terms.stream()
+                .map(term -> MEASURABLE.EXTERNAL_ID.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(externalIdCondition)
+                .orderBy(MEASURABLE.EXTERNAL_ID)
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        Condition nameCondition = terms.stream()
+                .map(term -> MEASURABLE.NAME.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Measurable> measurablesViaName = dsl.selectDistinct(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(nameCondition)
+                .orderBy(MEASURABLE.NAME)
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        List<Measurable> measurablesViaFullText = dsl
+                .selectFrom(MEASURABLE)
+                .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }
 
 }

@@ -93,28 +93,6 @@ public class StringUtilities {
     }
 
 
-
-    public static List<String> mkTerms(String query) {
-        String safeQuery = query
-                .replace("[", " ")
-                .replace("]", " ")
-                .replace("'", " ")
-                .replace("\"", " ")
-                .replace("|", " ")
-                .replace("!", " ")
-                .replace("%", " ")
-                .replace("(", " ")
-                .replace(")", " ")
-                .replace(",", " ")
-                .replace("~", " ");
-
-        return Stream.of(safeQuery.split(" "))
-                .filter(StringUtilities::notEmpty)
-                .filter(s -> s.length() > 2)
-                .collect(toList());
-    }
-
-
     public static int length(String str) {
         return str == null
                 ? 0

@@ -19,7 +19,7 @@
         <waltz-section-actions>
             <a class="btn btn-danger btn-xs"
                waltz-has-role="SURVEY_ADMIN"
-               ng-if="ctrl.surveyInstance.status === 'COMPLETED'"
+               ng-if="ctrl.surveyInstance.status === 'COMPLETED' && ctrl.currentResponseVersion.isLatest"
                ng-click="ctrl.markAsInProgress()">
                 Mark as In Progress
             </a>
@@ -32,80 +32,101 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Survey Subject
-                    </div>
-                    <div class="col-sm-8">
-                        <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
-                        </waltz-entity-link>
-                    </div>
-                </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Survey Subject
             </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Survey ID
-                    </div>
-                    <div class="col-sm-8">
-                        <span ng-bind="ctrl.surveyInstance.id">
-                        </span>
-                    </div>
-                </div>
+            <div class="col-sm-4">
+                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Status
-                    </div>
-                    <div class="col-sm-8"
-                         ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
-                    </div>
-                </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Response Version
             </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Due
-                    </div>
-                    <div class="col-sm-8">
-                        <waltz-from-now timestamp="ctrl.surveyInstance.dueDate"></waltz-from-now>
-                    </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.currentResponseVersion.versionNum">
+                </span>
+                <span ng-if="ctrl.currentResponseVersion.isLatest">
+                    - <i>Latest</i>
+                </span>
+                <div class="btn-group"
+                     uib-dropdown
+                     is-open="status.isopen">
+                            <span ng-if="ctrl.otherResponseVersions.length > 0">
+                                -
+                                <a class="clickable"
+                                   uib-dropdown-toggle>
+                                    view a different version <span class="caret"></span>
+                                </a>
+                            </span>
+                    <ul class="dropdown-menu"
+                        uib-dropdown-menu
+                        role="menu">
+                        <li ng-repeat="ver in ctrl.otherResponseVersions"
+                            role="menuitem">
+                            <a class="clickable"
+                               ng-click="ctrl.viewOtherResponseVersion(ver)">
+                                <span ng-bind="ver.versionNum"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
         <br>
         <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Participants
-                    </div>
-                    <div class="col-sm-8">
-                        <ul class="list-unstyled list-inline">
-                            <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
+            <div class="col-sm-2 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-4"
+                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Survey ID
+            </div>
+            <div class="col-sm-4"
+                 ng-bind="ctrl.surveyInstance.id">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Submitted
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now ng-if="ctrl.surveyInstance.submittedAt"
+                                timestamp="ctrl.surveyInstance.submittedAt">
+                </waltz-from-now>
+                <span ng-if="! ctrl.surveyInstance.submittedAt">
+                    -
+                </span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyInstance.dueDate"></waltz-from-now>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Issued
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Participants
+            </div>
+            <div class="col-sm-10">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
                         <span>
                             <span ng-bind="p.displayName"></span>
                         </span>
-                                <span ng-hide="$last">, </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Issued
-                    </div>
-                    <div class="col-sm-8">
-                        <waltz-from-now timestamp="ctrl.surveyRun.issuedOn"></waltz-from-now>
-                    </div>
-                </div>
+                        <span ng-hide="$last">, </span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -163,6 +184,14 @@
                                 <div ng-switch-when="NUMBER">
                                     <span ng-bind="ctrl.answers[qi.question.id].answer | number">
                                     </span>
+                                </div>
+                                <div ng-switch-when="DATE">
+                                    <span ng-bind="ctrl.answers[qi.question.id].answer | date:'dd-MMM-yyyy'">
+                                    </span>
+                                </div>
+                                <div ng-switch-when="TEXTAREA">
+                                    <waltz-markdown text="ctrl.answers[qi.question.id].answer">
+                                    </waltz-markdown>
                                 </div>
                                 <div ng-switch-default>
                                     <span ng-bind="ctrl.answers[qi.question.id].answer">

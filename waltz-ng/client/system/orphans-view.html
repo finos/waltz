@@ -124,6 +124,19 @@
                         ng-click="ctrl.cleanupAuthSources()">
                     Cleanup Auth Sources
                 </button>
+
+                <hr>
+
+                <h4>Cleanup Attestations</h4>
+                <p class="small text-muted">
+                    Remove attestation instances and requests to recipients for all attestations where applications
+                    no longer exists, either due to removal or retirement.
+                </p>
+
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupAttestations()">
+                    Cleanup Attestations
+                </button>
             </div>
         </div>
     </div>

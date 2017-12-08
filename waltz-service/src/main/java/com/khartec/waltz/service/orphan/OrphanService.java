@@ -80,4 +80,9 @@ public class OrphanService {
         return orphanDao.findOrphanPhysicalFlows();
     }
 
+
+    public List<OrphanRelationship> findOrphanAttestatations() {
+        return orphanDao.findOrphanAttestatations();
+    }
+
 }

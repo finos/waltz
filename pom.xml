@@ -40,6 +40,7 @@
         <hikari.version>2.6.3</hikari.version>
         <immutables.version>2.5.6</immutables.version>
         <jackson.version>2.8.9</jackson.version>
+        <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.8.9</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
         <jool.version>0.9.12</jool.version>
@@ -51,6 +52,7 @@
         <spark.version>2.6.0</spark.version>
         <spring.version>4.3.10.RELEASE</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
+        <freemarker.version>2.3.23</freemarker.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
@@ -124,11 +126,15 @@
             </dependency>
 
 
-
             <!-- core -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
                 <version>${spring.version}</version>
             </dependency>
             <dependency>
@@ -154,11 +160,23 @@
 
 
             <!-- db -->
-
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
                 <version>${hikari.version}</version>
+            </dependency>
+
+
+            <!-- mail -->
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>${javax.mail.version}</version>
             </dependency>
 
 
@@ -168,7 +186,6 @@
                 <artifactId>super-csv</artifactId>
                 <version>${super-csv.version}</version>
             </dependency>
-
 
 
             <!-- test -->

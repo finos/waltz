@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -36,12 +37,15 @@ public class PersonHarness {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        int c = dsl.fetchCount(PERSON, PERSON.MANAGER_EMPLOYEE_ID.eq("").or(PERSON.MANAGER_EMPLOYEE_ID.isNull()));
+        PersonDao personDao = ctx.getBean(PersonDao.class);
 
+        int c = dsl.fetchCount(PERSON, PERSON.MANAGER_EMPLOYEE_ID.eq("").or(PERSON.MANAGER_EMPLOYEE_ID.isNull()));
 
         int c2 = dsl.fetchCount(DSL.selectDistinct(PERSON_HIERARCHY.MANAGER_ID).from(PERSON_HIERARCHY).where(PERSON_HIERARCHY.LEVEL.eq(1)));
         System.out.println(c);
         System.out.println(c2);
+
+
 
     }
 }

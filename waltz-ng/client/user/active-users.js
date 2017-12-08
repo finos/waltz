@@ -27,7 +27,7 @@ const initialState = {
 function controller($window,
                     accessLogStore) {
 
-    const vm =  initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
 
     vm.onDurationChange = (minutes) => {
         accessLogStore
@@ -37,7 +37,7 @@ function controller($window,
 
     vm.emailUsers = () => {
         const users = _.map(vm.activeUsers, 'userId');
-        $window.open('mailto:?bcc=' + users.join(', '));
+        $window.open('mailto:?bcc=' + users.join('; '));
     };
 }
 

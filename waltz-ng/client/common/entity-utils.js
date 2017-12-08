@@ -31,6 +31,15 @@ export function refToString(r) {
 }
 
 
+export function stringToRef(s) {
+    const bits = s.split('/');
+    return {
+        kind: bits[0],
+        id: bits[1]
+    };
+}
+
+
 export function toEntityRef(obj, kind = obj.kind) {
     const ref = {
         id: obj.id,

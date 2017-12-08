@@ -20,6 +20,7 @@ package com.khartec.waltz.data.orphan;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
@@ -202,6 +203,28 @@ public class OrphanDao {
                         .orphanSide(OrphanSide.A)
                         .build());
 
+    }
+
+
+    public List<OrphanRelationship> findOrphanAttestatations() {
+
+        return dsl
+                .selectDistinct(
+                        ATTESTATION_INSTANCE.ID,
+                        ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                .from(ATTESTATION_INSTANCE)
+                .leftJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                            .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
+                    .and(APPLICATION.ID.isNull()
+                        .or(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.REMOVED.name()))
+                        .or(APPLICATION.IS_REMOVED.eq(true)))
+                .fetch(r -> ImmutableOrphanRelationship.builder()
+                        .entityA(mkRef(EntityKind.ATTESTATION, r.value1()))
+                        .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
+                        .orphanSide(OrphanSide.A)
+                        .build());
     }
 
 

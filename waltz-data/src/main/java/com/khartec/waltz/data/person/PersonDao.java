@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
@@ -164,4 +165,16 @@ public class PersonDao {
                 .where(PERSON.EMAIL.eq(userId)) // TODO: change as part of 247
                 .fetchOne(personMapper);
     }
+
+
+    public List<Person> findPersonsByAttestationInstanceId(long instanceId) {
+        return dsl.select(PERSON.fields())
+                .from(ATTESTATION_INSTANCE_RECIPIENT)
+                .innerJoin(PERSON)
+                .on(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(PERSON.EMAIL))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(instanceId))
+                .fetch(personMapper);
+    }
+
+
 }

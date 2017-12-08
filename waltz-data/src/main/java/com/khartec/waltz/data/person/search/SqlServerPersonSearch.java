@@ -29,7 +29,7 @@ import org.jooq.DSLContext;
 import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVendorSpecific {
@@ -43,7 +43,7 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
 
         return dsl.select(PERSON.fields())
                 .from(PERSON)
-                .where(JooqUtilities.MSSQL.mkContains(terms))
+                .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);
     }

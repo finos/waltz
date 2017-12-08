@@ -29,18 +29,12 @@ const viewState = {
 };
 
 
-const appRelationshipEdit = {
-    url: '/{id:int}/app-relationship/edit',
-    views: { 'content@': require('./change-initiative-app-relationship-edit') }
-};
-
-
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.change-initiative', baseState)
-        .state('main.change-initiative.view', viewState)
-        .state('main.change-initiative.app-relationship-edit', appRelationshipEdit)
+        .state('main.change-initiative.view', viewState);
 }
+
 
 setupRoutes.$inject = ['$stateProvider'];
 

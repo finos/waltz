@@ -35,7 +35,7 @@ public class MariaPersonSearch implements FullTextSearch<Person>, DatabaseVendor
     private static final String QUERY
             = "SELECT * FROM person\n"
             + " WHERE\n"
-            + " MATCH(display_name, user_principal_name, title)\n"
+            + " MATCH(display_name, email, user_principal_name)\n"
             + " AGAINST (?)\n"
             + " LIMIT ?";
 

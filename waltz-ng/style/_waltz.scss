@@ -13,13 +13,16 @@
 @import "bootstrap-styles";
 @import "grid";
 @import "waltz-field-table";
+@import "waltz-popover-width";
 @import "waltz-scroll-region";
-@import "waltz-text-muted";
 @import "waltz-tabs";
+@import "waltz-text-muted";
 @import "waltz-visibility";
 
 @import "../client/applications/components/bulk-application-selector/bulk-application-selector";
 @import "../client/asset-cost/components/asset-costs-graph";
+@import "../client/attestation/attestation";
+@import "../client/attestation/components/confirmation/attestation-confirmation";
 @import "../client/auth-sources/components/non-auth-sources-panel/non-auth-sources-panel";
 @import "../client/auth-sources/components/navigator/auth-sources-navigator";
 @import "../client/auth-sources/components/navigator-chart/auth-sources-navigator-chart";
@@ -43,6 +46,7 @@
 @import "../client/entity-statistics/directives/entity-statistic";
 @import "../client/entity-statistics/components/entity-statistic-summary-card";
 @import "../client/entity-statistics/components/history-chart/entity-statistic-history-chart";
+@import "../client/entity-svg-diagram/components/viewer/entity-svg-diagram-viewer";
 @import "../client/extensions/extensions";
 @import "../client/flow-diagram/flow-diagram";
 @import "../client/logical-flow/components/app-centric-flow-table/app-centric-flow-table";

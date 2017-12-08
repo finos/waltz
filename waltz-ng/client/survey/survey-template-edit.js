@@ -34,6 +34,9 @@ const initialState = {
         name: 'Boolean',
         value: 'BOOLEAN'
     },{
+        name: 'Date',
+        value: 'DATE'
+    },{
         name: 'Dropdown',
         value: 'DROPDOWN'
     },{
