@@ -37,8 +37,6 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 - D3 
 
 
-
-
 ## Contact
 
 - email: dwatkins@khartec.com
