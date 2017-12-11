@@ -26,7 +26,7 @@ module.exports = {
     entry: {
         app: './client/main.js'
     },
-    devtool: 'cheap-source-map',
+    devtool: 'source-map',
     output: {
         path: path.join(basePath, '/dist'),
         filename: '[name].js'

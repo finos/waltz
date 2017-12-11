@@ -1,0 +1,47 @@
+<div>
+    <div class="row">
+        <div class="col-md-4">
+            <label>Switch viewpoint</label>
+            <div>
+                X - Cols:
+                <select ng-model="$ctrl.xAxis"
+                        ng-change="$ctrl.onAxisChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </div>
+            <div>
+                Y - Rows:
+                <select ng-model="$ctrl.yAxis"
+                        ng-change="$ctrl.onAxisChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <br>
+            <waltz-no-data ng-if="! $ctrl.visibility.chart">
+                <message>
+                    <strong>No data</strong> to show.
+                    <div ng-if="$ctrl.messages.length > 0">
+                        <br>
+                        <ul>
+                            <li ng-repeat="message in $ctrl.messages">
+                                <span ng-bind="message"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </message>
+            </waltz-no-data>
+
+            <div ng-show="$ctrl.visibility.chart">
+                <waltz-drill-grid-chart drill-grid="$ctrl.drillGrid">
+                </waltz-drill-grid-chart>
+            </div>
+
+        </div>
+    </div>
+
+</div>

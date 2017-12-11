@@ -24,8 +24,8 @@ import * as AuthSourcesTable from './components/table/auth-sources-table';
 import * as NonAuthSourcesPanel from './components/non-auth-sources-panel/non-auth-sources-panel';
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
-import AuthSourcesNavigator from './components/navigator/auth-sources-navigator';
-import AuthSourcesNavigatorChart from './components/navigator-chart/auth-sources-navigator-chart';
+import AuthSourcesNavigatorPanel from './components/navigator-panel/auth-sources-navigator-panel';
+import DrillGridChart from './components/drill-grid-chart/drill-grid-chart';
 import * as TreePicker from './components/tree-picker/tree-picker';
 import {registerComponents, registerStore} from '../common/module-utils';
 
@@ -37,16 +37,19 @@ export default () => {
     module
         .directive('waltzRatingIndicator', require('./directives/rating-indicator'));
 
-    registerStore(module, authSourcesStore);
-    registerComponents(module, [
-        AuthSourceEditorPanel,
-        AuthSourcesNavigator,
-        AuthSourcesNavigatorChart,
-        AuthSourcesTable,
-        AuthSourcesSection,
-        AuthSourcesSummaryPanel,
-        TreePicker,
-        NonAuthSourcesPanel ]);
+    registerStore(
+        module,
+        authSourcesStore);
+    registerComponents(
+        module,
+        [   AuthSourceEditorPanel,
+            AuthSourcesNavigatorPanel,
+            DrillGridChart,
+            AuthSourcesTable,
+            AuthSourcesSection,
+            AuthSourcesSummaryPanel,
+            TreePicker,
+            NonAuthSourcesPanel ]);
 
     return module.name;
 };

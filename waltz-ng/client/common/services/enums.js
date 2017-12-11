@@ -1176,7 +1176,7 @@ export const surveyQuestionFieldType = {
         description: null,
         position: 20
     },
-    DROPDOWN: {
+    DATE: {
         key: 'DATE',
         name: 'Date',
         icon: null,

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './auth-sources-navigator-chart.html';
+import template from './drill-grid-chart.html';
 import {initialiseData} from "../../../common";
 
 import {ragColorScale} from '../../../common/colors';
@@ -30,12 +30,11 @@ import {truncateText} from "../../../common/d3-utils";
 
 
 const bindings = {
-    navigator: '<'
+    drillGrid: '<'
 };
 
 
 const initialState = {
-
 };
 
 
@@ -51,11 +50,13 @@ const blockText = {
     dy: blockHeight * -0.3,
     dx: 3
 };
-const colWidth = 32;
+const colWidth = 24;
 const rowGroupPadding = 4;
 const minHeight = 350;
 
-const blockScaleX = scaleLinear().domain([0,32]).range([0, width]);
+const blockScaleX = scaleLinear()
+    .domain([0,32])
+    .range([0, width]);
 
 
 const styles = {
@@ -102,15 +103,15 @@ const regionInfo = [
 
 // -- UTIL --
 
-function calcTotalRequiredHeight(chartData) {
+function calcTotalRequiredHeight(drillGrid) {
     const top = blockHeight * 2;
     const groupsHeight = _
-        .chain(chartData.rowGroups)
+        .chain(drillGrid.rowGroups)
         .map(g => g.rows.length)
         .sum()
         .value() * blockHeight;
 
-    const groupsPadding = chartData.rowGroups.length * rowGroupPadding;
+    const groupsPadding = drillGrid.rowGroups.length * rowGroupPadding;
 
     const total = top + groupsHeight + groupsPadding + margin.top + margin.bottom;
     return _.max([total, minHeight]);
@@ -135,32 +136,18 @@ function applyBlockTextAttrs(selection) {
 function calculateRowGroupOffsets(rowGroups = []) {
     return _.reduce(
         rowGroups,
-        (acc, g) => {
-            const rowCount = g.rows.length;
+        (acc, rg) => {
+            const rowCount = rg.rows.length;
             const start = acc.total;
             const height = (rowCount * blockHeight);
 
-            acc[g.domain.id] = { start, height };
+            acc[rg.group.id] = { start, height };
 
             acc.total = start + height + rowGroupPadding;
             return acc;
         },
         { total: 0 });
 }
-
-
-const opacityScores = {
-    DIRECT: 1,
-    HEIR: 0.7,
-    ANCESTOR: 0.6,
-    UNKNOWN: 0.4
-};
-
-
-const calcOpacity = d => {
-    const total = (opacityScores[d.rowType] || 0.5) + (opacityScores[d.colType] || 0.5);
-    return total / 2;
-};
 
 
 const highlightColumn = (colId, flag, svg) => {
@@ -197,7 +184,7 @@ function init(svg, scaleX) {
 }
 
 
-function drawAppMappings(selector, colScale, navigator, svg) {
+function drawAppMappings(selector, colScale, drillGrid, svg) {
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
         .data(d => d.mappings, d => d.colId);
@@ -209,28 +196,53 @@ function drawAppMappings(selector, colScale, navigator, svg) {
         .filter(d => d.colType != 'NONE')
         .append('g')
         .classed(styles.appMapping, true)
-        .attr('transform', d => `translate(${colScale(d.colId)} , 0)`)
         .on('mouseover', d => highlightColumn(d.colId, true, svg))
         .on('mouseout', d => highlightColumn(d.colId, false, svg))
-        .on('click', d => navigator.focusBoth(d.colId, d.groupId));
+        .on('click.focus', d => drillGrid.refresh({ xId: d.colId, yId: d.groupId }));
 
     newAppMappings
         .append('rect')
         .attr('stroke', d => ragColorScale(d.rating))
-        .attr('fill', d => ragColorScale(d.rating).brighter(2))
+        .attr('fill', d => ragColorScale(d.rating).brighter(2.5))
         .attr('rx', 1)
         .attr('y', 1)
         .attr('x', (colScale.bandwidth() / 2) * -1)
         .attr('width', colScale.bandwidth())
         .attr('height', blockHeight - 2);
 
+    newAppMappings
+        .append('text')
+        .attr('dx', -6)
+        .attr('dy', 8)
+        .text(d => d.colId);
+
+    newAppMappings
+        .append('text')
+        .attr('dx', -6)
+        .attr('dy', 18)
+        .text(d => Math.floor(colScale(d.colId)));
+
     return newAppMappings
         .merge(appMappings)
-        .style('opacity', calcOpacity);
+        .attr('transform', d => `translate(${colScale(d.colId)} , 0)`);
 }
 
 
-function drawAppRows(selector, colScale, navigator, svg) {
+const arrows = {
+    DIRECT: ' ',
+    HEIR: '↥',
+    ANCESTOR: '↧',
+    NONE: 'x',
+    UNKNOWN: '?'
+};
+
+
+function typeToArrow(type) {
+    return arrows[type] || ' ';
+}
+
+
+function drawAppRows(selector, colScale, drillGrid, svg) {
     const appRows = selector
         .selectAll(`.${styles.appRow}`)
         .data(d => d.rows, d => d.app.id);
@@ -246,7 +258,7 @@ function drawAppRows(selector, colScale, navigator, svg) {
 
     newAppRows
         .append('text')
-        .text(d => d.app.name)
+        .text(d => typeToArrow(d.rowType) + d.app.name)
         .attr('y', blockHeight)
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 4);
@@ -255,7 +267,7 @@ function drawAppRows(selector, colScale, navigator, svg) {
 
     appRows
         .merge(newAppRows)
-        .call(drawAppMappings, colScale, navigator, svg);
+        .call(drawAppMappings, colScale, drillGrid, svg);
 
     return appRows;
 }
@@ -265,20 +277,20 @@ function drawRowGroupLabel(selection) {
     return selection
         .append('text')
         .attr('y', blockHeight)
-        .text(d => d.domain.name)
+        .text(d => d.group.name)
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 3 - 10)
 }
 
 
-function drawRowGroups(navigator, svg, chartData, colScale) {
+function drawRowGroups(drillGrid, svg, colScale) {
 
-    const groupOffsets = calculateRowGroupOffsets(chartData.rowGroups);
+    const groupOffsets = calculateRowGroupOffsets(drillGrid.rowGroups);
 
     const rowGroups = svg
         .select('.rowGroups')
         .selectAll(`.${styles.rowGroup}`)
-        .data(chartData.rowGroups, d => d.domain.id);
+        .data(drillGrid.rowGroups, d => d.group.id);
 
     rowGroups.exit().remove();
 
@@ -290,32 +302,32 @@ function drawRowGroups(navigator, svg, chartData, colScale) {
     newRowGroups
         .append('rect')
         .attr('width', 900)
-        .attr('height', d => groupOffsets[d.domain.id].height)
+        .attr('height', d => groupOffsets[d.group.id].height)
         .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
 
     newRowGroups
         .merge(rowGroups)
-        .attr('transform', d => `translate(0, ${groupOffsets[d.domain.id].start})`);
+        .attr('transform', d => `translate(0, ${groupOffsets[d.group.id].start})`);
 
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
         .on('mouseout.hover', function() { select(this).classed(styles.rowGroupHover, false)})
-        .on('click.focus', d => navigator.focusRowGroup(d.domain.id))
         .call(drawRowGroupLabel);
 
     rowGroups
         .merge(newRowGroups)
-        .call(drawAppRows, colScale, navigator, svg);
+        .on('click.focus', d => drillGrid.refresh({ yId: d.group.id }))
+        .call(drawAppRows, colScale, drillGrid, svg);
 }
 
 
-function drawColHeaders(navigator, svg, chartData, colScale) {
-    const colsDomain = _.get(chartData, 'cols.domain',[]);
+function drawColHeaders(drillGrid, svg, colScale) {
+    const colsDomain = _.get(drillGrid, 'xAxis.current.domain',[]);
 
     const headers = svg
         .select(".xHeader")
         .selectAll(`.${styles.colHeader}`)
-        .data(colsDomain, d => d.id);
+        .data(colsDomain, refToString);
 
     headers.exit().remove();
 
@@ -323,96 +335,106 @@ function drawColHeaders(navigator, svg, chartData, colScale) {
         .enter()
         .append('g')
         .classed(styles.colHeader, true)
-        .attr('transform', d => `translate(${colScale(d.id)}, 0) rotate(315 0,14)`)
         .on('mouseover', d => highlightColumn(d.id, true, svg))
-        .on('mouseout', d => highlightColumn(d.id, false, svg))
-        .on('click', d => navigator.focusCol(d.id));
+        .on('mouseout', d => highlightColumn(d.id, false, svg));
 
     newHeaders
         .append('text')
-        .text(d => d.name)
+        .text(d => d.name )
         .attr('y', 16)
-        .call(truncateText, blockWidth * 4)
+        .call(truncateText, blockWidth * 4);
 
-    return newHeaders.merge(headers);
+    return newHeaders
+        .merge(headers)
+        .attr('transform', d => `translate(${colScale(d.id)}, 0) rotate(315 0,14)`)
+        .on('click.focus', d => drillGrid.refresh( { xId: d.id }));
+
+
 }
 
 
-function drawHistory(navigator, svg, chartData) {
-    const colHistoryDatum = _.get(chartData, 'cols.active');
+function drawHistory(drillGrid, svg) {
+    const colHistoryDatum = _.get(drillGrid, 'xAxis.current.active');
 
     const xHistory = svg
         .select('.xHistory')
         .selectAll('text')
         .data(colHistoryDatum
-            ? [ colHistoryDatum ]
-            : [],
-            d => d.id);
+                ? [ colHistoryDatum ]
+                : [],
+            refToString);
 
     xHistory.exit().remove();
 
     xHistory
         .enter()
         .append('text')
-        .text(d => `.. up to ${d.name}`)
+        .text(d => `⇧ to ${d.name}`)
         .classed(styles.history, true)
         .classed('clickable', true)
         .attr('transform', `rotate(315 0,${blockHeight}) `)
-        .on('click', d => navigator.focusCol(d.parentId))
+        .on('click.focus', d => drillGrid.refresh({ xId: d.parentId }))
         .call(truncateText, blockWidth * 4);
 
+    const yActive = drillGrid.yAxis.current.active;
     const yHistory = svg
         .select('.yHistory')
         .selectAll('text')
-        .data(
-            chartData.rows.active
-                ? [chartData.rows.active]
+        .data(yActive
+                ? [yActive]
                 : [],
-            d => d.id);
+            refToString);
 
     yHistory.exit().remove();
 
     yHistory
         .enter()
         .append('text')
-        .text(d => `.. up to ${d.name}`)
+        .text(d => `⇧ to ${d.name}`)
         .classed('clickable', true)
         .classed(styles.history, true)
         .attr('text-anchor', 'end')
         .attr('y', blockWidth)
         .attr('dy', blockHeight)
         .attr('transform', `rotate(270 0,${blockHeight}) `)
-        .on('click', d => navigator.focusRowGroup(d.parentId));
+        .on('click.focus', d => drillGrid.refresh( { yId: d.parentId }));
 }
 
-function draw(navigator, chartData, svg, blockScaleX) {
-    console.log('draw', chartData);
-    global.chart = chartData;
+
+function refToString(ref) {
+    if (_.isString(ref)) return ref;
+    return `${ref.kind}/${ref.id}`;
+}
 
 
+function draw(drillGrid, svg, blockScaleX) {
     if (! svg) return;
 
+    console.log('draw', { drillGrid });
 
-    const height = calcTotalRequiredHeight(chartData);
+    const height = calcTotalRequiredHeight(drillGrid);
 
     svg.attr('viewBox', `0 0 1024 ${height}`);
+    svg.attr('height', height);
 
-    const colDomain = _.get(chartData, "cols.domain", []);
-    const colsWidth = colWidth * colDomain.length || 1;  // 'or 1' to prevent colScale from blowing up
+    const colIds = _.flow(
+        d => _.get(d, 'xAxis.current.domain', []),
+        d => _.map(d, 'id')
+    )(drillGrid);
+
+    const colsWidth = colWidth * colIds.length || 1;  // 'or 1' to prevent colScale from blowing up
     const colsStartX = blockScaleX(5);
 
-    console.log('colsWidth', colsWidth);
-
     const colScale = scaleBand()
-        .domain(_.map(colDomain, 'id'))
+        .domain(colIds)
         .range([colsStartX, colsStartX + colsWidth])
         .paddingInner([0.1])
         .paddingOuter([0.3])
         .align([0.5]);
 
-    drawColHeaders(navigator, svg, chartData, colScale);
-    drawRowGroups(navigator, svg, chartData, colScale);
-    drawHistory(navigator, svg, chartData);
+    drawColHeaders(drillGrid, svg, colScale);
+    drawRowGroups(drillGrid, svg, colScale);
+    drawHistory(drillGrid, svg);
 }
 
 
@@ -432,8 +454,8 @@ function controller($element) {
     };
 
     vm.$onChanges = (c) => {
-        if (c.navigator && vm.navigator) {
-            vm.navigator.addListener((chart) => draw(vm.navigator, chart, svg, blockScaleX));
+        if (c.drillGrid && vm.drillGrid) {
+            vm.drillGrid.addListener(() => draw(vm.drillGrid, svg, blockScaleX));
         }
     };
 }
@@ -450,6 +472,6 @@ const component = {
 
 
 export default {
-    id: 'waltzAuthSourcesNavigatorChart',
+    id: 'waltzDrillGridChart',
     component
 }
