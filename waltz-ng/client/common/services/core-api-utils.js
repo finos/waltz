@@ -31,6 +31,7 @@ import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
+import {DrillGridDefinitionStore_API as DrillGridDefinitionStore} from "../../drill-grid/services/drill-grid-definition-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
@@ -81,6 +82,7 @@ export const CORE_API = {
     DatabaseStore,
     DataTypeStore,
     DataTypeUsageStore,
+    DrillGridDefinitionStore,
     EndUserAppStore,
     EntityNamedNoteStore,
     EntityNamedNoteTypeStore,

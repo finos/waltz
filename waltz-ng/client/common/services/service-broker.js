@@ -100,8 +100,15 @@ function loadData($injector,
                   targetParams = [],
                   options) {
 
+
     const {serviceName, serviceFnName} = target;
     const {force = false, cacheRefreshListener} = options;
+
+    if (! $injector.has(serviceName)) {
+        const message = "ServiceBroker::loadData - Unable to locate service: " + serviceName;
+        console.error(message);
+        return Promise.reject(message)
+    }
 
     const service = $injector.get(serviceName);
     const cacheKey = createKey(serviceName, serviceFnName, targetParams);
@@ -127,7 +134,7 @@ function loadData($injector,
     })).catch(error => {
         //evict the cache entry because it's in error
         cache.delete(cacheKey);
-        console.warn(`SERVICE LOAD ERROR: ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams);
+        console.warn(`ServiceBroker::loadData - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams);
         throw error;
     });
     return resultPromise;
@@ -173,11 +180,18 @@ function service($injector) {
         performChecks(target, targetParams, options);
 
         const {serviceName, serviceFnName} = target;
+
+        if (! $injector.has(serviceName)) {
+            const message = "ServiceBroker::execute - Unable to locate service: " + serviceName;
+            console.error(message);
+            return Promise.reject(message)
+        }
+
         const service = $injector.get(serviceName);
         const serviceFn = getFunction(service, serviceName, serviceFnName);
         return serviceFn(...targetParams)
             .then(data => ({data}))
-            .catch(error => console.warn(`SERVICE EXECUTE ERROR: ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams));
+            .catch(error => console.warn(`ServiceBroker::execute - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams));
     };
 
     const resetViewData = () => {

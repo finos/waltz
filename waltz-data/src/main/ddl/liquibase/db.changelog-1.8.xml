@@ -1,0 +1,59 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.8.xml">
+
+    <changeSet id="20171209-2867-1"
+               author="davidwatkins73">
+        <comment>2867: Drill Grid definitions</comment>
+        <createTable tableName="drill_grid_definition"
+                     remarks="Settings for drill grids, kind may be either measurable category or data type">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="drill_grid_defn_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="x_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="y_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20171209-2867-2"
+               author="davidwatkins73">
+        <comment>2867: Drill Grid definitions unique key</comment>
+        <createIndex indexName="idx_drill_grid_defn_unique"
+                     tableName="drill_grid_definition"
+                     unique="true">
+            <column name="x_entity_kind" type="${enum.type}"/>
+            <column name="x_entity_id" type="${id.type}"/>
+            <column name="y_entity_kind" type="${enum.type}"/>
+            <column name="y_entity_id" type="${id.type}"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

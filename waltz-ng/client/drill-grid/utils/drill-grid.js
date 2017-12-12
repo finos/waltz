@@ -29,12 +29,14 @@ const DEFAULT_OPTIONS = {
 
 export default class DrillGrid {
 
-    constructor(xAxis,
+    constructor(definition,
+                xAxis,
                 yAxis,
                 options) {
 
         this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
+        this.definition = definition;
         this.xAxis = xAxis;
         this.yAxis = yAxis;
         this.rowGroups = [];

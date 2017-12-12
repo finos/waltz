@@ -69,6 +69,7 @@ const dependencies = [
     require('./data-type-usage')(),
     require('./data-types')(),
     require('./databases')(),
+    require('./drill-grid')(),
     require('./dynamic-section')(),
     require('./end-user-apps')(),
     require('./entity')(),
