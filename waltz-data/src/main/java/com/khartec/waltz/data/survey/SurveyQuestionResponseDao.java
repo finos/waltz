@@ -1,6 +1,26 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.data.survey;
 
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.EntityNameUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -14,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +75,7 @@ public class SurveyQuestionResponseDao {
                         .stringResponse(Optional.ofNullable(record.getStringResponse()))
                         .numberResponse(Optional.ofNullable(record.getNumberResponse()).map(BigDecimal::doubleValue))
                         .booleanResponse(Optional.ofNullable(record.getBooleanResponse()))
+                        .dateResponse(Optional.ofNullable(record.getDateResponse()).map(Date::toLocalDate))
                         .entityResponse(entityReference)
                         .build())
                 .build();
@@ -112,6 +134,21 @@ public class SurveyQuestionResponseDao {
     }
 
 
+    public int[] cloneResponses(long sourceSurveyInstanceId, long targetSurveyInstanceId) {
+        Result<SurveyQuestionResponseRecord> records = dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+                .select(entityNameField)
+                .from(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
+                .fetchInto(SURVEY_QUESTION_RESPONSE);
+
+        records.stream()
+                .forEach(r -> r.setSurveyInstanceId(targetSurveyInstanceId));
+
+        return dsl.batchInsert(records)
+                .execute();
+    }
+
+
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
         SurveyQuestionResponse questionResponse = response.questionResponse();
         Optional<EntityReference> entityResponse = questionResponse.entityResponse();
@@ -131,6 +168,9 @@ public class SurveyQuestionResponseDao {
                                     .map(BigDecimal::valueOf)
                                     .orElse(null));
         record.setBooleanResponse(questionResponse.booleanResponse().orElse(null));
+        record.setDateResponse(questionResponse.dateResponse()
+                                    .map(DateTimeUtilities::toSqlDate)
+                                    .orElse(null));
         record.setEntityResponseKind(entityResponse.map(er -> er.kind().name()).orElse(null));
         record.setEntityResponseId(entityResponse.map(er -> er.id()).orElse(null));
 

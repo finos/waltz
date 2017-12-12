@@ -83,6 +83,16 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Export -->
+            <a ng-click="$ctrl.export()"
+               ng-if="!$ctrl.visibility.editor && !$ctrl.selectedRow"
+               class="clickable pull-right"
+               style="text-decoration: none;"
+               role="button">
+                <waltz-icon name="download"></waltz-icon>
+                Export
+            </a>
         </div>
 
         <!-- NO DATA -->

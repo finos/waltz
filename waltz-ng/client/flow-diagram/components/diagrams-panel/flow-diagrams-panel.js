@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,9 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 import template from './flow-diagrams-panel.html';
@@ -94,11 +93,10 @@ function controller(
         flowDiagramStateService
             .reset();
 
-        showEditableDiagram();
-
         flowDiagramStarterService
             .mkCommands(vm.parentEntityRef)
             .then(starterCommands => {
+                showEditableDiagram();
                 flowDiagramStateService.processCommands(starterCommands);
                 notification.warning("Flow diagrams are not automatically saved. Remember to save your work.")
             });

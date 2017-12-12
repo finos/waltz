@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,7 +21,6 @@ import template from './auth-source-editor-panel.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from 'lodash';
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 
 

@@ -1,3 +1,22 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.data.survey;
 
 import com.khartec.waltz.model.EntityKind;
@@ -33,6 +52,8 @@ public class SurveyInstanceDao {
             .as("entity_name");
 
 
+    private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull();
+
     private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
         SurveyInstanceRecord record = r.into(SURVEY_INSTANCE);
         return ImmutableSurveyInstance.builder()
@@ -46,6 +67,7 @@ public class SurveyInstanceDao {
                 .dueDate(record.getDueDate().toLocalDate())
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(record.getSubmittedBy())
+                .originalInstanceId(record.getOriginalInstanceId())
                 .build();
     };
 
@@ -76,6 +98,7 @@ public class SurveyInstanceDao {
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -85,6 +108,7 @@ public class SurveyInstanceDao {
                 .select(ENTITY_NAME_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -98,6 +122,24 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+
+        record.store();
+        return record.getId();
+    }
+
+
+    public long createPreviousVersion(SurveyInstance currentInstance) {
+        checkNotNull(currentInstance, "currentInstance cannot be null");
+
+        SurveyInstanceRecord record = dsl.newRecord(SURVEY_INSTANCE);
+        record.setSurveyRunId(currentInstance.surveyRunId());
+        record.setEntityKind(currentInstance.surveyEntity().kind().name());
+        record.setEntityId(currentInstance.surveyEntity().id());
+        record.setStatus(currentInstance.status().name());
+        record.setDueDate(toSqlDate(currentInstance.dueDate()));
+        record.setOriginalInstanceId(currentInstance.id().get());
+        record.setSubmittedAt(Timestamp.valueOf(currentInstance.submittedAt()));
+        record.setSubmittedBy(currentInstance.submittedBy());
 
         record.store();
         return record.getId();
@@ -134,6 +176,7 @@ public class SurveyInstanceDao {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .execute();
     }
 
@@ -154,6 +197,16 @@ public class SurveyInstanceDao {
                 .select(ENTITY_NAME_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ID.in(selector))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<SurveyInstance> findPreviousVersionsForInstance(long instanceId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(instanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -162,6 +215,7 @@ public class SurveyInstanceDao {
         final Result<Record2<String, Integer>> countsByStatus = dsl.select(SURVEY_INSTANCE.STATUS, DSL.count(SURVEY_INSTANCE.ID))
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .groupBy(SURVEY_INSTANCE.STATUS)
                 .fetch();
 

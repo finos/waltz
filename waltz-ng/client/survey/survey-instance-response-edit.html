@@ -136,7 +136,8 @@
                         </waltz-markdown>
                     </label>
                     <div ng-switch="qi.question.fieldType"
-                         class="col-sm-7">
+                         class="col-sm-7"
+                         ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
                         <!-- input control -->
                         <!-- text -->
                         <input ng-switch-when="TEXT"
@@ -199,6 +200,17 @@
                                   rows="4"
                                   class="form-control">
                         </textarea>
+                        <!-- date -->
+                        <waltz-date-picker-form-input ng-switch-when="DATE"
+                                                      id="{{ qi.question.id }}"
+                                                      item-id="qi.question.id"
+                                                      allow-past-dates="true"
+                                                      place-holder="dd-MMM-yyyy"
+                                                      format="dd-MMM-yyyy"
+                                                      model="ctrl.surveyResponses[qi.question.id].dateResponse"
+                                                      on-change="ctrl.saveDateResponse"
+                                                      ng-required="qi.question.isMandatory">
+                        </waltz-date-picker-form-input>
                         <!-- dropdown -->
                         <select ng-switch-when="DROPDOWN"
                                 id="{{ qi.question.id }}"
@@ -213,7 +225,7 @@
                                                item-id="qi.question.id"
                                                required="qi.question.isMandatory"
                                                current-selection="ctrl.surveyResponses[qi.question.id].entityResponse"
-                                               on-select="ctrl.saveEntityRespone"
+                                               on-select="ctrl.saveEntityResponse"
                                                entity-kinds="['APPLICATION']">
                         </waltz-entity-selector>
                         <!-- person -->
@@ -221,7 +233,7 @@
                                                item-id="qi.question.id"
                                                required="qi.question.isMandatory"
                                                current-selection="ctrl.surveyResponses[qi.question.id].entityResponse"
-                                               on-select="ctrl.saveEntityRespone"
+                                               on-select="ctrl.saveEntityResponse"
                                                entity-kinds="['PERSON']">
                         </waltz-entity-selector>
                         <!-- comment -->

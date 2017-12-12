@@ -1,0 +1,61 @@
+<div ng-if="$ctrl.run">
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Run Name
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.run.name"></span>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-10">
+            <waltz-markdown text="$ctrl.run.description">
+            </waltz-markdown>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Scope
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.run.targetEntityKind | toDisplayName:'entity'"></span>s within
+            <waltz-entity-link entity-ref="$ctrl.run.selectionOptions.entityReference"></waltz-entity-link>
+            <span ng-bind="$ctrl.getFriendlyScope($ctrl.run.selectionOptions.scope)"></span>
+        </div>
+
+        <div class="col-sm-2 waltz-display-field-label">
+            Issued by
+        </div>
+        <div class="col-sm-4">
+            <waltz-entity-link entity-ref="$ctrl.issuedByRef">
+            </waltz-entity-link>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Due date
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.run.dueDate"></span>
+        </div>
+
+        <div class="col-sm-2 waltz-display-field-label">
+            Issued on
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.run.issuedOn"></span>
+        </div>
+    </div>
+</div>

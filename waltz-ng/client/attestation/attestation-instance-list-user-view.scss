@@ -1,0 +1,14 @@
+.waltz-attestation-instance-list-user-view {
+
+    .wailuv-run {
+        border-radius: $border-radius-base;
+        border: 3px solid  $waltz-section-background-color;
+        margin-top: 0.7em;
+        padding: 0.8em;
+        background: lighten($waltz-section-background-color, 3);
+    }
+
+    .wailuv-attested {
+        color: $waltz-green;
+    }
+}

@@ -1,0 +1,52 @@
+.wesd-viewer {
+    svg {
+        border: 1px solid #eee;
+        overflow: hidden;
+
+        text {
+            font-family: Arial;
+            font-size: 10px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        text::selection {
+            background: none;
+        }
+    }
+
+
+    [data-wesd-node-entity-link] {
+        path {
+            transition: 300ms linear all;
+            stroke: blue;
+            stroke-width: 2;
+            stroke-opacity: 0.5;
+            cursor: pointer;
+        }
+
+        path:hover {
+            stroke-width: 4;
+            stroke-opacity: 0.8;
+        }
+
+        text {
+            pointer-events: none;
+        }
+    }
+}
+
+.wesd-popup {
+    border: 3px solid #ddd;
+    border-radius: 1.5px;
+    padding: 12px;
+    opacity: 0.93;
+    position: absolute;
+    background: #fafafa;
+    z-index: 100;
+    width: 30%;
+    max-width: 300px;
+    pointer-events: none;
+}

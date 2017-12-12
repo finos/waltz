@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -158,6 +159,18 @@ public class JooqUtilities {
                     .map(t -> wrapSpecialInQuotes(t))
                     .forEach(joiner::add);
             return DSL.sql(joiner.toString());
+        }
+
+        public static SQL mkContainsPrefix(Collection<String> terms) {
+            checkNotNull(terms, "terms cannot be null");
+
+            // this is based on: https://stackoverflow.com/a/4321828
+            List<String> wildcardTerms = terms
+                    .stream()
+                    .map(s -> "\"" + s + "*\"")
+                    .collect(Collectors.toList());
+
+            return mkContains(wildcardTerms);
         }
 
         private static String wrapSpecialInQuotes(String t) {

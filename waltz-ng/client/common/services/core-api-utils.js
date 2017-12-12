@@ -1,27 +1,28 @@
 /*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
- *  * Waltz - Enterprise Architecture
- *  * Copyright (C) 2017  Khartec Ltd.
- *  *
- *  * This program is free software: you can redistribute it and/or modify
- *  * it under the terms of the GNU Lesser General Public License as published by
- *  * the Free Software Foundation, either version 3 of the License, or
- *  * (at your option) any later version.
- *  *
- *  * This program is distributed in the hope that it will be useful,
- *  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  * GNU Lesser General Public License for more details.
- *  *
- *  * You should have received a copy of the GNU Lesser General Public License
- *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
 import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
+import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
+import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
@@ -38,6 +39,7 @@ import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {EntityTagStore_API as EntityTagStore} from "../../entity-tags/services/entity-tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
+import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
@@ -49,6 +51,7 @@ import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../meas
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
+import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
 import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-unit-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../../perspective/services/perspective-definition-store";
@@ -72,6 +75,8 @@ export const CORE_API = {
     AliasStore,
     AppGroupStore,
     ApplicationStore,
+    AttestationInstanceStore,
+    AttestationRunStore,
     AssetCostStore,
     AuthSourcesStore,
     BookmarkStore,
@@ -91,6 +96,7 @@ export const CORE_API = {
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,
+    EntitySvgDiagramStore,
     InvolvementStore,
     InvolvementKindStore,
     LogicalFlowStore,
@@ -99,6 +105,7 @@ export const CORE_API = {
     MeasurableRatingStore,
     MeasurableRelationshipStore,
     MeasurableStore,
+    NotificationStore,
     OrgUnitStore,
     PersonStore,
     PerspectiveDefinitionStore,

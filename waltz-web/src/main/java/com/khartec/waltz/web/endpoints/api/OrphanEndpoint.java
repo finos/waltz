@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -64,6 +65,7 @@ public class OrphanEndpoint implements Endpoint {
         String findOrphanChangeInitiativesPath = mkPath(BASE_URL, "change-initiative");
         String findOrphanLogicalDataFlowsPath = mkPath(BASE_URL, "logical-flow");
         String findOrphanPhysicalFlowsPath = mkPath(BASE_URL, "physical-flow");
+        String findOrphanAttestationsPath = mkPath(BASE_URL, "attestation");
 
 
         ListRoute<OrphanRelationship> findApplicationsWithNonExistingOrgUnitRoute = (request, response) -> {
@@ -114,6 +116,12 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
+        ListRoute<OrphanRelationship> findOrphanAttestationsRoute = (request, response) -> {
+            requireRole(userRoleService, request, ADMIN);
+            return orphanService.findOrphanAttestatations();
+        };
+
+
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
         getForList(findOrphanMeasurableRatingsPath, findOrphanMeasurableRatingsRoute);
         getForList(findOrphanAuthoritativeSourcesByAppPath, findOrphanAuthoritativeSourcesByAppRoute);
@@ -122,5 +130,6 @@ public class OrphanEndpoint implements Endpoint {
         getForList(findOrphanChangeInitiativesPath, findOrphanChangeInitiativesRoute);
         getForList(findOrphanLogicalDataFlowsPath, findOrphanLogicalDataFlowsRoute);
         getForList(findOrphanPhysicalFlowsPath, findOrphanPhysicalFlowsRoute);
+        getForList(findOrphanAttestationsPath, findOrphanAttestationsRoute);
     }
 }

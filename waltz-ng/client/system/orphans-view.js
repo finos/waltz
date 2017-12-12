@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -47,7 +48,8 @@ function controller($q,
                 orphanStore.findOrphanAuthoritativeSourcesByDataType(),
                 orphanStore.findOrphanChangeInitiatives(),
                 orphanStore.findOrphanLogicalFlows(),
-                orphanStore.findOrphanPhysicalFlows()
+                orphanStore.findOrphanPhysicalFlows(),
+                orphanStore.findOrphanAttestations()
             ])
             .then( ([apps,
                 measurableRatings,
@@ -56,7 +58,8 @@ function controller($q,
                 authSourcesByDataType,
                 changeInitiatives,
                 logicalFlows,
-                physicalFlows
+                physicalFlows,
+                attestations
             ]) => {
                 const orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
@@ -66,7 +69,8 @@ function controller($q,
                     {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
                     {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
                     {description: 'Logical Flows referencing non-existent applications', values: logicalFlows},
-                    {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows}
+                    {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows},
+                    {description: 'Attestations referencing non-existent applications', values: attestations}
                 ];
                 vm.orphans = orphans;
             });
@@ -100,6 +104,12 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AuthSourcesStore.cleanupOrphans, [])
             .then(r => notification.success(`Cleaned up ${r.data} auth sources/s`));
+    };
+
+    vm.cleanupAttestations = () => {
+        serviceBroker
+            .execute(CORE_API.AttestationInstanceStore.cleanupOrphans, [])
+            .then(r => notification.success(`Cleaned up ${r.data} attestations/s`));
     };
 }
 

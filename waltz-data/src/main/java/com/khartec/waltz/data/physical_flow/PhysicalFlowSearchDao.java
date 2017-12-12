@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;

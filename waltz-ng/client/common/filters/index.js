@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,5 +26,7 @@ export default (module) => {
         .filter('toDomain', require('./to-domain-filter'))
         .filter('toDescription', require('./description-filter'))
         .filter('toFixed', require('./fixed-filter'))
-        .filter('toIconName', require('./icon-name-filter'));
+        .filter('toIconName', require('./icon-name-filter'))
+        .filter('truncate', require('./truncate-filter'))
+        .filter('truncateMiddle', require('./truncate-middle-filter'));
 };

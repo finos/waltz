@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -90,28 +91,6 @@ public class StringUtilities {
         if (str == null) return null;
         int howMuch = Math.min(maxLength, str.length());
         return str.substring(0, howMuch);
-    }
-
-
-
-    public static List<String> mkTerms(String query) {
-        String safeQuery = query
-                .replace("[", " ")
-                .replace("]", " ")
-                .replace("'", " ")
-                .replace("\"", " ")
-                .replace("|", " ")
-                .replace("!", " ")
-                .replace("%", " ")
-                .replace("(", " ")
-                .replace(")", " ")
-                .replace(",", " ")
-                .replace("~", " ");
-
-        return Stream.of(safeQuery.split(" "))
-                .filter(StringUtilities::notEmpty)
-                .filter(s -> s.length() > 2)
-                .collect(toList());
     }
 
 

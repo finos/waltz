@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,14 +16,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkLinkGridCell, kindToBaseState} from "../../../common/link-utils";
+import {mkLinkGridCell} from "../../../common/link-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKind} from "../../../common/services/enums";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {sameRef} from "../../../common/entity-utils";
+import {
+    allowedRelationshipsByKind,
+    fetchRelationshipFunctionsByKind,
+    changeRelationshipFunctionsByKind
+} from "../../../common/relationship-definitions";
+
 
 import template from './related-apps-section.html';
 
@@ -43,8 +51,11 @@ const initialState = {
         { field: 'app.businessCriticalityDisplay', name: 'Business Criticality'},
         { field: 'app.lifecyclePhaseDisplay', name: 'Lifecycle Phase'},
     ],
-    appRelationships: [],
-    sourceDataRatings: []
+    allowedRelationships: [],
+    entityRelationships: [],
+    visibility: {
+        editor: false
+    }
 };
 
 
@@ -58,15 +69,31 @@ function mkGridData(relations = [], apps = []) {
 }
 
 
-function controller($q, serviceBroker) {
+function mkChangeCommand(operation, entityRef, relKind) {
+    return {
+        operation,
+        entityReference: {
+            id: entityRef.id,
+            kind: 'APPLICATION'
+        },
+        relationship: relKind
+    };
+}
+
+
+function controller($q,
+                    notification,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    function loadData(force = false) {
+        const fetchRelationships = fetchRelationshipFunctionsByKind[vm.parentEntityRef.kind];
 
-    function loadData() {
         const relationsPromise = serviceBroker
             .loadViewData(
-                CORE_API.ChangeInitiativeStore.findRelatedForId,
-                [ vm.parentEntityRef.id ])
+                fetchRelationships,
+                [ vm.parentEntityRef.id ],
+                { force })
             .then(r => _
                 .chain(r.data)
                 .flatMap(rel => ([
@@ -79,30 +106,76 @@ function controller($q, serviceBroker) {
 
         const appsPromise = serviceBroker.loadViewData(
             CORE_API.ApplicationStore.findBySelector,
-            [ mkSelectionOptions(vm.parentEntityRef) ])
+            [ mkSelectionOptions(vm.parentEntityRef) ],
+            { force })
             .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
 
         $q.all([appsPromise, relationsPromise])
             .then(([apps, relations]) => {
                 vm.gridData = mkGridData(relations, apps);
+                vm.entityRelationships = _.map(relations, r => Object.assign({}, {
+                    relationship: r.relationship,
+                    entity: {
+                        id: r.entity.id,
+                        name: r.entity.name,
+                        kind: 'APPLICATION'
+                    }
+                }));
             });
     }
 
     vm.$onChanges= (c) => {
         if (vm.parentEntityRef) {
-            vm.editRouteState = kindToBaseState(vm.parentEntityRef.kind) + '.app-relationship-edit';
-            loadData();
+            vm.allowedRelationships = allowedRelationshipsByKind[vm.parentEntityRef.kind];
+            loadData(false);
         }
     };
 
     vm.onInitialise = (cfg) => {
         vm.export = () => cfg.exportFn(`app-relationships.csv`);
     };
+
+    vm.editMode = (editMode) => {
+        vm.visibility.editor = editMode;
+    };
+
+    vm.onAdd = (entityRel) => {
+        const changeRelationship = changeRelationshipFunctionsByKind[vm.parentEntityRef.kind];
+        serviceBroker
+            .execute(
+                changeRelationship,
+                [vm.parentEntityRef.id, mkChangeCommand('ADD', entityRel.entity, entityRel.relationship)])
+            .then(result => {
+                if(result.data) {
+                    notification.success("Relationship added successfully");
+                } else {
+                    notification.warning("Failed to add relationship")
+                }
+                loadData(true);
+            });
+    };
+
+    vm.onRemove = (entityRel) => {
+        const changeRelationship = changeRelationshipFunctionsByKind[vm.parentEntityRef.kind];
+        serviceBroker
+            .execute(
+                changeRelationship,
+                [vm.parentEntityRef.id, mkChangeCommand('REMOVE', entityRel.entity, entityRel.relationship)])
+            .then(result => {
+                if(result.data) {
+                    notification.success("Relationship removed successfully");
+                } else {
+                    notification.warning("Failed to remove relationship")
+                }
+                loadData(true);
+            });
+    };
 }
 
 
 controller.$inject = [
     '$q',
+    'Notification',
     'ServiceBroker'
 ];
 
