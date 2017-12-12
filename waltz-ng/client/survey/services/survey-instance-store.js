@@ -1,8 +1,7 @@
-import {checkIsEntityRef} from "../../common/checks";
-
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +16,8 @@ import {checkIsEntityRef} from "../../common/checks";
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {checkIsEntityRef} from "../../common/checks";
 
 function store($http, baseApiUrl) {
 
