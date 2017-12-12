@@ -67,7 +67,8 @@ const styles = {
     appMapping: 'wasnc-appMapping',
     rowGroup: 'wasnc-rowGroup',
     appRow: 'wasnc-appRow',
-    history: 'wasnc-history'
+    history: 'wasnc-history',
+    descendable: 'wasnc-descendable'
 };
 
 
@@ -210,18 +211,18 @@ function drawAppMappings(selector, colScale, drillGrid, svg) {
         .attr('width', colScale.bandwidth())
         .attr('height', blockHeight - 2);
 
-    newAppMappings
-        .append('text')
-        .attr('dx', -6)
-        .attr('dy', 8)
-        .text(d => d.colId);
-
-    newAppMappings
-        .append('text')
-        .attr('dx', -6)
-        .attr('dy', 18)
-        .text(d => Math.floor(colScale(d.colId)));
-
+    // newAppMappings
+    //     .append('text')
+    //     .attr('dx', -6)
+    //     .attr('dy', 8)
+    //     .text(d => d.colId);
+    //
+    // newAppMappings
+    //     .append('text')
+    //     .attr('dx', -6)
+    //     .attr('dy', 18)
+    //     .text(d => Math.floor(colScale(d.colId)));
+    //
     return newAppMappings
         .merge(appMappings)
         .attr('transform', d => `translate(${colScale(d.colId)} , 0)`);
@@ -297,6 +298,7 @@ function drawRowGroups(drillGrid, svg, colScale) {
     const newRowGroups = rowGroups
         .enter()
         .append('g')
+        .classed(styles.descendable, d => { console.log('d', d);  return (d.group.children || []).length > 0; })
         .classed(styles.rowGroup, true);
 
     newRowGroups
@@ -335,6 +337,7 @@ function drawColHeaders(drillGrid, svg, colScale) {
         .enter()
         .append('g')
         .classed(styles.colHeader, true)
+        .classed(styles.descendable, d => (d.children || []).length > 0)
         .on('mouseover', d => highlightColumn(d.id, true, svg))
         .on('mouseout', d => highlightColumn(d.id, false, svg));
 
@@ -348,8 +351,6 @@ function drawColHeaders(drillGrid, svg, colScale) {
         .merge(headers)
         .attr('transform', d => `translate(${colScale(d.id)}, 0) rotate(315 0,14)`)
         .on('click.focus', d => drillGrid.refresh( { xId: d.id }));
-
-
 }
 
 
