@@ -1,0 +1,18 @@
+<div>
+    <h5>
+        Recipients for
+        <span ng-bind="$ctrl.instance.parentEntity.name"></span>
+        (<span ng-bind="$ctrl.instance.childEntityKind | toDisplayName:'entity'"></span>s)
+    </h5>
+
+    <waltz-loading-notification show="$ctrl.visibility.loading"
+                                name="Loading">
+    </waltz-loading-notification>
+
+    <div  ng-class="{'waltz-scroll-region-250': $ctrl.recipientReferences.length > 10}">
+        <div ng-repeat="recipientRef in $ctrl.recipientReferences">
+            <waltz-entity-link entity-ref="recipientRef">
+            </waltz-entity-link>
+        </div>
+    </div>
+</div>

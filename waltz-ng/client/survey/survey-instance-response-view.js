@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from 'lodash';
 import {groupQuestions} from './survey-utils';
 
@@ -22,7 +24,7 @@ import {groupQuestions} from './survey-utils';
 function extractAnswer(response = {}) {
     return !_.isNil(response.booleanResponse)
             ? response.booleanResponse
-            : (response.stringResponse || response.numberResponse || response.entityResponse)
+            : (response.stringResponse || response.numberResponse || response.dateResponse || response.entityResponse)
 }
 
 
@@ -57,7 +59,32 @@ function controller($state,
             return surveyRunStore
                 .getById(surveyInstance.surveyRunId)
         })
-        .then(sr => vm.surveyRun = sr);
+        .then(sr => vm.surveyRun = sr)
+        .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
+        .then(prevVersionInstances => {
+            const prevVersions = _.chain(prevVersionInstances)
+                .sortBy('submittedAt')
+                .map((pv, i) => ({
+                    versionNum: `${i + 1}.0`,
+                    instanceId: pv.id,
+                    isLatest: false
+                }))
+                .reverse()
+                .value();
+
+            const latestInstanceId = vm.surveyInstance.originalInstanceId || id;
+            const latestResponseVersion = {
+                versionNum: `${prevVersions.length + 1}.0`,
+                instanceId: latestInstanceId,
+                isLatest: true
+            };
+
+            const allResponseVersions = [latestResponseVersion].concat(prevVersions);
+            vm.currentResponseVersion = _.keyBy(allResponseVersions, 'instanceId')[id];
+            vm.otherResponseVersions = _.filter(
+                allResponseVersions,
+                rv => rv.instanceId !== vm.currentResponseVersion.instanceId);
+        });
 
 
     const loadParticipants = responses => {
@@ -94,6 +121,10 @@ function controller($state,
                 $state.reload();
             });
         }
+    };
+
+    vm.viewOtherResponseVersion = (otherVer) => {
+        $state.go('main.survey.instance.response.view', {id: otherVer.instanceId});
     };
 }
 

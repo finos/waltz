@@ -1,0 +1,38 @@
+@import "./attestation-instance-list-user-view";
+
+$invalid-color: #f0ad4e;
+
+
+.waltz-attestation-form {
+    input.ng-invalid {
+        border-color: $invalid-color;
+    }
+
+    input[type=radio].ng-invalid {
+        outline: 1px dashed $invalid-color;
+    }
+
+    textarea.ng-invalid {
+        border-color: $invalid-color;
+    }
+
+    select.ng-invalid {
+        border-color: $invalid-color;
+    }
+
+    .ui-select-container.ng-invalid .ui-select-match {
+        border: 1px solid $invalid-color;
+    }
+
+    input[type=checkbox] {
+        box-shadow: none;
+        margin: 0;
+    }
+}
+
+
+.waltz-attestation-progress {
+    .progress-bar {
+        box-shadow: none;
+    }
+}

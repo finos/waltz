@@ -1,0 +1,54 @@
+<div class="wesd-viewer">
+    <!-- svg goes here -->
+</div>
+<div style="margin-bottom: 10px"
+     class="waltz-visibility-parent">
+
+    <div class="waltz-visibility-child-50">
+
+          <span class="wesd-pan-button btn btn-sm btn-success"
+                ng-if="$ctrl.panZoomEnabled"
+                ng-click="$ctrl.togglePanZoom()">
+            Disable Pan and Zoom via mouse
+        </span>
+
+        <span class="wesd-pan-button btn btn-sm btn-default"
+              ng-if="! $ctrl.panZoomEnabled"
+              ui-popover="Use mouse to drag and the wheel to zoom"
+              ng-click="$ctrl.togglePanZoom()">
+            Enable Pan and Zoom via mouse
+        </span>
+
+        <span class="wesd-pan-button btn btn-sm btn-default"
+              ng-click="$ctrl.zoom(-0.1)">
+            <waltz-icon name="minus"></waltz-icon>
+        </span>
+            <span class="wesd-pan-button btn btn-sm btn-default"
+                  ng-click="$ctrl.zoom(0.1)">
+            <waltz-icon name="plus"></waltz-icon>
+        </span>
+            <span class="wesd-pan-button btn btn-sm btn-default"
+                  ng-click="$ctrl.panX(-50)">
+            <waltz-icon name="chevron-left"></waltz-icon>
+        </span>
+            <span class="wesd-pan-button btn btn-sm btn-default"
+                  ng-click="$ctrl.panY(50)">
+            <waltz-icon name="chevron-up"></waltz-icon>
+        </span>
+            <span class="wesd-pan-button btn btn-sm btn-default"
+                  ng-click="$ctrl.panY(-50)">
+            <waltz-icon name="chevron-down"></waltz-icon>
+        </span>
+            <span class="wesd-pan-button btn btn-sm btn-default"
+                  ng-click="$ctrl.panX(50)">
+            <waltz-icon name="chevron-right"></waltz-icon>
+        </span>
+
+
+    </div>
+</div>
+
+<div ng-style="$ctrl.popup.style"
+     class="wesd-popup">
+    <waltz-markdown text="$ctrl.popup.text"></waltz-markdown>
+</div>

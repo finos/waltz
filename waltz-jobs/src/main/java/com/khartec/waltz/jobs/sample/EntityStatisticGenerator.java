@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -98,7 +99,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
     private static final EntityStatisticDefinition SERVER_COUNT = ImmutableEntityStatisticDefinition.builder()
             .active(true)
             .id(20010L)
-            .category(StatisticCategory.SECURITY)
+            .category(StatisticCategory.TECHNICAL)
             .name("Server Type Count")
             .description("Server Types")
             .type(StatisticType.NUMERIC)

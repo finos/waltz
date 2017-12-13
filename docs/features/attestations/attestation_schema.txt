@@ -1,0 +1,62 @@
+
+
+
+attestation_run as ar
+-
+id  PK long
+name string
+<entity_selector>  selector
+involvement_kinds [int] FK -< involvement_kind.id
+issued_by string
+issued_on string
+due_date date
+
+
+attestation_instance as ai
+-
+id long PK
+attestation_run_id long FK >- ar.id
+<entiy_ref>
+child_entity_kind string
+attested_at timestamp
+attested_by string
+
+
+attestation_instance_recipient as air
+-
+id long PK
+attestation_instance_id long FK >- ai.id
+user_id string FK >- p.email
+
+person as p
+-
+id long PK
+employee_id string
+email string
+display_name string
+
+
+involvement_kind as ik
+-
+id PK long
+name string
+
+involvement as inv
+-
+employee_id PK long FK - p.employee_id
+<entity_ref>
+kind id FK - ik.id
+
+
+[settings]
+Zoom 90
+Position -72 -76
+
+[layout]
+involvement_kind 449 419
+attestation_run 236 112
+attestation_instance 570 116
+attestation_instance_recipient 962 123
+person 749 418
+involvement 473 577
+

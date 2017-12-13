@@ -24,12 +24,12 @@
                         <div class="col-md-offset-1 col-md-4">
                             <br>
                             <h3>
-                                Total Cost:
+                                Application TCO:
                                 <waltz-currency-amount amount="$ctrl.currentTotal">
                                 </waltz-currency-amount>
                             </h3>
                             <h4>
-                                <span ng-bind="$ctrl.currentYear"></span>
+                                <span ng-bind="$ctrl.currentYear"></span> YTD
                             </h4>
                         </div>
                         <div class="col-md-7">
@@ -73,9 +73,6 @@
                                                         csv-name='{{$ctrl.parentEntityRef.name}}-costs.csv'>
                                 </waltz-asset-cost-table>
                             </div>
-                            <p class="small">
-                                The table shows historic cost entries for this application
-                            </p>
                         </div>
                     </div>
                 </uib-tab>

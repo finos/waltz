@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +37,8 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jndi.JndiPropertySource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.sql.DataSource;
@@ -75,6 +78,11 @@ public class DIConfiguration {
     @Value("${jooq.dialect}")
     private String dialect;
 
+    @Value("${smtpHost:localhost}")
+    private String smtpHost;
+
+    @Value("${smtpPort:25}")
+    private int smtpPort;
 
     // -- BUILD ---
 
@@ -160,6 +168,16 @@ public class DIConfiguration {
     @Autowired
     public PersonMaintenance personMaintenance(PersonHierarchyService personHierarchyService) {
         return new PersonMaintenance(personHierarchyService);
+    }
+
+
+    @Bean
+    public JavaMailSender mailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(smtpHost);
+        mailSender.setPort(smtpPort);
+
+        return mailSender;
     }
 
 }

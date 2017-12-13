@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {timeFormat} from "d3-time-format";
@@ -144,6 +146,33 @@ function controller($stateParams,
                     },
                     r => notification.error('Failed to update survey instance due date')
                 );
+        }
+    };
+
+    vm.markAsWithdrawn = () => {
+        if (confirm('Are you sure you want to withdraw this survey instance? ')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'WITHDRAWN'}
+            )
+                .then(result => {
+                    notification.success('Survey instance withdrawn');
+                    loadInstanceAndRun();
+                });
+        }
+    };
+
+    vm.markAsInProgress = () => {
+        if (confirm('Are you sure you want this survey to be marked as In Progress? ' +
+                'This will enable participants to edit and re-submit their responses.')) {
+            surveyInstanceStore.updateStatus(
+                vm.surveyInstance.id,
+                {newStatus: 'IN_PROGRESS'}
+            )
+                .then(result => {
+                    notification.success('Survey response marked as In Progress');
+                    loadInstanceAndRun();
+                });
         }
     };
 

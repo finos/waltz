@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +36,7 @@ public class MariaPersonSearch implements FullTextSearch<Person>, DatabaseVendor
     private static final String QUERY
             = "SELECT * FROM person\n"
             + " WHERE\n"
-            + " MATCH(display_name, user_principal_name, title)\n"
+            + " MATCH(display_name, email, user_principal_name)\n"
             + " AGAINST (?)\n"
             + " LIMIT ?";
 

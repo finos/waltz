@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -29,18 +30,12 @@ const viewState = {
 };
 
 
-const appRelationshipEdit = {
-    url: '/{id:int}/app-relationship/edit',
-    views: { 'content@': require('./change-initiative-app-relationship-edit') }
-};
-
-
 function setupRoutes($stateProvider) {
     $stateProvider
         .state('main.change-initiative', baseState)
-        .state('main.change-initiative.view', viewState)
-        .state('main.change-initiative.app-relationship-edit', appRelationshipEdit)
+        .state('main.change-initiative.view', viewState);
 }
+
 
 setupRoutes.$inject = ['$stateProvider'];
 

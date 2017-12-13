@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -59,6 +60,7 @@ const dependencies = [
     require('./applications')(),
     require('./app-groups')(),
     require('./asset-cost')(),
+    require('./attestation')(),
     require('./auth-sources')(),
     require('./bookmarks')(),
     require('./change-initiative')(),
@@ -74,6 +76,7 @@ const dependencies = [
     require('./entity')(),
     require('./entity-named-note')(),
     require('./entity-statistics')(),
+    require('./entity-svg-diagram')(),
     require('./entity-tags')(),
     require('./enum-value')(),
     require('./examples')(),
@@ -91,6 +94,7 @@ const dependencies = [
     require('./measurable-rating')(),
     require('./measurable-relationship')(),
     require('./navbar')(),
+    require('./notification')(),
     require('./org-units')(),
     require('./orphan')(),
     require('./person')(),

@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 
@@ -33,6 +35,9 @@ const initialState = {
     },{
         name: 'Boolean',
         value: 'BOOLEAN'
+    },{
+        name: 'Date',
+        value: 'DATE'
     },{
         name: 'Dropdown',
         value: 'DROPDOWN'

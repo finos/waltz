@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -30,7 +31,7 @@ import org.jooq.impl.DSL;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.StringUtilities.mkTerms;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 

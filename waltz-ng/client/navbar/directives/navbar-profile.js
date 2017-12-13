@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +18,7 @@
  */
 
 import _ from "lodash";
+import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 
 const bindings = {
     logoOverlayText: '<'
@@ -29,7 +31,9 @@ const template = require('./navbar-profile.html');
 const initialState = {
     logoOverlayText: '',
     user: null,
-    showSysAdminMenuItem: false
+    showSysAdminMenuItem: false,
+    notificationCountTotal: null,
+    notificationsCountsByKind: {}
 };
 
 
@@ -57,8 +61,10 @@ loginController.$inject = [
 ];
 
 
-function controller($state,
+function controller($interval,
+                    $state,
                     $uibModal,
+                    serviceBroker,
                     settingsService,
                     userService) {
     const vm = _.defaultsDeep(this, initialState);
@@ -75,7 +81,35 @@ function controller($state,
         .then(() => vm.showSysAdminMenuItem = userService.hasRole(vm.user, 'ADMIN')
                                                 || userService.hasRole(vm.user, 'USER_ADMIN'));
 
+    const notificationCacheRefreshListener = (e) => {
+        if (e.eventType === 'REFRESH'
+            && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.NotificationStore.findAll) {
+            loadNotifications();
+        }
+    };
 
+    const loadNotifications = () => {
+        return serviceBroker
+            .loadAppData(CORE_API.NotificationStore.findAll, [], {
+                cacheRefreshListener: {
+                    componentId: 'waltzNavbarProfile',
+                    fn: notificationCacheRefreshListener
+                }
+            })
+            .then(r => {
+                const notificationSummaries = r.data;
+                vm.notificationCountTotal = _.sumBy(notificationSummaries, 'count');
+                vm.notificationsCountsByKind = _.keyBy(notificationSummaries, 'kind');
+            });
+    };
+
+    const setupNotificationTimer = () => {
+        const fn = () => serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
+        $interval(fn, 300000);
+    };
+
+    loadNotifications()
+        .then(() => setupNotificationTimer());
 
     const reloadPage = () => $state.reload();
 
@@ -112,10 +146,13 @@ function controller($state,
 
 
 controller.$inject = [
+    '$interval',
     '$state',
     '$uibModal',
+    'ServiceBroker',
     'SettingsService',
-    'UserService'];
+    'UserService'
+];
 
 
 const directive = {

@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav navbar-right"
+<ul class="nav navbar-nav navbar-right waltz-navbar-profile"
     style="padding-right: 60px">
 
     <li class="dropdown" uib-dropdown>
@@ -12,6 +12,10 @@
             <span waltz-if-anonymous="false">
                 <waltz-icon name="user"></waltz-icon>
                 Profile
+                <span class="badge wnp-badge"
+                      ng-if="ctrl.notificationCountTotal > 0"
+                      ng-bind="ctrl.notificationCountTotal">
+                </span>
                 <b class="caret"></b>
             </span>
         </a>
@@ -51,6 +55,23 @@
             <li style="margin: 4px"
                 ui-sref-active="side-active"
                 class="no-overflow">
+                <span>
+                    <a ui-sref="main.attestation.instance.user">
+                        <waltz-icon class='text-muted small'
+                                    fixed-width="true"
+                                    name="check-square-o"></waltz-icon>
+                        Attestations
+                        <span class="badge wnp-badge"
+                              ng-if="ctrl.notificationsCountsByKind['ATTESTATION'].count > 0"
+                              ng-bind="ctrl.notificationsCountsByKind['ATTESTATION'].count">
+                        </span>
+                    </a>
+                </span>
+            </li>
+
+            <li style="margin: 4px"
+                ui-sref-active="side-active"
+                class="no-overflow">
                 <span waltz-has-role="APP_EDITOR">
                     <a ui-sref="main.app.registration">
                         <waltz-icon class='text-muted small'
@@ -82,6 +103,10 @@
                                     fixed-width="true"
                                     name="wpforms"></waltz-icon>
                         Surveys
+                        <span class="badge wnp-badge"
+                              ng-if="ctrl.notificationsCountsByKind['SURVEY_INSTANCE'].count > 0"
+                              ng-bind="ctrl.notificationsCountsByKind['SURVEY_INSTANCE'].count">
+                        </span>
                     </a>
                 </span>
             </li>

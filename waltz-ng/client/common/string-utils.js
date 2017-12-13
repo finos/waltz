@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +16,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * Truncate a string
+ *
+ * i.e.
+ *
+ * truncate('abcdefghijkl', 7, '...') => 'abcd...'
+ *
+ * @param origStr
+ * @param maxLength
+ * @param end
+ * @returns {*}
+ */
+export function truncate(origStr = '',
+                         maxLength = 16,
+                         end = '...') {
+    if (origStr.length <= maxLength) {
+        return origStr;
+    }
+
+    const endLength = end.length;
+    const charsToShow = maxLength - endLength;
+
+    const truncated = origStr.substr(0, charsToShow);
+
+    return truncated + end;
+}
+
 
 /**
  * Truncates via cutting out middle of string and replacing with separator

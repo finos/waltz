@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2017  Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
@@ -164,4 +166,16 @@ public class PersonDao {
                 .where(PERSON.EMAIL.eq(userId)) // TODO: change as part of 247
                 .fetchOne(personMapper);
     }
+
+
+    public List<Person> findPersonsByAttestationInstanceId(long instanceId) {
+        return dsl.select(PERSON.fields())
+                .from(ATTESTATION_INSTANCE_RECIPIENT)
+                .innerJoin(PERSON)
+                .on(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(PERSON.EMAIL))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(instanceId))
+                .fetch(personMapper);
+    }
+
+
 }
