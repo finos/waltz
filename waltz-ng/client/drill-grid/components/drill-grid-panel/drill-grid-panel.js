@@ -21,11 +21,11 @@ import _ from 'lodash';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {AUTH_SOURCE_NAVIGATOR_CATEGORY_ID} from "../../../system/services/settings-names";
+import {DRILL_GRID_DEFAULT_DEFINITION_ID} from "../../../system/services/settings-names";
 
-import template from './auth-sources-navigator-panel.html';
 import HierarchicalAxis from "../../utils/hierarchical-axis";
 import DrillGrid from "../../utils/drill-grid";
+import template from './drill-grid-panel.html';
 
 
 const bindings = {
@@ -39,14 +39,6 @@ const BUS = 6;
 
 
 const initialState = {
-    xAxis: {
-        kind: 'MEASURABLE_CATEGORY',
-        id: PROD
-    },
-    yAxis: {
-        kind: 'MEASURABLE_CATEGORY',
-        id: FUN
-    },
     visibility: {
         chart: false
     }
@@ -126,10 +118,10 @@ function determineAppsById(colMappings, rowMappings, xAxis, yAxis, allApps) {
 }
 
 
-function controller($element, $timeout, $q, serviceBroker, settingsService) {
+function controller($q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
-    const loadChartData = () => {
+    const loadChartData = (drillGridDefn) => {
 
         const mkDomainPromise = (axis) => axis.kind === 'DATA_TYPE'
             ? serviceBroker.loadAppData(CORE_API.DataTypeStore.findAll).then(r => r.data)
@@ -140,10 +132,10 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
             : serviceBroker.loadViewData(CORE_API.MeasurableRatingStore.findByCategory, [ axis.id ]).then(r => r.data);
 
         const promises = [
-            mkDomainPromise(vm.xAxis),
-            mkDomainPromise(vm.yAxis),
-            mkMappingPromise(vm.xAxis),
-            mkMappingPromise(vm.yAxis)
+            mkDomainPromise(drillGridDefn.xAxis),
+            mkDomainPromise(drillGridDefn.yAxis),
+            mkMappingPromise(drillGridDefn.xAxis),
+            mkMappingPromise(drillGridDefn.yAxis)
         ];
 
         $q.all(promises)
@@ -153,12 +145,12 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
 
                 if (_.isEmpty(rawColMappings)) {
                     canShow = false;
-                    messages.push(`No data for x-axis: ${vm.xAxis.name}`);
+                    messages.push(`No data for x-axis: ${drillGridDefn.xAxis.name}`);
                 }
 
                 if (_.isEmpty(rawRowMappings)) {
                     canShow = false;
-                    messages.push(`No data for y-axis: ${vm.yAxis.name}`);
+                    messages.push(`No data for y-axis: ${drillGridDefn.yAxis.name}`);
                 }
 
                 vm.messages = messages;
@@ -168,9 +160,9 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                     return;
                 }
 
-                const appsById = determineAppsById(rawColMappings, rawRowMappings, vm.xAxis, vm.yAxis, vm.allApps);
-                const colMappings = prepareMappings(rawColMappings, colDomain, vm.xAxis, appsById);
-                const rowMappings = prepareMappings(rawRowMappings, rowDomain, vm.yAxis, appsById);
+                const appsById = determineAppsById(rawColMappings, rawRowMappings, drillGridDefn.xAxis, drillGridDefn.yAxis, vm.allApps);
+                const colMappings = prepareMappings(rawColMappings, colDomain, drillGridDefn.xAxis, appsById);
+                const rowMappings = prepareMappings(rawRowMappings, rowDomain, drillGridDefn.yAxis, appsById);
 
                 const colData = {
                     domain: colDomain,
@@ -183,9 +175,9 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                 };
 
                 const drillGrid = new DrillGrid(
+                    drillGridDefn,
                     new HierarchicalAxis(colData),
                     new HierarchicalAxis(rowData));
-
 
                 vm.visibility.chart = ! drillGrid.isEmpty();
                 vm.drillGrid = drillGrid;
@@ -198,36 +190,28 @@ function controller($element, $timeout, $q, serviceBroker, settingsService) {
                 .loadViewData(CORE_API.ApplicationStore.findBySelector, [ mkSelectionOptions(vm.parentEntityRef) ])
                 .then(r => r.data),
             serviceBroker
-                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
                 .then(r => r.data),
             settingsService
-                .findOrDie(AUTH_SOURCE_NAVIGATOR_CATEGORY_ID, 'Cannot find auth source navigator measurable category')
+                .findOrDie(DRILL_GRID_DEFAULT_DEFINITION_ID, `Cannot find default drill grid definition (settings: ${DRILL_GRID_DEFAULT_DEFINITION_ID}`)
         ];
 
         $q.all(promises)
-            .then(([apps, categories, defaultCategoryId]) => {
-                console.log('asnp, disabled default category id ', { defaultCategoryId })
+            .then(([apps, definitions, defaultDefinitionId]) => {
                 vm.allApps = apps;
-                vm.categories = categories;
-                vm.categoriesById = _.keyBy(categories, 'id');
-
-                vm.axisOptions = _.union(
-                    categories,
-                    [ { id: null, kind: 'DATA_TYPE', name: 'Data Type' }]);
-
-                loadChartData();
+                vm.selectedDefinition = _.find(definitions, { id: +defaultDefinitionId });
+                loadChartData(vm.selectedDefinition);
             });
     };
 
-    vm.onAxisChange = () => {
-        loadChartData();
-    };
+    vm.onSelectDefinition = (d) => {
+        vm.selectedDefinition = d;
+        loadChartData(d);
+    }
 }
 
 
 controller.$inject = [
-    '$element',
-    '$timeout',
     '$q',
     'ServiceBroker',
     'SettingsService'
@@ -242,6 +226,6 @@ const component = {
 
 
 export default {
-    id: 'waltzAuthSourcesNavigatorPanel',
+    id: 'waltzDrillGridPanel',
     component
 }

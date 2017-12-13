@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
@@ -16,6 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
-export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
-export const DRILL_GRID_DEFAULT_DEFINITION_ID = "settings.drill-grid.default-definition";
+
+
+export function store($http, root) {
+
+    const BASE = `${root}/drill-grid-definition`;
+
+
+    const findAll = () => {
+        return $http
+            .get(BASE)
+            .then(r => { console.log('tap', r); return r; })
+            .then(result => result.data);
+    };
+
+    return {
+        findAll,
+    };
+
+}
+
+store.$inject = [
+    '$http',
+    'BaseApiUrl'
+];
+
+
+export const serviceName = 'DrillGridDefinitionStore';
+
+
+export const DrillGridDefinitionStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'findAll'
+    }
+};

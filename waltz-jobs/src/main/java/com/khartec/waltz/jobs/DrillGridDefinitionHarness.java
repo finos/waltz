@@ -16,6 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
-export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
-export const DRILL_GRID_DEFAULT_DEFINITION_ID = "settings.drill-grid.default-definition";
+package com.khartec.waltz.jobs;
+
+import com.khartec.waltz.data.drill_grid.DrillGridDefinitionDao;
+import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+
+public class DrillGridDefinitionHarness {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+
+        DrillGridDefinitionDao dao = ctx.getBean(DrillGridDefinitionDao.class);
+
+        dao.findAll().stream().forEach(System.out::println);
+
+    }
+
+
+
+}

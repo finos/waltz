@@ -1,0 +1,91 @@
+<!-- SUMMARY -->
+<div ng-if="$ctrl.visibility.summary">
+    <span uib-popover-template="'wdgds/desc-popup.html'"
+          popover-class="waltz-popover-wide"
+          popover-append-to-body="true"
+          popover-placement="right"
+          popover-trigger="outsideClick">
+        <span ng-bind="$ctrl.selectedDefinition.name"></span>
+        <a href>
+            <waltz-icon name="info-circle">
+            </waltz-icon>
+        </a>
+    </span>
+    <div class="small">
+        <a ng-click="$ctrl.switchToChoicePicker()">
+            <waltz-icon name="exchange"></waltz-icon>
+            Change
+        </a>
+    </div>
+</div>
+
+
+<!-- CHOICES -->
+<div ng-if="$ctrl.visibility.choicePicker">
+    <ul class="list-unstyled">
+        <li ng-repeat="definition in $ctrl.definitions">
+            <waltz-toggle state="definition.id == $ctrl.selectedDefinition.id"
+                          on-toggle="$ctrl.onOptionSelect(definition)">
+            </waltz-toggle>
+            <span ng-bind="definition.name"
+                  class="clickable"
+                  ng-click="$ctrl.onOptionSelect(definition)">
+            </span>
+        </li>
+    </ul>
+    <div>
+        <a class='small'
+           ng-click="$ctrl.switchToManualPicker()">
+            <waltz-icon name="wrench"></waltz-icon>
+            Configure
+        </a>
+    </div>
+</div>
+
+
+<!-- CONFIGURE -->
+<div ng-if="$ctrl.visibility.manualPicker">
+    <p class="text-muted">
+        Select dimensions
+    </p>
+    <div class="row">
+        <div class="col-md-3">
+            Columns (X):
+        </div>
+        <div class="col-md-9">
+            <select ng-model="$ctrl.selectedDefinition.xAxis"
+                    ng-change="$ctrl.onAxisChange()"
+                    ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+            </select>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            Rows Groups (Y):
+        </div>
+        <div class="col-md-9">
+            <select ng-model="$ctrl.selectedDefinition.yAxis"
+                    ng-change="$ctrl.onAxisChange()"
+                    ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+            </select>
+        </div>
+    </div>
+
+    <div ng-if="$ctrl.definitions.length > 0">
+        <a class='small'
+           ng-click="$ctrl.switchToSummary()">
+            <waltz-icon name="check"></waltz-icon>
+            Done
+        </a>
+    </div>
+</div>
+
+
+<!-- DESCRIPTION POPUP -->
+<script type="text/ng-template"
+        id="wdgds/desc-popup.html">
+    <div>
+        <waltz-markdown text="$ctrl.selectedDefinition.description"></waltz-markdown>
+    </div>
+</script>

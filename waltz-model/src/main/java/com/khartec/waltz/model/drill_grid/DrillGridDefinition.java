@@ -16,6 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
-export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
-export const DRILL_GRID_DEFAULT_DEFINITION_ID = "settings.drill-grid.default-definition";
+package com.khartec.waltz.model.drill_grid;
+
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.NameProvider;
+import org.immutables.value.Value;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableDrillGridDefinition.class)
+@JsonDeserialize(as = ImmutableDrillGridDefinition.class)
+public abstract class DrillGridDefinition implements NameProvider, DescriptionProvider, IdProvider{
+
+    public abstract EntityReference xAxis();
+    public abstract EntityReference yAxis();
+
+}

@@ -1,21 +1,9 @@
 <div>
     <div class="row">
-        <div class="col-md-4">
-            <label>Switch viewpoint</label>
-            <div>
-                X - Cols:
-                <select ng-model="$ctrl.xAxis"
-                        ng-change="$ctrl.onAxisChange()"
-                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
-                </select>
-            </div>
-            <div>
-                Y - Rows:
-                <select ng-model="$ctrl.yAxis"
-                        ng-change="$ctrl.onAxisChange()"
-                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
-                </select>
-            </div>
+        <div class="col-md-12">
+            <waltz-drill-grid-definition-selector on-select-definition="$ctrl.onSelectDefinition"
+                                                  selected-definition="$ctrl.selectedDefinition">
+            </waltz-drill-grid-definition-selector>
         </div>
 
     </div>

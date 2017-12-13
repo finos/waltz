@@ -20,12 +20,15 @@ import {CORE_API} from "./common/services/core-api-utils";
 
 
 function warmUpCache($q, serviceBroker) {
-    return $q.all([
+    const promises = $q.all([
         serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll),
         serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .loadAppData(CORE_API.DataTypeStore.findAll),
+        serviceBroker
+            .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
     ]);
+    return promises;
 }
 
 
