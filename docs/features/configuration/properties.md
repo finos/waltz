@@ -1,6 +1,6 @@
 Waltz configuration properties can be defined in:
 
-* `${user.home}/.waltz/waltz.properties` or
+* `${user.home}/.waltz/waltz.properties` (see waltz.sample.properties for example) or
 * JNDI (eg: Tomcat `conf/context.xml`)
 
 
