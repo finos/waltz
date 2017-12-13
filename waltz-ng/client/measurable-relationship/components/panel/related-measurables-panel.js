@@ -115,7 +115,7 @@ function mkExportData(relationships = [], categories = [], measurables = []) {
     const getType = (id, kind) => {
         return kind === 'MEASURABLE'
             ? categoriesByMeasurableId[id].category.name
-            : entityNames[kind];
+            : getEnumName(entity, kind);
     };
 
     const columnNames = [[
