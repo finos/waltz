@@ -13,9 +13,9 @@
         <option value="ALL">
             All
         </option>
-        <option ng-repeat="type in $ctrl.types | orderBy"
-                value="{{ type }}"
-                ng-bind="type | toDisplayName:'dataType'">
+        <option ng-repeat="type in $ctrl.types"
+                value="{{ type.id }}"
+                ng-bind="type.name">
         </option>
     </select>
     <hr>

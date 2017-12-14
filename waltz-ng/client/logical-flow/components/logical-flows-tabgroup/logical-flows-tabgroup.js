@@ -145,11 +145,14 @@ function calculateFlowData(allFlows = [],
 }
 
 
-function getDataTypeIds(decorators = []) {
+function getDataTypeIds(allDataTypes = [], decorators = []) {
+    const dataTypesById = _.keyBy(allDataTypes, 'id');
     return _.chain(decorators)
         .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
         .map('decoratorEntity.id')
         .uniq()
+        .map(dtId => dataTypesById[dtId])
+        .orderBy('name')
         .value();
 }
 
@@ -200,7 +203,7 @@ function controller($scope,
                 [ vm.selector ])
             .then(r => {
                 vm.decorators = r.data;
-                vm.dataTypes = getDataTypeIds(vm.decorators);
+                vm.dataTypes = getDataTypeIds(vm.allDataTypes, vm.decorators);
             });
 
         const appsPromise = serviceBroker
@@ -282,6 +285,12 @@ function controller($scope,
             vm.selector = mkSelectionOptions(vm.parentEntityRef);
             loadStats();
         }
+    };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.allDataTypes = r.data);
     };
 
 }
