@@ -47,7 +47,6 @@ function controller() {
         };
         vm.onChange(options);
     };
-
     // -- BOOT ---
 
     vm.notifyChanges();
