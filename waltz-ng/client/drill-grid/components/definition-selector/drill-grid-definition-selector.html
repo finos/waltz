@@ -1,20 +1,17 @@
 <!-- SUMMARY -->
 <div ng-if="$ctrl.visibility.summary">
-    <span uib-popover-template="'wdgds/desc-popup.html'"
-          popover-class="waltz-popover-wide"
-          popover-append-to-body="true"
-          popover-placement="right"
-          popover-trigger="outsideClick">
-        <span ng-bind="$ctrl.selectedDefinition.name"></span>
-        <a href>
-            <waltz-icon name="info-circle">
-            </waltz-icon>
-        </a>
-    </span>
+    <h4 ng-bind="$ctrl.selectedDefinition.name"></h4>
+
     <div class="small">
-        <a ng-click="$ctrl.switchToChoicePicker()">
+        <waltz-markdown text="$ctrl.selectedDefinition.description">
+        </waltz-markdown>
+    </div>
+
+    <div class="small">
+        <a ng-click="$ctrl.switchToChoicePicker()"
+           class="clickable">
             <waltz-icon name="exchange"></waltz-icon>
-            Change
+            Change dimensions
         </a>
     </div>
 </div>
@@ -31,10 +28,22 @@
                   class="clickable"
                   ng-click="$ctrl.onOptionSelect(definition)">
             </span>
+
+            <span uib-popover-template="'wdgds/desc-popup.html'"
+                  popover-class="waltz-popover-wide"
+                  popover-append-to-body="true"
+                  popover-placement="right"
+                  popover-trigger="outsideClick">
+                <a class="clickable">
+                    <waltz-icon name="info-circle">
+                    </waltz-icon>
+                </a>
+            </span>
+
         </li>
     </ul>
     <div>
-        <a class='small'
+        <a class='small clickable'
            ng-click="$ctrl.switchToManualPicker()">
             <waltz-icon name="wrench"></waltz-icon>
             Configure
@@ -73,7 +82,7 @@
     </div>
 
     <div ng-if="$ctrl.definitions.length > 0">
-        <a class='small'
+        <a class='small clickable'
            ng-click="$ctrl.switchToSummary()">
             <waltz-icon name="check"></waltz-icon>
             Done
@@ -86,6 +95,6 @@
 <script type="text/ng-template"
         id="wdgds/desc-popup.html">
     <div>
-        <waltz-markdown text="$ctrl.selectedDefinition.description"></waltz-markdown>
+        <waltz-markdown text="definition.description"></waltz-markdown>
     </div>
 </script>

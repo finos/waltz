@@ -1,38 +1,34 @@
 <div>
-    <div class="row">
-        <div class="col-sm-6">
-            <waltz-measurable-ratings-browser rating-tallies="$ctrl.ratingTallies"
-                                              measurables="$ctrl.measurables"
-                                              categories="$ctrl.measurableCategories"
-                                              scroll-height="500"
-                                              on-select="$ctrl.onSelect">
-            </waltz-measurable-ratings-browser>
-        </div>
-        <div class="col-sm-6">
-            <waltz-loading-notification show="$ctrl.visibility.loading"
-                                        style="padding-top: 54px;"
-                                        name="Loading">
-            </waltz-loading-notification>
-            <div ng-if="$ctrl.tableData"
-                 class="waltz-fade-if">
-                <h4>
-                    <span ng-bind="$ctrl.selectedMeasurable.name">
-                    </span>
-                    <a class="small small"
-                       ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
-                        ( more &raquo; )
-                    </a>
-                </h4>
-                <p class="small text-muted"
-                   ng-bind="$ctrl.selectedMeasurable.description"></p>
-                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                        entries="$ctrl.tableData"
-                                        searchPlaceholderText="Search"
-                                        exportFilename="ratings.csv"
-                                        on-initialise="$ctrl.onGridInitialise">
-                </waltz-grid-with-search>
-            </div>
-        </div>
+
+
+    <waltz-section-actions>
+        <button class="btn btn-xs btn-primary"
+                ng-if="$ctrl.visibility.treeView"
+                ng-click="$ctrl.showGridView()">
+            <waltz-icon name="th"></waltz-icon>
+            Grid View
+        </button>
+        <button class="btn btn-xs btn-primary"
+                ng-if="$ctrl.visibility.gridView"
+                ng-click="$ctrl.showTreeView()">
+            <waltz-icon name="sitemap" rotate="270"></waltz-icon>
+            Tree View
+        </button>
+    </waltz-section-actions>
+
+
+    <div ng-if="$ctrl.visibility.treeView"
+         class="waltz-fade-if">
+        <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-measurable-ratings-browser-tree-panel>
+    </div>
+
+
+
+    <div ng-if="$ctrl.visibility.gridView"
+         class="waltz-fade-if">
+        <waltz-drill-grid-panel parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-drill-grid-panel>
     </div>
 
 </div>

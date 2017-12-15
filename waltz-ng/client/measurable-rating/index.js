@@ -22,6 +22,7 @@ import { registerComponents, registerStores } from '../common/module-utils';
 import measurableRatingStore from './services/measurable-rating-store';
 
 import MeasurableRatingsBrowserSection from './components/browser-section/measurable-ratings-browser-section';
+import MeasurableRatingsBrowserTreePanel from './components/browser-tree-panel/measurable-ratings-browser-tree-panel';
 import MeasurableRatingEditPanel from './components/edit-panel/measurable-rating-edit-panel';
 
 
@@ -48,6 +49,7 @@ export default () => {
 
     registerComponents(module, [
         MeasurableRatingsBrowserSection,
+        MeasurableRatingsBrowserTreePanel,
         MeasurableRatingEditPanel
     ]);
 
