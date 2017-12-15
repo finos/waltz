@@ -63,8 +63,8 @@ export default () => {
     registerComponents(module, [
         CurrencyAmount,
         EditableEnum,
-        SubSection,
-        SpreadsheetLoader
+        SpreadsheetLoader,
+        SubSection
     ]);
 
     return module.name;
