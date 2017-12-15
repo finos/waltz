@@ -80,18 +80,7 @@
             </div>
         </uib-tab>
 
-        <!-- AUTH SOURCES -->
-        <uib-tab index="4"
-                 heading="Authoritative Source Navigator"
-                 ng-if="$ctrl.visibility.authSourcesList"
-                 select="$ctrl.tabSelected('authSources', 4)">
-            <div class="waltz-panel-content">
 
-                <waltz-auth-sources-navigator-panel parent-entity-ref="$ctrl.parentEntityRef">
-                </waltz-auth-sources-navigator-panel>
-
-            </div>
-        </uib-tab>
     </uib-tabset>
 
     <!-- ABOUT -->
