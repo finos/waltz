@@ -58,7 +58,8 @@
     "ng-showdown": "1.1.0",
     "ng-tags-input": "3.2.0",
     "satellizer": "0.15.5",
-    "ui-select": "0.19.8"
+    "ui-select": "0.19.8",
+    "xlsx": "0.11.13"
   },
   "devDependencies": {
     "babel-core": "5.8.33",
