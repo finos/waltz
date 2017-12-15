@@ -70,7 +70,7 @@ function prepareFlows(
                 specification: specsById[f.specificationId]
             };
         })
-        .sortBy('specification.name')
+        .sortBy(d => d.specification.name.toLowerCase())
         .value();
 }
 

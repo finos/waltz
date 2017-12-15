@@ -80,7 +80,7 @@ function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = []) {
                 existing: flowExists
             };
         })
-        .sortBy('counterpartEntity.name')
+        .sortBy(d => d.counterpartEntity.name.toLowerCase())
         .value();
 }
 
