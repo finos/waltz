@@ -20,6 +20,7 @@ import angular from "angular";
 import CurrencyAmount from './currency-amount';
 import SubSection from './sub-section';
 import EditableEnum from './editable-enum/editable-enum';
+import SpreadsheetLoader from './spreadsheet-loader/spreadsheet-loader';
 import {registerComponents} from "../common/module-utils";
 
 
@@ -62,6 +63,7 @@ export default () => {
     registerComponents(module, [
         CurrencyAmount,
         EditableEnum,
+        SpreadsheetLoader,
         SubSection
     ]);
 

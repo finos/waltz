@@ -1,0 +1,23 @@
+<div class="waltz-spreadsheet-loader">
+    <div class="input">
+        <h5 class="muted">Select Spreadsheet File</h5>
+        <input type="file"
+               accept=".xls,.xlsx,.ods"
+               multiple="false"
+               onchange="angular.element(this).scope().$ctrl.fileChange(event)" />
+    </div>
+
+    <div class="grid"
+         ng-if="$ctrl.rowData.length > 0">
+
+        <hr/>
+
+        <waltz-grid-with-search scope-provider="$ctrl"
+                                column-defs="$ctrl.columnDefs"
+                                entries="$ctrl.rowData"
+                                searchPlaceholderText="Search"
+                                on-initialise="ctrl.onGridInitialise">
+        </waltz-grid-with-search>
+    </div>
+
+</div>
