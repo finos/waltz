@@ -22,7 +22,7 @@ Waltz depends on many great libraries and projects, including:
 | Babel | [MIT](https://opensource.org/licenses/MIT) | https://babeljs.io/ |
 | Bootstrap | [MIT](https://opensource.org/licenses/MIT) | http://getbootstrap.com/ |
 | D3 | [BSD 3](https://opensource.org/licenses/BSD-3-Clause) | https://d3js.org/ |
-| JOOq | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.jooq.org |
+| jOOQ | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.jooq.org |
 | Liquibase | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.liquibase.org/ |
 | Lodash | [MIT](https://opensource.org/licenses/MIT) | https://lodash.com/ |
 | Spark framework | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://sparkjava.com/ |
