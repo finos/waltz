@@ -25,6 +25,7 @@ Waltz depends on many great libraries and projects, including:
 | JOOq | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.jooq.org |
 | Liquibase | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.liquibase.org/ |
 | Lodash | [MIT](https://opensource.org/licenses/MIT) | https://lodash.com/ |
+| Spark framework | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://sparkjava.com/ |
 | Spring framework | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.springframework.org |
 | Webpack | [MIT](https://opensource.org/licenses/MIT) | https://webpack.js.org/ |
 
