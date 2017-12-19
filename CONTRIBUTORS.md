@@ -4,10 +4,10 @@ This file lists the people and/or organisations involved with Waltz
 
 | Name | Type |
 | -- | -- |
-| Dave Watkins | individual |
-| Deutshce Bank | organisational |
-| Kamran Saleem | individual |
-| Rohit Vats | individual |
+| [David Watkins](https://github.com/davidwatkins73) | individual |
+| [Deutshce Bank](https://github.com/db-waltz) | organisational |
+| [Kamran Saleem](https://github.com/kamransaleem) | individual |
+| [Rohit Vats](https://github.com/rovats) | individual |
 
 
 
