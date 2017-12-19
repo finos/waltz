@@ -1,6 +1,8 @@
-This file lists the people and/or organisations involved with Waltz
 
-### Code Contributions
+
+### Contributors
+
+The following table list the people and/or organisations involved with Waltz
 
 | Name | Type |
 | -- | -- |
@@ -10,9 +12,9 @@ This file lists the people and/or organisations involved with Waltz
 | [Rohit Vats](https://github.com/rovats) | individual |
 
 
-
-
 ### Libraries
+
+Waltz depends on many great libraries and projects, including:
 
 | Name | License | Website |
 | -- | -- | -- |
@@ -25,8 +27,6 @@ This file lists the people and/or organisations involved with Waltz
 | Lodash | [MIT](https://opensource.org/licenses/MIT) | https://lodash.com/ |
 | Spring framework | [ASL](http://www.apache.org/licenses/LICENSE-2.0) | http://www.springframework.org |
 | Webpack | [MIT](https://opensource.org/licenses/MIT) | https://webpack.js.org/ |
-
-
 
 
 _WIP_:  See package.json and maven pom.xml files for full list.
