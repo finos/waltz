@@ -1,0 +1,35 @@
+<div class="waltz-column-mapper">
+    <div class="text-muted small">
+        Please pick a column each source column below
+    </div>
+
+    <br>
+
+    <table class="table small table-condensed" >
+        <tr ng-repeat="source in $ctrl.sourceColumns">
+            <td>
+                <div ng-bind="source">
+                </div>
+            </td>
+            <td width="50%">
+                <ui-select ng-model="$ctrl.mappings[source]"
+                           on-select="$ctrl.onMappingSelect()"
+                           theme="bootstrap">
+
+                    <ui-select-match placeholder="Select..."
+                                     allow-clear="true">
+                        <span ng-bind-html="$select.selected.label">
+                        </span>
+                    </ui-select-match>
+
+                    <ui-select-choices repeat="target in $ctrl.availableTargetColumns">
+                        <span ng-bind="target.label"></span>
+                        <small style="display: block"
+                               class="wcm-required"
+                               ng-if="target.required">required</small>
+                    </ui-select-choices>
+                </ui-select>
+            </td>
+        </tr>
+    </table>
+</div>

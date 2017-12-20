@@ -17,25 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {event, selectAll, select} from 'd3-selection'
-
-const svg = `
-     
-`;
-
-
-function calculateBoundingRect(clientRect, referenceElement) {
-    const hPosX = referenceElement.getBoundingClientRect().left;
-    const hPosY = referenceElement.getBoundingClientRect().top;
-
-    return {
-        x: clientRect.left - hPosX,
-        y: clientRect.top - hPosY,
-        width: clientRect.width,
-        height: clientRect.height
-    };
-}
-
 
 function controller(notification,
                     svgDiagramStore,
@@ -43,50 +24,18 @@ function controller(notification,
 
     const vm = Object.assign(this, {});
 
-    svgDiagramStore
-        .findByGroup('ORG_UNIT')
-        .then(x => {
-            const diagram = x[0]
-            document
-                .getElementById('holder')
-                .innerHTML = diagram.svg;
+    vm.sourceColumns = ['aS', 'bS', 'cS', 'dS'];
+    vm.targetColumns = [
+        {label: 'aT', required: true },
+        {label: 'bT', required: true },
+        {label: 'cT', required: false },
+        {label: 'dT', required: true },
+        {label: 'eT', required: false },
+    ];
 
-            select('#holder svg')
-                .append('rect')
-                .attr('id', 'highlighter')
-                .attr('stroke', 'red');
-
-            vm.annotate();
-            return x;
-        });
-
-    const highlight = (elem) => {
-
-        console.log(elem)
-        // const dimensions = calculateBoundingRect(
-        //     elem.getBoundingClientRect(),
-        //     document.getElementById('holder'));
-        //
-        // select('#highlighter')
-        //     .attr('x', dimensions.x)
-        //     .attr('y', dimensions.y)
-        //     .attr('width', dimensions.width)
-        //     .attr('height', dimensions.height);
+    vm.onMappingsChanged = (event) => {
+        console.log('mappings changed: ', event.mappings, event.isComplete());
     };
-
-    vm.annotate = () => {
-
-
-
-        document.getElementById('holder').onmousemove =
-            e => {
-                const mx = e.clientX;
-                const my = e.clientY;
-                const elementMouseIsOver = document.elementFromPoint(mx, my);
-                highlight(elementMouseIsOver);
-            };
-    }
-
 
 }
 
