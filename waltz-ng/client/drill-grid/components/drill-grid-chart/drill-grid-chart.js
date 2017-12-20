@@ -219,7 +219,7 @@ function hideTooltip(d, tooltip) {
 function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
-        .data(d => d.mappings, d => d.colId);
+        .data(d => _.filter(d.mappings, m => m.rating !== 'Z'), d => d.colId);
 
     appMappings.exit().remove();
 
@@ -336,7 +336,7 @@ function drawRowGroups(drillGrid, svg, tooltip, colScale) {
 
     newRowGroups
         .append('rect')
-        .attr('width', 900)
+        .attr('width', "100%")
         .attr('height', d => groupOffsets[d.group.id].height)
         .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
 
@@ -444,7 +444,7 @@ function refToString(ref) {
 function draw(drillGrid, svg, tooltip, blockScaleX) {
     if (! svg) return;
 
-    console.log('draw', { drillGrid });
+    // console.log('draw', { drillGrid });
 
     const height = calcTotalRequiredHeight(drillGrid);
 

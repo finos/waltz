@@ -32,6 +32,9 @@
 export function truncate(origStr = '',
                          maxLength = 16,
                          end = '...') {
+    if (! origStr) {
+        return '';
+    }
     if (origStr.length <= maxLength) {
         return origStr;
     }

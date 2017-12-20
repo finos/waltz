@@ -41,7 +41,8 @@ const BUS = 6;
 
 const initialState = {
     visibility: {
-        chart: false
+        chart: false,
+        unavailable: false
     }
 };
 
@@ -201,7 +202,9 @@ function controller($q, serviceBroker, settingsService) {
             .then(([apps, definitions, defaultDefinitionId]) => {
                 vm.allApps = apps;
                 vm.selectedDefinition = _.find(definitions, { id: +defaultDefinitionId });
-                loadChartData(vm.selectedDefinition);
+                if (vm.selectedDefinition) {
+                    loadChartData(vm.selectedDefinition);
+                }
             });
     };
 
