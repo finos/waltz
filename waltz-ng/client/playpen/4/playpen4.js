@@ -22,7 +22,7 @@ import {refToString} from '../../common/entity-utils';
 import {initialiseData} from "../../common/index";
 
 const initialState = {
-    parentEntityRef: { kind: 'ORG_UNIT', id: 20 },
+    parentEntityRef: { kind: 'ORG_UNIT', id: 200 },
     foo: 'baa'
 };
 
