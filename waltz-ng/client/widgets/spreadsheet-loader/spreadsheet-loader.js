@@ -20,18 +20,22 @@
 import _ from 'lodash';
 import { initialiseData } from '../../common';
 import XLSX from 'xlsx'
+import { invokeFunction } from '../../common/index';
+
 
 import template from './spreadsheet-loader.html';
 
 
 const bindings = {
+    onSpreadsheetLoaded: '<'
 };
 
 
 const initialState = {
     columnDefs: [],
     rowData: [],
-    onGridInitialise: (cfg) => console.log('default grid initialise handler for spreadsheet-loader')
+    onGridInitialise: (cfg) => console.log('default grid initialise handler for spreadsheet-loader'),
+    onSpreadsheetLoaded: (event) => console.log('default onSpreadsheetLoaded handler for spreadsheet-loader, ', event)
 };
 
 
@@ -63,6 +67,11 @@ function controller($scope) {
 
                 vm.columnDefs = prepareColumnDefs(headerNames);
                 vm.rowData = rowData;
+                const event = {
+                    columnDefs: vm.columnDefs,
+                    rowData: vm.rowData
+                };
+                invokeFunction(vm.onSpreadsheetLoaded, event);
             });
         };
 
