@@ -14,8 +14,7 @@
         <div class="row wpfes-existing-row"
              ng-repeat="candidate in $ctrl.candidates | orderBy:'name'"
              ng-class="{
-                'wpfes-current': candidate.id == $ctrl.current.id,
-                'wpfes-selected': candidate.id == $ctrl.selected.id
+                'wpfes-current': candidate.id == $ctrl.current.id
              }"
              ng-click="$ctrl.select(candidate)">
             <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
@@ -116,14 +115,7 @@
     <div ng-if="$ctrl.visibility.showAddButton">
         <div class="row">
             <div class="col-md-offset-8 col-md-4">
-                <button ng-click='$ctrl.change()'
-                        ng-disabled="!$ctrl.visibility.showAddButton"
-                        class="btn btn-sm btn-primary">
-                    Select
-                </button>
-
                 <a class="clickable"
-
                    ng-click="$ctrl.cancel()">
                     Cancel
                 </a>

@@ -63,10 +63,6 @@ function controller() {
     vm.select = (spec) => {
         vm.cancelAddNew();
         vm.selected = spec;
-    };
-
-    vm.change = () => {
-        if (vm.selected == null) vm.cancel();
         if (vm.current && vm.selected.id === vm.current.id) vm.cancel();
         vm.onChange(vm.selected);
     };
