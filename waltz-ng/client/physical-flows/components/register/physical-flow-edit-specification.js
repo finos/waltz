@@ -36,9 +36,13 @@ const bindings = {
 const template = require('./physical-flow-edit-specification.html');
 
 
+const SEARCH_CUTOFF = 6;
+
+
 const initialState = {
     visibility: {
-        showAddButton: true
+        showAddButton: true,
+        search: false
     },
     form: {
         name: "",
@@ -56,9 +60,7 @@ const initialState = {
 
 function controller() {
 
-
     const vm = initialiseData(this, initialState);
-
 
     vm.select = (spec) => {
         vm.cancelAddNew();
@@ -104,8 +106,11 @@ function controller() {
             canSubmit: nameDefined && nameUnique && formatDefined,
             message
         };
-    }
+    };
 
+    vm.$onInit = () => {
+        vm.visibility.search = vm.candidates.length > SEARCH_CUTOFF;
+    };
 }
 
 

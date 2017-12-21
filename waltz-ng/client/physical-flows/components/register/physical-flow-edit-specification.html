@@ -1,4 +1,21 @@
 <div class="waltz-physical-flow-edit-specification">
+
+    <div class="row small"
+         ng-if="$ctrl.visibility.search">
+        <div class="col-sm-6 col-sm-offset-2">
+            <div class="input-group input-group-sm">
+                <span class="input-group-addon">
+                    <waltz-icon name="search"></waltz-icon>
+                </span>
+                <input type="search"
+                       class="form-control"
+                       ng-model="$ctrl.qry"
+                       placeholder="Search...">
+            </div>
+            <br>
+        </div>
+    </div>
+
     <div class="wpfes-table">
 
         <!-- HEADER -->
@@ -9,10 +26,9 @@
             <div class="col-md-5">Description</div>
         </div>
 
-
         <!-- EXISTING -->
         <div class="row wpfes-existing-row"
-             ng-repeat="candidate in $ctrl.candidates | orderBy:'name'"
+             ng-repeat="candidate in $ctrl.candidates | orderBy:'name' | filter:$ctrl.qry"
              ng-class="{
                 'wpfes-current': candidate.id == $ctrl.current.id
              }"
