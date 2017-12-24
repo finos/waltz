@@ -18,6 +18,7 @@
  */
 
 import {checkIsEntityRef} from './checks';
+import {CORE_API} from "./services/core-api-utils";
 
 export function sameRef(r1, r2) {
     checkIsEntityRef(r1);
@@ -52,5 +53,26 @@ export function toEntityRef(obj, kind = obj.kind) {
     checkIsEntityRef(ref);
 
     return ref;
+}
+
+
+function determineLoadByIdCall(kind) {
+    switch (kind) {
+        case 'APPLICATION':
+            return CORE_API.ApplicationStore.getById;
+        case 'ACTOR':
+            return CORE_API.ActorStore.getById;
+        default:
+            throw "Unsupported kind for loadEntity: " + kind;
+    }
+}
+
+export function loadEntity(serviceBroker, entityRef) {
+    checkIsEntityRef(entityRef);
+
+    const remoteCall = determineLoadByIdCall(entityRef.kind);
+    return serviceBroker
+        .loadViewData(remoteCall, [ entityRef.id ])
+        .then(r => r.data);
 }
 

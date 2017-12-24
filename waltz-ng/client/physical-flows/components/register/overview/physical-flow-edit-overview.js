@@ -17,40 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
-
+import {initialiseData} from "../../../../common";
 
 const bindings = {
-    outboundLogicalFlows: '<',  // [ <entityRef>... ]
-    onChange: '<'
+    sourceEntity: '<',
+    specification: '<',
+    targetLogicalFlow: '<',
+    flowAttributes: '<',
+    onSpecificationFocus: '<',
+    onFlowAttributesFocus: '<',
+    onTargetFocus: '<',
+    onClone: '<'
 };
 
 
-const template = require('./physical-flow-edit-target-logical-flow.html');
+const template = require('./physical-flow-edit-overview.html');
 
 
 const initialState = {
-    outboundLogicalFlows: [],
-    onChange: (f) => console.log('pfetlf::onChange', f)
+    onSpecificationFocus: () => console.log("No onSpecificationFocus handler defined for physical-flow-edit-overview"),
+    onFlowAttributesFocus: () => console.log("No onFlowAttributesFocus handler defined for physical-flow-edit-overview"),
+    onTargetFocus: () => console.log("No onTargetFocus handler defined for physical-flow-edit-overview")
 };
 
 
 function controller() {
-    initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
 }
 
 
-controller.$inject = [
-    'ActorStore'
-];
+controller.$inject = [];
 
 
 const component = {
-    bindings,
     template,
+    bindings,
     controller
 };
 
 
 export default component;
-

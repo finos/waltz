@@ -23,6 +23,8 @@ import {kindToViewState} from '../common/link-utils';
 
 
 import template from './physical-flow-registration.html';
+import {CORE_API} from "../common/services/core-api-utils";
+import {loadEntity} from "../common/entity-utils";
 
 
 const initialState = {
@@ -41,25 +43,10 @@ const initialState = {
     },
     visibility: {
         editor: "",
+        loading: false,
         similarFlows: false
     }
 };
-
-
-function loadEntity(entityRef, appStore, actorStore) {
-    switch (entityRef.kind) {
-        case 'APPLICATION':
-            return appStore
-                .getById(entityRef.id)
-                .then(app => Object.assign({}, app, { kind: 'APPLICATION' }));
-        case 'ACTOR':
-            return actorStore
-                .getById(entityRef.id)
-                .then(actor => Object.assign({}, actor, { kind: 'ACTOR' }));
-        default:
-            throw "Unsupported owningEntity (kind): " + entityRef;
-    }
-}
 
 
 function validate(specification, flowAttributes, targetLogicalFlow) {
@@ -98,6 +85,7 @@ function controller(
     notification,
     physicalFlowStore,
     specificationStore,
+    serviceBroker,
     preventNavigationService) {
 
     const vm = initialiseData(this, initialState);
@@ -149,6 +137,12 @@ function controller(
 
     vm.focusTarget = () => {
         vm.visibility.editor = 'TARGET-LOGICAL-FLOW';
+    };
+
+    vm.focusClone = () => {
+        vm.visibility.editor = 'CLONE';
+        vm.visibility.loading = true;
+        console.log('focusClone', { vm })
     };
 
     vm.attributesChanged = (attributes) => {
@@ -204,7 +198,7 @@ function controller(
     };
 
 
-    loadEntity(sourceEntityRef, applicationStore, actorStore)
+    loadEntity(serviceBroker, sourceEntityRef)
         .then(ent => vm.sourceEntity = ent);
 
     specificationStore
@@ -219,7 +213,6 @@ function controller(
                 .filter(f => f.source.kind === sourceEntityRef.kind && f.source.id === sourceEntityRef.id)
                 .orderBy('target.name')
                 .value());
-
 }
 
 
@@ -233,6 +226,7 @@ controller.$inject = [
     'Notification',
     'PhysicalFlowStore',
     'PhysicalSpecificationStore',
+    'ServiceBroker',
     'PreventNavigationService'
 ];
 

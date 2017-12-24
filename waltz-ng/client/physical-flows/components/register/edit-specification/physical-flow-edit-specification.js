@@ -18,9 +18,9 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {toEntityRef} from '../../../common/entity-utils';
-import {toOptions, dataFormatKind} from "../../../common/services/enums";
+import {initialiseData} from "../../../../common";
+import {toEntityRef} from '../../../../common/entity-utils';
+import {toOptions, dataFormatKind} from "../../../../common/services/enums";
 
 
 const bindings = {

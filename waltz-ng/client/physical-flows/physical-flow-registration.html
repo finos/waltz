@@ -15,6 +15,7 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
 
+        <!-- DIAGRAM -->
         <div>
             <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
                                                specification="ctrl.specification"
@@ -22,11 +23,14 @@
                                                flow-attributes="ctrl.flowAttributes"
                                                on-specification-focus="ctrl.focusSpecification"
                                                on-flow-attributes-focus="ctrl.focusFlowAttributes"
-                                               on-target-focus="ctrl.focusTarget">
+                                               on-target-focus="ctrl.focusTarget"
+                                               on-clone="ctrl.focusClone">
             </waltz-physical-flow-edit-overview>
         </div>
 
         <hr>
+
+        <!-- DYNAMIC SECTIONS -->
 
         <waltz-physical-flow-attribute-editor ng-if="ctrl.visibility.editor === 'FLOW-ATTRIBUTES'"
                                               current="ctrl.flowAttributes"
@@ -48,10 +52,16 @@
                                                 on-change="ctrl.specificationChanged">
         </waltz-physical-flow-edit-specification>
 
+        <waltz-physical-flow-clone-selector ng-if="ctrl.visibility.editor === 'CLONE'">
+        </waltz-physical-flow-clone-selector>
+
 
         <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length === 0">
             <div class="row">
-                <div class="col-md-offset-8 col-md-2">
+
+
+                <!-- SAVE/CANCEL -->
+                <div class="col-md-offset-6 col-md-2">
                     <button class="btn btn-success"
                             ng-click="ctrl.doSave()"
                             ng-disabled="!ctrl.validation.canSave">
@@ -65,6 +75,7 @@
                     </a>
 
                 </div>
+                <!-- MESSAGES -->
                 <div class="col-md-2">
 
                     <ul class="list-unstyled small text-muted">
@@ -78,8 +89,10 @@
         </div>
 
 
+        <!-- SIMILAR FLOWS CONFIRMATION -->
         <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length > 0">
-            <div class="row" ng-hide="ctrl.visibility.similarFlows">
+            <div class="row"
+                 ng-hide="ctrl.visibility.similarFlows">
                 <div class="col-md-offset-8 col-md-2">
                     <strong class="text-warning">Similar flows exist!</strong>
                     <button class="btn btn-warning"

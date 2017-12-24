@@ -18,15 +18,15 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../../common";
 import {
     transportField,
     frequencyField,
     basisOffsetSelectField,
     basisOffsetInputField,
     criticalityField
-} from "../../formly/physical-flow-fields";
-import {CORE_API} from "../../../common/services/core-api-utils";
+} from "../../../formly/physical-flow-fields";
+import {CORE_API} from "../../../../common/services/core-api-utils";
 
 
 const bindings = {

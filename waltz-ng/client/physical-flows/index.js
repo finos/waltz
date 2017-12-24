@@ -22,6 +22,7 @@ import angular from 'angular';
 import {registerComponents, registerStore} from '../common/module-utils';
 import * as PhysicalFlowStore from './service/physical-flow-store';
 import PhysicalFlowEditor from './components/flow-editor/physical-flow-editor';
+import PhysicalFlowCloneSelector from './components/register/clone/physical-flow-clone-selector';
 import PhysicalFlowOverview from './components/overview/physical-flow-overview';
 
 
@@ -34,14 +35,15 @@ function setup() {
     registerStore(module, PhysicalFlowStore);
 
     module
-        .component('waltzPhysicalFlowEditOverview', require('./components/register/physical-flow-edit-overview'))
-        .component("waltzPhysicalFlowEditSpecification", require('./components/register/physical-flow-edit-specification'))
+        .component('waltzPhysicalFlowEditOverview', require('./components/register/overview/physical-flow-edit-overview'))
+        .component("waltzPhysicalFlowEditSpecification", require('./components/register/edit-specification/physical-flow-edit-specification'))
+        .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
+        .component('waltzPhysicalFlowAttributeEditor', require('./components/register/attribute-editor/physical-flow-attribute-editor'))
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
-        .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
-        .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'))
-        .component('waltzPhysicalFlowAttributeEditor', require('./components/attribute-editor/physical-flow-attribute-editor'));
+        .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'));
 
     registerComponents(module, [
+        PhysicalFlowCloneSelector,
         PhysicalFlowEditor,
         PhysicalFlowOverview
     ]);
