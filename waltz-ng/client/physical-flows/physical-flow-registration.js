@@ -79,12 +79,7 @@ function controller(
     $scope,
     $state,
     $stateParams,
-    actorStore,
-    applicationStore,
-    logicalFlowStore,
     notification,
-    physicalFlowStore,
-    specificationStore,
     serviceBroker,
     preventNavigationService) {
 
@@ -108,10 +103,11 @@ function controller(
     };
 
     const targetFlowId = $stateParams.targetLogicalFlowId;
+
     if (targetFlowId) {
-        logicalFlowStore
-            .getById(targetFlowId)
-            .then(logicalFlow => vm.targetChanged(logicalFlow));
+        serviceBroker
+            .loadViewData(CORE_API.LogicalFlowStore.getById, [ targetFlowId ])
+            .then(r => vm.targetChanged(r.data));
     }
 
     const viewState = kindToViewState(sourceEntityRef.kind);
@@ -175,9 +171,10 @@ function controller(
                 flowAttributes: vm.flowAttributes,
                 logicalFlowId: vm.targetLogicalFlow.id
             };
-            physicalFlowStore
-                .create(cmd)
-                .then(resp => {
+            serviceBroker
+                .execute(CORE_API.PhysicalFlowStore.create, [cmd])
+                .then(r => {
+                    const resp = r.data;
                     if(resp.outcome == 'SUCCESS') {
                         notification.info("Created new flow");
                     } else if(resp.outcome == 'FAILURE') {
@@ -190,7 +187,7 @@ function controller(
                         vm.targetLogicalFlow = null;
                         $state.go('main.physical-flow.view', {id: resp.entityReference.id});
                     }
-                })
+                });
         } else {
             const messages =  _.join(validationResult.messages, '<br> - ');
             notification.warning("Cannot save: <br> - " + messages);
@@ -201,15 +198,15 @@ function controller(
     loadEntity(serviceBroker, sourceEntityRef)
         .then(ent => vm.sourceEntity = ent);
 
-    specificationStore
-        .findByEntityReference(sourceEntityRef)
-        .then(specs => vm.existingSpecifications = specs);
+    serviceBroker
+        .loadViewData(CORE_API.PhysicalSpecificationStore.findByEntityReference, [sourceEntityRef])
+        .then(r =>  vm.existingSpecifications = r.data);
 
-    logicalFlowStore
-        .findByEntityReference(sourceEntityRef)
-        .then(flows =>
+    serviceBroker
+        .loadViewData(CORE_API.LogicalFlowStore.findByEntityReference, [ sourceEntityRef ])
+        .then(r =>
             vm.outboundLogicalFlows = _
-                .chain(flows)
+                .chain(r.data)
                 .filter(f => f.source.kind === sourceEntityRef.kind && f.source.id === sourceEntityRef.id)
                 .orderBy('target.name')
                 .value());
@@ -220,12 +217,7 @@ controller.$inject = [
     '$scope',
     '$state',
     '$stateParams',
-    'ActorStore',
-    'ApplicationStore',
-    'LogicalFlowStore',
     'Notification',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore',
     'ServiceBroker',
     'PreventNavigationService'
 ];
