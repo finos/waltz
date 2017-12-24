@@ -24,6 +24,10 @@ import * as PhysicalFlowStore from './service/physical-flow-store';
 import PhysicalFlowEditor from './components/flow-editor/physical-flow-editor';
 import PhysicalFlowCloneSelector from './components/register/clone/physical-flow-clone-selector';
 import PhysicalFlowOverview from './components/overview/physical-flow-overview';
+import PhysicalFlowEditOverview from './components/register/overview/physical-flow-edit-overview';
+import PhysicalFlowEditTargetLogicalFlow from './components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow';
+import PhysicalFlowEditSpecification from './components/register/edit-specification/physical-flow-edit-specification';
+import PhysicalFlowAttributeEditor from './components/register/attribute-editor/physical-flow-attribute-editor';
 
 
 function setup() {
@@ -35,17 +39,17 @@ function setup() {
     registerStore(module, PhysicalFlowStore);
 
     module
-        .component('waltzPhysicalFlowEditOverview', require('./components/register/overview/physical-flow-edit-overview'))
-        .component("waltzPhysicalFlowEditSpecification", require('./components/register/edit-specification/physical-flow-edit-specification'))
-        .component('waltzPhysicalFlowEditTargetLogicalFlow', require('./components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow'))
-        .component('waltzPhysicalFlowAttributeEditor', require('./components/register/attribute-editor/physical-flow-attribute-editor'))
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'));
 
     registerComponents(module, [
         PhysicalFlowCloneSelector,
         PhysicalFlowEditor,
-        PhysicalFlowOverview
+        PhysicalFlowOverview,
+        PhysicalFlowEditOverview,
+        PhysicalFlowEditTargetLogicalFlow,
+        PhysicalFlowEditSpecification,
+        PhysicalFlowAttributeEditor
     ]);
     return module.name;
 }

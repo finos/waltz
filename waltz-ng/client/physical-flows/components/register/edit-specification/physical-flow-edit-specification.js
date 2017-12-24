@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../../common";
 import {toEntityRef} from '../../../../common/entity-utils';
 import {toOptions, dataFormatKind} from "../../../../common/services/enums";
+import template from './physical-flow-edit-specification.html';
 
 
 const bindings = {
@@ -31,9 +32,6 @@ const bindings = {
     owningEntity: '<',
     selected: '<',
 };
-
-
-const template = require('./physical-flow-edit-specification.html');
 
 
 const SEARCH_CUTOFF = 6;
@@ -124,4 +122,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzPhysicalFlowEditSpecification'
+};
