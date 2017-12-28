@@ -52,7 +52,10 @@
                                                 on-change="ctrl.specificationChanged">
         </waltz-physical-flow-edit-specification>
 
-        <waltz-physical-flow-clone-selector ng-if="ctrl.visibility.editor === 'CLONE'">
+        <waltz-physical-flow-clone-selector ng-if="ctrl.visibility.editor === 'CLONE'"
+                                            on-clone="ctrl.onClone"
+                                            on-dismiss="ctrl.editorDismiss"
+                                            parent-entity-ref="ctrl.sourceEntity">
         </waltz-physical-flow-clone-selector>
 
 
