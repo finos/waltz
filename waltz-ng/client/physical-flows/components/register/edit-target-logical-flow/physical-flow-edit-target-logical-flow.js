@@ -17,16 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import {initialiseData} from "../../../../common";
+import template from './physical-flow-edit-target-logical-flow.html';
 
 
 const bindings = {
     outboundLogicalFlows: '<',  // [ <entityRef>... ]
     onChange: '<'
 };
-
-
-const template = require('./physical-flow-edit-target-logical-flow.html');
 
 
 const initialState = {
@@ -52,5 +50,8 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzPhysicalFlowEditTargetLogicalFlow'
+};
 

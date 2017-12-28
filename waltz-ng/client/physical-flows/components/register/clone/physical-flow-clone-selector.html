@@ -1,0 +1,84 @@
+<div class="row small"
+     ng-if="$ctrl.visibility.search">
+    <div class="col-sm-6 col-sm-offset-2">
+        <div class="input-group input-group-sm">
+                <span class="input-group-addon">
+                    <waltz-icon name="search"></waltz-icon>
+                </span>
+            <input type="search"
+                   class="form-control"
+                   ng-model="$ctrl.qry"
+                   placeholder="Search...">
+        </div>
+        <br>
+    </div>
+</div>
+
+
+<table class="table table-condensed small table-hover table-striped">
+    <colgroup>
+        <col width="4%">
+        <col width="18%">
+        <col width="18%">
+        <col width="14%">
+        <col width="14%">
+        <col width="14%">
+        <col width="18%">
+    </colgroup>
+    <thead>
+    <tr>
+        <th></th>
+        <th>Target</th>
+        <th>Name</th>
+        <th>Format</th>
+        <th>Transport</th>
+        <th>Frequency</th>
+        <th>Ext Id</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="flow in $ctrl.outbound | filter:$ctrl.qry"
+        ng-click="$ctrl.onSelect(flow)"
+        class="clickable">
+        <td>
+            <waltz-icon name="clone"></waltz-icon>
+        </td>
+        <td>
+            <span ng-bind="flow.logical.target.name">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="flow.specification.name">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="flow.specification.formatName">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="flow.physical.transportName">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="flow.physical.frequencyName">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="flow.specification.externalId">
+            </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+
+<div>
+    <div class="row">
+        <div class="col-md-offset-8 col-md-4">
+            <a class="clickable"
+               ng-click="$ctrl.onDismiss()">
+                Cancel
+            </a>
+        </div>
+    </div>
+</div>

@@ -18,9 +18,10 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {toEntityRef} from '../../../common/entity-utils';
-import {toOptions, dataFormatKind} from "../../../common/services/enums";
+import {initialiseData} from "../../../../common";
+import {toEntityRef} from '../../../../common/entity-utils';
+import {toOptions, dataFormatKind} from "../../../../common/services/enums";
+import template from './physical-flow-edit-specification.html';
 
 
 const bindings = {
@@ -33,12 +34,13 @@ const bindings = {
 };
 
 
-const template = require('./physical-flow-edit-specification.html');
+const SEARCH_CUTOFF = 6;
 
 
 const initialState = {
     visibility: {
-        showAddButton: true
+        showAddButton: true,
+        search: false
     },
     form: {
         name: "",
@@ -56,17 +58,11 @@ const initialState = {
 
 function controller() {
 
-
     const vm = initialiseData(this, initialState);
-
 
     vm.select = (spec) => {
         vm.cancelAddNew();
         vm.selected = spec;
-    };
-
-    vm.change = () => {
-        if (vm.selected == null) vm.cancel();
         if (vm.current && vm.selected.id === vm.current.id) vm.cancel();
         vm.onChange(vm.selected);
     };
@@ -108,8 +104,11 @@ function controller() {
             canSubmit: nameDefined && nameUnique && formatDefined,
             message
         };
-    }
+    };
 
+    vm.$onInit = () => {
+        vm.visibility.search = vm.candidates.length > SEARCH_CUTOFF;
+    };
 }
 
 
@@ -123,4 +122,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzPhysicalFlowEditSpecification'
+};
