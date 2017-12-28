@@ -21,7 +21,8 @@
                     </div>
                 </div>
 
-                <div ng-if="$ctrl.visibility.editor">
+                <div ng-if="$ctrl.visibility.editor"
+                     class="waltz-highlight-if">
                     <waltz-data-type-usage-selector parent-entity-ref="$ctrl.parentEntityRef"
                                                     on-dirty="$ctrl.onDirty"
                                                     on-register-save="$ctrl.registerSaveFn">
