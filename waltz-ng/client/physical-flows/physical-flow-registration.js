@@ -25,6 +25,7 @@ import {kindToViewState} from '../common/link-utils';
 import template from './physical-flow-registration.html';
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
+import {removeEnrichments} from "./physical-flow-utils";
 
 
 const initialState = {
@@ -63,15 +64,13 @@ function validate(specification, flowAttributes, targetLogicalFlow) {
 }
 
 
-function findSimilarFlows(specification, flowAttributes, targetEntity, existingFlowsByTarget = {}) {
-    if(specification && flowAttributes && targetEntity) {
-        const existingFlows = existingFlowsByTarget[targetEntity.kind + "_" + targetEntity.id] || [];
-        return _.chain(existingFlows)
-                .filter(f => f.specificationId === specification.id)
-                .map(physicalFlow => ({specification, physicalFlow}))
-                .value();
-    }
-    return [];
+function toAttributes(physFlow) {
+    return {
+        transport: physFlow.transport,
+        frequency: physFlow.frequency,
+        criticality: physFlow.criticality,
+        basisOffset: physFlow.basisOffset
+    };
 }
 
 
@@ -162,6 +161,13 @@ function controller(
         vm.validation = doValidation();
     };
 
+    vm.onClone = flow => {
+        vm.specification = removeEnrichments(flow.specification);
+        vm.flowAttributes = toAttributes(flow.physical);
+        vm.targetLogicalFlow = flow.logical;
+        vm.editorDismiss();
+        notification.info("Flow has been cloned, please make some changes before saving.")
+    };
 
     vm.doSave = () => {
         const validationResult = doValidation();

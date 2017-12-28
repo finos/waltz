@@ -32,6 +32,7 @@ const SEARCH_CUTOFF = 2;
 const bindings = {
     parentEntityRef: '<',
     onDismiss: '<',
+    onClone: '<'
 };
 
 
@@ -86,7 +87,7 @@ function controller($q,
     };
 
     vm.onSelect = (flow) => {
-        console.log('pfcs', { flow })
+        vm.onClone(flow);
     };
 
 }

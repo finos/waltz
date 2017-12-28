@@ -53,6 +53,16 @@ export function enrichSpecification(spec, displayNameService) {
 
 
 /**
+ * Given either an enriched physical flow or specification returns a new object with the
+ * enriched fields removed.
+ * @param o
+ * @returns {*}
+ */
+export function removeEnrichments(o) {
+    return _.omit(o, ['frequencyName', 'transportName', 'criticalityName', 'formatName']);
+}
+
+/**
  * Given arrays of physical flows, logical flows and physical specs, this
  * function will return a new array where each object represents a triple of
  * `
