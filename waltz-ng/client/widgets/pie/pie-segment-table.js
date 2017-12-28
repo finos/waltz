@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {variableScale} from "../common/colors";
-import {numberFormatter} from "../common/string-utils";
+import {variableScale} from "../../common/colors";
+import {numberFormatter, toPercentage} from "../../common/string-utils";
 
 
 const bindings = {
@@ -66,14 +66,7 @@ function controller() {
         }
     };
 
-    vm.asPercentage = (d) => {
-        const numerator = d.count || 0;
-        const denominator = vm.total || 0;
-
-        return denominator === 0
-            ? '-'
-            : Number(((numerator / denominator) * 100).toFixed(1)).toString();
-    };
+    vm.asPercentage = (d) => toPercentage(d.count, vm.total);
 }
 
 

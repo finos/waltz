@@ -181,3 +181,18 @@ export function numberFormatter(num, digits = 0, simplify = true) {
     }
 }
 
+
+/**
+ * Given a numerator and denominator returns a percentage value (no percent sign)
+ * or '-' if the denominator is zero.  The precision is controlled by `fixedPlaces`.2
+ * @param numerator
+ * @param denominator
+ * @param fixedPlaces, defaults to 1
+ * @returns {string}
+ */
+export function toPercentage(numerator = 0, denominator = 0, fixedPlaces = 1) {
+    return denominator === 0
+        ? '-'
+        : Number(((numerator / denominator) * 100).toFixed(fixedPlaces)).toString();
+}
+
