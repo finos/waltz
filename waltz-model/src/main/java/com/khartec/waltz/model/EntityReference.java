@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -70,6 +71,15 @@ public abstract class EntityReference {
                 .name(Optional.ofNullable(name))
                 .description(Optional.ofNullable(description))
                 .build();
+    }
+
+
+    public static EntityReference mkRef(Map map) {
+        return EntityReference.mkRef(
+                Enum.valueOf(EntityKind.class, map.get("kind").toString()),
+                Long.parseLong(map.get("id").toString()),
+                (String) map.get("name"),
+                (String) map.get("description"));
     }
 
 

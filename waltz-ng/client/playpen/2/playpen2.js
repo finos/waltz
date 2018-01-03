@@ -17,12 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+
 
 function controller(notification,
                     svgDiagramStore,
                     $element) {
 
     const vm = Object.assign(this, {});
+
+
+    const logicalFlowFields = [
+        {name: 'id', required: false},
+        {name: 'source', required: true},
+        {name: 'target', required: true},
+        {name: 'lastUpdatedAt', required: false},
+        {name: 'lastUpdatedBy', required: true},
+        {name: 'lastAttestedAt', required: false},
+        {name: 'lastAttestedBy', required: false},
+        {name: 'isRemoved', required: false},
+        {name: 'provenance', required: false},
+    ];
 
     vm.sourceColumns = ['aS', 'bS', 'cS', 'dS'];
     vm.targetColumns = [
@@ -37,6 +52,21 @@ function controller(notification,
         console.log('mappings changed: ', event.mappings, event.isComplete());
     };
 
+    vm.columnMappings = {
+        from_app_nar: {name: 'source', required: true},
+        'Target code': {name: 'target', required: true},
+        'Data Types': {name: 'dataType', required: true},
+        'Source Pr': {name: 'provenance', required: false},
+    };
+
+    vm.spreadsheetLoaded = (event) => {
+        console.log('spreadsheet loaded: ', event);
+        vm.sourceData = event.rowData;
+    };
+
+    vm.parseComplete = (event) => {
+        console.log('parse complete: ', event.data, event.isComplete());
+    };
 }
 
 

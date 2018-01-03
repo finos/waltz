@@ -1,4 +1,21 @@
 <div class="waltz-physical-flow-edit-specification">
+
+    <div class="row small"
+         ng-if="$ctrl.visibility.search">
+        <div class="col-sm-6 col-sm-offset-2">
+            <div class="input-group input-group-sm">
+                <span class="input-group-addon">
+                    <waltz-icon name="search"></waltz-icon>
+                </span>
+                <input type="search"
+                       class="form-control"
+                       ng-model="$ctrl.qry"
+                       placeholder="Search...">
+            </div>
+            <br>
+        </div>
+    </div>
+
     <div class="wpfes-table">
 
         <!-- HEADER -->
@@ -9,13 +26,11 @@
             <div class="col-md-5">Description</div>
         </div>
 
-
         <!-- EXISTING -->
         <div class="row wpfes-existing-row"
-             ng-repeat="candidate in $ctrl.candidates | orderBy:'name'"
+             ng-repeat="candidate in $ctrl.candidates | orderBy:'name' | filter:$ctrl.qry"
              ng-class="{
-                'wpfes-current': candidate.id == $ctrl.current.id,
-                'wpfes-selected': candidate.id == $ctrl.selected.id
+                'wpfes-current': candidate.id == $ctrl.current.id
              }"
              ng-click="$ctrl.select(candidate)">
             <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
@@ -116,14 +131,7 @@
     <div ng-if="$ctrl.visibility.showAddButton">
         <div class="row">
             <div class="col-md-offset-8 col-md-4">
-                <button ng-click='$ctrl.change()'
-                        ng-disabled="!$ctrl.visibility.showAddButton"
-                        class="btn btn-sm btn-primary">
-                    Select
-                </button>
-
                 <a class="clickable"
-
                    ng-click="$ctrl.cancel()">
                     Cancel
                 </a>

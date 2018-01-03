@@ -95,8 +95,28 @@
                     <waltz-entity-icon-label entity-ref="$ctrl.targetLogicalFlow.target"></waltz-entity-icon-label>
                 </div>
             </td>
+        </tr>
 
+        <!-- CLONE -->
+        <tr>
+            <td colspan="2"></td>
+            <td align="center">
+                <div>
+                    <span class="small"
+                          uib-popover="Base this new flow on an existing flow"
+                          popover-trigger="mouseenter"
+                          popover-append-to-body="true"
+                          popover-placement="right">
+                        <a class="clickable"
+                           ng-click="$ctrl.onClone()">
+                            <waltz-icon name="copy"></waltz-icon>
+                            Clone and modify existing physical flow
+                        </a>
+                    </span>
 
+                </div>
+            </td>
+            <td></td>
         </tr>
     </table>
 </div>

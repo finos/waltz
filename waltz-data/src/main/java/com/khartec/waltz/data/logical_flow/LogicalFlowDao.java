@@ -28,16 +28,14 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -139,6 +137,30 @@ public class LogicalFlowDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
+    public List<LogicalFlow> findBySourcesAndTargets(List<Tuple2<EntityReference, EntityReference>> sourceAndTargets) {
+        if(sourceAndTargets.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        List<Condition> sourceTargetConditions = sourceAndTargets
+                .stream()
+                .map(t -> isSourceCondition(t.v1)
+                        .and(isTargetCondition(t.v2))
+                        .and(NOT_REMOVED))
+                .collect(Collectors.toList());
+
+        Condition condition = sourceTargetConditions
+                .stream()
+                .reduce((a, b) -> a.or(b))
+                .get();
+
+        List<LogicalFlow> fetch = baseQuery()
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+
+        return fetch;
+    }
 
 
     public Collection<LogicalFlow> findUpstreamFlowsForEntityReferences(List<EntityReference> references) {

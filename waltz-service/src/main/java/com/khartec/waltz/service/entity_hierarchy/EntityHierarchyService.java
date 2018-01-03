@@ -200,7 +200,7 @@ public class EntityHierarchyService {
         ImmutableEntityHierarchyItem selfAsEntityHierarchyItem = ImmutableEntityHierarchyItem.builder()
                 .id(nodeId)
                 .parentId(nodeId)
-                .level(level)
+                .level(level == null ? -1 : level)
                 .kind(kind)
                 .build();
         return Stream.of(selfAsEntityHierarchyItem);

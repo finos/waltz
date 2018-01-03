@@ -17,7 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
+import template from './pie-table.html';
+
+import {limitSegments} from "./pie-utils";
+import {initialiseData} from "../../common/index";
+
 
 const bindings = {
     data: '<',
@@ -28,11 +32,17 @@ const bindings = {
     selectedSegmentKey: '<'
 };
 
+
+const initialState = {
+};
+
+
 const MAX_PIE_SEGMENTS = 5;
+
 
 function controller() {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const defaultOnSelect = (d) => {
         vm.selectedSegmentKey = d
@@ -41,23 +51,7 @@ function controller() {
     };
 
     const dataChanged = (data = []) => {
-        vm.total = _.sumBy(data, 'count');
-
-        if (data.length > MAX_PIE_SEGMENTS) {
-            const sorted = _.sortBy(data, d => d.count * -1);
-
-            const topData = _.take(sorted, MAX_PIE_SEGMENTS);
-            const otherData = _.drop(sorted, MAX_PIE_SEGMENTS);
-            const otherDatum = {
-                key: 'Other',
-                count : _.sumBy(otherData, "count")
-            };
-
-            vm.pieData = _.concat(topData, otherDatum);
-        } else {
-            vm.pieData = data;
-        }
-
+        vm.pieData = limitSegments(data, MAX_PIE_SEGMENTS);
     };
 
     vm.$onChanges = (changes) => {
@@ -77,9 +71,8 @@ function controller() {
 }
 
 
-
 const component = {
-    template: require('./pie-table.html'),
+    template,
     bindings,
     controller
 };

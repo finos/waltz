@@ -78,6 +78,7 @@ public class ScheduledJobService {
 
     @Scheduled(fixedRate = 300_000)
     public void run() {
+        Thread.currentThread().setName("WaltzScheduledJobService");
         runIfNeeded(JobKey.HIERARCHY_REBUILD_CHANGE_INITIATIVE,
                 (jk) -> entityHierarchyService.buildFor(EntityKind.CHANGE_INITIATIVE));
 
