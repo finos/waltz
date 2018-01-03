@@ -45,6 +45,7 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const calculateMessages = () => {
+        console.log('cM', { vm })
         vm.messages = [];
         if (!vm.selectedDefinition) {
             vm.messages.push('No selected definition');
@@ -61,7 +62,7 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.axisOptions = _.union(
                     r.data,
-                    [ { id: null, kind: 'DATA_TYPE', name: 'Data Type' }]);
+                    [ { id: -1, kind: 'DATA_TYPE', name: 'Data Type' } ]);
             });
 
         serviceBroker

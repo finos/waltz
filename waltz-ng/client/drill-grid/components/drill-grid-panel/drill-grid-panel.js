@@ -195,16 +195,20 @@ function controller($q, serviceBroker, settingsService) {
                 .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
                 .then(r => r.data),
             settingsService
-                .findOrDie(DRILL_GRID_DEFAULT_DEFINITION_ID, `Cannot find default drill grid definition (settings: ${DRILL_GRID_DEFAULT_DEFINITION_ID}`)
+                .findOrDefault(DRILL_GRID_DEFAULT_DEFINITION_ID)
         ];
 
         $q.all(promises)
             .then(([apps, definitions, defaultDefinitionId]) => {
-                vm.allApps = apps;
-                vm.selectedDefinition = _.find(definitions, { id: +defaultDefinitionId });
-                if (vm.selectedDefinition) {
-                    loadChartData(vm.selectedDefinition);
+                if (_.isEmpty(definitions)) {
+                    console.error('Cannot show drill grid if no definitions have been declared.')
+                    return;
                 }
+                vm.allApps = apps;
+
+                // use default, fall back to first if not found
+                vm.selectedDefinition = _.find(definitions, { id: +defaultDefinitionId }) || definitions[0];
+                loadChartData(vm.selectedDefinition);
             });
     };
 

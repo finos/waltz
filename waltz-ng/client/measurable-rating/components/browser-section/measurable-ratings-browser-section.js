@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import template from './measurable-ratings-browser-section.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -37,15 +37,21 @@ const bindings = {
 const initialState = {
     visibility: {
         treeView: true,
-        gridView: false
+        gridView: false,
+        gridAvailable: false,
     }
 };
 
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
+            .then(r => vm.visibility.gridAvailable = r.data.length > 0);
+    };
 
     vm.showGridView = () => {
         vm.visibility.gridView = true;
@@ -60,6 +66,7 @@ function controller() {
 
 
 controller.$inject = [
+    'ServiceBroker'
 ];
 
 

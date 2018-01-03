@@ -53,14 +53,12 @@ export default class DrillGrid {
 
 
     notifyListeners() {
-        console.log('notify')
         _.each(this.listeners, cb => cb(this));
     }
 
 
     refresh(newOptions) {
         _.merge(this.options, newOptions);
-        console.log('refresh', { newOptions, options: this.options })
 
         this.yAxis.focus(this.options.yId);
         this.xAxis.focus(this.options.xId);
@@ -80,7 +78,5 @@ export default class DrillGrid {
     isEmpty() {
         return (this.rowGroups || []).length == 0
     }
-
-
 
 }
