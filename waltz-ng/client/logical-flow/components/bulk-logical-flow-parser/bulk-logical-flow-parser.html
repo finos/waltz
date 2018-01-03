@@ -37,6 +37,7 @@
                     <th>Target</th>
                     <th>Data Type</th>
                     <th>Provenance (optional)</th>
+                    <th></th>
                 </tr>
             </thead>
 
@@ -79,6 +80,12 @@
                     <td>
                         <span ng-bind="result.provenance">
                         </span>
+                    </td>
+                    <td>
+                        <span ng-if="result.existing === null"
+                              class="label label-success">New</span>
+                        <span ng-if="result.existing"
+                              class="label label-warning">Exists</span>
                     </td>
                 </tr>
             </tbody>

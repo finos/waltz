@@ -38,6 +38,7 @@ import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -95,6 +96,11 @@ public class LogicalFlowService {
 
     public List<LogicalFlow> findByEntityReference(EntityReference ref) {
         return logicalFlowDao.findByEntityReference(ref);
+    }
+
+
+    public List<LogicalFlow> findBySourceAndTargetEntityReferences(List<Tuple2<EntityReference, EntityReference>> sourceAndTargets) {
+        return logicalFlowDao.findBySourcesAndTargets(sourceAndTargets);
     }
 
 

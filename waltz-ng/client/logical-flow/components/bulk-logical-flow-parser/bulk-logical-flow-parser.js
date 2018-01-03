@@ -18,9 +18,10 @@
  */
 
 import _ from 'lodash';
+import { nest } from "d3-collection";
 import { CORE_API } from '../../../common/services/core-api-utils';
 import { initialiseData } from '../../../common';
-import { toEntityRef } from '../../../common/entity-utils';
+import { refToString, toEntityRef } from '../../../common/entity-utils';
 
 
 import template from './bulk-logical-flow-parser.html';
@@ -44,10 +45,10 @@ const initialState = {
 };
 
 
-function resolveEntityRef(entitiesByIdentifier = {}, identifier) {
+function resolveEntityRef(entitiesByIdentifier = {}, kind, identifier) {
     const search = _.toLower(identifier);
     const app = entitiesByIdentifier[search];
-    const entityRef = app ? toEntityRef(app, 'APPLICATION') : null;
+    const entityRef = app ? toEntityRef(app, kind) : null;
 
     return {
         identifier,
@@ -73,6 +74,28 @@ function mapColumns(columnMappings = {}, sourceData = [], columnResolvers = {}) 
 }
 
 
+function findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets) {
+    return serviceBroker
+        .loadViewData(
+            CORE_API.LogicalFlowStore.findBySourceAndTargetEntityReferences,
+            [sourcesAndTargets])
+        .then(flows => {
+            // add decorators
+            const existingFlowIds = _.map(flows.data, 'id');
+            return serviceBroker
+                .loadViewData(CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind, [existingFlowIds])
+                .then(decorators => {
+                    const decoratorsByFlowId = _.groupBy(decorators.data, 'dataFlowId');
+                    const flowsWithDecorators = _.flatMap(flows.data, f => {
+                        const decorators = decoratorsByFlowId[f.id];
+                        return _.map(decorators, d => Object.assign({}, f, {decorator: d}));
+                    });
+                    return flowsWithDecorators;
+                });
+        })
+}
+
+
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -93,6 +116,12 @@ function controller($q, serviceBroker) {
         return _.every(allParsedRefs, p => p.entityRef != null);
     };
 
+    const parseErrorCount = (data = []) => {
+        const allParsedRefs = _.flatMap(data, d => [d.source, d.target, d.dataType]);
+        return _.sumBy(allParsedRefs, p => p.entityRef == null ? 1 : 0);
+    };
+
+
     vm.$onInit = async () => {
         vm.loading = true;
         const [entityRefsByAssetCode, dataTypesByCode] = await $q.all([
@@ -101,18 +130,48 @@ function controller($q, serviceBroker) {
         ]);
 
         vm.columnResolvers = {
-            source: (identifier) => resolveEntityRef(entityRefsByAssetCode, identifier),
-            target: (identifier) => resolveEntityRef(entityRefsByAssetCode, identifier),
-            dataType: (identifier) => resolveEntityRef(dataTypesByCode, identifier),
+            source: (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
+            target: (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
+            dataType: (identifier) => resolveEntityRef(dataTypesByCode, 'DATA_TYPE', identifier),
         }
     };
 
 
     vm.$onChanges = async (changes) => {
         if(vm.columnMappings && vm.sourceData) {
-            vm.parsedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
-            vm.loading = false;
+            const mappedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
 
+            if(mappedData.length > 0 && parseErrorCount(mappedData) == 0) {
+                //compare against logical flows in database
+
+                const sourcesAndTargets = _.map(mappedData, p => ({source: p.source.entityRef, target: p.target.entityRef}));
+                const existingFlows = await findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets);
+
+                // nesting: source -> target -> data type
+                const existingFlowsNested = nest()
+                    .key(flow => refToString(flow.source))
+                    .key(flow => refToString(flow.target))
+                    .key(flow => refToString(flow.decorator.decoratorEntity))
+                    .object(existingFlows);
+
+                const parsedWithExisting = _.map(mappedData, p => {
+                    const sourceRefString = refToString(p.source.entityRef);
+                    const targetRefString = refToString(p.target.entityRef);
+                    const dataTypeString = refToString(p.dataType.entityRef);
+                    const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][]${dataTypeString}`);
+                    let existing = null;
+                    if(existingFlows && existingFlows.length > 0) {
+                        existing = existingFlows[0];
+                    }
+                    return Object.assign({}, p, {existing});
+                });
+                vm.parsedData = parsedWithExisting;
+            } else {
+                vm.parsedData = mappedData;
+            }
+
+
+            vm.loading = false;
             const event = {
                 data: vm.parsedData,
                 isComplete
