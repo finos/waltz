@@ -18,15 +18,16 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../../common";
 import {
     transportField,
     frequencyField,
     basisOffsetSelectField,
     basisOffsetInputField,
     criticalityField
-} from "../../formly/physical-flow-fields";
-import {CORE_API} from "../../../common/services/core-api-utils";
+} from "../../../formly/physical-flow-fields";
+import {CORE_API} from "../../../../common/services/core-api-utils";
+import template from './physical-flow-attribute-editor.html';
 
 
 const bindings = {
@@ -36,7 +37,6 @@ const bindings = {
 };
 
 
-const template = require('./physical-flow-attribute-editor.html');
 
 
 const initialState = {
@@ -153,4 +153,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzPhysicalFlowAttributeEditor'
+};

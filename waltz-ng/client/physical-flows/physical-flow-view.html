@@ -40,10 +40,11 @@
                     <content>
                         <div class="waltz-sub-section-content">
                             <div ng-if="! ctrl.visibility.overviewEditor">
-                                <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference">
+                                <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
                                 </waltz-physical-flow-overview>
                             </div>
-                            <div ng-if="ctrl.visibility.overviewEditor">
+                            <div ng-if="ctrl.visibility.overviewEditor"
+                                 class="waltz-highlight-if">
                                 <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
                                 </waltz-physical-flow-editor>
                             </div>

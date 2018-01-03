@@ -23,6 +23,9 @@ import {kindToViewState} from '../common/link-utils';
 
 
 import template from './physical-flow-registration.html';
+import {CORE_API} from "../common/services/core-api-utils";
+import {loadEntity} from "../common/entity-utils";
+import {removeEnrichments} from "./physical-flow-utils";
 
 
 const initialState = {
@@ -41,25 +44,10 @@ const initialState = {
     },
     visibility: {
         editor: "",
+        loading: false,
         similarFlows: false
     }
 };
-
-
-function loadEntity(entityRef, appStore, actorStore) {
-    switch (entityRef.kind) {
-        case 'APPLICATION':
-            return appStore
-                .getById(entityRef.id)
-                .then(app => Object.assign({}, app, { kind: 'APPLICATION' }));
-        case 'ACTOR':
-            return actorStore
-                .getById(entityRef.id)
-                .then(actor => Object.assign({}, actor, { kind: 'ACTOR' }));
-        default:
-            throw "Unsupported owningEntity (kind): " + entityRef;
-    }
-}
 
 
 function validate(specification, flowAttributes, targetLogicalFlow) {
@@ -76,15 +64,13 @@ function validate(specification, flowAttributes, targetLogicalFlow) {
 }
 
 
-function findSimilarFlows(specification, flowAttributes, targetEntity, existingFlowsByTarget = {}) {
-    if(specification && flowAttributes && targetEntity) {
-        const existingFlows = existingFlowsByTarget[targetEntity.kind + "_" + targetEntity.id] || [];
-        return _.chain(existingFlows)
-                .filter(f => f.specificationId === specification.id)
-                .map(physicalFlow => ({specification, physicalFlow}))
-                .value();
-    }
-    return [];
+function toAttributes(physFlow) {
+    return {
+        transport: physFlow.transport,
+        frequency: physFlow.frequency,
+        criticality: physFlow.criticality,
+        basisOffset: physFlow.basisOffset
+    };
 }
 
 
@@ -92,12 +78,8 @@ function controller(
     $scope,
     $state,
     $stateParams,
-    actorStore,
-    applicationStore,
-    logicalFlowStore,
     notification,
-    physicalFlowStore,
-    specificationStore,
+    serviceBroker,
     preventNavigationService) {
 
     const vm = initialiseData(this, initialState);
@@ -120,10 +102,11 @@ function controller(
     };
 
     const targetFlowId = $stateParams.targetLogicalFlowId;
+
     if (targetFlowId) {
-        logicalFlowStore
-            .getById(targetFlowId)
-            .then(logicalFlow => vm.targetChanged(logicalFlow));
+        serviceBroker
+            .loadViewData(CORE_API.LogicalFlowStore.getById, [ targetFlowId ])
+            .then(r => vm.targetChanged(r.data));
     }
 
     const viewState = kindToViewState(sourceEntityRef.kind);
@@ -151,6 +134,12 @@ function controller(
         vm.visibility.editor = 'TARGET-LOGICAL-FLOW';
     };
 
+    vm.focusClone = () => {
+        vm.visibility.editor = 'CLONE';
+        vm.visibility.loading = true;
+        console.log('focusClone', { vm })
+    };
+
     vm.attributesChanged = (attributes) => {
         vm.flowAttributes = attributes;
         vm.editorDismiss();
@@ -172,6 +161,13 @@ function controller(
         vm.validation = doValidation();
     };
 
+    vm.onClone = flow => {
+        vm.specification = removeEnrichments(flow.specification);
+        vm.flowAttributes = toAttributes(flow.physical);
+        vm.targetLogicalFlow = flow.logical;
+        vm.editorDismiss();
+        notification.info("Flow has been cloned, please make some changes before saving.")
+    };
 
     vm.doSave = () => {
         const validationResult = doValidation();
@@ -181,9 +177,10 @@ function controller(
                 flowAttributes: vm.flowAttributes,
                 logicalFlowId: vm.targetLogicalFlow.id
             };
-            physicalFlowStore
-                .create(cmd)
-                .then(resp => {
+            serviceBroker
+                .execute(CORE_API.PhysicalFlowStore.create, [cmd])
+                .then(r => {
+                    const resp = r.data;
                     if(resp.outcome == 'SUCCESS') {
                         notification.info("Created new flow");
                     } else if(resp.outcome == 'FAILURE') {
@@ -196,7 +193,7 @@ function controller(
                         vm.targetLogicalFlow = null;
                         $state.go('main.physical-flow.view', {id: resp.entityReference.id});
                     }
-                })
+                });
         } else {
             const messages =  _.join(validationResult.messages, '<br> - ');
             notification.warning("Cannot save: <br> - " + messages);
@@ -204,22 +201,21 @@ function controller(
     };
 
 
-    loadEntity(sourceEntityRef, applicationStore, actorStore)
+    loadEntity(serviceBroker, sourceEntityRef)
         .then(ent => vm.sourceEntity = ent);
 
-    specificationStore
-        .findByEntityReference(sourceEntityRef)
-        .then(specs => vm.existingSpecifications = specs);
+    serviceBroker
+        .loadViewData(CORE_API.PhysicalSpecificationStore.findByEntityReference, [sourceEntityRef])
+        .then(r =>  vm.existingSpecifications = r.data);
 
-    logicalFlowStore
-        .findByEntityReference(sourceEntityRef)
-        .then(flows =>
+    serviceBroker
+        .loadViewData(CORE_API.LogicalFlowStore.findByEntityReference, [ sourceEntityRef ])
+        .then(r =>
             vm.outboundLogicalFlows = _
-                .chain(flows)
+                .chain(r.data)
                 .filter(f => f.source.kind === sourceEntityRef.kind && f.source.id === sourceEntityRef.id)
                 .orderBy('target.name')
                 .value());
-
 }
 
 
@@ -227,12 +223,8 @@ controller.$inject = [
     '$scope',
     '$state',
     '$stateParams',
-    'ActorStore',
-    'ApplicationStore',
-    'LogicalFlowStore',
     'Notification',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore',
+    'ServiceBroker',
     'PreventNavigationService'
 ];
 

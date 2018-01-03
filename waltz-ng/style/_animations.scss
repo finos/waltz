@@ -40,6 +40,26 @@ $animation-speed: 0.2s;
 }
 
 
+
+.waltz-highlight-if.ng-enter {
+    -webkit-transition: background-color linear $animation-speed * 2;
+    -moz-transition: background-color linear $animation-speed * 2;
+    -ms-transition: background-color linear $animation-speed * 2;
+    -o-transition: background-color linear $animation-speed * 2;
+    transition: background-color linear $animation-speed * 2;
+}
+
+
+.waltz-highlight-if.ng-enter,
+.waltz-highlight-if.ng-leave.ng-leave-active {
+    background-color: #fff9dc;
+}
+
+.waltz-highlight-if.ng-leave,
+.waltz-highlight-if.ng-enter.ng-enter-active {
+    background-color: #fff;
+}
+
 .waltz-fade-if.ng-enter {
     -webkit-transition: opacity ease-in-out $animation-speed;
     -moz-transition: opacity ease-in-out $animation-speed;

@@ -1,4 +1,4 @@
-.waltz-auth-sources-navigator-chart {
+.waltz-drill-grid-chart {
     border: 1px solid #fafafa;
 
     text {
@@ -7,12 +7,12 @@
         font-size: xx-small;
     }
 
-    .wasnc-rowGroupHover {
-        .wasnc-appMapping {
+    .wdgc-rowGroupHover {
+        .wdgc-appMapping {
             stroke-width: 1.5;
             cursor: pointer;
         }
-        &.wasnc-rowGroup {
+        &.wdgc-rowGroup {
             text {
                 font-weight: bolder;
                 fill: #222;
@@ -22,18 +22,18 @@
 
     }
 
-    .wasnc-history {
+    .wdgc-history {
         font-style: italic;
         text-decoration: underline;
     }
 
-    .wasnc-colHover {
-        &.wasnc-appMapping {
+    .wdgc-colHover {
+        &.wdgc-appMapping {
             stroke-width: 1.5;
             cursor: pointer;
         }
 
-        &.wasnc-colHeader {
+        &.wdgc-colHeader {
             text {
                 font-weight: bolder;
                 fill: #222;
@@ -44,7 +44,19 @@
 
     }
 
-    .wasnc-descendable {
+    .wdgc-descendable {
         font-weight: bolder;
+    }
+
+    .wdgc-tooltip {
+        display: block;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        width: 30%;
+        position: absolute;
+        transition: all 0.3s ease-in-out;
+        pointer-events: none;
+
     }
 }

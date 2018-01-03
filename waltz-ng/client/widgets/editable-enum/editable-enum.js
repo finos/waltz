@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import template from './editable-enum.html';
 import {initialiseData} from "../../common/index";
-import {toOptions} from "../../common/services/enums";
 
 const bindings = {
     initialVal: "<",
@@ -44,8 +44,11 @@ function controller(displayNameService) {
 
     vm.$onChanges = () => {
         vm.currentVal = vm.initialVal;
+        global.dns =displayNameService;
         const enumValuesMap = displayNameService.lookupsByType[vm.enumKind];
-        vm.enumValues = toOptions(enumValuesMap);
+        global.evm = enumValuesMap;
+
+        vm.enumValues = _.map(enumValuesMap, (v,k) => ({ code: k, name: v }));
     };
 
     vm.onEdit = () => {

@@ -28,7 +28,6 @@ export function store($http, root) {
     const findAll = () => {
         return $http
             .get(BASE)
-            .then(r => { console.log('tap', r); return r; })
             .then(result => result.data);
     };
 
