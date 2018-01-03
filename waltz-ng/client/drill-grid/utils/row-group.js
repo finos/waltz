@@ -134,6 +134,9 @@ export default class RowGroup {
                         colId: xDatum.id,
                         groupId: yDatum.id,
                         colType,
+                        col: xDatum,
+                        row: yDatum,
+                        app: app,
                         rating
                     };
                 });

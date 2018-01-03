@@ -41,3 +41,10 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 - email: dwatkins@khartec.com
 - irc: #waltzdev
+
+
+## Contributors
+
+All contributions should contain the standard license and copyright notice (see [Notice file](NOTICE.md)).  
+
+Individual and organisational contributors are listed in [the contributors file](CONTRIBUTORS.md)

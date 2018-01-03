@@ -17,40 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import _ from 'lodash';
 
 
-const bindings = {
-    outboundLogicalFlows: '<',  // [ <entityRef>... ]
-    onChange: '<'
-};
-
-
-const template = require('./physical-flow-edit-target-logical-flow.html');
-
-
-const initialState = {
-    outboundLogicalFlows: [],
-    onChange: (f) => console.log('pfetlf::onChange', f)
-};
-
-
-function controller() {
-    initialiseData(this, initialState);
+export function calcTotal(data) {
+    return _.sumBy(data, 'count')
 }
 
 
-controller.$inject = [
-    'ActorStore'
-];
+export function isPieEmpty(data) {
+    return calcTotal(data) === 0;
+}
 
 
-const component = {
-    bindings,
-    template,
-    controller
-};
 
+export function limitSegments(data = [], maxSegments = 5) {
+    const removeEmptySegments = segs => _.filter(segs, s => s.count !== 0)
+    if (data.length > maxSegments) {
+        const sorted = _.sortBy(data, d => d.count * -1);
+        const topData = _.take(sorted, maxSegments);
+        const otherData = _.drop(sorted, maxSegments);
+        const otherDatum = {
+            key: 'Other',
+            count : _.sumBy(otherData, "count")
+        };
 
-export default component;
+        return removeEmptySegments(_.concat(topData, otherDatum));
+    } else {
+        return removeEmptySegments(data);
+    }
+}
+
 

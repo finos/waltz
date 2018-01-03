@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import {initialiseData} from "../../../../common";
+import template from './physical-flow-edit-overview.html';
+
 
 const bindings = {
     sourceEntity: '<',
@@ -26,11 +28,9 @@ const bindings = {
     flowAttributes: '<',
     onSpecificationFocus: '<',
     onFlowAttributesFocus: '<',
-    onTargetFocus: '<'
+    onTargetFocus: '<',
+    onClone: '<'
 };
-
-
-const template = require('./physical-flow-edit-overview.html');
 
 
 const initialState = {
@@ -55,4 +55,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzPhysicalFlowEditOverview'
+};

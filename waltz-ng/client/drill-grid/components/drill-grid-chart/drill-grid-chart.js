@@ -25,9 +25,10 @@ import {initialiseData} from "../../../common";
 import {ragColorScale} from '../../../common/colors';
 
 import _ from 'lodash';
-import { select } from 'd3-selection';
+import { select, event } from 'd3-selection';
 import {scaleBand, scaleLinear} from 'd3-scale';
 import {truncateText} from "../../../common/d3-utils";
+import {truncate} from "../../../common/string-utils";
 
 
 const bindings = {
@@ -61,15 +62,16 @@ const blockScaleX = scaleLinear()
 
 
 const styles = {
-    region: 'wasnc-region',
-    rowGroupHover: 'wasnc-rowGroupHover',
-    colHeader: 'wasnc-colHeader',
-    colHover: 'wasnc-colHover',
-    appMapping: 'wasnc-appMapping',
-    rowGroup: 'wasnc-rowGroup',
-    appRow: 'wasnc-appRow',
-    history: 'wasnc-history',
-    descendable: 'wasnc-descendable'
+    region: 'wdgc-region',
+    rowGroupHover: 'wdgc-rowGroupHover',
+    colHeader: 'wdgc-colHeader',
+    colHover: 'wdgc-colHover',
+    appMapping: 'wdgc-appMapping',
+    rowGroup: 'wdgc-rowGroup',
+    appRow: 'wdgc-appRow',
+    history: 'wdgc-history',
+    descendable: 'wdgc-descendable',
+    tooltip: 'wdgc-tooltip'
 };
 
 
@@ -186,10 +188,38 @@ function init(svg, scaleX) {
 }
 
 
-function drawAppMappings(selector, colScale, drillGrid, svg) {
+function showTooltip(d, tooltip) {
+    const html = `
+        <div class="small">
+            <div>
+                ${d.col.name} / ${d.row.name}
+            </div>
+            <div>${d.app.name}</div>
+            <div class="small">
+                ${truncate(d.app.description, 128)}
+            </div>
+        </div>
+    `;
+
+    return tooltip
+        .html(html)
+        .style('display', 'block')
+        .style('left', () => `${event.pageX}px`)
+        .style('top', () => `${event.offsetY}px`)
+        .style('opacity', 0.9);
+}
+
+
+function hideTooltip(d, tooltip) {
+    tooltip
+        .style('display', 'none')
+}
+
+
+function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
-        .data(d => d.mappings, d => d.colId);
+        .data(d => _.filter(d.mappings, m => m.rating !== 'Z'), d => d.colId);
 
     appMappings.exit().remove();
 
@@ -200,6 +230,8 @@ function drawAppMappings(selector, colScale, drillGrid, svg) {
         .classed(styles.appMapping, true)
         .on('mouseover', d => highlightColumn(d.colId, true, svg))
         .on('mouseout', d => highlightColumn(d.colId, false, svg))
+        .on("mouseover", d => showTooltip(d, tooltip))
+        .on("mouseout", d => hideTooltip(d, tooltip))
         .on('click.focus', d => drillGrid.refresh({ xId: d.colId, yId: d.groupId }));
 
     newAppMappings
@@ -244,7 +276,7 @@ function typeToArrow(type) {
 }
 
 
-function drawAppRows(selector, colScale, drillGrid, svg) {
+function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
     const appRows = selector
         .selectAll(`.${styles.appRow}`)
         .data(d => d.rows, d => d.app.id);
@@ -269,7 +301,7 @@ function drawAppRows(selector, colScale, drillGrid, svg) {
 
     appRows
         .merge(newAppRows)
-        .call(drawAppMappings, colScale, drillGrid, svg);
+        .call(drawAppMappings, colScale, drillGrid, svg, tooltip);
 
     return appRows;
 }
@@ -285,7 +317,7 @@ function drawRowGroupLabel(selection) {
 }
 
 
-function drawRowGroups(drillGrid, svg, colScale) {
+function drawRowGroups(drillGrid, svg, tooltip, colScale) {
 
     const groupOffsets = calculateRowGroupOffsets(drillGrid.rowGroups);
 
@@ -299,12 +331,12 @@ function drawRowGroups(drillGrid, svg, colScale) {
     const newRowGroups = rowGroups
         .enter()
         .append('g')
-        .classed(styles.descendable, d => { console.log('d', d);  return (d.group.children || []).length > 0; })
+        .classed(styles.descendable, d => (d.group.children || []).length > 0)
         .classed(styles.rowGroup, true);
 
     newRowGroups
         .append('rect')
-        .attr('width', 900)
+        .attr('width', "100%")
         .attr('height', d => groupOffsets[d.group.id].height)
         .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
 
@@ -320,7 +352,7 @@ function drawRowGroups(drillGrid, svg, colScale) {
     rowGroups
         .merge(newRowGroups)
         .on('click.focus', d => drillGrid.refresh({ yId: d.group.id }))
-        .call(drawAppRows, colScale, drillGrid, svg);
+        .call(drawAppRows, colScale, drillGrid, svg, tooltip);
 }
 
 
@@ -409,10 +441,10 @@ function refToString(ref) {
 }
 
 
-function draw(drillGrid, svg, blockScaleX) {
+function draw(drillGrid, svg, tooltip, blockScaleX) {
     if (! svg) return;
 
-    console.log('draw', { drillGrid });
+    // console.log('draw', { drillGrid });
 
     const height = calcTotalRequiredHeight(drillGrid);
 
@@ -435,8 +467,10 @@ function draw(drillGrid, svg, blockScaleX) {
         .align([0.5]);
 
     drawColHeaders(drillGrid, svg, colScale);
-    drawRowGroups(drillGrid, svg, colScale);
+    drawRowGroups(drillGrid, svg, tooltip, colScale);
     drawHistory(drillGrid, svg);
+
+
 }
 
 
@@ -446,18 +480,22 @@ function controller($element) {
     const vm = initialiseData(this, initialState);
 
     let svg = null;
+    let tooltip = null;
 
     vm.$onInit = () => {
         const rootElem = $element[0];
         svg = select(rootElem)
             .select('svg');
 
+        tooltip = select(rootElem)
+            .select(`.${styles.tooltip}`);
+
         init(svg, blockScaleX);
     };
 
     vm.$onChanges = (c) => {
         if (c.drillGrid && vm.drillGrid) {
-            vm.drillGrid.addListener(() => draw(vm.drillGrid, svg, blockScaleX));
+            vm.drillGrid.addListener(() => draw(vm.drillGrid, svg, tooltip, blockScaleX));
         }
     };
 }
