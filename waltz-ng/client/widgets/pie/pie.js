@@ -23,6 +23,7 @@ import { easeElasticOut } from 'd3-ease';
 import "d3-selection-multi";
 
 import _ from "lodash";
+import {isPieEmpty} from "./pie-utils";
 
 
 /**
@@ -42,12 +43,17 @@ const bindings = {
 };
 
 
+const styles = {
+    emptyPie: 'empty-pie'
+};
+
 const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
 
 
 const DEFAULT_SIZE = 80;
 const FOCUS_DURATION = 1000;
 const BLUR_DURATION = 50;
+
 
 function mkPieArc(radius, focused = false) {
     if(focused) {
@@ -126,8 +132,8 @@ function renderArcs(holder, config, data, onSelect) {
         .remove();
 
     const emptyPie = holder
-        .selectAll('.empty-pie')
-        .data(data.length ? [] : [1]);
+        .selectAll(`.${styles.emptyPie}`)
+        .data(isPieEmpty(data) ? [1] : []);
 
     emptyPie
         .enter()
@@ -140,7 +146,7 @@ function renderArcs(holder, config, data, onSelect) {
             stroke: '#bbb',
             'stroke-dasharray': [5, 1]
         })
-        .classed('empty-pie', true);
+        .classed(styles.emptyPie, true);
 
     emptyPie
         .exit()

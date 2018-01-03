@@ -34,14 +34,28 @@ const initialState = {
         manualPicker: false,
         choicePicker: false,
         summary: true,
-    }
+        loading: true
+    },
+    definitions: [],
+    messages: []
 };
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const calculateMessages = () => {
+        vm.messages = [];
+        if (!vm.selectedDefinition) {
+            vm.messages.push('No selected definition');
+        }
+        if (vm.definitions.length == 0) {
+            vm.messages.push('No prebuilt definitions, select the dimensions manually');
+        }
+    };
+
     vm.$onInit = () => {
+        vm.visibility.loading = true;
         serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => {
@@ -55,6 +69,8 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.definitions = r.data;
                 vm.visibility.manualPicker = r.data.length === 0;
+                calculateMessages();
+                vm.visibility.loading = false;
             });
 
 
@@ -62,6 +78,8 @@ function controller(serviceBroker) {
             vm.visibility.manualPicker = vm.selectedDefinition.id === null;
         }
     };
+
+    vm.$onChanges = () => calculateMessages();
 
     vm.onAxisChange = () => {
 
@@ -102,7 +120,9 @@ function controller(serviceBroker) {
     };
 }
 
-controller.$inject = [ 'ServiceBroker' ];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {

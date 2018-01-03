@@ -1,17 +1,10 @@
 <div class="waltz-visibility-parent">
 
-    <span ng-if='!$ctrl.visibility.editor'
-          ng-bind="$ctrl.currentVal | toDisplayName:$ctrl.enumKind">
-    </span>
-    <form class='form-inline'
-           ng-if='$ctrl.visibility.editor'>
-        <select ng-model="$ctrl.currentVal"
-                ng-options="item.code as item.name for item in $ctrl.enumValues | orderBy:'name'"
-                class="form-control">
-        </select>
-    </form>
+    <!-- VIEW -->
+    <span ng-if='!$ctrl.visibility.editor'>
 
-    <span ng-if="! $ctrl.visibility.editor">
+        <span ng-bind="$ctrl.currentVal | toDisplayName:$ctrl.enumKind"></span>
+
         <a ng-click="$ctrl.onEdit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"
@@ -27,7 +20,14 @@
         </a>
     </span>
 
-    <span ng-if="$ctrl.visibility.editor">
+    <!-- EDIT -->
+    <form class='form-inline'
+           ng-if='$ctrl.visibility.editor'>
+        <select ng-model="$ctrl.currentVal"
+                ng-options="item.code as item.name for item in $ctrl.enumValues | orderBy:'name'"
+                class="form-control">
+        </select>
+
         <button class="btn btn-xs btn-success"
                 ng-disabled="$ctrl.saving"
                 ng-click="$ctrl.doSave()">
@@ -46,7 +46,6 @@
                         spin="true">
             </waltz-icon>
         </span>
-
-    </span>
+    </form>
 
 </div>

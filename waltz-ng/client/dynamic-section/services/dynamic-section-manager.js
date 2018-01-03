@@ -102,10 +102,18 @@ export function service($location, $stateParams, localStorage) {
         }
 
         const userSectionIds = readFromLocalStorage(kind);
+
+        // we toggle the section if it's the current top one...
+        const discardSection = userSectionIds.length > 0 && userSectionIds[0] === section.id;
+
         const workingIds =  _.reject(
             userSectionIds,
             activeSectionId => activeSectionId === section.id);
-        workingIds.unshift(section.id); // push to front
+
+        if (!discardSection) {
+            // push to front
+            workingIds.unshift(section.id);
+        }
 
         writeToLocalStorage(kind, workingIds);
 

@@ -16,41 +16,42 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {CORE_API} from '../../common/services/core-api-utils';
-import {refToString} from '../../common/entity-utils';
-import {initialiseData} from "../../common/index";
 
-const initialState = {
-    parentEntityRef: { kind: 'ORG_UNIT', id: 200 },
-    foo: 'baa'
+import {initialiseData} from "../../../../common";
+import template from './physical-flow-edit-target-logical-flow.html';
+
+
+const bindings = {
+    outboundLogicalFlows: '<',  // [ <entityRef>... ]
+    onChange: '<'
 };
 
 
+const initialState = {
+    outboundLogicalFlows: [],
+    onChange: (f) => console.log('pfetlf::onChange', f)
+};
 
-function controller(serviceBroker, $stateParams) {
 
-    const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-    };
-
+function controller() {
+    initialiseData(this, initialState);
 }
 
 
 controller.$inject = [
-    'ServiceBroker',
-    '$stateParams'
+    'ActorStore'
 ];
 
 
-const view = {
-    template: require('./playpen4.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
+const component = {
+    bindings,
+    template,
+    controller
 };
 
 
-export default view;
+export default {
+    component,
+    id: 'waltzPhysicalFlowEditTargetLogicalFlow'
+};
+

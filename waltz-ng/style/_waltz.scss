@@ -66,11 +66,11 @@
 @import "../client/playpen/4/playpen4";
 @import "../client/perspective/components/grid/perspective-grid";
 @import "../client/physical-flow-lineage/lineage-edit";
-@import "../client/physical-flows/components/attribute-editor/physical-flow-attribute-editor";
-@import "../client/physical-flows/components/edit-target-logical-flow/physical-flow-edit-target-logical-flow";
 @import "../client/physical-flows/components/overview/physical-flow-overview";
-@import "../client/physical-flows/components/register/physical-flow-edit-overview";
-@import "../client/physical-flows/components/register/physical-flow-edit-specification";
+@import "../client/physical-flows/components/register/overview/physical-flow-edit-overview";
+@import "../client/physical-flows/components/register/attribute-editor/physical-flow-attribute-editor";
+@import "../client/physical-flows/components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow";
+@import "../client/physical-flows/components/register/edit-specification/physical-flow-edit-specification";
 @import "../client/ratings/directives/rating-brush-select/style";
 @import "../client/ratings/components/rating-picker/rating-picker";
 @import "../client/ratings/components/rating-indicator-cell/rating-indicator-cell";
