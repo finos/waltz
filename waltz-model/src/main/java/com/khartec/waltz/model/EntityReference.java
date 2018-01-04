@@ -26,6 +26,9 @@ import org.immutables.value.Value;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityReference.class)
@@ -75,6 +78,12 @@ public abstract class EntityReference {
 
 
     public static EntityReference mkRef(Map map) {
+        checkNotNull(map, "map cannot be null");
+        checkTrue(map.containsKey("kind"), "kind does not exist");
+        checkTrue(map.containsKey("id"), "id does not exist");
+        checkNotNull(map.get("kind"), "kind cannot be null");
+        checkNotNull(map.get("id"), "id cannot be null");
+
         return EntityReference.mkRef(
                 Enum.valueOf(EntityKind.class, map.get("kind").toString()),
                 Long.parseLong(map.get("id").toString()),

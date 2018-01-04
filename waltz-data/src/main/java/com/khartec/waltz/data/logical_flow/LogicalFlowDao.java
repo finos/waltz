@@ -139,19 +139,15 @@ public class LogicalFlowDao {
 
 
     public List<LogicalFlow> findBySourcesAndTargets(List<Tuple2<EntityReference, EntityReference>> sourceAndTargets) {
-        if(sourceAndTargets.size() == 0) {
+        if(sourceAndTargets.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Condition> sourceTargetConditions = sourceAndTargets
+        Condition condition = sourceAndTargets
                 .stream()
                 .map(t -> isSourceCondition(t.v1)
                         .and(isTargetCondition(t.v2))
                         .and(NOT_REMOVED))
-                .collect(Collectors.toList());
-
-        Condition condition = sourceTargetConditions
-                .stream()
                 .reduce((a, b) -> a.or(b))
                 .get();
 

@@ -158,7 +158,7 @@ function controller($q, serviceBroker) {
                     const sourceRefString = refToString(p.source.entityRef);
                     const targetRefString = refToString(p.target.entityRef);
                     const dataTypeString = refToString(p.dataType.entityRef);
-                    const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][]${dataTypeString}`);
+                    const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][${dataTypeString}]`);
                     let existing = null;
                     if(existingFlows && existingFlows.length > 0) {
                         existing = existingFlows[0];
