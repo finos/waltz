@@ -45,7 +45,6 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const calculateMessages = () => {
-        console.log('cM', { vm })
         vm.messages = [];
         if (!vm.selectedDefinition) {
             vm.messages.push('No selected definition');
