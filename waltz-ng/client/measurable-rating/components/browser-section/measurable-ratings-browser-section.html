@@ -2,18 +2,20 @@
 
 
     <waltz-section-actions>
-        <button class="btn btn-xs btn-primary"
-                ng-if="$ctrl.visibility.treeView"
-                ng-click="$ctrl.showGridView()">
-            <waltz-icon name="th"></waltz-icon>
-            Grid View
-        </button>
-        <button class="btn btn-xs btn-primary"
-                ng-if="$ctrl.visibility.gridView"
-                ng-click="$ctrl.showTreeView()">
-            <waltz-icon name="sitemap" rotate="270"></waltz-icon>
-            Tree View
-        </button>
+        <div ng-if="$ctrl.visibility.gridAvailable">
+            <button class="btn btn-xs btn-primary"
+                    ng-if="$ctrl.visibility.treeView"
+                    ng-click="$ctrl.showGridView()">
+                <waltz-icon name="th"></waltz-icon>
+                Grid View
+            </button>
+            <button class="btn btn-xs btn-primary"
+                    ng-if="$ctrl.visibility.gridView"
+                    ng-click="$ctrl.showTreeView()">
+                <waltz-icon name="sitemap" rotate="270"></waltz-icon>
+                Tree View
+            </button>
+        </div>
     </waltz-section-actions>
 
 
