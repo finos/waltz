@@ -18,6 +18,7 @@
  */
 
 import {registerComponents} from "../../common/module-utils";
+import BulkLogicalFlowParser from './bulk-logical-flow-parser/bulk-logical-flow-parser';
 import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
 import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
 import * as SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
@@ -29,6 +30,7 @@ import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-p
 function setup(module) {
 
     registerComponents(module, [
+        BulkLogicalFlowParser,
         LogicalFlowEditPanel,
         LogicalFlowTypeEditor,
         LogicalFlowsDataTypeSummaryPane,

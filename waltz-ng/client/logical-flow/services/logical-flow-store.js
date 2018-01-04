@@ -48,6 +48,13 @@ export function store($http, BaseApiUrl) {
     };
 
 
+    const findBySourceAndTargetEntityReferences = (sourceTargetReferences) => {
+        return $http
+            .post(`${BASE}/source-targets`, sourceTargetReferences)
+            .then(result => result.data);
+    };
+
+
     const findUpstreamFlowsForEntityReferences = (refs = []) => {
         return $http
             .post(`${BASE}/find-upstream-flows`, refs)
@@ -87,6 +94,7 @@ export function store($http, BaseApiUrl) {
     return {
         findBySelector,
         findByEntityReference,
+        findBySourceAndTargetEntityReferences,
         findUpstreamFlowsForEntityReferences,
         calculateStats,
         countByDataType,
@@ -118,6 +126,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'find logical flows involving a given entity'
+    },
+    findBySourceAndTargetEntityReferences: {
+        serviceName,
+        serviceFnName: 'findBySourceAndTargetEntityReferences',
+        description: 'find logical flows for the source and target entity references'
     },
     findUpstreamFlowsForEntityReferences: {
         serviceName,

@@ -1,0 +1,95 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017  Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="waltz-bulk-logical-flow-parser">
+
+    <div class="text-center">
+        <waltz-loading-notification show="$ctrl.loading"
+                                    name="Loading">
+        </waltz-loading-notification>
+    </div>
+
+
+    <!-- Results -->
+    <div ng-class="{'waltz-scroll-region-250': $ctrl.parsedData.length > 15 }"
+         ng-if="$ctrl.parsedData.length > 0">
+
+        <table class="table table-condensed small">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Target</th>
+                    <th>Data Type</th>
+                    <th>Provenance (optional)</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr ng-repeat="result in $ctrl.parsedData"
+                    ng-class="{
+                                    'text-danger': !result.source.entityRef,
+                                    'bg-danger': !result.source.entityRef
+                                  }">
+                    <td>
+                        <waltz-entity-link ng-if="result.source.entityRef"
+                                           entity-ref="result.source.entityRef">
+                        </waltz-entity-link>
+                        <span ng-if="!result.source.entityRef"
+                              class="text-danger bg-danger">
+                            <strong ng-bind="result.source.identifier"></strong>
+                            <small>not found</small>
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-entity-link ng-if="result.target.entityRef"
+                                           entity-ref="result.target.entityRef">
+                        </waltz-entity-link>
+                        <span ng-if="!result.target.entityRef"
+                              class="text-danger bg-danger">
+                            <strong ng-bind="result.target.identifier"></strong>
+                            <small>not found</small>
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-entity-link ng-if="result.dataType.entityRef"
+                                           entity-ref="result.dataType.entityRef">
+                        </waltz-entity-link>
+                        <span ng-if="!result.dataType.entityRef"
+                              class="text-danger bg-danger">
+                            <strong ng-bind="result.dataType.identifier"></strong>
+                            <small>not found</small>
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="result.provenance">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="result.existing === null"
+                              class="label label-success">New</span>
+                        <span ng-if="result.existing"
+                              class="label label-warning">Exists</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
