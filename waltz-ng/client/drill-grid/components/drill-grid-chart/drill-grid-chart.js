@@ -21,7 +21,6 @@
 
 import template from './drill-grid-chart.html';
 import {initialiseData} from "../../../common";
-
 import {ragColorScale} from '../../../common/colors';
 
 import _ from 'lodash';
@@ -71,7 +70,7 @@ const styles = {
     appRow: 'wdgc-appRow',
     history: 'wdgc-history',
     descendable: 'wdgc-descendable',
-    tooltip: 'wdgc-tooltip'
+    tooltip: 'wdgc-tooltip',
 };
 
 
@@ -287,7 +286,13 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
         .append('text')
         .text(d => `${typeToArrow(d.rowType)} ${d.app.name}`)
         .attr('y', blockHeight)
-        .on('click', (d) => drillGrid.refresh({ focusApp: d.app }))
+        .on('click', (d) => {
+            if (_.get(drillGrid, "options.focusApp.id") === d.app.id) {
+                drillGrid.refresh({ focusApp: null });
+            } else {
+                drillGrid.refresh({ focusApp: d.app });
+            }
+        })
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 4);
 
@@ -387,7 +392,9 @@ function drawHistory(drillGrid, svg) {
     const appFocus = svg
         .select('.appFocus')
         .selectAll('text')
-        .data(drillGrid.options.focusApp ? [ drillGrid.options.focusApp ] : []);
+        .data(drillGrid.options.focusApp
+            ? [ drillGrid.options.focusApp ]
+            : []);
 
     const appFocusLabel = appFocus
         .enter()
