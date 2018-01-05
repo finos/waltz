@@ -22,7 +22,7 @@ import {buildHierarchies, getParents, groupHierarchyByKey, indexHierarchyByKey} 
 import _ from 'lodash';
 
 
-function recalcDomain(dataSet, focusId = null) {
+function recalcDomain(dataSet, focusId) {
     const potentialParents = _
         .chain(dataSet.nodesByParent[focusId] || [])
         .sortBy('name')

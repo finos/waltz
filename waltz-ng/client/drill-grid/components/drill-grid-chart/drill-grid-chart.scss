@@ -59,4 +59,16 @@
         pointer-events: none;
 
     }
+
+    .appFocus {
+        @extend .clickable;
+        text {
+            fill: #830000;
+
+        }
+        tspan.clearFocus {
+            fill: red;
+            font-weight: bolder;
+        }
+    }
 }

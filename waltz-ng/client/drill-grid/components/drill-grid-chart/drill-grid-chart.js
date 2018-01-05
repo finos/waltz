@@ -101,6 +101,11 @@ const regionInfo = [
         x: 2,
         y: 1,
         w: blocks - 1
+    }, {
+        name: 'appFocus',
+        x: 2,
+        y: -1,
+        w: 3
     }
 ];
 
@@ -244,18 +249,6 @@ function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
         .attr('width', colScale.bandwidth())
         .attr('height', blockHeight - 2);
 
-    // newAppMappings
-    //     .append('text')
-    //     .attr('dx', -6)
-    //     .attr('dy', 8)
-    //     .text(d => d.colId);
-    //
-    // newAppMappings
-    //     .append('text')
-    //     .attr('dx', -6)
-    //     .attr('dy', 18)
-    //     .text(d => Math.floor(colScale(d.colId)));
-    //
     return newAppMappings
         .merge(appMappings)
         .attr('transform', d => `translate(${colScale(d.colId)} , 0)`);
@@ -264,8 +257,8 @@ function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
 
 const arrows = {
     DIRECT: ' ',
-    HEIR: '↥',
-    ANCESTOR: '↧',
+    HEIR: '↑', // ⇑
+    ANCESTOR: '↓', // ⇓
     NONE: 'x',
     UNKNOWN: '?'
 };
@@ -292,8 +285,9 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
 
     newAppRows
         .append('text')
-        .text(d => typeToArrow(d.rowType) + d.app.name)
+        .text(d => `${typeToArrow(d.rowType)} ${d.app.name}`)
         .attr('y', blockHeight)
+        .on('click', (d) => drillGrid.refresh({ focusApp: d.app }))
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 4);
 
@@ -307,11 +301,12 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
 }
 
 
-function drawRowGroupLabel(selection) {
+function drawRowGroupLabel(selection, drillGrid) {
     return selection
         .append('text')
         .attr('y', blockHeight)
         .text(d => d.group.name)
+        .on('click.focus', d => drillGrid.refresh({ yId: d.group.id }))
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 3 - 10)
 }
@@ -347,11 +342,10 @@ function drawRowGroups(drillGrid, svg, tooltip, colScale) {
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
         .on('mouseout.hover', function() { select(this).classed(styles.rowGroupHover, false)})
-        .call(drawRowGroupLabel);
+        .call(drawRowGroupLabel, drillGrid);
 
     rowGroups
         .merge(newRowGroups)
-        .on('click.focus', d => drillGrid.refresh({ yId: d.group.id }))
         .call(drawAppRows, colScale, drillGrid, svg, tooltip);
 }
 
@@ -389,6 +383,29 @@ function drawColHeaders(drillGrid, svg, colScale) {
 
 function drawHistory(drillGrid, svg) {
     const colHistoryDatum = _.get(drillGrid, 'xAxis.current.active');
+
+    const appFocus = svg
+        .select('.appFocus')
+        .selectAll('text')
+        .data(drillGrid.options.focusApp ? [ drillGrid.options.focusApp ] : []);
+
+    const appFocusLabel = appFocus
+        .enter()
+        .append('text')
+        .on('click', () => drillGrid.refresh({ focusApp: null }));
+
+    appFocusLabel
+        .append('tspan')
+        .classed('clearFocus', true)
+        .text('✕ ');
+
+    appFocusLabel
+        .append('tspan')
+        .text(d => d.name);
+
+    appFocus
+        .exit()
+        .remove();
 
     const xHistory = svg
         .select('.xHistory')
