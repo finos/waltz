@@ -72,13 +72,14 @@ function determineRating(mappings, appId) {
  * Given a collection of mappings, extracts a unique list of application references
  * @param mappings
  */
-function getAppsFromMappings(mappings) {
+function getAppsFromMappings(mappings, focusApp) {
     return _
         .chain(mappings)
         .values()
         .flatten()
         .map(m => m.app)
         .uniqBy(a => a.id)
+        .filter(a => focusApp ? a.id === focusApp.id : true)
         .value();
 }
 
@@ -93,16 +94,16 @@ const Strategies = {
 
 export default class RowGroup {
 
-    constructor(yDatum, xAxis) {
+    constructor(yDatum, xAxis, focusApp) {
 
         const xDomain = xAxis.current.domain || [];
         if (xDomain.length == 0){
             return null;
         }
-        const rowApplications = getAppsFromMappings(yDatum.mappings);
+        const rowApplications = getAppsFromMappings(yDatum.mappings, focusApp);
         const colApplications = _.flatMap(
             xDomain,
-            xDatum => getAppsFromMappings(xDatum.mappings));
+            xDatum => getAppsFromMappings(xDatum.mappings, focusApp));
 
         const appsWithBothDimensions = _.intersectionBy(rowApplications, colApplications, 'id'); //_.unionBy(rowApplications, colApplications, 'id');
         const appsWithOnlyRowDimension = _.differenceBy(rowApplications, appsWithBothDimensions, 'id');

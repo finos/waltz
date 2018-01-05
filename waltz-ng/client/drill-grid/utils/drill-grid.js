@@ -65,7 +65,7 @@ export default class DrillGrid {
 
         this.rowGroups = _
             .chain(this.yAxis.current.domain)
-            .map(yDatum => new RowGroup(yDatum, this.xAxis))
+            .map(yDatum => new RowGroup(yDatum, this.xAxis, this.options.focusApp))
             .reject(rg => rg.isEmpty())
             .value();
 
