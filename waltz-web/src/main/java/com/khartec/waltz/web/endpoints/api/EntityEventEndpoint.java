@@ -15,7 +15,7 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 @Service
 public class EntityEventEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "entity", "event");
+    private static final String BASE_URL = mkPath("api", "entity-event");
 
 
     private final EntityEventService entityEventService;
