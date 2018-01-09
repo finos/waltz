@@ -86,16 +86,6 @@ const regionInfo = [
         y: 1,
         w: 4
     }, {
-        name: 'xHistory',
-        x: 10,
-        y: 0,
-        w: blocks - 5
-    }, {
-        name: 'yHistory',
-        x: 0,
-        y: 1,
-        w: 1
-    }, {
         name: 'rowGroups',
         x: 2,
         y: 1,
@@ -387,75 +377,64 @@ function drawColHeaders(drillGrid, svg, colScale) {
 
 
 function drawHistory(drillGrid, svg) {
-    const colHistoryDatum = _.get(drillGrid, 'xAxis.current.active');
+    const xHistoryDatum = _.get(drillGrid, 'xAxis.current.active');
+    const yHistoryDatum = _.get(drillGrid, 'yAxis.current.active');
+    const appHistoryDatum = drillGrid.options.focusApp;
 
-    const appFocus = svg
+    const appEntry = appHistoryDatum
+        ? {
+            id: 'APPLICATION',
+            name: appHistoryDatum.name,
+            action: () => drillGrid.refresh({ focusApp: null })
+        }
+        : null;
+
+    const xEntry = xHistoryDatum
+        ? {
+            id: 'XAXIS',
+            name: xHistoryDatum.name,
+            action: () => drillGrid.refresh({ xId: xHistoryDatum.parentId })
+        }
+        : null;
+
+    const yEntry = yHistoryDatum
+        ? {
+            id: 'YAXIS',
+            name: yHistoryDatum.name,
+            action: () => drillGrid.refresh({ yId: yHistoryDatum.parentId })
+        }
+        : null;
+
+    const historyEntries = _.compact([
+        appEntry,
+        xEntry,
+        yEntry
+    ]);
+
+    const historyElems = svg
         .select('.appFocus')
         .selectAll('text')
-        .data(drillGrid.options.focusApp
-            ? [ drillGrid.options.focusApp ]
-            : []);
+        .data(historyEntries, d => d.id);
 
-    const appFocusLabel = appFocus
+    historyElems.exit().remove();
+
+    const newHistoryElems = historyElems
         .enter()
         .append('text')
-        .on('click', () => drillGrid.refresh({ focusApp: null }));
+        .on('click', (d) => d.action());
 
-    appFocusLabel
+    historyElems
+        .merge(newHistoryElems)
+        .attr('dy', (d,i) => i * 12);
+
+    newHistoryElems
         .append('tspan')
         .classed('clearFocus', true)
         .text('✕ ');
 
-    appFocusLabel
+    newHistoryElems
         .append('tspan')
         .text(d => d.name);
-
-    appFocus
-        .exit()
-        .remove();
-
-    const xHistory = svg
-        .select('.xHistory')
-        .selectAll('text')
-        .data(colHistoryDatum
-                ? [ colHistoryDatum ]
-                : [],
-            refToString);
-
-    xHistory.exit().remove();
-
-    xHistory
-        .enter()
-        .append('text')
-        .text(d => `⇧ to ${d.name}`)
-        .classed(styles.history, true)
-        .classed('clickable', true)
-        .attr('transform', `rotate(315 0,${blockHeight}) `)
-        .on('click.focus', d => drillGrid.refresh({ xId: d.parentId }))
-        .call(truncateText, blockWidth * 4);
-
-    const yActive = drillGrid.yAxis.current.active;
-    const yHistory = svg
-        .select('.yHistory')
-        .selectAll('text')
-        .data(yActive
-                ? [yActive]
-                : [],
-            refToString);
-
-    yHistory.exit().remove();
-
-    yHistory
-        .enter()
-        .append('text')
-        .text(d => `⇧ to ${d.name}`)
-        .classed('clickable', true)
-        .classed(styles.history, true)
-        .attr('text-anchor', 'end')
-        .attr('y', blockWidth)
-        .attr('dy', blockHeight)
-        .attr('transform', `rotate(270 0,${blockHeight}) `)
-        .on('click.focus', d => drillGrid.refresh( { yId: d.parentId }));
 }
 
 
