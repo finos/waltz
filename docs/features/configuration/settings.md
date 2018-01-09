@@ -26,6 +26,10 @@ Group of settings which control how waltz handles authentication/authorization
   * ```com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter```
 * ```server.authentication.roles.default``` - Default set of role names (comma sep)
 
+If using header based authentication provide an additional setting which gives the name of the parameter to obtain the username from:
+
+* `server.authentication.filter.headerbased.param`  e.g. `ct_user`
+
 
 ## Development (```web.devext``` )
 
