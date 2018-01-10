@@ -28,6 +28,7 @@ import { select, event } from 'd3-selection';
 import {scaleBand, scaleLinear} from 'd3-scale';
 import {truncateText} from "../../../common/d3-utils";
 import {truncate} from "../../../common/string-utils";
+import {ascending} from "d3-array";
 
 
 const bindings = {
@@ -253,8 +254,22 @@ const arrows = {
 };
 
 
+const typePriority = {
+    DIRECT: 1,
+    HEIR: 2,
+    ANCESTOR: 3,
+    UNKNOWN: 4,
+    NONE: 5
+};
+
+
 function typeToArrow(type) {
     return arrows[type] || ' ';
+}
+
+
+function typeToPriority(type) {
+    return typePriority[type] || 9;
 }
 
 
@@ -270,6 +285,12 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
 
     newAppRows
         .merge(appRows)
+        .sort((a, b) => {
+            const aPriority = typeToPriority(a.rowType);
+            const bPriority = typeToPriority(b.rowType);
+
+            return ascending(aPriority + a.app.name, bPriority + b.app.name);
+        })
         .attr('transform', (d, i) => `translate(${blockWidth * 3}, ${i * blockHeight})`);
 
     newAppRows
@@ -414,7 +435,7 @@ function drawHistory(drillGrid, svg) {
     const historyElems = svg
         .select('.appFocus')
         .selectAll('text')
-        .data(historyEntries, d => d.id);
+        .data(historyEntries, d => d.id + d.name);
 
     historyElems.exit().remove();
 
