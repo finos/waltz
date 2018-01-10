@@ -65,7 +65,25 @@ export function store($http,
             .then(r => r.data);
     };
 
+
     /**
+     * where command like:
+     *    [{
+     *      flowId: <number>,
+     *      addedDecorators: [<entityRef>],
+     *      removedDecorators: [<entityRef>]
+     *    }]
+     *
+     * @param command
+     * @returns {*|Promise.<[FlowDecorator]>}
+     */
+    const updateDecoratorsBatch = (commands) => {
+        return $http
+            .post(`${BASE}/batch`, commands);
+    };
+
+
+        /**
      * Given a selector returns a promising giving results like:
      *
      *      [
@@ -100,6 +118,7 @@ export function store($http,
         findBySelector,
         findByFlowIdsAndKind,
         updateDecorators,
+        updateDecoratorsBatch,
         summarizeInboundBySelector,
         summarizeOutboundBySelector,
         summarizeInboundForAll
@@ -135,6 +154,11 @@ export const LogicalFlowDecoratorStore_API = {
         serviceName,
         serviceFnName: 'updateDecorators',
         description: 'executes updateDecorators'
+    },
+    updateDecoratorsBatch: {
+        serviceName,
+        serviceFnName: 'updateDecoratorsBatch',
+        description: 'executes updateDecoratorsBatch'
     },
     summarizeInboundBySelector: {
         serviceName,

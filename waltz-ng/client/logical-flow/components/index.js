@@ -18,7 +18,9 @@
  */
 
 import {registerComponents} from "../../common/module-utils";
+import BulkLogicalFlowLoaderWizard from './bulk-logical-flow-loader-wizard/bulk-logical-flow-loader-wizard';
 import BulkLogicalFlowParser from './bulk-logical-flow-parser/bulk-logical-flow-parser';
+import BulkLogicalFlowUploader from './bulk-logical-flow-uploader/bulk-logical-flow-uploader';
 import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
 import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
 import * as SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
@@ -30,7 +32,9 @@ import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-p
 function setup(module) {
 
     registerComponents(module, [
+        BulkLogicalFlowLoaderWizard,
         BulkLogicalFlowParser,
+        BulkLogicalFlowUploader,
         LogicalFlowEditPanel,
         LogicalFlowTypeEditor,
         LogicalFlowsDataTypeSummaryPane,

@@ -18,12 +18,12 @@
 
                     <ui-select-match placeholder="Select..."
                                      allow-clear="true">
-                        <span ng-bind-html="$select.selected.label">
+                        <span ng-bind-html="$select.selected.name">
                         </span>
                     </ui-select-match>
 
                     <ui-select-choices repeat="target in $ctrl.availableTargetColumns">
-                        <span ng-bind="target.label"></span>
+                        <span ng-bind="target.name"></span>
                         <small style="display: block"
                                class="wcm-required"
                                ng-if="target.required">required</small>

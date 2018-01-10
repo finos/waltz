@@ -121,23 +121,7 @@ function controller($q, serviceBroker) {
         return _.sumBy(allParsedRefs, p => p.entityRef == null ? 1 : 0);
     };
 
-
-    vm.$onInit = async () => {
-        vm.loading = true;
-        const [entityRefsByAssetCode, dataTypesByCode] = await $q.all([
-            loadIdentifierToEntityRefMap(),
-            loadCodeToDataTypeMap()
-        ]);
-
-        vm.columnResolvers = {
-            source: (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
-            target: (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
-            dataType: (identifier) => resolveEntityRef(dataTypesByCode, 'DATA_TYPE', identifier),
-        }
-    };
-
-
-    vm.$onChanges = async (changes) => {
+    const parseData = async () => {
         if(vm.columnMappings && vm.sourceData) {
             const mappedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
 
@@ -154,17 +138,25 @@ function controller($q, serviceBroker) {
                     .key(flow => refToString(flow.decorator.decoratorEntity))
                     .object(existingFlows);
 
-                const parsedWithExisting = _.map(mappedData, p => {
-                    const sourceRefString = refToString(p.source.entityRef);
-                    const targetRefString = refToString(p.target.entityRef);
-                    const dataTypeString = refToString(p.dataType.entityRef);
-                    const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][${dataTypeString}]`);
-                    let existing = null;
-                    if(existingFlows && existingFlows.length > 0) {
-                        existing = existingFlows[0];
-                    }
-                    return Object.assign({}, p, {existing});
-                });
+                const parsedWithExisting = _
+                    .chain(mappedData)
+                    .map(p => {
+                        const sourceRefString = refToString(p.source.entityRef);
+                        const targetRefString = refToString(p.target.entityRef);
+                        const dataTypeString = refToString(p.dataType.entityRef);
+                        const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][${dataTypeString}]`);
+                        let existing = null;
+                        if(existingFlows && existingFlows.length > 0) {
+                            existing = existingFlows[0];
+                        }
+                        return Object.assign({}, p, {existing});
+                    })
+                    .sortBy([
+                        o => o.source.entityRef.name,
+                        o => o.target.entityRef.name,
+                        o => o.dataType.entityRef.name,
+                    ])
+                    .value();
                 vm.parsedData = parsedWithExisting;
             } else {
                 vm.parsedData = mappedData;
@@ -176,8 +168,30 @@ function controller($q, serviceBroker) {
                 data: vm.parsedData,
                 isComplete
             };
-            invokeFunction(vm.onParseComplete, event)
+            invokeFunction(vm.onParseComplete, event, vm.loading)
         }
+    };
+
+
+    vm.$onInit = () => {
+        vm.loading = true;
+        $q.all([
+            loadIdentifierToEntityRefMap(),
+            loadCodeToDataTypeMap()
+        ]).then(([entityRefsByAssetCode, dataTypesByCode]) => {
+            vm.columnResolvers = {
+                'source': (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
+                'target': (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
+                'dataType': (identifier) => resolveEntityRef(dataTypesByCode, 'DATA_TYPE', identifier),
+            };
+            console.log('parser initialised: ', vm.loading);
+            return parseData();
+        });
+    };
+
+
+    vm.$onChanges = async (changes) => {
+
     };
 }
 

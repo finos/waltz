@@ -1,0 +1,51 @@
+<div class="waltz-bulk-logical-flow-uploader">
+
+    <div class="text-center">
+        <waltz-loading-notification show="$ctrl.loading"
+                                    name="Loading">
+        </waltz-loading-notification>
+    </div>
+
+
+    <div ng-if="!$ctrl.loading && $ctrl.flows.length > 0">
+        <h4>Upload Summary</h4>
+
+        <div>
+            <span ng-bind="$ctrl.flows.length"></span> Logical Data Flows were successfully uploaded into Waltz.
+        </div>
+
+        <br>
+
+        <div ng-class="{'waltz-scroll-region-250': $ctrl.flows.length > 15 }">
+            <table class="table table-condensed small">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Target</th>
+                        <th>Data Type</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="result in $ctrl.flows">
+                        <td>
+                            <waltz-entity-link entity-ref="result.source">
+                            </waltz-entity-link>
+                        </td>
+                        <td>
+                            <waltz-entity-link entity-ref="result.target">
+                            </waltz-entity-link>
+                        </td>
+                        <td>
+                            <waltz-entity-link entity-ref="result.dataType">
+                            </waltz-entity-link>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+</div>

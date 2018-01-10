@@ -1,0 +1,42 @@
+<div class="waltz-bulk-loader-wizard">
+    <div ng-if="$ctrl.currentStep === 1">
+        <waltz-spreadsheet-loader on-spreadsheet-loaded="$ctrl.spreadsheetLoaded">
+        </waltz-spreadsheet-loader>
+    </div>
+
+    <div ng-if="$ctrl.currentStep === 2">
+        <waltz-column-mapper source-columns="$ctrl.sourceColumns"
+                             target-columns="$ctrl.targetColumns"
+                             on-change="$ctrl.onMappingsChanged">
+        </waltz-column-mapper>
+    </div>
+
+    <div ng-if="$ctrl.currentStep === 3">
+        <waltz-bulk-logical-flow-parser column-mappings="$ctrl.columnMappings"
+                                        source-data="$ctrl.sourceData"
+                                        on-parse-complete="$ctrl.parseComplete">
+        </waltz-bulk-logical-flow-parser>
+    </div>
+
+    <div ng-if="$ctrl.currentStep === 4">
+        <waltz-bulk-logical-flow-uploader flows="$ctrl.newFlows"
+                                          on-upload-complete="$ctrl.uploadComplete">
+        </waltz-bulk-logical-flow-uploader>
+    </div>
+
+    <div class="wblw-buttons text-right">
+
+        <br>
+        <hr />
+
+        <button class="btn btn-xs btn-warning"
+                ng-click="$ctrl.back()">
+            Back
+        </button>
+        <button class="btn btn-xs btn-success"
+                ng-click="$ctrl.next()">
+            Next
+        </button>
+    </div>
+
+</div>

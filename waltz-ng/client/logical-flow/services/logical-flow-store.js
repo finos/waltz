@@ -83,6 +83,10 @@ export function store($http, BaseApiUrl) {
         .post(`${BASE}`, addFlowCmd)
         .then(r => r.data);
 
+    const addFlows = (addFlowCmds) => $http
+        .post(`${BASE}/list`, addFlowCmds)
+        .then(r => r.data);
+
     const cleanupOrphans = () => $http
         .get(`${BASE}/cleanup-orphans`)
         .then(r => r.data);
@@ -101,6 +105,7 @@ export function store($http, BaseApiUrl) {
         removeFlow,
         getById,
         addFlow,
+        addFlows,
         cleanupOrphans,
         cleanupSelfReferences
     };
@@ -161,6 +166,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'addFlow',
         description: 'adds a single logical flow'
+    },
+    addFlows: {
+        serviceName,
+        serviceFnName: 'addFlows',
+        description: 'adds a list of logical flows'
     },
     cleanupOrphans: {
         serviceName,

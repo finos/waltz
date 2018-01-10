@@ -39,6 +39,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,6 +83,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String cleanupSelfReferencesPath = mkPath(BASE_URL, "cleanup-self-references");
         String addFlowPath = mkPath(BASE_URL);
+        String addFlowsPath = mkPath(BASE_URL, "list");
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
@@ -110,6 +112,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         postForDatum(findStatsPath, findStatsRoute);
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
+        postForList(addFlowsPath, this::addFlowsRoute);
     }
 
 
@@ -161,6 +164,18 @@ public class LogicalFlowEndpoint implements Endpoint {
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
         LogicalFlow savedFlow = logicalFlowService.addFlow(addCmd, username);
         return savedFlow;
+    }
+
+
+    private List<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
+        ensureUserHasEditRights(request);
+
+        String username = getUsername(request);
+
+        List<AddLogicalFlowCommand> addCmds = Arrays.asList(readBody(request, AddLogicalFlowCommand[].class));
+        LOG.info("User: {}, adding new logical flows: {}", username, addCmds);
+        List<LogicalFlow> savedFlows = logicalFlowService.addFlows(addCmds, username);
+        return savedFlows;
     }
 
 
