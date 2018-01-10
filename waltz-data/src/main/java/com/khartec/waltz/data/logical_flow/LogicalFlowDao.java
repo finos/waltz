@@ -28,6 +28,7 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 
 @Repository
@@ -201,6 +203,46 @@ public class LogicalFlowDao {
     }
 
 
+    public List<LogicalFlow> addFlows(List<LogicalFlow> flows, String user) {
+        Condition condition = flows
+                .stream()
+                .map(t -> isSourceCondition(t.source())
+                        .and(isTargetCondition(t.target()))
+                        .and(LOGICAL_FLOW.IS_REMOVED.eq(true)))
+                .reduce((a, b) -> a.or(b))
+                .get();
+
+        List<LogicalFlow> removedFlows = baseQuery()
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+
+        if(removedFlows.size() > 0) {
+            restoreFlows(removedFlows, user);
+        }
+
+        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> existing = removedFlows
+                .stream()
+                .collect(Collectors.toMap(f -> Tuple.tuple(f.source(), f.target()), f -> f));
+
+
+        List<LogicalFlow> addedFlows = flows
+                .stream()
+                .filter(f -> !existing.containsKey(Tuple.tuple(f.source(), f.target())))
+                .map(f -> {
+                    LogicalFlowRecord record = TO_RECORD_MAPPER.apply(f, dsl);
+                    record.store();
+                    return ImmutableLogicalFlow
+                            .copyOf(f)
+                            .withId(record.getId());
+                })
+                .collect(toList());
+
+
+        addedFlows.addAll(removedFlows);
+        return addedFlows;
+    }
+
+
     /**
      * Attempt to restore a flow.  The id is ignored and only source and target
      * are used. Return's true if the flow has been successfully restored or
@@ -229,6 +271,28 @@ public class LogicalFlowDao {
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.ID.eq(logicalFlowId))
                 .execute() == 1;
+    }
+
+
+    private int restoreFlows(List<LogicalFlow> flows, String username) {
+        if(flows.isEmpty()) {
+            return 0;
+        }
+
+        Condition condition = flows
+                .stream()
+                .map(t -> isSourceCondition(t.source())
+                        .and(isTargetCondition(t.target()))
+                        .and(LOGICAL_FLOW.IS_REMOVED.eq(true)))
+                .reduce((a, b) -> a.or(b))
+                .get();
+
+        return dsl.update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.IS_REMOVED, false)
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .where(condition)
+                .execute();
     }
 
 

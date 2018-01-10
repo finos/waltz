@@ -30,6 +30,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -47,12 +48,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -143,6 +147,47 @@ public class LogicalFlowService {
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
 
         return logicalFlow;
+    }
+
+
+    public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
+        addCmds.forEach(cmd -> rejectIfSelfLoop(cmd));
+
+        List<ChangeLog> logEntries = addCmds
+                .stream()
+                .flatMap(cmd -> {
+                    ImmutableChangeLog addedSourceParent = ImmutableChangeLog.builder()
+                            .parentReference(cmd.source())
+                            .severity(Severity.INFORMATION)
+                            .userId(username)
+                            .message(String.format(
+                                    "Flow %s between: %s and %s",
+                                    "added",
+                                    cmd.source().name().orElse(Long.toString(cmd.source().id())),
+                                    cmd.target().name().orElse(Long.toString(cmd.target().id()))))
+                            .childKind(LOGICAL_DATA_FLOW)
+                            .operation(Operation.ADD)
+                            .build();
+
+                    ImmutableChangeLog addedTargetParent = addedSourceParent.withParentReference(cmd.target());
+                    return Stream.of(addedSourceParent, addedTargetParent);
+                })
+                .collect(Collectors.toList());
+        changeLogService.write(logEntries);
+
+        List<LogicalFlow> flowsToAdd = addCmds
+                .stream()
+                .map(addCmd -> ImmutableLogicalFlow.builder()
+                        .source(addCmd.source())
+                        .target(addCmd.target())
+                        .lastUpdatedAt(nowUtc())
+                        .lastUpdatedBy(username)
+                        .provenance("kam")
+                        .build())
+                .collect(toList());
+
+        List<LogicalFlow> logicalFlows = logicalFlowDao.addFlows(flowsToAdd, username);
+        return logicalFlows;
     }
 
 
