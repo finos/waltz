@@ -57,7 +57,16 @@
         position: absolute;
         transition: all 0.3s ease-in-out;
         pointer-events: none;
+    }
 
+    .wdgc-popup {
+        display: block;
+        padding: 20px;
+        background: #fff;
+        border-radius: 5px;
+        width: 30%;
+        position: absolute;
+        transition: all 0.3s ease-in-out;
     }
 
     .appFocus {

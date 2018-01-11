@@ -29,6 +29,7 @@ import {scaleBand, scaleLinear} from 'd3-scale';
 import {truncateText} from "../../../common/d3-utils";
 import {truncate} from "../../../common/string-utils";
 import {ascending} from "d3-array";
+import {flattenChildren, getParents} from "../../../common/hierarchy-utils";
 
 
 const bindings = {
@@ -72,6 +73,7 @@ const styles = {
     history: 'wdgc-history',
     descendable: 'wdgc-descendable',
     tooltip: 'wdgc-tooltip',
+    popup: 'wdgc-popup'
 };
 
 
@@ -183,7 +185,7 @@ function init(svg, scaleX) {
 }
 
 
-function showTooltip(d, tooltip) {
+function showCellTooltip(d, dialogs) {
     const html = `
         <div class="small">
             <div>
@@ -193,25 +195,147 @@ function showTooltip(d, tooltip) {
             <div class="small">
                 ${truncate(d.app.description, 128)}
             </div>
+            <br>
+            <div class="small text-muted">
+                Click cell for more information
+            </div>
         </div>
     `;
 
-    return tooltip
-        .html(html)
-        .style('display', 'block')
-        .style('left', () => `${event.pageX}px`)
-        .style('top', () => `${event.offsetY}px`)
-        .style('opacity', 0.9);
+    return showDialog(dialogs, 'tooltip', html);
 }
 
 
-function hideTooltip(d, tooltip) {
-    tooltip
-        .style('display', 'none')
+function showCellDetail(d, dialogs, drillGrid) {
+    hideDialog(d, dialogs, 'tooltip');
+
+    const colName = d.col.name;
+    const rowName = d.row.name;
+    const colChildren = _.map(flattenChildren(d.col), c => `<li>${c.name}</li>`);
+    const rowChildren = _.map(flattenChildren(d.row), c => `<li>${c.name}</li>`);
+
+    const html = `
+       <div class="small">
+            <div>
+                ${d.col.name} / ${d.row.name}
+            </div>
+            <div>${d.app.name}</div>
+            <div class="small">
+                ${truncate(d.app.description, 128)}
+            </div>
+            <br>
+            
+            <div>
+                Children of <strong>${colName}</strong>:
+                <ul class="small">
+                   ${_.join(colChildren, '')}
+                </ul>
+            </div>
+  
+            <div>
+                Children of ${rowName}:
+                <ul class="small">
+                   ${_.join(rowChildren, '')}
+                </ul>
+            </div>
+            <div class="small clickable closer">
+            <text>
+              <tspan class="clearFocus">✕ </tspan>
+              <tspan>Dismiss</tspan>
+            </text>
+            </div>
+        </div>
+    `;
+
+    return showDialog(dialogs, 'popup', html, true);
 }
 
 
-function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
+function showGroupTooltip(d, dialogs) {
+    console.log('group', {d});
+
+    const parentList = _.map(
+        getParents(d.group),
+        p =>  `<li>${p.name}</li>`);
+
+    const parentHtml = _.isEmpty(parentList)
+        ? ''
+        : `<hr>
+           <div class="small text-muted">Parents</div>
+           <ul class="small text-muted">
+               ${_.join(parentList, '')}
+           </ul>
+          `;
+
+    const html = `
+        <div class="small">
+            <div>
+                ${d.group.name}
+            </div>
+            <div class="small">
+                ${truncate(d.group.description, 128)}
+            </div>
+            ${parentHtml}
+        </div>
+    `;
+
+    return showDialog(dialogs, 'tooltip', html);
+}
+
+
+function showAppTooltip(d, dialogs) {
+    const html = `
+        <div class="small">
+            <div class="strong">${d.app.name}</div>
+            <div class="small">
+                ${truncate(d.app.description, 128)}
+            </div>
+            <br>
+            <div class="small text-muted">
+                Click on the application to toggle focus
+            </div>
+        </div>
+    `;
+
+    return showDialog(dialogs, 'tooltip', html);
+}
+
+
+function showDialog(dialogs, dialogName, html, pin = false) {
+    const dialog = dialogs[dialogName];
+
+    if (! dialogs.pinned || pin) {
+        dialogs.active = dialog;
+        dialogs.pinned = pin;
+
+        return dialog
+            .html(html)
+            .style('display', 'block')
+            .style('left', () => `${event.pageX}px`)
+            .style('top', () => `${event.offsetY}px`)
+            .style('opacity', 0.9)
+            .selectAll('.closer')
+            .on('click', (d) => hideDialog(d, dialogs, dialogName, true));
+
+    } else {
+        return dialogs.active;
+    }
+}
+
+
+function hideDialog(d, dialogs, dialogName = 'tooltip', force = false) {
+    const dialog = dialogs[dialogName];
+
+    if (! dialogs.pinned || force) {
+        dialog
+            .style('display', 'none');
+        dialogs.active = null;
+        dialogs.pinned = false;
+    }
+}
+
+
+function drawAppMappings(selector, colScale, drillGrid, svg, dialogs) {
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
         .data(d => _.filter(d.mappings, m => m.rating !== 'Z'), d => d.colId);
@@ -223,11 +347,11 @@ function drawAppMappings(selector, colScale, drillGrid, svg, tooltip) {
         .filter(d => d.colType != 'NONE')
         .append('g')
         .classed(styles.appMapping, true)
-        .on('mouseover', d => highlightColumn(d.colId, true, svg))
-        .on('mouseout', d => highlightColumn(d.colId, false, svg))
-        .on("mouseover", d => showTooltip(d, tooltip))
-        .on("mouseout", d => hideTooltip(d, tooltip))
-        .on('click.focus', d => drillGrid.refresh({ xId: d.colId, yId: d.groupId }));
+        .on('mouseover.highlight', d => highlightColumn(d.colId, true, svg))
+        .on('mouseout.highlight', d => highlightColumn(d.colId, false, svg))
+        .on("mouseover.tooltip", d => showCellTooltip(d, dialogs))
+        .on("mouseout.tooltip", d => hideDialog(d, dialogs, 'tooltip'))
+        .on("click.detail", d => showCellDetail(d, dialogs, drillGrid));
 
     newAppMappings
         .append('rect')
@@ -273,7 +397,7 @@ function typeToPriority(type) {
 }
 
 
-function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
+function drawAppRows(selector, colScale, drillGrid, svg, dialogs) {
     const appRows = selector
         .selectAll(`.${styles.appRow}`)
         .data(d => d.rows, d => d.app.id);
@@ -304,6 +428,8 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
                 drillGrid.refresh({ focusApp: d.app });
             }
         })
+        .on("mouseover", d => showAppTooltip(d, dialogs))
+        .on("mouseout", d => hideDialog(d, dialogs, 'tooltip'))
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 4);
 
@@ -311,24 +437,26 @@ function drawAppRows(selector, colScale, drillGrid, svg, tooltip) {
 
     appRows
         .merge(newAppRows)
-        .call(drawAppMappings, colScale, drillGrid, svg, tooltip);
+        .call(drawAppMappings, colScale, drillGrid, svg, dialogs);
 
     return appRows;
 }
 
 
-function drawRowGroupLabel(selection, drillGrid) {
+function drawRowGroupLabel(selection, drillGrid, dialogs) {
     return selection
         .append('text')
         .attr('y', blockHeight)
         .text(d => d.group.name)
         .on('click.focus', d => drillGrid.refresh({ yId: d.group.id }))
+        .on("mouseover", d => showGroupTooltip(d, dialogs))
+        .on("mouseout", d => hideDialog(d, dialogs, 'tooltip'))
         .call(applyBlockTextAttrs)
         .call(truncateText, blockWidth * 3 - 10)
 }
 
 
-function drawRowGroups(drillGrid, svg, tooltip, colScale) {
+function drawRowGroups(drillGrid, svg, dialogs, colScale) {
 
     const groupOffsets = calculateRowGroupOffsets(drillGrid.rowGroups);
 
@@ -358,11 +486,11 @@ function drawRowGroups(drillGrid, svg, tooltip, colScale) {
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
         .on('mouseout.hover', function() { select(this).classed(styles.rowGroupHover, false)})
-        .call(drawRowGroupLabel, drillGrid);
+        .call(drawRowGroupLabel, drillGrid, dialogs);
 
     rowGroups
         .merge(newRowGroups)
-        .call(drawAppRows, colScale, drillGrid, svg, tooltip);
+        .call(drawAppRows, colScale, drillGrid, svg, dialogs);
 }
 
 
@@ -455,7 +583,8 @@ function drawHistory(drillGrid, svg) {
 
     newHistoryElems
         .append('tspan')
-        .text(d => d.name);
+        .text(d => d.name)
+        .call(truncateText, blockWidth * 4);
 }
 
 
@@ -465,10 +594,8 @@ function refToString(ref) {
 }
 
 
-function draw(drillGrid, svg, tooltip, blockScaleX) {
+function draw(drillGrid, svg, dialogs, blockScaleX) {
     if (! svg) return;
-
-    // console.log('draw', { drillGrid });
 
     const height = calcTotalRequiredHeight(drillGrid);
 
@@ -491,7 +618,7 @@ function draw(drillGrid, svg, tooltip, blockScaleX) {
         .align([0.5]);
 
     drawColHeaders(drillGrid, svg, colScale);
-    drawRowGroups(drillGrid, svg, tooltip, colScale);
+    drawRowGroups(drillGrid, svg, dialogs, colScale);
     drawHistory(drillGrid, svg);
 
 
@@ -504,22 +631,29 @@ function controller($element) {
     const vm = initialiseData(this, initialState);
 
     let svg = null;
-    let tooltip = null;
+    const dialogs = {
+        tooltip: null,
+        popup: null,
+        active: null
+    };
 
     vm.$onInit = () => {
         const rootElem = $element[0];
         svg = select(rootElem)
             .select('svg');
 
-        tooltip = select(rootElem)
+        dialogs.tooltip = select(rootElem)
             .select(`.${styles.tooltip}`);
+
+        dialogs.popup = select(rootElem)
+            .select(`.${styles.popup}`);
 
         init(svg, blockScaleX);
     };
 
     vm.$onChanges = (c) => {
         if (c.drillGrid && vm.drillGrid) {
-            vm.drillGrid.addListener(() => draw(vm.drillGrid, svg, tooltip, blockScaleX));
+            vm.drillGrid.addListener(() => draw(vm.drillGrid, svg, dialogs, blockScaleX));
         }
     };
 }
