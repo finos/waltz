@@ -159,6 +159,7 @@ function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
         const rs = talliesMap[m.id];
         while (m.parentId) {
             const parent = measurablesById[m.parentId];
+            if (! parent) break;
             const parentRating = talliesMap[m.parentId];
             parentRating.total = addRatingTallies(parentRating.total, rs.direct);
             m = parent;
@@ -174,13 +175,17 @@ function controller() {
 
     vm.$onChanges = (c) => {
         if (vm.measurables && vm.ratingTallies && vm.categories) {
-            vm.tabs = prepareTabs(vm.categories, vm.measurables);
-            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
-            vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
-            vm.maxTotal = _.max(
-                _.map(
-                    _.values(vm.ratingsMap),
-                    r => _.get(r, 'total.total'), 0));
+            if (_.isEmpty(vm.measurables) || _.isEmpty(vm.ratingTallies)) {
+                return;
+            } else {
+                vm.tabs = prepareTabs(vm.categories, vm.measurables);
+                vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
+                vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
+                vm.maxTotal = _.max(
+                    _.map(
+                        _.values(vm.ratingsMap),
+                        r => _.get(r, 'total.total'), 0));
+            }
         }
 
         if (c.scrollHeight) {
