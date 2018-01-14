@@ -1,25 +1,27 @@
 <div class="waltz-bulk-loader-wizard">
-    <div ng-if="$ctrl.currentStep === 1">
+    <div ng-show="$ctrl.currentStep === 1">
         <waltz-spreadsheet-loader on-spreadsheet-loaded="$ctrl.spreadsheetLoaded">
         </waltz-spreadsheet-loader>
     </div>
 
-    <div ng-if="$ctrl.currentStep === 2">
+    <div ng-show="$ctrl.currentStep === 2">
         <waltz-column-mapper source-columns="$ctrl.sourceColumns"
                              target-columns="$ctrl.targetColumns"
                              on-change="$ctrl.onMappingsChanged">
         </waltz-column-mapper>
     </div>
 
-    <div ng-if="$ctrl.currentStep === 3">
+    <div ng-show="$ctrl.currentStep === 3">
         <waltz-bulk-logical-flow-parser column-mappings="$ctrl.columnMappings"
                                         source-data="$ctrl.sourceData"
+                                        on-initialise="$ctrl.parserInitialised"
                                         on-parse-complete="$ctrl.parseComplete">
         </waltz-bulk-logical-flow-parser>
     </div>
 
-    <div ng-if="$ctrl.currentStep === 4">
+    <div ng-show="$ctrl.currentStep === 4">
         <waltz-bulk-logical-flow-uploader flows="$ctrl.newFlows"
+                                          on-initialise="$ctrl.uploaderInitialised"
                                           on-upload-complete="$ctrl.uploadComplete">
         </waltz-bulk-logical-flow-uploader>
     </div>
@@ -29,12 +31,15 @@
         <br>
         <hr />
 
-        <button class="btn btn-xs btn-warning"
-                ng-click="$ctrl.back()">
+        <a class="clickable"
+           ng-click="$ctrl.back()"
+           ng-if="$ctrl.backVisible()">
             Back
-        </button>
+        </a>
         <button class="btn btn-xs btn-success"
-                ng-click="$ctrl.next()">
+                ng-click="$ctrl.next()"
+                ng-if="$ctrl.nextVisible()"
+                ng-disabled="!$ctrl.canGoNext()">
             Next
         </button>
     </div>

@@ -22,14 +22,16 @@ import { CORE_API } from '../../../common/services/core-api-utils';
 import { nest } from 'd3-collection';
 
 import { initialiseData } from '../../../common';
+import { invokeFunction } from '../../../common/index';
 import { refToString } from '../../../common/entity-utils';
-
 
 import template from './bulk-logical-flow-uploader.html';
 
 
 const bindings = {
     flows: '<',
+
+    onInitialise: '<',
     onUploadComplete: '<'
 };
 
@@ -37,7 +39,8 @@ const bindings = {
 const initialState = {
     loading: false,
 
-    onUploadComplete: (event) => console.log('default onUploadComplete handler for bulk-logical-flow-uploader: ', event)
+    onInitialise: (event) => console.log('default onInitialise handler for bulk-logical-flow-uploader: ', event),
+    onUploadComplete: () => console.log('default onUploadComplete handler for bulk-logical-flow-uploader')
 };
 
 
@@ -72,7 +75,6 @@ async function findOrAddLogicalFlows(serviceBroker, sourceTargets = []) {
     });
 
     const addFlowCmds = _.map(logicalFlowsToAdd, p => ({source: p.source, target: p.target}));
-    console.log('logical flow add cmds: ', addFlowCmds);
 
     let allServerLogicalFlows = existingLogicalFlows;
     if(! _.isEmpty(addFlowCmds)) {
@@ -88,14 +90,13 @@ async function findOrAddLogicalFlows(serviceBroker, sourceTargets = []) {
     return allServerLogicalFlows;
 }
 
+
 async function updateDecorators(serviceBroker, existingLogicalFlows, newFlows) {
     // get the decorators that need to be added by flow id
     const flowsBySourceByTarget = nest()
         .key(flow => refToString(flow.source))
         .key(flow => refToString(flow.target))
         .object(newFlows);
-
-    console.log('flowsBySourceByTarget: ', flowsBySourceByTarget);
 
     const updateCmds = _.map(existingLogicalFlows, f => {
         const sourceRefString = refToString(f.source);
@@ -113,7 +114,6 @@ async function updateDecorators(serviceBroker, existingLogicalFlows, newFlows) {
         };
     });
 
-    console.log('updateCmds: ', updateCmds);
     return serviceBroker
         .execute(CORE_API.LogicalFlowDecoratorStore.updateDecoratorsBatch, [updateCmds])
         .then(r => r.data);
@@ -128,20 +128,17 @@ function controller(serviceBroker) {
             vm.loading = true;
             findOrAddLogicalFlows(serviceBroker, vm.flows)
                 .then(logicalFlows => updateDecorators(serviceBroker, logicalFlows, vm.flows))
-                .then(decorators => vm.loading = false);
+                .then(decorators => vm.loading = false)
+                .then(() => invokeFunction(vm.onUploadComplete));
         }
     };
 
-
     vm.$onInit = () => {
+        const api = {
+            uploadFlows
+        };
+        invokeFunction(vm.onInitialise, api);
     };
-
-    vm.$onChanges = (changes) => {
-        console.log('changes: ', changes)
-        uploadFlows();
-    };
-
-
 
 }
 

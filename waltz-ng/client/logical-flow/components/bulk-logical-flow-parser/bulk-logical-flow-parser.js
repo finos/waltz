@@ -31,6 +31,8 @@ import { invokeFunction } from '../../../common/index';
 const bindings = {
     columnMappings: '<',
     sourceData: '<',
+
+    onInitialise: '<',
     onParseComplete: '<'
 };
 
@@ -44,6 +46,7 @@ const initialState = {
     sourceData: [],
     summary: {},
 
+    onInitialise: (event) => console.log('default onInitialise handler for bulk-logical-flow-parser: ', event),
     onParseComplete: (event) => console.log('default onParseComplete handler for bulk-logical-flow-parser: ', event)
 };
 
@@ -60,7 +63,7 @@ function resolveEntityRef(entitiesByIdentifier = {}, kind, identifier) {
 }
 
 
-function mapColumns(columnMappings = {}, sourceData = [], columnResolvers = {}) {
+function resolveEntities(columnMappings = {}, sourceData = [], columnResolvers = {}) {
     const sourceKeys = _.keys(columnMappings);
     const mappedObjects = _.map(sourceData, sourceObj => {
         const targetObj = {};
@@ -81,12 +84,13 @@ function findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets)
     return serviceBroker
         .loadViewData(
             CORE_API.LogicalFlowStore.findBySourceAndTargetEntityReferences,
-            [sourcesAndTargets])
+            [sourcesAndTargets],
+            { force: true })
         .then(flows => {
             // add decorators
             const existingFlowIds = _.map(flows.data, 'id');
             return serviceBroker
-                .loadViewData(CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind, [existingFlowIds])
+                .loadViewData(CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind, [existingFlowIds], { force: true })
                 .then(decorators => {
                     const decoratorsByFlowId = _.groupBy(decorators.data, 'dataFlowId');
                     const flowsWithDecorators = _.flatMap(flows.data, f => {
@@ -130,17 +134,17 @@ function mkFilterPredicate(criteria) {
 }
 
 
-function controller($q, serviceBroker) {
+function controller($q, $scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadIdentifierToEntityRefMap = async () => {
-        return await serviceBroker
+    const loadIdentifierToEntityRefMap = () => {
+        return serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findAll)
             .then(r => _.keyBy(r.data, k => _.toLower(k.assetCode)));
     };
 
-    const loadCodeToDataTypeMap = async () => {
-        return await serviceBroker
+    const loadCodeToDataTypeMap = () => {
+        return serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
             .then(r => _.keyBy(r.data, k => _.toLower(k.code)));
     };
@@ -160,38 +164,34 @@ function controller($q, serviceBroker) {
         return _.filter(vm.parsedData, mkFilterPredicate(criteria));
     };
 
-    const parseData = async () => {
+    const resolveFlows = async () => {
         if(vm.columnMappings && vm.sourceData) {
-            const mappedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
+            const resolvedData = resolveEntities(vm.columnMappings, vm.sourceData, vm.columnResolvers);
 
-            if(mappedData.length == 0 || parseErrorCount(mappedData) > 0) {
-                return mappedData;
+            if(resolvedData.length === 0 || parseErrorCount(resolvedData) > 0) {
+                return resolvedData;
             }
 
-            //no parse errors - compare against logical flows in database
-            const sourcesAndTargets = _.map(mappedData, p => ({
-                source: p.source.entityRef,
-                target: p.target.entityRef
-            }));
-
+            //compare against logical flows in database
+            const sourcesAndTargets = _.map(resolvedData, p => ({source: p.source.entityRef, target: p.target.entityRef}));
             const existingFlows = await findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets);
 
             // nesting: source -> target -> data type
-            const existingFlowsNested = nest()
+            const existingFlowsBySourceByTargetByDataType = nest()
                 .key(flow => refToString(flow.source))
                 .key(flow => refToString(flow.target))
                 .key(flow => refToString(flow.decorator.decoratorEntity))
                 .object(existingFlows);
 
-            const parsedWithExisting = _
-                .chain(mappedData)
+            const resolvedFlowsWithExisting = _
+                .chain(resolvedData)
                 .map(p => {
                     const sourceRefString = refToString(p.source.entityRef);
                     const targetRefString = refToString(p.target.entityRef);
                     const dataTypeString = refToString(p.dataType.entityRef);
-                    const existingFlows = _.get(existingFlowsNested, `[${sourceRefString}][${targetRefString}][${dataTypeString}]`);
+                    const existingFlows = _.get(existingFlowsBySourceByTargetByDataType, `[${sourceRefString}][${targetRefString}][${dataTypeString}]`);
                     let existing = null;
-                    if (existingFlows && existingFlows.length > 0) {
+                    if(existingFlows && existingFlows.length > 0) {
                         existing = existingFlows[0];
                     }
                     return Object.assign({}, p, {existing});
@@ -202,12 +202,12 @@ function controller($q, serviceBroker) {
                     o => o.dataType.entityRef.name,
                 ])
                 .value();
-            return parsedWithExisting;
+            return resolvedFlowsWithExisting;
         }
     };
 
 
-    vm.$onInit = () => {
+    const parseFlows = () => {
         vm.loading = true;
         $q.all([
             loadIdentifierToEntityRefMap(),
@@ -218,26 +218,33 @@ function controller($q, serviceBroker) {
                 'target': (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
                 'dataType': (identifier) => resolveEntityRef(dataTypesByCode, 'DATA_TYPE', identifier),
             };
-
-            return parseData()
-                .then((data) => {
-                    vm.parsedData = data;
+            return resolveFlows()
+                .then(flows => {
+                    vm.parsedData = flows;
                     vm.filteredData = filterResults();
                     vm.summary = mkParseSummary(vm.parsedData);
-                    vm.loading = false;
+
+                    $scope.$apply(() => vm.loading = false);
 
                     const event = {
                         data: vm.parsedData,
                         isComplete
                     };
-                    invokeFunction(vm.onParseComplete, event, vm.loading);
+                    invokeFunction(vm.onParseComplete, event);
                 });
         });
     };
 
 
-    vm.$onChanges = async (changes) => {
+    vm.$onInit = () => {
+        const api = {
+            parseFlows
+        };
+        invokeFunction(vm.onInitialise, api);
+    };
 
+
+    vm.$onChanges =(changes) => {
     };
 
 
@@ -249,6 +256,7 @@ function controller($q, serviceBroker) {
 
 controller.$inject = [
     '$q',
+    '$scope',
     'ServiceBroker'
 ];
 
