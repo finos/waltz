@@ -211,8 +211,25 @@ function showCellDetail(d, dialogs, drillGrid) {
 
     const colName = d.col.name;
     const rowName = d.row.name;
-    const colChildren = _.map(flattenChildren(d.col), c => `<li>${c.name}</li>`);
-    const rowChildren = _.map(flattenChildren(d.row), c => `<li>${c.name}</li>`);
+
+    const toTreeHtml = (nodes, optionName) => {
+        const sortedNodes = _.sortBy(nodes, 'name');
+        const items = _.map(sortedNodes, n => {
+            return _.isEmpty(n.children)
+                ? `<li>${n.name}</li>`
+                : `<li><a class="clickable navigation" data-wdgc-option-key="${optionName}" data-wdgc-option-value="${n.id}">${n.name}</a></li>` + toTreeHtml(n.children, optionName)
+        });
+        return nodes.length > 0
+            ? `<ul> ${_.join(items, '')} </ul>`
+            : '';
+    };
+
+    const toTreeView = (tree, optionName) => {
+        const needScroll = flattenChildren(tree).length > 10;
+        return `<div class="${needScroll ? 'waltz-scroll-region-150' : ''} small">
+            ${toTreeHtml([tree], optionName)}
+        </div>`;
+    };
 
     const html = `
        <div class="small">
@@ -227,36 +244,32 @@ function showCellDetail(d, dialogs, drillGrid) {
             
             <div>
                 Children of <strong>${colName}</strong>:
-                <ul class="small">
-                   ${_.join(colChildren, '')}
-                </ul>
+                ${toTreeView(d.col, 'xId')}
+                <br>
             </div>
   
             <div>
                 Children of ${rowName}:
-                <ul class="small">
-                   ${_.join(rowChildren, '')}
-                </ul>
+                ${toTreeView(d.row, 'yId')}
+                <br>
             </div>
-            <div class="small clickable closer">
-            <text>
-              <tspan class="clearFocus">✕ </tspan>
-              <tspan>Dismiss</tspan>
-            </text>
+            <div class="clickable closer">
+                <a class="clickable">
+                  <span class="clearFocus">✕ </span>
+                  <span>Dismiss</span>
+                </a>
             </div>
         </div>
     `;
 
-    return showDialog(dialogs, 'popup', html, true);
+    return showDialog(dialogs, 'popup', html, true, drillGrid);
 }
 
 
 function showGroupTooltip(d, dialogs) {
-    console.log('group', {d});
-
     const parentList = _.map(
         getParents(d.group),
-        p =>  `<li>${p.name}</li>`);
+        p => `<li>${p.name}</li>`);
 
     const parentHtml = _.isEmpty(parentList)
         ? ''
@@ -301,22 +314,37 @@ function showAppTooltip(d, dialogs) {
 }
 
 
-function showDialog(dialogs, dialogName, html, pin = false) {
+function showDialog(dialogs, dialogName, html, pin = false, drillGrid) {
     const dialog = dialogs[dialogName];
 
     if (! dialogs.pinned || pin) {
         dialogs.active = dialog;
         dialogs.pinned = pin;
 
-        return dialog
+        const dialogElem = dialog
             .html(html)
             .style('display', 'block')
             .style('left', () => `${event.pageX}px`)
-            .style('top', () => `${event.offsetY}px`)
-            .style('opacity', 0.9)
+            .style('top', () => `${event.offsetY - 30}px`)
+            .style('opacity', 0.9);
+
+        dialogElem
             .selectAll('.closer')
             .on('click', (d) => hideDialog(d, dialogs, dialogName, true));
 
+        dialogElem
+            .selectAll('.navigation')
+            .on('click', function(d) {
+                hideDialog(d, dialogs, dialogName, true);
+                const linkElem = select(this);
+                const key = linkElem.attr('data-wdgc-option-key');
+                const val = linkElem.attr('data-wdgc-option-value');
+                if (_.isEmpty(key) || _.isEmpty(val)) {
+                    // nop
+                } else {
+                    drillGrid.refresh({ [key]: val });
+                }
+            });
     } else {
         return dialogs.active;
     }
@@ -475,13 +503,14 @@ function drawRowGroups(drillGrid, svg, dialogs, colScale) {
 
     newRowGroups
         .append('rect')
-        .attr('width', "100%")
-        .attr('height', d => groupOffsets[d.group.id].height)
-        .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
+        .attr('width', "100%");
 
     newRowGroups
         .merge(rowGroups)
-        .attr('transform', d => `translate(0, ${groupOffsets[d.group.id].start})`);
+        .attr('transform', d => `translate(0, ${groupOffsets[d.group.id].start})`)
+        .select('rect')
+        .attr('height', d => groupOffsets[d.group.id].height)
+        .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
 
     newRowGroups
         .on('mouseover.hover', function() { select(this).classed(styles.rowGroupHover, true)})
