@@ -62,7 +62,7 @@ function controller() {
     vm.onMappingSelect = () => {
         vm.availableTargetColumns = mkAvailableTargetColumns();
         const event = {
-            mappings: _.omitBy(vm.mappings, (v,k) => v == null || v == undefined),
+            mappings: _.omitBy(vm.mappings, (v,k) => _.isEmpty(v)),
             isComplete
         };
         invokeFunction(vm.onChange, event);

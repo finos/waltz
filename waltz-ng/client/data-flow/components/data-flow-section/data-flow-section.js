@@ -40,7 +40,8 @@ const initialState = {
         dataTab: 0,
         logicalFlows: false, // this is the source data ratings panel, rename
         editor: {
-            logicalFlows: false
+            logicalFlows: false,
+            bulkLogicalFlows: false
         }
 
     }
