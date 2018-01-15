@@ -31,12 +31,14 @@ const bindings = {
 
 const initialState = {
     currentStep: 1,
-    columnMappings: {
-        from_app_nar: {name: 'source', required: true},
-        'Target code': {name: 'target', required: true},
-        'Data Types': {name: 'dataType', required: true},
-        'Source Pr': {name: 'provenance', required: false},
-    },
+    columnMappings: null,
+    // columnMappings: {
+    //     from_app_nar: {name: 'source', required: true},
+    //     'Target code': {name: 'target', required: true},
+    //     'Data Types': {name: 'dataType', required: true},
+    //     'Source Pr': {name: 'provenance', required: false},
+    // },
+    newFlows: [],
     sourceData: [],
     sourceColumns: [],
     targetColumns: [
@@ -57,29 +59,61 @@ function controller() {
     vm.$onChanges = (changes) => {
     };
 
+    vm.backVisible = () => {
+      return vm.currentStep > 1;
+    };
+
     vm.back = () => {
         vm.currentStep--;
+        if(vm.currentStep === 3) {
+            vm.parseFlows();
+        }
+    };
+
+    vm.nextVisible = () => {
+        return vm.currentStep < 4;
+    };
+
+    vm.canGoNext = () => {
+        switch (vm.currentStep) {
+            case 1:
+                return vm.sourceData.length > 0 && vm.sourceColumns.length > 0;
+            case 2:
+                return !_.isEmpty(vm.columnMappings);
+            case 3:
+                return vm.newFlows.length > 0;
+            default:
+                throw 'Unrecognised step number: ' + vm.currentStep;
+        }
     };
 
     vm.next = () => {
         vm.currentStep++;
+        if(vm.currentStep === 3) {
+            vm.parseFlows();
+        }
+
+        if(vm.currentStep === 4) {
+            vm.uploadFlows();
+        }
     };
 
     vm.spreadsheetLoaded = (event) => {
-        console.log('spreadsheet loaded: ', event);
         vm.sourceData = event.rowData;
         vm.sourceColumns = _.map(event.columnDefs, 'name');
     };
 
     vm.onMappingsChanged = (event) => {
-        console.log('mappings changed: ', event.mappings, event.isComplete());
         if(event.isComplete()) {
             vm.columnMappings = event.mappings;
         }
     };
 
+    vm.parserInitialised = (api) => {
+        vm.parseFlows = api.parseFlows;
+    };
+
     vm.parseComplete = (event) => {
-        console.log('parse complete: ', event.data, event.isComplete());
         if(event.isComplete()) {
             vm.newFlows = _
                 .chain(event.data)
@@ -91,8 +125,11 @@ function controller() {
                     provenance: f.provenance
                 }))
                 .value();
-            console.log('new flows: ', vm.newFlows);
         }
+    };
+
+    vm.uploaderInitialised = (api) => {
+        vm.uploadFlows = api.uploadFlows;
     };
 
     vm.uploadComplete = (event) => {
