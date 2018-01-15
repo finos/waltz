@@ -208,4 +208,15 @@
         </createTable>
     </changeSet>
 
+
+    <changeSet id="20180115-2941-1"
+               author="rovats">
+        <comment>2941: Entity workflow state - add description</comment>
+        <addColumn tableName="entity_workflow_state">
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
