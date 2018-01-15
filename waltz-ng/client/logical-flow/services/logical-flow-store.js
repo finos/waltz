@@ -48,6 +48,13 @@ export function store($http, BaseApiUrl) {
     };
 
 
+    const findBySourceAndTargetEntityReferences = (sourceTargetReferences) => {
+        return $http
+            .post(`${BASE}/source-targets`, sourceTargetReferences)
+            .then(result => result.data);
+    };
+
+
     const findUpstreamFlowsForEntityReferences = (refs = []) => {
         return $http
             .post(`${BASE}/find-upstream-flows`, refs)
@@ -76,6 +83,10 @@ export function store($http, BaseApiUrl) {
         .post(`${BASE}`, addFlowCmd)
         .then(r => r.data);
 
+    const addFlows = (addFlowCmds) => $http
+        .post(`${BASE}/list`, addFlowCmds)
+        .then(r => r.data);
+
     const cleanupOrphans = () => $http
         .get(`${BASE}/cleanup-orphans`)
         .then(r => r.data);
@@ -87,12 +98,14 @@ export function store($http, BaseApiUrl) {
     return {
         findBySelector,
         findByEntityReference,
+        findBySourceAndTargetEntityReferences,
         findUpstreamFlowsForEntityReferences,
         calculateStats,
         countByDataType,
         removeFlow,
         getById,
         addFlow,
+        addFlows,
         cleanupOrphans,
         cleanupSelfReferences
     };
@@ -118,6 +131,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'find logical flows involving a given entity'
+    },
+    findBySourceAndTargetEntityReferences: {
+        serviceName,
+        serviceFnName: 'findBySourceAndTargetEntityReferences',
+        description: 'find logical flows for the source and target entity references'
     },
     findUpstreamFlowsForEntityReferences: {
         serviceName,
@@ -148,6 +166,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: 'addFlow',
         description: 'adds a single logical flow'
+    },
+    addFlows: {
+        serviceName,
+        serviceFnName: 'addFlows',
+        description: 'adds a list of logical flows'
     },
     cleanupOrphans: {
         serviceName,

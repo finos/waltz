@@ -25,10 +25,12 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -43,15 +45,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityKind.ACTOR;
-import static com.khartec.waltz.model.EntityKind.APPLICATION;
-import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
+import static com.khartec.waltz.model.EntityKind.*;
 
 @Service
 public class LogicalFlowDecoratorService {
@@ -201,6 +204,59 @@ public class LogicalFlowDecoratorService {
     }
 
 
+    public int[] addDecoratorsBatch(List<UpdateDataFlowDecoratorsAction> actions,
+                                    String username) {
+        checkNotNull(actions, "actions cannot be null");
+        checkNotEmpty(username, "username must be provided");
+
+        if (actions.isEmpty()) return new int[0];
+
+        List<LogicalFlowDecorator> unrated = actions
+                .stream()
+                .flatMap(action -> action.addedDecorators()
+                        .stream()
+                        .map(ref -> ImmutableLogicalFlowDecorator.builder()
+                                .rating(AuthoritativenessRating.NO_OPINION)
+                                .provenance("waltz")
+                                .dataFlowId(action.flowId())
+                                .decoratorEntity(ref)
+                                .lastUpdatedBy(username)
+                                .lastUpdatedAt(nowUtc())
+                                .build())
+                )
+                .collect(Collectors.toList());
+
+        Collection decorators = ratingsCalculator.calculate(unrated);
+        int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
+
+        List<EntityReference> effectedEntities = logicalFlowDao.findByFlowIds(map(actions, a -> a.flowId()))
+                .stream()
+                .flatMap(f -> Stream.of(f.source(), f.target()))
+                .collect(Collectors.toList());
+
+        dataTypeUsageService.recalculateForApplications(effectedEntities);
+
+        List<ChangeLog> logEntries = actions
+                .stream()
+                .map(action -> ImmutableChangeLog.builder()
+                        .parentReference(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, action.flowId()))
+                        .userId(username)
+                        .severity(Severity.INFORMATION)
+                        .message(String.format(
+                                "%s characteristics: %s, for flow: %s",
+                                "bulk added",
+                                action.addedDecorators().toString(),
+                                action.flowId()))
+                        .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                        .operation(Operation.UPDATE)
+                        .build())
+                .collect(Collectors.toList());
+        changeLogService.write(logEntries);
+
+        return added;
+    }
+
+
     public List<DecoratorRatingSummary> summarizeInboundForSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
@@ -236,7 +292,6 @@ public class LogicalFlowDecoratorService {
     }
 
 
-
     public Collection<LogicalFlowDecorator> findByFlowIdsAndKind(List<Long> ids, EntityKind decorationKind) {
         checkNotNull(decorationKind, "decorationKind cannot be null");
         if (isEmpty(ids)) {
@@ -244,6 +299,7 @@ public class LogicalFlowDecoratorService {
         }
         return logicalFlowDecoratorDao.findByFlowIdsAndKind(ids, decorationKind);
     }
+
 
     private void audit(String verb,
                        Collection<EntityReference> decorators,

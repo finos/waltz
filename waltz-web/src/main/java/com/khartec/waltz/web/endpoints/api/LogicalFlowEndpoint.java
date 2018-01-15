@@ -29,6 +29,8 @@ import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,10 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -69,6 +75,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     public void register() {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
+        String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
@@ -76,6 +83,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String cleanupSelfReferencesPath = mkPath(BASE_URL, "cleanup-self-references");
         String addFlowPath = mkPath(BASE_URL);
+        String addFlowsPath = mkPath(BASE_URL, "list");
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
@@ -87,7 +95,6 @@ public class LogicalFlowEndpoint implements Endpoint {
             EntityReference[] refs = readBody(request, EntityReference[].class);
             return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
         };
-
 
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
                 -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
@@ -101,9 +108,11 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
+        postForDatum(findBySourceAndTargetsPath, this::findBySourceAndTargetsRoute);
         postForDatum(findStatsPath, findStatsRoute);
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
+        postForList(addFlowsPath, this::addFlowsRoute);
     }
 
 
@@ -127,6 +136,23 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
+    private List<LogicalFlow> findBySourceAndTargetsRoute(Request request, Response response) throws IOException {
+        List list = readBody(request, List.class);
+
+        List<Tuple2<EntityReference, EntityReference>> sourcesAndTargets = (List<Tuple2<EntityReference, EntityReference>>) list.stream()
+                .map(t -> {
+                    Map map = (Map) t;
+                    Map source = (Map) map.get("source");
+                    Map target = (Map) map.get("target");
+                    EntityReference sourceRef = EntityReference.mkRef(source);
+                    EntityReference targetRef = EntityReference.mkRef(target);
+                    return Tuple.tuple(sourceRef, targetRef);
+                })
+                .collect(Collectors.toList());
+        return logicalFlowService.findBySourceAndTargetEntityReferences(sourcesAndTargets);
+    }
+
+
     private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
 
@@ -138,6 +164,18 @@ public class LogicalFlowEndpoint implements Endpoint {
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
         LogicalFlow savedFlow = logicalFlowService.addFlow(addCmd, username);
         return savedFlow;
+    }
+
+
+    private List<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
+        ensureUserHasEditRights(request);
+
+        String username = getUsername(request);
+
+        List<AddLogicalFlowCommand> addCmds = Arrays.asList(readBody(request, AddLogicalFlowCommand[].class));
+        LOG.info("User: {}, adding new logical flows: {}", username, addCmds);
+        List<LogicalFlow> savedFlows = logicalFlowService.addFlows(addCmds, username);
+        return savedFlows;
     }
 
 

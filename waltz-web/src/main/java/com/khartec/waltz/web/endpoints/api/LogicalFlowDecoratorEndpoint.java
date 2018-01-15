@@ -25,7 +25,7 @@ import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.action.UpdateDataFlowDecoratorsAction;
+import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +35,12 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -72,6 +75,7 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
+        String updateDecoratorsBatchPath = mkPath(BASE_URL, "batch");
         String summarizeInboundPath = mkPath(BASE_URL, "summarize-inbound");
         String summarizeOutboundPath = mkPath(BASE_URL, "summarize-outbound");
 
@@ -127,6 +131,10 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
                 summarizeForAllRoute);
 
         postForList(
+                updateDecoratorsBatchPath,
+                this::updateDecoratorsBatchRoute);
+
+        postForList(
                 updateDecoratorsPath,
                 this::updateDecoratorsRoute);
     }
@@ -149,6 +157,17 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         }
 
         return logicalFlowDecoratorService.findByFlowIds(newArrayList(action.flowId()));
+    }
+
+
+    private Collection<LogicalFlowDecorator> updateDecoratorsBatchRoute(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+        String user = getUsername(request);
+        List<UpdateDataFlowDecoratorsAction> actions = Arrays.asList(readBody(request, UpdateDataFlowDecoratorsAction[].class));
+
+        logicalFlowDecoratorService.addDecoratorsBatch(actions, user);
+        return logicalFlowDecoratorService.findByFlowIds(map(actions, a -> a.flowId()));
     }
 
 }

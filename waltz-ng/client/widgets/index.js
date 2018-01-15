@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import ColumnMapper from './column-mapper/column-mapper.js';
 import CurrencyAmount from './currency-amount';
 import SubSection from './sub-section';
 import EditableEnum from './editable-enum/editable-enum';
+import SpreadsheetLoader from './spreadsheet-loader/spreadsheet-loader';
 import {registerComponents} from "../common/module-utils";
 
 
@@ -60,8 +62,10 @@ export default () => {
         .component('waltzTwistie', require('./twistie'));
 
     registerComponents(module, [
+        ColumnMapper,
         CurrencyAmount,
         EditableEnum,
+        SpreadsheetLoader,
         SubSection
     ]);
 
