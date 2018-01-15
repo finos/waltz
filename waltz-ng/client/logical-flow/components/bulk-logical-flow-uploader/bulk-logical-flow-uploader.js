@@ -81,12 +81,9 @@ async function findOrAddLogicalFlows(serviceBroker, sourceTargets = []) {
         const addedFlows = await serviceBroker
             .execute(CORE_API.LogicalFlowStore.addFlows, [addFlowCmds])
             .then(r => r.data);
-
-        console.log('added flows: ', addedFlows);
         allServerLogicalFlows = _.union(existingLogicalFlows, addedFlows);
     }
 
-    console.log('allServerFlows: ', allServerLogicalFlows);
     return allServerLogicalFlows;
 }
 

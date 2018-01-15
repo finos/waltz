@@ -50,6 +50,10 @@ function controller(uiGridExporterConstants,
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
+        if(changes.columnDefs) {
+            vm.gridOptions.columnDefs = vm.columnDefs;
+        }
+
         vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
     };

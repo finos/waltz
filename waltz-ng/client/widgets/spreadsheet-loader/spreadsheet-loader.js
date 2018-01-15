@@ -34,6 +34,10 @@ const bindings = {
 const initialState = {
     columnDefs: [],
     rowData: [],
+    selectedSheetName: null,
+    sheetNames: [],
+    workbook: null,
+
     onGridInitialise: (cfg) => console.log('default grid initialise handler for spreadsheet-loader'),
     onSpreadsheetLoaded: (event) => console.log('default onSpreadsheetLoaded handler for spreadsheet-loader, ', event)
 };
@@ -44,39 +48,60 @@ function prepareColumnDefs(headerNames) {
 }
 
 
+function mkHeadersAndRows(workbook, sheetName) {
+    const headerNames = XLSX.utils.sheet_to_json(
+        workbook.Sheets[sheetName],
+        { header: 1 }
+    )[0];
+
+    const rowData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    const columnDefs = prepareColumnDefs(headerNames);
+
+    return {
+        columnDefs,
+        rowData
+    };
+}
+
+
 function controller($scope) {
     const vm = initialiseData(this, initialState);
+
+    const loadWorksheet = () => {
+        const { columnDefs, rowData } = mkHeadersAndRows(vm.workbook, vm.selectedSheetName);
+        vm.columnDefs = columnDefs;
+        vm.rowData = rowData;
+
+        const event = {
+            columnDefs,
+            rowData
+        };
+        invokeFunction(vm.onSpreadsheetLoaded, event);
+    };
+
 
     vm.fileChange = (e) => {
         const files = e.srcElement.files;
         if(files.length == 0) return;
         const file = files[0];
 
-        var reader = new FileReader();
-        reader.onload =function (evt) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
             $scope.$apply(function () {
-                var evtData = evt.target.result;
-                var workbook = XLSX.read(evtData, {type: 'binary'});
+                const evtData = evt.target.result;
+                vm.workbook = XLSX.read(evtData, {type: 'binary'});
 
-                const headerNames = XLSX.utils.sheet_to_json(
-                    workbook.Sheets[workbook.SheetNames[0]],
-                    { header: 1 }
-                )[0];
-
-                const rowData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                vm.columnDefs = prepareColumnDefs(headerNames);
-                vm.rowData = rowData;
-                const event = {
-                    columnDefs: vm.columnDefs,
-                    rowData: vm.rowData
-                };
-                invokeFunction(vm.onSpreadsheetLoaded, event);
+                vm.sheetNames = vm.workbook.SheetNames;
+                vm.selectedSheetName = vm.sheetNames[0];
+                loadWorksheet();
             });
         };
-
         reader.readAsBinaryString(file);
-    }
+    };
+
+    vm.onSelectedSheetChange = () => {
+        loadWorksheet();
+    };
 }
 
 

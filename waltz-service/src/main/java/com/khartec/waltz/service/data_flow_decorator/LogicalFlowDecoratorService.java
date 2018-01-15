@@ -217,7 +217,7 @@ public class LogicalFlowDecoratorService {
                         .stream()
                         .map(ref -> ImmutableLogicalFlowDecorator.builder()
                                 .rating(AuthoritativenessRating.NO_OPINION)
-                                .provenance("kam")
+                                .provenance("waltz")
                                 .dataFlowId(action.flowId())
                                 .decoratorEntity(ref)
                                 .lastUpdatedBy(username)

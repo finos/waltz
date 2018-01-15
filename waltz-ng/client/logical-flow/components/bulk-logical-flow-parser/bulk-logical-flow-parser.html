@@ -33,7 +33,7 @@
         <div>
             <h4>Summary</h4>
             <div ng-if="!$ctrl.summary.missingEntities"
-                  class="text-success">
+                 class="text-success">
                 <p>
                     <span ng-bind="$ctrl.summary.total"></span> logical flows parsed,
                     <span ng-bind="$ctrl.summary.newFlows"></span> logical flows are
@@ -82,17 +82,12 @@
                         <th>Source</th>
                         <th>Target</th>
                         <th>Data Type</th>
-                        <th>Provenance (optional)</th>
                         <th></th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr ng-repeat="result in $ctrl.filteredData"
-                        xxng-class="{
-                                        'text-danger': !result.source.entityRef,
-                                        'bg-danger': !result.source.entityRef
-                                      }">
+                    <tr ng-repeat="result in $ctrl.filteredData">
                         <td>
                             <waltz-entity-link ng-if="result.source.entityRef"
                                                entity-ref="result.source.entityRef">
@@ -121,10 +116,6 @@
                                   class="text-danger bg-danger">
                                 <strong ng-bind="result.dataType.identifier"></strong>
                                 <small>not found</small>
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-bind="result.provenance">
                             </span>
                         </td>
                         <td>
