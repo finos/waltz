@@ -37,7 +37,7 @@ const initialState = {
     targetColumns: [],
     availableTargetColumns: [],
     mappings: {},
-    onChange: (event) => console.log('default onChange handler for column-mapper: ', event ),
+    onChange: (event) => console.log('default onChange handler for column-mapper: ', event)
 };
 
 
@@ -62,10 +62,15 @@ function controller() {
     vm.onMappingSelect = () => {
         vm.availableTargetColumns = mkAvailableTargetColumns();
         const event = {
-            mappings: vm.mappings,
+            mappings: _.omitBy(vm.mappings, (v,k) => v == null || v == undefined),
             isComplete
         };
         invokeFunction(vm.onChange, event);
+    };
+
+    vm.resetMappings = () => {
+        vm.mappings = {};
+        vm.onMappingSelect();
     };
 }
 

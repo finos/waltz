@@ -231,7 +231,8 @@ function controller($q, $scope, serviceBroker) {
                         isComplete
                     };
                     invokeFunction(vm.onParseComplete, event);
-                });
+                })
+                .catch(err => console.err('error resolving flows: ', err));
         });
     };
 

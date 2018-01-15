@@ -24,20 +24,13 @@ import template from './bulk-logical-flow-loader-wizard.html';
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@'
 };
 
 
 const initialState = {
     currentStep: 1,
     columnMappings: null,
-    // columnMappings: {
-    //     from_app_nar: {name: 'source', required: true},
-    //     'Target code': {name: 'target', required: true},
-    //     'Data Types': {name: 'dataType', required: true},
-    //     'Source Pr': {name: 'provenance', required: false},
-    // },
+    mappingsComplete: false,
     newFlows: [],
     sourceData: [],
     sourceColumns: [],
@@ -45,19 +38,12 @@ const initialState = {
         {name: 'source', required: true},
         {name: 'target', required: true},
         {name: 'dataType', required: true},
-        {name: 'provenance', required: false},
     ]
 };
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-    };
-
-    vm.$onChanges = (changes) => {
-    };
 
     vm.backVisible = () => {
       return vm.currentStep > 1;
@@ -79,7 +65,7 @@ function controller() {
             case 1:
                 return vm.sourceData.length > 0 && vm.sourceColumns.length > 0;
             case 2:
-                return !_.isEmpty(vm.columnMappings);
+                return !_.isEmpty(vm.columnMappings) && vm.mappingsComplete;
             case 3:
                 return vm.newFlows.length > 0;
             default:
@@ -104,9 +90,8 @@ function controller() {
     };
 
     vm.onMappingsChanged = (event) => {
-        if(event.isComplete()) {
-            vm.columnMappings = event.mappings;
-        }
+        vm.columnMappings = event.mappings;
+        vm.mappingsComplete = event.isComplete();
     };
 
     vm.parserInitialised = (api) => {
@@ -132,8 +117,7 @@ function controller() {
         vm.uploadFlows = api.uploadFlows;
     };
 
-    vm.uploadComplete = (event) => {
-        console.log('upload complete: ', event);
+    vm.uploadComplete = () => {
     };
 
 }
