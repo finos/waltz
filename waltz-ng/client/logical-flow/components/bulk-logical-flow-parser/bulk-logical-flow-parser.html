@@ -27,69 +27,117 @@
 
 
     <!-- Results -->
-    <div ng-class="{'waltz-scroll-region-250': $ctrl.parsedData.length > 15 }"
-         ng-if="$ctrl.parsedData.length > 0">
+    <div ng-if="$ctrl.parsedData.length > 0">
 
-        <table class="table table-condensed small">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Target</th>
-                    <th>Data Type</th>
-                    <th>Provenance (optional)</th>
-                    <th></th>
-                </tr>
-            </thead>
+        <!-- Summary -->
+        <div>
+            <h4>Summary</h4>
+            <div ng-if="!$ctrl.summary.missingEntities"
+                  class="text-success">
+                <p>
+                    <span ng-bind="$ctrl.summary.total"></span> logical flows parsed,
+                    <span ng-bind="$ctrl.summary.newFlows"></span> logical flows are
+                    <a class="clickable wbas-inline-link"
+                       ng-click="$ctrl.applyFilter('NEW')">new</a>
+                    and
+                    <span ng-bind="$ctrl.summary.existingFlows"></span> already
+                    <a class="clickable wbas-inline-link"
+                       ng-click="$ctrl.applyFilter('EXISTING')">exist</a>.
+                    <a class="clickable"
+                       ng-if="$ctrl.filterCriteria"
+                       ng-click="$ctrl.applyFilter(null)">
+                        show all
+                    </a>
+                </p>
+                <p>
+                    Ready to save these flows? Click next upload these flows.
+                </p>
+            </div>
 
-            <tbody>
-                <tr ng-repeat="result in $ctrl.parsedData"
-                    ng-class="{
-                                    'text-danger': !result.source.entityRef,
-                                    'bg-danger': !result.source.entityRef
-                                  }">
-                    <td>
-                        <waltz-entity-link ng-if="result.source.entityRef"
-                                           entity-ref="result.source.entityRef">
-                        </waltz-entity-link>
-                        <span ng-if="!result.source.entityRef"
-                              class="text-danger bg-danger">
-                            <strong ng-bind="result.source.identifier"></strong>
-                            <small>not found</small>
-                        </span>
-                    </td>
-                    <td>
-                        <waltz-entity-link ng-if="result.target.entityRef"
-                                           entity-ref="result.target.entityRef">
-                        </waltz-entity-link>
-                        <span ng-if="!result.target.entityRef"
-                              class="text-danger bg-danger">
-                            <strong ng-bind="result.target.identifier"></strong>
-                            <small>not found</small>
-                        </span>
-                    </td>
-                    <td>
-                        <waltz-entity-link ng-if="result.dataType.entityRef"
-                                           entity-ref="result.dataType.entityRef">
-                        </waltz-entity-link>
-                        <span ng-if="!result.dataType.entityRef"
-                              class="text-danger bg-danger">
-                            <strong ng-bind="result.dataType.identifier"></strong>
-                            <small>not found</small>
-                        </span>
-                    </td>
-                    <td>
-                        <span ng-bind="result.provenance">
-                        </span>
-                    </td>
-                    <td>
-                        <span ng-if="result.existing === null"
-                              class="label label-success">New</span>
-                        <span ng-if="result.existing"
-                              class="label label-warning">Exists</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div ng-if="$ctrl.summary.missingEntities > 0"
+                 class="text-danger">
+                <span ng-bind="$ctrl.summary.missingEntities"></span>
+                identifer<span ng-if="$ctrl.summary.missingEntities > 1">s</span>
+                <a class="clickable wbas-inline-link"
+                   ng-click="$ctrl.applyFilter('NOT_FOUND')">not found</a> in Waltz.
+
+                Please review below and correct and re-upload file.
+
+                <a class="clickable"
+                   ng-if="$ctrl.filterCriteria"
+                   ng-click="$ctrl.applyFilter(null)">
+                    show all
+                </a>
+            </div>
+        </div>
+
+        <br>
+
+        <!-- Table -->
+        <div ng-class="{'waltz-scroll-region-250': $ctrl.filteredData.length > 15 }">
+
+            <table class="table table-condensed small">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Target</th>
+                        <th>Data Type</th>
+                        <th>Provenance (optional)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="result in $ctrl.filteredData"
+                        xxng-class="{
+                                        'text-danger': !result.source.entityRef,
+                                        'bg-danger': !result.source.entityRef
+                                      }">
+                        <td>
+                            <waltz-entity-link ng-if="result.source.entityRef"
+                                               entity-ref="result.source.entityRef">
+                            </waltz-entity-link>
+                            <span ng-if="!result.source.entityRef"
+                                  class="text-danger bg-danger">
+                                <strong ng-bind="result.source.identifier"></strong>
+                                <small>not found</small>
+                            </span>
+                        </td>
+                        <td>
+                            <waltz-entity-link ng-if="result.target.entityRef"
+                                               entity-ref="result.target.entityRef">
+                            </waltz-entity-link>
+                            <span ng-if="!result.target.entityRef"
+                                  class="text-danger bg-danger">
+                                <strong ng-bind="result.target.identifier"></strong>
+                                <small>not found</small>
+                            </span>
+                        </td>
+                        <td>
+                            <waltz-entity-link ng-if="result.dataType.entityRef"
+                                               entity-ref="result.dataType.entityRef">
+                            </waltz-entity-link>
+                            <span ng-if="!result.dataType.entityRef"
+                                  class="text-danger bg-danger">
+                                <strong ng-bind="result.dataType.identifier"></strong>
+                                <small>not found</small>
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-bind="result.provenance">
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-if="result.existing === null"
+                                  class="label label-success">New</span>
+                            <span ng-if="result.existing"
+                                  class="label label-warning">Exists</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
 </div>
