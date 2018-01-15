@@ -19,7 +19,7 @@
 import {initialiseData} from "../../common/index";
 
 const initialState = {
-    parentEntityRef: { kind: 'ORG_UNIT', id: 10 },
+    parentEntityRef: { kind: 'ORG_UNIT', id: 6018 },
     foo: 'baa'
 };
 

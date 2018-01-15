@@ -48,25 +48,23 @@
         font-weight: bolder;
     }
 
-    .wdgc-tooltip {
-        display: block;
+    .wdgc-dialog {
+        display: none;
         padding: 20px;
         background: #fff;
-        border-radius: 5px;
         width: 30%;
         position: absolute;
         transition: all 0.3s ease-in-out;
+        border: 2px solid #ccc;
+        border-radius: 3px;
+    }
+    .wdgc-tooltip {
+        @extend .wdgc-dialog;
         pointer-events: none;
     }
 
     .wdgc-popup {
-        display: block;
-        padding: 20px;
-        background: #fff;
-        border-radius: 5px;
-        width: 30%;
-        position: absolute;
-        transition: all 0.3s ease-in-out;
+        @extend .wdgc-dialog;
     }
 
     .appFocus {
