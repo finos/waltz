@@ -27,6 +27,7 @@ public class EntityWorkflowStateDao {
                             .id(r.getEntityId())
                             .build())
                     .state(r.getState())
+                    .description(r.getDescription())
                     .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                     .lastUpdatedBy(r.getLastUpdatedBy())
                     .provenance(r.getProvenance())
