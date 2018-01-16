@@ -150,6 +150,31 @@
 
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
+                Planned Retirement:
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
+                                timestamp="$ctrl.app.plannedRetirementDate">
+                </waltz-from-now>
+                <span ng-if="! $ctrl.app.plannedRetirementDate">
+                    -
+                </span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Actual Retirement:
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
+                                timestamp="$ctrl.app.actualRetirementDate">
+                </waltz-from-now>
+                <span ng-if="! $ctrl.app.actualRetirementDate">
+                    -
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
                 Description
             </div>
             <div class="col-sm-10">

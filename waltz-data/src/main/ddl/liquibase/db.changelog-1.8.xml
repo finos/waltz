@@ -3,6 +3,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.8.xml">
 
+    <!-- 2867: Drill Grid definitions -->
     <changeSet id="20171209-2867-1"
                author="davidwatkins73">
         <comment>2867: Drill Grid definitions</comment>
@@ -57,6 +58,7 @@
     </changeSet>
 
 
+    <!-- 2924: Create entity events table -->
     <changeSet id="20180105-2924-1"
                author="rovats">
         <comment>2924: Create entity events table</comment>
@@ -99,6 +101,7 @@
     </changeSet>
 
 
+    <!-- 2931: Entity workflow -->
     <changeSet id="20180110-2931-1"
                author="rovats">
         <comment>2931: Entity workflow</comment>
@@ -209,6 +212,7 @@
     </changeSet>
 
 
+    <!-- 2941: Entity workflow state - add description -->
     <changeSet id="20180115-2941-1"
                author="rovats">
         <comment>2941: Entity workflow state - add description</comment>
@@ -219,4 +223,24 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <!-- 2950: App retirement dates -->
+    <changeSet id="20180116-2950-1"
+               author="rovats">
+        <comment>2950: App retirement dates</comment>
+        <addColumn tableName="application">
+            <column name="planned_retirement_date"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="application">
+            <column name="actual_retirement_date"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

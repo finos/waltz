@@ -26,6 +26,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -48,6 +49,8 @@ public abstract class Application implements
     public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
+    public abstract Optional<LocalDateTime> plannedRetirementDate();
+    public abstract Optional<LocalDateTime> actualRetirementDate();
 
 
     @Value.Default

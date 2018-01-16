@@ -38,12 +38,12 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static java.util.Optional.ofNullable;
 
 
 @Repository
@@ -56,8 +56,8 @@ public class ApplicationDao {
         Application app = ImmutableApplication.builder()
                 .name(appRecord.getName())
                 .description(appRecord.getDescription())
-                .assetCode(Optional.ofNullable(appRecord.getAssetCode()))
-                .parentAssetCode(Optional.ofNullable(appRecord.getParentAssetCode()))
+                .assetCode(ofNullable(appRecord.getAssetCode()))
+                .parentAssetCode(ofNullable(appRecord.getParentAssetCode()))
                 .id(appRecord.getId())
                 .isRemoved(appRecord.getIsRemoved())
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
@@ -66,6 +66,8 @@ public class ApplicationDao {
                 .overallRating(readEnum(appRecord.getOverallRating(), RagRating.class, (s) -> RagRating.Z))
                 .businessCriticality(readEnum(appRecord.getBusinessCriticality(), Criticality.class, c -> Criticality.UNKNOWN))
                 .entityLifecycleStatus(readEnum(appRecord.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
+                .plannedRetirementDate(ofNullable(appRecord.getPlannedRetirementDate()).map(Timestamp::toLocalDateTime))
+                .actualRetirementDate(ofNullable(appRecord.getActualRetirementDate()).map(Timestamp::toLocalDateTime))
                 .provenance(appRecord.getProvenance())
                 .build();
 
