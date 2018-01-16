@@ -43,6 +43,16 @@ const initialState = {
 };
 
 
+function convertToBinaryString(data) {
+    let binary = "";
+    const bytes = new Uint8Array(data);
+    for (var i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+
+
 function prepareColumnDefs(headerNames) {
     return _.map(headerNames, name => ({field: name, name}));
 }
@@ -103,19 +113,21 @@ function controller($element, $scope) {
         reader.onload = function (evt) {
             $scope.$apply(function () {
                 const evtData = _.get(evt, 'target.result');
-                vm.workbook = XLSX.read(evtData, {type: 'binary'});
+                const data = convertToBinaryString(evtData);
+                vm.workbook = XLSX.read(data, {type: 'binary'});
 
                 vm.sheetNames = vm.workbook.SheetNames;
                 vm.selectedSheetName = vm.sheetNames[0];
                 loadWorksheet();
             });
         };
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
     };
 
     vm.onSelectedSheetChange = () => {
         loadWorksheet();
     };
+
 }
 
 
