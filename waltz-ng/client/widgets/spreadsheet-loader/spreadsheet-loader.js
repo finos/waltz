@@ -95,14 +95,14 @@ function controller($element, $scope) {
     };
 
     vm.fileChange = (e) => {
-        const files = e.target.files;
+        const files = _.get(e, 'target.files', []);
         if(files.length == 0) return;
         const file = files[0];
 
         const reader = new FileReader();
         reader.onload = function (evt) {
             $scope.$apply(function () {
-                const evtData = evt.target.result;
+                const evtData = _.get(evt, 'target.result');
                 vm.workbook = XLSX.read(evtData, {type: 'binary'});
 
                 vm.sheetNames = vm.workbook.SheetNames;
