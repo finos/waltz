@@ -64,7 +64,7 @@ function mkHeadersAndRows(workbook, sheetName) {
 }
 
 
-function controller($scope) {
+function controller($element, $scope) {
     const vm = initialiseData(this, initialState);
 
     const loadWorksheet = () => {
@@ -80,8 +80,22 @@ function controller($scope) {
     };
 
 
+    vm.$onInit = () => {
+        vm.input = $element.find('input');
+        if(! vm.input) {
+            throw 'Could not find input element';
+        }
+        vm.input.on('change', vm.fileChange);
+    };
+
+    vm.$onDestroy = () => {
+        if(vm.input) {
+            vm.input.off('change', vm.fileChange);
+        }
+    };
+
     vm.fileChange = (e) => {
-        const files = e.srcElement.files;
+        const files = e.target.files;
         if(files.length == 0) return;
         const file = files[0];
 
@@ -106,6 +120,7 @@ function controller($scope) {
 
 
 controller.$inject = [
+    '$element',
     '$scope'
 ];
 
