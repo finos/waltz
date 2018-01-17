@@ -29,6 +29,13 @@ export const formats = {
 };
 
 
+export const entityLifecycleStatuses = {
+    ACTIVE: "ACTIVE",
+    PENDING: "PENDING",
+    REMOVED: "REMOVED"
+};
+
+
 export function notEmpty(xs) {
     return ! _.isEmpty(xs);
 }

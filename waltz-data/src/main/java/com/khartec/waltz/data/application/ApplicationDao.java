@@ -92,17 +92,7 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.eq(id))
-                .and(IS_ACTIVE)
                 .fetchOne(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<Application> findByOrganisationalUnitIds(List<Long> ids) {
-        return dsl.select(APPLICATION.fields())
-                .from(APPLICATION)
-                .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ids))
-                .and(IS_ACTIVE)
-                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -234,7 +224,6 @@ public class ApplicationDao {
     public List<Application> findByAppIdSelector(Select<Record1<Long>> selector) {
         return dsl.selectFrom(APPLICATION)
                 .where(APPLICATION.ID.in(selector))
-                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -245,7 +234,6 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ASSET_CODE.eq(assetCode))
-                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

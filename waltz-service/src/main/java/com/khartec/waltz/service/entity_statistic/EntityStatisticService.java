@@ -28,6 +28,7 @@ import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -98,6 +99,13 @@ public class EntityStatisticService {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         return valueDao.getStatisticValuesForAppIdSelector(statisticId, appIdSelector);
+    }
+
+
+    public List<Application> getStatisticAppsForAppIdSelector(long statisticId, IdSelectionOptions options) {
+        Select<Record1<Long>> appIdSelector = factory.apply(options);
+
+        return valueDao.getStatisticAppsForAppIdSelector(statisticId, appIdSelector);
     }
 
 
