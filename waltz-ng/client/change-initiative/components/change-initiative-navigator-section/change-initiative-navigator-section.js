@@ -26,7 +26,6 @@ import { buildHierarchies } from "../../../common/hierarchy-utils";
 
 import {
     changeInitiative,
-    lifecyclePhase,
     getEnumName
 } from "../../../common/services/enums";
 
@@ -63,6 +62,7 @@ const initialState = {
     visibility: {
         sourcesOverlay: false
     },
+    changeInitiativeLifecyclePhaseByKey: {},
     children: [],
     childrenGridOptions: {
         columnDefs: [
@@ -90,20 +90,20 @@ const initialState = {
 };
 
 
-function enrichChangeInitiative(ci) {
+function enrichChangeInitiative(ci, changeInitiativeLifecyclePhaseByKey = {}) {
     const extensions = {
         kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
-        lifecyclePhaseName: getEnumName(lifecyclePhase, ci.lifecyclePhase)
+        lifecyclePhaseName: getEnumName(changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase)
     };
 
     return Object.assign({}, ci, extensions);
 }
 
 
-function buildChangeInitiativeHierarchy(changeInitiatives) {
+function buildChangeInitiativeHierarchy(changeInitiatives = [], changeInitiativeLifecyclePhaseByKey = {}) {
     const enriched = _.map(
         changeInitiatives,
-        ci => enrichChangeInitiative(ci));
+        ci => enrichChangeInitiative(ci, changeInitiativeLifecyclePhaseByKey));
     return buildHierarchies(enriched);
 }
 
@@ -117,6 +117,19 @@ function controller(serviceBroker) {
 
     vm.onClearSelection = () => vm.selectedChange = null;
 
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {
+                vm.changeInitiativeLifecyclePhaseByKey = _
+                    .chain(r.data)
+                    .filter({ type: 'changeInitiativeLifecyclePhase'})
+                    .map(c => ({ key: c.key, name: c.name }))
+                    .keyBy('key')
+                    .value();
+            });
+    };
+
     vm.$onChanges = () => {
         if(vm.parentEntityRef) {
             serviceBroker
@@ -125,7 +138,7 @@ function controller(serviceBroker) {
                     [ mkSelectionOptions(vm.parentEntityRef, 'CHILDREN') ], { force: true })
                 .then(r => {
                     vm.children = _.reject(r.data, { id: vm.parentEntityRef.id });
-                    vm.childrenGridOptions.data = buildChangeInitiativeHierarchy(vm.children);
+                    vm.childrenGridOptions.data = buildChangeInitiativeHierarchy(vm.children, vm.changeInitiativeLifecyclePhaseByKey);
                 });
 
             serviceBroker
@@ -134,7 +147,7 @@ function controller(serviceBroker) {
                     [ mkSelectionOptions(vm.parentEntityRef, 'PARENTS') ], { force: true })
                 .then(r => {
                     vm.parents = _.reject(r.data, { id: vm.parentEntityRef.id });
-                    vm.parentGridOptions.data = buildChangeInitiativeHierarchy(vm.parents);
+                    vm.parentGridOptions.data = buildChangeInitiativeHierarchy(vm.parents, vm.changeInitiativeLifecyclePhaseByKey);
                 });
         }
     };

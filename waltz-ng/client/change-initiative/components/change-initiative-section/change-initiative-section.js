@@ -26,7 +26,6 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from './change-initiative-section.html';
 import {
     changeInitiative,
-    lifecyclePhase,
     getEnumName
 } from "../../../common/services/enums";
 
@@ -59,6 +58,7 @@ const nameCellTemplate = `
 
 const initialState = {
     changeInitiatives: [],
+    changeInitiativeLifecyclePhaseByKey: {},
     selectedChange: null,
     visibility: {
         sourcesOverlay: false
@@ -89,7 +89,7 @@ function controller(serviceBroker) {
                 const icon = children.length > 0 ? 'sitemap' : 'fw';
                 const extensions = {
                     kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
-                    lifecyclePhaseName: getEnumName(lifecyclePhase, ci.lifecyclePhase),
+                    lifecyclePhaseName: getEnumName(vm.changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase),
                     icon,
                     parent: null,
                     children
@@ -108,6 +108,19 @@ function controller(serviceBroker) {
     };
 
     vm.onClearSelection = () => vm.selectedChange = null;
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {
+                vm.changeInitiativeLifecyclePhaseByKey = _
+                    .chain(r.data)
+                    .filter({ type: 'changeInitiativeLifecyclePhase'})
+                    .map(c => ({ key: c.key, name: c.name }))
+                    .keyBy('key')
+                    .value();
+            });
+    };
 
     vm.$onChanges = (changes) => {
         if(vm.parentEntityRef && changes.parentEntityRef.previousValue.id !== changes.parentEntityRef.currentValue.id) {
