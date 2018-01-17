@@ -44,6 +44,9 @@ const initialState = {
 
 
 function convertToBinaryString(data) {
+    if(!data) {
+        return;
+    }
     let binary = "";
     const bytes = new Uint8Array(data);
     for (var i = 0; i < bytes.byteLength; i++) {
