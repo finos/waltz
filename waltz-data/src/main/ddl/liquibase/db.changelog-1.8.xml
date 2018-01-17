@@ -257,4 +257,51 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 2962: changeInitiativeLifecyclePhase soft enum -->
+    <changeSet id="20180117-2962-1"
+               author="kamransaleem">
+        <comment>2962: changeInitiativeLifecyclePhase soft enum</comment>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="changeInitiativeLifecyclePhase"/>
+            <column name="key"
+                    value="PRODUCTION"/>
+            <column name="display_name"
+                    value="Production"/>
+            <column name="description"
+                    value="Production"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="changeInitiativeLifecyclePhase"/>
+            <column name="key"
+                    value="DEVELOPMENT"/>
+            <column name="display_name"
+                    value="Development"/>
+            <column name="description"
+                    value="Development"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="changeInitiativeLifecyclePhase"/>
+            <column name="key"
+                    value="CONCEPTUAL"/>
+            <column name="display_name"
+                    value="Conceptual"/>
+            <column name="description"
+                    value="Conceptual"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type"
+                    value="changeInitiativeLifecyclePhase"/>
+            <column name="key"
+                    value="RETIRED"/>
+            <column name="display_name"
+                    value="Retired"/>
+            <column name="description"
+                    value="Retired"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
