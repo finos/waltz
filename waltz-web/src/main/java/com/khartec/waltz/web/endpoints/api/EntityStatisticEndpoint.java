@@ -22,6 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -113,6 +114,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findStatsForEntityPath = mkPath(BASE_URL, ":kind", ":id");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
+        String findStatAppsBySelectorPath = mkPath(BASE_URL, "app", ":statId");
         String findStatTalliesPath = mkPath(BASE_URL, "tally");
         String calculateStatTallyPath = mkPath(BASE_URL, "tally", ":id", ":rollupKind");
         String calculateHistoricStatTallyPath = mkPath(BASE_URL, "tally", "historic", ":id", ":rollupKind");
@@ -129,12 +131,16 @@ public class EntityStatisticEndpoint implements Endpoint {
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
                 -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
+        ListRoute<Application> findStatAppsForAppSelectorRoute = (request, response)
+                -> entityStatisticService.getStatisticAppsForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
+
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"), true);
 
         getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         getForList(findStatsForEntityPath, findStatsForEntityRoute);
         postForList(findStatValuesBySelectorPath, findStatValuesForAppSelectorRoute);
+        postForList(findStatAppsBySelectorPath, findStatAppsForAppSelectorRoute);
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         postForDatum(calculateStatTallyPath, this::calculateStatTallyRoute);
         postForDatum(calculateHistoricStatTallyPath, this::calculateHistoricStatTallyRoute);

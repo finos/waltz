@@ -100,8 +100,7 @@ public class LogicalFlowStatsDao {
         Select<Record1<Integer>> intraAppCounter = dsl
                     .select(count())
                     .from(APPLICATION)
-                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)))
-                    .and(dsl.renderInlined(IS_ACTIVE));
+                    .where(dsl.renderInlined(APPLICATION.ID.in(appIdSelector)));
 
         Future<Integer> inAppCount = dbExecutorPool.submit(() -> inAppCounter.fetchOne().value1());
         Future<Integer> outAppCount = dbExecutorPool.submit(() -> outAppCounter.fetchOne().value1());

@@ -151,8 +151,7 @@ public class ServerInformationDao {
         Condition condition = SERVER_INFORMATION.ASSET_CODE
                 .in(select(APPLICATION.ASSET_CODE)
                         .from(APPLICATION)
-                        .where(APPLICATION.ID.in(appIdSelector))
-                        .and(IS_ACTIVE));
+                        .where(APPLICATION.ID.in(appIdSelector)));
 
         // de-duplicate host names, as one server can host multiple apps
         Result<? extends Record> serverInfo = dsl.select(

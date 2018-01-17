@@ -108,6 +108,7 @@ public class InvolvementDao {
     }
 
 
+    @Deprecated
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
         return dsl.select()
                 .from(APPLICATION)
@@ -120,6 +121,7 @@ public class InvolvementDao {
     }
 
 
+    @Deprecated
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
         SelectOrderByStep<Record1<String>> employeeIds = dsl
                 .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)

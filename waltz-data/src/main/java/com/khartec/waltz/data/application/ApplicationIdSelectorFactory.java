@@ -95,11 +95,11 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
             case ACTOR:
                 return mkForActor(options);
             case APP_GROUP:
-                return mkForAppGroup(ref, options.scope());
+                return mkForAppGroup(options);
             case APPLICATION:
-                return mkForApplication(ref, options.scope());
+                return mkForApplication(options);
             case CHANGE_INITIATIVE:
-                return mkForChangeInitiative(ref, options.scope());
+                return mkForChangeInitiative(options);
             case DATA_TYPE:
                 return mkForDataType(options);
             case FLOW_DIAGRAM:
@@ -107,9 +107,9 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
             case MEASURABLE:
                 return mkForMeasurable(options);
             case ORG_UNIT:
-                return mkForOrgUnit(ref, options.scope());
+                return mkForOrgUnit(options);
             case PERSON:
-                return mkForPerson(ref, options.scope());
+                return mkForPerson(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
@@ -124,13 +124,15 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .from(logicalFlow)
                 .where(logicalFlow.TARGET_ENTITY_ID.eq(actorId)
                         .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
-                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(logicalFlow.IS_REMOVED.isFalse()));
 
         Select<Record1<Long>> targetAppIds = DSL.select(logicalFlow.TARGET_ENTITY_ID)
                 .from(logicalFlow)
                 .where(logicalFlow.SOURCE_ENTITY_ID.eq(actorId)
                         .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
-                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(logicalFlow.IS_REMOVED.isFalse()));
 
         return sourceAppIds
                 .union(targetAppIds);
@@ -141,8 +143,11 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         return DSL.select(flowDiagram.ENTITY_ID)
                 .from(flowDiagram)
+                .innerJoin(app)
+                    .on(app.ID.eq(flowDiagram.ENTITY_ID))
                 .where(flowDiagram.DIAGRAM_ID.eq(options.entityReference().id()))
-                .and(flowDiagram.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(flowDiagram.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
@@ -150,31 +155,40 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         Select<Record1<Long>> measurableSelector = measurableIdSelectorFactory.apply(options);
         return dsl.select(measurableRating.ENTITY_ID)
                 .from(measurableRating)
+                .innerJoin(app)
+                    .on(app.ID.eq(flowDiagram.ENTITY_ID))
                 .where(measurableRating.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())))
-                .and(measurableRating.MEASURABLE_ID.in(measurableSelector));
+                .and(measurableRating.MEASURABLE_ID.in(measurableSelector))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
-    private Select<Record1<Long>> mkForApplication(EntityReference ref, HierarchyQueryScope scope) {
-        checkTrue(scope == EXACT, "Can only create selector for exact matches if given an app ref");
-        return DSL.select(DSL.val(ref.id()));
+    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given an app ref");
+        return DSL.select(DSL.val(options.entityReference().id()));
     }
 
 
-    private Select<Record1<Long>> mkForChangeInitiative(EntityReference ref, HierarchyQueryScope scope) {
-        checkTrue(scope == EXACT, "Can only create selector for exact matches if given a change initiative");
+    private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a change initiative");
 
         Select<Record1<Long>> appToCi = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(app)
+                    .on(app.ID.eq(ENTITY_RELATIONSHIP.ID_A))
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(options.entityReference().kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_B.eq(options.entityReference().id()))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
 
         Select<Record1<Long>> ciToApp = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(app)
+                    .on(app.ID.eq(ENTITY_RELATIONSHIP.ID_B))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(options.entityReference().kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(options.entityReference().id()))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
 
 
         return appToCi
@@ -182,11 +196,11 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private SelectConditionStep<Record1<Long>> mkForOrgUnit(EntityReference ref, HierarchyQueryScope scope) {
+    private SelectConditionStep<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
 
         ImmutableIdSelectionOptions ouSelectorOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(scope)
+                .entityReference(options.entityReference())
+                .scope(options.scope())
                 .build();
 
         Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(ouSelectorOptions);
@@ -194,41 +208,45 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         return dsl
                 .selectDistinct(app.ID)
                 .from(app)
-                .where(dsl.renderInlined(app.ORGANISATIONAL_UNIT_ID.in(ouSelector)));
+                .where(dsl.renderInlined(app.ORGANISATIONAL_UNIT_ID.in(ouSelector)))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
-    private SelectConditionStep<Record1<Long>> mkForAppGroup(EntityReference ref, HierarchyQueryScope scope) {
-        if (scope != EXACT) {
-            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: " + scope);
+    private SelectConditionStep<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+        if (options.scope() != EXACT) {
+            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
         }
         return dsl
                 .selectDistinct(appGroup.APPLICATION_ID)
                 .from(appGroup)
-                .where(appGroup.GROUP_ID.eq(ref.id()));
+                .innerJoin(app)
+                    .on(app.ID.eq(appGroup.APPLICATION_ID))
+                .where(appGroup.GROUP_ID.eq(options.entityReference().id()))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
-    private Select<Record1<Long>> mkForPerson(EntityReference ref, HierarchyQueryScope scope) {
-        switch (scope) {
+    private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
+        switch (options.scope()) {
             case EXACT:
-                return mkForSinglePerson(ref);
+                return mkForSinglePerson(options);
             case CHILDREN:
-                return mkForPersonReportees(ref);
+                return mkForPersonReportees(options);
             default:
                 throw new UnsupportedOperationException(
                         "Querying for appIds of person using (scope: '"
-                                + scope
+                                + options.scope()
                                 + "') not supported");
         }
     }
 
 
-    private Select<Record1<Long>> mkForPersonReportees(EntityReference ref) {
+    private Select<Record1<Long>> mkForPersonReportees(IdSelectionOptions options) {
 
         Select<Record1<String>> emp = dsl.select(person.EMPLOYEE_ID)
                 .from(person)
-                .where(person.ID.eq(ref.id()));
+                .where(person.ID.eq(options.entityReference().id()));
 
         SelectConditionStep<Record1<String>> reporteeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
                 .from(personHierarchy)
@@ -236,26 +254,32 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(involvement.EMPLOYEE_ID.eq(emp)
-                        .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
+                        .or(involvement.EMPLOYEE_ID.in(reporteeIds)))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
 
         return dsl
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
+                .innerJoin(app)
+                    .on(app.ID.eq(involvement.ENTITY_ID))
                 .where(dsl.renderInlined(condition));
     }
 
 
-    private Select<Record1<Long>> mkForSinglePerson(EntityReference ref) {
+    private Select<Record1<Long>> mkForSinglePerson(IdSelectionOptions options) {
 
         Select<Record1<String>> employeeId = dsl.select(person.EMPLOYEE_ID)
                 .from(person)
-                .where(person.ID.eq(ref.id()));
+                .where(person.ID.eq(options.entityReference().id()));
 
         return dsl
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
+                .innerJoin(app)
+                    .on(app.ID.eq(involvement.ENTITY_ID))
                 .where(involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(involvement.EMPLOYEE_ID.eq(employeeId));
+                .and(involvement.EMPLOYEE_ID.eq(employeeId))
+                .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
