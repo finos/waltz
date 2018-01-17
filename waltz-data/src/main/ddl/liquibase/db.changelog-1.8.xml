@@ -243,4 +243,18 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 2925: Add index on app lifecycle status -->
+    <changeSet id="20180116-2925-1"
+               author="rovats">
+        <comment>2925: Add index on app lifecycle status</comment>
+        <createIndex indexName="idx_els_application"
+                     tableName="application"
+                     unique="false">
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

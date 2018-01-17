@@ -19,8 +19,10 @@
 
 package com.khartec.waltz.data.entity_statistic;
 
+import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
 import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
 import com.khartec.waltz.model.entity_statistic.StatisticValueState;
@@ -41,7 +43,6 @@ import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATIS
 @Repository
 public class EntityStatisticValueDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
     private static final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
 
@@ -114,10 +115,7 @@ public class EntityStatisticValueDao {
     public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        Condition condition = esv.STATISTIC_ID.eq(statisticId)
-                .and(esv.CURRENT.eq(true))
-                .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(esv.ENTITY_ID.in(appIdSelector));
+        Condition condition = mkStatisticSelectorCondition(statisticId, appIdSelector);
 
         List<EntityStatisticValue> fetch = dsl
                 .select(app.NAME)
@@ -129,6 +127,29 @@ public class EntityStatisticValueDao {
                 .fetch(TO_VALUE_MAPPER);
 
         return fetch;
+    }
+
+
+    public List<Application> getStatisticAppsForAppIdSelector(long statisticId, Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        Condition condition = mkStatisticSelectorCondition(statisticId, appIdSelector);
+
+        return dsl
+                .selectDistinct(app.fields())
+                .from(app)
+                .join(esv)
+                .on(esv.ENTITY_ID.eq(app.ID))
+                .where(dsl.renderInlined(condition))
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+    }
+
+
+    private Condition mkStatisticSelectorCondition(long statisticId, Select<Record1<Long>> appIdSelector) {
+        return esv.STATISTIC_ID.eq(statisticId)
+                    .and(esv.CURRENT.eq(true))
+                    .and(esv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(esv.ENTITY_ID.in(appIdSelector));
     }
 
 }

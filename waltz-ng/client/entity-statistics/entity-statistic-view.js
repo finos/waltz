@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {resetData} from "../common";
+import {entityLifecycleStatuses, resetData} from "../common";
 import {kindToViewState} from "../common/link-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
@@ -56,10 +56,21 @@ function mkHistory(history = [], current) {
 }
 
 
+function mkStatisticSelector(entityRef) {
+    const selector = mkSelectionOptions(entityRef);
+    selector.entityLifecycleStatuses = [
+        entityLifecycleStatuses.ACTIVE,
+        entityLifecycleStatuses.PENDING,
+        entityLifecycleStatuses.REMOVED
+    ];
+
+    return selector;
+}
+
+
 function controller($q,
                     $state,
                     $stateParams,
-                    applicationStore,
                     entityStatisticUtilities,
                     entityStatisticStore,
                     orgUnitStore) {
@@ -107,7 +118,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector = mkSelectionOptions(vm.parentRef);
+        const selector = mkStatisticSelector(vm.parentRef);
 
         entityStatisticStore
             .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
@@ -129,7 +140,7 @@ function controller($q,
         vm.parentRef = entityReference;
 
 
-        const selector = mkSelectionOptions(entityReference);
+        const selector = mkStatisticSelector(entityReference);
 
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)
@@ -154,8 +165,8 @@ function controller($q,
             .findStatValuesByIdSelector(statId, selector)
             .then(stats => vm.statistic.values = stats);
 
-        applicationStore
-            .findBySelector(selector)
+        entityStatisticStore
+            .findStatAppsByIdSelector(statId, selector)
             .then(apps => vm.applications = apps);
 
         loadHistory();
@@ -184,7 +195,6 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'ApplicationStore',
     'EntityStatisticUtilities',
     'EntityStatisticStore',
     'OrgUnitStore'

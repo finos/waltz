@@ -285,7 +285,7 @@ public class AuthoritativeSourceDao {
         Condition unknownOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID.notIn(orgUnitIds)
                 .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition unknownApp = AUTHORITATIVE_SOURCE.APPLICATION_ID.notIn(appIds);
+        Condition appIsInactive = AUTHORITATIVE_SOURCE.APPLICATION_ID.notIn(appIds);
 
         List<EntityReference> authSourceAppsWithoutOrgUnit = dsl
                 .select(AUTHORITATIVE_SOURCE.APPLICATION_ID)
@@ -299,7 +299,7 @@ public class AuthoritativeSourceDao {
         List<EntityReference> authSourceOrgUnitsWithoutApp = dsl
                 .select(AUTHORITATIVE_SOURCE.PARENT_ID, AUTHORITATIVE_SOURCE.PARENT_KIND)
                 .from(AUTHORITATIVE_SOURCE)
-                .where(unknownApp)
+                .where(appIsInactive)
                 .fetch()
                 .stream()
                 .map(r -> mkRef(
@@ -313,7 +313,7 @@ public class AuthoritativeSourceDao {
 
         dsl.deleteFrom(AUTHORITATIVE_SOURCE)
                 .where(unknownOrgUnit)
-                .or(unknownApp)
+                .or(appIsInactive)
                 .execute();
 
         return bereaved;

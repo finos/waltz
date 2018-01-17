@@ -43,6 +43,10 @@ function store($http, BaseApiUrl) {
         .post(`${ BASE }/value/${ statId }`, options)
         .then(r => r.data);
 
+    const findStatAppsByIdSelector = (statId, options) => $http
+        .post(`${ BASE }/app/${ statId }`, options)
+        .then(r => r.data);
+
     const findRelatedStatDefinitions = (statId) => $http
         .get(`${ BASE }/definition/${ statId }/related`)
         .then(r => r.data);
@@ -78,6 +82,7 @@ function store($http, BaseApiUrl) {
         findStatDefinition,
         findStatsForEntity,
         findStatValuesByIdSelector,
+        findStatAppsByIdSelector,
         findRelatedStatDefinitions,
         findStatTallies,
         calculateStatTally,
@@ -115,6 +120,11 @@ export const EntityStatisticStore_API = {
         serviceName,
         serviceFnName: 'findStatValuesByIdSelector',
         description: 'finds entity statistic values by app id selector'
+    },
+    findStatAppsByIdSelector: {
+        serviceName,
+        serviceFnName: 'findStatAppsByIdSelector',
+        description: 'finds entity statistic apps by app id selector'
     },
     findRelatedStatDefinitions: {
         serviceName,

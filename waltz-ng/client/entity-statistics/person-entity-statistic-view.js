@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {resetData} from "../common";
+import {entityLifecycleStatuses, resetData} from "../common";
+import {mkSelectionOptions} from "../common/selector-utils";
 import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
 
 
@@ -56,10 +57,21 @@ function mkHistory(history = [], current) {
 }
 
 
+function mkStatisticSelector(entityRef, scope) {
+    const selector = mkSelectionOptions(entityRef, scope);
+    selector.entityLifecycleStatuses = [
+        entityLifecycleStatuses.ACTIVE,
+        entityLifecycleStatuses.PENDING,
+        entityLifecycleStatuses.REMOVED
+    ];
+
+    return selector;
+}
+
+
 function controller($q,
                     $state,
                     $stateParams,
-                    applicationStore,
                     entityStatisticStore,
                     orgUnitStore,
                     personStore) {
@@ -106,10 +118,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector = {
-            scope: 'CHILDREN',
-            entityReference: vm.parentRef
-        };
+        const selector = mkStatisticSelector(vm.parentRef, 'CHILDREN');
 
         entityStatisticStore
             .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
@@ -128,10 +137,7 @@ function controller($q,
         };
         vm.parentRef = entityReference;
 
-        const selector = {
-            scope: 'CHILDREN',
-            entityReference
-        };
+        const selector = mkStatisticSelector(entityReference, 'CHILDREN');
 
         entityStatisticStore
             .calculateStatTally(vm.statistic.definition, selector)
@@ -168,8 +174,8 @@ function controller($q,
             .then(peers => _.reject(peers, p => p.id === person.id))
             .then(peers => vm.peers = peers);
 
-        applicationStore
-            .findBySelector(selector)
+        entityStatisticStore
+            .findStatAppsByIdSelector(statId, selector)
             .then(apps => vm.applications = apps);
 
         loadHistory();
@@ -193,7 +199,6 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'ApplicationStore',
     'EntityStatisticStore',
     'OrgUnitStore',
     'PersonStore'
