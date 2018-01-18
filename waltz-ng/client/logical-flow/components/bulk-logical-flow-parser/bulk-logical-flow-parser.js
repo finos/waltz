@@ -143,10 +143,14 @@ function controller($q, $scope, serviceBroker) {
             .then(r => _.keyBy(r.data, k => _.toLower(k.assetCode)));
     };
 
-    const loadCodeToDataTypeMap = () => {
+    const loadDataTypeMap = () => {
         return serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
-            .then(r => _.keyBy(r.data, k => _.toLower(k.code)));
+            .then(r => {
+                const dataTypesByCode = _.keyBy(r.data, k => _.toLower(k.code));
+                const dataTypesByName = _.keyBy(r.data, k => _.toLower(k.name));
+                return Object.assign({}, dataTypesByCode, dataTypesByName);
+            });
     };
 
     const isComplete = () => {
@@ -211,12 +215,12 @@ function controller($q, $scope, serviceBroker) {
         vm.loading = true;
         $q.all([
             loadIdentifierToEntityRefMap(),
-            loadCodeToDataTypeMap()
-        ]).then(([entityRefsByAssetCode, dataTypesByCode]) => {
+            loadDataTypeMap()
+        ]).then(([entityRefsByAssetCode, dataTypeMap]) => {
             vm.columnResolvers = {
                 'source': (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
                 'target': (identifier) => resolveEntityRef(entityRefsByAssetCode, 'APPLICATION', identifier),
-                'dataType': (identifier) => resolveEntityRef(dataTypesByCode, 'DATA_TYPE', identifier),
+                'dataType': (identifier) => resolveEntityRef(dataTypeMap, 'DATA_TYPE', identifier),
             };
             return resolveFlows()
                 .then(flows => {
