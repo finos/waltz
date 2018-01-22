@@ -20,6 +20,7 @@
 package com.khartec.waltz.service.data_flow_decorator;
 
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
@@ -41,10 +42,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -229,29 +227,15 @@ public class LogicalFlowDecoratorService {
         Collection decorators = ratingsCalculator.calculate(unrated);
         int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
 
-        List<EntityReference> effectedEntities = logicalFlowDao.findByFlowIds(map(actions, a -> a.flowId()))
+        List<LogicalFlow> effectedFlows = logicalFlowDao.findByFlowIds(map(actions, a -> a.flowId()));
+
+        List<EntityReference> effectedEntities = effectedFlows
                 .stream()
                 .flatMap(f -> Stream.of(f.source(), f.target()))
                 .collect(Collectors.toList());
 
         dataTypeUsageService.recalculateForApplications(effectedEntities);
-
-        List<ChangeLog> logEntries = actions
-                .stream()
-                .map(action -> ImmutableChangeLog.builder()
-                        .parentReference(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, action.flowId()))
-                        .userId(username)
-                        .severity(Severity.INFORMATION)
-                        .message(String.format(
-                                "%s characteristics: %s, for flow: %s",
-                                "bulk added",
-                                action.addedDecorators().toString(),
-                                action.flowId()))
-                        .childKind(EntityKind.LOGICAL_DATA_FLOW)
-                        .operation(Operation.UPDATE)
-                        .build())
-                .collect(Collectors.toList());
-        changeLogService.write(logEntries);
+        bulkAudit(actions, username, effectedFlows);
 
         return added;
     }
@@ -306,7 +290,45 @@ public class LogicalFlowDecoratorService {
                        LogicalFlow flow,
                        String username) {
 
-        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
+        List<ChangeLog> logEntries = mkChangeLogEntries(verb, decorators, flow, username);
+        changeLogService.write(logEntries);
+    }
+
+
+    private void bulkAudit(List<UpdateDataFlowDecoratorsAction> actions, String username, List<LogicalFlow> effectedFlows) {
+        Map<Long, LogicalFlow> effectedFlowsById = effectedFlows
+                .stream()
+                .collect(Collectors.toMap(f -> f.id().get(), f -> f));
+
+        List<ChangeLog> logEntries = actions
+                .stream()
+                .flatMap(action -> {
+                    LogicalFlow flow = effectedFlowsById.get(action.flowId());
+
+                    List<ChangeLog> addedLogEntries = mkChangeLogEntries("Bulk added", action.addedDecorators(), flow, username);
+                    List<ChangeLog> removedLogEntries = mkChangeLogEntries("Bulk removed", action.removedDecorators(), flow, username);
+
+                    return Stream.concat(addedLogEntries.stream(), removedLogEntries.stream());
+                })
+                .collect(Collectors.toList());
+        changeLogService.write(logEntries);
+    }
+
+
+    private List<ChangeLog> mkChangeLogEntries(String verb,
+                                               Collection<EntityReference> decorators,
+                                               LogicalFlow flow,
+                                               String username) {
+        checkNotEmpty(verb, "verb cannot be empty");
+        checkNotNull(decorators, "decorators cannot be null");
+        checkNotNull(flow, "flow cannot be null");
+        checkNotEmpty(username, "username cannot be empty");
+
+        if(isEmpty(decorators)) {
+            return Collections.emptyList();
+        }
+
+        ImmutableChangeLog sourceCL = ImmutableChangeLog.builder()
                 .parentReference(flow.source())
                 .userId(username)
                 .severity(Severity.INFORMATION)
@@ -320,10 +342,8 @@ public class LogicalFlowDecoratorService {
                 .operation(Operation.UPDATE)
                 .build();
 
-        changeLogService.write(logEntry);
-        changeLogService.write(logEntry.withParentReference(flow.target()));
-
+        ImmutableChangeLog targetCL = sourceCL.withParentReference(flow.target());
+        return ListUtilities.newArrayList(sourceCL, targetCL);
     }
 
-    
 }
