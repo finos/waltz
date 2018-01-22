@@ -304,4 +304,21 @@
         </insert>
     </changeSet>
 
+
+    <!-- 2971: EntityStatisticValue: Create index on statistic_id + outcome -->
+    <changeSet id="20180122-2971-1"
+               author="rovats">
+        <comment>2971: EntityStatisticValue: Create index on statistic_id + outcome</comment>
+        <createIndex indexName="idx_esv_statistic_id_outcome"
+                     tableName="entity_statistic_value"
+                     unique="false">
+            <column name="statistic_id"
+                    type="${id.type}">
+            </column>
+            <column name="outcome"
+                    type="VARCHAR(128)">
+            </column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
