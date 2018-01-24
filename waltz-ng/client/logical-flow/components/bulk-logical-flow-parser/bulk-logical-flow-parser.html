@@ -54,12 +54,14 @@
                 </p>
             </div>
 
-            <div ng-if="$ctrl.summary.missingEntities > 0"
+            <div ng-if="$ctrl.summary.errors > 0"
                  class="text-danger">
-                <span ng-bind="$ctrl.summary.missingEntities"></span>
-                identifer<span ng-if="$ctrl.summary.missingEntities > 1">s</span>
+                <span ng-bind="$ctrl.summary.errors"></span>
                 <a class="clickable wbas-inline-link"
-                   ng-click="$ctrl.applyFilter('NOT_FOUND')">not found</a> in Waltz.
+                   ng-click="$ctrl.applyFilter('ERROR')">
+                    error<span ng-if="$ctrl.summary.errors > 1">s</span>
+                </a>
+                found in the imported data.
 
                 Please review below and correct and re-upload file.
 
@@ -69,8 +71,7 @@
                     show all
                 </a>
 
-                <div style="padding: 0.3em;"
-                     class="pull-right">
+                <div class="pull-right">
                     <a class="clickable"
                        ng-click="$ctrl.exportParseErrors()">
                         <waltz-icon name="cloud-download"></waltz-icon>

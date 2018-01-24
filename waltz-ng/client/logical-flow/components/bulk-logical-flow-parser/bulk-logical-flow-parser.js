@@ -21,7 +21,7 @@ import _ from 'lodash';
 import { nest } from "d3-collection";
 import { CORE_API } from '../../../common/services/core-api-utils';
 import { initialiseData } from '../../../common';
-import { refToString, toEntityRef } from '../../../common/entity-utils';
+import { refToString, sameRef, toEntityRef } from '../../../common/entity-utils';
 import { invokeFunction } from '../../../common/index';
 import { downloadTextFile } from '../../../common/file-utils';
 
@@ -106,25 +106,32 @@ function findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets)
 
 function mkParseSummary(data = []) {
     const allParsedRefs = _.flatMap(data, d => [d.source, d.target, d.dataType]);
-    return Object.assign(
+    const summary = Object.assign(
         {
             total: data.length,
             newFlows: 0,
             existingFlows: 0,
             missingEntities: 0,
-            foundEntities: 0
+            foundEntities: 0,
+            circularFlows: 0,
+            nonCircularFlows: data.length
         },
         _.countBy(data, r => r.existing == null ? 'newFlows' : 'existingFlows'),
-        _.countBy(allParsedRefs, p => p.entityRef == null ? 'missingEntities' : 'foundEntities'));
+        _.countBy(allParsedRefs, p => p.entityRef == null ? 'missingEntities' : 'foundEntities'),
+        _.countBy(data, r => r.source.entityRef && r.target.entityRef && sameRef(r.source.entityRef, r.target.entityRef) ? 'circularFlows' : 'nonCircularFlows'));
+
+    summary.errors = summary.missingEntities + summary.circularFlows;
+    return summary;
 }
 
 
 function mkFilterPredicate(criteria) {
     switch (criteria) {
-        case 'NOT_FOUND':
+        case 'ERROR':
             return (r) => r.source.entityRef === null
                 || r.target.entityRef === null
-                || r.dataType.entityRef === null;
+                || r.dataType.entityRef === null
+                || r.source.entityRef && r.target.entityRef && sameRef(r.source.entityRef, r.target.entityRef);
         case 'NEW':
             return (r) => r.existing === null;
         case 'EXISTING':
@@ -132,6 +139,17 @@ function mkFilterPredicate(criteria) {
         default:
             return (r) => true;
     }
+}
+
+
+function parseErrorCount(data = []) {
+    const allParsedRefs = _.flatMap(data, d => [d.source, d.target, d.dataType]);
+    const circularFlowCount = _.sumBy(data, r => r.source.entityRef
+                                        && r.target.entityRef
+                                        && sameRef(r.source.entityRef, r.target.entityRef) ? 1 : 0);
+    const missingEntityRefs =  _.sumBy(allParsedRefs, p => p.entityRef == null ? 1 : 0);
+
+    return missingEntityRefs + circularFlowCount;
 }
 
 
@@ -155,13 +173,7 @@ function controller($q, $scope, serviceBroker) {
     };
 
     const isComplete = () => {
-        const allParsedRefs = _.flatMap(vm.parsedData, d => [d.source, d.target, d.dataType]);
-        return _.every(allParsedRefs, p => p.entityRef != null);
-    };
-
-    const parseErrorCount = (data = []) => {
-        const allParsedRefs = _.flatMap(data, d => [d.source, d.target, d.dataType]);
-        return _.sumBy(allParsedRefs, p => p.entityRef == null ? 1 : 0);
+        return parseErrorCount(vm.parsedData) === 0;
     };
 
     const filterResults = (criteria) => {
@@ -269,7 +281,7 @@ function controller($q, $scope, serviceBroker) {
 
         const dataRows = _
             .chain(vm.filteredData)
-            .filter(mkFilterPredicate('NOT_FOUND'))
+            .filter(mkFilterPredicate('ERROR'))
             .map(flow => {
                 return [
                     _.get(flow.source, 'entityRef.name', flow.source.identifier + ' not found'),
