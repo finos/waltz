@@ -22,10 +22,11 @@ import { nest } from "d3-collection";
 import { CORE_API } from '../../../common/services/core-api-utils';
 import { initialiseData } from '../../../common';
 import { refToString, toEntityRef } from '../../../common/entity-utils';
+import { invokeFunction } from '../../../common/index';
+import { downloadTextFile } from '../../../common/file-utils';
 
 
 import template from './bulk-logical-flow-parser.html';
-import { invokeFunction } from '../../../common/index';
 
 
 const bindings = {
@@ -255,6 +256,33 @@ function controller($q, $scope, serviceBroker) {
 
     vm.applyFilter = (criteria) => {
         vm.filteredData = filterResults(criteria);
+    };
+
+
+    vm.exportParseErrors = () => {
+
+        const header = [
+            "Source",
+            "Target",
+            "Data Type"
+        ];
+
+        const dataRows = _
+            .chain(vm.filteredData)
+            .filter(mkFilterPredicate('NOT_FOUND'))
+            .map(flow => {
+                return [
+                    _.get(flow.source, 'entityRef.name', flow.source.identifier + ' not found'),
+                    _.get(flow.target, 'entityRef.name', flow.target.identifier + ' not found'),
+                    _.get(flow.dataType, 'entityRef.name', flow.dataType.identifier + ' not found')
+                ];
+            })
+            .value();
+
+        const rows = [header]
+            .concat(dataRows);
+
+        downloadTextFile(rows, ",", `logical_flow_errors.csv`);
     };
 }
 
