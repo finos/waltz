@@ -200,7 +200,7 @@ public class EntityStatisticSummaryDao {
                 .select(esvCreatedAtDateOnly, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
                 .from(esv)
                 .where(dsl.renderInlined(condition))
-                .and(mkHistoryDurationCondition(duration))
+                .and(dsl.renderInlined(mkHistoryDurationCondition(duration)))
                 .groupBy(castDateField, esv.STATISTIC_ID, esv.OUTCOME, esv.VALUE)
                 .orderBy(esvCreatedAtDateOnly.asc())
                 .fetch();
@@ -309,8 +309,8 @@ public class EntityStatisticSummaryDao {
         Result<Record3<Date, String, T>> values = dsl
                 .select(esvCreatedAtDateOnly, esv.OUTCOME, aggregateField)
                 .from(esv)
-                .where(condition)
-                .and(mkHistoryDurationCondition(duration))
+                .where(dsl.renderInlined(condition))
+                .and(dsl.renderInlined(mkHistoryDurationCondition(duration)))
                 .groupBy(castDateField, esv.OUTCOME)
                 .orderBy(esvCreatedAtDateOnly.asc())
                 .fetch();
