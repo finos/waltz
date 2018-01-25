@@ -71,11 +71,15 @@ async function findOrAddLogicalFlows(serviceBroker, sourceTargets = []) {
         .key(flow => refToString(flow.target))
         .object(existingLogicalFlows);
 
-    const logicalFlowsToAdd = _.filter(sourceTargets, f => {
-        const sourceRefString = refToString(f.source);
-        const targetRefString = refToString(f.target);
-        return _.get(existingFlowsBySourceByTarget, `[${sourceRefString}][${targetRefString}]`) === undefined;
-    });
+    const logicalFlowsToAdd = _
+        .chain(sourceTargets)
+        .filter(f => {
+            const sourceRefString = refToString(f.source);
+            const targetRefString = refToString(f.target);
+            return _.get(existingFlowsBySourceByTarget, `[${sourceRefString}][${targetRefString}]`) === undefined;
+        })
+        .uniqBy(f => refToString(f.source) + ' ' + refToString(f.target))
+        .value();
 
     const addFlowCmds = _.map(logicalFlowsToAdd, p => ({source: p.source, target: p.target}));
 
