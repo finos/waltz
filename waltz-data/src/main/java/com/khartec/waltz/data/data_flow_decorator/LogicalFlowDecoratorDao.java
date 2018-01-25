@@ -232,7 +232,7 @@ public class LogicalFlowDecoratorDao {
                         .set(record))
                 .toArray(Query[]::new);
         return dsl.batch(queries).execute();
-        // todo: in jOOQ 3.10.0 this can be written as follows
+        // todo: in jOOQ 3.10.0 this can be written as follows #2979
         // return dsl.batchInsert(records).onDuplicateKeyIgnore().execute();
     }
 
