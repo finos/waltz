@@ -28,7 +28,7 @@
                                 column-defs="$ctrl.columnDefs"
                                 entries="$ctrl.rowData"
                                 searchPlaceholderText="Search"
-                                on-initialise="ctrl.onGridInitialise">
+                                on-initialise="$ctrl.onGridInitialise">
         </waltz-grid-with-search>
 
         <waltz-no-data ng-if="$ctrl.rowData.length === 0">

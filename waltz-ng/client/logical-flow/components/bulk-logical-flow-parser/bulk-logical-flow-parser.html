@@ -83,61 +83,14 @@
 
         <br>
 
-        <!-- Table -->
-        <div ng-class="{'waltz-scroll-region-250': $ctrl.filteredData.length > 15 }">
-
-            <table class="table table-condensed small">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Target</th>
-                        <th>Data Type</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr ng-repeat="result in $ctrl.filteredData">
-                        <td>
-                            <waltz-entity-link ng-if="result.source.entityRef"
-                                               entity-ref="result.source.entityRef">
-                            </waltz-entity-link>
-                            <span ng-if="!result.source.entityRef"
-                                  class="text-danger bg-danger">
-                                <strong ng-bind="result.source.identifier"></strong>
-                                <small>not found</small>
-                            </span>
-                        </td>
-                        <td>
-                            <waltz-entity-link ng-if="result.target.entityRef"
-                                               entity-ref="result.target.entityRef">
-                            </waltz-entity-link>
-                            <span ng-if="!result.target.entityRef"
-                                  class="text-danger bg-danger">
-                                <strong ng-bind="result.target.identifier"></strong>
-                                <small>not found</small>
-                            </span>
-                        </td>
-                        <td>
-                            <waltz-entity-link ng-if="result.dataType.entityRef"
-                                               entity-ref="result.dataType.entityRef">
-                            </waltz-entity-link>
-                            <span ng-if="!result.dataType.entityRef"
-                                  class="text-danger bg-danger">
-                                <strong ng-bind="result.dataType.identifier"></strong>
-                                <small>not found</small>
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-if="result.existing === null"
-                                  class="label label-success">New</span>
-                            <span ng-if="result.existing"
-                                  class="label label-warning">Exists</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- Grid -->
+        <waltz-grid-with-search ng-if="$ctrl.filteredData.length > 0"
+                                scope-provider="$ctrl"
+                                column-defs="$ctrl.columnDefs"
+                                entries="$ctrl.filteredData"
+                                searchPlaceholderText="Search"
+                                on-initialise="$ctrl.onGridInitialise">
+        </waltz-grid-with-search>
 
     </div>
 

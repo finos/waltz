@@ -39,6 +39,7 @@ const bindings = {
 
 
 const initialState = {
+    columnDefs: [],
     columnMappings: {},
     filterCriteria: null,
     filteredData: [],
@@ -61,6 +62,46 @@ function resolveEntityRef(entitiesByIdentifier = {}, kind, identifier) {
         identifier,
         entityRef
     };
+}
+
+
+function mkEntityLinkColumnDef(columnHeading, entityRefField, identifierField) {
+    return {
+        field: entityRefField + '.name',
+        displayName: columnHeading,
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-entity-link ng-if="row.entity.${entityRefField}"
+                                   entity-ref="row.entity.${entityRefField}">
+                </waltz-entity-link>
+                <span ng-if="!row.entity.${entityRefField}"
+                      class="text-danger bg-danger">
+                    <strong ng-bind="row.entity.${identifierField}"></strong>
+                    <small>not found</small>
+                </span>
+            </div>`
+    };
+}
+
+
+function mkColumnDefs() {
+    return [
+        mkEntityLinkColumnDef('Source', 'source.entityRef', 'source.identifier'),
+        mkEntityLinkColumnDef('Target', 'target.entityRef', 'target.identifier'),
+        mkEntityLinkColumnDef('Data Type', 'dataType.entityRef', 'dataType.identifier'),
+        {
+            field: 'existing',
+            displayName: '',
+            width: '10%',
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <span ng-if="COL_FIELD === null"
+                          class="label label-success">New</span>
+                    <span ng-if="COL_FIELD"
+                          class="label label-warning">Exists</span>
+                </div>`
+        }
+    ];
 }
 
 
@@ -155,6 +196,8 @@ function parseErrorCount(data = []) {
 
 function controller($q, $scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    vm.columnDefs = mkColumnDefs();
 
     const loadIdentifierToEntityRefMap = () => {
         return serviceBroker
