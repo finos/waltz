@@ -16,34 +16,14 @@
 
         <br>
 
-        <div ng-class="{'waltz-scroll-region-250': $ctrl.flows.length > 15 }">
-            <table class="table table-condensed small">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Target</th>
-                        <th>Data Type</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr ng-repeat="result in $ctrl.flows">
-                        <td>
-                            <waltz-entity-link entity-ref="result.source">
-                            </waltz-entity-link>
-                        </td>
-                        <td>
-                            <waltz-entity-link entity-ref="result.target">
-                            </waltz-entity-link>
-                        </td>
-                        <td>
-                            <waltz-entity-link entity-ref="result.dataType">
-                            </waltz-entity-link>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- Grid -->
+        <waltz-grid-with-search ng-if="$ctrl.flows.length > 0"
+                                scope-provider="$ctrl"
+                                column-defs="$ctrl.columnDefs"
+                                entries="$ctrl.flows"
+                                searchPlaceholderText="Search"
+                                on-initialise="$ctrl.onGridInitialise">
+        </waltz-grid-with-search>
 
     </div>
 

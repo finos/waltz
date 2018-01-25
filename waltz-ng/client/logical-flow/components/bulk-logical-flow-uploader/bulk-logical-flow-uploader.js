@@ -24,6 +24,8 @@ import { nest } from 'd3-collection';
 import { initialiseData } from '../../../common';
 import { invokeFunction } from '../../../common/index';
 import { refToString } from '../../../common/entity-utils';
+import { mkEntityLinkGridCell } from '../../../common/link-utils';
+
 
 import template from './bulk-logical-flow-uploader.html';
 
@@ -37,6 +39,7 @@ const bindings = {
 
 
 const initialState = {
+    columnDefs: [],
     loading: false,
 
     onInitialise: (event) => console.log('default onInitialise handler for bulk-logical-flow-uploader: ', event),
@@ -130,13 +133,19 @@ function controller(serviceBroker) {
         }
     };
 
+
     vm.$onInit = () => {
+        vm.columnDefs = [
+            mkEntityLinkGridCell('Source', 'source'),
+            mkEntityLinkGridCell('Target', 'target'),
+            mkEntityLinkGridCell('Data Type', 'dataType')
+        ];
+
         const api = {
             uploadFlows
         };
         invokeFunction(vm.onInitialise, api);
     };
-
 }
 
 

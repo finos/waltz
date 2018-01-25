@@ -224,7 +224,16 @@ public class LogicalFlowDecoratorDao {
                 .map(TO_RECORD)
                 .collect(toList());
 
-        return dsl.batchInsert(records).execute();
+        Query[] queries = records.stream().map(
+                record -> DSL.using(dsl.configuration())
+                        .insertInto(LOGICAL_FLOW_DECORATOR)
+                        .set(record)
+                        .onDuplicateKeyUpdate()
+                        .set(record))
+                .toArray(Query[]::new);
+        return dsl.batch(queries).execute();
+        // todo: in jOOQ 3.10.0 this can be written as follows #2979
+        // return dsl.batchInsert(records).onDuplicateKeyIgnore().execute();
     }
 
 
