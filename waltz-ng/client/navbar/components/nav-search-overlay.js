@@ -45,6 +45,7 @@ const initialState = {
         'PHYSICAL_SPECIFICATION'
     ],
     selectedCategory: null,
+    showActiveOnly: true,
     results: {},
     filteredResults: []
 };
@@ -140,6 +141,7 @@ function controller($element,
             return {
                 id: r.id,
                 kind: entityKind,
+                entityLifecycleStatus: r.entityLifecycleStatus || 'ACTIVE',
                 name: r.name || r.displayName,
                 qualifier,
                 description: r.description
@@ -148,7 +150,13 @@ function controller($element,
 
         return serviceBroker
             .loadViewData(searchAPI, [ query ])
-            .then(r => vm.results[entityKind] = _.map(r.data, transformResult));
+            .then(r => {
+                vm.results[entityKind] = _
+                    .chain(r.data)
+                    .map(transformResult)
+                    .filter(ref => vm.showActiveOnly ? ref.entityLifecycleStatus === 'ACTIVE' : true)
+                    .value();
+            });
     };
 
 
@@ -192,6 +200,11 @@ function controller($element,
         if(evt.keyCode === ESCAPE_KEYCODE) {
             vm.dismiss();
         }
+    };
+
+    vm.toggleActiveOnly = () => {
+       vm.showActiveOnly = ! vm.showActiveOnly;
+       vm.doSearch();
     };
 }
 

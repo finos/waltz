@@ -15,4 +15,10 @@
                 ng-if="$ctrl.iconPlacement === 'right'"
                 style="color: #332b23;">
     </waltz-icon>
+
+    <span ng-if="$ctrl.entityRef.entityLifecycleStatus !== 'ACTIVE'"
+          class="label label-default"
+          style="padding-bottom: 0.1em; font-size: 9px"
+          ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
+    </span>
 </span>
