@@ -1,14 +1,14 @@
 <a class="clickable no-text-select"
    style="text-decoration: none"
    ng-click="$ctrl.onToggle()">
-    <span ng-if="$ctrl.state">
+    <span ng-show="$ctrl.state">
         <span style="font-size: larger">
             <waltz-icon name="{{ $ctrl.iconOn }}"></waltz-icon>
         </span>
         <span ng-bind="$ctrl.labelOn"></span>
     </span>
 
-    <span ng-if="! $ctrl.state">
+    <span ng-show="! $ctrl.state">
         <span style="font-size: larger">
             <waltz-icon name="{{ $ctrl.iconOff }}"></waltz-icon>
         </span>

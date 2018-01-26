@@ -76,6 +76,13 @@
                     <tr>
                         <th colspan="2">
                             Results
+
+                            <waltz-toggle class="pull-right"
+                                          state="$ctrl.showActiveOnly"
+                                          on-toggle="$ctrl.toggleActiveOnly()"
+                                          label-on="Active only"
+                                          label-off="Active only">
+                            </waltz-toggle>
                         </th>
                     </tr>
                     </thead>
