@@ -158,7 +158,9 @@ function controller($location,
     };
 
     vm.submit = () => {
-        if (confirm('The survey cannot be edited once submitted. Are you sure you want to submit your responses?')) {
+        if (confirm(
+            `The survey cannot be edited once submitted.\nPlease ensure you have saved any comments you may have entered (by clicking 'Save' on each comment field). 
+            \nAre you sure you want to submit your responses?`)) {
             surveyInstanceStore.updateStatus(
                 vm.surveyInstance.id,
                 {newStatus: 'COMPLETED'}
