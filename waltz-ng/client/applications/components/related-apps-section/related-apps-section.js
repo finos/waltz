@@ -19,11 +19,11 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkLinkGridCell} from "../../../common/link-utils";
+import {mkEntityLinkGridCell} from "../../../common/link-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKind} from "../../../common/services/enums";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {getDefaultScopeForEntityKind, mkSelectionOptions} from "../../../common/selector-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {
     allowedRelationshipsByKind,
@@ -43,7 +43,7 @@ const bindings = {
 
 const initialState = {
     columnDefs: [
-        mkLinkGridCell('Name', 'app.name', 'app.id', 'main.app.view'),
+        Object.assign(mkEntityLinkGridCell('Name', 'app'), { width: "25%"} ),
         { field: 'relationshipDisplay', name: 'Relationship'},
         { field: 'app.assetCode'},
         { field: 'app.kindDisplay', name: 'Kind'},
@@ -63,7 +63,7 @@ function mkGridData(relations = [], apps = []) {
     const appsById = _.keyBy(apps, 'id');
 
     return _.map(relations, r => ({
-        relationshipDisplay: relationshipKind[r.relationship],
+        relationshipDisplay: relationshipKind[r.relationship] ? relationshipKind[r.relationship].name : r.relationship,
         app: appsById[r.entity.id]
     }));
 }
@@ -106,7 +106,11 @@ function controller($q,
 
         const appsPromise = serviceBroker.loadViewData(
             CORE_API.ApplicationStore.findBySelector,
-            [ mkSelectionOptions(vm.parentEntityRef) ],
+            [ mkSelectionOptions(
+                vm.parentEntityRef,
+                getDefaultScopeForEntityKind(vm.parentEntityRef.kind),
+                ['ACTIVE', 'PENDING', 'REMOVED'])
+            ],
             { force })
             .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
 

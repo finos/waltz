@@ -37,11 +37,12 @@ export function getDefaultScopeForEntityKind(kind) {
 }
 
 
-export function mkSelectionOptions(entityReference, scope) {
+export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ['ACTIVE']) {
     checkIsEntityRef(entityReference);
 
     return {
         entityReference,
-        scope: scope || getDefaultScopeForEntityKind(entityReference.kind)
+        scope: scope || getDefaultScopeForEntityKind(entityReference.kind),
+        entityLifecycleStatuses
     };
 }
