@@ -73,12 +73,4 @@ public class EntityRelationshipUtilities {
             return Optional.empty();
         }
     }
-
-
-    public static Optional<EntityRelationshipKey> mkEntityRelationshipKey(EntityReference entityA,
-                                                                          EntityReference entityB,
-                                                                          RelationshipKind relationshipKind) {
-        return mkEntityRelationshipKey(entityA, entityB, relationshipKind, true);
-    }
-
 }

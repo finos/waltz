@@ -81,7 +81,7 @@ public class MeasurableRelationshipService {
                           String description) {
 
         Optional<EntityRelationshipKey> entityRelationshipKey =
-                EntityRelationshipUtilities.mkEntityRelationshipKey(entityRefA, entityRefB, relationshipKind);
+                EntityRelationshipUtilities.mkEntityRelationshipKey(entityRefA, entityRefB, relationshipKind, true);
 
         EntityRelationship relationship = entityRelationshipKey
                 .map(erKey -> ImmutableEntityRelationship.builder()
