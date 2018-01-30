@@ -111,7 +111,7 @@ public class ChangeInitiativeService {
                                          EntityRelationshipChangeCommand command,
                                          String username) {
         checkNotNull(command, "command cannot be null");
-        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command);
+        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command, true);
 
         EntityRelationship entityRelationship = ImmutableEntityRelationship.builder()
                 .a(key.a())
@@ -143,7 +143,7 @@ public class ChangeInitiativeService {
                                             EntityRelationshipChangeCommand command,
                                             String username) {
         checkNotNull(command, "command cannot be null");
-        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command);
+        EntityRelationshipKey key = mkEntityRelationshipKey(changeInitiativeId, command, false);
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(String.format(
@@ -162,14 +162,17 @@ public class ChangeInitiativeService {
     }
 
 
-    private EntityRelationshipKey mkEntityRelationshipKey(long changeInitiativeId, EntityRelationshipChangeCommand command) {
+    private EntityRelationshipKey mkEntityRelationshipKey(long changeInitiativeId,
+                                                          EntityRelationshipChangeCommand command,
+                                                          boolean validate) {
         EntityReference entityReference = command.entityReference();
         RelationshipKind relationship = command.relationship();
 
         return EntityRelationshipUtilities.mkEntityRelationshipKey(
             mkRef(CHANGE_INITIATIVE, changeInitiativeId),
             entityReference,
-            relationship)
+            relationship,
+            validate)
             .orElseThrow(() -> new RuntimeException(String.format(
                     "Could not build a valid relationship for kind: %s between %s and %s",
                     relationship,

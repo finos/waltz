@@ -36,11 +36,20 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class EntityRelationshipUtilities {
 
     public static Optional<EntityRelationshipKey> mkEntityRelationshipKey(EntityReference entityA,
-                                                                       EntityReference entityB,
-                                                                       RelationshipKind relationshipKind) {
+                                                                          EntityReference entityB,
+                                                                          RelationshipKind relationshipKind,
+                                                                          boolean validate) {
         checkNotNull(relationshipKind, "relationshipKind cannot be null");
         checkNotNull(entityA, "entityA cannot be null");
         checkNotNull(entityB, "entityB cannot be null");
+
+        if (! validate) {
+            return Optional.of(ImmutableEntityRelationshipKey.builder()
+                    .a(entityA)
+                    .b(entityB)
+                    .relationshipKind(relationshipKind)
+                    .build());
+        }
 
         // given A, B and a relationship kind -> return the valid entity relationship
         Set<Tuple2<EntityKind, EntityKind>> allowedEntityKinds = relationshipKind.getAllowedEntityKinds();
@@ -64,6 +73,4 @@ public class EntityRelationshipUtilities {
             return Optional.empty();
         }
     }
-
-
 }
