@@ -45,10 +45,10 @@ const initialState = {
 function mkGridData(involvements = [], displayNameService) {
     return _.chain(involvements)
         .map(inv => {
-            const roles = _.join(
-                _.map(inv.involvements, ik => displayNameService.lookup('involvementKind', ik.kindId)),
-                ', '
-            );
+            const roles = _.map(inv.involvements, ik => ({
+                    provenance: ik.provenance,
+                    displayName: displayNameService.lookup('involvementKind', ik.kindId)
+                }));
 
             return {
                 person: inv.person,
@@ -145,7 +145,20 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
         },
         { field: 'person.title', displayName: 'Title' },
         { field: 'person.officePhone', displayName: 'Telephone' },
-        { field: 'roles', displayName: 'Roles' }
+        {
+            field: 'roles',
+            displayName: 'Roles',
+            cellTemplate: `
+                <div class="ui-grid-cell-contents"> 
+                    <span ng-repeat="role in COL_FIELD">
+                        <span ng-bind="role.displayName" 
+                              uib-popover="{{ 'Provenance: ' + role.provenance }}"
+                              popover-trigger="mouseenter"
+                              popover-append-to-body="true">
+                        </span><span ng-if="!$last">, </span>
+                    </span>
+                </div>`
+        }
     ];
 
     vm.onGridInitialise = (e) => {
