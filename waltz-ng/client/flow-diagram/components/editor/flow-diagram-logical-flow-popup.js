@@ -18,9 +18,10 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {toGraphId} from "../../flow-diagram-utils";
-import {sameRef} from "../../../common/entity-utils";
+import { initialiseData } from "../../../common";
+import { toGraphId } from "../../flow-diagram-utils";
+import { sameRef, toEntityRef } from "../../../common/entity-utils";
+import { kindToViewState } from "../../../common/link-utils";
 
 /**
  * @name waltz-flow-diagram-logical-flow-popup
@@ -152,9 +153,10 @@ function controller($state) {
         vm.description = description;
         vm.title = `Add ${direction} nodes for ${vm.node.name}`;
         vm.flows = mkFlows(vm.logicalFlows, vm.node, vm.isUpstream, vm.existingEntities);
+
         vm.logicalFlowAdditionUrl = $state.href(
-            'main.logical-flow.edit',
-            {kind: vm.node.kind, id: vm.node.id });
+            kindToViewState(vm.node.kind),
+            { id: vm.node.id });
     };
 
     vm.update = () => {
