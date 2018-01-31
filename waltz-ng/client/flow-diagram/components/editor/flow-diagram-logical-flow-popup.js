@@ -18,9 +18,10 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {toGraphId} from "../../flow-diagram-utils";
-import {sameRef} from "../../../common/entity-utils";
+import { initialiseData } from "../../../common";
+import { toGraphId } from "../../flow-diagram-utils";
+import { sameRef, toEntityRef } from "../../../common/entity-utils";
+import { kindToViewState } from "../../../common/link-utils";
 
 /**
  * @name waltz-flow-diagram-logical-flow-popup
@@ -44,6 +45,7 @@ const initialState = {
     logicalFlows: [],
     existingEntities: [],
     node: null,
+    nodeRef: null,
     isUpstream: true,
     commandProcessor: () => console.log('wfdlfp: default command processor'),
     onDismiss: () => console.log('wfdlfp: default on-dismiss'),
@@ -142,6 +144,10 @@ function controller($state) {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
+        if(vm.node) {
+            vm.nodeRef = toEntityRef(vm.node);
+        }
+
         const description = vm.isUpstream
             ? 'Select upstream nodes from the list below:'
             : 'Select downstream nodes from the list below:';
@@ -152,9 +158,11 @@ function controller($state) {
         vm.description = description;
         vm.title = `Add ${direction} nodes for ${vm.node.name}`;
         vm.flows = mkFlows(vm.logicalFlows, vm.node, vm.isUpstream, vm.existingEntities);
+
+        const viewState = kindToViewState(vm.node.kind);
         vm.logicalFlowAdditionUrl = $state.href(
-            'main.logical-flow.edit',
-            {kind: vm.node.kind, id: vm.node.id });
+            viewState,
+            { id: vm.node.id });
     };
 
     vm.update = () => {
