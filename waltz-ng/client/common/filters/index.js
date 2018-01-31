@@ -17,16 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import IsEmptyFilter from './is-empty-filter';
+import MergeFilter from './merge-filter';
+import ToBasisOffsetFilter from './to-basis-offset-filter';
+import DisplayNameFilter from './display-name-filter';
+import ToDomainFilter from './to-domain-filter';
+import DescriptionFilter from './description-filter';
+import FixedFilter from './fixed-filter';
+import IconNameFilter from './icon-name-filter';
+import TruncateFilter from './truncate-filter';
+import TruncateMiddleFilter from './truncate-middle-filter';
+
+
 export default (module) => {
     module
-        .filter('isEmpty', require('./is-empty-filter'))
-        .filter('merge', require('./merge-filter'))
-        .filter('toBasisOffset', require('./to-basis-offset-filter'))
-        .filter('toDisplayName', require('./display-name-filter'))
-        .filter('toDomain', require('./to-domain-filter'))
-        .filter('toDescription', require('./description-filter'))
-        .filter('toFixed', require('./fixed-filter'))
-        .filter('toIconName', require('./icon-name-filter'))
-        .filter('truncate', require('./truncate-filter'))
-        .filter('truncateMiddle', require('./truncate-middle-filter'));
+        .filter('isEmpty', IsEmptyFilter)
+        .filter('merge', MergeFilter)
+        .filter('toBasisOffset', ToBasisOffsetFilter)
+        .filter('toDisplayName', DisplayNameFilter)
+        .filter('toDomain', ToDomainFilter)
+        .filter('toDescription', DescriptionFilter)
+        .filter('toFixed', FixedFilter)
+        .filter('toIconName', IconNameFilter)
+        .filter('truncate', TruncateFilter)
+        .filter('truncateMiddle', TruncateMiddleFilter);
 };
