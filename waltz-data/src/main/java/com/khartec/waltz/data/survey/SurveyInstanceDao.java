@@ -67,6 +67,8 @@ public class SurveyInstanceDao {
                 .dueDate(record.getDueDate().toLocalDate())
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(record.getSubmittedBy())
+                .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
+                .approvedBy(record.getApprovedBy())
                 .originalInstanceId(record.getOriginalInstanceId())
                 .build();
     };
@@ -140,6 +142,10 @@ public class SurveyInstanceDao {
         record.setOriginalInstanceId(currentInstance.id().get());
         record.setSubmittedAt(Timestamp.valueOf(currentInstance.submittedAt()));
         record.setSubmittedBy(currentInstance.submittedBy());
+        record.setApprovedAt(ofNullable(currentInstance.approvedAt())
+                .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
+                .orElse(null));
+        record.setApprovedBy(currentInstance.approvedBy());
 
         record.store();
         return record.getId();
@@ -187,6 +193,26 @@ public class SurveyInstanceDao {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
                 .set(SURVEY_INSTANCE.SUBMITTED_BY, userName)
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+                .execute();
+    }
+
+
+    public int markApproved(long instanceId, String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.APPROVED_AT, Timestamp.valueOf(nowUtc()))
+                .set(SURVEY_INSTANCE.APPROVED_BY, userName)
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+                .execute();
+    }
+
+
+    public void clearApproved(long instanceId) {
+        dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.APPROVED_AT, (Timestamp) null)
+                .set(SURVEY_INSTANCE.APPROVED_BY, (String) null)
                 .where(SURVEY_INSTANCE.ID.eq(instanceId))
                 .execute();
     }
