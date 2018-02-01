@@ -75,7 +75,7 @@ public class FlowDiagramEndpoint implements Endpoint {
                     getUsername(req));
         };
         DatumRoute<Boolean> deleteByIdRoute = (req, res)
-                -> flowDiagramService.deleteById(getId(req));
+                -> flowDiagramService.deleteById(getId(req), getUsername(req));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
