@@ -90,6 +90,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const markApproved = (id) => {
+        return $http
+            .put(`${base}/${id}/approval`)
+            .then(result => result.data);
+    };
+
     const addRecipient = (id, command) => {
         return $http
             .post(`${base}/${id}/recipient`, command)
@@ -115,7 +121,8 @@ function store($http, baseApiUrl) {
         updateDueDate,
         updateRecipient,
         addRecipient,
-        deleteRecipient
+        deleteRecipient,
+        markApproved
     };
 }
 
@@ -179,6 +186,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: 'updateRecipient',
         description: 'update recipient for a given survey instance id'
+    },
+    markApproved: {
+        serviceName,
+        serviceFnName: 'markApproved',
+        description: 'approve a survey instance response'
     },
     addRecipient: {
         serviceName,

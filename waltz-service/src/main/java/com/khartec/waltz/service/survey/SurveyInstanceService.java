@@ -148,6 +148,7 @@ public class SurveyInstanceService {
                 && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
+            surveyInstanceDao.clearApproved(instanceId);
         }
 
         int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
@@ -186,6 +187,27 @@ public class SurveyInstanceService {
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
                         .message("Survey Instance: due date changed to " + newDueDate)
+                        .build());
+
+        return result;
+    }
+
+
+    public int markApproved(String userName, long instanceId) {
+        checkNotNull(userName, "userName cannot be null");
+
+        SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+
+        checkTrue(surveyInstance.status() == SurveyInstanceStatus.COMPLETED, "Only completed surveys can be approved");
+
+        int result = surveyInstanceDao.markApproved(instanceId, userName);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
+                        .message("Survey Instance: approved")
                         .build());
 
         return result;

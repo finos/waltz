@@ -123,6 +123,16 @@ function controller($state,
         }
     };
 
+    vm.approve = () => {
+        if (confirm('Are you sure you want to approve this survey?')) {
+            surveyInstanceStore.markApproved(vm.surveyInstance.id)
+                .then(result => {
+                    notification.success('Survey response approved');
+                    $state.reload();
+                });
+        }
+    };
+
     vm.viewOtherResponseVersion = (otherVer) => {
         $state.go('main.survey.instance.response.view', {id: otherVer.instanceId});
     };

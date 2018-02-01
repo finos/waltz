@@ -79,6 +79,7 @@
                     <th>Status</th>
                     <th>Issued</th>
                     <th>Due</th>
+                    <th>Approved By</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -103,6 +104,19 @@
                     <td>
                         <waltz-from-now timestamp="completedSurvey.surveyInstance.dueDate">
                         </waltz-from-now>
+                    </td>
+                    <td>
+                        <span ng-if="completedSurvey.surveyInstance.approvedBy">
+                            <span ng-bind="completedSurvey.surveyInstance.approvedBy">
+                            </span>,
+                        </span>
+                        <waltz-from-now class='text-muted'
+                                        ng-if="completedSurvey.surveyInstance.approvedAt"
+                                        timestamp="completedSurvey.surveyInstance.approvedAt">
+                        </waltz-from-now>
+                        <span ng-if="! completedSurvey.surveyInstance.approvedAt">
+                            -
+                        </span>
                     </td>
                 </tr>
                 </tbody>

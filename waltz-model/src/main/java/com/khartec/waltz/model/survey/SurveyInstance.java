@@ -47,5 +47,11 @@ public abstract class SurveyInstance implements IdProvider {
     public abstract String submittedBy();
 
     @Nullable
+    public abstract LocalDateTime approvedAt();
+
+    @Nullable
+    public abstract String approvedBy();
+
+    @Nullable
     public abstract Long originalInstanceId();
 }

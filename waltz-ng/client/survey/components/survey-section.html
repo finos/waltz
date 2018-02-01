@@ -13,8 +13,8 @@
                 <th>Title</th>
                 <th>Description</th>
                 <th>Issued</th>
-                <th>Submitted</th>
                 <th>Submitted By</th>
+                <th>Approved By</th>
             </tr>
             </thead>
             <tbody>
@@ -26,8 +26,27 @@
                 </td>
                 <td><waltz-markdown text="row.surveyRun.description"></waltz-markdown></td>
                 <td><waltz-from-now timestamp="row.surveyRun.issuedOn"></waltz-from-now></td>
-                <td><waltz-from-now timestamp="row.surveyInstance.submittedAt"></waltz-from-now></td>
-                <td><span ng-bind="row.surveyInstance.submittedBy"></span></td>
+                <td>
+                    <span ng-bind="row.surveyInstance.submittedBy">
+                    </span>,
+                    <waltz-from-now class='text-muted'
+                                    timestamp="row.surveyInstance.submittedAt">
+
+                    </waltz-from-now>
+                </td>
+                <td>
+                    <span ng-if="row.surveyInstance.approvedBy">
+                        <span ng-bind="row.surveyInstance.approvedBy">
+                        </span>,
+                    </span>
+                    <waltz-from-now class='text-muted'
+                                    ng-if="row.surveyInstance.approvedAt"
+                                    timestamp="row.surveyInstance.approvedAt">
+                    </waltz-from-now>
+                    <span ng-if="! row.surveyInstance.approvedAt">
+                        -
+                    </span>
+                </td>
             </tr>
             </tbody>
         </table>
