@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntitySvgDiagram.ENTITY_SVG_DIAGRAM;
@@ -54,7 +55,7 @@ public class EntitySvgDiagramDao {
                             .name(r.getName())
                             .description(r.getDescription())
                             .id(r.getId())
-                            .externalId(r.getExternalId())
+                            .externalId(Optional.ofNullable(r.getExternalId()))
                             .svg(r.getSvg())
                             .provenance(r.getProvenance())
                             .build());
