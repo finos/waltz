@@ -22,6 +22,7 @@ package com.khartec.waltz.service.survey;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyQuestionDao;
+import com.khartec.waltz.data.survey.SurveyQuestionDropdownEntryDao;
 import com.khartec.waltz.data.survey.SurveyTemplateDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -36,6 +37,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.ListUtilities.map;
 
 @Service
 public class SurveyTemplateService {
@@ -44,21 +46,26 @@ public class SurveyTemplateService {
     private final PersonDao personDao;
     private final SurveyTemplateDao surveyTemplateDao;
     private final SurveyQuestionDao surveyQuestionDao;
+    private final SurveyQuestionDropdownEntryDao surveyQuestionDropdownEntryDao;
+
 
     @Autowired
     public SurveyTemplateService(ChangeLogService changeLogService,
                                  PersonDao personDao,
                                  SurveyTemplateDao surveyTemplateDao,
-                                 SurveyQuestionDao surveyQuestionDao) {
+                                 SurveyQuestionDao surveyQuestionDao,
+                                 SurveyQuestionDropdownEntryDao surveyQuestionDropdownEntryDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
         checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
+        checkNotNull(surveyQuestionDropdownEntryDao, "surveyQuestionDropdownEntryDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
         this.surveyTemplateDao = surveyTemplateDao;
         this.surveyQuestionDao = surveyQuestionDao;
+        this.surveyQuestionDropdownEntryDao = surveyQuestionDropdownEntryDao;
     }
 
 
@@ -161,11 +168,25 @@ public class SurveyTemplateService {
         // clone questions
         List<SurveyQuestion> sourceQuestions = surveyQuestionDao.findForTemplate(sourceTemplateId);
 
-        sourceQuestions.stream()
-                .map(sq -> ImmutableSurveyQuestion.copyOf(sq)
-                        .withId(Optional.empty())
-                        .withSurveyTemplateId(newTemplateId))
-                .forEach(surveyQuestionDao::create);
+        sourceQuestions
+                .stream()
+                .forEach(sq -> {
+                    SurveyQuestion clonedQuestion = ImmutableSurveyQuestion
+                            .copyOf(sq)
+                            .withId(Optional.empty())
+                            .withSurveyTemplateId(newTemplateId);
+
+                    long id = surveyQuestionDao.create(clonedQuestion);
+
+                    if(sq.fieldType() == SurveyQuestionFieldType.DROPDOWN) {
+                        //clone the entries too
+                        List<SurveyQuestionDropdownEntry> existingEntries = surveyQuestionDropdownEntryDao.findForQuestion(sq.id().get());
+                        List<SurveyQuestionDropdownEntry> clonedEntries = map(
+                                existingEntries,
+                                e -> ImmutableSurveyQuestionDropdownEntry.copyOf(e).withQuestionId(id));
+                        surveyQuestionDropdownEntryDao.saveEntries(id, clonedEntries);
+                    }
+                });
 
         return newTemplateId;
     }
