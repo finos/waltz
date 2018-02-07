@@ -62,8 +62,7 @@ function controller($state,
         .then(sr => vm.surveyRun = sr)
         .then(sr => personStore
             .getById(sr.ownerId)
-            .then(p => vm.owner = p)
-        )
+            .then(p => vm.owner = p))
         .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
         .then(prevVersionInstances => {
             const prevVersions = _.chain(prevVersionInstances)
