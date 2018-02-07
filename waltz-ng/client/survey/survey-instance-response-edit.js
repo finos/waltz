@@ -81,7 +81,10 @@ function controller($location,
 
     instancePromise
         .then(instance => surveyRunStore.getById(instance.surveyRunId))
-        .then(sr => vm.surveyRun = sr);
+        .then(sr => vm.surveyRun = sr)
+        .then(sr => serviceBroker
+            .loadViewData(CORE_API.PersonStore.getById, [sr.ownerId])
+            .then(r => vm.owner = r.data));
 
     surveyQuestionStore
         .findForInstance(id)
