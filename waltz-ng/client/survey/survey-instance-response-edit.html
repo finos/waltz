@@ -97,6 +97,22 @@
             <div class="col-sm-6">
                 <div class="row">
                     <div class="col-sm-4 waltz-display-field-label">
+                        Owner
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="ctrl.owner.displayName"></span>
+                        <span ng-if="! ctrl.owner">
+                            -
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
                         Contact Email
                     </div>
                     <div class="col-sm-8">
