@@ -18,9 +18,11 @@
  */
 
 import _ from 'lodash';
-import template from './app-overview.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
+
+
+import template from './app-overview.html';
 
 
 const bindings = {
@@ -31,6 +33,7 @@ const bindings = {
 const initialState = {
     aliases: [],
     app: null,
+    appGroups: [],
     complexity: null,
     organisationalUnit: null,
     tags: [],
@@ -84,12 +87,21 @@ function controller($state, serviceBroker) {
             .then(r => vm.organisationalUnit = r.data);
     }
 
+    function loadAppGroups() {
+        return serviceBroker
+            .loadAppData(
+                CORE_API.AppGroupStore.findRelatedByApplicationId,
+                [vm.parentEntityRef.id])
+            .then(r => vm.appGroups = r.data);
+    }
+
     vm.$onInit = () => {
         loadApp()
             .then(() => loadComplexity())
             .then(() => loadOrganisationalUnit());
         loadAliases();
         loadTags();
+        loadAppGroups();
     };
 
 
