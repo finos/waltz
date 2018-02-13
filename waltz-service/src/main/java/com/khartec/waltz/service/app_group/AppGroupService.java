@@ -128,6 +128,11 @@ public class AppGroupService {
     }
 
 
+    public List<AppGroup> findRelatedByApplicationAndUser(long appId, String userId) {
+        return appGroupDao.findRelatedByApplicationAndUser(appId, userId);
+    }
+
+
     public List<AppGroup> search(String terms, EntitySearchOptions options) {
         checkNotNull(terms, "terms cannot be null");
         checkNotNull(options, "options cannot be null");

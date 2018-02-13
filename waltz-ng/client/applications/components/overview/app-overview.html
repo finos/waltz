@@ -183,9 +183,24 @@
             </div>
         </div>
 
+        <div class="row"
+             ng-if="$ctrl.appGroups.length > 0">
+            <div class="col-sm-2 waltz-display-field-label">
+                Application Groups
+            </div>
+            <div class="col-sm-10">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="appGroup in $ctrl.appGroups | orderBy:'name'">
+                        <waltz-entity-link entity-ref="appGroup">
+                        </waltz-entity-link>
+                        <span ng-hide="$last">, </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
 
         <!--  TEMPLATES -->
-
         <script type='text/ng-template' id='popup-app-complexity.html'>
             <div>
                 <table class="table small">
