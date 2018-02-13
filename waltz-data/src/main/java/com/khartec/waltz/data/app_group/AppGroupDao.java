@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
@@ -90,6 +91,21 @@ public class AppGroupDao {
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds)
                         .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())))
+                .fetch(TO_DOMAIN);
+    }
+
+
+    public List<AppGroup> findRelatedByApplicationAndUser(long appId, String userId) {
+        SelectConditionStep<Record1<Long>> groupsByUser = DSL
+                .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
+                .from(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+
+        return dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .join(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP.ID.eq(APPLICATION_GROUP_ENTRY.GROUP_ID))
+                .where(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(appId))
+                .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()).or(APPLICATION_GROUP.ID.in(groupsByUser)))
                 .fetch(TO_DOMAIN);
     }
 
