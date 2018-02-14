@@ -22,10 +22,11 @@ import _ from 'lodash';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './person-apps-section.html';
-import {mkSelectionOptions} from "../../../common/selector-utils";
 import {downloadTextFile} from "../../../common/file-utils";
+import {checkIsEntityRef} from "../../../common/checks";
 
+
+import template from './person-apps-section.html';
 
 const bindings = {
     parentEntityRef: '<'
@@ -38,6 +39,17 @@ const initialState = {
     direct: [],
     indirect: []
 };
+
+
+//TODO: use the version in /common/selector-utils as part of #3006
+function mkSelectionOptions(entityReference, scope = 'CHILDREN') {
+    checkIsEntityRef(entityReference);
+
+    return {
+        entityReference,
+        scope
+    };
+}
 
 
 function buildAppInvolvementSummary(apps = [], involvements = [], involvementKinds = []) {
