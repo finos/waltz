@@ -163,7 +163,8 @@ public class SurveyInstanceService {
                             .operation(Operation.UPDATE)
                             .userId(userName)
                             .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
-                            .message("Survey Instance: status changed to " + command.newStatus())
+                            .message("Survey Instance: status changed to " + command.newStatus()
+                                    + command.reason().map(r -> ", [Reason]: " + r).orElse(""))
                             .build());
         }
 
