@@ -1365,8 +1365,8 @@ export function getEnumName(enumValues = {}, key) {
  */
 export function toOptions(lookups = {}, excludeUnknown = false) {
     return _.chain(lookups)
-        .map((v, k) => ({name: v.name, code: k}))
-        .sortBy(o => o.name)
+        .map((v, k) => ({name: v.name, code: k, position: v.position}))
+        .sortBy(['position', 'name'])
         .reject(o => o.code === 'UNKNOWN' && excludeUnknown)
         .value();
 }

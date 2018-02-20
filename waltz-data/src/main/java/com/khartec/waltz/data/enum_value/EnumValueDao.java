@@ -45,6 +45,7 @@ public class EnumValueDao {
                 .name(r.getDisplayName())
                 .description(r.getDescription())
                 .icon(r.getIconName())
+                .position(r.getPosition())
                 .build();
 
     private final DSLContext dsl;

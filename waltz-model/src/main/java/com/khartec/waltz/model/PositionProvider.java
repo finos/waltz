@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,22 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.khartec.waltz.model;
 
-import angular from 'angular';
-import * as EnumValueStore from './services/enum-value-store';
-import EnumValueService from './services/enum-value-service';
-import {registerStores, registerComponents} from '../common/module-utils';
-import EnumValue from './components/enum-value/enum-value'
 
-export default () => {
+public interface PositionProvider {
 
-    const module = angular.module('waltz.enum-value', []);
+    int position();
 
-    module
-        .service('EnumValueService', EnumValueService);
-
-    registerStores(module, [ EnumValueStore ]);
-    registerComponents(module, [ EnumValue ])
-
-    return module.name;
-};
+}
