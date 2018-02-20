@@ -19,6 +19,7 @@
 
 import {
     applicationKind,
+    criticality,
     lifecyclePhase,
     toOptions
 } from "../../common/services/enums";
@@ -133,14 +134,7 @@ export const businessCriticalityField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: [
-            { code: 'LOW', name: 'Low'},
-            { code: 'MEDIUM', name: 'Medium' },
-            { code: 'HIGH', name: 'High' },
-            { code: 'VERY_HIGH', name: 'Very high' },
-            { code: 'NONE', name: 'None' },
-            { code: 'UNKNOWN', name: 'Unknown' }
-        ],
+        options: toOptions(criticality),
         label: 'Business Criticality',
         placeholder: '',
         required: true

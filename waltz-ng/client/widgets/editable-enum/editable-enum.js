@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import { initialiseData } from "../../common/index";
+import { toOptions } from '../../common/services/enums';
+
 import template from './editable-enum.html';
-import {initialiseData} from "../../common/index";
+
 
 const bindings = {
     initialVal: "<",
@@ -38,17 +40,18 @@ const initialState = {
 };
 
 
-function controller(displayNameService) {
+function controller(displayNameService, enumValueService) {
     const vm = initialiseData(this, initialState);
 
 
     vm.$onChanges = () => {
         vm.currentVal = vm.initialVal;
-        global.dns =displayNameService;
-        const enumValuesMap = displayNameService.lookupsByType[vm.enumKind];
-        global.evm = enumValuesMap;
 
-        vm.enumValues = _.map(enumValuesMap, (v,k) => ({ code: k, name: v }));
+        if (vm.enumKind) {
+            enumValueService
+                .loadEnums()
+                .then(d => vm.enumValues = toOptions( d[vm.enumKind]));
+        }
     };
 
     vm.onEdit = () => {
@@ -73,7 +76,10 @@ function controller(displayNameService) {
 
 }
 
-controller.$inject = ['DisplayNameService'];
+controller.$inject = [
+    'DisplayNameService',
+    'EnumValueService'
+];
 
 
 const component = {

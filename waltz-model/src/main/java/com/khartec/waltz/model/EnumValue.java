@@ -30,7 +30,8 @@ import org.immutables.value.Value;
 public abstract class EnumValue implements
         IconProvider,
         DescriptionProvider,
-        NameProvider {
+        NameProvider,
+        PositionProvider {
 
     public abstract String type();
     public abstract String key();
