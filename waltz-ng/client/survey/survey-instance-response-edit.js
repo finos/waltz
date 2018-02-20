@@ -22,9 +22,11 @@ import {groupQuestions} from "./survey-utils";
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 
 const initialState = {
+    changeLogSection: dynamicSections.changeLogSection,
     isUserInstanceRecipient: false,
     instanceCanBeEdited: false,
     surveyInstance: {},
@@ -70,6 +72,11 @@ function controller($location,
     const vm = initialiseData(this, initialState);
 
     const id = $stateParams.id;
+
+    vm.entityReference = {
+        id,
+        kind: 'SURVEY_INSTANCE'
+    };
 
     const instancePromise  = surveyInstanceStore
         .getById(id)
