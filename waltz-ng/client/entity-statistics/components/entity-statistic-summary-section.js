@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {resetData} from "../../common";
+import {entityLifecycleStatuses, resetData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 
@@ -53,7 +53,14 @@ function controller(serviceBroker) {
             vm.activeSummary = vm.summaries[d.id];
         } else {
             vm.loading = true;
-            const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+            const selectionOptions = mkSelectionOptions(
+                vm.parentEntityRef,
+                null,
+                [
+                    entityLifecycleStatuses.ACTIVE,
+                    entityLifecycleStatuses.PENDING,
+                    entityLifecycleStatuses.REMOVED
+                ]);
             serviceBroker
                 .loadViewData(CORE_API.EntityStatisticStore.findStatTallies, [[d.id], selectionOptions])
                 .then(result => {
