@@ -23,7 +23,10 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -156,7 +159,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
         return dsl.select(measurableRating.ENTITY_ID)
                 .from(measurableRating)
                 .innerJoin(app)
-                    .on(app.ID.eq(flowDiagram.ENTITY_ID))
+                    .on(app.ID.eq(measurableRating.ENTITY_ID))
                 .where(measurableRating.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())))
                 .and(measurableRating.MEASURABLE_ID.in(measurableSelector))
                 .and(app.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
