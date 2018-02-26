@@ -17,11 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {entityLifecycleStatuses, resetData} from "../common";
-import {kindToViewState} from "../common/link-utils";
-import {mkSelectionOptions} from "../common/selector-utils";
-import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
-import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
+import { entityLifecycleStatuses, resetData } from "../common";
+import { kindToViewState } from "../common/link-utils";
+import { mkSelectionOptions } from "../common/selector-utils";
+import { hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload } from "./utilities";
+import { dynamicSections } from '../dynamic-section/dynamic-section-definitions';
+import { CORE_API } from '../common/services/core-api-utils';
+
+
 import template from './entity-statistic-view.html';
 
 
@@ -72,8 +75,7 @@ function controller($q,
                     $state,
                     $stateParams,
                     entityStatisticUtilities,
-                    entityStatisticStore,
-                    orgUnitStore) {
+                    serviceBroker) {
     const vm = resetData(this, initData);
 
     const statId = $stateParams.statId;
@@ -85,8 +87,9 @@ function controller($q,
         kind: 'ENTITY_STATISTIC'
     };
 
-    const definitionPromise = entityStatisticStore
-        .findRelatedStatDefinitions(statId)
+    const definitionPromise = serviceBroker
+        .loadViewData(CORE_API.EntityStatisticStore.findRelatedStatDefinitions, [statId])
+        .then(r => r.data)
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self)
         .then(() => vm.statRef = Object.assign({}, vm.statRef, { name: vm.statistic.definition.name }))
@@ -96,13 +99,13 @@ function controller($q,
         .findAllForKind(entityKind, entityId)
         .then(xs => vm.navItems = xs);
 
-    const allDefinitionsPromise = entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(ds => vm.allDefinitions = ds);
+    const allDefinitionsPromise = serviceBroker
+        .loadViewData(CORE_API.EntityStatisticStore.findAllActiveDefinitions, [])
+        .then(r => vm.allDefinitions = r.data);
 
-    const orgUnitsPromise = orgUnitStore
-        .findAll()
-        .then(os => vm.orgUnits = os);
+    const orgUnitsPromise = serviceBroker
+        .loadAppData(CORE_API.OrgUnitStore.findAll, [])
+        .then(r => vm.orgUnits = r.data);
 
     $q.all([navItemPromise, definitionPromise])
         .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })))
@@ -120,9 +123,11 @@ function controller($q,
     function loadHistory() {
         const selector = mkStatisticSelector(vm.parentRef);
 
-        entityStatisticStore
-            .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
-            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.calculateHistoricStatTally,
+                [vm.statistic.definition, selector, vm.duration])
+            .then(r => vm.history = mkHistory(r.data, vm.statistic.summary));
     }
 
 
@@ -142,10 +147,12 @@ function controller($q,
 
         const selector = mkStatisticSelector(entityReference);
 
-        entityStatisticStore
-            .calculateStatTally(vm.statistic.definition, selector)
-            .then(summary => {
-                vm.statistic.summary = summary;
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.calculateStatTally,
+                [vm.statistic.definition, selector])
+            .then(r => {
+                vm.statistic.summary = r.data;
                 vm.reloading = false;
             })
             .then(() => vm.history = mkHistory(vm.history, vm.statistic.summary))
@@ -157,17 +164,25 @@ function controller($q,
                     .map('id')
                     .value();
 
-                return entityStatisticStore.findStatTallies(relatedIds, selector);
+                return serviceBroker
+                    .loadViewData(
+                        CORE_API.EntityStatisticStore.findStatTallies,
+                        [relatedIds, selector])
+                    .then(r => r.data)
             })
             .then(summaries => vm.summaries = summaries);
 
-        entityStatisticStore
-            .findStatValuesByIdSelector(statId, selector)
-            .then(stats => vm.statistic.values = stats);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.findStatValuesByIdSelector,
+                [statId, selector])
+            .then(r => vm.statistic.values = r.data);
 
-        entityStatisticStore
-            .findStatAppsByIdSelector(statId, selector)
-            .then(apps => vm.applications = apps);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.findStatAppsByIdSelector,
+                [statId, selector])
+            .then(r => vm.applications = r.data);
 
         loadHistory();
 
@@ -196,8 +211,7 @@ controller.$inject = [
     '$state',
     '$stateParams',
     'EntityStatisticUtilities',
-    'EntityStatisticStore',
-    'OrgUnitStore'
+    'ServiceBroker'
 ];
 
 

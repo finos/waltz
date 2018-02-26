@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
+import { CORE_API } from '../../common/services/core-api-utils';
 
 
 /**
@@ -33,33 +34,30 @@ function filterBySameMeasurableCategory(all, id) {
 }
 
 
-function utils(appGroupStore,
-               changeInitiativeStore,
-               flowDiagramStore,
-               measurableStore,
-               orgUnitStore) {
+function utils(serviceBroker) {
 
     const findAllForKind = (kind, id /* optional */) => {
         switch (kind) {
             case 'APP_GROUP':
-                return appGroupStore
-                    .findMyGroupSubscriptions()
-                    .then(gs => _.map(gs, 'appGroup'));
+                return serviceBroker
+                    .loadViewData(CORE_API.AppGroupStore.findMyGroupSubscriptions, [])
+                    .then(r => _.map(r.data, 'appGroup'));
             case 'MEASURABLE':
-                return measurableStore
-                    .findAll()
-                    .then(all => filterBySameMeasurableCategory(all, id));
+                return serviceBroker
+                    .loadAppData(CORE_API.MeasurableStore.findAll, [])
+                    .then(r => filterBySameMeasurableCategory(r.data, id));
             case 'ORG_UNIT':
-                return orgUnitStore
-                    .findAll();
+                return serviceBroker
+                    .loadAppData(CORE_API.OrgUnitStore.findAll, [])
+                    .then(r => r.data);
             case 'FLOW_DIAGRAM':
-                return flowDiagramStore
-                    .getById(id)
-                    .then(fd => [fd]);
+                return serviceBroker
+                    .loadViewData(CORE_API.FlowDiagramStore.getById, [id])
+                    .then(r => [r.data]);
             case 'CHANGE_INITIATIVE':
-                return changeInitiativeStore
-                    .getById(id)
-                    .then(ci => [ci]);
+                return serviceBroker
+                    .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
+                    .then(r => [r.data]);
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;
         }
@@ -72,11 +70,7 @@ function utils(appGroupStore,
 
 
 utils.$inject = [
-    'AppGroupStore',
-    'ChangeInitiativeStore',
-    'FlowDiagramStore',
-    'MeasurableStore',
-    'OrgUnitStore'
+    'ServiceBroker'
 ];
 
 
