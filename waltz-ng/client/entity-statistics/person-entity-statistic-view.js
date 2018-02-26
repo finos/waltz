@@ -17,14 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {entityLifecycleStatuses, resetData} from "../common";
-import {mkSelectionOptions} from "../common/selector-utils";
-import {hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload} from "./utilities";
+import { entityLifecycleStatuses, resetData } from "../common";
+import { mkSelectionOptions } from "../common/selector-utils";
+import { hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload } from "./utilities";
+import { dynamicSections } from '../dynamic-section/dynamic-section-definitions';
+import { CORE_API } from '../common/services/core-api-utils';
+
+
+import template from './person-entity-statistic-view.html';
 
 
 const initData = {
     allDefinitions: [],
     applications: [],
+    bookmarkSection: dynamicSections.bookmarksSection,
     orgUnits: [],
     statistic: {
         definition: null,
@@ -44,10 +50,6 @@ const initData = {
     },
     reloading: false
 };
-
-
-import template from './person-entity-statistic-view.html';
-
 
 
 function mkHistory(history = [], current) {
@@ -72,36 +74,36 @@ function mkStatisticSelector(entityRef, scope) {
 function controller($q,
                     $state,
                     $stateParams,
-                    entityStatisticStore,
-                    orgUnitStore,
-                    personStore) {
+                    serviceBroker) {
 
     const vm = resetData(this, initData);
     const statId = $stateParams.statId;
     const personId = $stateParams.id;
 
-    const personPromise = personStore
-        .getById(personId);
+    const personPromise = serviceBroker
+        .loadViewData(CORE_API.PersonStore.getById, [personId])
+        .then(r => r.data);
 
     vm.statRef = {
         id: statId,
         kind: 'ENTITY_STATISTIC'
     };
 
-    const definitionPromise = entityStatisticStore
-        .findRelatedStatDefinitions(statId)
+    const definitionPromise = serviceBroker
+        .loadViewData(CORE_API.EntityStatisticStore.findRelatedStatDefinitions, [statId])
+        .then(r => r.data)
         .then(ds => vm.relatedDefinitions = ds)
         .then(ds => vm.statistic.definition = ds.self)
         .then(() => vm.statRef = Object.assign({}, vm.statRef, { name: vm.statistic.definition.name }))
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
-    const allDefinitionsPromise = entityStatisticStore
-        .findAllActiveDefinitions()
-        .then(ds => vm.allDefinitions = ds);
+    const allDefinitionsPromise = serviceBroker
+        .loadViewData(CORE_API.EntityStatisticStore.findAllActiveDefinitions, [])
+        .then(r => vm.allDefinitions = r.data);
 
-    const orgUnitsPromise = orgUnitStore
-        .findAll()
-        .then(os => vm.orgUnits = os);
+    const orgUnitsPromise = serviceBroker
+        .loadViewData(CORE_API.OrgUnitStore.findAll, [])
+        .then(r => vm.orgUnits = r.data);
 
     $q.all([personPromise, definitionPromise])
         .then(([person, definitions]) => vm.onSelectPerson(person))
@@ -120,9 +122,11 @@ function controller($q,
     function loadHistory() {
         const selector = mkStatisticSelector(vm.parentRef, 'CHILDREN');
 
-        entityStatisticStore
-            .calculateHistoricStatTally(vm.statistic.definition, selector, vm.duration)
-            .then(h => vm.history = mkHistory(h, vm.statistic.summary));
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.calculateHistoricStatTally,
+                [vm.statistic.definition, selector, vm.duration])
+            .then(r => vm.history = mkHistory(r.data, vm.statistic.summary));
     }
 
     vm.onSelectPerson = (person) => {
@@ -139,10 +143,12 @@ function controller($q,
 
         const selector = mkStatisticSelector(entityReference, 'CHILDREN');
 
-        entityStatisticStore
-            .calculateStatTally(vm.statistic.definition, selector)
-            .then(summary => {
-                vm.statistic.summary = summary;
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.calculateStatTally,
+                [vm.statistic.definition, selector])
+            .then(r => {
+                vm.statistic.summary = r.data;
                 vm.reloading = false;
             })
             .then(() => {
@@ -153,30 +159,37 @@ function controller($q,
                     .map('id')
                     .value();
 
-                return entityStatisticStore.findStatTallies(relatedIds, selector);
+                return serviceBroker
+                    .loadViewData(CORE_API.EntityStatisticStore.findStatTallies, [relatedIds, selector])
+                    .then(r => r.data)
             })
             .then(summaries => vm.summaries = summaries);
 
-        entityStatisticStore
-            .findStatValuesByIdSelector(statId, selector)
-            .then(stats => vm.statistic.values = stats);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.findStatValuesByIdSelector,
+                [statId, selector])
+            .then(r => vm.statistic.values = r.data);
 
-        personStore
-            .findDirects(person.employeeId)
-            .then(directs => vm.directs = directs);
+        serviceBroker
+            .loadViewData(CORE_API.PersonStore.findDirects, [person.employeeId])
+            .then(r => vm.directs = r.data);
 
-        personStore
-            .findManagers(person.employeeId)
-            .then(managers => vm.managers = managers);
+        serviceBroker
+            .loadViewData(CORE_API.PersonStore.findManagers, [person.employeeId])
+            .then(r => vm.managers = r.data);
 
-        personStore
-            .findDirects(person.managerEmployeeId)
+        serviceBroker
+            .loadViewData(CORE_API.PersonStore.findDirects, [person.managerEmployeeId])
+            .then(r => r.data)
             .then(peers => _.reject(peers, p => p.id === person.id))
             .then(peers => vm.peers = peers);
 
-        entityStatisticStore
-            .findStatAppsByIdSelector(statId, selector)
-            .then(apps => vm.applications = apps);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityStatisticStore.findStatAppsByIdSelector,
+                [statId, selector])
+            .then(r => vm.applications = r.data);
 
         loadHistory();
 
@@ -199,9 +212,7 @@ controller.$inject = [
     '$q',
     '$state',
     '$stateParams',
-    'EntityStatisticStore',
-    'OrgUnitStore',
-    'PersonStore'
+    'ServiceBroker'
 ];
 
 
