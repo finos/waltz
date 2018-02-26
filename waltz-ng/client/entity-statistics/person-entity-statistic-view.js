@@ -102,7 +102,7 @@ function controller($q,
         .then(r => vm.allDefinitions = r.data);
 
     const orgUnitsPromise = serviceBroker
-        .loadViewData(CORE_API.OrgUnitStore.findAll, [])
+        .loadAppData(CORE_API.OrgUnitStore.findAll, [])
         .then(r => vm.orgUnits = r.data);
 
     $q.all([personPromise, definitionPromise])

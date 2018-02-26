@@ -44,11 +44,11 @@ function utils(serviceBroker) {
                     .then(r => _.map(r.data, 'appGroup'));
             case 'MEASURABLE':
                 return serviceBroker
-                    .loadViewData(CORE_API.MeasurableStore.findAll, [])
+                    .loadAppData(CORE_API.MeasurableStore.findAll, [])
                     .then(r => filterBySameMeasurableCategory(r.data, id));
             case 'ORG_UNIT':
                 return serviceBroker
-                    .loadViewData(CORE_API.OrgUnitStore.findAll, [])
+                    .loadAppData(CORE_API.OrgUnitStore.findAll, [])
                     .then(r => r.data);
             case 'FLOW_DIAGRAM':
                 return serviceBroker
