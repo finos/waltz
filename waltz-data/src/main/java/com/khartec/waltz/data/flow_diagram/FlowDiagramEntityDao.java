@@ -136,7 +136,7 @@ public class FlowDiagramEntityDao {
     public int deleteForDiagram(long diagramId) {
         return dsl.deleteFrom(FLOW_DIAGRAM_ENTITY)
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notEqual(EntityKind.MEASURABLE.name()))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
                 .execute();
     }
 
