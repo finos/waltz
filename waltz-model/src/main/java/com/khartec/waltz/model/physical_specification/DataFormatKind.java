@@ -19,6 +19,11 @@
 
 package com.khartec.waltz.model.physical_specification;
 
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.common.EnumUtilities;
+
+import java.util.function.Function;
+
 /**
  * How an specification manifests itself 'physically'.
  * <p/>
@@ -36,6 +41,20 @@ public enum DataFormatKind {
     OTHER,
     UNSTRUCTURED,
     UNKNOWN,
-    XML
+    XML;
 
+
+    private static final Aliases<DataFormatKind> defaultAliases = new Aliases<>()
+            .register(DataFormatKind.FLAT_FILE,
+                    "CSV_FILE", "CSV", "EXCEL", "PDF", "EXCEL/PDF",
+                    "FILE", "TEXT", "XL", "XLS", "XLM", "PIPE DELIMITED")
+            .register(DataFormatKind.DATABASE, "DATA")
+            .register(DataFormatKind.UNSTRUCTURED, "EMAIL", "STRING", "TXT")
+            .register(DataFormatKind.OTHER, "OTHER", "JOB_ROW_CRM")
+            .register(DataFormatKind.XML, "Webservice");
+
+
+    public static DataFormatKind parse(String value, Function<String, DataFormatKind> failedParseSupplier) {
+        return EnumUtilities.parseEnumWithAliases(value, DataFormatKind.class, failedParseSupplier, defaultAliases);
+    }
 }

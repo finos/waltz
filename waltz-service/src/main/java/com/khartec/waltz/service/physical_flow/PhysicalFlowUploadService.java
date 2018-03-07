@@ -6,14 +6,12 @@ import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.CriticalityKindParser;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
-import com.khartec.waltz.model.physical_specification.DataFormatKindParser;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -39,10 +37,6 @@ public class PhysicalFlowUploadService {
     private Map<String, Application> applicationsByAssetCode;
     private Map<String, Actor> actorsByNameMap;
 
-    private final TransportKindParser transportKindKindParser = new TransportKindParser();
-    private final FrequencyKindParser frequencyKindParser = new FrequencyKindParser();
-    private final DataFormatKindParser dataFormatKindParser = new DataFormatKindParser();
-    private final CriticalityKindParser criticalityKindParser = new CriticalityKindParser();
     private final Pattern basisOffsetRegex = Pattern.compile("T?(?<offset>[\\+\\-]?\\d+)");
 
 
@@ -72,14 +66,11 @@ public class PhysicalFlowUploadService {
         Checks.checkNotNull(cmds, "cmds cannot be empty");
 
         // load application and actor maps
-        time("PFUS.loadMaps", () -> {
-            loadMaps();
-            return null;
-        });
+        loadMaps();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowValidateCommandResponse> parsedFlows = cmds.stream()
-                .map(cmd -> validate(cmd))
+                .map(cmd -> validateCommand(cmd))
                 .collect(Collectors.toList());
 
         // enumerate and locate an existing physical flows that exist - iff no parse errors
@@ -89,21 +80,18 @@ public class PhysicalFlowUploadService {
 
         // no parse errors - check for duplicates
         List<PhysicalFlowValidateCommandResponse> responses = parsedFlows.stream()
-                .map(f -> {
-                    PhysicalFlow match = physicalFlowDao.getByParsedFlow(f.parsedFlow());
-                    return match != null
-                            ? ImmutablePhysicalFlowValidateCommandResponse
+                .map(f -> Optional.ofNullable(physicalFlowDao.getByParsedFlow(f.parsedFlow()))
+                    .map(m -> (PhysicalFlowValidateCommandResponse) ImmutablePhysicalFlowValidateCommandResponse
                             .copyOf(f)
-                            .withEntityReference(match.entityReference())
-                            : f;
-                })
+                            .withEntityReference(m.entityReference()))
+                    .orElse(f))
                 .collect(Collectors.toList());
 
         return responses;
     }
 
 
-    private PhysicalFlowValidateCommandResponse validate(PhysicalFlowValidateCommand cmd) {
+    private PhysicalFlowValidateCommandResponse validateCommand(PhysicalFlowValidateCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
         Map<String, String> errors = new HashMap<>();
@@ -127,22 +115,22 @@ public class PhysicalFlowUploadService {
 
 
         // resolve enums - format, frequency, transport, criticality
-        DataFormatKind format = dataFormatKindParser.parse(cmd.format(), null);
+        DataFormatKind format = DataFormatKind.parse(cmd.format(), (s) -> null);
         if (format == null) {
             errors.put("format", String.format("%s is not a recognised value", cmd.format()));
         }
 
-        FrequencyKind frequency = frequencyKindParser.parse(cmd.frequency(), null);
+        FrequencyKind frequency = FrequencyKind.parse(cmd.frequency(), (s) -> null);
         if (frequency == null) {
             errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
         }
 
-        TransportKind transport = transportKindKindParser.parse(cmd.transport(), null);
+        TransportKind transport = TransportKind.parse(cmd.transport(), (s) -> null);
         if (transport == null) {
             errors.put("transport", String.format("%s is not a recognised value", cmd.transport()));
         }
 
-        Criticality criticality = criticalityKindParser.parse(cmd.criticality(), null);
+        Criticality criticality = Criticality.parse(cmd.criticality(), (s) -> null);
         if (criticality == null) {
             errors.put("criticality", String.format("%s is not a recognised value", cmd.criticality()));
         }

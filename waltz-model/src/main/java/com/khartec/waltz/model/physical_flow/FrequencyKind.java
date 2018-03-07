@@ -19,6 +19,11 @@
 
 package com.khartec.waltz.model.physical_flow;
 
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.common.EnumUtilities;
+
+import java.util.function.Function;
+
 /**
  * Represents the frequency a data flow is 'activated'
  * <p/>
@@ -37,5 +42,22 @@ public enum FrequencyKind {
     QUARTERLY,
     BIANNUALLY,
     YEARLY,
-    UNKNOWN
+    UNKNOWN;
+
+
+    private static final Aliases<FrequencyKind> defaultAliases = new Aliases<>()
+            .register(FrequencyKind.YEARLY, "ANNUALLY")
+            .register(FrequencyKind.BIANNUALLY, "BIANNUAL", "BIANUALY")
+            .register(FrequencyKind.DAILY, "DAILY-WEEKDAYS")
+            .register(FrequencyKind.INTRA_DAY, "INTRADAY")
+            .register(FrequencyKind.ON_DEMAND, "PER REQUEST", "REQUEST BASIS", "AD HOC", "ON REQUEST")
+            .register(FrequencyKind.MONTHLY, "MONTHLY")
+            .register(FrequencyKind.QUARTERLY, "QUARTERLY")
+            .register(FrequencyKind.WEEKLY)
+            .register(FrequencyKind.REAL_TIME, "REAL", "REALTIME", "REAL-TIME");
+
+
+    public static FrequencyKind parse(String value, Function<String, FrequencyKind> failedParseSupplier) {
+        return EnumUtilities.parseEnumWithAliases(value, FrequencyKind.class, failedParseSupplier, defaultAliases);
+    }
 }

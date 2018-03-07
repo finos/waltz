@@ -24,6 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 
@@ -118,5 +119,16 @@ public class StringUtilities {
         return Arrays.stream(str.split(separator))
                 .map(itemTransformer)
                 .collect(toList());
+    }
+
+
+    public static List<String> tokenise(String value) {
+        checkNotNull(value, "value cannot be null");
+
+        String[] split = value.split(" ");
+
+        return Stream.of(split)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 }
