@@ -24,6 +24,7 @@ import com.khartec.waltz.model.SetAttributeCommand;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import com.khartec.waltz.service.physical_flow.PhysicalFlowUploadService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -36,6 +37,8 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -49,15 +52,19 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
+    private final PhysicalFlowUploadService physicalFlowUploadService;
 
 
     @Autowired
     public PhysicalFlowEndpoint(PhysicalFlowService physicalFlowService,
+                                PhysicalFlowUploadService physicalFlowUploadService,
                                 UserRoleService userRoleService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+        checkNotNull(physicalFlowUploadService, "physicalFlowUploadService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.physicalFlowService = physicalFlowService;
+        this.physicalFlowUploadService = physicalFlowUploadService;
         this.userRoleService = userRoleService;
     }
 
@@ -127,6 +134,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 ":id",
                 "attribute");
 
+        String validateUploadPath = mkPath(
+                BASE_URL,
+                "upload",
+                "validate");
+
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
 
@@ -173,6 +185,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForDatum(createPath, this::createFlow);
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
         postForDatum(updateAttributePath, this::updateAttribute);
+        postForDatum(validateUploadPath, this::validateUpload);
 
         deleteForDatum(deletePath, this::deleteFlow);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
@@ -222,6 +235,13 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 .build();
 
         return physicalFlowService.delete(deleteCommand, username);
+    }
+
+
+    private List<PhysicalFlowValidateCommandResponse> validateUpload(Request request, Response response) throws IOException {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        List<PhysicalFlowValidateCommand> commands = Arrays.asList(readBody(request, PhysicalFlowValidateCommand[].class));
+        return physicalFlowUploadService.validate(commands);
     }
 
 

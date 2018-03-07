@@ -21,10 +21,7 @@ package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.physical_flow.FrequencyKind;
-import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_flow.TransportKind;
+import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -146,6 +143,40 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()));
 
         return findByCondition(sameFlow);
+    }
+
+
+    public PhysicalFlow getByParsedFlow(PhysicalFlowParsed flow) {
+        Condition attributesMatch = PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset())
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().name()))
+                .and(PHYSICAL_FLOW.IS_REMOVED.isFalse());
+
+        Condition logicalFlowMatch = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
+
+        Condition specMatch = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id())
+                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
+                .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
+                .and(PHYSICAL_SPECIFICATION.NAME.eq(flow.name()))
+                .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
+
+
+        PhysicalFlow match = dsl
+                .select(PHYSICAL_FLOW.fields())
+                .from(PHYSICAL_FLOW)
+                .join(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .join(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(logicalFlowMatch)
+                .and(specMatch)
+                .and(attributesMatch)
+                .fetchOne(TO_DOMAIN_MAPPER);
+
+        return match;
     }
 
 
