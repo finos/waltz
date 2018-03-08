@@ -20,6 +20,8 @@
 import angular from 'angular';
 
 import {registerComponents, registerStore} from '../common/module-utils';
+
+import BulkPhysicalFlowParser from './components/bulk-physical-flow-parser/bulk-physical-flow-parser';
 import * as PhysicalFlowStore from './service/physical-flow-store';
 import PhysicalFlowEditor from './components/flow-editor/physical-flow-editor';
 import PhysicalFlowCloneSelector from './components/register/clone/physical-flow-clone-selector';
@@ -42,7 +44,11 @@ function setup() {
         .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
         .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'));
 
+
+
+
     registerComponents(module, [
+        BulkPhysicalFlowParser,
         PhysicalFlowCloneSelector,
         PhysicalFlowEditor,
         PhysicalFlowOverview,

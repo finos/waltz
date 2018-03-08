@@ -18,14 +18,15 @@
  */
 
 import _ from 'lodash';
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 function controller(notification,
                     svgDiagramStore,
-                    $element) {
+                    $element,
+                    serviceBroker) {
 
     const vm = Object.assign(this, {});
-
 
     const logicalFlowFields = [
         {name: 'id', required: false},
@@ -37,6 +38,26 @@ function controller(notification,
         {name: 'lastAttestedBy', required: false},
         {name: 'isRemoved', required: false},
         {name: 'provenance', required: false},
+    ];
+
+    const physicalSpecFields = [
+        {name: 'id', required: false},
+        {name: 'owner', required: true},
+        {name: 'externalId', required: true},
+        {name: 'name', required: true},
+        {name: 'format', required: true},
+        {name: 'description', required: false},
+        {name: 'provenance', required: false}
+    ];
+
+    const physicalFlowFields = [
+        {name: 'id', required: false},
+        {name: 'basisOffset', required: true},
+        {name: 'frequency', required: true},
+        {name: 'transport', required: true},
+        {name: 'criticality', required: true},
+        {name: 'description', required: false},
+        {name: 'provenance', required: false}
     ];
 
     vm.sourceColumns = ['aS', 'bS', 'cS', 'dS'];
@@ -223,15 +244,26 @@ function controller(notification,
     };
 
     vm.columnMappings = {
-        from_app_nar: {name: 'source', required: true},
-        'Target code': {name: 'target', required: true},
-        'Data Types': {name: 'dataType', required: true},
-        'Source Pr': {name: 'provenance', required: false},
+        'source nar': {name: 'source', required: true},
+        'target nar': {name: 'target', required: true},
+        'name': {name: 'name', required: true},
+        'external id': {name: 'externalId', required: true},
+        'description': {name: 'description', required: true},
+        'frequency': {name: 'frequency', required: true},
+        'basis': {name: 'basisOffset', required: true},
+        'format': {name: 'format', required: true},
+        'transport': {name: 'transport', required: true},
+        'criticality': {name: 'criticality', required: true},
     };
 
     vm.spreadsheetLoaded = (event) => {
         console.log('spreadsheet loaded: ', event);
         vm.sourceData = event.rowData;
+    };
+
+    vm.parserInitialised = (api) => {
+        console.log('parser init')
+        vm.parseFlows = api.parseFlows;
     };
 
     vm.parseComplete = (event) => {
@@ -241,6 +273,35 @@ function controller(notification,
     vm.uploadComplete = (event) => {
         console.log('upload complete: ', event);
     };
+
+    vm.validate = () => {
+        const logicalFlow = {
+            source: '109235-1',
+            target: '21455-1'
+        };
+
+        const physicalSpecification = {
+            owner: '109235-1',
+            specExternalId: '',
+            name: 'abcd_<YYYYMMDD>.csv',
+            format: 'FLAT_FILE',
+            specDescription: ''
+        };
+
+        const flowAttributes = {
+            basisOffset: '-5',
+            criticality: 'MEDIUM',
+            description: 'Daily file with Waltz usage data',
+            externalId: 'IF10293321',
+            frequency: 'DAILY',
+            transport: 'FILE_TRANSPORT',
+        };
+
+        const cmds = [Object.assign({}, logicalFlow, physicalSpecification, flowAttributes)];
+
+        console.log('validating: ', cmds);
+        vm.parseFlows();
+    };
 }
 
 
@@ -248,7 +309,8 @@ function controller(notification,
 controller.$inject = [
     'Notification',
     'SvgDiagramStore',
-    '$element'
+    '$element',
+    'ServiceBroker'
 ];
 
 

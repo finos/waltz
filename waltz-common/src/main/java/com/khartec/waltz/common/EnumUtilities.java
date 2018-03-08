@@ -20,12 +20,16 @@
 package com.khartec.waltz.common;
 
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.tokenise;
 
 
 public class EnumUtilities {
@@ -44,10 +48,51 @@ public class EnumUtilities {
     }
 
 
+    public static <T extends Enum<T>> T parseEnumWithAliases(String value,
+                                                             Class<T> enumClass,
+                                                             Function<String, T> failedParseSupplier,
+                                                             Aliases<T> aliases) {
+        checkNotEmpty(value, "value cannot be empty");
+
+        String valueNormalised = value.trim()
+                .toUpperCase()
+                .replace(' ', '_')
+                .replace('-', '_');
+
+        T parsed = readEnum(valueNormalised, enumClass, (s) -> null);
+
+        if(parsed != null) return parsed;
+
+        // now doing it with fallback
+        T fallbackEnum = fallbackParseEnum(value, aliases);
+        return fallbackEnum != null ? fallbackEnum : failedParseSupplier.apply(value);
+    }
+
+
     public static <T extends Enum> Set<String> names(T... enums) {
         return Stream
                 .of(enums)
                 .map(t -> t.name())
                 .collect(Collectors.toSet());
+    }
+
+
+    private static <T extends Enum<T>> T fallbackParseEnum(String value, Aliases<T> aliases) {
+        checkNotNull(value, "value cannot be null");
+
+        String normalisedValue = value.trim().toUpperCase();
+        Optional<T> lookup = aliases.lookup(normalisedValue);
+        if (lookup.isPresent()) {
+            return lookup.get();
+        }
+
+        List<String> tokens = tokenise(normalisedValue);
+        for (String token : tokens) {
+            Optional<T> tokenLookup = aliases.lookup(token);
+            if (tokenLookup.isPresent()) {
+                return tokenLookup.get();
+            }
+        }
+        return null;
     }
 }

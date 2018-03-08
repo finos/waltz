@@ -58,4 +58,12 @@ public abstract class PhysicalFlow implements
     public abstract Optional<Long> specificationDefinitionId();
 
     public abstract Criticality criticality();
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.PHYSICAL_FLOW)
+                .id(id().get())
+                .description(description())
+                .build();
+    }
 }
