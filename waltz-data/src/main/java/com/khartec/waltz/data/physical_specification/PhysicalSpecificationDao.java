@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -135,28 +134,20 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public List<PhysicalSpecification> findByParsedFlows(List<PhysicalFlowParsed> flows) {
+    public PhysicalSpecification getByParsedFlow(PhysicalFlowParsed flow) {
 
-        if(flows.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Condition condition = flows
-                .stream()
-                .map(f -> PHYSICAL_SPECIFICATION.NAME.eq(f.name())
-                        .and(PHYSICAL_SPECIFICATION.FORMAT.eq(f.format().name()))
-                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(f.owner().kind().name()))
-                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(f.owner().id()))
-                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()))
-                .reduce((a, b) -> a.or(b))
-                .get();
+        Condition condition = PHYSICAL_SPECIFICATION.NAME.eq(flow.name())
+                        .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
+                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
 
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .where(condition)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

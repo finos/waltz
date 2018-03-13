@@ -45,9 +45,6 @@ public class PhysicalFlowUploadService {
     private final LogicalFlowDao logicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
 
-    private Map<String, Application> applicationsByAssetCode;
-    private Map<String, Actor> actorsByNameMap;
-
     private final Pattern basisOffsetRegex = Pattern.compile("T?(?<offset>[\\+\\-]?\\d+)");
 
 
@@ -83,11 +80,12 @@ public class PhysicalFlowUploadService {
         checkNotNull(cmds, "cmds cannot be empty");
 
         // load application and actor maps
-        loadMaps();
+        Map<String, Application> applicationsByAssetCode = loadApplicationsByAssetCode();
+        Map<String, Actor> actorsByNameMap = loadActorsByName();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
-                .map(cmd -> validateCommand(cmd))
+                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, cmd))
                 .collect(toList());
 
         // enumerate and locate an existing physical flows that exist - iff no parse errors
@@ -128,10 +126,10 @@ public class PhysicalFlowUploadService {
                 .collect(toList());
 
         // check or create logical flow
-        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> logicalFlowsBySourceAndTarget = loadLogicalFlowMap(newFlows);
+        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> logicalFlowsBySourceAndTarget = new HashMap<>();
 
         // check or create physical spec
-        Map<Tuple3<EntityReference, DataFormatKind, String>, PhysicalSpecification> physicalSpecMap = loadPhysicalSpecificationMap(newFlows);
+        Map<Tuple3<EntityReference, DataFormatKind, String>, PhysicalSpecification> physicalSpecMap = new HashMap<>();
 
         // create physical flow with ids from the above two
         List<PhysicalFlowUploadCommandResponse> created = newFlowCmds.stream()
@@ -170,15 +168,17 @@ public class PhysicalFlowUploadService {
     ////////////////////// PRIVATE //////////////////////
     /////////////////////////////////////////////////////
 
-    private PhysicalFlowUploadCommandResponse validateCommand(PhysicalFlowUploadCommand cmd) {
+    private PhysicalFlowUploadCommandResponse validateCommand(Map<String, Actor> actorsByName,
+                                                              Map<String, Application> applicationsByAssetCode,
+                                                              PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
         Map<String, String> errors = new HashMap<>();
 
         // resolve entity refs - source, target, owner
-        EntityReference source = getEntityRefByString(cmd.source());
-        EntityReference target = getEntityRefByString(cmd.target());
-        EntityReference owner = getEntityRefByString(cmd.owner());
+        EntityReference source = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.source());
+        EntityReference target = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.target());
+        EntityReference owner = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.owner());
 
         if (source == null) {
             errors.put("source", String.format("%s not found", cmd.source()));
@@ -265,56 +265,42 @@ public class PhysicalFlowUploadService {
      * @param input
      * @return
      */
-    private EntityReference getEntityRefByString(String input) {
+    private EntityReference getEntityRefByString(Map<String, Actor> actorsByName,
+                                                 Map<String, Application> applicationsByAssetCode,
+                                                 String input) {
         checkNotNull(input, "input cannot be null");
         input = input.trim();
 
-        return Optional.ofNullable(getActorRefByName(input))
-                .orElse(getAppRefByAssetCode(input));
+        return Optional.ofNullable(getActorRefByName(actorsByName, input))
+                .orElse(getAppRefByAssetCode(applicationsByAssetCode, input));
     }
 
 
-    private EntityReference getActorRefByName(String name) {
-        return Optional.ofNullable(actorsByNameMap.get(name))
+    private EntityReference getActorRefByName(Map<String, Actor> actorsByName, String name) {
+        return Optional.ofNullable(actorsByName.get(name))
                 .map(a -> a.entityReference())
                 .orElse(null);
     }
 
 
-    private EntityReference getAppRefByAssetCode(String source) {
+    private EntityReference getAppRefByAssetCode(Map<String, Application> applicationsByAssetCode, String source) {
         return Optional.ofNullable(applicationsByAssetCode.get(source))
                 .map(a -> a.entityReference())
                 .orElse(null);
     }
 
 
-    private void loadMaps() {
-        actorsByNameMap = MapUtilities.indexBy(
-                a -> a.name(),
-                actorDao.findAll());
-
-        applicationsByAssetCode = MapUtilities.indexBy(
+    private Map<String, Application> loadApplicationsByAssetCode() {
+        return MapUtilities.indexBy(
                 a -> a.assetCode().get(),
                 applicationDao.getAll());
     }
 
 
-    private Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> loadLogicalFlowMap(List<PhysicalFlowParsed> flows) {
-        List<Tuple2<EntityReference, EntityReference>> sourcesAndTargets = flows.stream()
-                .map(p -> Tuple.tuple(p.source(), p.target()))
-                .distinct()
-                .collect(toList());
-
-        return MapUtilities.indexBy(
-                f -> Tuple.tuple(f.source(), f.target()),
-                logicalFlowDao.findBySourcesAndTargets(sourcesAndTargets));
-    }
-
-
-    private Map<Tuple3<EntityReference, DataFormatKind, String>, PhysicalSpecification> loadPhysicalSpecificationMap(List<PhysicalFlowParsed> flows) {
-        return MapUtilities.indexBy(
-                s -> Tuple.tuple(s.owningEntity(), s.format(), s.name()),
-                physicalSpecificationDao.findByParsedFlows(flows));
+    private Map<String, Actor> loadActorsByName() {
+        return  MapUtilities.indexBy(
+                a -> a.name(),
+                actorDao.findAll());
     }
 
 
@@ -326,6 +312,9 @@ public class PhysicalFlowUploadService {
         return logicalFlowsBySourceAndTarget.computeIfAbsent(
                 Tuple.tuple(source, target),
                 t4 -> {
+                    LogicalFlow existing = logicalFlowDao.findBySourceAndTarget(source, target);
+                    if(existing != null) return existing;
+
                     LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
                             .source(source)
                             .target(target)
@@ -350,6 +339,11 @@ public class PhysicalFlowUploadService {
         return physicalSpecMap.computeIfAbsent(
                 Tuple.tuple(owner, format, name),
                 t -> {
+                    // check database
+                    PhysicalSpecification existing = physicalSpecificationDao.getByParsedFlow(flow);
+                    if(existing != null) return existing;
+
+                    // create
                     PhysicalSpecification specToAdd = ImmutablePhysicalSpecification.builder()
                             .owningEntity(owner)
                             .format(format)
