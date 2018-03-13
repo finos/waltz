@@ -56,7 +56,7 @@ const initialState = {
 
 function mkEntityLinkColumnDef(columnHeading, entityRefField) {
     return {
-        field: entityRefField + '.name',
+        field: 'parsedFlow.' + entityRefField + '.name',
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
@@ -74,7 +74,7 @@ function mkEntityLinkColumnDef(columnHeading, entityRefField) {
 
 function mkColumnDef(columnHeading, entityRefField) {
     return {
-        field: entityRefField,
+        field: 'parsedFlow.' + entityRefField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
@@ -147,7 +147,7 @@ function mkParseSummary(data = []) {
             circularFlows: 0,
             nonCircularFlows: data.length
         },
-        _.countBy(data, r => r.outcome === 'SUCCESS' && r.entityReference !== null ? 'newFlows' : 'existingFlows'),
+        _.countBy(data, r => r.outcome === 'SUCCESS' && r.entityReference === null ? 'newFlows' : 'existingFlows'),
         _.countBy(data, r => r.parsedFlow.source && r.parsedFlow.target && sameRef(r.parsedFlow.source, r.parsedFlow.target) ? 'circularFlows' : 'nonCircularFlows'));
 
     summary.errors = summary.missingEntities + summary.circularFlows;

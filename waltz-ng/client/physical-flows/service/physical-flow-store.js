@@ -118,6 +118,13 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const upload = (commands) => {
+        return $http
+            .post(`${base}/upload`, commands)
+            .then(r => r.data);
+    };
+
+
     const cleanupOrphans = () => $http
         .get(`${base}/cleanup-orphans`)
         .then(r => r.data);
@@ -137,6 +144,7 @@ export function store($http, baseApiUrl) {
         updateSpecDefinitionId,
         updateAttribute,
         validateUpload,
+        upload,
         cleanupOrphans
     };
 }
@@ -217,6 +225,11 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: 'validateUpload',
         description: 'executes validateUpload'
+    },
+    upload: {
+        serviceName,
+        serviceFnName: 'upload',
+        description: 'executes upload'
     },
     cleanupOrphans: {
         serviceName,

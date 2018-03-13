@@ -11,10 +11,10 @@ import java.util.Map;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalFlowValidateCommandResponse.class)
-@JsonDeserialize(as = ImmutablePhysicalFlowValidateCommandResponse.class)
-public abstract class PhysicalFlowValidateCommandResponse
-        extends AbstractCommandResponse<PhysicalFlowValidateCommand> {
+@JsonSerialize(as = ImmutablePhysicalFlowUploadCommandResponse.class)
+@JsonDeserialize(as = ImmutablePhysicalFlowUploadCommandResponse.class)
+public abstract class PhysicalFlowUploadCommandResponse
+        extends AbstractCommandResponse<PhysicalFlowUploadCommand> {
 
     // overridden as nullable because it is not used here
     @Nullable

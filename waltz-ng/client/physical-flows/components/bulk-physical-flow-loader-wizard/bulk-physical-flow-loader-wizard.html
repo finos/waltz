@@ -1,0 +1,46 @@
+<div class="waltz-bulk-physical-flow-loader-wizard">
+    <div ng-show="$ctrl.currentStep === 1">
+        <waltz-spreadsheet-loader on-spreadsheet-loaded="$ctrl.spreadsheetLoaded">
+        </waltz-spreadsheet-loader>
+    </div>
+
+    <div ng-show="$ctrl.currentStep === 2">
+        <waltz-column-mapper source-columns="$ctrl.sourceColumns"
+                             target-columns="$ctrl.targetColumns"
+                             on-change="$ctrl.onMappingsChanged">
+        </waltz-column-mapper>
+    </div>
+
+    <div ng-show="$ctrl.currentStep === 3">
+        <waltz-bulk-physical-flow-parser column-mappings="$ctrl.columnMappings"
+                                         source-data="$ctrl.sourceData"
+                                         on-initialise="$ctrl.parserInitialised"
+                                         on-parse-complete="$ctrl.parseComplete">
+        </waltz-bulk-physical-flow-parser>
+    </div>
+
+    <div ng-show="$ctrl.currentStep === 4">
+        <waltz-bulk-physical-flow-uploader flow-commands="$ctrl.uploadCmds"
+                                           on-initialise="$ctrl.uploaderInitialised"
+                                           on-upload-complete="$ctrl.uploadComplete">
+        </waltz-bulk-physical-flow-uploader>
+    </div>
+
+    <div class="text-right">
+        <br>
+        <hr />
+
+        <a class="clickable"
+           ng-click="$ctrl.back()"
+           ng-if="$ctrl.backVisible()">
+            Back
+        </a>
+        <button class="btn btn-xs btn-success"
+                ng-click="$ctrl.next()"
+                ng-if="$ctrl.nextVisible()"
+                ng-disabled="!$ctrl.canGoNext()">
+            Next
+        </button>
+    </div>
+
+</div>

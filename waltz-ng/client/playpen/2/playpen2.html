@@ -10,10 +10,19 @@
     </waltz-page-header>
 
 
-    <!--<waltz-section name="Logical Flow Uploader">-->
-        <!--<waltz-bulk-logical-flow-loader-wizard>-->
-        <!--</waltz-bulk-logical-flow-loader-wizard>-->
-    <!--</waltz-section>-->
+    <waltz-section name="Physical Flow Uploader">
+        <waltz-bulk-physical-flow-loader-wizard>
+        </waltz-bulk-physical-flow-loader-wizard>
+    </waltz-section>
+
+
+    <waltz-section name="upload">
+        <waltz-bulk-physical-flow-uploader flow-commands="ctrl.uploadCmds"
+                                           on-initialise="ctrl.uploaderInitialised"
+                                           on-upload-complete="ctrl.uploadComplete">
+        </waltz-bulk-physical-flow-uploader>
+    </waltz-section>
+
 
     <waltz-section name="parser">
         <button class="btn"

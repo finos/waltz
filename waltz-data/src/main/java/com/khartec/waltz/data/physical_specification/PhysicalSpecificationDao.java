@@ -21,6 +21,7 @@ package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -129,6 +131,31 @@ public class PhysicalSpecificationDao {
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .where(PHYSICAL_SPECIFICATION.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<PhysicalSpecification> findByParsedFlows(List<PhysicalFlowParsed> flows) {
+
+        if(flows.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Condition condition = flows
+                .stream()
+                .map(f -> PHYSICAL_SPECIFICATION.NAME.eq(f.name())
+                        .and(PHYSICAL_SPECIFICATION.FORMAT.eq(f.format().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(f.owner().kind().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(f.owner().id()))
+                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()))
+                .reduce((a, b) -> a.or(b))
+                .get();
+
+        return dsl
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
+                .from(PHYSICAL_SPECIFICATION)
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

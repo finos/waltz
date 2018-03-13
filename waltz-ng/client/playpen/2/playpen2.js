@@ -268,6 +268,16 @@ function controller(notification,
 
     vm.parseComplete = (event) => {
         console.log('parse complete: ', event.data, event.isComplete());
+        vm.validatedRows = event.data;
+        vm.uploadCmds = _.map(vm.validatedRows, 'originalCommand');
+
+        console.log('uploading: ', vm.uploadCmds);
+        vm.uploadFlows();
+    };
+
+    vm.uploaderInitialised = (api) => {
+        console.log('uploader initialised');
+        vm.uploadFlows = api.uploadFlows;
     };
 
     vm.uploadComplete = (event) => {
@@ -297,9 +307,9 @@ function controller(notification,
             transport: 'FILE_TRANSPORT',
         };
 
-        const cmds = [Object.assign({}, logicalFlow, physicalSpecification, flowAttributes)];
+        // vm.uploadCmds = [Object.assign({}, logicalFlow, physicalSpecification, flowAttributes)];
 
-        console.log('validating: ', cmds);
+        // console.log('validating: ', vm.uploadCmds);
         vm.parseFlows();
     };
 }
