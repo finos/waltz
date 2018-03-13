@@ -40,12 +40,36 @@
             Done
         </a>
 
-        <a class="btn btn-xs btn-primary"
-           ui-sref="main.physical-flow.registration ($ctrl.parentEntityRef)"
-           ng-if="$ctrl.visibility.dataTab == 1"
-           waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-            Register
-        </a>
+
+        <!-- Register Split button -->
+        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
+             ng-if="$ctrl.visibility.dataTab == 1 && !$ctrl.isAnyEditorVisible()">
+            <div class="btn-group"
+                 uib-dropdown>
+
+                <a class="btn btn-xs btn-primary"
+                   ui-sref="main.physical-flow.registration ($ctrl.parentEntityRef)">
+                    Register
+                </a>
+                <button type="button"
+                        class="btn btn-xs btn-primary"
+                        uib-dropdown-toggle>
+                    <span class="caret"></span>
+                </button>
+                <ul uib-dropdown-menu
+                    class="dropdown-menu"
+                    role="menu">
+                    <li role="menuitem">
+                        <a href=""
+                           ng-click="$ctrl.visibility.editor.bulkPhysicalFlows = true"
+                           class="small">
+                            <waltz-icon name="upload"></waltz-icon>
+                            Bulk Insert
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
         <waltz-physical-flow-export-buttons ng-if="$ctrl.visibility.dataTab == 1"
                                             export-consumes="$ctrl.exportPhysicalFlowConsumes"
@@ -211,6 +235,12 @@
         <h4>Bulk Insert Logical Data Flows</h4>
         <waltz-bulk-logical-flow-loader-wizard>
         </waltz-bulk-logical-flow-loader-wizard>
+    </div>
+
+    <div ng-if="$ctrl.visibility.editor.bulkPhysicalFlows">
+        <h4>Bulk Insert Physical Flows</h4>
+        <waltz-bulk-physical-flow-loader-wizard>
+        </waltz-bulk-physical-flow-loader-wizard>
     </div>
 
 
