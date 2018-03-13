@@ -19,11 +19,24 @@
 
 package com.khartec.waltz.model;
 
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.common.EnumUtilities;
+
+import java.util.function.Function;
+
 public enum Criticality {
     LOW,
     MEDIUM,
     HIGH,
     VERY_HIGH,
     NONE,
-    UNKNOWN
+    UNKNOWN;
+
+
+    private static final Aliases<Criticality> defaultAliases = new Aliases<>();
+
+
+    public static Criticality parse(String value, Function<String, Criticality> failedParseSupplier) {
+        return EnumUtilities.parseEnumWithAliases(value, Criticality.class, failedParseSupplier, defaultAliases);
+    }
 }

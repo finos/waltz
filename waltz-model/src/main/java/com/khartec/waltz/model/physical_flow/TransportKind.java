@@ -19,6 +19,11 @@
 
 package com.khartec.waltz.model.physical_flow;
 
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.common.EnumUtilities;
+
+import java.util.function.Function;
+
 /**
  * Represents how a data flow is enacted between systems.
  * <p/>
@@ -38,6 +43,21 @@ public enum TransportKind {
     RPC,
     UNKNOWN,
     UDP,
-    WEB
+    WEB;
+
+
+    private static final Aliases<TransportKind> defaultAliases = new Aliases<>()
+            .register(TransportKind.EMAIL, "SMTP")
+            .register(TransportKind.DATABASE_CONNECTION, "OLEDB", "JDBC", "DB", "DB-LINK", "DIRECT DATABASE ACCESS")
+            .register(TransportKind.FILE_TRANSPORT, "SFTP", "SFTPS", "FTP", "SCP", "FILE")
+            .register(TransportKind.FILE_SHARE, "SAMBA")
+            .register(TransportKind.MESSAGING, "JMS")
+            .register(TransportKind.OTHER, "OTHER", "N/A", "NA")
+            .register(TransportKind.WEB, "HTTP", "HTTPS", "SOAP");
+
+
+    public static TransportKind parse(String value, Function<String, TransportKind> failedParseSupplier) {
+        return EnumUtilities.parseEnumWithAliases(value, TransportKind.class, failedParseSupplier, defaultAliases);
+    }
 
 }
