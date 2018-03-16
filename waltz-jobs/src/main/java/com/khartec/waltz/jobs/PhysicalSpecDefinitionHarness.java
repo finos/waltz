@@ -20,6 +20,7 @@
 package com.khartec.waltz.jobs;
 
 
+import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.physical_specification_definition.*;
 import com.khartec.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
@@ -57,7 +58,7 @@ public class PhysicalSpecDefinitionHarness {
                 .name("Field1")
                 .description("First field")
                 .position(1)
-                .type(PhysicalSpecDefinitionFieldType.STRING)
+                .type(FieldDataType.STRING)
                 .build());
 
         System.out.println(fieldService.findForSpecDefinition(defId));

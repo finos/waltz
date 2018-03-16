@@ -21,7 +21,7 @@ package com.khartec.waltz.data.physical_specification_definition;
 
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldType;
+import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnFieldRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -46,7 +46,7 @@ public class PhysicalSpecDefinitionFieldDao {
                 .specDefinitionId(record.getSpecDefnId())
                 .name(record.getName())
                 .position(record.getPosition())
-                .type(PhysicalSpecDefinitionFieldType.valueOf(record.getType()))
+                .type(FieldDataType.valueOf(record.getType()))
                 .description(record.getDescription())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
