@@ -36,4 +36,39 @@
     </changeSet>
 
 
+    <!-- 3028: create logical_data_element table -->
+    <changeSet id="20180314-3028-1"
+               author="kamransaleem">
+        <comment>3028: create logical_data_element table</comment>
+        <createTable tableName="logical_data_element">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="logical_data_element_pkey"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"></constraints>
+            </column>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
