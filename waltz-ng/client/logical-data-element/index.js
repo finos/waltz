@@ -17,40 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../../common/index";
-import {CORE_API} from "../../common/services/core-api-utils";
+import angular from 'angular';
+import {registerStores} from '../common/module-utils';
+import * as LogicalDataElementStore from './services/logical-data-element-store';
 
 
-const initialState = {
-    parentEntityRef: {
-        id: 16,
-        kind: 'FLOW_DIAGRAM'
-    }
-};
+function setup() {
+    const module = angular.module('waltz.logical.data.element', []);
 
-function controller($stateParams, serviceBroker) {
-    const vm = initialiseData(this, initialState);
+    registerStores(module, [LogicalDataElementStore]);
 
-    vm.onSelectorEntitySelect = (itemId, item) => {
-        console.log({itemId, item});
-    };
+    return module.name;
 }
 
 
-controller.$inject = [
-    '$stateParams',
-    'ServiceBroker'
-];
-
-
-const view = {
-    template: require('./playpen3.html'),
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export default setup;

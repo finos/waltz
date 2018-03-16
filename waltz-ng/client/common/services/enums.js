@@ -413,6 +413,13 @@ export const entity = {
         description: null,
         position: 150
     },
+    LOGICAL_DATA_ELEMENT: {
+        key: 'LOGICAL_DATA_ELEMENT',
+        name: 'Logical Data Element',
+        icon: 'asterisk',
+        description: null,
+        position: 155
+    },
     LOGICAL_DATA_FLOW: {
         key: 'LOGICAL_DATA_FLOW',
         name: 'Logical Data Flow',

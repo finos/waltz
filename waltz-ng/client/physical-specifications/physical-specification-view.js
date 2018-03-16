@@ -23,6 +23,7 @@ import {initialiseData} from "../common";
 import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
 
 import template from './physical-specification-view.html';
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -34,6 +35,7 @@ const initialState = {
     createReportForm: {
         name: ""
     },
+    logicalDataElements: [],
     selectedSpecDefinition: {},
     specDefinitions: [],
     specDefinitionCreate: {
@@ -95,7 +97,8 @@ function controller($q,
                     physicalSpecDefinitionFieldStore,
                     physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
-                    physicalFlowStore)
+                    physicalFlowStore,
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
@@ -136,6 +139,15 @@ function controller($q,
         .then(specDefs => {
             const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
             if (activeSpec) vm.selectSpecDefinition(activeSpec);
+
+            const selectionOptions = {
+                scope: 'EXACT',
+                entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: specId }
+            };
+
+            serviceBroker
+                .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ])
+                .then(r => vm.logicalDataElements = r.data);
         });
 
     loadSpecDefinitions();
@@ -158,9 +170,8 @@ function controller($q,
 
         $q.all([specDefFieldPromise, specDefSampleFilePromise])
             .then(([fields, file]) => {
-                vm.selectedSpecDefinition.def = def;
-                vm.selectedSpecDefinition.fields = fields;
-                vm.selectedSpecDefinition.sampleFile = file;
+                vm.selectedSpecDefinition = { def, fields, file };
+                console.log('select spec: ', vm.selectedSpecDefinition)
             });
     };
 
@@ -256,7 +267,8 @@ controller.$inject = [
     'PhysicalSpecDefinitionFieldStore',
     'PhysicalSpecDefinitionSampleFileStore',
     'PhysicalSpecificationStore',
-    'PhysicalFlowStore'
+    'PhysicalFlowStore',
+    'ServiceBroker'
 ];
 
 

@@ -88,6 +88,7 @@ const dependencies = [
     require('./involvement')(),
     require('./involvement-kind')(),
     require('./lineage')(),
+    require('./logical-data-element')(),
     require('./logical-flow')(),
     require('./logical-flow-decorator')(),
     require('./measurable')(),

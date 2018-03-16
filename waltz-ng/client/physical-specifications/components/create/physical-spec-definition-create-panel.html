@@ -110,14 +110,16 @@ Field2&#9;DATE&#9;description for field 2
                     <colgroup>
                         <col width="20%">
                         <col width="10%">
+                        <col width="25%">
+                        <col width="15%">
                         <col width="30%">
-                        <col width="40%">
                     </colgroup>
                     <thead>
                     <tr>
                         <th>Name</th>
                         <th>Type</th>
                         <th>Description</th>
+                        <th>Logical Element</th>
                         <th>Errors</th>
                     </tr>
                     </thead>
@@ -134,6 +136,12 @@ Field2&#9;DATE&#9;description for field 2
                         <td>
                             <span ng-bind="fieldData.field.description">
                             </span>
+                        </td>
+                        <td>
+                            <waltz-entity-selector item-id="fieldData.field.position"
+                                                   on-select="$ctrl.onSelectorEntitySelect"
+                                                   entity-kinds="['LOGICAL_DATA_ELEMENT']">
+                            </waltz-entity-selector>
                         </td>
                         <td ng-class="{ 'bg-danger' : fieldData.errors.length > 0 }">
                             <div ng-repeat="error in fieldData.errors">

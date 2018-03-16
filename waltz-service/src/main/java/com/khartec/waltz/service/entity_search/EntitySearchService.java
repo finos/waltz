@@ -28,6 +28,7 @@ import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
+import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.person.PersonService;
@@ -51,6 +52,7 @@ public class EntitySearchService {
     private final ApplicationService applicationService;
     private final AppGroupService appGroupService;
     private final ChangeInitiativeService changeInitiativeService;
+    private final LogicalDataElementService logicalDataElementService;
     private final MeasurableService measurableService;
     private final OrganisationalUnitService organisationalUnitService;
     private final PersonService personService;
@@ -62,6 +64,7 @@ public class EntitySearchService {
                                ApplicationService applicationService,
                                AppGroupService appGroupService,
                                ChangeInitiativeService changeInitiativeService,
+                               LogicalDataElementService logicalDataElementService,
                                MeasurableService measurableService,
                                OrganisationalUnitService organisationalUnitService,
                                PersonService personService) {
@@ -70,6 +73,7 @@ public class EntitySearchService {
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(appGroupService, "appGroupService cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
+        checkNotNull(logicalDataElementService, "logicalDataElementService cannot be null");
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
         checkNotNull(personService, "personService cannot be null");
@@ -79,6 +83,7 @@ public class EntitySearchService {
         this.applicationService = applicationService;
         this.appGroupService = appGroupService;
         this.changeInitiativeService = changeInitiativeService;
+        this.logicalDataElementService = logicalDataElementService;
         this.measurableService = measurableService;
         this.organisationalUnitService = organisationalUnitService;
         this.personService = personService;
@@ -112,6 +117,8 @@ public class EntitySearchService {
                 return () -> appGroupService.search(terms, options);
             case CHANGE_INITIATIVE:
                 return () -> changeInitiativeService.search(terms, options);
+            case LOGICAL_DATA_ELEMENT:
+                return () -> logicalDataElementService.search(terms, options);
             case MEASURABLE:
                 return () -> measurableService.search(terms, options);
             case ORG_UNIT:

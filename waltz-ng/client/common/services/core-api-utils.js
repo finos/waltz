@@ -46,6 +46,7 @@ import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../.
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
 import {InvolvementKindStore_API as InvolvementKindStore} from "../../involvement-kind/services/involvement-kind-store";
+import {LogicalDataElementStore_API as LogicalDataElementStore} from "../../logical-data-element/services/logical-data-element-store";
 import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/services/logical-flow-store";
 import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
@@ -59,6 +60,8 @@ import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../.
 import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspective/services/perspective-rating-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
+import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
+import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
@@ -101,6 +104,7 @@ export const CORE_API = {
     EntitySvgDiagramStore,
     InvolvementStore,
     InvolvementKindStore,
+    LogicalDataElementStore,
     LogicalFlowStore,
     LogicalFlowDecoratorStore,
     MeasurableCategoryStore,
@@ -114,6 +118,8 @@ export const CORE_API = {
     PerspectiveRatingStore,
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
+    PhysicalSpecDefinitionStore,
+    PhysicalSpecDefinitionSampleFileStore,
     PhysicalSpecificationStore,
     ServerInfoStore,
     SettingsStore,

@@ -100,4 +100,4 @@ export const PhysicalSpecificationStore_API = {
         serviceFnName: 'search',
         description: 'executes search'
     },
-}
+};

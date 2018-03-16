@@ -19,8 +19,11 @@
 
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
-import * as physicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
-import * as physicalSpecificationStore from "./services/physical-specification-store";
+import * as PhysicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
+import * as PhysicalSpecificationStore from "./services/physical-specification-store";
+import * as PhysicalSpecDefinitionStore from "./services/physical-spec-definition-store";
+import * as PhysicalSpecDefinitionSampleFileStore from "./services/physical-spec-definition-sample-file-store";
+
 import dataTypeList from "./components/data-type/physical-spec-data-type-list";
 import dataTypeSection from "./components/data-type/physical-spec-data-type-section";
 
@@ -47,12 +50,10 @@ function setup() {
 
     registerStores(
         module,
-        [physicalSpecDataTypeStore, physicalSpecificationStore]);
+        [PhysicalSpecDataTypeStore, PhysicalSpecificationStore, PhysicalSpecDefinitionStore, PhysicalSpecDefinitionSampleFileStore]);
 
     module
-        .service('PhysicalSpecDefinitionStore', require('./services/physical-spec-definition-store'))
-        .service('PhysicalSpecDefinitionFieldStore', require('./services/physical-spec-definition-field-store'))
-        .service('PhysicalSpecDefinitionSampleFileStore', require('./services/physical-spec-definition-sample-file-store'));
+        .service('PhysicalSpecDefinitionFieldStore', require('./services/physical-spec-definition-field-store'));
 
 
     return module.name;

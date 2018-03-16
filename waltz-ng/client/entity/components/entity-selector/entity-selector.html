@@ -6,6 +6,7 @@
 
         <ui-select-match placeholder="Search...">
             <waltz-icon fixed-width="true"
+                        ng-if="$ctrl.entityKinds.length > 1"
                         class="wes-selected-icon"
                         name="{{ $select.selected.kind | toIconName:'entity' }}">
             </waltz-icon>
@@ -19,6 +20,7 @@
                            refresh-delay="300">
 
             <waltz-icon fixed-width="true"
+                        ng-if="$ctrl.entityKinds.length > 1"
                         name="{{ entity.kind | toIconName:'entity' }}">
             </waltz-icon>
 

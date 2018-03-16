@@ -63,7 +63,7 @@ public class PhysicalSpecificationSearchDao {
         List<String> terms = mkTerms(termsStr);
 
         Condition likeName = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
-        Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
+        Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.DESCRIPTION, terms);
 
         return dsl.selectDistinct(
                     PHYSICAL_SPECIFICATION.ID,
