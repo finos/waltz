@@ -46,7 +46,6 @@ function controller() {
     vm.$onChanges = () => {
         if(vm.logicalDataElements) {
             vm.logicalDataElementsById = _.keyBy(vm.logicalDataElements, 'id');
-            console.log('log els: ', vm.logicalDataElementsById);
         }
     };
 

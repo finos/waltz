@@ -21,11 +21,13 @@ import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as PhysicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
 import * as PhysicalSpecificationStore from "./services/physical-specification-store";
+import * as PhysicalSpecDefinitionFieldStore from "./services/physical-spec-definition-field-store";
 import * as PhysicalSpecDefinitionStore from "./services/physical-spec-definition-store";
 import * as PhysicalSpecDefinitionSampleFileStore from "./services/physical-spec-definition-sample-file-store";
 
-import dataTypeList from "./components/data-type/physical-spec-data-type-list";
-import dataTypeSection from "./components/data-type/physical-spec-data-type-section";
+import DataTypeList from "./components/data-type/physical-spec-data-type-list";
+import DataTypeSection from "./components/data-type/physical-spec-data-type-section";
+import PhysicalSpecDefinitionSection from "./components/spec-definition-section/physical-spec-definition-section";
 
 
 function setup() {
@@ -35,10 +37,11 @@ function setup() {
     module
         .config(require('./routes'));
 
-    registerComponents(
-        module,
-        [dataTypeList, dataTypeSection]);
-
+    registerComponents(module, [
+        DataTypeList,
+        DataTypeSection,
+        PhysicalSpecDefinitionSection
+    ]);
 
     module
         .component('waltzPhysicalDataSection', require('./components/physical-data-section/physical-data-section'))
@@ -48,13 +51,13 @@ function setup() {
         .component('waltzPhysicalSpecificationMentions', require('./components/mentions/physical-specification-mentions'))
         .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
 
-    registerStores(
-        module,
-        [PhysicalSpecDataTypeStore, PhysicalSpecificationStore, PhysicalSpecDefinitionStore, PhysicalSpecDefinitionSampleFileStore]);
-
-    module
-        .service('PhysicalSpecDefinitionFieldStore', require('./services/physical-spec-definition-field-store'));
-
+    registerStores(module, [
+        PhysicalSpecDataTypeStore,
+        PhysicalSpecDefinitionFieldStore,
+        PhysicalSpecificationStore,
+        PhysicalSpecDefinitionStore,
+        PhysicalSpecDefinitionSampleFileStore
+    ]);
 
     return module.name;
 }

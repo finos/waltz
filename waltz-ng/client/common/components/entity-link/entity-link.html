@@ -4,13 +4,13 @@
    ng-href="{{ $ctrl.viewUrl }}">
 
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
-                             icon-placement="$ctrl.iconPlacement"
-                             tooltip-placement="$ctrl.tooltipPlacement">
+                             icon-placement="{{$ctrl.iconPlacement}}"
+                             tooltip-placement="{{$ctrl.tooltipPlacement}}"
     </waltz-entity-icon-label>
 </a>
 
 <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
-                         icon-placement="$ctrl.iconPlacement"
-                         tooltip-placement="$ctrl.tooltipPlacement"
+                         icon-placement="{{$ctrl.iconPlacement}}"
+                         tooltip-placement="{{$ctrl.tooltipPlacement}}"
                          ng-if="!$ctrl.viewUrl">
 </waltz-entity-icon-label>

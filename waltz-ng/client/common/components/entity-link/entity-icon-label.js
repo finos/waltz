@@ -22,8 +22,8 @@ import { initialiseData } from "../../../common";
 
 const bindings = {
     entityRef: '<',
-    iconPlacement: '<',
-    tooltipPlacement: '<'
+    iconPlacement: '@',
+    tooltipPlacement: '@'
 };
 
 

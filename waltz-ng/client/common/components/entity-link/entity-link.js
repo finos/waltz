@@ -23,8 +23,8 @@ import {kindToViewState} from "../../../common/link-utils";
 
 const bindings = {
     entityRef: '<',
-    iconPlacement: '<',
-    tooltipPlacement: '<'
+    iconPlacement: '@',
+    tooltipPlacement: '@'
 };
 
 

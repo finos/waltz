@@ -60,6 +60,7 @@ import {PerspectiveDefinitionStore_API as PerspectiveDefinitionStore} from "../.
 import {PerspectiveRatingStore_API as PerspectiveRatingStore} from "../../perspective/services/perspective-rating-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/service/physical-flow-store";
 import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
+import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore} from "../../physical-specifications/services/physical-spec-definition-field-store";
 import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
 import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
@@ -118,6 +119,7 @@ export const CORE_API = {
     PerspectiveRatingStore,
     PhysicalFlowStore,
     PhysicalSpecDataTypeStore,
+    PhysicalSpecDefinitionFieldStore,
     PhysicalSpecDefinitionStore,
     PhysicalSpecDefinitionSampleFileStore,
     PhysicalSpecificationStore,

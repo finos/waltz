@@ -23,7 +23,6 @@ import {initialiseData} from "../common";
 import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
 
 import template from './physical-specification-view.html';
-import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -79,11 +78,6 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
 }
 
 
-function mkReleaseLifecycleStatusChangeCommand(newStatus) {
-    return { newStatus };
-};
-
-
 function controller($q,
                     $stateParams,
                     applicationStore,
@@ -91,14 +85,9 @@ function controller($q,
                     flowDiagramEntityStore,
                     historyStore,
                     logicalFlowStore,
-                    notification,
                     orgUnitStore,
-                    physicalSpecDefinitionStore,
-                    physicalSpecDefinitionFieldStore,
-                    physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
-                    physicalFlowStore,
-                    serviceBroker)
+                    physicalFlowStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -133,123 +122,12 @@ function controller($q,
             vm.logicalFlowsById = _.keyBy(logicalFlows, 'id')
         });
 
-    const loadSpecDefinitions = () => physicalSpecDefinitionStore
-        .findForSpecificationId(specId)
-        .then(specDefs => vm.specDefinitions = specDefs)
-        .then(specDefs => {
-            const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
-            if (activeSpec) vm.selectSpecDefinition(activeSpec);
-
-            const selectionOptions = {
-                scope: 'EXACT',
-                entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: specId }
-            };
-
-            serviceBroker
-                .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ])
-                .then(r => vm.logicalDataElements = r.data);
-        });
-
-    loadSpecDefinitions();
-
-
     vm.loadFlowDiagrams = () => {
         loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore)
             .then(r => Object.assign(vm, r));
     };
 
     vm.loadFlowDiagrams();
-
-
-    vm.selectSpecDefinition = (def) => {
-        const specDefFieldPromise = physicalSpecDefinitionFieldStore
-            .findForSpecDefinitionId(def.id);
-
-        const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
-            .findForSpecDefinitionId(def.id);
-
-        $q.all([specDefFieldPromise, specDefSampleFilePromise])
-            .then(([fields, file]) => {
-                vm.selectedSpecDefinition = { def, fields, file };
-                console.log('select spec: ', vm.selectedSpecDefinition)
-            });
-    };
-
-    vm.showCreateSpecDefinition = () => {
-        vm.specDefinitionCreate.creating = true;
-    };
-
-    vm.hideCreateSpecDefinition = () => {
-        vm.specDefinitionCreate.creating = false;
-    };
-
-    vm.createSpecDefinition = (specDef) => {
-        physicalSpecDefinitionStore
-            .create(specId, specDef.def)
-            .then(specDefId => {
-                const fieldsPromise = physicalSpecDefinitionFieldStore
-                    .createFields(specDefId, specDef.fields);
-
-                if (specDef.sampleData) {
-                    const sampleDataPromise = physicalSpecDefinitionSampleFileStore
-                        .create(specDefId, {
-                            name: vm.specification.name,
-                            fileData: specDef.sampleData
-                        });
-
-                    return $q.all([fieldsPromise, sampleDataPromise]);
-                } else {
-                    return fieldsPromise;
-                }
-            })
-            .then(r => {
-                notification.success('Specification definition created successfully');
-                loadSpecDefinitions();
-                vm.hideCreateSpecDefinition();
-            }, r => {
-                notification.error("Failed to create specification definition. Ensure that 'version' is unique");
-            });
-    };
-
-    vm.deleteSpec = (specDef) => {
-        physicalSpecDefinitionStore
-            .deleteSpecification(specDef.id)
-            .then(result => {
-                if (result) {
-                    notification.success(`Deleted version ${specDef.version}`);
-                    loadSpecDefinitions();
-                } else {
-                    notification.error(`Could not delete version ${specDef.version}`);
-                }
-            })
-    };
-
-    vm.activateSpec = (specDef) => {
-        physicalSpecDefinitionStore
-            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('ACTIVE'))
-            .then(result => {
-                if (result) {
-                    notification.success(`Marked version ${specDef.version} as active`);
-                    loadSpecDefinitions();
-                } else {
-                    notification.error(`Could not mark version ${specDef.version} as active`);
-                }
-            })
-    };
-
-    vm.markSpecObsolete = (specDef) => {
-        physicalSpecDefinitionStore
-            .updateStatus(specDef.id, mkReleaseLifecycleStatusChangeCommand('OBSOLETE'))
-            .then(result => {
-                if (result) {
-                    notification.success(`Marked version ${specDef.version} as obsolete`);
-                    loadSpecDefinitions();
-                } else {
-                    notification.error(`Could not mark version ${specDef.version} as obsolete`);
-                }
-            })
-    };
-
 }
 
 
@@ -261,14 +139,9 @@ controller.$inject = [
     'FlowDiagramEntityStore',
     'HistoryStore',
     'LogicalFlowStore',
-    'Notification',
     'OrgUnitStore',
-    'PhysicalSpecDefinitionStore',
-    'PhysicalSpecDefinitionFieldStore',
-    'PhysicalSpecDefinitionSampleFileStore',
     'PhysicalSpecificationStore',
-    'PhysicalFlowStore',
-    'ServiceBroker'
+    'PhysicalFlowStore'
 ];
 
 
