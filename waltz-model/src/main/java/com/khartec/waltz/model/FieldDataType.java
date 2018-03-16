@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.physical_specification_definition;
+package com.khartec.waltz.model;
 
 
-public enum PhysicalSpecDefinitionFieldType {
+public enum FieldDataType {
 
     DATE,
+    DATETIME,
     DECIMAL,
     INTEGER,
     STRING,
