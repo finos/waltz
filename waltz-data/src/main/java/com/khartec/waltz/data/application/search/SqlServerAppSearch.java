@@ -107,7 +107,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
 
         appsViaName.sort(mkRelevancyComparator(a -> a.name(), terms.get(0)));
 
-        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText)); //orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
+        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
     }
 
 }
