@@ -20,7 +20,9 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.PhysicalSpecification;
 import com.khartec.waltz.service.DIConfiguration;
@@ -47,28 +49,13 @@ public class PhysicalSpecificationHarness {
 
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
-
-        PhysicalSpecification ps = PHYSICAL_SPECIFICATION.as("ps");
-        Application app = APPLICATION.as("app");
+        PhysicalSpecificationSearchDao searcher = ctx.getBean(PhysicalSpecificationSearchDao.class);
 
 
-        Field<String> ownerName = mkEntityNameField(ps.OWNING_ENTITY_ID, ps.OWNING_ENTITY_KIND, ListUtilities.newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+        searcher
+                .search("sap", EntitySearchOptions.mkForEntity(EntityKind.PHYSICAL_SPECIFICATION))
+                .forEach(ps -> System.out.println(ps.name()));
 
-        List<String> terms = ListUtilities.newArrayList("exchange", "trade");
-
-        Condition likeName = mkBasicTermSearch(ps.NAME, terms);
-        Condition likeDesc = mkBasicTermSearch(ps.NAME, terms);
-
-        dsl.select(ps.ID, ps.NAME, ownerName)
-                .from(ps)
-                .where(likeName)
-                .or(likeDesc)
-                .fetch()
-                .forEach(r -> System.out.printf(
-                        "%d) %s - %s\n",
-                        r.getValue(ps.ID),
-                        r.getValue(ps.NAME),
-                        r.getValue(ownerName) ));
     }
 
 

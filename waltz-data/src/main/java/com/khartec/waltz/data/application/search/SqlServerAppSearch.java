@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
@@ -50,6 +51,8 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
             return Collections.emptyList();
         }
 
+        Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
         Condition assetCodeCondition = terms.stream()
                 .map(term -> APPLICATION.ASSET_CODE.like(term + "%"))
                 .collect(Collectors.reducing(
@@ -59,6 +62,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
         List<Application> appsViaAssetCode = dsl.selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(assetCodeCondition)
+                .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
@@ -74,6 +78,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
                 .innerJoin(ENTITY_ALIAS)
                 .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID))
                 .where(aliasCondition)
+                .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
@@ -87,17 +92,22 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
         List<Application> appsViaName = dsl.selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(nameCondition)
+                .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
+
         List<Application> appsViaFullText = dsl.select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .and(lifecycleCondition)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
+        appsViaName.sort(mkRelevancyComparator(a -> a.name(), terms.get(0)));
+
+        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText)); //orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
     }
 
 }

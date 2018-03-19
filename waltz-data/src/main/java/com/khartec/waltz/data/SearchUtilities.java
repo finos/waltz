@@ -22,7 +22,9 @@ package com.khartec.waltz.data;
 import com.khartec.waltz.common.StringUtilities;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -54,4 +56,38 @@ public class SearchUtilities
                 .filter(StringUtilities::notEmpty)
                 .collect(toList());
     }
+
+
+    /**
+     * Constructs a RelevancyComparator.  This comparator can be used to refine search results
+     * based on the location of the term in the value calculated by the extractor function.  In
+     * the result of a tie, the natural sort order of the extracted values will be used.
+     * @param extractor
+     * @param term
+     * @return
+     */
+    public static <T> Comparator<T> mkRelevancyComparator(Function<T, String> extractor,
+                                                               String term) {
+        return (a, b) -> {
+            String sA = extractor.apply(a).toLowerCase();
+            String sB = extractor.apply(b).toLowerCase();
+
+            int idxA = sA.indexOf(term);
+            int idxB = sB.indexOf(term);
+
+            if (idxA == -1) {
+                if (idxB == -1) {
+                    return sA.compareTo(sB);
+                } else {
+                    return 1;
+                }
+            } else if (idxA != idxB) {
+                return Integer.compare(idxA, idxB);
+            } else {
+                return sA.compareTo(sB);
+            }
+        };
+    }
+
+
 }

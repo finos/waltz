@@ -127,7 +127,7 @@ public class PhysicalSpecificationService {
     }
 
 
-    public List<EntityReference> search(String query, EntitySearchOptions options) {
+    public List<PhysicalSpecification> search(String query, EntitySearchOptions options) {
         if (isEmpty(query)) return emptyList();
         return specificationSearchDao.search(query, options);
     }
