@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {initialiseData} from "../../common/index";
+import {entityLifecycleStatuses, initialiseData} from "../../common/index";
 
 import template from './nav-search-overlay.html';
 
@@ -147,13 +147,13 @@ function controller($element,
             };
         };
 
-        const entityLifecycleStatuses = vm.showActiveOnly
-            ? ['ACTIVE', 'PENDING']
-            : ['ACTIVE', 'PENDING', 'REMOVED'];
+        const statuses = vm.showActiveOnly
+            ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
+            : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
 
         const searchOptions = {
             entityKinds: [entityKind],
-            entityLifecycleStatuses
+            entityLifecycleStatuses: statuses
         };
 
         return serviceBroker
