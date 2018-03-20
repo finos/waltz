@@ -34,7 +34,8 @@ public abstract class DataType implements
         DescriptionProvider,
         CodeProvider,
         IdProvider,
-        ParentIdProvider {
+        ParentIdProvider,
+        WaltzEntity {
 
     @Value.Default
     public boolean concrete() {
@@ -46,4 +47,13 @@ public abstract class DataType implements
 
     @Value.Default
     public boolean unknown() { return false; }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.DATA_TYPE)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }
