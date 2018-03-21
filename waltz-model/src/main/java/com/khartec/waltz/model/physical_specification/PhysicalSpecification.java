@@ -41,9 +41,19 @@ public abstract class PhysicalSpecification implements
         NameProvider,
         DescriptionProvider,
         ProvenanceProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        WaltzEntity {
 
     public abstract EntityReference owningEntity();
     public abstract DataFormatKind format();
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.PHYSICAL_SPECIFICATION)
+                .id(id().get())
+                .name(name() + externalId().map(extId -> " (" + extId + ")").orElse(""))
+                .description(description())
+                .build();
+    }
 
 }

@@ -90,7 +90,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         ListRoute<PhysicalSpecification> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
-        ListRoute<EntityReference> searchRoute =
+        ListRoute<PhysicalSpecification> searchRoute =
                 (request, response) -> specificationService.search(
                         request.params("query"),
                         ImmutableEntitySearchOptions.builder()

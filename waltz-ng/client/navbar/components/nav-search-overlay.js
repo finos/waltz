@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {initialiseData} from "../../common/index";
+import {entityLifecycleStatuses, initialiseData} from "../../common/index";
 
 import template from './nav-search-overlay.html';
 
@@ -119,7 +119,7 @@ function controller($element,
 
 
     // helper fn, to reduce boilerplate
-    const handleSearch = (query, searchAPI, entityKind) => {
+    const handleSearch = (query, entityKind) => {
         const transformResult = r => {
             let qualifier = null;
 
@@ -141,22 +141,24 @@ function controller($element,
             return {
                 id: r.id,
                 kind: entityKind,
-                entityLifecycleStatus: r.entityLifecycleStatus || 'ACTIVE',
                 name: r.name || r.displayName,
                 qualifier,
                 description: r.description
             };
         };
 
+        const statuses = vm.showActiveOnly
+            ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
+            : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
+
+        const searchOptions = {
+            entityKinds: [entityKind],
+            entityLifecycleStatuses: statuses
+        };
+
         return serviceBroker
-            .loadViewData(searchAPI, [ query ])
-            .then(r => {
-                vm.results[entityKind] = _
-                    .chain(r.data)
-                    .map(transformResult)
-                    .filter(ref => vm.showActiveOnly ? ref.entityLifecycleStatus === 'ACTIVE' : true)
-                    .value();
-            });
+            .loadViewData(CORE_API.EntitySearchStore.search, [ query, searchOptions ])
+            .then(r => vm.results[entityKind] = _.map(r.data, transformResult));
     };
 
 
@@ -166,15 +168,15 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, CORE_API.ApplicationStore.search, 'APPLICATION');
-        handleSearch(query, CORE_API.ChangeInitiativeStore.search, 'CHANGE_INITIATIVE');
-        handleSearch(query, CORE_API.DataTypeStore.search, 'DATA_TYPE');
-        handleSearch(query, CORE_API.PersonStore.search, 'PERSON');
-        handleSearch(query, CORE_API.MeasurableStore.search, 'MEASURABLE');
-        handleSearch(query, CORE_API.OrgUnitStore.search, 'ORG_UNIT');
-        handleSearch(query, CORE_API.ActorStore.search, 'ACTOR');
-        handleSearch(query, CORE_API.PhysicalSpecificationStore.search, 'PHYSICAL_SPECIFICATION');
-        handleSearch(query, CORE_API.AppGroupStore.search, 'APP_GROUP');
+        handleSearch(query, 'APPLICATION');
+        handleSearch(query, 'CHANGE_INITIATIVE');
+        handleSearch(query, 'DATA_TYPE');
+        handleSearch(query, 'PERSON');
+        handleSearch(query, 'MEASURABLE');
+        handleSearch(query, 'ORG_UNIT');
+        handleSearch(query, 'ACTOR');
+        handleSearch(query, 'PHYSICAL_SPECIFICATION');
+        handleSearch(query, 'APP_GROUP');
     };
 
     vm.doSearch = () => doSearch(vm.query);
