@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.physical_specification.search;
 
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
@@ -56,6 +58,9 @@ public class PhysicalSpecificationSearchDao {
 
     public List<PhysicalSpecification> search(String termsStr, EntitySearchOptions options) {
         List<String> terms = mkTerms(termsStr);
+        if (terms.isEmpty()) {
+            return newArrayList();
+        }
 
         Condition likeName = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
         Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.DESCRIPTION, terms);
