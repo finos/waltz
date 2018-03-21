@@ -102,7 +102,7 @@ function controller($location,
         .then(([user = {}, recipients = []]) => {
             vm.user = user;
             const [currentRecipients = [], otherRecipients = []] = _.partition(recipients,
-                r => r.person.email === user.userName);
+                r => _.toLower(r.person.email) === _.toLower(user.userName));
 
             vm.isUserInstanceRecipient = currentRecipients.length > 0;
             vm.otherRecipients = otherRecipients.map(r => r.person);
