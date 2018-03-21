@@ -72,9 +72,11 @@ function calculateExpandedNodes(nodes = [], ratingsById = {}) {
     const requiredIds = [];
     _.each(startingNodes, n => {
         requiredIds.push(n.id);
-        while (n.parentId) {
+        while (n && n.parentId) {
             requiredIds.push(n.parentId);
-            n = byId[n.parentId];
+            const parent = byId[n.parentId];
+            if (! parent) console.warn(`WMRE: could not find parent (${n.parentId}) of measurable (${n.id})`);
+            n = parent;
         }
     });
 
