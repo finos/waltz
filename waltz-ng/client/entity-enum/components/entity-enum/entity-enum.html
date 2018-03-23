@@ -1,0 +1,17 @@
+<div class="row" ng-repeat="row in $ctrl.chunkedEntries">
+    <div class="col-sm-2 waltz-display-field-label"
+         ng-repeat-start="entry in row">
+        <span ng-bind="entry.definition.name"
+              uib-popover="{{ entry.definition.description }}"
+              popover-append-to-body="true"
+              popover-trigger="mouseenter">
+        </span>
+    </div>
+    <div class="col-sm-4"
+         ng-repeat-end="">
+        <waltz-enum-value type="entry.definition.enumValueType"
+                          key="entry.value.enumValueKey"
+                          show-icon="false">
+        </waltz-enum-value>
+    </div>
+</div>
