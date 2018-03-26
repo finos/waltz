@@ -24,6 +24,7 @@ import {kindToViewState} from "../../../common/link-utils";
 const bindings = {
     entityRef: '<',
     iconPlacement: '<',
+    target: '@', /** if '_blank' the external icon is shown **/
     tooltipPlacement: '<'
 };
 
