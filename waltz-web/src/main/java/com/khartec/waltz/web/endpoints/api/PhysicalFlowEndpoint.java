@@ -139,6 +139,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "upload",
                 "validate");
 
+        String uploadPath = mkPath(
+                BASE_URL,
+                "upload");
+
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
 
@@ -186,6 +190,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
         postForDatum(updateAttributePath, this::updateAttribute);
         postForDatum(validateUploadPath, this::validateUpload);
+        postForDatum(uploadPath, this::upload);
 
         deleteForDatum(deletePath, this::deleteFlow);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
@@ -214,6 +219,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         return physicalFlowService.updateSpecDefinitionId(username, flowId, command);
     }
 
+
     private int updateAttribute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
         String username = getUsername(request);
@@ -238,10 +244,19 @@ public class PhysicalFlowEndpoint implements Endpoint {
     }
 
 
-    private List<PhysicalFlowValidateCommandResponse> validateUpload(Request request, Response response) throws IOException {
+    private List<PhysicalFlowUploadCommandResponse> validateUpload(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
-        List<PhysicalFlowValidateCommand> commands = Arrays.asList(readBody(request, PhysicalFlowValidateCommand[].class));
+        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
         return physicalFlowUploadService.validate(commands);
+    }
+
+
+    private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
+        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
+        String username = getUsername(request);
+
+        return physicalFlowUploadService.upload(username, commands);
     }
 
 

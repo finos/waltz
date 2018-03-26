@@ -9,9 +9,9 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalFlowValidateCommand.class)
-@JsonDeserialize(as = ImmutablePhysicalFlowValidateCommand.class)
-public abstract class PhysicalFlowValidateCommand implements
+@JsonSerialize(as = ImmutablePhysicalFlowUploadCommand.class)
+@JsonDeserialize(as = ImmutablePhysicalFlowUploadCommand.class)
+public abstract class PhysicalFlowUploadCommand implements
         Command,
         DescriptionProvider {
 
@@ -40,7 +40,4 @@ public abstract class PhysicalFlowValidateCommand implements
 
     public abstract String frequency();
     public abstract String transport();
-
-    //todo: data types
-
 }
