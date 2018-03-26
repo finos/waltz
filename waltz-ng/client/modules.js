@@ -75,6 +75,7 @@ const dependencies = [
     require('./dynamic-section')(),
     require('./end-user-apps')(),
     require('./entity')(),
+    require('./entity-enum')(),
     require('./entity-named-note')(),
     require('./entity-statistics')(),
     require('./entity-svg-diagram')(),
