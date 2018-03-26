@@ -72,6 +72,19 @@
     </changeSet>
 
 
+    <!-- 3029: physical_spec_defn_field associate with logical_data_element -->
+    <changeSet id="20180315-3029-1"
+               author="kamransaleem">
+        <comment>3029: physical_spec_defn_field associate with logical_data_element</comment>
+        <addColumn tableName="physical_spec_defn_field">
+            <column name="logical_data_element_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
     <!-- 3030: Entity enums -->
     <changeSet id="20180322-3030-1"
                author="rovats">

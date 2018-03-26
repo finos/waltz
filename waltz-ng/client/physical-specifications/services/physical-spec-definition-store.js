@@ -18,7 +18,7 @@
  */
 
 
-function store($http, baseApiUrl) {
+export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-spec-definition`;
 
@@ -62,4 +62,28 @@ store.$inject = [
 ];
 
 
-export default store;
+export const serviceName = 'PhysicalSpecDefinitionStore';
+
+
+export const PhysicalSpecDefinitionStore_API = {
+    findForSpecificationId: {
+        serviceName,
+        serviceFnName: 'findForSpecificationId',
+        description: 'executes findForSpecificationId'
+    },
+    create: {
+        serviceName,
+        serviceFnName: 'create',
+        description: 'executes create'
+    },
+    updateStatus: {
+        serviceName,
+        serviceFnName: 'updateStatus',
+        description: 'executes updateStatus'
+    },
+    deleteSpecification: {
+        serviceName,
+        serviceFnName: 'deleteSpecification',
+        description: 'executes deleteSpecification'
+    }
+};

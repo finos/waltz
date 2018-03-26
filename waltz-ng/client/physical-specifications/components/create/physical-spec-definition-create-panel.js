@@ -129,6 +129,17 @@ function controller() {
         });
     };
 
+    vm.onSelectorEntitySelect = (itemId, item) => {
+        console.log({itemId, item});
+
+        const match = _.find(vm.specDefFields.parsedData, ['field.position', itemId]);
+        if(match) {
+            match.field.logicalDataElementId = item.id;
+            console.log('match: ', match)
+        }
+        console.log('fields: ', vm.specDefFields)
+    };
+
     vm.submit = () => {
         vm.specDefinition.fields = _.map(vm.specDefFields.parsedData, 'field');
         invokeFunction(vm.onSubmit, vm.specDefinition);

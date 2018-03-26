@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutablePhysicalSpecDefinitionField.class)
 @JsonDeserialize(as = ImmutablePhysicalSpecDefinitionField.class)
@@ -36,5 +38,5 @@ public abstract class PhysicalSpecDefinitionField implements
     public abstract long specDefinitionId();
     public abstract int position();
     public abstract FieldDataType type();
-
+    public abstract Optional<Long> logicalDataElementId();
 }

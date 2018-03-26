@@ -1,14 +1,10 @@
 <div>
 
-    <style>
-
-
-    </style>
-
-
     <waltz-section>
-        <waltz-spreadsheet-loader></waltz-spreadsheet-loader>
-
+        <waltz-entity-selector item-id="1"
+                               on-select="ctrl.onSelectorEntitySelect"
+                               entity-kinds="['LOGICAL_DATA_ELEMENT']">
+        </waltz-entity-selector>
     </waltz-section>
 
 </div>
