@@ -29,9 +29,11 @@ import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
+import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.person.PersonService;
+import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,9 +55,11 @@ public class EntitySearchService {
     private final AppGroupService appGroupService;
     private final ChangeInitiativeService changeInitiativeService;
     private final LogicalDataElementService logicalDataElementService;
+    private final DataTypeService dataTypeService;
     private final MeasurableService measurableService;
     private final OrganisationalUnitService organisationalUnitService;
     private final PersonService personService;
+    private final PhysicalSpecificationService physicalSpecificationService;
 
 
     @Autowired
@@ -65,28 +69,34 @@ public class EntitySearchService {
                                AppGroupService appGroupService,
                                ChangeInitiativeService changeInitiativeService,
                                LogicalDataElementService logicalDataElementService,
+                               DataTypeService dataTypeService,
                                MeasurableService measurableService,
                                OrganisationalUnitService organisationalUnitService,
-                               PersonService personService) {
+                               PersonService personService,
+                               PhysicalSpecificationService physicalSpecificationService) {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(appGroupService, "appGroupService cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
         checkNotNull(logicalDataElementService, "logicalDataElementService cannot be null");
+        checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
         checkNotNull(personService, "personService cannot be null");
+        checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
         this.applicationService = applicationService;
         this.appGroupService = appGroupService;
         this.changeInitiativeService = changeInitiativeService;
+        this.dataTypeService = dataTypeService;
         this.logicalDataElementService = logicalDataElementService;
         this.measurableService = measurableService;
         this.organisationalUnitService = organisationalUnitService;
         this.personService = personService;
+        this.physicalSpecificationService = physicalSpecificationService;
     }
 
 
@@ -117,6 +127,8 @@ public class EntitySearchService {
                 return () -> appGroupService.search(terms, options);
             case CHANGE_INITIATIVE:
                 return () -> changeInitiativeService.search(terms, options);
+            case DATA_TYPE:
+                return () -> dataTypeService.search(terms);
             case LOGICAL_DATA_ELEMENT:
                 return () -> logicalDataElementService.search(terms, options);
             case MEASURABLE:
@@ -125,6 +137,8 @@ public class EntitySearchService {
                 return () -> organisationalUnitService.search(terms, options);
             case PERSON:
                 return () -> personService.search(terms, options);
+            case PHYSICAL_SPECIFICATION:
+                return () -> physicalSpecificationService.search(terms, options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }

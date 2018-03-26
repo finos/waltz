@@ -21,17 +21,26 @@ package com.khartec.waltz.model.entity_search;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import org.immutables.value.Value;
 
 import java.util.List;
+
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.PENDING;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntitySearchOptions.class)
 @JsonDeserialize(as = ImmutableEntitySearchOptions.class)
 public abstract class EntitySearchOptions {
     public abstract List<EntityKind> entityKinds();
+
+    @Value.Default
+    public List<EntityLifecycleStatus> entityLifecycleStatuses() {
+        return newArrayList(ACTIVE, PENDING);
+    }
 
     @Value.Default
     public int limit() {
@@ -47,7 +56,7 @@ public abstract class EntitySearchOptions {
 
     public static EntitySearchOptions mkForEntity(EntityKind entityKind) {
         return ImmutableEntitySearchOptions.builder()
-                .entityKinds(ListUtilities.newArrayList(entityKind))
+                .entityKinds(newArrayList(entityKind))
                 .build();
     }
 }

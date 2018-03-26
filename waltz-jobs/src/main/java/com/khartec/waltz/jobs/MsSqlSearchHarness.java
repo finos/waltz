@@ -19,13 +19,18 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.data.application.search.SqlServerAppSearch;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import java.util.List;
 
 public class MsSqlSearchHarness {
 
@@ -34,15 +39,22 @@ public class MsSqlSearchHarness {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
+        SqlServerAppSearch appSearch = new SqlServerAppSearch();
 
+        EntitySearchOptions searchOptions = ImmutableEntitySearchOptions.builder()
+                .addEntityKinds(EntityKind.APPLICATION)
+                .userId("admin")
+                .limit(50)
+                .build();
 
-        dsl.select(PERSON.fields())
-                .from(PERSON)
-                .where(JooqUtilities.MSSQL.mkContains("fowler"))
-                .limit(5)
-                .fetch()
-                .forEach(p -> System.out.println(p.getValue(PERSON.DISPLAY_NAME)));
+        List<Application> results = appSearch.search(
+                dsl,
+                "sap",
+                searchOptions);
 
+        results.stream()
+            .filter(a -> a.entityLifecycleStatus() != EntityLifecycleStatus.REMOVED)
+            .forEach(a -> System.out.println(a.name() + " - " + a.lifecyclePhase()));
     }
 
 
