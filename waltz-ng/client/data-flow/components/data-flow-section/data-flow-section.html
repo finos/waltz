@@ -2,7 +2,7 @@
 
     <!-- ACTIONS -->
     <waltz-section-actions>
-        <!-- Edit Split button -->
+        <!-- Edit Logical Split button -->
         <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
              ng-if="$ctrl.visibility.dataTab == 0 && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
@@ -41,7 +41,7 @@
         </a>
 
 
-        <!-- Register Split button -->
+        <!-- Edit Physical Split button -->
         <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
              ng-if="$ctrl.visibility.dataTab == 1 && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
@@ -49,7 +49,7 @@
 
                 <a class="btn btn-xs btn-primary"
                    ui-sref="main.physical-flow.registration ($ctrl.parentEntityRef)">
-                    Register
+                    Edit
                 </a>
                 <button type="button"
                         class="btn btn-xs btn-primary"
@@ -238,7 +238,6 @@
     </div>
 
     <div ng-if="$ctrl.visibility.editor.bulkPhysicalFlows">
-        <h4>Bulk Insert Physical Flows</h4>
         <waltz-bulk-physical-flow-loader-wizard>
         </waltz-bulk-physical-flow-loader-wizard>
     </div>

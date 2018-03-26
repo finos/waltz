@@ -61,7 +61,8 @@ function mkEntityLinkColumnDef(columnHeading, entityRefField) {
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link ng-if="row.entity.parsedFlow.${entityRefField}"
-                                   entity-ref="row.entity.parsedFlow.${entityRefField}">
+                                   entity-ref="row.entity.parsedFlow.${entityRefField}"
+                                   target="_blank">
                 </waltz-entity-link>
                 <span ng-if="row.entity.errors.${entityRefField}"
                       class="text-danger bg-danger">
@@ -111,6 +112,7 @@ function mkColumnDefs() {
                     <span ng-if="COL_FIELD === null"
                           class="label label-success">New</span>
                     <a ng-if="COL_FIELD"
+                       target="_blank"
                        ui-sref="main.physical-flow.view ({ id:COL_FIELD.id })"
                        class="label label-warning">Exists</a>
                 </div>`

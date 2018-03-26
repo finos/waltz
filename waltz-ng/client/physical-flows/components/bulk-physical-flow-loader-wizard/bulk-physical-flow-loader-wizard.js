@@ -55,7 +55,7 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.backVisible = () => {
-      return vm.currentStep > 1;
+      return vm.currentStep > 1 && vm.currentStep < 4;
     };
 
     vm.back = () => {

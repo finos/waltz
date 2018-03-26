@@ -51,7 +51,8 @@ function mkEntityLinkColumnDef(columnHeading, entityRefField) {
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link ng-if="row.entity.parsedFlow.${entityRefField}"
-                                   entity-ref="row.entity.parsedFlow.${entityRefField}">
+                                   entity-ref="row.entity.parsedFlow.${entityRefField}"
+                                   target="_blank">
                 </waltz-entity-link>
                 <span ng-if="row.entity.errors.${entityRefField}"
                       class="text-danger bg-danger">
@@ -90,7 +91,8 @@ function mkColumnDefs() {
                 <div class="ui-grid-cell-contents">
                     <a ng-if="row.entity.entityReference.id"
                        ng-bind="row.entity.parsedFlow.name"
-                       ui-sref="main.physical-flow.view ({ id: row.entity.entityReference.id })"></a>
+                       ui-sref="main.physical-flow.view ({ id: row.entity.entityReference.id })"
+                       target="_blank"></a>
                 </div>`
         },
         mkEntityLinkColumnDef('Source', 'source'),
