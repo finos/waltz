@@ -90,9 +90,9 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
-    const markApproved = (id) => {
+    const markApproved = (id, reasonCommand) => {
         return $http
-            .put(`${base}/${id}/approval`)
+            .put(`${base}/${id}/approval`, reasonCommand)
             .then(result => result.data);
     };
 

@@ -25,5 +25,6 @@ public enum SurveyInstanceStatus {
     IN_PROGRESS,
     COMPLETED,
     EXPIRED,
+    REJECTED,
     WITHDRAWN
 }

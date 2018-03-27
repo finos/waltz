@@ -38,7 +38,8 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
 
     const [incomplete = [], complete = []] = _.partition(mappedData,
         data => data.surveyInstance.status == 'NOT_STARTED'
-        || data.surveyInstance.status == 'IN_PROGRESS');
+        || data.surveyInstance.status == 'IN_PROGRESS'
+        || data.surveyInstance.status == 'REJECTED');
 
     return {
         'incomplete': incomplete,

@@ -81,7 +81,7 @@ function controller($location,
     const instancePromise  = surveyInstanceStore
         .getById(id)
         .then(r => {
-            vm.instanceCanBeEdited = (r.status === 'NOT_STARTED' || r.status === 'IN_PROGRESS');
+            vm.instanceCanBeEdited = (r.status === 'NOT_STARTED' || r.status === 'IN_PROGRESS' || r.status === 'REJECTED');
             vm.surveyInstance = r;
             return r;
         });
