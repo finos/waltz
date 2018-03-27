@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.logical_data_element;
 
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.model.logical_data_element.ImmutableLogicalDataElement;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
@@ -31,6 +32,7 @@ public class LogicalDataElementDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .type(FieldDataType.valueOf(record.getType()))
+                .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .provenance(record.getProvenance())
                 .build();
 
@@ -43,7 +45,6 @@ public class LogicalDataElementDao {
     @Autowired
     public LogicalDataElementDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
-
         this.dsl = dsl;
     }
 

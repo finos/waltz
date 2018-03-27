@@ -1013,6 +1013,13 @@ export const physicalSpecDefinitionFieldType = {
         icon: null,
         description: null,
         position: 60
+    },
+    UNSPECIFIED: {
+        key: 'UNSPECIFIED',
+        name: 'Unspecified',
+        icon: null,
+        description: null,
+        position: 70
     }
 };
 
