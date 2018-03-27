@@ -20,8 +20,8 @@
             <a class="btn btn-danger btn-xs"
                waltz-has-role="SURVEY_ADMIN"
                ng-if="ctrl.surveyInstance.status === 'COMPLETED' && ctrl.currentResponseVersion.isLatest"
-               ng-click="ctrl.markAsInProgress()">
-                Mark as In Progress
+               ng-click="ctrl.reject()">
+                Reject
             </a>
             <a class="btn btn-success btn-xs"
                waltz-has-role="SURVEY_ADMIN"
@@ -168,7 +168,7 @@
     <br>
 
     <div class="alert alert-info"
-         ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS'">
+         ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS' || ctrl.surveyInstance.status === 'REJECTED'">
         <h4>Survey In Progress</h4>
         <p>Survey responses cannot be viewed until they have been submitted</p>
     </div>
