@@ -1,0 +1,30 @@
+<div class="waltz-bulk-physical-flow-uploader">
+
+    <div class="text-center">
+        <waltz-loading-notification show="$ctrl.loading"
+                                    name="Loading">
+        </waltz-loading-notification>
+    </div>
+
+
+    <div ng-if="!$ctrl.loading && $ctrl.uploadedFlows.length > 0">
+        <h4>Upload Summary</h4>
+
+        <div>
+            <span ng-bind="$ctrl.uploadedFlows.length"></span> Physical Data Flows were successfully uploaded into Waltz.
+        </div>
+
+        <br>
+
+        <!-- Grid -->
+        <waltz-grid-with-search ng-if="$ctrl.uploadedFlows.length > 0"
+                                scope-provider="$ctrl"
+                                column-defs="$ctrl.columnDefs"
+                                entries="$ctrl.uploadedFlows"
+                                searchPlaceholderText="Search"
+                                on-initialise="$ctrl.onGridInitialise">
+        </waltz-grid-with-search>
+
+    </div>
+
+</div>

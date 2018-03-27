@@ -56,12 +56,13 @@ const initialState = {
 
 function mkEntityLinkColumnDef(columnHeading, entityRefField) {
     return {
-        field: entityRefField + '.name',
+        field: 'parsedFlow.' + entityRefField + '.name',
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link ng-if="row.entity.parsedFlow.${entityRefField}"
-                                   entity-ref="row.entity.parsedFlow.${entityRefField}">
+                                   entity-ref="row.entity.parsedFlow.${entityRefField}"
+                                   target="_blank">
                 </waltz-entity-link>
                 <span ng-if="row.entity.errors.${entityRefField}"
                       class="text-danger bg-danger">
@@ -74,7 +75,7 @@ function mkEntityLinkColumnDef(columnHeading, entityRefField) {
 
 function mkColumnDef(columnHeading, entityRefField) {
     return {
-        field: entityRefField,
+        field: 'parsedFlow.' + entityRefField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
@@ -111,6 +112,7 @@ function mkColumnDefs() {
                     <span ng-if="COL_FIELD === null"
                           class="label label-success">New</span>
                     <a ng-if="COL_FIELD"
+                       target="_blank"
                        ui-sref="main.physical-flow.view ({ id:COL_FIELD.id })"
                        class="label label-warning">Exists</a>
                 </div>`
@@ -147,7 +149,7 @@ function mkParseSummary(data = []) {
             circularFlows: 0,
             nonCircularFlows: data.length
         },
-        _.countBy(data, r => r.outcome === 'SUCCESS' && r.entityReference !== null ? 'newFlows' : 'existingFlows'),
+        _.countBy(data, r => r.outcome === 'SUCCESS' && r.entityReference === null ? 'newFlows' : 'existingFlows'),
         _.countBy(data, r => r.parsedFlow.source && r.parsedFlow.target && sameRef(r.parsedFlow.source, r.parsedFlow.target) ? 'circularFlows' : 'nonCircularFlows'));
 
     summary.errors = summary.missingEntities + summary.circularFlows;

@@ -21,6 +21,7 @@ package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -130,6 +131,23 @@ public class PhysicalSpecificationDao {
                 .from(PHYSICAL_SPECIFICATION)
                 .where(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public PhysicalSpecification getByParsedFlow(PhysicalFlowParsed flow) {
+
+        Condition condition = PHYSICAL_SPECIFICATION.NAME.eq(flow.name())
+                        .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
+                        .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
+                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
+
+        return dsl
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
+                .from(PHYSICAL_SPECIFICATION)
+                .where(condition)
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

@@ -41,7 +41,8 @@ const initialState = {
         logicalFlows: false, // this is the source data ratings panel, rename
         editor: {
             logicalFlows: false,
-            bulkLogicalFlows: false
+            bulkLogicalFlows: false,
+            bulkPhysicalFlows: false
         }
 
     }
