@@ -28,6 +28,7 @@ public enum FieldDataType {
     INTEGER,
     STRING,
     BOOLEAN,
-    ENUM
+    ENUM,
+    UNSPECIFIED
 
 }
