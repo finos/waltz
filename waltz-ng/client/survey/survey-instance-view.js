@@ -162,20 +162,26 @@ function controller($stateParams,
         }
     };
 
-    vm.markAsInProgress = () => {
-        if (confirm('Are you sure you want this survey to be marked as In Progress? ' +
-                'This will enable participants to edit and re-submit their responses.')) {
+    vm.reject = () => {
+        const reason = prompt('Are you sure you want reject this survey? ' +
+            'This will enable participants to edit and re-submit their responses.' +
+            ' \n\nPlease enter a reason below (mandatory):');
+
+        if (reason) {
             surveyInstanceStore.updateStatus(
                 vm.surveyInstance.id,
-                {newStatus: 'IN_PROGRESS'}
-            )
+                {
+                    newStatus: 'REJECTED',
+                    reason
+                }
+                )
                 .then(result => {
-                    notification.success('Survey response marked as In Progress');
-                    loadInstanceAndRun();
+                    notification.success('Survey response rejected');
+                    $state.reload();
                 });
         }
     };
-
+    
     loadInstanceAndRun();
     loadRecipients();
 }

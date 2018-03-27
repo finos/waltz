@@ -40,6 +40,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static java.util.Optional.ofNullable;
 
 @Service
 public class SurveyInstanceService {
@@ -122,7 +123,8 @@ public class SurveyInstanceService {
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         checkTrue(surveyInstance.status() == SurveyInstanceStatus.NOT_STARTED
-                    || surveyInstance.status() == SurveyInstanceStatus.IN_PROGRESS,
+                    || surveyInstance.status() == SurveyInstanceStatus.IN_PROGRESS
+                    || surveyInstance.status() == SurveyInstanceStatus.REJECTED,
                 "Survey instance cannot be updated, current status: " + surveyInstance.status());
 
         SurveyInstanceQuestionResponse instanceQuestionResponse = ImmutableSurveyInstanceQuestionResponse.builder()
@@ -145,7 +147,7 @@ public class SurveyInstanceService {
 
         // if survey is being sent back, store current responses as a version
         if (surveyInstance.status() == SurveyInstanceStatus.COMPLETED
-                && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
+                && command.newStatus() == SurveyInstanceStatus.REJECTED) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
             surveyInstanceDao.clearApproved(instanceId);
@@ -194,7 +196,7 @@ public class SurveyInstanceService {
     }
 
 
-    public int markApproved(String userName, long instanceId) {
+    public int markApproved(String userName, long instanceId, String reason) {
         checkNotNull(userName, "userName cannot be null");
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
@@ -208,7 +210,7 @@ public class SurveyInstanceService {
                         .operation(Operation.UPDATE)
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
-                        .message("Survey Instance: approved")
+                        .message("Survey Instance: Approved" + ofNullable(reason).map(r -> ", [Reason]: " + r).orElse(""))
                         .build());
 
         return result;

@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions} from './survey-utils';
+import {groupQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 
@@ -124,8 +124,8 @@ function controller($state,
             loadParticipants(responses);
         });
 
-    vm.markAsInProgress = () => {
-        const reason = prompt('Are you sure you want this survey to be marked as In Progress? ' +
+    vm.reject = () => {
+        const reason = prompt('Are you sure you want reject this survey? ' +
             'This will enable participants to edit and re-submit their responses.' +
             ' \n\nPlease enter a reason below (mandatory):');
 
@@ -133,24 +133,29 @@ function controller($state,
             surveyInstanceStore.updateStatus(
                 vm.surveyInstance.id,
                 {
-                    newStatus: 'IN_PROGRESS',
+                    newStatus: 'REJECTED',
                     reason
                 }
             )
             .then(result => {
-                notification.success('Survey response marked as In Progress');
+                notification.success('Survey response rejected');
                 $state.reload();
             });
         }
     };
 
     vm.approve = () => {
-        if (confirm('Are you sure you want to approve this survey?')) {
-            surveyInstanceStore.markApproved(vm.surveyInstance.id)
-                .then(result => {
-                    notification.success('Survey response approved');
-                    $state.reload();
-                });
+        const reason = prompt('Are you sure you want to approve this survey? '
+                        + ' \n\nPlease enter a reason below (optional)');
+
+        if (!_.isNil(reason)) {
+            surveyInstanceStore.markApproved(vm.surveyInstance.id, {
+                newStringVal: (_.isEmpty(reason) ? null : reason)
+            })
+            .then(result => {
+                notification.success('Survey response approved');
+                $state.reload();
+            });
         }
     };
 

@@ -1145,12 +1145,19 @@ export const surveyInstanceStatus = {
         description: null,
         position: 40
     },
+    REJECTED: {
+        key: 'REJECTED',
+        name: 'Rejected',
+        icon: null,
+        description: null,
+        position: 50
+    },
     WITHDRAWN: {
         key: 'WITHDRAWN',
         name: 'Withdrawn',
         icon: null,
         description: null,
-        position: 50
+        position: 60
     }
 };
 

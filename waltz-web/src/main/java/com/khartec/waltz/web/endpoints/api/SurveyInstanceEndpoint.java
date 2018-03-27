@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.DateChangeCommand;
+import com.khartec.waltz.model.StringChangeCommand;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
@@ -145,10 +146,12 @@ public class SurveyInstanceEndpoint implements Endpoint {
             ensureUserHasAdminRights(req);
 
             res.type(WebUtilities.TYPE_JSON);
+            StringChangeCommand command = readBody(req, StringChangeCommand.class);
 
             return surveyInstanceService.markApproved(
                     WebUtilities.getUsername(req),
-                    getId(req));
+                    getId(req),
+                    command.newStringVal().orElse(null));
         };
 
 
