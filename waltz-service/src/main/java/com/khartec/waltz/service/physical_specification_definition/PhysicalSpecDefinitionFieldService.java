@@ -57,6 +57,7 @@ public class PhysicalSpecDefinitionFieldService {
                 .position(command.position())
                 .type(command.type())
                 .description(command.description())
+                .logicalDataElementId(command.logicalDataElementId())
                 .lastUpdatedBy(userName)
                 .build());
     }

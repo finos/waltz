@@ -27,6 +27,8 @@ import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutablePhysicalSpecDefinitionFieldChangeCommand.class)
 @JsonDeserialize(as = ImmutablePhysicalSpecDefinitionFieldChangeCommand.class)
@@ -37,5 +39,6 @@ public abstract class PhysicalSpecDefinitionFieldChangeCommand implements
 
     public abstract int position();
     public abstract FieldDataType type();
+    public abstract Optional<Long> logicalDataElementId();
 
 }

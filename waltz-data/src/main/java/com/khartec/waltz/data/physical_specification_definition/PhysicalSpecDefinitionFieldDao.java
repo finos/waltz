@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -48,6 +49,7 @@ public class PhysicalSpecDefinitionFieldDao {
                 .position(record.getPosition())
                 .type(FieldDataType.valueOf(record.getType()))
                 .description(record.getDescription())
+                .logicalDataElementId(Optional.ofNullable(record.getLogicalDataElementId()))
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
@@ -60,6 +62,7 @@ public class PhysicalSpecDefinitionFieldDao {
         record.setName(f.name());
         record.setPosition(f.position());
         record.setType(f.type().name());
+        record.setLogicalDataElementId(f.logicalDataElementId().orElse(null));
         record.setDescription(f.description());
         record.setLastUpdatedAt(Timestamp.valueOf(f.lastUpdatedAt()));
         record.setLastUpdatedBy(f.lastUpdatedBy());

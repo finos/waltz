@@ -6,8 +6,8 @@
    class="waltz-visibility-parent">
 
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
-                             icon-placement="$ctrl.iconPlacement"
-                             tooltip-placement="$ctrl.tooltipPlacement">
+                             icon-placement="{{$ctrl.iconPlacement}}"
+                             tooltip-placement="{{$ctrl.tooltipPlacement}}">
     </waltz-entity-icon-label>
     <waltz-icon ng-if='$ctrl.target === "_blank"'
                 class="waltz-visibility-child-30"
@@ -16,7 +16,7 @@
 </a>
 
 <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
-                         icon-placement="$ctrl.iconPlacement"
-                         tooltip-placement="$ctrl.tooltipPlacement"
+                         icon-placement="{{$ctrl.iconPlacement}}"
+                         tooltip-placement="{{$ctrl.tooltipPlacement}}"
                          ng-if="!$ctrl.viewUrl">
 </waltz-entity-icon-label>

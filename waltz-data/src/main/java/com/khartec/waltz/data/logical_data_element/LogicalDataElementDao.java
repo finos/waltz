@@ -4,9 +4,7 @@ import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.model.logical_data_element.ImmutableLogicalDataElement;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
 import com.khartec.waltz.schema.tables.records.LogicalDataElementRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +57,14 @@ public class LogicalDataElementDao {
     public List<LogicalDataElement> findAll() {
         return dsl.select()
                 .from(LOGICAL_DATA_ELEMENT)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<LogicalDataElement> findBySelector(Select<Record1<Long>> selector) {
+        return dsl
+                .selectFrom(LOGICAL_DATA_ELEMENT)
+                .where(LOGICAL_DATA_ELEMENT.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }
