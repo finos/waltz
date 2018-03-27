@@ -1,0 +1,44 @@
+<div class="container-fluid">
+
+    <!-- Header -->
+    <waltz-page-header name="{{ ctrl.logicalDataElement.name }}"
+                       small="{{ ctrl.logicalDataElement.type }}"
+                       tour="ctrl.tour"
+                       icon="asterisk">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li ng-bind="ctrl.logicalDataElement.name | truncateMiddle:50"></li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-sub-section name="Overview">
+                    <content>
+                        <div class="waltz-sub-section-content">
+                            <div ng-bind="ctrl.logicalDataElement.description">
+                            </div>
+                        </div>
+                    </content>
+                </waltz-sub-section>
+            </div>
+        </div>
+
+    </div>
+
+    <br>
+
+
+    <!-- Entity Named Notes -->
+    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+
+
+    <!-- Bookmarks -->
+    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+</div>

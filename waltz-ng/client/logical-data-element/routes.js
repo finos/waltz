@@ -17,21 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerStores} from '../common/module-utils';
-import routes from './routes';
-import * as LogicalDataElementStore from './services/logical-data-element-store';
+const baseState = {
+};
 
 
-function setup() {
-    const module = angular.module('waltz.logical.data.element', []);
+const viewState = {
+    url: 'logical-data-element/{id:int}',
+    views: {'content@': require('./logical-data-element-view') },
+};
 
-    registerStores(module, [LogicalDataElementStore]);
 
-    module.config(routes);
+function setup($stateProvider) {
 
-    return module.name;
+    $stateProvider
+        .state('main.logical-data-element', baseState)
+        .state('main.logical-data-element.view', viewState);
 }
+
+
+setup.$inject = ['$stateProvider'];
 
 
 export default setup;
