@@ -169,4 +169,19 @@
             </column>
         </createTable>
     </changeSet>
+
+
+    <!-- 3050: Add entityLifecycleStatus field to LogicalDataElement -->
+    <changeSet id="20180327-3050-1"
+               author="dwatkins">
+        <comment>3050: Add entityLifecycleStatus field to LogicalDataElement</comment>
+        <addColumn tableName="logical_data_element">
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

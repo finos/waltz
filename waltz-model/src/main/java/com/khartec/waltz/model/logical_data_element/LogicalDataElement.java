@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public abstract class LogicalDataElement implements
         IdProvider,
         EntityKindProvider,
+        EntityLifecycleStatusProvider,
         ExternalIdProvider,
         NameProvider,
         DescriptionProvider,

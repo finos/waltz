@@ -19,7 +19,13 @@
 
 package com.khartec.waltz.model;
 
+import org.immutables.value.Value;
+
 public interface EntityLifecycleStatusProvider {
 
-    EntityLifecycleStatus entityLifecycleStatus();
+    @Value.Default
+    default EntityLifecycleStatus entityLifecycleStatus() {
+        return EntityLifecycleStatus.ACTIVE;
+    }
+
 }
