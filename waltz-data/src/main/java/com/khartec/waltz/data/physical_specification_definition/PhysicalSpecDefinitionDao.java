@@ -19,15 +19,12 @@
 
 package com.khartec.waltz.data.physical_specification_definition;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -37,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
 
@@ -82,7 +78,6 @@ public class PhysicalSpecDefinitionDao {
     private final DSLContext dsl;
 
 
-
     @Autowired
     public PhysicalSpecDefinitionDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
@@ -101,6 +96,13 @@ public class PhysicalSpecDefinitionDao {
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
                 .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<PhysicalSpecDefinition> findBySelector(Select<Record1<Long>> selector) {
+        return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
+                .where(PHYSICAL_SPEC_DEFN.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

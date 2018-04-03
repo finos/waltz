@@ -20,9 +20,13 @@
 package com.khartec.waltz.service.physical_specification_definition;
 
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
+import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefnFieldIdSelectorFactory;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,13 +38,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class PhysicalSpecDefinitionFieldService {
 
     private final PhysicalSpecDefinitionFieldDao dao;
+    private final PhysicalSpecDefnFieldIdSelectorFactory idSelectorFactory;
 
 
     @Autowired
-    public PhysicalSpecDefinitionFieldService(PhysicalSpecDefinitionFieldDao dao) {
+    public PhysicalSpecDefinitionFieldService(PhysicalSpecDefinitionFieldDao dao,
+                                              PhysicalSpecDefnFieldIdSelectorFactory physicalSpecDefnFieldIdSelectorFactory) {
         checkNotNull(dao, "dao cannot be null");
+        checkNotNull(physicalSpecDefnFieldIdSelectorFactory, "idSelectorFactory cannot be null");
 
         this.dao = dao;
+        this.idSelectorFactory = physicalSpecDefnFieldIdSelectorFactory;
     }
 
 
@@ -75,5 +83,11 @@ public class PhysicalSpecDefinitionFieldService {
 
     public List<PhysicalSpecDefinitionField> findForSpecDefinition(long specDefinitionId) {
         return dao.findForSpecDefinition(specDefinitionId);
+    }
+
+
+    public List<PhysicalSpecDefinitionField> findBySelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = idSelectorFactory.apply(options);
+        return dao.findBySelector(selector);
     }
 }

@@ -22,15 +22,15 @@ package com.khartec.waltz.service.physical_specification_definition;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
+import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefnIdSelectorFactory;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,22 +52,25 @@ public class PhysicalSpecDefinitionService {
     private final PhysicalSpecDefinitionFieldDao physicalSpecDefinitionFieldDao;
     private final PhysicalSpecDefinitionSampleFileDao physicalSpecDefinitionSampleFileDao;
     private final Map<ReleaseLifecycleStatus, List<ReleaseLifecycleStatus>> stateTransitions;
-
+    private final PhysicalSpecDefnIdSelectorFactory physicalSpecDefnIdSelectorFactory;
 
 
     @Autowired
     public PhysicalSpecDefinitionService(ChangeLogService changeLogService,
                                          PhysicalSpecDefinitionDao physicalSpecDefinitionDao,
                                          PhysicalSpecDefinitionFieldDao physicalSpecDefinitionFieldDao,
+                                         PhysicalSpecDefnIdSelectorFactory physicalSpecDefnIdSelectorFactory,
                                          PhysicalSpecDefinitionSampleFileDao physicalSpecDefinitionSampleFileDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(physicalSpecDefinitionDao, "physicalSpecDefinitionDao cannot be null");
         checkNotNull(physicalSpecDefinitionFieldDao, "physicalSpecDefinitionFieldDao cannot be null");
+        checkNotNull(physicalSpecDefnIdSelectorFactory, "physicalSpecDefnIdSelectorFactory cannot be null");
         checkNotNull(physicalSpecDefinitionSampleFileDao, "physicalSpecDefinitionSampleFileDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.physicalSpecDefinitionDao = physicalSpecDefinitionDao;
         this.physicalSpecDefinitionFieldDao = physicalSpecDefinitionFieldDao;
+        this.physicalSpecDefnIdSelectorFactory = physicalSpecDefnIdSelectorFactory;
         this.physicalSpecDefinitionSampleFileDao = physicalSpecDefinitionSampleFileDao;
 
         // initialise valid state transitions
@@ -141,6 +144,12 @@ public class PhysicalSpecDefinitionService {
 
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
         return physicalSpecDefinitionDao.findForSpecification(specificationId);
+    }
+
+
+    public List<PhysicalSpecDefinition> findBySelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = physicalSpecDefnIdSelectorFactory.apply(options);
+        return physicalSpecDefinitionDao.findBySelector(selector);
     }
 
 

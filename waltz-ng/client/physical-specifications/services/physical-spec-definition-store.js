@@ -18,9 +18,18 @@
  */
 
 
+import {checkIsIdSelector} from "../../common/checks";
+
 export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-spec-definition`;
+
+    const findBySelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${base}/selector`, options)
+            .then(r => r.data);
+    };
 
     const findForSpecificationId = (specId) => {
         return $http
@@ -48,6 +57,7 @@ export function store($http, baseApiUrl) {
 
 
     return {
+        findBySelector,
         findForSpecificationId,
         create,
         updateStatus,
@@ -66,6 +76,11 @@ export const serviceName = 'PhysicalSpecDefinitionStore';
 
 
 export const PhysicalSpecDefinitionStore_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
     findForSpecificationId: {
         serviceName,
         serviceFnName: 'findForSpecificationId',

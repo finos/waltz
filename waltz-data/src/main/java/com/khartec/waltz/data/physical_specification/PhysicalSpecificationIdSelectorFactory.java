@@ -30,9 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
@@ -55,6 +55,8 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
         switch(options.entityReference().kind()) {
             case PHYSICAL_FLOW:
                 return mkForPhysicalFlow(options);
+            case LOGICAL_DATA_ELEMENT:
+                return mkForLogicalElement(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalFlow(options);
             case FLOW_DIAGRAM:
@@ -67,8 +69,19 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     }
 
 
+    private Select<Record1<Long>> mkForLogicalElement(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long logicalElementId = options.entityReference().id();
+        return DSL.select(PHYSICAL_SPECIFICATION.ID)
+                .from(PHYSICAL_SPECIFICATION)
+                .join(PHYSICAL_SPEC_DEFN).on(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .join(PHYSICAL_SPEC_DEFN_FIELD).on(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID.eq(PHYSICAL_SPEC_DEFN.ID))
+                .where(PHYSICAL_SPEC_DEFN_FIELD.LOGICAL_DATA_ELEMENT_ID.eq(logicalElementId));
+    }
+
+
     private Select<Record1<Long>> mkForSpecification(IdSelectionOptions options) {
-        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a spec ref");
+        ensureScopeIsExact(options);
         return DSL.select(DSL.val(options.entityReference().id()));
     }
 
