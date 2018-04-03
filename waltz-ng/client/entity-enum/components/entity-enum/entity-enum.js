@@ -62,12 +62,12 @@ function controller($q, serviceBroker) {
 
             $q.all([definitionsPromise, valuesPromise])
                 .then(([defs, vals]) => {
-                    const defsById = _.keyBy(defs, 'id');
+                    const valsByDefId = _.keyBy(vals, 'definitionId');
 
-                    const entries = _.chain(vals)
-                        .map(v => ({
-                            definition: defsById[v.definitionId],
-                            value: v
+                    const entries = _.chain(defs)
+                        .map(d => ({
+                            definition: d,
+                            value: valsByDefId[d.id] || {enumValueKey: "-"}
                         }))
                         .sortBy(o => [o.definition.position, o.definition.id])
                         .value();
