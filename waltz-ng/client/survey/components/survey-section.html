@@ -2,47 +2,70 @@
     <div ng-if="$ctrl.surveys.length > 0">
         <table class="table table-condensed table-striped small">
             <colgroup>
-                <col width="30%">
-                <col width="35%">
+                <col width="34%">
                 <col width="10%">
-                <col width="10%">
-                <col width="15%">
+                <col width="8%">
+                <col width="16%">
+                <col width="8%">
+                <col width="16%">
+                <col width="8%">
             </colgroup>
             <thead>
             <tr>
                 <th>Title</th>
-                <th>Description</th>
-                <th>Issued</th>
+                <th>Status</th>
+                <th>Issued On</th>
                 <th>Submitted By</th>
+                <th>Submitted On</th>
                 <th>Approved By</th>
+                <th>Approved On</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
                 <td>
-                    <a ng-bind="row.surveyRun.name"
+                    <a ng-if="row.surveyInstance.status === 'COMPLETED'"
+                       ng-bind="row.surveyRun.name"
                        class="clickable"
                        ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
+                    <a ng-if="row.surveyInstance.status !== 'COMPLETED'"
+                       ng-bind="row.surveyRun.name"
+                       class="clickable"
+                       ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
                 </td>
-                <td><waltz-markdown text="row.surveyRun.description"></waltz-markdown></td>
-                <td><waltz-from-now timestamp="row.surveyRun.issuedOn"></waltz-from-now></td>
+                <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+                </td>
+                <td ng-bind="row.surveyRun.issuedOn | date:'dd-MM-yyyy'">
+                </td>
                 <td>
-                    <span ng-bind="row.surveyInstance.submittedBy">
-                    </span>,
-                    <waltz-from-now class='text-muted'
-                                    timestamp="row.surveyInstance.submittedAt">
-
-                    </waltz-from-now>
+                    <span ng-if="row.surveyInstance.submittedBy"
+                          ng-bind="row.surveyInstance.submittedBy">
+                    </span>
+                    <span ng-if="! row.surveyInstance.submittedBy">
+                        -
+                    </span>
+                </td>
+                <td>
+                    <span ng-if="row.surveyInstance.submittedAt"
+                          ng-bind="row.surveyInstance.submittedAt | date:'dd-MM-yyyy'">
+                    </span>
+                    <span ng-if="! row.surveyInstance.submittedAt">
+                        -
+                    </span>
                 </td>
                 <td>
                     <span ng-if="row.surveyInstance.approvedBy">
                         <span ng-bind="row.surveyInstance.approvedBy">
-                        </span>,
+                        </span>
                     </span>
-                    <waltz-from-now class='text-muted'
-                                    ng-if="row.surveyInstance.approvedAt"
-                                    timestamp="row.surveyInstance.approvedAt">
-                    </waltz-from-now>
+                    <span ng-if="! row.surveyInstance.approvedBy">
+                        -
+                    </span>
+                </td>
+                <td>
+                    <span ng-if="row.surveyInstance.approvedAt"
+                          ng-bind="row.surveyInstance.approvedAt | date:'dd-MM-yyyy'">
+                    </span>
                     <span ng-if="! row.surveyInstance.approvedAt">
                         -
                     </span>
