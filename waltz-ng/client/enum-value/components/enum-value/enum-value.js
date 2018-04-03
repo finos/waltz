@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../../common/index';
-
-import template from './enum-value.html';
+import {initialiseData} from "../../../common/index";
+import template from "./enum-value.html";
 
 
 const bindings = {
@@ -40,7 +39,7 @@ function controller(displayNameService, descriptionService, iconNameService) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        vm.name = displayNameService.lookup(vm.type, vm.key);
+        vm.name = displayNameService.lookup(vm.type, vm.key) || vm.key;
         vm.description = descriptionService.lookup(vm.type, vm.key);
         vm.icon = iconNameService.lookup(vm.type, vm.key);
     };
