@@ -16,34 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import angular from "angular";
+
+import {registerComponents} from '../common/module-utils';
+
+import RelatedPhysicalSpecDefnFieldsSection from './components/related-physical-fields-section/related-physical-spec-defn-field-section';
 
 
-import {checkIsEntityRef} from "./checks";
+function setup() {
+    const module = angular.module('waltz.physical-spec-defn-field', []);
 
-export function getDefaultScopeForEntityKind(kind) {
-    switch (kind) {
-        case 'ACTOR':
-        case 'APPLICATION':
-        case 'APP_GROUP':
-        case 'CHANGE_INITIATIVE':
-        case 'FLOW_DIAGRAM':
-        case 'LOGICAL_DATA_ELEMENT':
-        case 'LOGICAL_FLOW':
-        case 'PHYSICAL_FLOW':
-        case 'PHYSICAL_SPECIFICATION':
-            return 'EXACT';
-        default:
-            return 'CHILDREN';
-    }
+    registerComponents(module, [
+        RelatedPhysicalSpecDefnFieldsSection
+    ]);
+
+    return module.name;
 }
 
 
-export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ['ACTIVE']) {
-    checkIsEntityRef(entityReference);
-
-    return {
-        entityReference,
-        scope: scope || getDefaultScopeForEntityKind(entityReference.kind),
-        entityLifecycleStatuses
-    };
-}
+export default setup;

@@ -30,6 +30,7 @@ const initialState = {
     tour: [],
     bookmarksSection: dynamicSections.bookmarksSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
+    relatedPhysicalFieldSection: dynamicSections.relatedPhysicalFieldSection,
 };
 
 
@@ -57,11 +58,8 @@ function addToHistory(historyStore, logicalDataElement) {
 }
 
 
-function controller($q,
-                    $state,
-                    $stateParams,
+function controller($stateParams,
                     historyStore,
-                    notification,
                     serviceBroker,
                     tourService)
 {
@@ -89,11 +87,8 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$state',
     '$stateParams',
     'HistoryStore',
-    'Notification',
     'ServiceBroker',
     'TourService'
 ];

@@ -41,6 +41,9 @@ export function kindToViewState(kind) {
     if (kind === 'FLOW_DIAGRAM') {
         return "main.flow-diagram.view";
     }
+    if (kind === 'LOGICAL_DATA_ELEMENT') {
+        return "main.logical-data-element.view";
+    }
     if (kind === 'MEASURABLE') {
         return "main.measurable.view";
     }
@@ -66,14 +69,6 @@ export function kindToViewState(kind) {
         return "main.physical-flow.view";
     }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
-}
-
-
-export function kindToBaseState(kind) {
-    if (kind === 'CHANGE_INITIATIVE') {
-        return "main.change-initiative";
-    }
-    throw "Unable to convert kind: "+kind+ " to a ui-base state";
 }
 
 
