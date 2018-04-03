@@ -17,10 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {checkIsIdSelector} from "../../common/checks";
+
 
 export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/physical-spec-definition-field`;
+
+    const findBySelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${base}/selector`, options)
+            .then(r => r.data);
+    };
 
     const findForSpecDefinitionId = (specDefId) => {
         return $http
@@ -35,6 +44,7 @@ export function store($http, baseApiUrl) {
     };
 
     return {
+        findBySelector,
         findForSpecDefinitionId,
         createFields
     };
@@ -47,11 +57,15 @@ store.$inject = [
 ];
 
 
-
 export const serviceName = 'PhysicalSpecDefinitionFieldStore';
 
 
 export const PhysicalSpecDefinitionFieldStore_API = {
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
+    },
     findForSpecDefinitionId: {
         serviceName,
         serviceFnName: 'findForSpecDefinitionId',

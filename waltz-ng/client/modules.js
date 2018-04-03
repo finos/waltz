@@ -105,6 +105,7 @@ const dependencies = [
     require('./physical-flow-lineage')(),
     require('./physical-flows')(),
     require('./physical-specifications')(),
+    require('./physical-field')(),
     require('./playpen')(),
     require('./playpen/5')(),
     require('./profile')(),

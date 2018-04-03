@@ -62,10 +62,14 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForSpecDefinitionPath = mkPath(BASE_URL, "spec-definition", ":id");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String createFieldsPath = mkPath(BASE_URL, "spec-definition", ":id", "fields");
 
         ListRoute<PhysicalSpecDefinitionField> findForSpecDefinitionRoute =
                 (req, res) -> specDefinitionFieldService.findForSpecDefinition(getId(req));
+
+        ListRoute<PhysicalSpecDefinitionField> findBySelectorRoute =
+                (req, res) -> specDefinitionFieldService.findBySelector(readIdSelectionOptionsFromBody(req));
 
         ListRoute<Long> createFieldsRoute = (req, res) -> {
             requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
@@ -83,5 +87,6 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
 
         getForList(findForSpecDefinitionPath, findForSpecDefinitionRoute);
         postForList(createFieldsPath, createFieldsRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
     }
 }

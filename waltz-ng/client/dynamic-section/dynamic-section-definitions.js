@@ -198,6 +198,12 @@ export const dynamicSections = {
         icon: 'paper-plane-o',
         id: 30,
     },
+    relatedPhysicalFieldSection: {
+        componentId: 'related-physical-spec-defn-field-section',
+        name: 'Physical Fields',
+        icon: 'file-code-o',
+        id: 40,
+    },
 };
 
 

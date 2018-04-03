@@ -23,9 +23,7 @@ import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysic
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnFieldRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -85,6 +83,13 @@ public class PhysicalSpecDefinitionFieldDao {
     public List<PhysicalSpecDefinitionField> findForSpecDefinition(long specDefinitionId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DEFN_FIELD)
                 .where(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID.eq(specDefinitionId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<PhysicalSpecDefinitionField> findBySelector(Select<Record1<Long>> selector) {
+        return dsl.selectFrom(PHYSICAL_SPEC_DEFN_FIELD)
+                .where(PHYSICAL_SPEC_DEFN_FIELD.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
