@@ -42,7 +42,8 @@ const initialState = {
         'APP_GROUP',
         'ORG_UNIT',
         'MEASURABLE',
-        'PHYSICAL_SPECIFICATION'
+        'PHYSICAL_SPECIFICATION',
+        'LOGICAL_DATA_ELEMENT'
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -177,6 +178,7 @@ function controller($element,
         handleSearch(query, 'ACTOR');
         handleSearch(query, 'PHYSICAL_SPECIFICATION');
         handleSearch(query, 'APP_GROUP');
+        handleSearch(query, 'LOGICAL_DATA_ELEMENT');
     };
 
     vm.doSearch = () => doSearch(vm.query);
