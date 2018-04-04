@@ -19,47 +19,16 @@
 
 package com.khartec.waltz.model;
 
-public enum EntityKind {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.command.Command;
+import org.immutables.value.Value;
 
-    APPLICATION,
-    APP_GROUP,
-    APP_RATING,
-    ASSET_COST,
-    ATTESTATION,
-    AUTHORITATIVE_SOURCE,
-    BOOKMARK,
-    CHANGE_INITIATIVE,
-    DATABASE,
-    DATA_TYPE,
-    DRILL_GRID_DEFINITION,
-    END_USER_APPLICATION,
-    ENTITY_HIERARCHY,
-    ENTITY_NAMED_NOTE,
-    ENTITY_NAMED_NOTE_TYPE,
-    ENTITY_STATISTIC,
-    FLOW_DIAGRAM,
-    INVOLVEMENT,
-    INVOLVEMENT_KIND,
-    ACTOR,
-    LOGICAL_DATA_ELEMENT,
-    LOGICAL_DATA_FLOW,
-    MEASURABLE,
-    MEASURABLE_CATEGORY,
-    MEASURABLE_RATING,
-    ORG_UNIT,
-    PERFORMANCE_METRIC_PACK,
-    PERSON,
-    PHYSICAL_SPECIFICATION,
-    PHYSICAL_SPEC_DEFN,
-    PHYSICAL_SPEC_DEFN_FIELD,
-    PHYSICAL_FLOW,
-    SERVER,
-    SOFTWARE,
-    SURVEY_INSTANCE,
-    SURVEY_RUN,
-    SURVEY_TEMPLATE,
-    SYSTEM,
 
-    @Deprecated
-    CAPABILITY  // TO BE REMOVED IN 1.5
+@Value.Immutable
+@JsonSerialize(as = ImmutableDescriptionChangeCommand.class)
+@JsonDeserialize(as = ImmutableDescriptionChangeCommand.class)
+public abstract class DescriptionChangeCommand implements Command {
+
+    public abstract String newDescription();
 }
