@@ -35,16 +35,21 @@ import static com.khartec.waltz.model.EntityLifecycleStatus.PENDING;
 @JsonSerialize(as = ImmutableEntitySearchOptions.class)
 @JsonDeserialize(as = ImmutableEntitySearchOptions.class)
 public abstract class EntitySearchOptions {
+
+    private static final int DEFAULT_SEARCH_RESULTS_LIMIT = 20;
+
     public abstract List<EntityKind> entityKinds();
+
 
     @Value.Default
     public List<EntityLifecycleStatus> entityLifecycleStatuses() {
         return newArrayList(ACTIVE, PENDING);
     }
 
+
     @Value.Default
     public int limit() {
-        return 20;
+        return DEFAULT_SEARCH_RESULTS_LIMIT;
     }
 
 

@@ -128,7 +128,7 @@ public class CollectionUtilities {
      * @param <X>
      * @return
      */
-    public static <X> Collection<X> sort(Collection<X> xs, Comparator<? super X> comparator) {
+    public static <X> List<X> sort(Collection<X> xs, Comparator<? super X> comparator) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(comparator, "comparator cannot be null");
 

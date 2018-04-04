@@ -60,7 +60,7 @@ function controller($q, serviceBroker) {
 
             $q.all([runsPromise, instancesPromise])
                 .then(([runs, instances]) =>
-                    vm.surveys = mkTableData(runs, _.filter(instances, {'status': 'COMPLETED'})));
+                    vm.surveys = mkTableData(runs, instances));
         }
     };
 
