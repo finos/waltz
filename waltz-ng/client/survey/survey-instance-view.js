@@ -163,9 +163,7 @@ function controller($stateParams,
     };
 
     vm.reject = () => {
-        const reason = prompt('Are you sure you want reject this survey? ' +
-            'This will enable participants to edit and re-submit their responses.' +
-            ' \n\nPlease enter a reason below (mandatory):');
+        const reason = prompt('Are you sure you want reject this survey? Please enter a reason below (mandatory):');
 
         if (reason) {
             surveyInstanceStore.updateStatus(
@@ -191,7 +189,7 @@ controller.$inject = [
     '$stateParams',
     'Notification',
     'SurveyInstanceStore',
-    'SurveyRunStore',
+    'SurveyRunStore'
 ];
 
 
