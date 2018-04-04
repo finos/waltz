@@ -25,7 +25,9 @@ const bindings = {
     logicalDataElements: '<',
     specDefinition: '<',
     selectableDefinitions: '<',
-    onDefinitionSelect: '<'
+    onDefinitionSelect: '<',
+    onUpdateFieldDescription: '<',
+    onUpdateLogicalDataElement: '<'
 };
 
 
@@ -33,14 +35,16 @@ const initialState = {
     logicalDataElementsById: {},
     specDefinition: {},
     selectableDefinitions: [],
-    onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def)
+    onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def),
+    onUpdateFieldDescription: (fieldId, change) => console.log('psdp::onUpdateFieldDescription', { fieldId, change }),
+    onUpdateLogicalDataElement: (fieldId, change) => console.log('psdp::onUpdateLogicalDataElement', { fieldId, change })
 };
 
 
 const template = require('./physical-spec-definition-panel.html');
 
 
-function controller() {
+function controller($q) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
@@ -50,10 +54,22 @@ function controller() {
     };
 
     vm.definitionSelected = (def) => invokeFunction(vm.onDefinitionSelect, def);
+
+    vm.updateDescription = (id, change) => {
+        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
+        invokeFunction(vm.onUpdateFieldDescription, id, change);
+    };
+
+    vm.updateLogicalElement = (id, change) => {
+        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Not selected");
+        invokeFunction(vm.onUpdateLogicalDataElement, id, change);
+    };
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    '$q'
+];
 
 
 const component = {

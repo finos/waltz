@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.physical_specification_definition;
 
+import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.FieldDataType;
@@ -115,6 +116,21 @@ public class PhysicalSpecDefinitionFieldDao {
     public int deleteForSpecDefinition(long specDefinitionId) {
         return dsl.deleteFrom(PHYSICAL_SPEC_DEFN_FIELD)
                 .where(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID.eq(specDefinitionId))
+                .execute();
+    }
+
+
+    public int updateDescription(long fieldId, String description) {
+        return dsl.update(PHYSICAL_SPEC_DEFN_FIELD)
+                .set(PHYSICAL_SPEC_DEFN_FIELD.DESCRIPTION, description)
+                .where(PHYSICAL_SPEC_DEFN_FIELD.ID.eq(fieldId))
+                .execute();
+    }
+
+    public int updateLogicalDataElement(long fieldId, long logicalDataElementId) {
+        return dsl.update(PHYSICAL_SPEC_DEFN_FIELD)
+                .set(PHYSICAL_SPEC_DEFN_FIELD.LOGICAL_DATA_ELEMENT_ID, logicalDataElementId)
+                .where(PHYSICAL_SPEC_DEFN_FIELD.ID.eq(fieldId))
                 .execute();
     }
 }

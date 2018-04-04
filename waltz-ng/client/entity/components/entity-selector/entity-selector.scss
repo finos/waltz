@@ -3,4 +3,11 @@
     span.wes-selected-name {
         display: inline;
     }
+
+    .wes-entity-description {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }

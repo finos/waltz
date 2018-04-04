@@ -19,12 +19,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.DescriptionChangeCommand;
+import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.putForDatum;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -64,6 +69,8 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
         String findForSpecDefinitionPath = mkPath(BASE_URL, "spec-definition", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String createFieldsPath = mkPath(BASE_URL, "spec-definition", ":id", "fields");
+        String updateDescriptionPath = mkPath(BASE_URL, ":id", "description");
+        String updateLogicalElementPath = mkPath(BASE_URL, ":id", "logical-data-element");
 
         ListRoute<PhysicalSpecDefinitionField> findForSpecDefinitionRoute =
                 (req, res) -> specDefinitionFieldService.findForSpecDefinition(getId(req));
@@ -85,8 +92,36 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
                     .collect(toList());
         };
 
+        DatumRoute<Integer> updateDescriptionRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+            res.type(WebUtilities.TYPE_JSON);
+            DescriptionChangeCommand command = readBody(req, DescriptionChangeCommand.class);
+
+            return specDefinitionFieldService.updateDescription(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    command);
+        };
+
+        DatumRoute<Integer> updateLogicalElementRoute = (req, res) -> {
+            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+
+            res.type(WebUtilities.TYPE_JSON);
+            LogicalDataElementChangeCommand command = readBody(req, LogicalDataElementChangeCommand.class);
+
+            return specDefinitionFieldService.updateLogicalDataElement(
+                    WebUtilities.getUsername(req),
+                    getId(req),
+                    command);
+        };
+
         getForList(findForSpecDefinitionPath, findForSpecDefinitionRoute);
-        postForList(createFieldsPath, createFieldsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
+
+        putForDatum(updateDescriptionPath, updateDescriptionRoute);
+        putForDatum(updateLogicalElementPath, updateLogicalElementRoute);
+
+        postForList(createFieldsPath, createFieldsRoute);
     }
 }

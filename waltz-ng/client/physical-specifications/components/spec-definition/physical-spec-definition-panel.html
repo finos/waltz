@@ -87,10 +87,10 @@
             <br>
             <table class="table table-condensed table-striped">
                 <colgroup>
-                    <col width="30%">
-                    <col width="20%">
-                    <col width="30%">
-                    <col width="20%">
+                    <col width="27%">
+                    <col width="7%">
+                    <col width="33%">
+                    <col width="33%">
                 </colgroup>
                 <thead>
                 <tr>
@@ -111,13 +111,18 @@
                         </span>
                     </td>
                     <td>
-                        <span ng-bind="field.description">
-                        </span>
+                        <waltz-editable-field on-save="$ctrl.updateDescription"
+                                              field-type="textarea"
+                                              initial-val="field.description"
+                                              item-id="field.id">
+                        </waltz-editable-field>
                     </td>
                     <td>
-                        <waltz-entity-link entity-ref="$ctrl.logicalDataElementsById[field.logicalDataElementId]"
-                                           icon-placement="none">
-                        </waltz-entity-link>
+                        <waltz-editable-field on-save="$ctrl.updateLogicalElement"
+                                              field-type="logical-data-element"
+                                              initial-val="$ctrl.logicalDataElementsById[field.logicalDataElementId]"
+                                              item-id="field.id">
+                        </waltz-editable-field>
                     </td>
                 </tr>
                 </tbody>

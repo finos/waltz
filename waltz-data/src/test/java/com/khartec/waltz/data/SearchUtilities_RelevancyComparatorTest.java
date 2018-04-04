@@ -33,14 +33,14 @@ public class SearchUtilities_RelevancyComparatorTest {
     @Test
     public void foo() {
         ArrayList<String> list = ListUtilities.newArrayList(
+                "zappy",
+                "silly",
                 "SAP foo",
                 "SAP Baa",
                 "MySap",
                 "Where is sap",
                 "bogus",
-                "",
-                "zappy",
-                "silly");
+                "");
 
         String term = "sap";
         Function<String, String> extractor = x -> x.toString();

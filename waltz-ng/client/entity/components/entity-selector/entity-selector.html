@@ -1,5 +1,6 @@
 <div class="waltz-entity-selector">
-    <ui-select ng-model="$ctrl.currentSelection"
+    <ui-select class="waltz-entity-selector"
+               ng-model="$ctrl.currentSelection"
                on-select="$ctrl.select($item)"
                theme="bootstrap"
                ng-required="$ctrl.required">
@@ -19,16 +20,21 @@
                            refresh="$ctrl.refresh($select.search)"
                            refresh-delay="300">
 
-            <waltz-icon fixed-width="true"
-                        ng-if="$ctrl.entityKinds.length > 1"
-                        name="{{ entity.kind | toIconName:'entity' }}">
-            </waltz-icon>
+            <div uib-popover="{{ entity.description }}"
+                 popover-trigger="mouseenter"
+                 popover-append-to-body="true">
 
-            <span ng-bind-html="entity.name | highlight: $select.search"></span>
+                <waltz-icon fixed-width="true"
+                            ng-if="$ctrl.entityKinds.length > 1"
+                            name="{{ entity.kind | toIconName:'entity' }}">
+                </waltz-icon>
 
-            <small style="display: block"
-                   ng-bind-html="entity.description | highlight: $select.search"></small>
+                <span ng-bind-html="entity.name | highlight: $select.search"></span>
 
+                <small class="wes-entity-description"
+                       ng-bind-html="entity.description | highlight: $select.search">
+                </small>
+            </div>
         </ui-select-choices>
     </ui-select>
 </div>

@@ -75,9 +75,12 @@ public class SearchUtilities
             int idxA = sA.indexOf(term);
             int idxB = sB.indexOf(term);
 
-            if (idxB == -1) {
+            boolean onlyInA = idxA != -1 && idxB == -1;
+            boolean onlyInB = idxA == -1 && idxB != -1;
+
+            if (onlyInA) {
                 return -1;
-            } else if (idxA == -1) {
+            } else if (onlyInB) {
                 return 1;
             } else if (idxA != idxB) {
                 return Integer.compare(idxA, idxB);

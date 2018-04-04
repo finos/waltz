@@ -24,7 +24,7 @@ const template = require('./editable-field.html');
 const bindings = {
     initialVal: '<',
     onSave: '<',
-    fieldType: '@',  // person | text | textarea | boolean | date
+    fieldType: '@',  // logical-data-element | person | text | textarea | boolean | date
     dateFormat: '@',
     itemId: '<',
     buttonLabel: '@',

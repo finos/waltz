@@ -21,10 +21,13 @@ package com.khartec.waltz.service.physical_specification_definition;
 
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefnFieldIdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,21 +35,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalSpecDefinitionFieldService {
 
+    private final ChangeLogService changeLogService;
     private final PhysicalSpecDefinitionFieldDao dao;
     private final PhysicalSpecDefnFieldIdSelectorFactory idSelectorFactory;
 
 
     @Autowired
-    public PhysicalSpecDefinitionFieldService(PhysicalSpecDefinitionFieldDao dao,
+    public PhysicalSpecDefinitionFieldService(ChangeLogService changeLogService,
+                                              PhysicalSpecDefinitionFieldDao dao,
                                               PhysicalSpecDefnFieldIdSelectorFactory physicalSpecDefnFieldIdSelectorFactory) {
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "dao cannot be null");
         checkNotNull(physicalSpecDefnFieldIdSelectorFactory, "idSelectorFactory cannot be null");
 
+        this.changeLogService = changeLogService;
         this.dao = dao;
         this.idSelectorFactory = physicalSpecDefnFieldIdSelectorFactory;
     }
@@ -89,5 +97,44 @@ public class PhysicalSpecDefinitionFieldService {
     public List<PhysicalSpecDefinitionField> findBySelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = idSelectorFactory.apply(options);
         return dao.findBySelector(selector);
+    }
+
+
+    public int updateDescription(String username, long fieldId, DescriptionChangeCommand command) {
+        checkNotNull(username, "username cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        String description = command.newDescription();
+        checkNotEmpty(description, "description cannot be empty");
+
+        int result = dao.updateDescription(fieldId, description);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(username)
+                        .parentReference(EntityReference.mkRef(EntityKind.PHYSICAL_SPEC_DEFN_FIELD, fieldId))
+                        .message("Physical Field: description changed to " + description)
+                        .build());
+
+        return result;
+    }
+
+
+    public int updateLogicalDataElement(String username, long fieldId, LogicalDataElementChangeCommand command) {
+        checkNotNull(username, "username cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        int result = dao.updateLogicalDataElement(fieldId, command.newLogicalDataElement().id());
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(username)
+                        .parentReference(EntityReference.mkRef(EntityKind.PHYSICAL_SPEC_DEFN_FIELD, fieldId))
+                        .message("Physical Field: logical element changed to " + command.newLogicalDataElement())
+                        .build());
+
+        return result;
     }
 }

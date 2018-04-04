@@ -5,6 +5,11 @@
                 <waltz-entity-link entity-ref="$ctrl.newVal">
                 </waltz-entity-link>
             </span>
+            <span ng-switch-when="logical-data-element">
+                <waltz-entity-link entity-ref="$ctrl.newVal"
+                                   icon-placement="none">
+                </waltz-entity-link>
+            </span>
             <span ng-switch-when="date">
                 <span ng-bind="$ctrl.initialVal | date:'{{ $ctrl.dateFormat }}'">
                 </span>
@@ -59,6 +64,14 @@
             <waltz-entity-selector current-selection="$ctrl.newVal"
                                    on-select="$ctrl.entitySelect"
                                    entity-kinds="['PERSON']"
+                                   item-id="$ctrl.itemId">
+            </waltz-entity-selector>
+        </div>
+
+        <div ng-if="$ctrl.fieldType === 'logical-data-element'">
+            <waltz-entity-selector current-selection="$ctrl.newVal"
+                                   on-select="$ctrl.entitySelect"
+                                   entity-kinds="['LOGICAL_DATA_ELEMENT']"
                                    item-id="$ctrl.itemId">
             </waltz-entity-selector>
         </div>
