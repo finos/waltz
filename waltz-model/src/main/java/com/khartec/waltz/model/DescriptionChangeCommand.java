@@ -30,5 +30,6 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableDescriptionChangeCommand.class)
 public abstract class DescriptionChangeCommand implements Command {
 
+    @Nullable
     public abstract String newDescription();
 }

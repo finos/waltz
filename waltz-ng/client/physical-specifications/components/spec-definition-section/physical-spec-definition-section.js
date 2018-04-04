@@ -59,7 +59,7 @@ function controller($q,
         .then(specDefs => vm.specDefinitions = specDefs)
         .then(specDefs => {
             const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
-            if (activeSpec) vm.selectSpecDefinition(activeSpec);
+            if (activeSpec) vm.selectSpecDefinition(activeSpec, force);
 
             const selectionOptions = {
                 scope: 'EXACT',
@@ -188,6 +188,16 @@ function controller($q,
             .then(result => {
                 if (result) {
                     notification.success(`Updated logical data element for field`);
+
+                    const selectionOptions = {
+                        scope: 'EXACT',
+                        entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: vm.parentEntityRef.id }
+                    };
+
+                    serviceBroker
+                        .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ], { force: true })
+                        .then(r => vm.logicalDataElements = r.data);
+
                     vm.selectSpecDefinition(vm.selectedSpecDefinition.def, true);
                 } else {
                     notification.error(`Could not update logical data element`);
