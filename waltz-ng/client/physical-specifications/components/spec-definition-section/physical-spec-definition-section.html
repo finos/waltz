@@ -80,7 +80,9 @@
                  ng-if="$ctrl.selectedSpecDefinition.def">
                 <waltz-physical-spec-definition-panel spec-definition="$ctrl.selectedSpecDefinition"
                                                       logical-data-elements="$ctrl.logicalDataElements"
-                                                      default-active-tab-index="0">
+                                                      default-active-tab-index="0"
+                                                      on-update-field-description="$ctrl.updateFieldDescription"
+                                                      on-update-logical-data-element="$ctrl.updateLogicalDataElement">
                     <no-data-message>
                         <strong>No definitions</strong> for this physical specification.
                     </no-data-message>

@@ -43,10 +43,24 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const updateDescription = (id, command) => {
+        return $http
+            .put(`${base}/${id}/description`, command)
+            .then(r => r.data);
+    };
+
+    const updateLogicalElement = (id, command) => {
+        return $http
+            .put(`${base}/${id}/logical-data-element`, command)
+            .then(r => r.data);
+    };
+
     return {
         findBySelector,
         findForSpecDefinitionId,
-        createFields
+        createFields,
+        updateDescription,
+        updateLogicalElement
     };
 }
 
@@ -75,5 +89,15 @@ export const PhysicalSpecDefinitionFieldStore_API = {
         serviceName,
         serviceFnName: 'createFields',
         description: 'executes createFields'
+    },
+    updateDescription: {
+        serviceName,
+        serviceFnName: 'updateDescription',
+        description: 'executes updateDescription'
+    },
+    updateLogicalElement: {
+        serviceName,
+        serviceFnName: 'updateLogicalElement',
+        description: 'executes updateLogicalElement'
     }
 };

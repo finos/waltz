@@ -59,7 +59,7 @@ function controller($q,
         .then(specDefs => vm.specDefinitions = specDefs)
         .then(specDefs => {
             const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
-            if (activeSpec) vm.selectSpecDefinition(activeSpec);
+            if (activeSpec) vm.selectSpecDefinition(activeSpec, force);
 
             const selectionOptions = {
                 scope: 'EXACT',
@@ -72,14 +72,14 @@ function controller($q,
         });
 
 
-    vm.selectSpecDefinition = (def) => {
+    vm.selectSpecDefinition = (def, force = false) => {
         const specDefFieldPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecDefinitionFieldStore.findForSpecDefinitionId, [def.id])
+            .loadViewData(CORE_API.PhysicalSpecDefinitionFieldStore.findForSpecDefinitionId, [def.id], { force })
             .then(r => r.data);
 
 
         const specDefSampleFilePromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecDefinitionSampleFileStore.findForSpecDefinitionId, [def.id])
+            .loadViewData(CORE_API.PhysicalSpecDefinitionSampleFileStore.findForSpecDefinitionId, [def.id], { force })
             .then(r => r.data);
 
         $q.all([specDefFieldPromise, specDefSampleFilePromise])
@@ -163,6 +163,44 @@ function controller($q,
                     loadSpecDefinitions(true);
                 } else {
                     notification.error(`Could not mark version ${specDef.version} as obsolete`);
+                }
+            });
+    };
+
+    vm.updateFieldDescription = (fieldId, change) => {
+        const cmd = { newDescription: change.newVal };
+        serviceBroker
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
+            .then(result => {
+                if (result) {
+                    notification.success(`Updated description for field`);
+                    vm.selectSpecDefinition(vm.selectedSpecDefinition.def, true);
+                } else {
+                    notification.error(`Could not update field description`);
+                }
+            });
+    };
+
+    vm.updateLogicalDataElement = (fieldId, change) => {
+        const cmd = { newLogicalDataElement: change.newVal };
+        serviceBroker
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
+            .then(result => {
+                if (result) {
+                    notification.success(`Updated logical data element for field`);
+
+                    const selectionOptions = {
+                        scope: 'EXACT',
+                        entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: vm.parentEntityRef.id }
+                    };
+
+                    serviceBroker
+                        .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ], { force: true })
+                        .then(r => vm.logicalDataElements = r.data);
+
+                    vm.selectSpecDefinition(vm.selectedSpecDefinition.def, true);
+                } else {
+                    notification.error(`Could not update logical data element`);
                 }
             });
     };
