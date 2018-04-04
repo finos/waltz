@@ -40,13 +40,8 @@ public class EntitySearchHarness {
 
         EntitySearchOptions searchOptions = ImmutableEntitySearchOptions.builder()
                 .entityKinds(ListUtilities.newArrayList(
-                        EntityKind.ACTOR,
-                        EntityKind.APPLICATION,
-                        EntityKind.APP_GROUP,
-                        EntityKind.CHANGE_INITIATIVE,
-                        EntityKind.ORG_UNIT,
-                        EntityKind.MEASURABLE,
-                        EntityKind.PERSON))
+//                        EntityKind.APPLICATION,
+                        EntityKind.LOGICAL_DATA_ELEMENT))
                 .userId("admin")
                 .build();
 
@@ -59,6 +54,9 @@ public class EntitySearchHarness {
                 "equities"
         };
 
+        searchService.search("desk", searchOptions).forEach(d -> System.out.println(d.name()));
+
+        System.exit(-1);
         Arrays.stream(searchTerms)
                 .forEach(term -> {
                     System.out.println("-------------------");
