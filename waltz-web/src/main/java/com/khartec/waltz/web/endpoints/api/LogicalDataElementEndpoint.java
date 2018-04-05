@@ -39,6 +39,7 @@ public class LogicalDataElementEndpoint implements Endpoint {
     public void register() {
         // read
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
+        getForDatum(mkPath(BASE_URL, "external-id", ":extId"), this::getByExternalIdRoute);
         getForList(mkPath(BASE_URL, "all"), (request, response) -> service.findAll());
         postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
     }
@@ -47,6 +48,12 @@ public class LogicalDataElementEndpoint implements Endpoint {
     private LogicalDataElement getByIdRoute(Request request, Response response) {
         long id = getId(request);
         return service.getById(id);
+    }
+
+
+    private LogicalDataElement getByExternalIdRoute(Request request, Response response) {
+        String extId = request.params("extId");
+        return service.getByExternalId(extId);
     }
 
 

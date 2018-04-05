@@ -29,6 +29,10 @@ export function store($http,
         .get(`${BASE}/id/${id}`)
         .then(result => result.data);
 
+    const getByExternalId = (id) => $http
+        .get(`${BASE}/external-id/${id}`)
+        .then(result => result.data);
+
     const findAll = (ids) => $http
         .get(`${BASE}/all`)
         .then(x => x.data);
@@ -42,6 +46,7 @@ export function store($http,
 
     return {
         getById,
+        getByExternalId,
         findAll,
         findBySelector
     };
@@ -61,6 +66,11 @@ export const LogicalDataElementStore_API = {
         serviceName,
         serviceFnName: 'getById',
         description: 'executes getById'
+    },
+    getByExternalId: {
+        serviceName,
+        serviceFnName: 'getByExternalId',
+        description: 'executes getByExternalId'
     },
     findAll: {
         serviceName,

@@ -55,6 +55,14 @@ public class LogicalDataElementDao {
     }
 
 
+    public LogicalDataElement getByExternalId(String externalId) {
+        return dsl.select()
+                .from(LOGICAL_DATA_ELEMENT)
+                .where(LOGICAL_DATA_ELEMENT.EXTERNAL_ID.eq(externalId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<LogicalDataElement> findAll() {
         return dsl.select()
                 .from(LOGICAL_DATA_ELEMENT)
