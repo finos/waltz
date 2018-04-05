@@ -41,6 +41,11 @@ public class LogicalDataElementService {
     }
 
 
+    public LogicalDataElement getByExternalId(String externalId) {
+        return logicalDataElementDao.getByExternalId(externalId);
+    }
+
+
     public List<LogicalDataElement> findAll() {
         return logicalDataElementDao.findAll();
     }
