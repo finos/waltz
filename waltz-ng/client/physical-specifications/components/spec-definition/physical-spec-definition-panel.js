@@ -56,7 +56,7 @@ function controller($q) {
     vm.definitionSelected = (def) => invokeFunction(vm.onDefinitionSelect, def);
 
     vm.updateDescription = (id, change) => {
-        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
+        if (_.isEmpty(change.newVal)) return $q.reject("Too short");
         invokeFunction(vm.onUpdateFieldDescription, id, change);
     };
 
