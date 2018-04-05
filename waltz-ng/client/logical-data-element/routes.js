@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {CORE_API} from "../common/services/core-api-utils";
 const baseState = {
 };
 
@@ -27,9 +28,34 @@ const viewState = {
 };
 
 
+function bouncer($state, $stateParams, serviceBroker) {
+    const externalId = $stateParams.externalId;
+    serviceBroker
+        .loadViewData(CORE_API.LogicalDataElementStore.getByExternalId, [externalId])
+        .then(r => {
+            const element = r.data;
+            if(element) {
+                $state.go('main.logical-data-element.view', {id: element.id});
+            } else {
+                console.log(`Cannot find logical data element corresponding to external id: ${externalId}`);
+            }
+        });
+}
+
+bouncer.$inject = ['$state', '$stateParams', 'ServiceBroker'];
+
+
+const bouncerState = {
+    url: 'logical-data-element/external-id/{externalId:string}',
+    resolve: {
+        bouncer
+    }
+};
+
 function setup($stateProvider) {
 
     $stateProvider
+        .state('main.logical-data-element.bouncer', bouncerState)
         .state('main.logical-data-element', baseState)
         .state('main.logical-data-element.view', viewState);
 }
