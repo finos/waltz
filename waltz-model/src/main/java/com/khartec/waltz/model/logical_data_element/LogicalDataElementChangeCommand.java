@@ -25,11 +25,13 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableLogicalDataElementChangeCommand.class)
 @JsonDeserialize(as = ImmutableLogicalDataElementChangeCommand.class)
 public abstract class LogicalDataElementChangeCommand implements Command {
 
-    public abstract EntityReference newLogicalDataElement();
+    public abstract Optional<EntityReference> newLogicalDataElement();
 }

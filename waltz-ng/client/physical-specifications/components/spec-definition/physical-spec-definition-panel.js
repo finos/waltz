@@ -61,7 +61,6 @@ function controller($q) {
     };
 
     vm.updateLogicalElement = (id, change) => {
-        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Not selected");
         invokeFunction(vm.onUpdateLogicalDataElement, id, change);
     };
 }
