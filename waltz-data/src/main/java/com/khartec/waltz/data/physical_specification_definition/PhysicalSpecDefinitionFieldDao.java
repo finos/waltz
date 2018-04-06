@@ -127,7 +127,8 @@ public class PhysicalSpecDefinitionFieldDao {
                 .execute();
     }
 
-    public int updateLogicalDataElement(long fieldId, long logicalDataElementId) {
+
+    public int updateLogicalDataElement(long fieldId, Long logicalDataElementId) {
         return dsl.update(PHYSICAL_SPEC_DEFN_FIELD)
                 .set(PHYSICAL_SPEC_DEFN_FIELD.LOGICAL_DATA_ELEMENT_ID, logicalDataElementId)
                 .where(PHYSICAL_SPEC_DEFN_FIELD.ID.eq(fieldId))

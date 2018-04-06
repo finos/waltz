@@ -125,14 +125,15 @@ public class PhysicalSpecDefinitionFieldService {
         checkNotNull(username, "username cannot be null");
         checkNotNull(command, "command cannot be null");
 
-        int result = dao.updateLogicalDataElement(fieldId, command.newLogicalDataElement().id());
+        Long logicalElementId = command.newLogicalDataElement().map(ref -> ref.id()).orElse(null);
+        int result = dao.updateLogicalDataElement(fieldId, logicalElementId);
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
                         .operation(Operation.UPDATE)
                         .userId(username)
                         .parentReference(EntityReference.mkRef(EntityKind.PHYSICAL_SPEC_DEFN_FIELD, fieldId))
-                        .message("Physical Field: logical element changed to " + command.newLogicalDataElement())
+                        .message("Physical Field: logical element changed to " + command.newLogicalDataElement().orElse(null))
                         .build());
 
         return result;

@@ -56,13 +56,12 @@ function controller($q) {
     vm.definitionSelected = (def) => invokeFunction(vm.onDefinitionSelect, def);
 
     vm.updateDescription = (id, change) => {
-        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        invokeFunction(vm.onUpdateFieldDescription, id, change);
+        if (_.isEmpty(change.newVal)) return $q.reject("Too short");
+        return invokeFunction(vm.onUpdateFieldDescription, id, change);
     };
 
     vm.updateLogicalElement = (id, change) => {
-        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Not selected");
-        invokeFunction(vm.onUpdateLogicalDataElement, id, change);
+        return invokeFunction(vm.onUpdateLogicalDataElement, id, change);
     };
 }
 

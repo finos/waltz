@@ -28,6 +28,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
+    logicalDataElements: [],
     physicalFlow: null,
     selected: {
         entity: null,
@@ -164,7 +165,7 @@ function controller($q,
         });
 
     // spec definitions
-    const loadSpecDefinitions = () => physicalSpecDefinitionStore
+    const loadSpecDefinitions = (force = false) => physicalSpecDefinitionStore
         .findForSpecificationId(vm.physicalFlow.specificationId)
         .then(specDefs => {
             vm.selectedSpecDefinition.def = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId);
@@ -178,10 +179,20 @@ function controller($q,
                 const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
                     .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
 
-                $q.all([specDefFieldPromise, specDefSampleFilePromise])
-                    .then(([fields, file]) => {
+                const selectionOptions = {
+                    scope: 'EXACT',
+                    entityReference: { kind: 'PHYSICAL_SPECIFICATION', id:vm.selectedSpecDefinition.def.specificationId }
+                };
+
+                const logicalElementsPromise = serviceBroker
+                    .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ], { force })
+                    .then(r => r.data);
+
+                $q.all([specDefFieldPromise, specDefSampleFilePromise, logicalElementsPromise])
+                    .then(([fields, file, logicalElements]) => {
                         vm.selectedSpecDefinition.fields = fields;
                         vm.selectedSpecDefinition.sampleFile = file;
+                        vm.logicalDataElements = logicalElements;
                     });
             }
         });
@@ -244,6 +255,34 @@ function controller($q,
                     notification.success('Specification definition version updated successfully');
                 });
         }
+    };
+
+    vm.updateFieldDescription = (fieldId, change) => {
+        const cmd = { newDescription: change.newVal };
+        serviceBroker
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
+            .then(result => {
+                if (result) {
+                    notification.success(`Updated description for field`);
+                    loadSpecDefinitions(true);
+                } else {
+                    notification.error(`Could not update field description`);
+                }
+            });
+    };
+
+    vm.updateLogicalDataElement = (fieldId, change) => {
+        const cmd = { newLogicalDataElement: change.newVal };
+        serviceBroker
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
+            .then(result => {
+                if (result) {
+                    notification.success(`Updated logical data element for field`);
+                    loadSpecDefinitions(true);
+                } else {
+                    notification.error(`Could not update logical data element`);
+                }
+            });
     };
 
 }

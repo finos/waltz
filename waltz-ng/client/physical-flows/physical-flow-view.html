@@ -115,8 +115,11 @@
             <div class="col-sm-12">
                 <label>Current Definition</label>
                 <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
+                                                      logical-data-elements="ctrl.logicalDataElements"
                                                       selectable-definitions="ctrl.selectableSpecDefinitions"
-                                                      on-definition-select="ctrl.updateSpecDefinitionId">
+                                                      on-definition-select="ctrl.updateSpecDefinitionId"
+                                                      on-update-field-description="ctrl.updateFieldDescription"
+                                                      on-update-logical-data-element="ctrl.updateLogicalDataElement">
                     <no-data-message>
                         <strong>No <i>active</i> definition</strong> for this physical specification.
                     </no-data-message>
