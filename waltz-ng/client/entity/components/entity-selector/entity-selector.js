@@ -22,6 +22,7 @@ import _ from 'lodash';
 
 
 const bindings = {
+    clearable: '<',
     currentSelection: '<',
     entityKinds: '<',
     itemId: '<',
