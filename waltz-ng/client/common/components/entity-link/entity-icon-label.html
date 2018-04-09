@@ -1,4 +1,5 @@
-<span uib-popover="{{ $ctrl.entityRef.description }}"
+<span class="waltz-entity-icon-label"
+      uib-popover="{{ $ctrl.entityRef.description }}"
       popover-trigger="mouseenter"
       popover-append-to-body="true"
       popover-placement="{{ $ctrl.tooltipPlacement }}" >
@@ -8,7 +9,8 @@
                 style="color: #332b23;">
     </waltz-icon>
 
-    <span ng-bind="$ctrl.entityRef.name"></span>
+    <span ng-bind="$ctrl.entityRef.name"
+          ng-class="{'weil-entity-removed': $ctrl.entityRef.entityLifecycleStatus === 'REMOVED'}"></span>
 
     <waltz-icon fixed-width="true"
                 name="{{ $ctrl.entityRef.kind | toIconName:'entity' }}"
@@ -16,9 +18,4 @@
                 style="color: #332b23;">
     </waltz-icon>
 
-    <span ng-if="$ctrl.entityRef.entityLifecycleStatus !== 'ACTIVE'"
-          class="label label-default"
-          style="padding-bottom: 0.1em; font-size: 9px"
-          ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
-    </span>
 </span>

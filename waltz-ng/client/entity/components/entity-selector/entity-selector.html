@@ -30,10 +30,12 @@
                             name="{{ entity.kind | toIconName:'entity' }}">
                 </waltz-icon>
 
-                <span ng-bind-html="entity.name | highlight: $select.search"></span>
+                <span ng-bind-html="entity.name | highlight: $select.search"
+                      ng-class="{'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED'}"></span>
 
                 <small class="wes-entity-description"
-                       ng-bind-html="entity.description | highlight: $select.search">
+                       ng-bind-html="entity.description | highlight: $select.search"
+                       ng-class="{'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED'}">
                 </small>
             </div>
         </ui-select-choices>
