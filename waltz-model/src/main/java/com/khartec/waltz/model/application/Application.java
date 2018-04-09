@@ -72,6 +72,7 @@ public abstract class Application implements
                 .id(id().get())
                 .name(name())
                 .description(description())
+                .entityLifecycleStatus(entityLifecycleStatus())
                 .build();
     }
 }

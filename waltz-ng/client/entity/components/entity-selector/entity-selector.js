@@ -51,7 +51,8 @@ function controller(entitySearchStore) {
     vm.$onChanges = (changes) => {
         vm.options = {
             entityKinds: vm.entityKinds,
-            limit: vm.limit
+            limit: vm.limit,
+            entityLifecycleStatuses: ['ACTIVE', 'PENDING', 'REMOVED']
         };
 
         if (changes.entityKinds) {

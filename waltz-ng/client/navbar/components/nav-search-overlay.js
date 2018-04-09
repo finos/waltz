@@ -143,6 +143,7 @@ function controller($element,
                 id: r.id,
                 kind: entityKind,
                 name: r.name || r.displayName,
+                entityLifecycleStatus: r.entityLifecycleStatus || 'ACTIVE',
                 qualifier,
                 description: r.description
             };
