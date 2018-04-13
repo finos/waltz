@@ -60,7 +60,6 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if(changes.existingMappings) {
-            console.log('existing mappings: ', vm.existingMappings);
             vm.mappings = vm.existingMappings || {};
             vm.onMappingSelect();
         }

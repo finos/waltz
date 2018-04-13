@@ -128,7 +128,6 @@ function controller(serviceBroker) {
 
         loadMappings(serviceBroker, vm.sourceColumns, vm.targetColumns)
             .then(mappings => {
-                console.log('loaded mappings: ', mappings);
                 vm.loadedMappings = mappings;
             });
     };
