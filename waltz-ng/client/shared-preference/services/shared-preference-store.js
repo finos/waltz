@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import angular from "angular";
 import {checkIsEntityRef} from "../../common/checks";
 
 function store($http, baseApiUrl) {
@@ -24,7 +23,6 @@ function store($http, baseApiUrl) {
     const base = `${baseApiUrl}/shared-preference`;
 
     const getByKeyAndCategory = (key, category) => {
-        // encode because the key will be used in URI
         const keyEncoded = encodeURIComponent(key);
         return $http
             .get(`${base}/key/${keyEncoded}/category/${category}`)
@@ -39,21 +37,18 @@ function store($http, baseApiUrl) {
     };
 
     const generateKeyRoute = (obj) => {
-        // toJson - to remove the angular binding properties before we use object
-        const data = angular.toJson(obj);
         return $http
-            .post(`${base}/generate-key`, data)
+            .post(`${base}/generate-key`, obj)
             .then(result => result.data);
     };
 
 
     const save = (key, category, value) => {
         // toJson - to remove the angular binding properties before we use object
-        const data = angular.toJson(value);
         const cmd = {
             key,
             category,
-            value: data
+            value: value
         };
         return $http
             .post(`${base}/save`, cmd)

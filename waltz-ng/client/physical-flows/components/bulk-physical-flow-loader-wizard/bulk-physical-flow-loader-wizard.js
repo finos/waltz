@@ -18,6 +18,7 @@
  */
 
 import _ from 'lodash';
+import { toJson } from 'angular';
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { initialiseData } from '../../../common';
 
@@ -55,26 +56,26 @@ const initialState = {
 
 
 function saveMappings(serviceBroker, sourceColumns, targetColumns, mappings) {
-    const obj = {
+    const obj = toJson({
         sourceColumns,
         targetColumns
-    };
+    });
 
     return serviceBroker
         .loadViewData(CORE_API.SharedPreferenceStore.generateKeyRoute, [obj], { force: true })
         .then(keyResult => {
             return serviceBroker
-                .execute(CORE_API.SharedPreferenceStore.save, [keyResult.data, sharedPreferenceMappingKey, mappings])
+                .execute(CORE_API.SharedPreferenceStore.save, [keyResult.data, sharedPreferenceMappingKey, toJson(mappings)])
                 .then(saveResult => saveResult.data);
         });
 }
 
 
 function loadMappings(serviceBroker, sourceColumns, targetColumns) {
-    const obj = {
+    const obj = toJson({
         sourceColumns,
         targetColumns
-    };
+    });
 
     return serviceBroker
         .loadViewData(CORE_API.SharedPreferenceStore.generateKeyRoute, [obj], { force: true })
