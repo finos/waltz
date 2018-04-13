@@ -18,10 +18,12 @@
  */
 
 import _ from 'lodash';
+import { CORE_API } from "../../../common/services/core-api-utils";
 import { initialiseData } from '../../../common';
 
 import template from './bulk-physical-flow-loader-wizard.html';
 
+const sharedPreferenceMappingKey = 'physical-flow-upload-mapping';
 
 const bindings = {
 };
@@ -30,6 +32,7 @@ const bindings = {
 const initialState = {
     currentStep: 1,
     columnMappings: null,
+    loadedMappings: null,
     mappingsComplete: false,
     sourceData: [],
     sourceColumns: [],
@@ -51,7 +54,40 @@ const initialState = {
 };
 
 
-function controller() {
+function saveMappings(serviceBroker, sourceColumns, targetColumns, mappings) {
+    const obj = {
+        sourceColumns,
+        targetColumns
+    };
+
+    return serviceBroker
+        .loadViewData(CORE_API.SharedPreferenceStore.generateKeyRoute, [obj], { force: true })
+        .then(keyResult => {
+            return serviceBroker
+                .execute(CORE_API.SharedPreferenceStore.save, [keyResult.data, sharedPreferenceMappingKey, mappings])
+                .then(saveResult => saveResult.data);
+        });
+}
+
+
+function loadMappings(serviceBroker, sourceColumns, targetColumns) {
+    const obj = {
+        sourceColumns,
+        targetColumns
+    };
+
+    return serviceBroker
+        .loadViewData(CORE_API.SharedPreferenceStore.generateKeyRoute, [obj], { force: true })
+        .then(r => {
+            return serviceBroker
+                .execute(CORE_API.SharedPreferenceStore.getByKeyAndCategory, [r.data, sharedPreferenceMappingKey])
+                .then(r => r.data)
+                .then(preference => preference ? JSON.parse(preference.value) : undefined);
+        });
+}
+
+
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.backVisible = () => {
@@ -85,6 +121,7 @@ function controller() {
     vm.next = () => {
         vm.currentStep++;
         if(vm.currentStep === 3) {
+            saveMappings(serviceBroker, vm.sourceColumns, vm.targetColumns, vm.columnMappings);
             vm.parseFlows();
         }
 
@@ -96,6 +133,11 @@ function controller() {
     vm.spreadsheetLoaded = (event) => {
         vm.sourceData = event.rowData;
         vm.sourceColumns = _.map(event.columnDefs, 'name');
+
+        loadMappings(serviceBroker, vm.sourceColumns, vm.targetColumns)
+            .then(mappings => {
+                vm.loadedMappings = mappings;
+            });
     };
 
     vm.onMappingsChanged = (event) => {
@@ -127,7 +169,9 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {

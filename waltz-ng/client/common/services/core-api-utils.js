@@ -67,6 +67,7 @@ import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampl
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
+import {SharedPreferenceStore_API as SharedPreferenceStore} from "../../shared-preference/services/shared-preference-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
 import {StaticPanelStore_API as StaticPanelStore} from "../../static-panel/services/static-panel-store";
 import {SurveyInstanceStore_API as SurveyInstanceStore} from "../../survey/services/survey-instance-store";
@@ -127,6 +128,7 @@ export const CORE_API = {
     PhysicalSpecificationStore,
     ServerInfoStore,
     SettingsStore,
+    SharedPreferenceStore,
     SourceDataRatingStore,
     StaticPanelStore,
     SurveyInstanceStore,
