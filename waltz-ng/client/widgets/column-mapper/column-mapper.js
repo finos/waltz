@@ -21,13 +21,12 @@ import _ from 'lodash';
 import { initialiseData } from '../../common';
 import { invokeFunction } from '../../common/index';
 
-
 import template from './column-mapper.html';
-
 
 const bindings = {
     sourceColumns: '<',
     targetColumns: '<',
+    existingMappings: '<',
     onChange: '<'
 };
 
@@ -46,17 +45,25 @@ function controller() {
 
     const mkAvailableTargetColumns = () => {
         const mappedTargets = _.values(vm.mappings);
-        return _.difference(vm.targetColumns, mappedTargets);
+        return _.differenceBy(vm.targetColumns, mappedTargets, 'name');
     };
 
     const isComplete = () => {
         const requiredTargets = _.filter(vm.targetColumns, tc => tc.required);
         const mappedTargets = _.values(vm.mappings);
-        return _.isEmpty(_.difference(requiredTargets, mappedTargets));
+        return _.isEmpty(_.differenceBy(requiredTargets, mappedTargets, 'name'));
     };
 
     vm.$onInit = () => {
         vm.availableTargetColumns = vm.targetColumns;
+    };
+
+    vm.$onChanges = (changes) => {
+        if(changes.existingMappings) {
+            console.log('existing mappings: ', vm.existingMappings);
+            vm.mappings = vm.existingMappings || {};
+            vm.onMappingSelect();
+        }
     };
 
     vm.onMappingSelect = () => {

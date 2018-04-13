@@ -312,6 +312,23 @@ function controller(notification,
         // console.log('validating: ', vm.uploadCmds);
         vm.parseFlows();
     };
+
+    vm.generate = () => {
+        const obj = {
+            sourceColumns: vm.sourceColumns,
+            targetColumns: vm.targetColumns
+        };
+
+        serviceBroker
+            .loadViewData(CORE_API.SharedPreferenceStore.generateKeyRoute, [obj], { force: true })
+            .then(r => {
+                console.log('key: ', r.data);
+                serviceBroker
+                    .execute(CORE_API.SharedPreferenceStore.save, [r.data, 'physical-flow-upload-mapping', vm.columnMappings])
+                    .then(r2 => console.log('r2: ', r2))
+            });
+
+    };
 }
 
 

@@ -110,6 +110,7 @@ const dependencies = [
     require('./playpen/5')(),
     require('./profile')(),
     require('./ratings')(),
+    require('./shared-preference')(),
     require('./server-info')(),
     require('./software-catalog')(),
     require('./source-data-rating')(),
