@@ -4,6 +4,7 @@ import com.khartec.waltz.model.shared_preference.SharedPreference;
 import com.khartec.waltz.model.shared_preference.SharedPreferenceSaveCommand;
 import com.khartec.waltz.service.shared_preference.SharedPreferenceService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import com.khartec.waltz.web.json.SharedPreferenceKeyAndCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -36,22 +37,21 @@ public class SharedPreferenceEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String getByKeyAndCategoryPath = mkPath(BASE_URL, "key", ":key", "category", ":category");
+        String getByKeyAndCategoryPath = mkPath(BASE_URL, "key-category");
         String findByCategoryPath = mkPath(BASE_URL, "category", ":category");
         String savePath = mkPath(BASE_URL, "save");
         String generateKeyPath = mkPath(BASE_URL, "generate-key");
 
-        getForDatum(getByKeyAndCategoryPath, this::getByKeyAndCategoryRoute);
+        postForDatum(getByKeyAndCategoryPath, this::getByKeyAndCategoryRoute);
         getForList(findByCategoryPath, this::findByCategoryRoute);
         postForDatum(generateKeyPath, this::generateKeyRoute);
         postForDatum(savePath, this::saveRoute);
     }
 
 
-    private SharedPreference getByKeyAndCategoryRoute(Request request, Response response) {
-        String key = request.params("key");
-        String category = request.params("category");
-        return sharedPreferenceService.getPreference(key, category);
+    private SharedPreference getByKeyAndCategoryRoute(Request request, Response response) throws IOException {
+        SharedPreferenceKeyAndCategory keyCat = readBody(request, SharedPreferenceKeyAndCategory.class);
+        return sharedPreferenceService.getPreference(keyCat.key(), keyCat.category());
     }
 
 
