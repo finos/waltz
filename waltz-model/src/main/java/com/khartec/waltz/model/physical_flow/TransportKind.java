@@ -38,6 +38,7 @@ public enum TransportKind {
     EMAIL,
     FILE_SHARE,
     FILE_TRANSPORT,
+    MANUAL,
     MESSAGING,
     OTHER,
     RPC,
@@ -51,6 +52,7 @@ public enum TransportKind {
             .register(TransportKind.DATABASE_CONNECTION, "OLEDB", "JDBC", "DB", "DB-LINK", "DIRECT DATABASE ACCESS")
             .register(TransportKind.FILE_TRANSPORT, "SFTP", "SFTPS", "FTP", "SCP", "FILE")
             .register(TransportKind.FILE_SHARE, "SAMBA")
+            .register(TransportKind.MANUAL, "MANUAL UPLOAD", "SNEAKERNET")
             .register(TransportKind.MESSAGING, "JMS")
             .register(TransportKind.OTHER, "OTHER", "N/A", "NA")
             .register(TransportKind.WEB, "HTTP", "HTTPS", "SOAP");
