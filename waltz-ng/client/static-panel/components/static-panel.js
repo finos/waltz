@@ -19,7 +19,7 @@
 
 const bindings = {
     panel: '<',
-    renderMode: '<'
+    renderMode: '<' // section | chromeless | minimal-border
 };
 
 

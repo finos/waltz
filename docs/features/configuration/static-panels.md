@@ -28,3 +28,4 @@ Currently assigned groups are:
 - ```HOME.PERFORMANCE```: For the Performance Metric overview page
 - ```SECTION.ASSET_COSTS.ABOUT```: For an explanation of the asset costs section
 - ```SECTION.COMPLEXITY.ABOUT```: For an explanation of the complexity calculation
+- ```SECTION.AUTH_SOURCES.ABOUT```: For explanations about authoritative sources
