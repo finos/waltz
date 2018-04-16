@@ -73,7 +73,8 @@ const styles = {
     history: 'wdgc-history',
     descendable: 'wdgc-descendable',
     tooltip: 'wdgc-tooltip',
-    popup: 'wdgc-popup'
+    popup: 'wdgc-popup',
+    usage: 'wdgc-usage'
 };
 
 
@@ -588,6 +589,9 @@ function drawHistory(drillGrid, svg) {
         xEntry,
         yEntry
     ]);
+
+    svg.select(`.${styles.usage}`)
+        .style('display', historyEntries.length > 0 ? 'none' : 'inline-block');
 
     const historyElems = svg
         .select('.appFocus')
