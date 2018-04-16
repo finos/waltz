@@ -23,9 +23,12 @@ function store($http, baseApiUrl) {
     const base = `${baseApiUrl}/shared-preference`;
 
     const getByKeyAndCategory = (key, category) => {
-        const keyEncoded = encodeURIComponent(key);
+        const body = {
+            key,
+            category
+        };
         return $http
-            .get(`${base}/key/${keyEncoded}/category/${category}`)
+            .post(`${base}/key-category`, body)
             .then(result => result.data);
     };
 
@@ -44,7 +47,6 @@ function store($http, baseApiUrl) {
 
 
     const save = (key, category, value) => {
-        // toJson - to remove the angular binding properties before we use object
         const cmd = {
             key,
             category,
