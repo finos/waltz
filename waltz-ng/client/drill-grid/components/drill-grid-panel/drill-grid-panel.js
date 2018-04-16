@@ -42,6 +42,7 @@ const BUS = 6;
 const initialState = {
     visibility: {
         chart: false,
+        loading: true,
         unavailable: false
     }
 };
@@ -125,6 +126,8 @@ function controller($q, serviceBroker, settingsService) {
 
     const loadChartData = (drillGridDefn) => {
 
+        vm.visibility.loading = true;
+
         const mkDomainPromise = (axis) => axis.kind === 'DATA_TYPE'
             ? serviceBroker.loadAppData(CORE_API.DataTypeStore.findAll).then(r => r.data)
             : serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll).then(r => _.filter(r.data, { categoryId: axis.id }));
@@ -141,7 +144,11 @@ function controller($q, serviceBroker, settingsService) {
         ];
 
         $q.all(promises)
+            .then(() => vm.visibility.loading = false);
+
+        $q.all(promises)
             .then(([colDomain, rowDomain, rawColMappings, rawRowMappings]) => {
+
                 const messages = [];
                 let canShow = true;
 

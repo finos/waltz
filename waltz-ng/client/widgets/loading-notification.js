@@ -18,7 +18,7 @@
  */
 
 const BINDINGS = {
-    show: '=',
+    show: '<',
     name: '@'
 }
 
