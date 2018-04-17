@@ -74,7 +74,8 @@ const styles = {
     descendable: 'wdgc-descendable',
     tooltip: 'wdgc-tooltip',
     popup: 'wdgc-popup',
-    usage: 'wdgc-usage'
+    usage: 'wdgc-usage',
+    rowGroupBackground: 'wdgc-rowGroupBackground'
 };
 
 
@@ -485,7 +486,7 @@ function drawRowGroupLabel(selection, drillGrid, dialogs) {
 }
 
 
-function drawRowGroups(drillGrid, svg, dialogs, colScale) {
+function drawRowGroups(drillGrid, svg, dialogs, colScale, rowWidth) {
 
     const groupOffsets = calculateRowGroupOffsets(drillGrid.rowGroups);
 
@@ -504,12 +505,13 @@ function drawRowGroups(drillGrid, svg, dialogs, colScale) {
 
     newRowGroups
         .append('rect')
-        .attr('width', "100%");
+        .classed(styles.rowGroupBackground, true);
 
     newRowGroups
         .merge(rowGroups)
         .attr('transform', d => `translate(0, ${groupOffsets[d.group.id].start})`)
         .select('rect')
+        .attr('width', rowWidth)
         .attr('height', d => groupOffsets[d.group.id].height)
         .attr('fill', (d,i) => i % 2 ? '#fafafa': '#f3f3f3');
 
@@ -643,6 +645,7 @@ function draw(drillGrid, svg, dialogs, blockScaleX) {
     const colsWidth = colWidth * colIds.length || 1;  // 'or 1' to prevent colScale from blowing up
     const colsStartX = blockScaleX(5);
 
+    // this scale works within the xHeader group
     const colScale = scaleBand()
         .domain(colIds)
         .range([colsStartX, colsStartX + colsWidth])
@@ -650,8 +653,11 @@ function draw(drillGrid, svg, dialogs, blockScaleX) {
         .paddingOuter([0.3])
         .align([0.5]);
 
+    // full rowWidth takes account of group and app names (blockScale 8)
+    const rowWidth = colsWidth + blockScaleX(8);
+
     drawColHeaders(drillGrid, svg, colScale);
-    drawRowGroups(drillGrid, svg, dialogs, colScale);
+    drawRowGroups(drillGrid, svg, dialogs, colScale, rowWidth);
     drawHistory(drillGrid, svg);
 
 

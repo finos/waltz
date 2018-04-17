@@ -45,7 +45,10 @@
     }
 
     .wdgc-descendable {
-        font-weight: bolder;
+        text {
+            font-weight: bolder;
+            fill: #21136d;
+        }
     }
 
     .wdgc-dialog {
