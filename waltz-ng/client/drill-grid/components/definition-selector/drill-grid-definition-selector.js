@@ -45,6 +45,7 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const calculateMessages = () => {
+        if (vm.visibility.loading) return [];
         vm.messages = [];
         if (!vm.selectedDefinition) {
             vm.messages.push('No selected definition');

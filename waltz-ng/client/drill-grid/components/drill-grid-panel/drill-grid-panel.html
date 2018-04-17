@@ -9,8 +9,11 @@
     </div>
     <div class="row">
         <div class="col-md-12">
+            <waltz-loading-notification show="$ctrl.visibility.loading"
+                                        name="Loading data">
+            </waltz-loading-notification>
             <br>
-            <waltz-no-data ng-if="! $ctrl.visibility.chart">
+            <waltz-no-data ng-if="! $ctrl.visibility.chart && ! $ctrl.visibility.loading">
                 <message>
                     <strong>No data</strong> to show.
                     <div ng-if="$ctrl.messages.length > 0">
@@ -24,7 +27,7 @@
                 </message>
             </waltz-no-data>
 
-            <div ng-show="$ctrl.visibility.chart">
+            <div ng-show="$ctrl.visibility.chart && ! $ctrl.visibility.loading">
                 <waltz-drill-grid-chart drill-grid="$ctrl.drillGrid">
                 </waltz-drill-grid-chart>
             </div>
