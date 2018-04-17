@@ -760,6 +760,13 @@ export const transportKind = {
         description: null,
         position: 40
     },
+    MANUAL: {
+        key: 'MANUAL',
+        name: 'Manual',
+        icon: null,
+        description: null,
+        position: 45
+    },
     MESSAGING: {
         key: 'MESSAGING',
         name: 'Messaging',
