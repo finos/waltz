@@ -26,7 +26,6 @@ function recalcDomain(dataSet, focusId) {
     const potentialParents = _
         .chain(dataSet.nodesByParent[focusId] || [])
         .sortBy('name')
-        .map()
         .value();
 
     return potentialParents;
