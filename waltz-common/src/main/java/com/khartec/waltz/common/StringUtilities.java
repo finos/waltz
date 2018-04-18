@@ -131,4 +131,12 @@ public class StringUtilities {
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
     }
+
+
+    public static String sanitise(String value) {
+        checkNotNull(value, "value cannot be null");
+        return value
+                .toLowerCase()
+                .trim();
+    }
 }

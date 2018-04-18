@@ -41,6 +41,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
@@ -165,18 +166,43 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_SPECIFICATION.NAME.eq(flow.name()))
                 .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
 
+        Condition specDataTypeMatch = PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(flow.dataType().id());
+
 
         PhysicalFlow match = dsl
                 .select(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
                 .join(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .join(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .join(PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .where(logicalFlowMatch)
                 .and(specMatch)
                 .and(attributesMatch)
+                .and(specDataTypeMatch)
                 .fetchOne(TO_DOMAIN_MAPPER);
 
         return match;
+    }
+
+
+    /**
+     * Returns the flow in the database that matches the parameter based on all attributes except possibly id
+     * @param flow
+     * @return
+     */
+    public PhysicalFlow getByPhysicalFlow(PhysicalFlow flow) {
+
+        Condition idCondition = flow.id().map(id -> PHYSICAL_FLOW.ID.eq(id)).orElse(DSL.trueCondition());
+
+        return dsl.selectFrom(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))
+                .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId()))
+                .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().name()))
+                .and(idCondition)
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -350,6 +376,4 @@ public class PhysicalFlowDao {
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .execute();
     }
-
-
 }

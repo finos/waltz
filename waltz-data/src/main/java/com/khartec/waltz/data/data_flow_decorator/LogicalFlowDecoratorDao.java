@@ -43,6 +43,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.TO_DOMAIN_MAPPER;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
@@ -90,6 +91,18 @@ public class LogicalFlowDecoratorDao {
 
 
     // --- FINDERS ---
+
+    public LogicalFlowDecorator getByFlowIdAndDecoratorRef(long flowId, EntityReference decoratorRef) {
+        checkNotNull(decoratorRef, "decoratorRef cannot be null");
+
+        return dsl
+                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(flowId))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorRef.kind().name()))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(decoratorRef.id()))
+                .fetchOne(TO_DECORATOR_MAPPER);
+    }
+
 
     public List<LogicalFlowDecorator> findByEntityIdSelectorAndKind(EntityKind nodeKind,
                                                                     Select<Record1<Long>> nodeIdSelector,

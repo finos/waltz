@@ -102,6 +102,7 @@ function mkColumnDefs() {
         mkColumnDef('Basis Offset', 'basisOffset'),
         mkColumnDef('Transport', 'transport'),
         mkColumnDef('Criticality', 'criticality'),
+        mkEntityLinkColumnDef('Data Type', 'dataType'),
         mkColumnDef('External ID', 'externalId'),
     ];
 }
