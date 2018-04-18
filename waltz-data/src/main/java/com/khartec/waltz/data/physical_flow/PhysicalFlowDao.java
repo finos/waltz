@@ -192,7 +192,9 @@ public class PhysicalFlowDao {
      */
     public PhysicalFlow getByPhysicalFlow(PhysicalFlow flow) {
 
-        Condition idCondition = flow.id().map(id -> PHYSICAL_FLOW.ID.eq(id)).orElse(DSL.trueCondition());
+        Condition idCondition = flow.id().isPresent()
+                ? PHYSICAL_FLOW.ID.eq(flow.id().get())
+                : DSL.trueCondition();
 
         return dsl.selectFrom(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))

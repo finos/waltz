@@ -133,7 +133,7 @@ public class StringUtilities {
     }
 
 
-    public static String sanitise(String value) {
+    public static String lower(String value) {
         checkNotNull(value, "value cannot be null");
         return value
                 .toLowerCase()

@@ -56,7 +56,6 @@ public abstract class PhysicalFlowParsed {
     @Nullable
     public abstract TransportKind transport();
 
-    // Data Type
     @Nullable
     public abstract EntityReference dataType();
 }
