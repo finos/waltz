@@ -40,4 +40,6 @@ public abstract class PhysicalFlowUploadCommand implements
 
     public abstract String frequency();
     public abstract String transport();
+
+    public abstract String dataType();
 }

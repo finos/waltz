@@ -73,6 +73,14 @@ public class PhysicalSpecDataTypeDao {
     }
 
 
+    public PhysicalSpecificationDataType getBySpecIdAndDataTypeID(long specId, long dataTypeId) {
+        return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
+                .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
+                .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(dataTypeId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<PhysicalSpecificationDataType> findBySpecificationId(long specId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
