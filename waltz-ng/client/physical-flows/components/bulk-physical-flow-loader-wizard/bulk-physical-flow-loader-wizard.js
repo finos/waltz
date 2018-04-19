@@ -38,18 +38,19 @@ const initialState = {
     sourceData: [],
     sourceColumns: [],
     targetColumns: [
-        {name: 'source', required: true},
-        {name: 'target', required: true},
-        {name: 'name', required: true},
-        {name: 'externalId', required: false},
-        {name: 'description', required: false},
-        {name: 'frequency', required: true},
         {name: 'basisOffset', required: true},
-        {name: 'format', required: true},
-        {name: 'transport', required: true},
         {name: 'criticality', required: true},
+        {name: 'dataType', required: true},
+        {name: 'description', required: false},
+        {name: 'externalId', required: false},
+        {name: 'format', required: true},
+        {name: 'frequency', required: true},
+        {name: 'name', required: true},
+        {name: 'source', required: true},
         {name: 'specDescription', required: false},
         {name: 'specExternalId', required: false},
+        {name: 'target', required: true},
+        {name: 'transport', required: true}
     ],
     uploadCmds: []
 };

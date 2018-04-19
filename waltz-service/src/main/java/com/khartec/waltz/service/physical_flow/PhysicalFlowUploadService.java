@@ -1,8 +1,10 @@
 package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
@@ -12,12 +14,17 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -33,6 +40,8 @@ import java.util.regex.Pattern;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static com.khartec.waltz.common.StringUtilities.lower;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
 
@@ -41,8 +50,11 @@ public class PhysicalFlowUploadService {
 
     private final ActorDao actorDao;
     private final ApplicationDao applicationDao;
-    private final PhysicalFlowDao physicalFlowDao;
+    private final DataTypeDao dataTypeDao;
     private final LogicalFlowDao logicalFlowDao;
+    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
+    private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
+    private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
 
     private final Pattern basisOffsetRegex = Pattern.compile("T?(?<offset>[\\+\\-]?\\d+)");
@@ -50,18 +62,27 @@ public class PhysicalFlowUploadService {
 
     public PhysicalFlowUploadService(ActorDao actorDao,
                                      ApplicationDao applicationDao,
+                                     DataTypeDao dataTypeDao,
                                      LogicalFlowDao logicalFlowDao,
+                                     LogicalFlowDecoratorService logicalFlowDecoratorService,
+                                     PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                      PhysicalFlowDao physicalFlowDao,
                                      PhysicalSpecificationDao physicalSpecificationDao) {
         checkNotNull(actorDao, "actorDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
+        checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+        checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
+        checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
 
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
+        this.dataTypeDao = dataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
+        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
+        this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
     }
@@ -82,10 +103,11 @@ public class PhysicalFlowUploadService {
         // load application and actor maps
         Map<String, Application> applicationsByAssetCode = loadApplicationsByAssetCode();
         Map<String, Actor> actorsByNameMap = loadActorsByName();
+        Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
-                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, cmd))
+                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, dataTypesByNameOrCodeMap, cmd))
                 .collect(toList());
 
         // enumerate and locate an existing physical flows that exist - iff no parse errors
@@ -121,16 +143,6 @@ public class PhysicalFlowUploadService {
                 .filter(v -> v.outcome() == CommandOutcome.SUCCESS && v.entityReference() == null)
                 .collect(toList());
 
-        List<PhysicalFlowParsed> newFlows = newFlowCmds.stream()
-                .map(v -> v.parsedFlow())
-                .collect(toList());
-
-        // check or create logical flow
-        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> logicalFlowsBySourceAndTarget = new HashMap<>();
-
-        // check or create physical spec
-        Map<Tuple3<EntityReference, DataFormatKind, String>, PhysicalSpecification> physicalSpecMap = new HashMap<>();
-
         // create physical flow with ids from the above two
         List<PhysicalFlowUploadCommandResponse> created = newFlowCmds.stream()
                 .map(v -> {
@@ -139,8 +151,8 @@ public class PhysicalFlowUploadService {
                     }
 
                     PhysicalFlowParsed flow = v.parsedFlow();
-                    LogicalFlow logicalFlow = getOrCreateLogicalFlow(flow.source(), flow.target(), logicalFlowsBySourceAndTarget, username);
-                    PhysicalSpecification specification = getOrCreatePhysicalSpec(flow, physicalSpecMap, username);
+                    LogicalFlow logicalFlow = getOrCreateLogicalFlow(flow.source(), flow.target(), flow.dataType(), username);
+                    PhysicalSpecification specification = getOrCreatePhysicalSpec(flow, username);
 
                     PhysicalFlow newFlow = ImmutablePhysicalFlow.builder()
                             .logicalFlowId(logicalFlow.id().get())
@@ -154,7 +166,7 @@ public class PhysicalFlowUploadService {
                             .lastUpdatedAt(nowUtc())
                             .build();
 
-                    long id = physicalFlowDao.create(newFlow);
+                    long id = getOrCreatePhysicalFlow(newFlow);
 
                     return ImmutablePhysicalFlowUploadCommandResponse.copyOf(v)
                             .withEntityReference(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, id));
@@ -170,15 +182,17 @@ public class PhysicalFlowUploadService {
 
     private PhysicalFlowUploadCommandResponse validateCommand(Map<String, Actor> actorsByName,
                                                               Map<String, Application> applicationsByAssetCode,
+                                                              Map<String, DataType> dataTypeMap,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
         Map<String, String> errors = new HashMap<>();
 
         // resolve entity refs - source, target, owner
-        EntityReference source = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.source());
-        EntityReference target = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.target());
-        EntityReference owner = getEntityRefByString(actorsByName, applicationsByAssetCode, cmd.owner());
+        EntityReference source = getNodeRefByString(actorsByName, applicationsByAssetCode, cmd.source());
+        EntityReference target = getNodeRefByString(actorsByName, applicationsByAssetCode, cmd.target());
+        EntityReference owner = getNodeRefByString(actorsByName, applicationsByAssetCode, cmd.owner());
+        EntityReference dataType = getDataTypeByString(dataTypeMap, cmd.dataType());
 
         if (source == null) {
             errors.put("source", String.format("%s not found", cmd.source()));
@@ -190,6 +204,10 @@ public class PhysicalFlowUploadService {
 
         if (owner == null) {
             errors.put("owner", String.format("%s not found", cmd.owner()));
+        }
+
+        if (dataType == null) {
+            errors.put("dataType", String.format("%s not found", cmd.dataType()));
         }
 
 
@@ -238,6 +256,7 @@ public class PhysicalFlowUploadService {
                 .description(cmd.description())
                 .externalId(cmd.externalId())
                 .basisOffset(basisOffset)
+                .dataType(dataType)
                 .build();
 
         return ImmutablePhysicalFlowUploadCommandResponse.builder()
@@ -265,9 +284,9 @@ public class PhysicalFlowUploadService {
      * @param input
      * @return
      */
-    private EntityReference getEntityRefByString(Map<String, Actor> actorsByName,
-                                                 Map<String, Application> applicationsByAssetCode,
-                                                 String input) {
+    private EntityReference getNodeRefByString(Map<String, Actor> actorsByName,
+                                               Map<String, Application> applicationsByAssetCode,
+                                               String input) {
         checkNotNull(input, "input cannot be null");
         input = input.trim();
 
@@ -277,14 +296,21 @@ public class PhysicalFlowUploadService {
 
 
     private EntityReference getActorRefByName(Map<String, Actor> actorsByName, String name) {
-        return Optional.ofNullable(actorsByName.get(name))
+        return Optional.ofNullable(actorsByName.get(lower(name)))
                 .map(a -> a.entityReference())
                 .orElse(null);
     }
 
 
     private EntityReference getAppRefByAssetCode(Map<String, Application> applicationsByAssetCode, String source) {
-        return Optional.ofNullable(applicationsByAssetCode.get(source))
+        return Optional.ofNullable(applicationsByAssetCode.get(lower(source)))
+                .map(a -> a.entityReference())
+                .orElse(null);
+    }
+
+
+    private EntityReference getDataTypeByString(Map<String, DataType> dataTypeMap, String value) {
+        return Optional.ofNullable(dataTypeMap.get(lower(value)))
                 .map(a -> a.entityReference())
                 .orElse(null);
     }
@@ -292,73 +318,101 @@ public class PhysicalFlowUploadService {
 
     private Map<String, Application> loadApplicationsByAssetCode() {
         return MapUtilities.indexBy(
-                a -> a.assetCode().get(),
+                a -> lower(a.assetCode().get()),
                 applicationDao.getAll());
     }
 
 
     private Map<String, Actor> loadActorsByName() {
         return  MapUtilities.indexBy(
-                a -> a.name(),
+                a -> lower(a.name()),
                 actorDao.findAll());
+    }
+
+
+    private Map<String, DataType> loadDataTypesByNameOrCode() {
+        List<DataType> allDataTypes = dataTypeDao.getAll();
+        Map<String, DataType> dataTypesByName = MapUtilities.indexBy(dt -> lower(dt.name()), identity(), allDataTypes, (d1, d2) -> d2);
+        Map<String, DataType> dataTypesByCode = MapUtilities.indexBy(dt -> lower(dt.code()), identity(), allDataTypes, (d1, d2) -> d2);
+        dataTypesByName.putAll(dataTypesByCode);
+        return dataTypesByName;
     }
 
 
     private LogicalFlow getOrCreateLogicalFlow(EntityReference source,
                                                EntityReference target,
-                                               Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> logicalFlowsBySourceAndTarget,
+                                               EntityReference dataType,
                                                String username) {
 
-        return logicalFlowsBySourceAndTarget.computeIfAbsent(
-                Tuple.tuple(source, target),
-                t4 -> {
-                    LogicalFlow existing = logicalFlowDao.findBySourceAndTarget(source, target);
-                    if(existing != null) return existing;
+        LogicalFlow flow = logicalFlowDao.findBySourceAndTarget(source, target);
 
-                    LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
-                            .source(source)
-                            .target(target)
-                            .lastUpdatedBy(username)
-                            .provenance("waltz")
-                            .build();
+        if (flow == null) {
+            LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
+                    .source(source)
+                    .target(target)
+                    .lastUpdatedBy(username)
+                    .provenance("waltz")
+                    .build();
 
-                    LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
-                    return logicalFlow;
-                }
-        );
+            flow = logicalFlowDao.addFlow(flowToAdd);
+        }
+
+        LogicalFlowDecorator existingDecorator = logicalFlowDecoratorService
+                .getByFlowIdAndDecoratorRef(flow.id().get(), dataType);
+
+        if(existingDecorator == null) {
+            logicalFlowDecoratorService.addDecorators(flow.id().get(), SetUtilities.fromArray(dataType), username);
+        }
+        return flow;
     }
 
 
     private PhysicalSpecification getOrCreatePhysicalSpec(PhysicalFlowParsed flow,
-                                                          Map<Tuple3<EntityReference, DataFormatKind, String>, PhysicalSpecification> physicalSpecMap,
                                                           String username) {
         EntityReference owner = flow.owner();
         DataFormatKind format = flow.format();
         String name = flow.name();
 
-        return physicalSpecMap.computeIfAbsent(
-                Tuple.tuple(owner, format, name),
-                t -> {
-                    // check database
-                    PhysicalSpecification existing = physicalSpecificationDao.getByParsedFlow(flow);
-                    if(existing != null) return existing;
 
-                    // create
-                    PhysicalSpecification specToAdd = ImmutablePhysicalSpecification.builder()
-                            .owningEntity(owner)
-                            .format(format)
-                            .name(name)
-                            .externalId(Optional.ofNullable(flow.specExternalId()).orElse(""))
-                            .description(Optional.ofNullable(flow.specDescription()).orElse(""))
-                            .lastUpdatedBy(username)
-                            .lastUpdatedAt(nowUtc())
-                            .provenance("waltz")
-                            .build();
+        // check database
+        PhysicalSpecification spec = physicalSpecificationDao.getByParsedFlow(flow);
+        if (spec == null) {
 
-                    Long id = physicalSpecificationDao.create(specToAdd);
-                    return ImmutablePhysicalSpecification
-                            .copyOf(specToAdd)
-                            .withId(id);
-                });
+            // create
+            PhysicalSpecification specToAdd = ImmutablePhysicalSpecification.builder()
+                    .owningEntity(owner)
+                    .format(format)
+                    .name(name)
+                    .externalId(Optional.ofNullable(flow.specExternalId()).orElse(""))
+                    .description(Optional.ofNullable(flow.specDescription()).orElse(""))
+                    .lastUpdatedBy(username)
+                    .lastUpdatedAt(nowUtc())
+                    .provenance("waltz")
+                    .build();
+
+            Long id = physicalSpecificationDao.create(specToAdd);
+            spec = ImmutablePhysicalSpecification
+                    .copyOf(specToAdd)
+                    .withId(id);
+        }
+
+        EntityReference dataType = flow.dataType();
+        Long specId = spec.id().get();
+        PhysicalSpecificationDataType existingDataType = physicalSpecDataTypeService.getBySpecIdAndDataTypeID(specId, dataType.id());
+        if(existingDataType == null) {
+            physicalSpecDataTypeService.addDataTypes(username, specId, SetUtilities.fromArray(dataType.id()));
+        }
+        return spec;
     }
+
+
+    private long getOrCreatePhysicalFlow(PhysicalFlow newFlow) {
+        PhysicalFlow existing = physicalFlowDao.getByPhysicalFlow(newFlow);
+        if (existing != null) {
+            return existing.id().get();
+        } else {
+            return physicalFlowDao.create(newFlow);
+        }
+    }
+
 }

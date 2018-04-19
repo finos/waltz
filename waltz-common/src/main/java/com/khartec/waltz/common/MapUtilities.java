@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -94,6 +95,19 @@ public class MapUtilities {
 
         return xs.stream()
                 .collect(toMap(keyFn, valueFn));
+    }
+
+
+    public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn,
+                                              Function<V, R> valueFn,
+                                              Collection<V> xs,
+                                              BinaryOperator<R> mergeFunction) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(keyFn, "keyFn cannot be null");
+        checkNotNull(valueFn, "valueFn cannot be null");
+
+        return xs.stream()
+                .collect(toMap(keyFn, valueFn, mergeFunction));
     }
 
 

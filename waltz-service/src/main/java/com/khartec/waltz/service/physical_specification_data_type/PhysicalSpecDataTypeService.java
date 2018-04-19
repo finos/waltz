@@ -65,6 +65,11 @@ public class PhysicalSpecDataTypeService {
     }
 
 
+    public PhysicalSpecificationDataType getBySpecIdAndDataTypeID(long specId, long dataTypeId) {
+        return physicalSpecDataTypeDao.getBySpecIdAndDataTypeID(specId, dataTypeId);
+    }
+
+
     public List<PhysicalSpecificationDataType> findBySpecificationId(long specId) {
         return physicalSpecDataTypeDao.findBySpecificationId(specId);
     }

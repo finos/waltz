@@ -95,6 +95,12 @@ public class LogicalFlowDecoratorService {
 
     // --- FINDERS ---
 
+    public LogicalFlowDecorator getByFlowIdAndDecoratorRef(long flowId, EntityReference decoratorRef) {
+        checkNotNull(decoratorRef, "decoratorRef cannot be null");
+        return logicalFlowDecoratorDao.getByFlowIdAndDecoratorRef(flowId, decoratorRef);
+    }
+
+
     public List<LogicalFlowDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
         return logicalFlowDecoratorDao.findByFlowIds(flowIds);
