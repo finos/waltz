@@ -70,7 +70,7 @@ function controller(serviceBroker) {
             ? 1
             : 0;
 
-        vm.visibility.authSourcesList = (vm.parentEntityRef.kind === 'ORG_UNIT')
+        vm.visibility.authSourcesList = vm.parentEntityRef.kind === 'ORG_UNIT' || vm.parentEntityRef.kind === 'DATA_TYPE'
     };
 
     vm.tabSelected = (name, idx) => {

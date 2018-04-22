@@ -19,9 +19,9 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {nest} from "d3-collection";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {ascending} from "d3-array";
+import {mkEntityLinkGridCell} from "../../../common/link-utils";
+import {mkEnumGridCell} from "../../../common/grid-utils";
 
 
 const bindings = {
@@ -33,13 +33,67 @@ const bindings = {
 
 const initialState = {
     consumersByAuthSourceId: {},
-    visibility: {
-        consumerColumn: false
-    }
 };
 
 
 const template = require('./auth-sources-table.html');
+
+
+function shouldShowConsumers(parentRef) {
+    const kind = _.get(parentRef, 'kind', '');
+    return kind === 'DATA_TYPE';
+}
+
+
+function mkColumnDefs(parentRef) {
+    const consumerCell = shouldShowConsumers(parentRef)
+        ? {
+            field: 'consumers',
+            displayName: 'Consumers',
+            cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <span class="label"
+                      style="cursor: pointer"
+                      ng-class="{ 'label-warning': COL_FIELD.length, 'label-default': COL_FIELD.length == 0 }"
+                      uib-popover-template="'wast/consumers-popup.html'"
+                      popover-class="waltz-popover-wide"
+                      popover-append-to-body="true"
+                      popover-placement="top-right"
+                      popover-trigger="outsideClick" 
+                      ng-bind="COL_FIELD.length > 0 
+                            ? COL_FIELD.length 
+                            : '-'">
+                </span>
+            </div>`}
+        : null;
+
+    const notesCell = {
+        field: 'description',
+        displayName: 'Notes',
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <span ng-if="COL_FIELD.length > 0">
+                    <waltz-icon name="sticky-note"
+                                style="color: #337ab7; cursor: pointer"
+                                uib-popover-template="'wast/desc-popup.html'"
+                                popover-class="waltz-popover-wide"
+                                popover-append-to-body="true"
+                                popover-placement="top-right"
+                                popover-trigger="outsideClick">
+                    </waltz-icon>
+                </span>
+            </div>`
+    };
+
+    return _.compact([
+        mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
+        mkEntityLinkGridCell('Declaring Org Unit', 'declaringOrgUnit', 'none'),
+        mkEntityLinkGridCell('Application', 'app', 'none'),
+        consumerCell,
+        mkEnumGridCell('Rating', 'rating', false /* showIcon */),
+        notesCell
+    ]);
+}
 
 
 function controller(serviceBroker) {
@@ -48,10 +102,9 @@ function controller(serviceBroker) {
 
     const refresh = () => {
         const dataTypesByCode= _.keyBy(vm.dataTypes, 'code');
-        const dataTypesById= _.keyBy(vm.dataTypes, 'id');
         const orgUnitsById = _.keyBy(vm.orgUnits, 'id');
 
-        const authSources = _.map(vm.authSources, d => {
+        vm.gridData = _.map(vm.authSources, d => {
             return {
                 app: d.applicationReference,
                 dataType: Object.assign({}, dataTypesByCode[d.dataType], { kind: 'DATA_TYPE' }),
@@ -62,12 +115,6 @@ function controller(serviceBroker) {
                 consumers: vm.consumersByAuthSourceId[d.id] || []
             };
         });
-
-        vm.authSourceTable = nest()
-            .key(d => d.dataType.id)
-            .sortKeys((a, b) => ascending(dataTypesById[a].name, dataTypesById[b].name))
-            .sortValues((a, b) => ascending(a.app.name, b.app.name))
-            .entries(authSources);
     };
 
     vm.$onInit = () => {
@@ -80,13 +127,11 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.OrgUnitStore.findAll)
             .then(r => vm.orgUnits = r.data)
             .then(refresh);
-    };
 
-    vm.$onChanges = () => {
-        const isDataTypeEntity = _.get(vm, 'parentEntityRef.kind', null) === 'DATA_TYPE';
-        if (isDataTypeEntity) {
-            vm.visibility.consumerColumn = true;
+        vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
+        vm.gridData = []; //gridData;
 
+        if (shouldShowConsumers(vm.parentEntityRef)) {
             const selector = {
                 entityReference: vm.parentEntityRef,
                 scope: 'CHILDREN'
@@ -104,11 +149,12 @@ function controller(serviceBroker) {
                         .value();
                     refresh();
                 });
-
-        } else {
-            refresh();
         }
-    }
+    };
+
+    vm.$onChanges = () => {
+        refresh();
+    };
 }
 
 
