@@ -384,6 +384,7 @@ function hideDialog(d, dialogs, dialogName = 'tooltip', force = false) {
 
 
 function drawAppMappings(selector, colScale, drillGrid, svg, dialogs) {
+
     const appMappings = selector
         .selectAll(`.${styles.appMapping}`)
         .data(d => _.filter(d.mappings, m => m.rating !== 'Z'), d => d.colId);
@@ -411,8 +412,8 @@ function drawAppMappings(selector, colScale, drillGrid, svg, dialogs) {
         .attr('width', colScale.bandwidth())
         .attr('height', blockHeight - 2);
 
-    return newAppMappings
-        .merge(appMappings)
+    return appMappings
+        .merge(newAppMappings)
         .attr('transform', d => `translate(${colScale(d.colId)} , 0)`);
 }
 
@@ -677,8 +678,6 @@ function draw(drillGrid, svg, dialogs, blockScaleX) {
     drawColHeaders(drillGrid, svg, colScale);
     drawRowGroups(drillGrid, svg, dialogs, colScale, rowWidth);
     drawHistory(drillGrid, svg);
-
-
 }
 
 
