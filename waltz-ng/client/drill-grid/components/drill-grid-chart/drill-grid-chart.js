@@ -19,13 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './drill-grid-chart.html';
+import template from "./drill-grid-chart.html";
 import {initialiseData} from "../../../common";
-import {ragColorScale} from '../../../common/colors';
+import {ragColorScale} from "../../../common/colors";
 
-import _ from 'lodash';
-import { select, event } from 'd3-selection';
-import {scaleBand, scaleLinear} from 'd3-scale';
+import _ from "lodash";
+import {event, select} from "d3-selection";
+import {scaleBand, scaleLinear} from "d3-scale";
 import {truncateText} from "../../../common/d3-utils";
 import {truncate} from "../../../common/string-utils";
 import {ascending} from "d3-array";
@@ -219,7 +219,7 @@ function showCellDetail(d, dialogs, drillGrid) {
         const items = _.map(sortedNodes, n => {
             return _.isEmpty(n.children)
                 ? `<li>${n.name}</li>`
-                : `<li><a class="clickable navigation" data-wdgc-option-key="${optionName}" data-wdgc-option-value="${n.id}">${n.name}</a></li>` + toTreeHtml(n.children, optionName)
+                : `<li><a class="clickable wdgc-navigation" data-wdgc-option-key="${optionName}" data-wdgc-option-value="${n.id}">${n.name}</a></li>` + toTreeHtml(n.children, optionName)
         });
         return nodes.length > 0
             ? `<ul> ${_.join(items, '')} </ul>`
@@ -233,12 +233,18 @@ function showCellDetail(d, dialogs, drillGrid) {
         </div>`;
     };
 
+
     const html = `
        <div class="small">
             <div>
                 ${d.col.name} / ${d.row.name}
             </div>
-            <div>${d.app.name}</div>
+            <div>
+                <a class="wdgc-app-link clickable" 
+                   data-wdgc-app-id="${d.app.id}">
+                    ${d.app.name}
+                </a>
+            </div>
             <div class="small">
                 ${truncate(d.app.description, 128)}
             </div>
@@ -335,7 +341,7 @@ function showDialog(dialogs, dialogName, html, pin = false, drillGrid) {
             .on('click', (d) => hideDialog(d, dialogs, dialogName, true));
 
         dialogElem
-            .selectAll('.navigation')
+            .selectAll('.wdgc-navigation')
             .on('click', function(d) {
                 hideDialog(d, dialogs, dialogName, true);
                 const linkElem = select(this);
@@ -345,6 +351,18 @@ function showDialog(dialogs, dialogName, html, pin = false, drillGrid) {
                     // nop
                 } else {
                     drillGrid.refresh({ [key]: val });
+                }
+            });
+
+        dialogElem
+            .selectAll('.wdgc-app-link')
+            .on('click', function(d) {
+                hideDialog(d, dialogs, dialogName, true);
+                const linkElem = select(this);
+                const id = linkElem.attr('data-wdgc-app-id');
+                if (! _.isEmpty(id)) {
+                    // naughty, but otherwise location or $state would need to be passed everywhere
+                    window.location.hash = `/application/${id}`;
                 }
             });
     } else {
