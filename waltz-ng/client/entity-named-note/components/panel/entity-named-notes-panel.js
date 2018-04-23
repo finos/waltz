@@ -65,6 +65,7 @@ function controller() {
             .filter(nt => !nt.isReadOnly)
             .filter(nt => !existingNotesByTypeId[nt.id])
             .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
+            .sortBy('name')
             .value();
 
         vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');

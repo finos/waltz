@@ -60,7 +60,7 @@ public class UserEndpoint implements Endpoint {
 
         String newUserPath = mkPath(BASE_URL, "new-user");
         String updateRolesPath = mkPath(BASE_URL, ":userName", "roles");
-        String resetPasswordPath = mkPath(BASE_URL, ":userName", "reset-password");
+        String resetPasswordPath = mkPath(BASE_URL, "reset-password");
 
         String deleteUserPath = mkPath(BASE_URL, ":userName");
 
@@ -85,11 +85,8 @@ public class UserEndpoint implements Endpoint {
             return userRoleService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
         };
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
-            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
-
-            String userName = request.params("userName");
-            String password = request.body().trim();
-            return userService.resetPassword(userName, password);
+            boolean validate = !userRoleService.hasAnyRole(getUsername(request), Role.USER_ADMIN, Role.ADMIN);
+            return userService.resetPassword(readBody(request, PasswordResetRequest.class), validate);
         };
 
         DatumRoute<Boolean> deleteUserRoute = (request, response) -> {
