@@ -1,5 +1,3 @@
-
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -18,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 import RowGroup from "./row-group";
 
 
@@ -69,9 +67,25 @@ export default class DrillGrid {
             .reject(rg => rg.isEmpty())
             .value();
 
+        this.restrictXDomainToUsedValues();
         this.notifyListeners();
 
         return this;
+    }
+
+    restrictXDomainToUsedValues() {
+        const activeXIds = _
+            .chain(this.rowGroups)
+            .flatMap(rg => rg.rows)
+            .flatMap(r => r.mappings)
+            .filter(r => r.rating != 'Z')
+            .map(r => r.colId)
+            .uniq()
+            .value();
+
+        this.xAxis.current.domain = _.filter(
+            this.xAxis.current.domain,
+            d => _.includes(activeXIds, d.id));
     }
 
 
