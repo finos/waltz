@@ -116,7 +116,6 @@ function controller($q,
             newPassword: vm.resetForm.password1
         };
 
-        console.log("cmd:", resetCmd);
         userStore
             .resetPassword(vm.userId, vm.resetForm.password1, vm.resetForm.currentPassword)
             .then(r => {
