@@ -23,9 +23,7 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.user.UserDao;
 import com.khartec.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.user.LoginRequest;
-import com.khartec.waltz.model.user.Role;
-import com.khartec.waltz.model.user.UserRegistrationRequest;
+import com.khartec.waltz.model.user.*;
 import com.khartec.waltz.service.settings.SettingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,10 +94,19 @@ public class UserService {
         return userDao.findAllUserNames();
     }
 
-    public boolean resetPassword(String userName, String password) {
-        LOG.info("Resetting password for: " + userName );
-        String hashedPassword = passwordService.hashPassword(password);
-        return userDao.resetPassword(userName, hashedPassword) == 1;
+    public boolean resetPassword(PasswordResetRequest resetRequest, boolean validate) {
+        LOG.info("Resetting password for: " + resetRequest.userName() );
+        if (validate) {
+            LoginRequest loginRequest = ImmutableLoginRequest.builder()
+                    .password(resetRequest.currentPassword())
+                    .userName(resetRequest.userName())
+                    .build();
+            if (! authenticate(loginRequest)) {
+                return false;
+            }
+        }
+        String hashedPassword = passwordService.hashPassword(resetRequest.newPassword());
+        return userDao.resetPassword(resetRequest.userName(), hashedPassword) == 1;
     }
 
     /**

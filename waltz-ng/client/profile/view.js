@@ -31,22 +31,29 @@ const initialState = {
     managers: [],
     person: null,
     roles: [],
-    user: null
+    user: null,
+    passwordResetEnabled: false
 };
 
 
 controller.$inject = [
+    '$q',
     '$stateParams',
     'PersonStore',
+    'SettingsService',
     'UserContributionStore',
-    'UserStore'
+    'UserStore',
+    'UserService'
 ];
 
 
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     personStore,
+                    settingsService,
                     userContributionStore,
-                    userStore) {
+                    userStore,
+                    userService) {
 
     const vm = Object.assign(this, initialState);
     const userId = $stateParams.userId;
@@ -90,6 +97,32 @@ function controller($stateParams,
     userContributionStore
         .getLeaderBoard()
         .then(leaderBoard => vm.contribution.leaderBoard = leaderBoard);
+
+    $q.all([userService.whoami(), settingsService.findOrDefault('web.authentication', null)])
+        .then(([who, how]) => vm.passwordResetEnabled = who.userName === userId && how === 'waltz');
+
+    vm.resetPassword = () => {
+        if (vm.resetForm.password1 !== vm.resetForm.password2) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        if (vm.resetForm.password1.length < 4) {
+            alert("Password too short (requires >= 4 chars)");
+            return;
+        }
+        const resetCmd = {
+            currentPassword: vm.resetForm.currentPassword,
+            newPassword: vm.resetForm.password1
+        };
+
+        userStore
+            .resetPassword(vm.userId, vm.resetForm.password1, vm.resetForm.currentPassword)
+            .then(r => {
+                if (!r) alert("Password reset failed");
+                else alert("Password updated")
+            });
+    }
 
 }
 
