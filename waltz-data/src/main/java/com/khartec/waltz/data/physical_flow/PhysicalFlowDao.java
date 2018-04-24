@@ -68,6 +68,7 @@ public class PhysicalFlowDao {
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .isRemoved(record.getIsRemoved())
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .build();
     };
 
@@ -245,6 +246,7 @@ public class PhysicalFlowDao {
         record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setIsRemoved(flow.isRemoved());
         record.setProvenance("waltz");
+        record.setExternalId(flow.externalId().orElse(null));
 
         record.store();
         return record.getId();

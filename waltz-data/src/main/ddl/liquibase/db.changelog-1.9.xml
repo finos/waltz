@@ -222,4 +222,17 @@ preference table -->
                        tableName="shared_preference"/>
     </changeSet>
 
+
+    <!-- 3022 - add external_id to physical_flow physical_flow -->
+    <changeSet id="20180423-3022-1"
+               author="kamransaleem">
+        <comment>3022: add external_id to physical_flow physical_flow</comment>
+        <addColumn tableName="physical_flow">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

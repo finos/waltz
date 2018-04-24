@@ -25,9 +25,6 @@ import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -162,6 +159,7 @@ public class PhysicalFlowUploadService {
                             .transport(flow.transport())
                             .criticality(flow.criticality())
                             .description(flow.description())
+                            .externalId(flow.externalId())
                             .lastUpdatedBy(username)
                             .lastUpdatedAt(nowUtc())
                             .build();

@@ -42,7 +42,8 @@ public abstract class PhysicalFlow implements
         DescriptionProvider,
         ProvenanceProvider,
         LastUpdatedProvider,
-        LastAttestedProvider {
+        LastAttestedProvider,
+        ExternalIdProvider {
 
     public abstract long logicalFlowId();
 
