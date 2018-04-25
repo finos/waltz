@@ -106,12 +106,12 @@ function mkColumnDefs() {
 
 
 function resolveEntities(columnMappings = {}, sourceData = [], columnResolvers = {}) {
-    const sourceKeys = _.keys(columnMappings);
+    const targetKeys = _.keys(columnMappings);
     const mappedObjects = _.map(sourceData, sourceObj => {
         const targetObj = {};
 
-        _.forEach(sourceKeys, sourceColumn => {
-            const targetColumn = columnMappings[sourceColumn].name;
+        _.forEach(targetKeys, targetColumn => {
+            const sourceColumn = columnMappings[targetColumn];
             const resolver = columnResolvers[targetColumn] || _.identity;
             targetObj[targetColumn] = resolver(sourceObj[sourceColumn]);
         });

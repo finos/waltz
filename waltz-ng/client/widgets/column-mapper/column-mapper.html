@@ -1,6 +1,7 @@
 <div class="waltz-column-mapper">
     <div class="text-muted small">
-        Please pick a target column each source column below
+        The list below details the fields required by Waltz to construct a physical flow.  Please select the columns from the drop down
+        selectors on the right to populate the required Waltz fields.
         <a class="pull-right clickable"
            ng-click="$ctrl.resetMappings()">
             reset
@@ -9,31 +10,64 @@
 
     <br>
 
-    <table class="table small table-condensed" >
-        <tr ng-repeat="source in $ctrl.sourceColumns">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <td>Target Fields (mapped to Waltz)</td>
+                <td>Source Fields (pick from file)</td>
+            </tr>
+        </thead>
+        <tr ng-repeat="target in $ctrl.targetColumns">
             <td>
-                <div ng-bind="source">
+                <div uib-popover-template="'wcm/desc-popup.html'"
+                     popover-class="waltz-popover-wide"
+                     popover-append-to-body="true"
+                     popover-placement="top"
+                     popover-trigger="mouseenter"
+                     ng-class="{
+                            'wcm-column-required': target.required && !$ctrl.mappings[target.key],
+                            'wcm-column-success': target.required && $ctrl.mappings[target.key]
+                          }">
+
+                    <span ng-bind="target.name">
+                    </span>
+                    <waltz-icon name="check-circle-o"
+                                ng-if="target.required && $ctrl.mappings[target.key]">
+                    </waltz-icon>
+                    <waltz-icon name="question-circle-o"
+                                ng-if="target.required && !$ctrl.mappings[target.key]">
+                    </waltz-icon>
                 </div>
             </td>
             <td width="50%">
-                <ui-select ng-model="$ctrl.mappings[source]"
+                <ui-select ng-model="$ctrl.mappings[target.key]"
                            on-select="$ctrl.onMappingSelect()"
                            theme="bootstrap">
-
                     <ui-select-match placeholder="Select..."
                                      allow-clear="true">
-                        <span ng-bind-html="$select.selected.name">
+                        <span ng-bind-html="$select.selected">
                         </span>
                     </ui-select-match>
 
-                    <ui-select-choices repeat="target in $ctrl.availableTargetColumns | filter: {name: $select.search}">
-                        <span ng-bind="target.name"></span>
-                        <small style="display: block"
-                               class="wcm-required"
-                               ng-if="target.required">required</small>
+                    <ui-select-choices repeat="source in $ctrl.availableSourceColumns | filter: $select.search">
+                        <span ng-bind="source"></span>
                     </ui-select-choices>
                 </ui-select>
             </td>
         </tr>
     </table>
 </div>
+
+
+<!-- DESCRIPTION POPUP -->
+<script type="text/ng-template"
+        id="wcm/desc-popup.html">
+    <div>
+        <waltz-markdown text="target.description"></waltz-markdown>
+        <br>
+        <strong ng-if="target.required"
+              class="text-muted small">
+            This is a required column
+        </strong>
+    </div>
+</script>
