@@ -38,19 +38,19 @@ const initialState = {
     sourceData: [],
     sourceColumns: [],
     targetColumns: [
-        {name: 'basisOffset', required: true},
-        {name: 'criticality', required: true},
-        {name: 'dataType', required: true},
-        {name: 'description', required: false},
-        {name: 'externalId', required: false},
-        {name: 'format', required: true},
-        {name: 'frequency', required: true},
-        {name: 'name', required: true},
-        {name: 'source', required: true},
-        {name: 'specDescription', required: false},
-        {name: 'specExternalId', required: false},
-        {name: 'target', required: true},
-        {name: 'transport', required: true}
+        {key: 'name', name: 'Name', required: true, description: 'A description name for the flow, could be the file that is transferred'},
+        {key: 'source', name: 'Source', required: true, description: 'The source of the flow'},
+        {key: 'target', name: 'Target', required: true, description: 'The target of the flow'},
+        {key: 'format', name: 'Format', required: true, description: 'The file format'},
+        {key: 'frequency', name: 'Frequency', required: true, description: 'Frequency of the sent flow, i.e. Daily, Weekly, Monthly etc.'},
+        {key: 'transport', name: 'Transport', required: true, description: 'The transport type of the flow'},
+        {key: 'criticality', name: 'Criticality', required: true, description: 'The flow\'s criticality'},
+        {key: 'basisOffset', name: 'Basis Offset', required: true, description: 'How current is the data transmitted in the flow i.e. T+1 means that the data in the flow is delayed by one day'},
+        {key: 'dataType', name: 'Data Type', required: true, description: 'The flow\'s data type'},
+        {key: 'externalId', name: 'Physical Flow External Id', required: false, description: 'The flow\'s external identifier, if imported from an existing system of record (if available)'},
+        {key: 'description', name: 'Physical Flow Description', required: false, description: 'A description of the flow (if available)'},
+        {key: 'specExternalId', name: 'Specification External Id', required: false, description: 'The Physical Specification\'s external identifier, if imported from an existing system of record (if available)'},
+        {key: 'specDescription', name: 'Specification Description', required: false, description: 'A description of the Physical Specification (if available)'}
     ],
     uploadCmds: []
 };

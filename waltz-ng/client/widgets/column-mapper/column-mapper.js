@@ -34,7 +34,7 @@ const bindings = {
 const initialState = {
     sourceColumns: [],
     targetColumns: [],
-    availableTargetColumns: [],
+    availableSourceColumns: [],
     mappings: {},
     onChange: (event) => console.log('default onChange handler for column-mapper: ', event)
 };
@@ -43,19 +43,22 @@ const initialState = {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    const mkAvailableTargetColumns = () => {
-        const mappedTargets = _.values(vm.mappings);
-        return _.differenceBy(vm.targetColumns, mappedTargets, 'name');
+    const mkAvailableSourceColumns = () => {
+        const mappedSources = _.values(vm.mappings);
+        return _.difference(vm.sourceColumns, mappedSources);
     };
 
     const isComplete = () => {
-        const requiredTargets = _.filter(vm.targetColumns, tc => tc.required);
-        const mappedTargets = _.values(vm.mappings);
-        return _.isEmpty(_.differenceBy(requiredTargets, mappedTargets, 'name'));
+        const requiredTargets = _
+            .chain(vm.targetColumns)
+            .filter(tc => tc.required)
+            .map(tc => tc.key);
+        const mappedSources = _.values(vm.mappings);
+        return _.isEmpty(_.difference(requiredTargets, mappedSources));
     };
 
     vm.$onInit = () => {
-        vm.availableTargetColumns = vm.targetColumns;
+        vm.availableSourceColumns = vm.sourceColumns;
     };
 
     vm.$onChanges = (changes) => {
@@ -66,7 +69,7 @@ function controller() {
     };
 
     vm.onMappingSelect = () => {
-        vm.availableTargetColumns = mkAvailableTargetColumns();
+        vm.availableSourceColumns = mkAvailableSourceColumns();
         const event = {
             mappings: _.omitBy(vm.mappings, (v,k) => _.isEmpty(v)),
             isComplete
