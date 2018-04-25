@@ -159,7 +159,7 @@ public class PhysicalFlowUploadService {
                             .transport(flow.transport())
                             .criticality(flow.criticality())
                             .description(flow.description())
-                            .externalId(flow.externalId())
+                            .externalId(Optional.ofNullable(flow.externalId()))
                             .lastUpdatedBy(username)
                             .lastUpdatedAt(nowUtc())
                             .build();

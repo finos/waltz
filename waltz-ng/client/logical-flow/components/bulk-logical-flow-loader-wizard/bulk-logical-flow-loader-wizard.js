@@ -40,9 +40,9 @@ const initialState = {
     sourceData: [],
     sourceColumns: [],
     targetColumns: [
-        {name: 'source', required: true},
-        {name: 'target', required: true},
-        {name: 'dataType', required: true},
+        {key: 'source', name: 'Source', required: true, description: 'The source of the flow'},
+        {key: 'target', name: 'Target', required: true, description: 'The target of the flow'},
+        {key: 'dataType', name: 'Data Type', required: true, description: 'The flow\'s data type'}
     ]
 };
 
