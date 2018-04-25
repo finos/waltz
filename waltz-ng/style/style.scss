@@ -48,3 +48,8 @@ footer {
 table {
   font-size: 14px;
 }
+
+
+input::-ms-clear {
+    display: none;
+}
