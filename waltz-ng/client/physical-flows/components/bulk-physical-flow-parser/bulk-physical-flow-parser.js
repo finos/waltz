@@ -196,15 +196,13 @@ function controller($scope, serviceBroker) {
         return _.filter(vm.parsedData, mkFilterPredicate(criteria));
     };
 
-    const resolveFlows = async () => {
+    const resolveFlows = () => {
         if(vm.columnMappings && vm.sourceData) {
             const mappedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
 
-            const parsedData = await serviceBroker
+            return serviceBroker
                 .execute(CORE_API.PhysicalFlowStore.validateUpload, [mappedData])
                 .then(r => r.data);
-
-            return parsedData;
         }
     };
 
@@ -216,6 +214,7 @@ function controller($scope, serviceBroker) {
 
         return resolveFlows()
             .then(flows => {
+                vm.loading = false;
                 const hasParseErrors = _.some(flows, f => f.outcome === 'FAILURE');
                 vm.parsedData = _.map(flows, f => Object.assign({}, f, { hasParseErrors }));
                 vm.filteredData = filterResults();
@@ -228,10 +227,10 @@ function controller($scope, serviceBroker) {
                 invokeFunction(vm.onParseComplete, event);
             })
             .catch(err => {
+                vm.loading = false;
                 vm.errorMessage = err.data.message;
                 console.error('error resolving flows: ', err, vm.errorMessage)
-            })
-            .finally(() => $scope.$apply(() => vm.loading = false));
+            });
     };
 
     vm.$onInit = () => {
