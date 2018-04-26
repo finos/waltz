@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.SetAttributeCommand;
 import com.khartec.waltz.model.physical_flow.*;
@@ -246,8 +247,16 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private List<PhysicalFlowUploadCommandResponse> validateUpload(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
-        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
-        return physicalFlowUploadService.validate(commands);
+        try {
+            List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
+            return physicalFlowUploadService.validate(commands);
+        } catch (JsonMappingException ex) {
+            Throwable cause = ex.getCause();
+            if(cause != null) {
+                throw new IOException(cause.getMessage(), ex);
+            }
+            throw ex;
+        }
     }
 
 
