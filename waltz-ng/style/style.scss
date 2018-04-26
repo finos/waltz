@@ -53,3 +53,8 @@ table {
 input::-ms-clear {
     display: none;
 }
+
+/* changes ui-select active row background color */
+.ui-select-bootstrap .ui-select-choices-row.active>span {
+    background-color: #e5e5e5;
+}
