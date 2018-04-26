@@ -41,6 +41,7 @@ const bindings = {
 const initialState = {
     columnDefs: [],
     columnMappings: {},
+    errorMessage: null,
     filterCriteria: null,
     filteredData: [],
     loading: false,
@@ -209,13 +210,16 @@ function controller($scope, serviceBroker) {
 
     const parseFlows = () => {
         vm.loading = true;
+        vm.errorMessage = null;
+        vm.parsedData = [];
+        vm.summary = {};
+
         return resolveFlows()
             .then(flows => {
                 const hasParseErrors = _.some(flows, f => f.outcome === 'FAILURE');
                 vm.parsedData = _.map(flows, f => Object.assign({}, f, { hasParseErrors }));
                 vm.filteredData = filterResults();
                 vm.summary = mkParseSummary(vm.parsedData);
-                $scope.$apply(() => vm.loading = false);
 
                 const event = {
                     data: vm.parsedData,
@@ -223,7 +227,11 @@ function controller($scope, serviceBroker) {
                 };
                 invokeFunction(vm.onParseComplete, event);
             })
-            .catch(err => console.error('error resolving flows: ', err));
+            .catch(err => {
+                vm.errorMessage = err.data.message;
+                console.error('error resolving flows: ', err, vm.errorMessage)
+            })
+            .finally(() => $scope.$apply(() => vm.loading = false));
     };
 
     vm.$onInit = () => {

@@ -190,7 +190,10 @@ function service($injector) {
         const serviceFn = getFunction(service, serviceName, serviceFnName);
         return serviceFn(...targetParams)
             .then(data => ({data}))
-            .catch(error => console.warn(`ServiceBroker::execute - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams));
+            .catch(error => {
+                console.warn(`ServiceBroker::execute - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams);
+                throw error;
+            });
     };
 
     const resetViewData = () => {

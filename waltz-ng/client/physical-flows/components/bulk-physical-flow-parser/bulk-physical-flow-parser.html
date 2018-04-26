@@ -7,6 +7,22 @@
     </div>
 
 
+    <!-- Errors -->
+    <div ng-if="$ctrl.errorMessage">
+        <div>
+            <p>Could not parse input data</p>
+
+            <p>
+                <span class="text-danger"
+                      ng-bind="$ctrl.errorMessage">
+                </span>
+            </p>
+
+            <p>Please go back and check input data and mappings.</p>
+        </div>
+    </div>
+
+
     <!-- Results -->
     <div ng-if="$ctrl.parsedData.length > 0">
 
