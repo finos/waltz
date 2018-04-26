@@ -31,11 +31,17 @@
                 </waltz-icon>
 
                 <span ng-bind-html="entity.name | highlight: $select.search"
-                      ng-class="{'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED'}"></span>
+                      ng-class="{
+                            'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED',
+                            'wes-entity-pending': entity.entityLifecycleStatus === 'PENDING'
+                      }"></span>
 
                 <small class="wes-entity-description"
                        ng-bind-html="entity.description | highlight: $select.search"
-                       ng-class="{'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED'}">
+                       ng-class="{
+                            'wes-entity-removed': entity.entityLifecycleStatus === 'REMOVED',
+                            'wes-entity-pending': entity.entityLifecycleStatus === 'PENDING'
+                       }">
                 </small>
             </div>
         </ui-select-choices>

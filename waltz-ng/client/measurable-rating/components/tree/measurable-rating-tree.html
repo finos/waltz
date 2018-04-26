@@ -45,7 +45,10 @@
                 </waltz-icon>
             </span>
 
-            <span ng-attr-title="{{ node.description }}"
+            <span uib-popover-template="'wmrt-popover.html'"
+                  popover-trigger="mouseenter"
+                  popover-append-to-body="true"
+                  popover-placement="right"
                   ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
                   class="no-overflow">
                 <span ng-bind="node.name"
@@ -55,8 +58,26 @@
                       class="waltz-visibility-child-50">
                     *
                 </span>
+                 <span ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
+                     ...
+                </span>
             </span>
         </span>
 
     </treecontrol>
 </div>
+
+
+
+
+<script type="text/ng-template"
+        id="wmrt-popover.html">
+    <div class="small">
+        <strong ng-bind="node.name"></strong>
+        <waltz-markdown text="node.description"></waltz-markdown>
+        <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
+            <hr>
+            <div ng-bind="$ctrl.ratingsByMeasurable[node.id].description"></div>
+        </div>
+    </div>
+</script>
