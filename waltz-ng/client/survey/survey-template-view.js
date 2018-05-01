@@ -18,18 +18,90 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../common/index";
+import {mkLinkGridCell} from "../common/link-utils";
+
+import template from './survey-template-view.html';
 
 
 const initialState = {
     template: {},
+    columnDefs: [],
     issuedAndCompletedRuns: [],
+    issuedAndCompletedRunsEnriched: [],
     draftRuns: [],
     questionInfos: [],
     runCompletionRates: {}
 };
 
 
-function controller($state,
+function mkColumnDefs() {
+    return [
+        Object.assign({},
+            mkLinkGridCell('Name', 'name', 'id', 'main.survey.run.view'),
+            { width: '25%'}
+        ),
+        {
+            field: 'status',
+            name: 'Status',
+            cellFilter: "toDisplayName:'surveyRunStatus'",
+            width: '5%'
+        },
+        {
+            field: 'id',
+            name: 'Responses',
+            cellTemplate: `<div uib-popover="{{grid.appScope.runCompletionRates[COL_FIELD].text}}"
+                                popover-trigger="mouseenter"
+                                popover-append-to-body="true">
+                            <uib-progress max="grid.appScope.runCompletionRates[COL_FIELD].totalCount"
+                                          animate="false"
+                                          class="waltz-survey-progress">
+                                <uib-bar value="grid.appScope.runCompletionRates[COL_FIELD].completedCount"
+                                         ng-bind="grid.appScope.runCompletionRates[COL_FIELD].completedCount"
+                                         type="success">
+                                </uib-bar>
+                                <uib-bar value="grid.appScope.runCompletionRates[COL_FIELD].inProgressCount"
+                                         ng-bind="grid.appScope.runCompletionRates[COL_FIELD].inProgressCount"
+                                         type="info">
+                                </uib-bar>
+                                <uib-bar value="grid.appScope.runCompletionRates[COL_FIELD].notStartedCount"
+                                         ng-bind="grid.appScope.runCompletionRates[COL_FIELD].notStartedCount"
+                                         type="warning">
+                                </uib-bar>
+                                <uib-bar value="grid.appScope.runCompletionRates[COL_FIELD].expiredCount"
+                                         ng-bind="grid.appScope.runCompletionRates[COL_FIELD].expiredCount"
+                                         type="danger">
+                                </uib-bar>
+                            </uib-progress>
+                        </div>`,
+            width: '10%'
+        },
+        {
+            field: 'contactEmail',
+            name: 'Contact',
+        },
+        {
+            field: 'issuedOn',
+            name: 'Issued',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+            width: '10%'
+        },
+        {
+            field: 'dueDate',
+            name: 'Due',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+            width: '10%'
+        },
+        {
+            field: 'owner.displayName',
+            name: 'Owner',
+            cellTemplate: '<div class="ui-grid-cell-contents"><span ng-bind="COL_FIELD"></span></div>',
+        },
+    ];
+}
+
+
+function controller($q,
+                    $state,
                     $stateParams,
                     notification,
                     personStore,
@@ -37,6 +109,8 @@ function controller($state,
                     surveyRunStore,
                     surveyTemplateStore) {
     const vm = initialiseData(this, initialState);
+
+    vm.columnDefs = mkColumnDefs();
 
     const templateId = $stateParams.id;
 
@@ -76,17 +150,27 @@ function controller($state,
                 });
 
             // populate owners
-            _.chain(vm.issuedAndCompletedRuns)
+            const personPromises = _.chain(vm.issuedAndCompletedRuns)
                 .map('ownerId')
                 .uniq()
-                .value()
-                .forEach(personId => personStore
+                .map(personId => personStore
                     .getById(personId)
                     .then(p => {
                         if (p) {
                             vm.people[p.id] = p;
                         }
-                    }));
+                        return p;
+                    }))
+                .value();
+
+             $q.all(personPromises)
+                .then(() => {
+                    vm.issuedAndCompletedRunsEnriched = _.map(
+                            vm.issuedAndCompletedRuns,
+                            r => Object.assign(r, {owner: vm.people[r.ownerId]})
+                    );
+                });
+
         });
 
     surveyQuestionStore
@@ -139,6 +223,7 @@ function controller($state,
 
 
 controller.$inject = [
+    '$q',
     '$state',
     '$stateParams',
     'Notification',
@@ -152,7 +237,7 @@ controller.$inject = [
 const page = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-template-view.html')
+    template
 };
 
 
