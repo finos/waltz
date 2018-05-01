@@ -63,67 +63,11 @@
         </waltz-section-actions>
 
         <div>
-            <table class="table table-condensed table-striped">
-                <colgroup>
-                    <col width="30%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="15%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="15%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Responses</th>
-                    <th>Contact</th>
-                    <th>Issued</th>
-                    <th>Due</th>
-                    <th>Owner</th>
-                </tr>
-                </thead>
-                <tr ng-repeat="r in ctrl.issuedAndCompletedRuns">   <!-- don't show DRAFT runs -->
-                    <td>
-                        <a ng-bind="r.name"
-                           class="clickable"
-                           ui-sref="main.survey.run.view ({id: r.id})"></a>
-                    </td>
-                    <td><span ng-bind="r.status | toDisplayName:'surveyRunStatus'"></span></td>
-                    <td>
-                        <div uib-popover="{{ctrl.runCompletionRates[r.id].text}}"
-                             popover-trigger="mouseenter">
-                            <uib-progress max="ctrl.runCompletionRates[r.id].totalCount"
-                                          animate="false"
-                                          class="waltz-survey-progress">
-                                <uib-bar value="ctrl.runCompletionRates[r.id].completedCount"
-                                         ng-bind="ctrl.runCompletionRates[r.id].completedCount"
-                                         type="success">
-                                </uib-bar>
-                                <uib-bar value="ctrl.runCompletionRates[r.id].inProgressCount"
-                                         ng-bind="ctrl.runCompletionRates[r.id].inProgressCount"
-                                         type="info">
-                                </uib-bar>
-                                <uib-bar value="ctrl.runCompletionRates[r.id].notStartedCount"
-                                         ng-bind="ctrl.runCompletionRates[r.id].notStartedCount"
-                                         type="warning">
-                                </uib-bar>
-                                <uib-bar value="ctrl.runCompletionRates[r.id].expiredCount"
-                                         ng-bind="ctrl.runCompletionRates[r.id].expiredCount"
-                                         type="danger">
-                                </uib-bar>
-                            </uib-progress>
-                        </div>
-                    </td>
-                    <td><span ng-bind="r.contactEmail"></span></td>
-                    <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
-                    <td><waltz-from-now ng-if='r.dueDate'
-                                        timestamp="r.dueDate"></waltz-from-now>
-                    </td>
-                    <td><span ng-bind="ctrl.people[r.ownerId].displayName"></span></td>
-                </tr>
-            </table>
+            <waltz-grid-with-search column-defs="ctrl.columnDefs"
+                                    entries="ctrl.issuedAndCompletedRunsEnriched"
+                                    scope-provider="ctrl"
+                                    search-placeholder-text="Search...">
+            </waltz-grid-with-search>
         </div>
         <span ng-if="ctrl.draftRuns.length > 0"
               class="text-muted small">
