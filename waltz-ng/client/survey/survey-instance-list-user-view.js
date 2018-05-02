@@ -16,15 +16,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData} from "../common/index";
 import _ from "lodash";
+import {initialiseData} from "../common/index";
+import {mkLinkGridCell} from "../common/link-utils";
+
+import template from './survey-instance-list-user-view.html';
+
 
 const initialState = {
+    incompleteColumnDefs: [],
+    completeColumnDefs: [],
     surveyInstancesAndRuns: [],
     showSurveyTemplateButton: false
 };
 
-const template = require('./survey-instance-list-user-view.html');
 
 function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     const runsById = _.keyBy(surveyRuns, 'id');
@@ -48,12 +53,93 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
 }
 
 
+function mkCommonColumnDefs() {
+    return [
+        {
+            field: 'surveyInstance.id',
+            name: 'ID',
+            width: '5%'
+        },
+        {
+            field: 'surveyInstance.surveyEntity.kind',
+            name: 'Subject Kind',
+            cellFilter: "toDisplayName:'entity'"
+        },
+        {
+            field: 'surveyInstance.surveyEntity.name',
+            name: 'Subject',
+            width: '25%'
+        },
+        {
+            field: 'surveyInstance.status',
+            name: 'Status',
+            cellFilter: "toDisplayName:'surveyInstanceStatus'",
+        },
+        {
+            field: 'surveyRun.issuedOn',
+            name: 'Issued',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+        },
+        {
+            field: 'surveyInstance.dueDate',
+            name: 'Due',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+        },
+    ];
+}
+
+
+function mkIncompleteColumnDefs() {
+    const columnDefs = mkCommonColumnDefs();
+    columnDefs.splice(0, 0, Object.assign({},
+        mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.edit'),
+        { width: '25%'}
+    ));
+    return columnDefs;
+}
+
+
+function mkCompleteColumnDefs() {
+    const columnDefs = mkCommonColumnDefs();
+    columnDefs.splice(0, 0, Object.assign({},
+        mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.view'),
+        { width: '25%'}
+    ));
+
+    const approved = {
+            field: 'surveyInstance.approvedBy',
+            name: 'Approved By',
+            cellTemplate: `<div class="ui-grid-cell-contents">
+                               <span ng-if="row.entity.surveyInstance.approvedBy">
+                                    <span ng-bind="row.entity.surveyInstance.approvedBy">
+                                    </span>,
+                                </span>
+                                <waltz-from-now class='text-muted'
+                                            ng-if="row.entity.surveyInstance.approvedAt"
+                                            timestamp="row.entity.surveyInstance.approvedAt">
+                                </waltz-from-now>
+                                <span ng-if="! row.entity.surveyInstance.approvedAt">
+                                    -
+                                </span>
+                           </div>`,
+            width: '15%'
+        };
+
+    columnDefs.push(approved);
+
+    return columnDefs;
+}
+
+
 function controller($q,
                     surveyInstanceStore,
                     surveyRunStore,
                     userService) {
 
     const vm = initialiseData(this, initialState);
+
+    vm.incompleteColumnDefs = mkIncompleteColumnDefs();
+    vm.completeColumnDefs = mkCompleteColumnDefs();
 
     userService.whoami()
         .then(user => vm.user = user)
