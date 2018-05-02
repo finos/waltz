@@ -20,7 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../common";
 
-import template from './involved-people-section.html';
+import template from "./involved-people-section.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {aggregatePeopleInvolvements} from "../involvement-utils";
 
@@ -148,6 +148,12 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
         {
             field: 'roles',
             displayName: 'Roles',
+            sortingAlgorithm: (a, b) => {
+                const aNames = _.join(_.map(a, 'displayName'));
+                const bNames = _.join(_.map(b, 'displayName'));
+                return aNames.localeCompare(bNames);
+            },
+            exportFormatter: (input) => _.join(_.map(input, 'displayName'), ','),
             cellTemplate: `
                 <div class="ui-grid-cell-contents"> 
                     <span ng-repeat="role in COL_FIELD">
