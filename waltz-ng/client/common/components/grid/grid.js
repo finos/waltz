@@ -89,6 +89,12 @@ function controller(uiGridExporterConstants,
                 gridApi: vm.gridApi
             });
         },
+        exporterFieldCallback: function (grid, row, col, input) {
+            const formatter = col.colDef.exportFormatter;
+            return formatter
+                ? formatter(input)
+                : input;
+        },
         rowTemplate: vm.rowTemplate
     };
 
