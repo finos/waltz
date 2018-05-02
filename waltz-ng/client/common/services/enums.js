@@ -1179,6 +1179,13 @@ export const surveyInstanceStatus = {
         icon: null,
         description: null,
         position: 60
+    },
+    APPROVED: {
+        key: 'APPROVED',
+        name: 'Approved',
+        icon: null,
+        description: null,
+        position: 70
     }
 };
 

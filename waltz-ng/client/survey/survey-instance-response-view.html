@@ -19,7 +19,8 @@
         <waltz-section-actions>
             <a class="btn btn-danger btn-xs"
                waltz-has-role="SURVEY_ADMIN"
-               ng-if="ctrl.surveyInstance.status === 'COMPLETED' && ctrl.currentResponseVersion.isLatest"
+               ng-if="(ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED')
+                        && ctrl.currentResponseVersion.isLatest"
                ng-click="ctrl.reject()">
                 Reject
             </a>
