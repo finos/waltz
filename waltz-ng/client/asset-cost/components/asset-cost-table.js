@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import { mkEntityLinkGridCell } from "../../common/link-utils";
-import { initialiseData } from "../../common/index";
+import {mkEntityLinkGridCell} from "../../common/grid-utils";
+import {initialiseData} from "../../common/index";
 
-import template from './asset-cost-table.html';
+import template from "./asset-cost-table.html";
 
 
 const DEFAULT_OPTIONS = {

@@ -18,9 +18,9 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../common/index";
-import {mkLinkGridCell} from "../common/link-utils";
+import {mkLinkGridCell} from "../common/grid-utils";
 
-import template from './survey-instance-list-user-view.html';
+import template from "./survey-instance-list-user-view.html";
 
 
 const initialState = {

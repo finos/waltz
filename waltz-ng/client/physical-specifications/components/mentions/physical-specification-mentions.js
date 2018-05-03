@@ -18,7 +18,7 @@
  */
 
 import {initialiseData} from "../../../common";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/link-utils";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 
 const bindings = {
     mentions: '<',

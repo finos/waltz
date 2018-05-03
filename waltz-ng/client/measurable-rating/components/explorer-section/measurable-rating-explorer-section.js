@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {mkLinkGridCell} from '../../../common/link-utils';
-import {ragColorScale} from '../../../common/colors';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {ragColorScale} from "../../../common/colors";
+import template from "./measurable-rating-explorer-section.html";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 /**
  * @name waltz-measurable-rating-explorer-section
@@ -31,9 +33,6 @@ import {ragColorScale} from '../../../common/colors';
  * ratings by their rated values.  It also provides a detail table showing
  * all the ratings and their associated applications.
  */
-
-import template from './measurable-rating-explorer-section.html';
-import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {

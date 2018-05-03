@@ -18,9 +18,9 @@
  */
 import _ from "lodash";
 import {initialiseData, isEmpty} from "../../../common";
-import {mkLinkGridCell} from "../../../common/link-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './complexity-section.html';
+import template from "./complexity-section.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
