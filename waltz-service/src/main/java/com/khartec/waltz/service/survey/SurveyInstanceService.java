@@ -146,7 +146,7 @@ public class SurveyInstanceService {
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
 
         // if survey is being sent back, store current responses as a version
-        if (surveyInstance.status() == SurveyInstanceStatus.COMPLETED
+        if ((surveyInstance.status() == SurveyInstanceStatus.COMPLETED || surveyInstance.status() == SurveyInstanceStatus.APPROVED)
                 && command.newStatus() == SurveyInstanceStatus.REJECTED) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);

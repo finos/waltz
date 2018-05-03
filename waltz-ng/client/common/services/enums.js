@@ -1138,6 +1138,13 @@ export const relationshipKind = {
 
 
 export const surveyInstanceStatus = {
+    APPROVED: {
+        key: 'APPROVED',
+        name: 'Approved',
+        icon: null,
+        description: null,
+        position: 5
+    },
     COMPLETED: {
         key: 'COMPLETED',
         name: 'Completed',

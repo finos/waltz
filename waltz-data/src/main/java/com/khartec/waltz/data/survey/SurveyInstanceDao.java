@@ -204,6 +204,7 @@ public class SurveyInstanceDao {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.APPROVED_AT, Timestamp.valueOf(nowUtc()))
                 .set(SURVEY_INSTANCE.APPROVED_BY, userName)
+                .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.APPROVED.name())
                 .where(SURVEY_INSTANCE.ID.eq(instanceId))
                 .execute();
     }
