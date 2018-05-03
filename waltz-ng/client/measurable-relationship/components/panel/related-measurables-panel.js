@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
 import {downloadTextFile} from "../../../common/file-utils";
-import {sameRef} from '../../../common/entity-utils';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {entity, relationshipKind, getEnumName} from '../../../common/services/enums';
-import {sanitizeRelationships} from '../../measurable-relationship-utils';
+import {sameRef} from "../../../common/entity-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {entity, getEnumName, relationshipKind} from "../../../common/services/enums";
+import {sanitizeRelationships} from "../../measurable-relationship-utils";
 
-import template from './related-measurables-panel.html';
+import template from "./related-measurables-panel.html";
 
 
 /**
@@ -178,7 +178,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.selectedCategory = c;
         vm.selectedRow = null;
         vm.selectionFilterFn = c.relationshipFilter;
-        vm.gridData = calcGridData(c);
+        vm.gridData = calcGridData();
         vm.cancelEditor();
     });
 

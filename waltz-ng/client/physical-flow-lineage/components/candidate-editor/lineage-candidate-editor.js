@@ -39,7 +39,7 @@ const template = require('./lineage-candidate-editor.html');
 const initialState = {
     selectedSource: null,
     candidateSelections: []
-}
+};
 
 
 function removeCandidatesWithNoPhysicalFlows(candidates = []) {
@@ -76,18 +76,9 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        const specOwners = _.map(vm.specifications, "owningEntity");
-        const flowTargets = _.map(vm.physicalFlows, "target");
-
-        const endpointReferences = _.chain(_.concat(specOwners, flowTargets))
-            .uniqBy("id")
-            .value();
-
-
         const flowData = enrichConsumes(
             vm.specifications,
-            vm.physicalFlows,
-            endpointReferences);
+            vm.physicalFlows);
 
         const candidateGroups = mkCandidateGroups(flowData, vm.currentLineage);
         vm.sources = candidateGroups.sources;

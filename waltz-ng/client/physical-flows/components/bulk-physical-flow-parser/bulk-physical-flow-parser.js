@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import { nest } from "d3-collection";
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from '../../../common';
-import { sameRef } from '../../../common/entity-utils';
-import { invokeFunction } from '../../../common/index';
-import { downloadTextFile } from '../../../common/file-utils';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {sameRef} from "../../../common/entity-utils";
+import {invokeFunction} from "../../../common/index";
+import {downloadTextFile} from "../../../common/file-utils";
 
 
-import template from './bulk-physical-flow-parser.html';
+import template from "./bulk-physical-flow-parser.html";
 
 
 const bindings = {
@@ -198,7 +197,7 @@ function controller($scope, serviceBroker) {
 
     const resolveFlows = () => {
         if(vm.columnMappings && vm.sourceData) {
-            const mappedData = mapColumns(vm.columnMappings, vm.sourceData, vm.columnResolvers);
+            const mappedData = mapColumns(vm.columnMappings, vm.sourceData);
 
             return serviceBroker
                 .execute(CORE_API.PhysicalFlowStore.validateUpload, [mappedData])

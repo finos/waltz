@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { nest } from 'd3-collection';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {nest} from "d3-collection";
 
-import { initialiseData } from '../../../common';
-import { invokeFunction } from '../../../common/index';
-import { refToString } from '../../../common/entity-utils';
-import { mkEntityLinkGridCell } from '../../../common/link-utils';
+import {initialiseData} from "../../../common";
+import {invokeFunction} from "../../../common/index";
+import {refToString} from "../../../common/entity-utils";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 
 
-import template from './bulk-logical-flow-uploader.html';
+import template from "./bulk-logical-flow-uploader.html";
 
 
 const bindings = {

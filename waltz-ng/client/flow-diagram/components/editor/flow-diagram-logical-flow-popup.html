@@ -28,8 +28,9 @@
     Click
     <a class="clickable"
        ng-click="$ctrl.onDismiss()"
-       href="{{ $ctrl.logicalFlowAdditionUrl }}"
-       target="_blank">
+       ng-href="{{ $ctrl.logicalFlowAdditionUrl }}"
+       target="_blank"
+       rel="noopener noreferrer">
         here
     </a>
     to add a new node.
