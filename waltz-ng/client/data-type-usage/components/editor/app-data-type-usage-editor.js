@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import allUsageKinds from "../../usage-kinds";
-import {initialiseData} from '../../../common'
+import {initialiseData} from "../../../common";
 
 const bindings = {
     primaryEntity: '<',
@@ -73,7 +73,7 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => vm.usageRows = mkUsageRows(vm.usages);
-    vm.save = () => vm.onSave(prepareSave(vm.usageRows, vm.type, vm.primaryEntity));
+    vm.save = () => vm.onSave(prepareSave(vm.usageRows));
     vm.cancel = () => vm.onCancel();
 }
 
