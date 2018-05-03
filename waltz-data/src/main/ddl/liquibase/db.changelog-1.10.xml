@@ -27,11 +27,11 @@
                author="kamransaleem">
         <comment>3112: SurveyInstance Approved status</comment>
         <sql>
-            UPDATE [survey_instance]
-            SET [status] = 'APPROVED'
-            WHERE [approved_by] is not null
-            AND [approved_at] is not null
-            AND [status] = 'COMPLETED'
+            UPDATE survey_instance
+            SET status = 'APPROVED'
+            WHERE approved_by is not null
+            AND approved_at is not null
+            AND status = 'COMPLETED'
         </sql>
     </changeSet>
 
