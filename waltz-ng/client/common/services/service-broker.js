@@ -86,9 +86,9 @@ function registerCacheRefreshListener(cacheRefreshListenersMap, cacheKey, cacheR
 
 
 function performChecks(target, targetParams, options) {
-    checkIsServiceBrokerTarget(target, 'target must have the correct properties');
+    checkIsServiceBrokerTarget(target);
     checkIsArray(targetParams, 'targetParams must be an array');
-    checkIsServiceBrokerOptions(options, 'options must have the correct properties');
+    checkIsServiceBrokerOptions(options);
 }
 
 
