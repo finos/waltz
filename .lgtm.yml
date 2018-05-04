@@ -1,0 +1,5 @@
+extraction:
+  java:
+    after_prepare:
+      # Disable modules that require a running SQL server in order to build
+      - sed -i -e '/\s*<module>waltz-\(service\|web\|jobs\|data\|schema\)<\/module>/d' pom.xml
