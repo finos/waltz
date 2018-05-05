@@ -60,12 +60,6 @@ function controller(serviceBroker) {
     };
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                ['SECTION.AUTH_SOURCES.ABOUT'])
-            .then(r => vm.descriptionPanels = r.data);
-
         vm.visibility.tab = vm.parentEntityRef.kind === 'DATA_TYPE'
             ? 1
             : 0;

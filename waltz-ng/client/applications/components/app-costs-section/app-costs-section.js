@@ -74,12 +74,6 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
 
         serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                ['SECTION.ASSET_COSTS.ABOUT'])
-            .then(r => vm.staticPanels = r.data);
-
-        serviceBroker
             .loadAppData(CORE_API.SourceDataRatingStore.findAll)
             .then(r => vm.sourceDataRatings = r.data);
 

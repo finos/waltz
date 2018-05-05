@@ -77,11 +77,6 @@ function controller(serviceBroker,
                 [ mkSelectionOptions(vm.parentEntityRef) ])
             .then(r => vm.topCosts = r.data);
 
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                [ 'SECTION.ASSET_COSTS.ABOUT' ])
-            .then(rs => vm.staticPanels = rs.data);
     };
 }
 
