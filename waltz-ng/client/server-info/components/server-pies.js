@@ -19,7 +19,7 @@
 
 import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
-import {endOfLifeStatus} from "../../common/services/enums";
+import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
 
 
 const bindings = {
@@ -41,7 +41,6 @@ const EOL_STATUS_CONFIG = {
 
 function controller() {
     const vm = this;
-
 
     vm.pie = {
         env: {

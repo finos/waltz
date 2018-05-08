@@ -21,12 +21,11 @@ import _ from "lodash";
 import {tallyBy} from "../../common/tally-utils";
 import {notEmpty} from "../../common";
 import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
-import {
-    criticality,
-    lifecyclePhase,
-    applicationKind,
-    getEnumName
-} from "../../common/services/enums";
+
+import {applicationKind} from "../../common/services/enums/application-kind";
+import {criticality} from "../../common/services/enums/criticality";
+import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
+import {getEnumName} from "../../common/services/enums";
 
 
 const bindings = {

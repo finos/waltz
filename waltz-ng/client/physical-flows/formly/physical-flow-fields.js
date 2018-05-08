@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {toOptions, frequencyKind, transportKind} from "../../common/services/enums";
+import {frequencyKind} from "../../common/services/enums/frequency-kind";
+import {transportKind} from "../../common/services/enums/transport-kind";
+import {toOptions} from "../../common/services/enums";
 
 
 export const transportField = {

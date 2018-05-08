@@ -21,7 +21,8 @@ import {enrichServerStats} from "../../../server-info/services/server-utilities"
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {refToString, sameRef} from '../../../common/entity-utils';
-import {entity, getEnumName} from '../../../common/services/enums';
+import {entity} from '../../../common/services/enums/entity';
+import {getEnumName} from '../../../common/services/enums';
 import template from './measurable-summary.html';
 import {initialiseData} from "../../../common/index";
 

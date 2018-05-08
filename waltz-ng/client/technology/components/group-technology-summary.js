@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
-import {endOfLifeStatus} from "../../common/services/enums";
+import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
 
 
 const bindings = {
