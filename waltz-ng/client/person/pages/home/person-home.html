@@ -17,12 +17,9 @@
                 </waltz-svg-diagrams>
 
 
-                <div ng-if="ctrl.panels.length > 0">
-                    <hr>
-                    <waltz-static-panels render-mode="chromeless"
-                                         panels="ctrl.panels">
-                    </waltz-static-panels>
-                </div>
+                <waltz-static-panels render-mode="chromeless"
+                                     group-key='HOME.PERSON'>
+                </waltz-static-panels>
             </div>
         </div>
     </div>

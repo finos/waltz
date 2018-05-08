@@ -25,8 +25,7 @@ function controller($stateParams,
                     measurableStore,
                     measurableRatingStore,
                     perspectiveDefinitionStore,
-                    perspectiveRatingStore,
-                    staticPanelStore)
+                    perspectiveRatingStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -42,10 +41,6 @@ function controller($stateParams,
         entityReference,
         scope: 'EXACT'
     };
-
-    staticPanelStore
-        .findByGroup('PERSPECTIVE.RATING.EDIT')
-        .then(panels => vm.panels = panels);
 
     applicationStore
         .getById(applicationId)
@@ -98,8 +93,7 @@ controller.$inject = [
     'MeasurableStore',
     'MeasurableRatingStore',
     'PerspectiveDefinitionStore',
-    'PerspectiveRatingStore',
-    'StaticPanelStore'
+    'PerspectiveRatingStore'
 ];
 
 

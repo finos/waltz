@@ -22,9 +22,9 @@ import moment from "moment";
 
 import {CORE_API} from "../common/services/core-api-utils";
 import {formats, initialiseData} from "../common/index";
-import {mkEntityLinkGridCell} from "../common/link-utils";
+import {mkEntityLinkGridCell} from "../common/grid-utils";
 
-import template from './attestation-run-view.html';
+import template from "./attestation-run-view.html";
 
 
 const initialState = {

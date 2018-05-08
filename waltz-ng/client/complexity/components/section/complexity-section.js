@@ -18,9 +18,9 @@
  */
 import _ from "lodash";
 import {initialiseData, isEmpty} from "../../../common";
-import {mkLinkGridCell} from "../../../common/link-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './complexity-section.html';
+import template from "./complexity-section.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
@@ -33,7 +33,6 @@ const initialState = {
     csvName: 'complexity.csv',
     gridData: [],
     gridDataCount: 0,
-    staticPanels: null,
     summarySelection: null,
     visibility: {
         summary: true,
@@ -59,11 +58,6 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                [ 'SECTION.COMPLEXITY.ABOUT' ])
-            .then(rs => vm.staticPanels = rs.data);
     };
 
     vm.$onChanges = () => {

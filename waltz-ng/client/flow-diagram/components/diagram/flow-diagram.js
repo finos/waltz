@@ -17,17 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {select, event, selectAll} from 'd3-selection';
-import {drag} from 'd3-drag';
-import {zoom} from 'd3-zoom';
-import {initialiseData, perhaps} from '../../../common';
-import {
-    mkCurvedLine, mkCurvedLineWithArrowPath, mkLineWithArrowPath, responsivefy,
-    wrapText
-} from '../../../common/d3-utils';
-import {d3ContextMenu} from '../../../common/d3-context-menu';
-import {toGraphId, toNodeShape, drawNodeShape, shapeFor, positionFor} from '../../flow-diagram-utils';
+import _ from "lodash";
+import {event, select, selectAll} from "d3-selection";
+import {drag} from "d3-drag";
+import {zoom} from "d3-zoom";
+import {initialiseData, perhaps} from "../../../common";
+import {mkCurvedLine, mkCurvedLineWithArrowPath, responsivefy, wrapText} from "../../../common/d3-utils";
+import {d3ContextMenu} from "../../../common/d3-context-menu";
+import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
 
 
 /**
@@ -481,7 +478,7 @@ function draw(state, commandProcessor = () => console.log('no command processor 
     }
 
     drawNodes(state, groups.nodes, commandProcessor);
-    drawFlows(state, groups.flows, commandProcessor);
+    drawFlows(state, groups.flows);
     drawAnnotations(state, groups.annotations, commandProcessor);
 
     enableLayers(state.visibility.layers);

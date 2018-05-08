@@ -26,6 +26,7 @@ import {buildPropertySummer} from "../../../common/tally-utils";
 
 const FIELDS_TO_SEARCH = ['name', 'description'];
 
+
 function setupBlockProcessor($state) {
     return b => {
         b.block.onclick = () =>
@@ -80,17 +81,12 @@ function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
 function controller(orgUnits,
                     appTallies,
                     endUserAppTallies,
-                    staticPanelStore,
                     svgStore,
                     $state) {
 
     const vm = this;
 
     loadDiagrams(svgStore, vm, $state);
-
-    staticPanelStore
-        .findByGroup("HOME.ORG_UNIT")
-        .then(panels => vm.panels = panels);
 
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
@@ -107,11 +103,11 @@ function controller(orgUnits,
     vm.clearSearch = (q) => vm.filteredOrgUnits = [];
 }
 
+
 controller.$inject = [
     'orgUnits',
     'appTallies',
     'endUserAppTallies',
-    'StaticPanelStore',
     'SvgDiagramStore',
     '$state'
 ];

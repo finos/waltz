@@ -37,12 +37,6 @@ function controller($state,
                 CORE_API.SvgDiagramStore.findByGroup,
                 [ 'ORG_TREE' ])
             .then(r => vm.diagrams = r.data);
-
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                [ 'HOME.PERSON' ])
-            .then(r => vm.panels = r.data);
     };
 
     vm.blockProcessor = b => {

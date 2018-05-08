@@ -45,18 +45,8 @@ function controller($state,
 
     vm.$onInit = () => {
         serviceBroker
-            .loadAppData(CORE_API.StaticPanelStore.findByGroup, ["HOME.DATA-TYPE"])
-            .then(r => vm.panels = r.data);
-
-        serviceBroker
             .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ['DATA_TYPE'])
             .then(r => vm.diagrams = r.data);
-
-        serviceBroker
-            .loadAppData(
-                CORE_API.StaticPanelStore.findByGroup,
-                    ['SECTION.AUTH_SOURCES.ABOUT'])
-            .then(r => vm.authSourcePanels = r.data);
 
         loadAuthSources();
 

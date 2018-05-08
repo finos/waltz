@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkEntityLinkGridCell} from "../../../common/link-utils";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKind} from "../../../common/services/enums/relationship-kind";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -27,12 +27,12 @@ import {getDefaultScopeForEntityKind, mkSelectionOptions} from "../../../common/
 import {sameRef} from "../../../common/entity-utils";
 import {
     allowedRelationshipsByKind,
-    fetchRelationshipFunctionsByKind,
-    changeRelationshipFunctionsByKind
+    changeRelationshipFunctionsByKind,
+    fetchRelationshipFunctionsByKind
 } from "../../../common/relationship-definitions";
 
 
-import template from './related-apps-section.html';
+import template from "./related-apps-section.html";
 
 
 const bindings = {

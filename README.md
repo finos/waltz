@@ -10,6 +10,8 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 [![Build Status](https://travis-ci.org/khartec/waltz.svg?branch=master)](https://travis-ci.org/khartec/waltz)
 
+[LGTM - Automated code reviews](https://lgtm.com/projects/g/khartec/waltz/)
+
 ## Technology Stack
 
 ### Server

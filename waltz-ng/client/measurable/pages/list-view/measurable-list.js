@@ -96,11 +96,6 @@ function controller($location,
 
     measurableCategoryPromise
         .then((cs) => serviceBroker
-            .loadViewData(CORE_API.StaticPanelStore.findByGroups, [_.map(cs, c => `HOME.MEASURABLE.${c.id}`)]))
-        .then(r => vm.panelsByCategory = _.groupBy(r.data, d => d.group.replace('HOME.MEASURABLE.', '')));
-
-    measurableCategoryPromise
-        .then((cs) => serviceBroker
             .loadViewData(CORE_API.SvgDiagramStore.findByGroups, [_.map(cs, c => `NAVAID.MEASURABLE.${c.id}`)]))
         .then(r => vm.diagramsByCategory = _.groupBy(r.data, d => d.group.replace('NAVAID.MEASURABLE.', '')));
 
