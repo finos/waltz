@@ -33,10 +33,9 @@
     <br>
 
     <!-- STATIC PANELS -->
-    <div class="row"
-         ng-if="ctrl.panels.length > 0">
+    <div class="row">
         <div class="col-sm-12">
-            <waltz-static-panels panels="ctrl.panels">
+            <waltz-static-panels group-key="HOME.DATA-TYPE">
             </waltz-static-panels>
         </div>
     </div>
@@ -78,7 +77,7 @@
         </waltz-section-actions>
 
         <waltz-static-panels render-mode='minimal-border'
-                             panels="ctrl.authSourcePanels">
+                             group-key='SECTION.AUTH_SOURCES.ABOUT'>
         </waltz-static-panels>
         <br>
 

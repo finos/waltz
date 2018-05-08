@@ -27,14 +27,9 @@ const initialState = {
 function controller($document,
                     appGroupStore,
                     localStorageService,
-                    staticPanelStore,
                     tourService) {
 
     const vm = Object.assign(this, initialState);
-
-    staticPanelStore
-        .findByGroup('HOME')
-        .then(panels => vm.panels = panels);
 
     appGroupStore
         .findMyGroupSubscriptions()
@@ -53,7 +48,6 @@ controller.$inject = [
     '$document',
     'AppGroupStore',
     'localStorageService',
-    'StaticPanelStore',
     'TourService'
 ];
 

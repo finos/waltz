@@ -19,9 +19,11 @@
  */
 
 import {initialiseData} from "../../common";
+import {CORE_API} from "../../common/services/core-api-utils";
+
 
 const bindings = {
-    panels: '<',
+    groupKey: '@',
     renderMode: '@'
 };
 
@@ -31,15 +33,23 @@ const template = require('./static-panels.html');
 
 const initialData = {
     renderMode: 'section'
-}
+};
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialData);
+
+    vm.$onChanges = () => {
+        if (vm.groupKey) {
+            serviceBroker
+                .loadAppData(CORE_API.StaticPanelStore.findByGroup, [vm.groupKey])
+                .then(r => vm.panels = r.data);
+        }
+    };
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {
