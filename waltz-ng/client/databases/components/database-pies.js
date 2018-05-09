@@ -19,7 +19,7 @@
 
 import {environmentColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts, notEmpty} from "../../common";
-import {endOfLifeStatus} from "../../common/services/enums";
+import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
 
 
 const bindings = {

@@ -22,7 +22,9 @@ import {initialiseData} from "../../../common";
 import {downloadTextFile} from "../../../common/file-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {entity, getEnumName, relationshipKind} from "../../../common/services/enums";
+import {entity} from "../../../common/services/enums/entity";
+import {relationshipKind} from "../../../common/services/enums/relationship-kind";
+import {getEnumName} from "../../../common/services/enums";
 import {sanitizeRelationships} from "../../measurable-relationship-utils";
 
 import template from "./related-measurables-panel.html";

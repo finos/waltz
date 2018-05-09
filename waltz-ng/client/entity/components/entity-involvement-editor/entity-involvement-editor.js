@@ -18,7 +18,9 @@
  */
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {entity, getEnumName} from "../../../common/services/enums";
+import {entity} from "../../../common/services/enums/entity";
+import {getEnumName} from "../../../common/services/enums";
+
 import template from './entity-involvement-editor.html';
 
 const bindings = {

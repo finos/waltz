@@ -17,12 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-    applicationKind,
-    criticality,
-    lifecyclePhase,
-    toOptions
-} from "../../common/services/enums";
+import {applicationKind} from "../../common/services/enums/application-kind";
+import {criticality} from "../../common/services/enums/criticality";
+import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
+import {toOptions} from "../../common/services/enums";
 
 
 export const nameField = {
@@ -125,7 +123,7 @@ export const overallRatingField = {
         placeholder: '',
         required: true
     }
-}
+};
 
 
 export const businessCriticalityField = {
@@ -139,4 +137,4 @@ export const businessCriticalityField = {
         placeholder: '',
         required: true
     }
-}
+};
