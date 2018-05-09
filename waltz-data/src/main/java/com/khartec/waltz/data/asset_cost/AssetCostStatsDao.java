@@ -20,24 +20,14 @@
 package com.khartec.waltz.data.asset_cost;
 
 import com.khartec.waltz.model.cost.Cost;
-import com.khartec.waltz.model.cost.CostBand;
 import com.khartec.waltz.model.cost.ImmutableCost;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.RangeBandUtilities.toPrettyString;
-import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 
