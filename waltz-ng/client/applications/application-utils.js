@@ -16,13 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {
-    criticality,
-    investmentRating,
-    lifecyclePhase,
-    applicationKind,
-    getEnumName
-} from "../common/services/enums"
+
+import {applicationKind} from "../common/services/enums/application-kind";
+import {criticality} from "../common/services/enums/criticality";
+import {investmentRating} from "../common/services/enums/investment-rating";
+import {lifecyclePhase} from "../common/services/enums/lifecycle-phase";
+import {getEnumName} from "../common/services/enums"
 
 
 export function mapToDisplayNames(app) {

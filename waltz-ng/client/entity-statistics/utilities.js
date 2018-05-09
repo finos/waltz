@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {rollupKind} from "../common/services/enums";
+import {rollupKind} from "../common/services/enums/rollup-kind";
 import {notEmpty} from "../common";
 
 

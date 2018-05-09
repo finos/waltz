@@ -24,10 +24,8 @@ import {initialiseData} from '../../../common';
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from './change-initiative-section.html';
-import {
-    changeInitiative,
-    getEnumName
-} from "../../../common/services/enums";
+import {changeInitiative} from "../../../common/services/enums/change-initiative";
+import {getEnumName} from "../../../common/services/enums";
 
 
 const bindings = {

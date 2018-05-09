@@ -24,10 +24,8 @@ import { initialiseData } from '../../../common';
 import { mkSelectionOptions } from "../../../common/selector-utils";
 import { buildHierarchies } from "../../../common/hierarchy-utils";
 
-import {
-    changeInitiative,
-    getEnumName
-} from "../../../common/services/enums";
+import {changeInitiative} from "../../../common/services/enums/change-initiative";
+import {getEnumName} from "../../../common/services/enums";
 
 import template from './change-initiative-navigator-section.html';
 
