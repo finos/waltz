@@ -21,14 +21,13 @@ package com.khartec.waltz.service.physical_specification_data_type;
 
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.physical_specification_data_type.ImmutablePhysicalSpecificationDataType;
 import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,24 +41,34 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class PhysicalSpecDataTypeService {
 
     private final ChangeLogService changeLogService;
+    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
+    private final PhysicalFlowService physicalFlowService;
     private final PhysicalSpecDataTypeDao physicalSpecDataTypeDao;
     private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory;
 
 
     @Autowired
     public PhysicalSpecDataTypeService(ChangeLogService changeLogService,
+                                       LogicalFlowDecoratorService logicalFlowDecoratorService,
+                                       PhysicalFlowService physicalFlowService,
                                        PhysicalSpecDataTypeDao physicalSpecDataTypeDao,
                                        PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
+        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeDao, "physicalSpecDataTypeDao cannot be null");
         checkNotNull(specificationIdSelectorFactory, "specificationIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
+        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
+        this.physicalFlowService = physicalFlowService;
         this.physicalSpecDataTypeDao = physicalSpecDataTypeDao;
         this.specificationIdSelectorFactory = specificationIdSelectorFactory;
     }
@@ -94,6 +103,20 @@ public class PhysicalSpecDataTypeService {
 
         audit("Added", dataTypeIds, specificationId, userName);
 
+        // now update logical flow data types
+        // find all physicals with this spec id, for each physical update it's logical decorators
+        List<Long> logicalFlowIds = physicalFlowService
+                .findBySpecificationId(specificationId)
+                .stream()
+                .map(f -> f.logicalFlowId())
+                .collect(toList());
+
+        Set<EntityReference> dataTypeRefs = dataTypeIds.stream()
+                .map(id -> EntityReference.mkRef(EntityKind.DATA_TYPE, id))
+                .collect(toSet());
+
+        logicalFlowIds.forEach(lfId -> logicalFlowDecoratorService.addDecorators(lfId, dataTypeRefs, userName));
+
         return result;
     }
 
@@ -110,6 +133,11 @@ public class PhysicalSpecDataTypeService {
         audit("Removed", dataTypeIds, specificationId, userName);
 
         return result;
+    }
+
+
+    public int[] rippleDataTypesToLogicalFlows() {
+        return physicalSpecDataTypeDao.rippleDataTypesToLogicalFlows();
     }
 
 

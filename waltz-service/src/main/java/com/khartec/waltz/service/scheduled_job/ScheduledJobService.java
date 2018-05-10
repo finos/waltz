@@ -28,6 +28,7 @@ import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService
 import com.khartec.waltz.service.complexity.ComplexityRatingService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,35 +45,37 @@ public class ScheduledJobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledJobService.class);
 
-
-    private final ScheduledJobDao scheduledJobDao;
-
-    private final EntityHierarchyService entityHierarchyService;
-    private final DataTypeUsageService dataTypeUsageService;
-    private final ComplexityRatingService complexityRatingService;
     private final AuthoritativeSourceService authoritativeSourceService;
+    private final ComplexityRatingService complexityRatingService;
+    private final DataTypeUsageService dataTypeUsageService;
+    private final EntityHierarchyService entityHierarchyService;
     private final LogicalFlowService logicalFlowService;
+    private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
+    private final ScheduledJobDao scheduledJobDao;
 
 
     @Autowired
-    public ScheduledJobService(ScheduledJobDao scheduledJobDao,
-                               EntityHierarchyService entityHierarchyService,
-                               DataTypeUsageService dataTypeUsageService,
+    public ScheduledJobService(AuthoritativeSourceService authoritativeSourceService,
                                ComplexityRatingService complexityRatingService,
-                               AuthoritativeSourceService authoritativeSourceService,
-                               LogicalFlowService logicalFlowService) {
-        checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
-        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
-        checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
+                               DataTypeUsageService dataTypeUsageService,
+                               EntityHierarchyService entityHierarchyService,
+                               LogicalFlowService logicalFlowService,
+                               PhysicalSpecDataTypeService physicalSpecDataTypeService,
+                               ScheduledJobDao scheduledJobDao) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService cannot be null");
+        checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
+        checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
+        checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
+        checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
 
-        this.scheduledJobDao = scheduledJobDao;
-        this.entityHierarchyService = entityHierarchyService;
-        this.dataTypeUsageService = dataTypeUsageService;
-        this.complexityRatingService = complexityRatingService;
         this.authoritativeSourceService = authoritativeSourceService;
+        this.complexityRatingService = complexityRatingService;
+        this.dataTypeUsageService = dataTypeUsageService;
+        this.entityHierarchyService = entityHierarchyService;
         this.logicalFlowService = logicalFlowService;
+        this.physicalSpecDataTypeService = physicalSpecDataTypeService;
+        this.scheduledJobDao = scheduledJobDao;
     }
 
 
@@ -96,6 +99,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.HIERARCHY_REBUILD_PERSON,
                 (jk) -> entityHierarchyService.buildFor(EntityKind.PERSON));
+
+        runIfNeeded(JobKey.DATA_TYPE_RIPPLE_PHYSICAL_TO_LOGICAL,
+                (jk) -> physicalSpecDataTypeService.rippleDataTypesToLogicalFlows());
 
         runIfNeeded(JobKey.DATA_TYPE_USAGE_RECALC_APPLICATION,
                 (jk) -> dataTypeUsageService.recalculateForAllApplications());
