@@ -136,7 +136,7 @@ public class PhysicalSpecDataTypeService {
     }
 
 
-    public int[] rippleDataTypesToLogicalFlows() {
+    public int rippleDataTypesToLogicalFlows() {
         return physicalSpecDataTypeDao.rippleDataTypesToLogicalFlows();
     }
 
