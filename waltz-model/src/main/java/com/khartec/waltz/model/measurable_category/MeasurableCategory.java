@@ -22,7 +22,11 @@ package com.khartec.waltz.model.measurable_category;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingScheme;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableCategory.class)
@@ -39,5 +43,12 @@ public abstract class MeasurableCategory implements
 
     @Value.Default
     public EntityKind kind() { return EntityKind.MEASURABLE_CATEGORY; }
+
+    @Value.Default
+    public List<RagName> ragNames() {
+        return RatingScheme.toList();
+    }
+
+    public abstract long ratingSchemeId();
 
 }

@@ -27,7 +27,6 @@
      ng-attr-tabindex="{{$ctrl.onKeypress ? 1 : undefined}}"
      ng-keydown="$ctrl.onKeypress($event)">
     <treecontrol class="tree-light"
-
                  tree-model="$ctrl.hierarchy"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions"
@@ -36,7 +35,7 @@
 
         <span class="waltz-visibility-parent">
             <span ng-if="node.concrete">
-                <waltz-rating-indicator-cell rating="$ctrl.ratingsByMeasurable[node.id].rating">
+                <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]">
                 </waltz-rating-indicator-cell>
             </span>
 

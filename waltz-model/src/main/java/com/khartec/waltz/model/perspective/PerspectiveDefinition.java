@@ -25,7 +25,11 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.RagNamesProvider;
+import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingScheme;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 
 @Value.Immutable
@@ -41,4 +45,11 @@ public abstract class PerspectiveDefinition implements
 
     public abstract long categoryY();
 
+    public abstract long ratingSchemeId();
+
+    @Value.Default
+    @Deprecated
+    public List<RagName> ragNames() {
+        return RatingScheme.toList();
+    }
 }

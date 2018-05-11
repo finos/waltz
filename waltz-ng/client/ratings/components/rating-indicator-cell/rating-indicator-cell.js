@@ -17,20 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from "./rating-indicator-cell.html";
+import {initialiseData} from "../../../common/index";
+
+
 const bindings = {
     rating: '<',
-    label: '<'
+    showName: '<'
+};
+
+const initialData = {
+    showName: false
 };
 
 
-const template = require('./rating-indicator-cell.html');
-
-
 function controller($scope) {
-    const vm = this;
-
-    // this needs to be $watch to work round ui-grid cell-template refresh issues
-    $scope.$watch('$ctrl.rating', (r) => vm.clazz = `wric-${ r }`);
+    const vm = initialiseData(this, initialData);
 }
 
 

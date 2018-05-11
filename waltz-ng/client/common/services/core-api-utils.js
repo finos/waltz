@@ -65,6 +65,7 @@ import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore
 import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
 import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
+import {RatingSchemeStore_API as RatingSchemeStore} from "../../ratings/services/rating-scheme-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SharedPreferenceStore_API as SharedPreferenceStore} from "../../shared-preference/services/shared-preference-store";
@@ -126,6 +127,7 @@ export const CORE_API = {
     PhysicalSpecDefinitionStore,
     PhysicalSpecDefinitionSampleFileStore,
     PhysicalSpecificationStore,
+    RatingSchemeStore,
     ServerInfoStore,
     SettingsStore,
     SharedPreferenceStore,
