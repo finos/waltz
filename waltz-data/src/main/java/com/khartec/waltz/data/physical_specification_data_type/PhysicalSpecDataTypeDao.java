@@ -70,17 +70,13 @@ public class PhysicalSpecDataTypeDao {
 
 
     private final DSLContext dsl;
-    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
 
     @Autowired
-    public PhysicalSpecDataTypeDao(DSLContext dsl,
-                                   LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+    public PhysicalSpecDataTypeDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
         this.dsl = dsl;
-        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
 
