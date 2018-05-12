@@ -104,7 +104,7 @@ function controller($state,
         vm.attestationRun.selectorEntity = null;
     };
 
-    vm.onSelectorEntitySelect = (itemId, entity) => {
+    vm.onSelectorEntitySelect = (entity) => {
         vm.attestationRun.selectorEntity = entity;
     };
 

@@ -78,7 +78,7 @@ function controller(serviceBroker) {
     };
 
 
-    vm.onAdd = (ctx, c) => {
+    vm.onAdd = (c) => {
         serviceBroker
             .execute(
                 CORE_API.FlowDiagramEntityStore.addRelationship,

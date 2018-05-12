@@ -132,7 +132,7 @@ function controller($location,
         );
     };
 
-    vm.saveEntityResponse = (questionId, entity) => {
+    vm.saveEntityResponse = (entity, questionId) => {
         vm.surveyResponses[questionId] = {
             entityResponse: {
                 id: entity.id,

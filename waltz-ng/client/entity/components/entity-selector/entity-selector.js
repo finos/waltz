@@ -74,7 +74,7 @@ function controller(entitySearchStore) {
             });
     };
 
-    vm.select = (item) => invokeFunction(vm.onSelect, vm.itemId, item);
+    vm.select = (item) => invokeFunction(vm.onSelect, item, vm.itemId);
 
     vm.mkTracker = (item) => item.kind + "_" + item.id;
 }

@@ -44,7 +44,7 @@ function controller($state,
         angular.element(b.block).addClass('clickable');
     };
 
-    vm.goToPerson = (key, person) => {
+    vm.goToPerson = (person) => {
         $state.go('main.person.id', { id: person.id });
     };
 

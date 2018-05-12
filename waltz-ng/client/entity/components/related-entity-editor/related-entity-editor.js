@@ -58,7 +58,7 @@ function controller() {
         }
     };
 
-    vm.onEntitySelect = (id, entity) => {
+    vm.onEntitySelect = (entity) => {
         vm.currentRelationship.entity = entity;
     };
 

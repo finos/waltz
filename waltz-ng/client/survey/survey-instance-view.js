@@ -118,7 +118,7 @@ function controller($stateParams,
             });
     };
 
-    vm.selectNewRecipient = (itemId, entity) => {
+    vm.selectNewRecipient = (entity) => {
         vm.newRecipient = entity;
     };
 
@@ -179,7 +179,7 @@ function controller($stateParams,
                 });
         }
     };
-    
+
     loadInstanceAndRun();
     loadRecipients();
 }

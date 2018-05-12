@@ -56,7 +56,7 @@ function controller() {
         }
     };
 
-    vm.onEntitySelect = (id, entity) => {
+    vm.onEntitySelect = (entity) => {
         vm.currentInvolvement.entity = entity;
     };
 

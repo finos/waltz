@@ -47,7 +47,7 @@ function controller() {
 
     vm.$onInit = () => initialiseData(vm, initialState);
 
-    vm.onNodeSelected = (itemId, entityRef) => {
+    vm.onNodeSelected = (entityRef) => {
         vm.selectedNode = entityRef;
     };
 
