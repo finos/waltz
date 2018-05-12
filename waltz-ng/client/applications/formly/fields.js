@@ -71,7 +71,7 @@ export const orgUnitField = {
     formControl: { $dirty: false },
     templateOptions: {
         label: 'Owning Organisational Unit',
-        onSelect: (id, item) => {
+        onSelect: (item) => {
             orgUnitField.model[orgUnitField.key] = item.id;
             orgUnitField.formControl =  { $dirty: true };
         }

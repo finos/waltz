@@ -129,9 +129,7 @@ function controller() {
         });
     };
 
-    vm.onSelectorEntitySelect = (itemId, item) => {
-        console.log({itemId, item});
-
+    vm.onSelectorEntitySelect = (item, itemId) => {
         const match = _.find(vm.specDefFields.parsedData, ['field.position', itemId]);
         if(match) {
             match.field.logicalDataElementId = item.id;

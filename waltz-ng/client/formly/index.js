@@ -75,19 +75,19 @@ export default () => {
 
     module
         .config([
-        'formlyConfigProvider',
-        (formlyConfigProvider) => {
-            formlyConfigProvider.setType({
-                name: 'tags-input',
-                template: require('./tags-input-template.html')
-            });
+            'formlyConfigProvider',
+            (formlyConfigProvider) => {
+                formlyConfigProvider.setType({
+                    name: 'tags-input',
+                    template: require('./tags-input-template.html')
+                });
 
-            formlyConfigProvider.setType({
-                name: 'org-unit-input',
-                template: require('./org-unit-input-template.html')
-            });
-        }
-    ]);
+                formlyConfigProvider.setType({
+                    name: 'org-unit-input',
+                    template: require('./org-unit-input-template.html')
+                });
+            }
+        ]);
 
     return module.name;
 };

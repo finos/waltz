@@ -104,7 +104,7 @@ function controller($timeout) {
     };
 
 
-    vm.entitySelect = (itemId, entity) => {
+    vm.entitySelect = (entity) => {
         vm.newVal = entity;
     };
 

@@ -122,7 +122,7 @@ function controller(notification, serviceBroker) {
 
     // -- INTERACT --
 
-    vm.onChangeInitiativeSelection = (id, changeInitiative) => {
+    vm.onChangeInitiativeSelection = (changeInitiative) => {
         vm.form.counterpart = changeInitiative;
     };
 

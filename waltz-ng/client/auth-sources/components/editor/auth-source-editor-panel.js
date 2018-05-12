@@ -122,7 +122,7 @@ function controller($q, serviceBroker, notification) {
         vm.onCreateFormChange();
     };
 
-    vm.onSelectOrgUnit = (key, ou) => {
+    vm.onSelectOrgUnit = (ou) => {
         vm.createForm.orgUnit = Object.assign({}, ou, { kind: 'ORG_UNIT' });
         vm.onCreateFormChange();
     };

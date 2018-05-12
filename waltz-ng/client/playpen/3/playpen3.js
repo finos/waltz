@@ -32,8 +32,8 @@ const initialState = {
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.onSelectorEntitySelect = (itemId, item) => {
-        console.log({itemId, item});
+    vm.onSelectorEntitySelect = (item, ctx) => {
+        console.log({ctx, item});
     };
 }
 
