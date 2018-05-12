@@ -102,7 +102,6 @@ const dependencies = [
     require('./orphan')(),
     require('./person')(),
     require('./perspective')(),
-    require('./physical-flow-lineage')(),
     require('./physical-flows')(),
     require('./physical-specifications')(),
     require('./physical-field')(),
