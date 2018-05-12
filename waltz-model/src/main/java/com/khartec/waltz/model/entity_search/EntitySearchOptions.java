@@ -36,7 +36,7 @@ import static com.khartec.waltz.model.EntityLifecycleStatus.PENDING;
 @JsonDeserialize(as = ImmutableEntitySearchOptions.class)
 public abstract class EntitySearchOptions {
 
-    private static final int DEFAULT_SEARCH_RESULTS_LIMIT = 20;
+    public static final int DEFAULT_SEARCH_RESULTS_LIMIT = 40;
 
     public abstract List<EntityKind> entityKinds();
 

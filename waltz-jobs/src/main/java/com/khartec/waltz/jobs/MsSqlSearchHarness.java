@@ -44,7 +44,7 @@ public class MsSqlSearchHarness {
         EntitySearchOptions searchOptions = ImmutableEntitySearchOptions.builder()
                 .addEntityKinds(EntityKind.APPLICATION)
                 .userId("admin")
-                .limit(50)
+                .limit(EntitySearchOptions.DEFAULT_SEARCH_RESULTS_LIMIT)
                 .build();
 
         List<Application> results = appSearch.search(
