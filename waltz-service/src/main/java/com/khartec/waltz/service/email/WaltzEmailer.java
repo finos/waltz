@@ -24,6 +24,8 @@ import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -39,6 +41,7 @@ import java.util.Map;
 @Service
 public class WaltzEmailer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(WaltzEmailer.class);
     private static final String DEFAULT_EMAIL_TEMPLATE_LOCATION = "/templates/waltz-email-template.ftlh";
 
     private final JavaMailSender mailSender;
@@ -57,6 +60,10 @@ public class WaltzEmailer {
                           String body,
                           String[] to) {
 
+        if (this.mailSender == null) {
+            LOG.warn("Not sending email.  No mailer provided.");
+            return;
+        }
         Checks.checkNotEmpty(subject, "subject cannot be empty");
         Checks.checkNotEmpty(body, "body cannot be empty");
         Checks.checkNotEmpty(to, "to cannot be empty");

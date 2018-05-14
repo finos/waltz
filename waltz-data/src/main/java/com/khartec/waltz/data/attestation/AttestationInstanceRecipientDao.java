@@ -24,6 +24,9 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 
 @Repository
@@ -47,5 +50,17 @@ public class AttestationInstanceRecipientDao {
         record.store();
 
         return record.getId();
+    }
+
+
+    public List<String> findRecipientsByRunId(Long id) {
+
+        return dsl
+                .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                .from(ATTESTATION_INSTANCE_RECIPIENT)
+                .innerJoin(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE.ID.eq(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(id))
+                .fetch(ATTESTATION_INSTANCE_RECIPIENT.USER_ID);
     }
 }

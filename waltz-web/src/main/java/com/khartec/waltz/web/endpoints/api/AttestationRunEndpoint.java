@@ -30,7 +30,6 @@ import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,25 +78,22 @@ public class AttestationRunEndpoint implements Endpoint {
                 (req, res) -> attestationRunService.findByEntityReference(getEntityReference(req));
 
         ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
-                attestationRunService.findByRecipient(WebUtilities.getUsername(req));
+                attestationRunService.findByRecipient(getUsername(req));
 
         ListRoute<AttestationRunResponseSummary> findResponseSummariesRoute = (req, res) ->
-                attestationRunService.findResponseSummaries();
+                attestationRunService
+                        .findResponseSummaries();
 
-        DatumRoute<AttestationCreateSummary> getCreateSummaryRoute = (req, res) -> {
-            AttestationRunCreateCommand createCommand = readBody(req, AttestationRunCreateCommand.class);
-            return attestationRunService
-                    .getCreateSummary(createCommand);
-        };
+        DatumRoute<AttestationCreateSummary> getCreateSummaryRoute = (req, res) ->
+                attestationRunService
+                        .getCreateSummary(readCreateCommand(req));
 
         DatumRoute<IdCommandResponse> attestationRunCreateRoute = (req, res) -> {
             ensureUserHasAttestationAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
-            AttestationRunCreateCommand createCommand = readBody(req, AttestationRunCreateCommand.class);
-
             return attestationRunService
-                    .create(WebUtilities.getUsername(req), createCommand);
+                        .create(
+                            getUsername(req),
+                            readCreateCommand(req));
         };
 
         getForDatum(getByIdPath, getByIdRoute);
@@ -107,6 +103,13 @@ public class AttestationRunEndpoint implements Endpoint {
         getForList(findResponseSummariesPath, findResponseSummariesRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
         postForDatum(getCreateSummaryPath, getCreateSummaryRoute);
+    }
+
+
+    // -- HELPERS ---
+
+    private AttestationRunCreateCommand readCreateCommand(Request req) throws java.io.IOException {
+        return readBody(req, AttestationRunCreateCommand.class);
     }
 
 
