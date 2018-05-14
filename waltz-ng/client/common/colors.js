@@ -235,3 +235,23 @@ export const variableScale = (x = '') => {
 };
 
 
+
+export function useBlackAsForeground(r, g, b) {
+    if (_.isString(r)) {
+        const c = rgb(r);
+        r = c.r;
+        g = c.g;
+        b = c.b;
+    }
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+    return brightness > 123;
+}
+
+
+export function mkRatingSchemeColorScale(scheme = {}) {
+    const ratings = scheme.ratings || [];
+    return scaleOrdinal()
+        .domain(_.map(ratings, "rating"))
+        .range(_.map(ratings, d => rgb(d.color)));
+}

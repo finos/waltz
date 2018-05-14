@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {scaleBand} from 'd3-scale';
-import {select, event} from 'd3-selection';
-import {path} from 'd3-path';
-import {initialiseData} from '../../../common';
-import {ragColorScale} from '../../../common/colors';
-import {truncateMiddle} from '../../../common/string-utils';
-import {mkPerspective} from '../../perpective-utilities';
-
-
+import _ from "lodash";
+import {scaleBand} from "d3-scale";
+import {event, select} from "d3-selection";
+import {path} from "d3-path";
+import {initialiseData} from "../../../common";
+import {truncateMiddle} from "../../../common/string-utils";
+import {mkPerspective} from "../../perpective-utilities";
+import template from "./perspective-grid.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 /**
  * @name waltz-perspective-grid
@@ -55,7 +54,6 @@ const initialState = {
 };
 
 
-const template = require('./perspective-grid.html');
 
 
 let width = 600;
@@ -94,8 +92,8 @@ function draw(elem, perspective, handlers) {
 
     elem
         .call(drawGrid, perspective, handlers)
-        .call(drawColTitles, perspective.axes.x)
-        .call(drawRowTitles, perspective.axes.y)
+        .call(drawColTitles, perspective)
+        .call(drawRowTitles, perspective)
         ;
 }
 
@@ -148,7 +146,7 @@ function drawCells(selection, perspective, handlers) {
         .on('mouseleave.base', handlers.base.onCellLeave)
         .on('click.custom', handlers.custom.onCellClick)
         .on('mouseover.drag', d => maybeDrag(d, _.get(handlers, "custom.onCellDrag")))
-        .call(drawInherited);
+        .call(drawInherited, perspective);
 
     cellGroups
         .merge(newCellGroups);
@@ -202,7 +200,7 @@ function toCellId(override) {
 }
 
 
-function drawExistingOverrides(selection, overrides = []) {
+function drawExistingOverrides(selection, overrides = [], colorScale) {
     const cellPadding = 3;
     const cellDimensions = calcOverrideCellDimensions(cellPadding);
 
@@ -214,7 +212,7 @@ function drawExistingOverrides(selection, overrides = []) {
             .attr('y', cellDimensions.t)
             .attr('width', cellDimensions.w)
             .attr('height', cellDimensions.h)
-            .attr('fill', d => ragColorScale(d.rating).brighter(1.3))
+            .attr('fill', d => colorScale(d.rating).brighter(1.3))
             ;
     };
 
@@ -241,7 +239,7 @@ function drawExistingOverrides(selection, overrides = []) {
 }
 
 
-function drawPendingOverrideShape(selection, cellDimensions) {
+function drawPendingOverrideShape(selection, cellDimensions, colorScale) {
     const notchSizeX = cellDimensions.w / 1.5;
     const notchSizeY = cellDimensions.h / 1.5;
     const pathData = path();
@@ -257,13 +255,12 @@ function drawPendingOverrideShape(selection, cellDimensions) {
         .append('path')
         .classed('cell-override', true)
         .attr('d', pathData)
-        .attr('fill', d => {
-            return ragColorScale(d.rating).brighter(1.3);
-        });
+        .attr('fill', d => colorScale(d.rating).brighter(1.3))
+        ;
 }
 
 
-function drawPendingOverrides(selection, overrides) {
+function drawPendingOverrides(selection, overrides, colorScale) {
     const cellPadding = 3;
     const cellDimensions = calcOverrideCellDimensions(cellPadding);
 
@@ -284,13 +281,13 @@ function drawPendingOverrides(selection, overrides) {
 
     newOverrides
         .attr('transform', calculateCellTranslation)
-        .call(drawPendingOverrideShape, cellDimensions)
+        .call(drawPendingOverrideShape, cellDimensions, colorScale)
         .filter(d => d.rating === 'X')
         .call(drawXShape, cellDimensions, true);
 }
 
 
-function drawInherited(selection) {
+function drawInherited(selection, perspective) {
     const cellPadding = 6;
 
     const t = cellPadding;
@@ -310,7 +307,7 @@ function drawInherited(selection) {
         .classed('cell-inherited', true)
         .attr('points', `${tl} ${tr} ${br}`)
         .attr('stroke', '#ccc')
-        .attr('fill', d => ragColorScale(d.col.rating.rating).brighter(2))
+        .attr('fill', d => perspective.ratingColorScales.x(d.col.rating.rating).brighter(2))
         ;
 
     const drawRowTriangles = (selection) => selection
@@ -318,38 +315,25 @@ function drawInherited(selection) {
         .classed('cell-inherited', true)
         .attr('points', `${tl} ${bl} ${br}`)
         .attr('stroke', '#ccc')
-        .attr('fill', d => ragColorScale(d.row.rating.rating).brighter(2))
+        .attr('fill', d => perspective.ratingColorScales.y(d.row.rating.rating).brighter(2))
         ;
 
     selection
-        .filter(d => d.row.rating.rating !== d.col.rating.rating)
         .call(drawColTriangles)
         .call(drawRowTriangles)
-        ;
-
-    selection
-        .filter(d => d.row.rating.rating === d.col.rating.rating)
-        .append('rect')
-        .classed('cell-inherited', true)
-        .attr('stroke', '#ccc')
-        .attr('fill', d => ragColorScale(d.row.rating.rating).brighter(2))
-        .attr('x', l)
-        .attr('y', t)
-        .attr('width', w)
-        .attr('height', h)
         ;
 }
 
 
-function drawRowTitles(elem, axis) {
+function drawRowTitles(elem, perspective) {
     const drawRect = (selection) => selection
         .append('rect')
         .attr('x', (labelIndicatorPadding + labelIndicatorSize) * -1)
         .attr('y', d => scales.y(d.measurable.id) + labelIndicatorPadding)
         .attr('width', labelIndicatorSize)
         .attr('height', scales.y.bandwidth() - labelIndicatorPadding * 2)
-        .attr('fill', d => ragColorScale(d.rating.rating).brighter(1.5))
-        .attr('stroke', d => ragColorScale(d.rating.rating))
+        .attr('fill', d => perspective.ratingColorScales.y(d.rating.rating).brighter(1.5))
+        .attr('stroke', d => perspective.ratingColorScales.y(d.rating.rating))
         ;
 
     const drawText = (selection) => selection
@@ -366,7 +350,7 @@ function drawRowTitles(elem, axis) {
     const rowTitles = elem
             .selectAll('.row-titles')
             .selectAll('.row-title')
-            .data(axis, d => d.measurable.id)
+            .data(perspective.axes.y, d => d.measurable.id)
         ;
 
     const newTitles = rowTitles
@@ -380,11 +364,11 @@ function drawRowTitles(elem, axis) {
 }
 
 
-function drawColTitles(elem, axis) {
+function drawColTitles(elem, perspective) {
     const colTitles = elem
         .selectAll('.col-titles')
         .selectAll('.col-title')
-        .data(axis, d => d.measurable.id)
+        .data(perspective.axes.x, d => d.measurable.id)
         ;
 
     const drawRect = (selection) => selection
@@ -393,8 +377,8 @@ function drawColTitles(elem, axis) {
         .attr('y', (labelIndicatorPadding + labelIndicatorSize) * -1)
         .attr('width', scales.x.bandwidth() - labelIndicatorPadding * 2)
         .attr('height', labelIndicatorSize)
-        .attr('fill', d => ragColorScale(d.rating.rating).brighter(1.5))
-        .attr('stroke', d => ragColorScale(d.rating.rating))
+        .attr('fill', d => perspective.ratingColorScales.x(d.rating.rating).brighter(1.5))
+        .attr('stroke', d => perspective.ratingColorScales.x(d.rating.rating))
         ;
 
     const drawText = selection => selection
@@ -461,19 +445,22 @@ function setupDimensions(perspective) {
 }
 
 
-function controller($element) {
+function controller($element, $q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (c) => {
+    function attemptDraw() {
+
         const canDraw = vm.measurables
             && vm.measurableRatings
-            && vm.perspectiveDefinition;
+            && vm.perspectiveDefinition
+            && vm.schemes;
 
         if (canDraw) {
             vm.perspective = mkPerspective(
                 vm.perspectiveDefinition,
                 vm.measurables,
-                vm.measurableRatings);
+                vm.measurableRatings,
+                vm.schemes);
 
             setupDimensions(vm.perspective);
             setupScales(vm.perspective);
@@ -482,23 +469,58 @@ function controller($element) {
             const handlers = initHandlers(vm.svg, vm.handlers);
 
             draw(vm.svg, vm.perspective, handlers);
-            vm.svg.call(drawExistingOverrides, vm.existingOverrides);
-            vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
+            vm.svg.call(drawExistingOverrides, vm.existingOverrides, vm.perspective.ratingColorScales.p);
+            vm.svg.call(drawPendingOverrides, vm.pendingOverrides, vm.perspective.ratingColorScales.p);
         }
 
         const canRefresh = (vm.existingOverrides || vm.pendingOverrides)
             && vm.svg && canDraw;
 
         if (canRefresh) {
-            vm.svg.call(drawExistingOverrides, vm.existingOverrides);
-            vm.svg.call(drawPendingOverrides, vm.pendingOverrides);
+            vm.svg.call(drawExistingOverrides, vm.existingOverrides, vm.perspective.ratingColorScales.p);
+            vm.svg.call(drawPendingOverrides, vm.pendingOverrides, vm.perspective.ratingColorScales.p);
         }
+    }
+
+    function loadSchemes(perspectiveDefinition) {
+        const schemePromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => _.keyBy(r.data, 'id'));
+        const categoryPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => _.keyBy(r.data, 'id'));
+
+        return $q
+            .all([schemePromise, categoryPromise])
+            .then(([schemesById, categoriesById]) => {
+                const xCat = categoriesById[perspectiveDefinition.categoryX];
+                const yCat = categoriesById[perspectiveDefinition.categoryY];
+                return {
+                    x: schemesById[xCat.ratingSchemeId],
+                    y: schemesById[yCat.ratingSchemeId],
+                    p: schemesById[perspectiveDefinition.ratingSchemeId]
+                };
+            });
+
+    }
+
+    vm.$onChanges = (c) => {
+        if (vm.perspectiveDefinition) {
+            loadSchemes(vm.perspectiveDefinition)
+                .then((schemes) => {
+                    vm.schemes = schemes;
+                    attemptDraw();
+                });
+        }
+        attemptDraw();
     };
 }
 
 
 controller.$inject = [
-    '$element'
+    '$element',
+    '$q',
+    'ServiceBroker'
 ];
 
 

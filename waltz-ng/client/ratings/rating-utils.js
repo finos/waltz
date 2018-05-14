@@ -17,6 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
+
+
+export function mkRatingsKeyHandler(ratings,
+                             selectHandler = () => {},
+                             cancelHandler = () => {}) {
+    const ratingsByKey = _.keyBy(ratings, r => r.rating.toUpperCase());
+    return (evt) => {
+        if (evt.keyCode === 27 /* esc */) {
+            cancelHandler();
+        } else {
+            const rating = ratingsByKey[evt.key.toUpperCase()];
+            if (rating && rating.userSelectable) {
+                return selectHandler(rating.rating);
+            }
+        }
+    };
+}
 
 export const baseRagNames = {
     'R': {

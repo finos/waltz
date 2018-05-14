@@ -17,44 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
-import {kindToViewState} from '../../../common/link-utils';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {kindToViewState} from "../../../common/link-utils";
 
-import template from './measurable-rating-edit-panel.html';
+import template from "./measurable-rating-edit-panel.html";
+import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 
 const bindings = {
     parentEntityRef: '<'
 };
-
-
-function prepareTabs(categories = [], measurables = [], ratings = []) {
-    const measurablesByCategory = _.groupBy(measurables, 'categoryId');
-
-    const tabs = _.map(categories, category => {
-        const measurablesForCategory = measurablesByCategory[category.id];
-        const ids = _.map(measurablesForCategory, 'id');
-        const ratingsForCategory = _.filter(ratings, r => _.includes(ids, r.measurableId));
-        return {
-            category,
-            measurables: measurablesForCategory,
-            ratings: ratingsForCategory
-        };
-    });
-
-    return _.sortBy(
-        tabs,
-        g => g.category.name);
-}
-
-
-function determineSelectedTab(tabs = []) {
-    // first with ratings, or simply first if no ratings
-    const tab = _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
-    return _.get(tab, 'category.id');
-}
 
 
 function determineSaveFn(selected, store) {
@@ -92,9 +67,16 @@ function controller($q,
     const loadData = (force) => {
         // -- LOAD ---
 
+        const ratingSchemePromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
+
         const categoryPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.categories = r.data);
+            .then(r => {
+                vm.categories = r.data;
+                vm.categoriesById = _.keyBy(r.data, 'id');
+            });
 
         const measurablesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
@@ -108,11 +90,11 @@ function controller($q,
             .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id], { force })
             .then(r => vm.entityRating = r.data.overallRating);
 
-
-        $q.all([ratingsPromise, measurablesPromise, categoryPromise])
+        $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
             .then(() => {
-                vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
-                vm.visibility.tab = determineSelectedTab(vm.tabs);
+                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
+                const startingTab = determineStartingTab(vm.tabs);
+                vm.onTabChange(startingTab.category.id);
             });
 
         serviceBroker
@@ -141,7 +123,7 @@ function controller($q,
 
         return savePromise
             .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings))
+            .then(() => vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings))
             .then(() => {
                 vm.saveInProgress = false;
                 const newRating = { rating, description };
@@ -160,7 +142,7 @@ function controller($q,
             .then(rs => {
                 vm.saveInProgress = false;
                 vm.ratings = rs;
-                vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratings);
+                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
                 vm.selected.rating = null;
             });
     };
@@ -177,7 +159,7 @@ function controller($q,
 
     vm.onMeasurableSelect = (measurable, rating) => {
         const category = _.find(vm.categories, ({ id: measurable.categoryId }));
-        vm.selected = { rating, measurable, category };
+        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
     };
 
     vm.onRatingSelect = r => {
@@ -200,35 +182,21 @@ function controller($q,
     vm.doCancel = reset;
 
     vm.onTabChange = (categoryId) => {
+        vm.visibility.tab = categoryId;
         reset();
-
-    };
-
-    vm.onKeypress = (evt) => {
-        const goRed = () => vm.onRatingSelect('R');
-        const goGreen = () => vm.onRatingSelect('G');
-        const goAmber = () => vm.onRatingSelect('A');
-        const remove = () => vm.onRatingSelect('X');
-        const cancel = () => vm.doCancel();
-
-        const keyActions = {
-            'r': goRed,
-            'R': goRed,
-            'a': goAmber,
-            'A': goAmber,
-            'y': goAmber,
-            'Y': goAmber,
-            'g': goGreen,
-            'G': goGreen,
-            'x': remove,
-            'X': remove,
-            27: cancel,
+        const category = vm.categoriesById[categoryId];
+        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
+        vm.selected = {
+            category,
+            ratingScheme,
         };
-
-        const action = keyActions[evt.keyCode] || keyActions[evt.key];
-
-        if (action) action();
+        vm.onKeypress = mkRatingsKeyHandler(
+            ratingScheme.ratings,
+            vm.onRatingSelect,
+            vm.doCancel);
     };
+
+
 }
 
 

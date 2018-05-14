@@ -22,24 +22,28 @@ package com.khartec.waltz.model.rating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.PositionProvider;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableRagName.class)
 @JsonDeserialize(as = ImmutableRagName.class)
-public abstract class RagName implements NameProvider, DescriptionProvider {
+public abstract class RagName implements
+        IdProvider,
+        NameProvider,
+        DescriptionProvider,
+        PositionProvider {
 
     public abstract RagRating rating();
+    public abstract String color();
+    public abstract long ratingSchemeId();
 
-
-    public static RagName mkRagName(RagRating rating, String name, String desc) {
-        return ImmutableRagName.builder()
-                .rating(rating)
-                .name(name)
-                .description(desc)
-                .build();
+    @Value.Default
+    public boolean userSelectable() {
+        return true;
     }
 
 }

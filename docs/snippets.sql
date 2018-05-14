@@ -103,3 +103,25 @@ SELECT
     target_entity_id,
     lvl
 FROM flow_cte;
+
+-- All incoming/intra/outgoing phys flows to an OU
+select
+  src.name as 'source',
+  trg.name as 'target',
+  ps.name as 'name',
+  ps.format,
+  ps.external_id,
+  pf.frequency,
+  pf.transport,
+  ps.description
+from physical_specification ps
+  inner join physical_flow pf on pf.specification_id = ps.id
+  inner join logical_flow lf on lf.id = pf.logical_flow_id
+  inner join application src on lf.source_entity_id = src.id
+  inner join application trg on lf.target_entity_id = trg.id
+where lf.is_removed = 0
+      and lf.source_entity_kind = 'APPLICATION'
+      and lf.target_entity_kind = 'APPLICATION'
+      and ( src.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT')
+            OR -- 4566 is an OU id
+            trg.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT'));

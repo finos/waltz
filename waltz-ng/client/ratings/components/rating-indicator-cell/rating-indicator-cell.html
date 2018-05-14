@@ -1,3 +1,6 @@
-<span ng-class="['wric-cell', $ctrl.clazz]">
+<span class="wric-cell"
+      ng-style="{ 'background-color': $ctrl.rating.color }">
 </span>
-<span ng-bind="$ctrl.label"></span>
+<span ng-if="$ctrl.showName"
+      ng-bind="$ctrl.rating.name">
+</span>

@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {CORE_API} from '../../../common/services/core-api-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
 
-import template from './measurable-rating-app-section.html';
+import template from "./measurable-rating-app-section.html";
+import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
 
 
 /**
@@ -55,34 +56,6 @@ const initialState = {
 };
 
 
-
-function mkTabs(categories = [], measurables = [], ratings = []) {
-
-    const measurablesByCategory = _.groupBy(
-        measurables,
-        'categoryId');
-
-    const grouped = _.map(categories, category => {
-        const usedMeasurables = measurablesByCategory[category.id] || [];
-
-        const measurableIds = _.map(usedMeasurables, 'id');
-        const ratingsForMeasure = _.filter(
-            ratings,
-            r => _.includes(measurableIds, r.measurableId));
-
-        return {
-            category,
-            measurables: usedMeasurables,
-            ratings: ratingsForMeasure,
-        };
-    });
-
-    return _.sortBy(
-        grouped,
-        g => g.category.name);
-}
-
-
 function mkOverridesMap(perspectiveRatings = [], measurables = []) {
     const ratings = _.map(perspectiveRatings, 'value');
     const measurablesById = _.keyBy(measurables, 'id');
@@ -107,7 +80,7 @@ function mkOverridesMap(perspectiveRatings = [], measurables = []) {
 
 
 function controller($q, serviceBroker) {
-    const vm = initialiseData(this, initialState);;
+    const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
         vm.selector = {  entityReference: vm.parentEntityRef, scope: 'EXACT'  };
@@ -128,6 +101,10 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector], { force })
             .then(r => vm.ratings = r.data);
 
+        const ratingSchemesPromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
+
         const categoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
@@ -143,11 +120,10 @@ function controller($q, serviceBroker) {
         $q.all([perspectiveRatingsPromise, measurablesPromise])
             .then(() => vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables));
 
-
-        $q.all([measurablesPromise, ratingsPromise, categoriesPromise])
+        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
-                vm.tabs = mkTabs(vm.categories, vm.measurables, vm.ratings);
-                const firstNonEmptyTab = _.find(vm.tabs, t => t.ratings.length > 0);
+                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
+                const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });
     };
