@@ -18,7 +18,7 @@
  */
 
 import '@fortawesome/fontawesome-free/js/all'
-import '@fortawesome/fontawesome-free/js/v4-shims'
+import {mkIconClasses} from './icon-utils';
 
 const bindings = {
     name: '@',
@@ -39,8 +39,7 @@ function controller() {
     const vm = this;
     vm.$onChanges = () => {
         vm.classNames = [
-            'fa',
-            `fa-${vm.name}`,
+            mkIconClasses(vm.name).join(' '),
             vm.flip ? `fa-flip-${vm.flip}` : '',
             vm.rotate ? `fa-rotate-${vm.rotate}` : '',
             vm.size ? `fa-${vm.size}` : '',
