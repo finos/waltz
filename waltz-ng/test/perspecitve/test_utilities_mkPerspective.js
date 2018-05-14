@@ -20,17 +20,11 @@ describe('mkPerspective', () => {
     });
 
     it('all good with little data', () => {
-        const p = mkPerspective(pd, []);
+        const p = mkPerspective(pd, [], [], {});
         assert.deepEqual(p.definition, pd);
-        //assert.deepEqual(p.ratings, []);
+        assert.deepEqual(p.axes.x, []);
+        assert.deepEqual(p.axes.y, []);
     });
-
-    it('only ratings relevant to perspective are included', () => {
-        const p = mkPerspective(pd, []);
-        assert.deepEqual(p.definition, pd);
-       // assert.deepEqual(p.ratings, []);
-    });
-
 
 });
 
