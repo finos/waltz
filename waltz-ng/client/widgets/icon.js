@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import '@fortawesome/fontawesome-free/js/all'
+import '@fortawesome/fontawesome-free/js/v4-shims'
+
 const bindings = {
     name: '@',
     size: '@',

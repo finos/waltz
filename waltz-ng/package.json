@@ -17,6 +17,7 @@
     "start": "node lib/server-production"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.1.0-4",
     "angular": "1.5.11",
     "angular-animate": "1.5.11",
     "angular-formly": "8.4.1",
@@ -50,7 +51,6 @@
     "d3-time-format": "2.0.5",
     "d3-transition": "1.0.4",
     "d3-zoom": "1.1.4",
-    "font-awesome": "4.7.0",
     "intro.js": "^2.3.0",
     "json-stable-stringify": "^1.0.1",
     "lodash": "4.17.4",
