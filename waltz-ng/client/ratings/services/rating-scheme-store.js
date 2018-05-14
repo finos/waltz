@@ -19,48 +19,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function store($http, BaseApiUrl) {
-    const base = BaseApiUrl + '/capability-rating';
+export function store($http, BaseApiUrl) {
+    const base = BaseApiUrl + '/rating-scheme';
 
-    function findByParent(kind, id) {
-        console.log("DEPRECATED: use app-capability-store instead");
+
+    function findAll(id) {
         return $http
-            .get(`${base}/parent/${kind}/${id}`)
+            .get(base)
             .then(result => result.data);
     }
 
-
-    function update(action) {
-        console.log("DEPRECATED: use app-capability-store instead");
+    function getById(id) {
         return $http
-            .post(`${base}`, action);
-    }
-
-
-    function findByAppIds(ids) {
-        console.log("DEPRECATED: use rating-store:findByAppIdSelector instead");
-        return $http
-            .post(`${base}/apps`, ids)
-            .then(result => result.data);
-    }
-
-
-    function findByAppIdSelector(selector) {
-        console.log("DEPRECATED: use app-capability-store instead");
-        return $http
-            .post(`${base}/app-selector`, selector)
+            .get(`${base}/id/${id}`)
             .then(result => result.data);
     }
 
 
     return {
-        findByParent,
-        findByAppIds,
-        findByAppIdSelector,
-        update
+        findAll,
+        getById
     };
 }
 
 store.$inject = ['$http', 'BaseApiUrl'];
 
-export default store;
+
+export const serviceName = 'RatingSchemeStore';
+
+export const RatingSchemeStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'executes findAll'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
+    }
+};
+

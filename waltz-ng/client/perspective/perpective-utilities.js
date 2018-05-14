@@ -16,22 +16,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 import {
     checkAll,
-    checkIsMeasurableRating,
     checkIsMeasurable,
+    checkIsMeasurableRating,
     checkIsPerspectiveDefinition,
-    checkNotEmpty,
-
-} from '../common/checks';
+    checkNotEmpty
+} from "../common/checks";
+import {mkRatingSchemeColorScale} from "../common/colors";
 
 
 function mkPerspective(perspectiveDefinition,
                        measurables = [],
-                       ratings = []) {
+                       ratings = [],
+                       schemes) {
     checkNotEmpty(perspectiveDefinition, "Must supply a perspective definition");
     checkIsPerspectiveDefinition(perspectiveDefinition);
     checkAll(measurables, checkIsMeasurable);
@@ -57,12 +58,20 @@ function mkPerspective(perspectiveDefinition,
             .value();
     };
 
+    const ratingColorScales = {
+        x: mkRatingSchemeColorScale(schemes.x),
+        y: mkRatingSchemeColorScale(schemes.y),
+        p: mkRatingSchemeColorScale(schemes.p)
+    };
+
     return {
         definition: perspectiveDefinition,
         axes: {
             x: mkAxis(perspectiveDefinition.categoryX),
             y: mkAxis(perspectiveDefinition.categoryY)
-        }
+        },
+        schemes,
+        ratingColorScales
     };
 }
 

@@ -19,51 +19,38 @@
                 </p>
                 <hr>
                 <p>
-                    <b>Keyboard shortcuts</b>
-                    When the tree has focus the following keys are enabled:
+                    <b>Rating Scheme</b>
+
                 <table class="table table-condensed">
                     <thead>
                     <tr>
+                        <th>Rating</th>
                         <th>Key</th>
-                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                    <tr ng-repeat="rating in $ctrl.selected.ratingScheme.ratings | orderBy: 'position'">
                         <td>
-                            <kbd>g</kbd>
+                            <span style="display: inline-block; width: 16px; height: 16px; border: 1px solid black; border-radius: 2px;"
+                                  ng-style="{ 'background-color': rating.color }">
+
+                            </span>
+                            <span ng-bind="rating.name"
+                                  ng-style="{ 'font-style': rating.userSelectable ? 'normal' : 'italic' }"
+                                  title="{{rating.description}}">
+                            </span>
                         </td>
-                        <td>Green</td>
+                        <td>
+                            <span ng-if="rating.userSelectable">
+                                <kbd ng-bind="rating.rating"></kbd>
+                            </span>
+                        </td>
                     </tr>
                     <tr>
-                        <td>
-                            <kbd>a/y</kbd>
-                        </td>
-                        <td>Amber</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <kbd>r</kbd>
-                        </td>
-                        <td>Red</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <kbd>x</kbd>
-                        </td>
-                        <td>Remove</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <kbd>Esc</kbd>
-                        </td>
-                        <td>Cancel</td>
-                    </tr>
-                    <tr>
+                        <td>Save comment</td>
                         <td>
                             <kbd>Ctrl+Enter</kbd>
                         </td>
-                        <td>Save comment</td>
                     </tr>
                     </tbody>
                 </table>
@@ -116,8 +103,7 @@
                         </div>
                         <div class="col-sm-9">
                             <waltz-rating-picker selected="$ctrl.selected.rating.rating"
-                                                 rag-names="$ctrl.selected.category.ragNames"
-                                                 hide-options="['Z']"
+                                                 scheme-id="$ctrl.selected.ratingScheme.id"
                                                  edit-disabled="$ctrl.saveInProgress"
                                                  on-select="$ctrl.onRatingSelect"
                                                  on-keypress="$ctrl.onKeypress">
@@ -217,6 +203,7 @@
 
                 <div style="padding-top: 6px">
                     <waltz-measurable-rating-tree ratings="tab.ratings"
+                                                  rating-scheme="tab.ratingScheme"
                                                   measurables="tab.measurables"
                                                   on-keypress="$ctrl.onKeypress"
                                                   scroll-height="600"

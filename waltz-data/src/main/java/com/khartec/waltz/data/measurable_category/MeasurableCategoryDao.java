@@ -21,9 +21,7 @@ package com.khartec.waltz.data.measurable_category;
 
 import com.khartec.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.rating.ImmutableRagNames;
-import com.khartec.waltz.model.rating.RagNames;
-import com.khartec.waltz.model.rating.RagRating;
+import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-import static com.khartec.waltz.model.rating.RagName.mkRagName;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
 
@@ -40,21 +37,16 @@ import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATE
 public class MeasurableCategoryDao {
 
     private static final RecordMapper<MeasurableCategoryRecord, MeasurableCategory> TO_DOMAIN_MAPPER = r -> {
-        RagNames ragNames = ImmutableRagNames.builder()
-                .R(mkRagName(RagRating.R, r.getRatingNameR(), r.getRatingDescR()))
-                .A(mkRagName(RagRating.A, r.getRatingNameA(), r.getRatingDescA()))
-                .G(mkRagName(RagRating.G, r.getRatingNameG(), r.getRatingDescG()))
-                .Z(mkRagName(RagRating.Z, r.getRatingNameZ(), r.getRatingDescZ()))
-                .build();
 
         return ImmutableMeasurableCategory.builder()
-                .ragNames(ragNames)
+                .ratingSchemeId(1)
                 .id(r.getId())
                 .name(r.getName())
                 .externalId(r.getExternalId())
                 .description(r.getDescription())
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
+                .ragNames(RatingScheme.toList())
                 .build();
     };
 

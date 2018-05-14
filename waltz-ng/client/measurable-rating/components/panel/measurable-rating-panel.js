@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-
+import template from "./measurable-rating-panel.html";
 
 /**
  * @name waltz-measurable-rating-panel
@@ -32,13 +32,11 @@ import {initialiseData} from "../../../common";
  */
 
 
-const template = require('./measurable-rating-panel.html');
-
-
 const bindings = {
     category: '<',
     entityReference: '<',
     ratings: '<',
+    ratingScheme: '<',
     measurables: '<',
     overrides: '<'
 };
@@ -61,6 +59,8 @@ function controller() {
         vm.overriddenMeasurableIds = _.map(
             _.keys(vm.overrides || {}),
             Number);
+
+        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), 'rating');
     };
 
     vm.onSelect = (measurable, rating) =>

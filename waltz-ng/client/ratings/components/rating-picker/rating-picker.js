@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../../common";
-import {baseRagNames} from "../../rating-utils";
 import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {useBlackAsForeground} from "../../../common/colors";
 
 
 const bindings = {
@@ -26,8 +27,7 @@ const bindings = {
     editDisabled: '<',
     onSelect: '<',
     onKeypress: '<',
-    ragNames: '<',
-    hideOptions: '<'
+    ratingSchemeId: '<',
 };
 
 
@@ -36,43 +36,36 @@ const template = require('./rating-picker.html');
 
 const initialState = {
     pickerStyle: {},
-    hideOptions: [],
     onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
-    ragNames: baseRagNames
 };
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
+        if (c.ratingSchemeId) {
+            serviceBroker
+                .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.ratingSchemeId])
+                .then(r => vm.options = _
+                        .chain(r.data.ratings)
+                        .filter(d => d.userSelectable)
+                        .map(d => Object.assign({}, d, { foregroundColor: useBlackAsForeground(d.color) ? '#000' : '#fff' }))
+                        .value());
+        }
         if (c.disabled) {
             vm.pickerStyle = vm.disabled
                 ? { opacity: 0.4 }
                 : [];
-        }
-
-        if (c.ragNames) {
-            vm.options = _
-                .chain(vm.ragNames)
-                .map((v, k) => {
-                    return {
-                        value: k,
-                        clazz: `rating-${k}`,
-                        label: v
-                    };
-                })
-                .reject(option => _.includes(vm.hideOptions, option.value))
-                .value();
         }
     }
 
 }
 
 
-controller.$inject = [];
+controller.$inject = [ 'ServiceBroker' ];
 
 
 const component = {

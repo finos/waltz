@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -18,29 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
+import * as RatingSchemeStore from "./services/rating-scheme-store";
+import {registerStores} from "../common/module-utils";
 
 export default () => {
     const module = angular.module('waltz.ratings', []);
 
     module
-        .directive('waltzRatingGroup', require('./directives/rating-group/directive'))
-        .directive('waltzRatingGroups', require('./directives/rating-groups/directive'))
-        .directive('waltzRatingGroupHeader', require('./directives/rating-group-header/directive'))
-        .directive('waltzAppRatingTable', require('./directives/viewer/app-rating-table'))
-        .directive('waltzRatingBrushSelect', require('./directives/rating-brush-select/directive'))
-        .directive('waltzCapabilityMultiSelector', require('./directives/viewer/capability-multi-selector'))
-        .directive('waltzMultiAppRatingViewer', require('./directives/viewer/multi-app-rating-viewer'))
-        .directive('waltzRatingColorStrategyOptions', require('./directives/viewer/rating-color-strategy-options'))
-        .directive('waltzRagLine', require('./directives/rating-explorer/rag-line'))
-        .directive('waltzRatingExplorerSection', require('./directives/rating-explorer/rating-explorer-section'));
+        .directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
 
     module
         .component('waltzRatingPicker', require('./components/rating-picker/rating-picker'))
         .component('waltzRatingIndicatorCell', require('./components/rating-indicator-cell/rating-indicator-cell'));
 
-    module
-        .service('RatingStore', require('./services/ratings-store'));
+    registerStores(module, [ RatingSchemeStore ]);
 
     return module.name;
 };

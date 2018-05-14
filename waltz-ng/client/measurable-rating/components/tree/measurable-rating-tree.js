@@ -18,8 +18,8 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {buildHierarchies, switchToParentIds, prepareSearchNodes, doSearch} from "../../../common/hierarchy-utils";
-
+import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
+import template from "./measurable-rating-tree.html";
 
 /**
  * @name waltz-measurable-rating-tree
@@ -31,6 +31,7 @@ import {buildHierarchies, switchToParentIds, prepareSearchNodes, doSearch} from 
  */
 const bindings = {
     ratings: '<',
+    ratingScheme: '<',
     measurables: '<',
     overrides: '<',
     onKeypress: '<',
@@ -44,6 +45,7 @@ const initialState = {
     hierarchy: [],
     measurables: [],
     ratings: [],
+    ratingScheme: null,
     searchTerms: '',
     treeOptions: {
         nodeChildren: "children",
@@ -59,9 +61,6 @@ const initialState = {
     onKeypress: null,
     onSelect: (m, r) => console.log('default on-select for measurable-rating-tree: ', m, r)
 };
-
-
-const template = require('./measurable-rating-tree.html');
 
 
 // expand nodes with a rating (incl. parents)
@@ -100,6 +99,7 @@ function controller() {
         vm.searchNodes = prepareSearchNodes(vm.measurables);
         vm.hierarchy = prepareTree(vm.measurables);
         vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], 'measurableId');
+        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, 'ratings', []), 'rating');
 
         if (_.isEmpty(vm.expandedNodes)) {
             vm.expandedNodes = calculateExpandedNodes(vm.measurables, vm.ratingsByMeasurable);

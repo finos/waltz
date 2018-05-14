@@ -19,8 +19,10 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.model.rating.RagNames;
+import com.khartec.waltz.model.rating.RagName;
+
+import java.util.List;
 
 public interface RagNamesProvider {
-    RagNames ragNames();
+    List<RagName> ragNames();
 }

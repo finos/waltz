@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
 
 export default () => {
@@ -41,29 +41,10 @@ export default () => {
                     url: '/directive-app-selector',
                     views: { 'content@': {template: require('./demo-directive-app-selector.html') } }
                 })
-                .state('main.examples.directive-rating-indicator', {
-                    url: '/directive-rating-indicator',
-                    views: { 'content@': {
-                        template: require('./demo-directive-rating-indicator.html')
-                    } }
-                })
                 .state('main.examples.directive-yq-selector', {
                     url: '/directive-yq-selector',
                     views: { 'content@': {
                         template: require('./demo-directive-yq-selector.html'),
-                        controller: function() {
-                            this.onSelect = (d) => {
-                                this.selected = d;
-                            };
-                        },
-                        bindToController: true,
-                        controllerAs: 'ctrl'
-                    } }
-                })
-                .state('main.examples.directive-rating-brush-select', {
-                    url: '/directive-rating-brush-select',
-                    views: { 'content@': {
-                        template: require('./demo-directive-rating-brush-select.html'),
                         controller: function() {
                             this.onSelect = (d) => {
                                 this.selected = d;
@@ -101,47 +82,6 @@ export default () => {
 
                             this.onSelect = (d) => {
                                 this.selected = d;
-                            };
-                        },
-                        controllerAs: 'ctrl',
-                        bindToController: true
-                    } }
-                })
-                .state('main.examples.directive-rating-group', {
-                    url: '/directive-rating-group',
-                    views: { 'content@': {
-                        template: require('./demo-directive-rating-group.html'),
-                        controller: function() {
-                            const m1 = { code: 'm1', name: 'M1', description: 'emm1' };
-                            const m2 = { code: 'm2', name: 'M2', description: 'emm2' };
-                            const c1 = { id: 100, name: 'Cap1' };
-                            const c2 = { id: 200, name: 'Cap2' };
-
-                            this.group = {
-                                groupRef: { id: 1, kind: 'APPLICATION', name: 'group'},
-                                measurables: [ m1, m2 ],
-                                capabilities: [ c1, c2 ],
-                                raw: [
-                                    {
-                                        ratings: [
-                                            { current: 'R', measurable: 'm1' },
-                                            { current: 'A', measurable: 'm2' }
-                                        ],
-                                        subject: c1
-                                    },
-                                    {
-                                        ratings: [
-                                            { current: 'R', measurable: 'm1' },
-                                            { current: 'Z', measurable: 'm2' }
-                                        ],
-                                        subject: c2
-                                    }
-                                ],
-                                summaries: [
-                                    { measurable: 'm1', R: 2 },
-                                    { measurable: 'm2', A: 1, Z: 1 }
-                                ],
-                                collapsed: false
                             };
                         },
                         controllerAs: 'ctrl',
