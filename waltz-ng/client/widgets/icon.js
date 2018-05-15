@@ -18,10 +18,12 @@
  */
 
 import '@fortawesome/fontawesome-free/js/all'
-import {mkIconClasses} from './icon-utils';
+import {mkCurrentName, mkIconSetName} from './icon-utils';
+import {initialiseData} from "../common/index";
 
 const bindings = {
     name: '@',
+    iconSet: '@',
     size: '@',
     flip: '@',
     rotate: '@',
@@ -31,15 +33,20 @@ const bindings = {
     spin: '@'
 };
 
+const initialState = {
+    iconSet: 'fa'
+};
+
 
 const template = '<span style="font-size: smaller; opacity: 0.8;"><i ng-class="$ctrl.classNames"/></span>';
 
 
 function controller() {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
     vm.$onChanges = () => {
         vm.classNames = [
-            mkIconClasses(vm.name).join(' '),
+            mkIconSetName(vm.iconSet, vm.name),
+            mkCurrentName(vm.name),
             vm.flip ? `fa-flip-${vm.flip}` : '',
             vm.rotate ? `fa-rotate-${vm.rotate}` : '',
             vm.size ? `fa-${vm.size}` : '',

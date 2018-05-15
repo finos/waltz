@@ -468,26 +468,26 @@ const faReplacements = _
     .chain(faV4Shims)
     .map(arr => ({
         previous: arr[0],
-        class: arr[1],
+        iconSet: arr[1],
         current: arr[2]
     }))
     .keyBy('previous')
     .value();
 
 
-function mkNamespace(name) {
+export function mkIconSetName(currentIconSet, name) {
     if (faReplacements[name]) {
-        const namespace = faReplacements[name].class;
-        if (namespace === 'fab') {
-            console.warn(`Icon [${name}] namespace updated to [${namespace}]`);
-            return `fa ${namespace}`;
+        const iconSet = faReplacements[name].iconSet;
+        if (iconSet && iconSet !== currentIconSet) {
+            console.warn(`Icon [${name}] namespace updated to [${iconSet}]`);
+            return `${iconSet}`;
         }
     }
-    return 'fa';
+    return currentIconSet;
 }
 
 
-function mkCurrentName(name) {
+export function mkCurrentName(name) {
     if (faReplacements[name]) {
         const currentName = faReplacements[name].current;
         if (currentName) {
@@ -497,12 +497,4 @@ function mkCurrentName(name) {
     }
     return `fa-${name}`;
 
-}
-
-
-export function mkIconClasses(name) {
-    return [
-        mkNamespace(name),
-        mkCurrentName(name)
-    ];
 }
