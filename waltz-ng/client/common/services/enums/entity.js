@@ -44,7 +44,7 @@ export const entity = {
     ATTESTATION: {
         key: 'ATTESTATION',
         name: 'Attestation',
-        icon: 'check-square-o',
+        icon: 'check-square',
         description: null,
         position: 65
     },
@@ -177,7 +177,7 @@ export const entity = {
     PROCESS: {
         key: 'PROCESS',
         name: 'Process',
-        icon: 'code-fork',
+        icon: 'code-branch',
         description: null,
         position: 230
     },
