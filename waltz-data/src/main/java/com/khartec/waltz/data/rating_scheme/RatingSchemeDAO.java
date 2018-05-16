@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.data.rating_scheme;
 
-import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.model.rating.*;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
@@ -82,8 +81,11 @@ public class RatingSchemeDAO {
                 .selectFrom(RATING_SCHEME)
                 .fetch(TO_SCHEME_MAPPER)
                 .stream()
-                .map(StreamUtilities.tap())
-                .map(s -> ImmutableRatingScheme.copyOf(s).withRatings(itemsByScheme.getOrDefault(s.id().get(), Collections.emptyList())))
+                .map(s -> ImmutableRatingScheme
+                        .copyOf(s)
+                        .withRatings(itemsByScheme.getOrDefault(
+                                s.id().get(),
+                                Collections.emptyList())))
                 .collect(Collectors.toList());
     }
 
