@@ -27,7 +27,7 @@ const bindings = {
     editDisabled: '<',
     onSelect: '<',
     onKeypress: '<',
-    ratingSchemeId: '<',
+    schemeId: '<',
 };
 
 
@@ -46,9 +46,9 @@ function controller(serviceBroker) {
     vm.$onInit = () => initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (c.ratingSchemeId) {
+        if (c.schemeId && vm.schemeId) {
             serviceBroker
-                .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.ratingSchemeId])
+                .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.schemeId])
                 .then(r => vm.options = _
                         .chain(r.data.ratings)
                         .filter(d => d.userSelectable)

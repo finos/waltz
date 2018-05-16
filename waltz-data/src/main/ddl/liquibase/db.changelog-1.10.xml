@@ -23,16 +23,184 @@
                    logicalFilePath="db.changelog-1.10.xml">
 
     <!-- 3112: SurveyInstance Approved status -->
-    <changeSet id="20180502-3112-1"
-               author="kamransaleem">
-        <comment>3112: SurveyInstance Approved status</comment>
+    <!-- TODO: re-enable for go-live
+        <changeSet id="20180502-3112-1"
+                   author="kamransaleem">
+            <comment>3112: SurveyInstance Approved status</comment>
+            <sql>
+                UPDATE survey_instance
+                SET status = 'APPROVED'
+                WHERE approved_by is not null
+                AND approved_at is not null
+                AND status = 'COMPLETED'
+            </sql>
+        </changeSet>
+    -->
+
+    <!-- 3144: SurveyInstance Approved status -->
+    <changeSet id="20180514-3144-1"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <renameTable oldTableName="rating_scheme_definition"
+                     newTableName="rating_scheme"/>
+        <renameTable oldTableName="rating_scheme_definition_item"
+                     newTableName="rating_scheme_item"/>
+    </changeSet>
+
+    <changeSet id="20180514-3144-2"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <addColumn tableName="rating_scheme_item">
+            <column name="user_selectable"
+                    type="BOOLEAN"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+       </addColumn>
+    </changeSet>
+
+    <changeSet id="20180514-3144-3"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <renameColumn tableName="rating_scheme_item"
+                      oldColumnName="scheme_definition_id"
+                      newColumnName="scheme_id"/>
+    </changeSet>
+
+    <changeSet id="20180514-3144-4"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <createIndex indexName="idx_rating_scheme_item_unique"
+                     tableName="rating_scheme_item"
+                     unique="true">
+            <column name="scheme_id" type="${id.type}"/>
+            <column name="code" type="${rag.type}"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet id="20180514-3144-5"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
         <sql>
-            UPDATE survey_instance
-            SET status = 'APPROVED'
-            WHERE approved_by is not null
-            AND approved_at is not null
-            AND status = 'COMPLETED'
+            insert into rating_scheme (name, description)
+                select name, description from measurable_category;
+        </sql>
+        <sql>
+            insert into rating_scheme (name, description)
+                select name, description from perspective_definition;
+        </sql>
+        <sql>
+            insert into rating_scheme_item (scheme_id, name, description, code, color, position)
+                (select rs.id, mc.rating_name_r, coalesce(mc.rating_desc_r, ''), 'R', '#DA524B' , 30
+                from measurable_category mc
+                inner join rating_scheme rs on rs.name = mc.name)
+                UNION
+                (select rs.id, mc.rating_name_a, coalesce(mc.rating_desc_a, ''), 'A', '#D9923F' , 20
+                from measurable_category mc
+                inner join rating_scheme rs on rs.name = mc.name)
+                UNION
+                (select rs.id, mc.rating_name_g, coalesce(mc.rating_desc_g, ''), 'G', '#5BB65D' , 10
+                from measurable_category mc
+                inner join rating_scheme rs on rs.name = mc.name)
+                UNION
+                (select rs.id, mc.rating_name_z, coalesce(mc.rating_desc_z, ''), 'Z', '#939393' , 10
+                from measurable_category mc
+                inner join rating_scheme rs on rs.name = mc.name);
+        </sql>
+        <sql>
+            insert into rating_scheme_item (scheme_id, name, description, code, color, position)
+                (select rs.id, pd.rating_name_r, '', 'R', '#DA524B' , 30
+                from perspective_definition pd
+                inner join rating_scheme rs on rs.name = pd.name)
+                UNION
+                (select rs.id, pd.rating_name_a, '', 'A', '#D9923F' , 20
+                from perspective_definition pd
+                inner join rating_scheme rs on rs.name = pd.name)
+                UNION
+                (select rs.id, pd.rating_name_g, '', 'G', '#5BB65D' , 10
+                from perspective_definition pd
+                inner join rating_scheme rs on rs.name = pd.name)
+                UNION
+                (select rs.id, pd.rating_name_z, '', 'Z', '#939393' , 40
+                from perspective_definition pd
+                inner join rating_scheme rs on rs.name = pd.name)
+                UNION
+                (select rs.id, pd.rating_name_x, '', 'X', '#d1d1d1' , 50
+                from perspective_definition pd
+                inner join rating_scheme rs on rs.name = pd.name);
+        </sql>
+        <sql>
+            update rating_scheme_item
+                set user_selectable = 0
+                where code = 'Z';
         </sql>
     </changeSet>
+
+    <changeSet id="20180514-3144-6"
+               author="davidwatkins73">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <sql dbms="mssql">
+            update
+                measurable_category
+            set
+                measurable_category.rating_scheme_definition_id = rs.id
+            from
+                measurable_category mc
+                    inner join
+                    rating_scheme rs
+                    on
+                    rs.name = mc.name;
+        </sql>
+        <sql dbms="mysql">
+            UPDATE
+                measurable_category mc,
+                rating_scheme rs
+            SET
+                mc.rating_scheme_definition_id = rs.id
+            WHERE
+                mc.name = rs.name;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180516-3144-7"
+               author="davidwatkins73">
+        <renameColumn tableName="measurable_category"
+                      oldColumnName="rating_scheme_definition_id"
+                      newColumnName="rating_scheme_id"/>
+
+        <addColumn tableName="perspective_definition">
+            <column name="rating_scheme_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180516-3144-8"
+               author="davidwatkins73">
+        <sql dbms="mssql">
+            update
+            perspective_definition
+            set
+            perspective_definition.rating_scheme_id = rs.id
+            from
+            perspective_definition pd
+            inner join
+            rating_scheme rs
+            on
+            rs.name = pd.name;
+        </sql>
+        <sql dbms="mysql">
+            UPDATE
+            perspective_definition pd,
+            rating_scheme rs
+            SET
+            pd.rating_scheme_id = rs.id
+            WHERE
+            pd.name = rs.name;
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

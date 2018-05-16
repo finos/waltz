@@ -26,6 +26,7 @@ import org.springframework.core.io.Resource;
 import java.io.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -35,16 +36,16 @@ public class IOUtilities {
 
     public static List<String> readLines(InputStream stream) throws IOException {
         checkNotNull(stream, "stream must not be null");
+        return streamLines(stream).collect(toList());
+    }
 
-        try {
-            InputStreamReader streamReader = new InputStreamReader(stream);
-            BufferedReader reader = new BufferedReader(streamReader);
-            return reader
-                    .lines()
-                    .collect(toList());
-        } finally {
-            stream.close();
-        }
+
+    public static Stream<String> streamLines(InputStream inputStream) throws IOException {
+        checkNotNull(inputStream, "inputStream must not be null");
+        InputStreamReader streamReader = new InputStreamReader(inputStream);
+        BufferedReader reader = new BufferedReader(streamReader);
+        return reader
+                .lines();
     }
 
 

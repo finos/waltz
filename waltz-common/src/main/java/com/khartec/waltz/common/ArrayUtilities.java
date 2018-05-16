@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.common;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -73,4 +74,11 @@ public class ArrayUtilities {
         return total;
     }
 
+    public static <T> T last(T[] arr) {
+        return arr[arr.length - 1];
+    }
+
+    public static <T> T[] initial(T[] bits) {
+        return Arrays.copyOf(bits, bits.length - 1);
+    }
 }
