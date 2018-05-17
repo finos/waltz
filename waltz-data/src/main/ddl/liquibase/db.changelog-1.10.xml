@@ -64,6 +64,7 @@
         <comment>3144: Add user_selectable to rating_scheme_item</comment>
         <renameColumn tableName="rating_scheme_item"
                       oldColumnName="scheme_definition_id"
+                      columnDataType="${id.type}"
                       newColumnName="scheme_id"/>
     </changeSet>
 
