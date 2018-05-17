@@ -219,14 +219,46 @@ function controller($q,
             })
     };
 
+    const deleteLogicalFlow = () => {
+        serviceBroker
+            .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.physicalFlow.logicalFlowId])
+            .then(r => {
+                if (r.outcome === 'SUCCESS') {
+                    notification.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
+                } else {
+                    notification.error(r.message);
+                }
+                navigateToLastView($state, historyStore);
+            });
+
+
+        physicalSpecificationStore.deleteById(vm.specification.id)
+            .then(r => {
+                if (r.outcome === 'SUCCESS') {
+                    notification.success(`Specification ${vm.specification.name} deleted`);
+                } else {
+                    notification.error(r.message);
+                }
+                navigateToLastView($state, historyStore);
+            })
+    };
+
     const handleDeleteFlowResponse = (response) => {
         if (response.outcome === 'SUCCESS') {
             notification.success('Physical flow deleted');
             removeFromHistory(historyStore, vm.physicalFlow, vm.specification);
 
-            const deleteSpecText = `The specification ${vm.specification.name} is no longer referenced by any physical flow. Do you want to delete the specification?`;
-            if (response.isSpecificationUnused && confirm(deleteSpecText)) {
-                deleteSpecification();
+            if (response.isSpecificationUnused || response.isLastPhysicalFlow) {
+                const deleteSpecText = `The specification ${vm.specification.name} is no longer referenced by any physical flow. Do you want to delete the specification?`;
+                const deleteLogicalFlowText = `The logical flow described by this physical flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} has no other physical flows. Do you want to delete the logical flow?`;
+
+                if (response.isSpecificationUnused && confirm(deleteSpecText)) {
+                    deleteSpecification();
+                }
+
+                if(response.isLastPhysicalFlow && confirm(deleteLogicalFlowText)) {
+                    deleteLogicalFlow()
+                }
             } else {
                 navigateToLastView($state, historyStore);
             }

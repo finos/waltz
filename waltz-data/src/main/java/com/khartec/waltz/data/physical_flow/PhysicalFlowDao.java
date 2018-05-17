@@ -371,6 +371,12 @@ public class PhysicalFlowDao {
     }
 
 
+    public boolean hasPhysicalFlows(long logicalFlowId) {
+        return dsl.fetchCount(DSL.selectFrom(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
+    }
+
     // ---
 
     private int updateEnum(long flowId, TableField<PhysicalFlowRecord, String> field, String value) {
