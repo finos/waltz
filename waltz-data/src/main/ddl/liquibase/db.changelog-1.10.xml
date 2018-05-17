@@ -106,6 +106,10 @@
                 UNION
                 (select rs.id, mc.rating_name_z, coalesce(mc.rating_desc_z, ''), 'Z', '#939393' , 10
                 from measurable_category mc
+                inner join rating_scheme rs on rs.name = mc.name)
+                UNION
+                (select rs.id, 'Not applicable', '', 'X', '#d1d1d1' , 50
+                from measurable_category mc
                 inner join rating_scheme rs on rs.name = mc.name);
         </sql>
         <sql>
@@ -168,7 +172,6 @@
         <renameColumn tableName="measurable_category"
                       oldColumnName="rating_scheme_definition_id"
                       newColumnName="rating_scheme_id"/>
-
         <addColumn tableName="perspective_definition">
             <column name="rating_scheme_id"
                     type="${id.type}">
@@ -200,6 +203,57 @@
             WHERE
             pd.name = rs.name;
         </sql>
+    </changeSet>
+
+    <changeSet id="20180517-3144-9"
+               author="davidwatkins73">
+        <addNotNullConstraint tableName="perspective_definition"
+                              columnName="rating_scheme_id"
+                              columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet id="20180517-3144-10"
+               author="davidwatkins73">
+        <addNotNullConstraint tableName="measurable_category"
+                              columnName="rating_scheme_id"
+                              columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet author="davidwatkins73"
+               id="20180517-3144-11">
+        <comment>Removing constraints prior to removal of columns in 1.11</comment>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_r"
+                               tableName="perspective_definition"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_a"
+                               tableName="perspective_definition"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_g"
+                               tableName="perspective_definition"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_z"
+                               tableName="perspective_definition"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_x"
+                               tableName="perspective_definition"/>
+    </changeSet>
+
+    <changeSet author="davidwatkins73"
+               id="20180517-3144-12">
+        <comment>Removing constraints prior to removal of columns in 1.11</comment>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_r"
+                               tableName="measurable_category"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_a"
+                               tableName="measurable_category"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_g"
+                               tableName="measurable_category"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="rating_name_z"
+                               tableName="measurable_category"/>
     </changeSet>
 
 

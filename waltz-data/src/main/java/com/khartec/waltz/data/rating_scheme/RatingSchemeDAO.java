@@ -48,7 +48,7 @@ public class RatingSchemeDAO {
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
                 .rating(RagRating.valueOf(r.getCode())) //TODO: this needs to be any char
-                .userSelectable(true)
+                .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
                 .description(r.getDescription())

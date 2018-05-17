@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {useBlackAsForeground} from "../../../common/colors";
+import {determineForegroundColor} from "../../../common/colors";
 
 
 const bindings = {
@@ -52,7 +52,7 @@ function controller(serviceBroker) {
                 .then(r => vm.options = _
                         .chain(r.data.ratings)
                         .filter(d => d.userSelectable)
-                        .map(d => Object.assign({}, d, { foregroundColor: useBlackAsForeground(d.color) ? '#000' : '#fff' }))
+                        .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
                         .value());
         }
         if (c.disabled) {
