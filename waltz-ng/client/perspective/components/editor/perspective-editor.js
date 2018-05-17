@@ -17,9 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {mkOverrides} from '../../perpective-utilities';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {mkOverrides} from "../../perpective-utilities";
+import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 
 /**
@@ -89,9 +90,20 @@ function controller($timeout) {
         }
     };
 
+    vm.$onInit = () => {
+
+
+    }
     vm.$onChanges = c => {
         if (c.perspectiveRatings) {
             vm.existingOverrides = mkOverrides(vm.perspectiveRatings);
+        }
+
+        if (_.has(vm, "perspectiveDefinition.ragNames")) {
+            vm.onKeypress = mkRatingsKeyHandler(
+                vm.perspectiveDefinition.ragNames,
+                vm.onRatingSelect,
+                vm.doCancel);
         }
     };
 
@@ -123,36 +135,6 @@ function controller($timeout) {
         vm.pendingOverrides = {};
     };
 
-
-
-    vm.onKeypress = (evt) => {
-        const goRed = () => vm.onRatingSelect('R');
-        const goGreen = () => vm.onRatingSelect('G');
-        const goAmber = () => vm.onRatingSelect('A');
-        const goNotApplicable = () => vm.onRatingSelect('X');
-        const goReset = () => vm.onRatingSelect('Z');
-        const cancel = () => vm.doCancel();
-
-        const keyActions = {
-            'r': goRed,
-            'R': goRed,
-            'a': goAmber,
-            'A': goAmber,
-            'y': goAmber,
-            'Y': goAmber,
-            'g': goGreen,
-            'G': goGreen,
-            'x': goNotApplicable,
-            'X': goNotApplicable,
-            'z': goReset,
-            'Z': goReset,
-            27: cancel,
-        };
-
-        const action = keyActions[evt.keyCode] || keyActions[evt.key];
-
-        if (action) action();
-    };
 }
 
 
