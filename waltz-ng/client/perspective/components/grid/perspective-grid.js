@@ -175,13 +175,15 @@ function drawXShape(selection, cellDimensions, isPending = false) {
 
 
 function calcOverrideCellDimensions(cellPadding) {
+    const xBandwidth = scales.x.bandwidth();
+    const yBandwidth = scales.y.bandwidth();
     return {
         t: cellPadding,
         l: cellPadding,
-        b: scales.y.bandwidth() - cellPadding,
-        r: scales.x.bandwidth() - cellPadding,
-        w: scales.x.bandwidth() - (2 * cellPadding),
-        h: scales.y.bandwidth() - (2 * cellPadding)
+        b: yBandwidth - cellPadding,
+        r: xBandwidth - cellPadding,
+        w: xBandwidth - (2 * cellPadding),
+        h: yBandwidth - (2 * cellPadding)
     }
 }
 
@@ -445,17 +447,22 @@ function setupDimensions(perspective) {
 }
 
 
+function canDraw(d = {}) {
+    const checks = [
+        d => d.measurables.length > 0,
+        d => d.measurableRatings.length > 0,
+        d => d.perspectiveDefinition != null,
+        d => d.schemes != null]
+    return _.every(checks, check => check(d));
+}
+
+
 function controller($element, $q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function attemptDraw() {
 
-        const canDraw = vm.measurables
-            && vm.measurableRatings
-            && vm.perspectiveDefinition
-            && vm.schemes;
-
-        if (canDraw) {
+        if (canDraw(vm)) {
             vm.perspective = mkPerspective(
                 vm.perspectiveDefinition,
                 vm.measurables,
