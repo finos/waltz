@@ -230,17 +230,6 @@ function controller($q,
                 }
                 navigateToLastView($state, historyStore);
             });
-
-
-        physicalSpecificationStore.deleteById(vm.specification.id)
-            .then(r => {
-                if (r.outcome === 'SUCCESS') {
-                    notification.success(`Specification ${vm.specification.name} deleted`);
-                } else {
-                    notification.error(r.message);
-                }
-                navigateToLastView($state, historyStore);
-            })
     };
 
     const handleDeleteFlowResponse = (response) => {
