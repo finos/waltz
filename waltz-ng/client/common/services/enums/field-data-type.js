@@ -1,4 +1,4 @@
-export const physicalSpecDefinitionFieldType = {
+export const fieldDataType = {
     DATE: {
         key: 'DATE',
         name: 'Date',
