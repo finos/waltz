@@ -20,9 +20,12 @@
 package com.khartec.waltz.common;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -38,5 +41,43 @@ public class StreamUtilities {
     public static <T> Stream<T> concat(Collection<T>... values) {
         return Stream.of(values)
                 .flatMap(Collection::stream);
+    }
+
+    public static <T> Function<T, T> tap() {
+        return t -> {
+            System.out.println(t);
+            return t;
+        };
+    }
+
+    public static <T> Function<T, T> tap(Consumer<T> consumer) {
+        return t -> {
+            consumer.accept(t);
+            return t;
+        };
+    }
+
+    public static class Siphon<T> implements Predicate<T> {
+        private final Predicate<T> pred;
+        private final List<T> results = new ArrayList();
+
+        public Siphon(Predicate<T> pred) {
+            this.pred = pred;
+        }
+
+        @Override
+        public boolean test(T t) {
+            boolean check = pred.test(t);
+            if (check) results.add(t);
+            return ! check;
+        }
+
+        public List<T> getResults() {
+            return results;
+        }
+    }
+
+    public static <T> Siphon<T> mkSiphon(Predicate<T> pred) {
+        return new Siphon(pred);
     }
 }

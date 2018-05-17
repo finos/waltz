@@ -3,7 +3,7 @@ JAVA
 RagName needs rename
 RagName needs ragRating removed and code adding
 RagNames needs removing
-RatingSchemeEndpoint needs to call to service/DAO etc
+* RatingSchemeEndpoint needs to call to service/DAO etc
 
 
 JS

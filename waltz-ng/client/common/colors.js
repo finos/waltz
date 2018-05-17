@@ -255,3 +255,10 @@ export function mkRatingSchemeColorScale(scheme = {}) {
         .domain(_.map(ratings, "rating"))
         .range(_.map(ratings, d => rgb(d.color)));
 }
+
+
+export function determineForegroundColor(r, g, b) {
+    return useBlackAsForeground(r, g, b)
+        ? '#000'
+        : '#fff'
+}

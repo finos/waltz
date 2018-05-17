@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
@@ -32,12 +32,19 @@ const template = require('./entity-icon-label.html');
 
 const initialState = {
     iconPlacement: 'left', // can be left, right, none
-    tooltipPlacement: 'top' // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    tooltipPlacement: 'top', // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    trigger: 'none'
 };
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
+
+    vm.$onChange = c => {
+        vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase
+            ? 'mouseenter'
+            : 'none';
+    };
 }
 
 

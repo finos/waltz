@@ -34,4 +34,12 @@ public abstract class SurveyQuestionDropdownEntry implements IdProvider {
     public abstract Optional<Long> questionId();
     public abstract String value();
     public abstract int position();
+
+
+    public static SurveyQuestionDropdownEntry mkEntry(String value, int position) {
+        return ImmutableSurveyQuestionDropdownEntry.builder()
+                .position(position)
+                .value(value)
+                .build();
+    }
 }

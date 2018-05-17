@@ -19,11 +19,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.model.rating.RatingScheme;
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -33,24 +35,20 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 public class RatingSchemeEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "rating-scheme");
+    private final RatingSchemeService ratingSchemeService;
 
+    @Autowired
+    public RatingSchemeEndpoint(RatingSchemeService ratingSchemeService) {
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
+        this.ratingSchemeService = ratingSchemeService;
+    }
 
     @Override
     public void register() {
         String findAllPath = BASE_URL;
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
 
-        String getByIdPath = mkPath(
-                BASE_URL,
-                "id",
-                ":id");
-
-        getForList(findAllPath, (req, resp) -> {
-            return ListUtilities.newArrayList(RatingScheme.mkDflt());
-        });
-
-        getForDatum(getByIdPath, (req, resp) -> {
-            return RatingScheme.mkDflt();
-        });
-
+        getForList(findAllPath, (req, resp) -> ratingSchemeService.findAll());
+        getForDatum(getByIdPath, (req, resp) -> ratingSchemeService.getById(getId(req)));
     }
 }

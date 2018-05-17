@@ -39,7 +39,7 @@ public class MeasurableCategoryDao {
     private static final RecordMapper<MeasurableCategoryRecord, MeasurableCategory> TO_DOMAIN_MAPPER = r -> {
 
         return ImmutableMeasurableCategory.builder()
-                .ratingSchemeId(1)
+                .ratingSchemeId(r.getRatingSchemeId())
                 .id(r.getId())
                 .name(r.getName())
                 .externalId(r.getExternalId())

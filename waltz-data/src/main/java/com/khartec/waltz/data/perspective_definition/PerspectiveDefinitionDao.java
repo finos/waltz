@@ -44,7 +44,7 @@ public class PerspectiveDefinitionDao {
 
         return ImmutablePerspectiveDefinition.builder()
                 .id(r.getId())
-                .ratingSchemeId(1)
+                .ratingSchemeId(r.getRatingSchemeId())
                 .name(r.getName())
                 .description(r.getDescription())
                 .categoryX(r.getCategoryX())
