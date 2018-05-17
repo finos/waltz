@@ -172,6 +172,7 @@
                author="davidwatkins73">
         <renameColumn tableName="measurable_category"
                       oldColumnName="rating_scheme_definition_id"
+                      columnDataType="${id.type}"
                       newColumnName="rating_scheme_id"/>
         <addColumn tableName="perspective_definition">
             <column name="rating_scheme_id"
