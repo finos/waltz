@@ -41,7 +41,9 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChange = c => {
-        vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase;
+        vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase
+            ? 'mouseenter'
+            : 'none';
     };
 }
 
