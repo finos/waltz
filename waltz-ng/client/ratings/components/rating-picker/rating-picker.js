@@ -53,7 +53,7 @@ function controller(serviceBroker) {
                     .chain(r.data.ratings)
                     .filter(d => d.userSelectable)
                     .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
-                    .orderBy(d => d.priority)
+                    .orderBy(d => d.position)
                     .value());
         }
         if (c.disabled) {
