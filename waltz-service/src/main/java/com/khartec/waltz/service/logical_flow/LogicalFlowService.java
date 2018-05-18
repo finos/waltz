@@ -72,7 +72,6 @@ public class LogicalFlowService {
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
-    private final PhysicalFlowDao physicalFlowDao;
 
     @Autowired
     public LogicalFlowService(ApplicationIdSelectorFactory appIdSelectorFactory,
@@ -81,8 +80,7 @@ public class LogicalFlowService {
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
-                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              PhysicalFlowDao physicalFlowDao) {
+                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory) {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
@@ -90,7 +88,6 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
-        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
 
         this.appIdSelectorFactory = appIdSelectorFactory;
         this.changeLogService = changeLogService;
@@ -99,7 +96,6 @@ public class LogicalFlowService {
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
-        this.physicalFlowDao = physicalFlowDao;
     }
 
 
@@ -321,10 +317,5 @@ public class LogicalFlowService {
         }
 
         return logicalFlowDao.findUpstreamFlowsForEntityReferences(references);
-    }
-
-
-    public boolean hasPhysicalFlows(long logicalFlowId) {
-        return physicalFlowDao.hasPhysicalFlows(logicalFlowId);
     }
 }

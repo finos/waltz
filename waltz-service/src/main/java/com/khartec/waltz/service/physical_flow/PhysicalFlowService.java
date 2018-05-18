@@ -156,7 +156,7 @@ public class PhysicalFlowService {
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
                 isSpecificationUnused = !physicalSpecificationDao.isUsed(physicalFlow.specificationId());
-                isLastPhysicalFlow = !logicalFlowService.hasPhysicalFlows(physicalFlow.logicalFlowId());
+                isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
         }
 
