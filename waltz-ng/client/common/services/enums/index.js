@@ -46,7 +46,7 @@ import {severity} from './severity';
 import {surveyInstanceStatus} from './survey-instance-status';
 import {surveyQuestionFieldType} from './survey-question-field-type';
 import {surveyRunStatus} from './survey-run-status';
-import {physicalSpecDefinitionFieldType} from './physical-spec-defn-field-type';
+import {fieldDataType} from './field-data-type';
 import {physicalSpecDefinitionType} from './physical-spec-definition-type';
 import {transportKind} from './transport-kind';
 
@@ -78,7 +78,7 @@ export const enums = {
     frequencyKind,
     dataFormatKind,
     lifecycleStatus,
-    physicalSpecDefinitionFieldType,
+    fieldDataType,
     physicalSpecDefinitionType,
     rag,
     relationshipKind,
