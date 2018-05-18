@@ -53,7 +53,8 @@
                 Overall Rating
             </div>
             <div class="col-sm-4">
-                <waltz-rating-indicator-cell rating="$ctrl.app.overallRating">
+                <waltz-rating-indicator-cell rating="$ctrl.app.overallRating | useDefaultRatingScheme:'investment' "
+                                             show-name="true">
                 </waltz-rating-indicator-cell>
             </div>
         </div>

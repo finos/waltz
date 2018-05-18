@@ -21,7 +21,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.measurable_rating.*;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.user.Role;
@@ -39,6 +38,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -142,7 +142,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         return ImmutableSaveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .measurableId(getLong(request, "measurableId"))
-                .rating(RagRating.valueOf(body.getOrDefault("rating", "Z")))
+                .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
                 .description(body.getOrDefault("description", ""))
                 .lastUpdate(LastUpdate.mkForUser(username))
                 .provenance("waltz")

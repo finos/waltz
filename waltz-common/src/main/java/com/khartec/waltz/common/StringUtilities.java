@@ -139,4 +139,10 @@ public class StringUtilities {
                 .toLowerCase()
                 .trim();
     }
+
+    public static char firstChar(String str, char dflt) {
+        return mkSafe(str).length() > 0
+                ? str.charAt(0)
+                : dflt;
+    }
 }
