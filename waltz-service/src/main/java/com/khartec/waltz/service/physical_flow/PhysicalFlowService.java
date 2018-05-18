@@ -143,6 +143,7 @@ public class PhysicalFlowService {
         CommandOutcome commandOutcome = CommandOutcome.SUCCESS;
         String responseMessage = null;
         boolean isSpecificationUnused = false;
+        boolean isLastPhysicalFlow = false;
 
         if (physicalFlow == null) {
             commandOutcome = CommandOutcome.FAILURE;
@@ -155,6 +156,7 @@ public class PhysicalFlowService {
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
                 isSpecificationUnused = !physicalSpecificationDao.isUsed(physicalFlow.specificationId());
+                isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
         }
 
@@ -192,6 +194,7 @@ public class PhysicalFlowService {
                 .outcome(commandOutcome)
                 .message(Optional.ofNullable(responseMessage))
                 .isSpecificationUnused(isSpecificationUnused)
+                .isLastPhysicalFlow(isLastPhysicalFlow)
                 .build();
     }
 

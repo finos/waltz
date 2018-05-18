@@ -30,4 +30,5 @@ import org.immutables.value.Value;
 public abstract class PhysicalFlowDeleteCommandResponse extends AbstractCommandResponse<PhysicalFlowDeleteCommand> {
 
     public abstract boolean isSpecificationUnused();
+    public abstract boolean isLastPhysicalFlow();
 }
