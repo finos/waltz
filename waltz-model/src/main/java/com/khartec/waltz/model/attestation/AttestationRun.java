@@ -27,10 +27,12 @@ import org.immutables.value.Value;
 import java.time.LocalDate;
 import java.util.Set;
 
+import static com.khartec.waltz.model.EntityReference.mkRef;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableAttestationRun.class)
 @JsonDeserialize(as = ImmutableAttestationRun.class)
-public abstract class AttestationRun implements IdProvider, NameProvider, DescriptionProvider {
+public abstract class AttestationRun implements IdProvider, NameProvider, DescriptionProvider, WaltzEntity {
 
     public abstract EntityKind targetEntityKind();
     public abstract IdSelectionOptions selectionOptions();
@@ -42,5 +44,13 @@ public abstract class AttestationRun implements IdProvider, NameProvider, Descri
     public LocalDate issuedOn() {
         return LocalDate.now();
     }
+
     public abstract LocalDate dueDate();
+
+
+    @Override
+    @Value.Default
+    public EntityReference entityReference() {
+        return mkRef(EntityKind.ATTESTATION_RUN, id().get());
+    }
 }

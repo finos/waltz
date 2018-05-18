@@ -33,16 +33,14 @@ import com.khartec.waltz.service.email.EmailService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -55,9 +53,6 @@ public class AttestationRunService {
     private final EmailService emailService;
     private final IdSelectorFactoryProvider idSelectorFactoryProvider;
     private final InvolvementDao involvementDao;
-
-    @Value("${waltz.base.url}")
-    private String baseUrl;
 
     @Autowired
     public AttestationRunService(AttestationInstanceDao attestationInstanceDao,
@@ -151,8 +146,7 @@ public class AttestationRunService {
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
 
-        // notify
-        sendAttestationNotification(command, instanceRecipients);
+        emailService.sendEmailNotification(mkRef(EntityKind.ATTESTATION_RUN, runId));
 
         return ImmutableIdCommandResponse.builder()
                 .id(runId)
@@ -240,34 +234,5 @@ public class AttestationRunService {
     }
 
 
-    private void sendAttestationNotification(AttestationRunCreateCommand attestationRunCreateCommand,
-                                             List<AttestationInstanceRecipient> instanceRecipients) {
-        final String MAIL_NEW_LINE = "<br/>";
-        final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
-
-        List<String> recipientEmails = instanceRecipients.stream()
-                .map(r -> r.userId())
-                .distinct()
-                .collect(toList());
-
-        List<String> applications = instanceRecipients.stream()
-                .map(r -> r.attestationInstance().parentEntity().name())
-                .filter(r -> r.isPresent())
-                .map(r -> r.get())
-                .distinct()
-                .collect(toList());
-
-        String subject = "Waltz attestation: " + attestationRunCreateCommand.name();
-
-        String attestationsUrl = baseUrl + "/attestation/instance/user";
-        String body = "You are required to attest correctness of the applications listed below:"
-                + MAIL_NEW_LINE + MAIL_NEW_LINE
-                + "<strong>Application(s):</strong> " + String.join(", ", applications) +  MAIL_NEW_LINE + MAIL_NEW_LINE
-                + "<strong>Due Date:</strong> " + attestationRunCreateCommand.dueDate().format(DATE_TIME_FORMATTER) +  MAIL_NEW_LINE +  MAIL_NEW_LINE
-                + attestationRunCreateCommand.description() +  MAIL_NEW_LINE +  MAIL_NEW_LINE
-                + "Please use this URL to view your pending attestations: " + attestationsUrl;
-
-        emailService.sendEmailNotification(subject, body, recipientEmails);
-    }
 
 }

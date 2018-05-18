@@ -78,7 +78,7 @@ public class DIConfiguration {
     @Value("${jooq.dialect}")
     private String dialect;
 
-    @Value("${smtpHost:localhost}")
+    @Value("${smtpHost:#{null}}")
     private String smtpHost;
 
     @Value("${smtpPort:25}")
@@ -149,9 +149,8 @@ public class DIConfiguration {
     }
 
 
-    /* Required for property interpolation to work correctly */
-
     /**
+     * Required for property interpolation to work correctly
      * @see <a href="http://stackoverflow.com/a/41760877/2311919">Explanation</a>
      */
     @Bean
@@ -164,6 +163,7 @@ public class DIConfiguration {
         return placeholderConfigurer;
     }
 
+
     @Bean
     @Autowired
     public PersonMaintenance personMaintenance(PersonHierarchyService personHierarchyService) {
@@ -173,11 +173,14 @@ public class DIConfiguration {
 
     @Bean
     public JavaMailSender mailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(smtpHost);
-        mailSender.setPort(smtpPort);
-
-        return mailSender;
+        if (smtpHost == null) {
+            return null;
+        } else {
+            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+            mailSender.setHost(smtpHost);
+            mailSender.setPort(smtpPort);
+            return mailSender;
+        }
     }
 
 }

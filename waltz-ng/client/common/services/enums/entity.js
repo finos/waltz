@@ -48,6 +48,13 @@ export const entity = {
         description: null,
         position: 65
     },
+    ATTESTATION_RUN: {
+        key: 'ATTESTATION_RUN',
+        name: 'Attestation Run',
+        icon: 'check-square-o',
+        description: null,
+        position: 67
+    },
     AUTHORITATIVE_SOURCE: {
         key: 'AUTHORITATIVE_SOURCE',
         name: 'Authoritative Source',
