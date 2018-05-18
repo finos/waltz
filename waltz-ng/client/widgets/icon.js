@@ -17,13 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@fortawesome/fontawesome-free/js/all'
-import {mkCurrentName, mkIconSetName} from './icon-utils';
-import {initialiseData} from "../common/index";
-
 const bindings = {
     name: '@',
-    iconSet: '@',
     size: '@',
     flip: '@',
     rotate: '@',
@@ -33,20 +28,16 @@ const bindings = {
     spin: '@'
 };
 
-const initialState = {
-    iconSet: 'fa'
-};
-
 
 const template = '<span style="font-size: smaller; opacity: 0.8;"><i ng-class="$ctrl.classNames"/></span>';
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    const vm = this;
     vm.$onChanges = () => {
         vm.classNames = [
-            mkIconSetName(vm.iconSet, vm.name),
-            mkCurrentName(vm.name),
+            'fa',
+            `fa-${vm.name}`,
             vm.flip ? `fa-flip-${vm.flip}` : '',
             vm.rotate ? `fa-rotate-${vm.rotate}` : '',
             vm.size ? `fa-${vm.size}` : '',
