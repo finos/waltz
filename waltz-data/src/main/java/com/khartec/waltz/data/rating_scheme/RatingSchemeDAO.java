@@ -19,7 +19,10 @@
 
 package com.khartec.waltz.data.rating_scheme;
 
-import com.khartec.waltz.model.rating.*;
+import com.khartec.waltz.model.rating.ImmutableRagName;
+import com.khartec.waltz.model.rating.ImmutableRatingScheme;
+import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import org.jooq.Condition;
@@ -36,6 +39,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
 import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 
@@ -47,7 +51,7 @@ public class RatingSchemeDAO {
                 .id(r.getId())
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
-                .rating(RagRating.valueOf(r.getCode())) //TODO: this needs to be any char
+                .rating(firstChar(r.getCode(), 'X'))
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())

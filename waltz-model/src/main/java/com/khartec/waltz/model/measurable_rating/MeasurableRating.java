@@ -25,7 +25,6 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdatedProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
-import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 
@@ -39,6 +38,6 @@ public abstract class MeasurableRating implements
 
     public abstract EntityReference entityReference();
     public abstract long measurableId();
-    public abstract RagRating rating();
+    public abstract char rating();
 
 }

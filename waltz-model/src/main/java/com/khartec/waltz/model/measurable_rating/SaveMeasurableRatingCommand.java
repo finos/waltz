@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
-import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -31,7 +30,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableSaveMeasurableRatingCommand.class)
 public abstract class SaveMeasurableRatingCommand extends MeasurableRatingCommand implements DescriptionProvider, ProvenanceProvider {
 
-    public abstract RagRating rating();
+    public abstract char rating();
 
 }
 

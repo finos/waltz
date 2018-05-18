@@ -39,7 +39,7 @@ const template = `<div class="row">
 
 const ratingColumn = {
     field: 'authSourceRating',
-    displayName: 'Source Rating',
+    displayName: 'Authoritativeness',
     cellTemplate: `<span>
                      <waltz-rating-indicator-cell rating="row.entity.ragRating"></waltz-rating-indicator-cell>
                      <span class="ui-grid-cell-contents">

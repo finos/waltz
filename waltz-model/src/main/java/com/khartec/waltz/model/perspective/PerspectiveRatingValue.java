@@ -21,7 +21,6 @@ package com.khartec.waltz.model.perspective;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -29,7 +28,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutablePerspectiveRatingValue.class)
 public abstract class PerspectiveRatingValue {
 
-    public abstract RagRating rating();
+    public abstract char rating();
     public abstract long measurableX();
     public abstract long measurableY();
 
