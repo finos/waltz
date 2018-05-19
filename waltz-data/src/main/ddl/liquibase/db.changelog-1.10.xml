@@ -105,7 +105,7 @@
                 from measurable_category mc
                 inner join rating_scheme rs on rs.name = mc.name)
                 UNION
-                (select rs.id, mc.rating_name_z, coalesce(mc.rating_desc_z, ''), 'Z', '#939393' , 10
+                (select rs.id, mc.rating_name_z, coalesce(mc.rating_desc_z, ''), 'Z', '#939393' , 40
                 from measurable_category mc
                 inner join rating_scheme rs on rs.name = mc.name)
                 UNION

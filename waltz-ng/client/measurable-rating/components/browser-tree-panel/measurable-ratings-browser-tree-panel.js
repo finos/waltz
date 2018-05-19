@@ -23,6 +23,7 @@ import {mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-ratings-browser-tree-panel.html";
+import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
 /**
  * @name waltz-measurable-ratings-browser-tree-panel
@@ -64,7 +65,7 @@ function prepareColumnDefs(measurableCategory) {
         {
             field: 'ratingName',
             name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating.rating" label="COL_FIELD.name"></waltz-rating-indicator-cell></div>'
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating" show-name="true"></waltz-rating-indicator-cell></div>'
         },
         {
             field: 'measurable.name',
@@ -90,7 +91,7 @@ function findChildIds(measurable) {
 
 
 function prepareTableData(measurable,
-                          ragNames = {},
+                          ratingScheme = {},
                           applications = [],
                           ratings = [],
                           measurablesById = {}) {
@@ -104,9 +105,8 @@ function prepareTableData(measurable,
         .map(r => {
             return {
                 application: appsById[r.entityReference.id],
-                rating: r,
-                measurable: measurablesById[r.measurableId],
-                ratingName: ragNames[r.rating]
+                rating: ratingScheme.ratingsByCode[r.rating],
+                measurable: measurablesById[r.measurableId]
             };
         })
         .value();
@@ -130,7 +130,10 @@ function loadMeasurableRatings(serviceBroker, selector, holder) {
 function loadMeasurables(serviceBroker, selector, holder) {
     return serviceBroker
         .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, [selector])
-        .then(r => holder.measurables = r.data);
+        .then(r => {
+            holder.measurables = r.data;
+            holder.measurablesById = _.keyBy(r.data, 'id');
+        });
 }
 
 
@@ -145,6 +148,13 @@ function loadApps(serviceBroker, selector, holder) {
     return serviceBroker
         .loadViewData(CORE_API.ApplicationStore.findBySelector, [selector])
         .then(r => holder.applications = r.data);
+}
+
+
+function loadRatingSchemes(serviceBroker, holder) {
+    return serviceBroker
+        .loadAppData(CORE_API.RatingSchemeStore.findAll)
+        .then(r => holder.ratingSchemesById = indexRatingSchemes(r.data));
 }
 
 
@@ -168,14 +178,13 @@ function controller($q, serviceBroker) {
             loadMeasurables(serviceBroker, vm.selector, vm),
             loadMeasurableCategories(serviceBroker, vm),
             loadApps(serviceBroker, vm.selector, vm),
+            loadRatingSchemes(serviceBroker, vm)
         ]);
     };
 
 
     vm.$onChanges = (c) => {
-        if (c.measurables) {
-            vm.measurablesById = _.keyBy(vm.measurables, 'id');
-        }
+
     };
 
 
@@ -185,13 +194,14 @@ function controller($q, serviceBroker) {
         vm.selectedMeasurable = measurable;
         const promise = loadRatingsDetail();
         const category = _.find(vm.measurableCategories, ({ id: measurable.categoryId }));
+        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
 
         vm.columnDefs = prepareColumnDefs(category);
         if (_.isFunction(_.get(promise, 'then'))) {
             promise
                 .then(ratings => vm.tableData = prepareTableData(
                     measurable,
-                    category.ragNames,
+                    ratingScheme,
                     vm.applications,
                     ratings,
                     vm.measurablesById))

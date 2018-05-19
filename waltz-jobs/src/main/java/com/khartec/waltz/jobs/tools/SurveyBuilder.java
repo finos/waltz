@@ -99,6 +99,7 @@ public class SurveyBuilder {
                         .fieldType(SurveyQuestionFieldType.BOOLEAN)
                         .questionText("Is the data provided by multiple systems?")
                         .isMandatory(false)
+                        .allowComment(true)
                         .surveyTemplateId(tId)
                         .sectionName(dt)
                         .build(),

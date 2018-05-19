@@ -25,7 +25,6 @@ import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.ImmutableMeasurableRatingTally;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
@@ -42,6 +41,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -57,7 +57,7 @@ public class MeasurableRatingDao {
                         r.getEntityId()))
                 .description(r.getDescription())
                 .provenance(r.getProvenance())
-                .rating(RagRating.valueOf(r.getRating()))
+                .rating(firstChar(r.getRating(), 'Z'))
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
@@ -67,12 +67,11 @@ public class MeasurableRatingDao {
 
     private static final RecordMapper<Record3<Long,String,Integer>, MeasurableRatingTally> TO_TALLY_MAPPER = record -> {
         Long measurableId = record.value1();
-        RagRating rating = RagRating.valueOf(record.value2());
         Integer count = record.value3();
 
         return ImmutableMeasurableRatingTally.builder()
                 .id(measurableId)
-                .rating(rating)
+                .rating(firstChar(record.value2(), 'Z'))
                 .count(count)
                 .build();
     };
@@ -82,7 +81,7 @@ public class MeasurableRatingDao {
         record.setEntityId(command.entityReference().id());
         record.setEntityKind(command.entityReference().kind().name());
         record.setMeasurableId(command.measurableId());
-        record.setRating(command.rating().name());
+        record.setRating(Character.toString(command.rating()));
         record.setDescription(command.description());
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
         record.setLastUpdatedBy(command.lastUpdate().by());

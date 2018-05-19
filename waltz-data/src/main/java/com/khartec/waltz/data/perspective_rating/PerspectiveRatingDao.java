@@ -26,7 +26,6 @@ import com.khartec.waltz.model.perspective.ImmutablePerspectiveRating;
 import com.khartec.waltz.model.perspective.ImmutablePerspectiveRatingValue;
 import com.khartec.waltz.model.perspective.PerspectiveRating;
 import com.khartec.waltz.model.perspective.PerspectiveRatingValue;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.PerspectiveRatingRecord;
 import org.jooq.Condition;
@@ -44,6 +43,7 @@ import java.util.Set;
 import static com.khartec.waltz.common.ArrayUtilities.sum;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.PerspectiveRating.PERSPECTIVE_RATING;
@@ -57,7 +57,7 @@ public class PerspectiveRatingDao {
         PerspectiveRatingValue rating = ImmutablePerspectiveRatingValue.builder()
                 .measurableX(r.getMeasurableX())
                 .measurableY(r.getMeasurableY())
-                .rating(RagRating.valueOf(r.getRating()))
+                .rating(firstChar(r.getRating(), 'Z'))
                 .build();
 
         return ImmutablePerspectiveRating.builder()
@@ -134,7 +134,7 @@ public class PerspectiveRatingDao {
             record.setEntityId(ref.id());
             record.setMeasurableX(item.measurableX());
             record.setMeasurableY(item.measurableY());
-            record.setRating(item.rating().name());
+            record.setRating(Character.toString(item.rating()));
             record.setLastUpdatedAt(Timestamp.valueOf(nowUtc()));
             record.setLastUpdatedBy(username);
             return record;

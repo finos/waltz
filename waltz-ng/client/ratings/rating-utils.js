@@ -40,21 +40,90 @@ export const baseRagNames = {
     'R': {
         rating: 'R',
         name: 'Poor',
+        position: 30,
+        color: '#DA524B'
     },
     'A': {
         rating: 'A',
-        name: 'Adequate'
+        name: 'Adequate',
+        position: 20,
+        color: '#D9923F'
     },
     'G': {
         rating: 'G',
-        name: 'Good'
+        name: 'Good',
+        position: 10,
+        color: '#5BB65D'
     },
     'Z': {
         rating: 'Z',
-        name: 'Unknown'
+        name: 'Unknown',
+        position: 40,
+        color: '#939393'
     },
     'X': {
         rating: 'X',
-        name: 'Not Applicable'
+        name: 'Not Applicable',
+        position: 50,
+        color: '#D1D1D1'
     }
 };
+
+
+export const investmentRagNames = {
+    'R': {
+        rating: 'R',
+        name: 'Disinvest',
+        position: 30,
+        color: '#DA524B'
+    },
+    'A': {
+        rating: 'A',
+        name: 'Maintain',
+        position: 20,
+        color: '#D9923F'
+    },
+    'G': {
+        rating: 'G',
+        name: 'Invest',
+        position: 10,
+        color: '#5BB65D'
+    },
+    'Z': {
+        rating: 'Z',
+        name: 'Unknown',
+        position: 40,
+        color: '#939393'
+    },
+    'X': {
+        rating: 'X',
+        name: 'Not Applicable',
+        position: 50,
+        color: '#D1D1D1'
+    }
+};
+
+
+const ragNameSchemes = {
+    base: baseRagNames,
+    investment: investmentRagNames
+};
+
+
+export function ragToRatingSchemeItem(code = 'Z', schemeName = 'base') {
+    const scheme = ragNameSchemes[schemeName] || baseRagNames;
+    return scheme[code] || scheme['Z'];
+}
+
+
+/**
+ * Given a flat list of rating schemes returns them indexed by their ids.  Also each scheme has
+ * an additional map giving 'ratingsByCode'.
+ * @param schemes
+ */
+export function indexRatingSchemes(schemes = []) {
+    return _.chain(schemes)
+        .map(scheme => Object.assign({}, scheme, { ratingsByCode: _.keyBy(scheme.ratings, 'rating')}))
+        .keyBy("id")
+        .value();
+}

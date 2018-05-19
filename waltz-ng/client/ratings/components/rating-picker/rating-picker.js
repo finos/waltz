@@ -50,10 +50,11 @@ function controller(serviceBroker) {
             serviceBroker
                 .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.schemeId])
                 .then(r => vm.options = _
-                        .chain(r.data.ratings)
-                        .filter(d => d.userSelectable)
-                        .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
-                        .value());
+                    .chain(r.data.ratings)
+                    .filter(d => d.userSelectable)
+                    .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
+                    .orderBy(d => d.position)
+                    .value());
         }
         if (c.disabled) {
             vm.pickerStyle = vm.disabled

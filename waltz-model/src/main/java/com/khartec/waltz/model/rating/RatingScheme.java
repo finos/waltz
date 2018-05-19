@@ -26,7 +26,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltR = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.R)
+            .rating('R')
             .name("dflt - Disinvest")
             .description("dflt - Disinvest")
             .color("#d62728")
@@ -36,7 +36,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltA = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.A)
+            .rating('A')
             .name("dflt - Maintain")
             .description("dflt - Maintain")
             .color("#ff7f0e")
@@ -46,7 +46,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltG = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.G)
+            .rating('G')
             .name("dflt - Invest")
             .description("dflt - Invest")
             .color("#2ca02c")
@@ -55,7 +55,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltT = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.F)
+            .rating('F')
             .name("dflt - Future")
             .description("dflt - Future")
             .color("#786aa5")
@@ -66,7 +66,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltZ = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.Z)
+            .rating('Z')
             .name("dflt - Unknown")
             .description("dflt - Unknown")
             .color("#28a1b6")
@@ -77,7 +77,7 @@ public abstract class RatingScheme implements
 
     private static final RagName dfltX = ImmutableRagName.builder()
             .ratingSchemeId(1)
-            .rating(RagRating.X)
+            .rating('X')
             .name("dflt - Not Applicable")
             .description("dflt - Not Applicable")
             .color("#eee")

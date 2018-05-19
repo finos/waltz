@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.model.rating;
 
+@Deprecated
 public enum RagRating {
 
     R, // Red

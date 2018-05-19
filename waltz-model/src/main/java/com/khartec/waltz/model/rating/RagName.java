@@ -37,7 +37,7 @@ public abstract class RagName implements
         DescriptionProvider,
         PositionProvider {
 
-    public abstract RagRating rating();
+    public abstract Character rating();
     public abstract String color();
     public abstract long ratingSchemeId();
 
