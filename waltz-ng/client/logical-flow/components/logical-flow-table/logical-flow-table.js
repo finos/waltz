@@ -83,7 +83,6 @@ function prepareGridData(flows = [], decorators = [], displayNameService, rating
         flow => _.map(groupedDecorators[flow.id],
             dc => Object.assign({
                 dataType: dc.dataType,
-                //authSourceRating: dc.authSourceRating,
                 rating: ratingSchemeItems[dc.authSourceRating]
             },
             flow)));
