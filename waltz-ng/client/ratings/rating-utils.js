@@ -127,3 +127,11 @@ export function indexRatingSchemes(schemes = []) {
         .keyBy("id")
         .value();
 }
+
+export function distinctRatingCodes(schemes = {}) {
+    return _.chain(schemes)
+        .flatMap((v,k) => v.ratings)
+        .map('rating')
+        .uniq()
+        .value();
+}
