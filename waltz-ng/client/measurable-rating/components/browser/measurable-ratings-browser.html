@@ -31,13 +31,14 @@
                               popover-trigger="mouseenter"
                               popover-append-to-body="true"
                               popover-placement="right"
+                              popover-popup-delay="300"
                               popover-enable="node.description.length > 0 || $ctrl.ratingsMap[node.id].compound.total > 0"
                               class="waltz-visibility-child-90"
                               ng-class="{ 'italics' : ! node.concrete }">
                         </span>
                         <waltz-rag-line class='waltz-visibility-child-50'
                                         scores="$ctrl.ratingsMap[node.id].compound"
-                                        rating-scheme="$ctrl.ratingSchemesById[tab.category.ratingSchemeId]"
+                                        rating-scheme-items="$ctrl.ratingSchemesById[tab.category.ratingSchemeId].ratings"
                                         style="padding: 0;"
                                         range="[0, $ctrl.maxTotal]">
                         </waltz-rag-line>
@@ -57,7 +58,7 @@
     <waltz-markdown text="node.description"></waltz-markdown>
     <hr>
     <div class="small">
-        <table class="table table-condensed table-striped small">
+        <table class="table table-condensed small">
             <thead>
             <tr>
                 <th>Rating</th>
@@ -80,7 +81,7 @@
             <tbody>
             <tr>
                 <td>
-                    <span>Total</span>
+                    <b>Total</b>
                 </td>
                 <td>
                     <span ng-bind="$ctrl.ratingsMap[node.id].compound.total"></span>

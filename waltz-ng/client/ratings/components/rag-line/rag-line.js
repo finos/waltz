@@ -25,7 +25,7 @@ import "d3-selection-multi";
 const bindings = {
     scores: '<',
     range: '<',
-    ratingScheme: '<'
+    ratingSchemeItems: '<'
 };
 
 
@@ -42,14 +42,14 @@ function controller($element) {
         .select('svg')
         .attrs({ width: `${width}px`, height: `${height}px` });
 
-    const update = (scores, range = [0, 0], ratingScheme) => {
+    const update = (scores, range = [0, 0], ratingSchemeItems) => {
         const xScale = scaleLinear()
             .domain([0, range[1]])
             .range([0, width]);
 
         let ptr = 0;
         const data = _
-            .chain(ratingScheme.ratings)
+            .chain(ratingSchemeItems)
             .filter(r => scores[r.rating] > 0)
             .map(r => {
                 const width = scores[r.rating];
@@ -77,8 +77,8 @@ function controller($element) {
 
 
     vm.$onChanges = () => {
-        if (vm.scores && vm.range, vm.ratingScheme) {
-            update(vm.scores, vm.range, vm.ratingScheme);
+        if (vm.scores && vm.range, vm.ratingSchemeItems) {
+            update(vm.scores, vm.range, vm.ratingSchemeItems);
         }
     };
 
