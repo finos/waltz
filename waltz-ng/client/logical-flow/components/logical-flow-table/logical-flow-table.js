@@ -38,17 +38,15 @@ const template = `<div class="row">
 
 
 const ratingColumn = {
-    field: 'authSourceRating',
+    field: 'rating',
     displayName: 'Authoritativeness',
     cellTemplate: `<span>
-                     <waltz-rating-indicator-cell rating="row.entity.ragRating"></waltz-rating-indicator-cell>
-                     <span class="ui-grid-cell-contents">
-                       <waltz-enum-value type="'AuthoritativenessRating'"
-                                         show-icon="false"
-                                         key="COL_FIELD">
-                       </waltz-enum-value>
-                     </span>
+                     <waltz-rating-indicator-cell rating="row.entity.rating" 
+                                                  show-name="true">
+                     </waltz-rating-indicator-cell>
                    </span>`,
+    sortingAlgorithm: (a, b) => a.name.localeCompare(b.name),
+    exportFormatter: (input) => input.name
 };
 
 
@@ -79,32 +77,48 @@ function groupDecoratorsByFlowId(decorators = [], displayNameService) {
 }
 
 
-function toRag(authRating) {
-    switch (authRating) {
-        case "PRIMARY":
-            return 'G';
-        case "SECONDARY":
-            return 'A';
-        case "DISCOURAGED":
-            return 'R';
-        case "NO_OPINION":
-            return 'Z';
-        default:
-            return ''
-    }
-}
-
-
-function prepareGridData(flows = [], decorators = [], displayNameService) {
+function prepareGridData(flows = [], decorators = [], displayNameService, ratingSchemeItems) {
     const groupedDecorators = groupDecoratorsByFlowId(decorators, displayNameService);
     return _.flatMap(flows,
         flow => _.map(groupedDecorators[flow.id],
             dc => Object.assign({
                 dataType: dc.dataType,
-                authSourceRating: dc.authSourceRating,
-                ragRating: toRag(dc.authSourceRating)
+                rating: ratingSchemeItems[dc.authSourceRating]
             },
             flow)));
+}
+
+
+function mkAuthoritativeRatingSchemeItems(displayNameService) {
+
+    const resolveName = k => displayNameService.lookup('AuthoritativenessRating', k);
+
+    return {
+        'DISCOURAGED': {
+            rating: 'R',
+            name: resolveName('DISCOURAGED'),
+            position: 30,
+            color: '#DA524B'
+        },
+        'SECONDARY': {
+            rating: 'A',
+            name: resolveName('SECONDARY'),
+            position: 20,
+            color: '#D9923F'
+        },
+        'PRIMARY': {
+            rating: 'G',
+            name: resolveName('PRIMARY'),
+            position: 10,
+            color: '#5BB65D'
+        },
+        'NO_OPINION': {
+            rating: 'Z',
+            name: resolveName('NO_OPINION'),
+            position: 40,
+            color: '#939393'
+        }
+    };
 }
 
 
@@ -112,7 +126,8 @@ function controller(displayNameService) {
     const vm = this;
 
     vm.$onChanges = () => {
-        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService);
+        const ratingScheme = mkAuthoritativeRatingSchemeItems(displayNameService);
+        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService, ratingScheme);
         vm.columnDefs = columnDefs;
         vm.gridData = gridData;
     };
@@ -120,7 +135,7 @@ function controller(displayNameService) {
 
 
 controller.$inject = [
-    'DisplayNameService',
+    'DisplayNameService'
 ];
 
 
