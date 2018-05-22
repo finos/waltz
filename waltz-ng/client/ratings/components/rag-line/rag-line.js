@@ -61,7 +61,7 @@ function controller($element) {
 
         const rects = svg
             .selectAll('rect')
-            .data(data);//, d => console.log({ data: data.length, d }) || d.rating);
+            .data(data, d => d.rating);
 
         const newRects = rects
             .enter()
