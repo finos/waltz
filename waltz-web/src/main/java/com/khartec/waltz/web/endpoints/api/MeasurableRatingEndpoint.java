@@ -34,8 +34,10 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
@@ -138,12 +140,17 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String username = getUsername(request);
 
         Map<String, String> body = readBody(request, Map.class);
+        String plannedDateString = body.get("plannedDate");
+        Optional<LocalDate> plannedDate = plannedDateString != null
+                ? Optional.of(LocalDate.parse(plannedDateString))
+                : Optional.empty();
 
         return ImmutableSaveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .measurableId(getLong(request, "measurableId"))
                 .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
                 .description(body.getOrDefault("description", ""))
+                .plannedDate(plannedDate)
                 .lastUpdate(LastUpdate.mkForUser(username))
                 .provenance("waltz")
                 .build();

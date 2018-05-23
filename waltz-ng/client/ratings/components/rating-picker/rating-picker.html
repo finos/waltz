@@ -13,7 +13,8 @@
                id="wrp-inp-{{ option.rating }}-{{ $id }}">
         <label for="wrp-inp-{{ option.rating }}-{{ $id }}"
                ng-style="{ 'background-color': option.color, color: option.foregroundColor }"
-               ng-bind="option.name">
+               ng-bind="option.name"
+               class="clickable">
         </label>
         <div class="small text-muted"
              ng-if="option.description"

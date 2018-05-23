@@ -25,12 +25,16 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableSaveMeasurableRatingCommand.class)
 @JsonDeserialize(as = ImmutableSaveMeasurableRatingCommand.class)
 public abstract class SaveMeasurableRatingCommand extends MeasurableRatingCommand implements DescriptionProvider, ProvenanceProvider {
 
     public abstract char rating();
+    public abstract Optional<LocalDate> plannedDate();
 
 }
 

@@ -41,9 +41,10 @@ public abstract class RagName implements
     public abstract String color();
     public abstract long ratingSchemeId();
 
+    public abstract boolean needsPlannedDate();
+
     @Value.Default
     public boolean userSelectable() {
         return true;
     }
-
 }

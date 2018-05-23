@@ -29,18 +29,48 @@
                         (more &raquo;)
                     </a>
                 </h4>
-                <waltz-markdown class="small"
-                                text="$ctrl.selected.measurable.description">
-                </waltz-markdown>
+
+                <div ng-if="$ctrl.selected.measurable.description">
+                    <waltz-markdown class="small"
+                                    text="$ctrl.selected.measurable.description">
+                    </waltz-markdown>
+                    <br>
+                </div>
+
                 <br>
+
                 <div>
-                    Rating: <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.selected.rating.rating]"
+                    <div class="row">
+                        <div class="col-sm-3 waltz-display-field-label">
+                            Rating
+                        </div>
+                        <div class="col-sm-9">
+                            <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.selected.rating.rating]"
                                                          show-name="true">
-                    </waltz-rating-indicator-cell>
-                    -
-                    <span class="small"
-                          ng-bind="$ctrl.selected.rating.description || 'No comment given'">
-                    </span>
+                            </waltz-rating-indicator-cell>
+                        </div>
+                    </div>
+                    <div class="row"
+                         ng-if="$ctrl.selected.rating.plannedDate">
+                        <div class="col-sm-3 waltz-display-field-label">
+                            Planned Date
+                        </div>
+                        <div class="col-sm-9">
+                            <span class="small"
+                                  ng-bind="$ctrl.selected.rating.plannedDate || 'No planned date'">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 waltz-display-field-label">
+                            Description
+                        </div>
+                        <div class="col-sm-9">
+                            <span class="small"
+                                  ng-bind="$ctrl.selected.rating.description || 'No comment given'">
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <div class="pull-right small">
                     <waltz-last-updated entity="$ctrl.selected.rating">

@@ -23,19 +23,18 @@
                    logicalFilePath="db.changelog-1.10.xml">
 
     <!-- 3112: SurveyInstance Approved status -->
-    <!-- TODO: re-enable for go-live
-        <changeSet id="20180502-3112-1"
-                   author="kamransaleem">
-            <comment>3112: SurveyInstance Approved status</comment>
-            <sql>
-                UPDATE survey_instance
-                SET status = 'APPROVED'
-                WHERE approved_by is not null
-                AND approved_at is not null
-                AND status = 'COMPLETED'
-            </sql>
-        </changeSet>
-    -->
+    <changeSet id="20180502-3112-1"
+               author="kamransaleem">
+        <comment>3112: SurveyInstance Approved status</comment>
+        <sql>
+            UPDATE survey_instance
+            SET status = 'APPROVED'
+            WHERE approved_by is not null
+            AND approved_at is not null
+            AND status = 'COMPLETED'
+        </sql>
+    </changeSet>
+
 
     <!-- 3144: SurveyInstance Approved status -->
     <changeSet id="20180514-3144-1"
