@@ -25,11 +25,9 @@ export default () => {
     const module = angular.module('waltz.ratings', []);
 
     module
-        .directive('waltzRagLine', require('./directives/rating-explorer/rag-line'));
-
-    module
         .component('waltzRatingPicker', require('./components/rating-picker/rating-picker'))
-        .component('waltzRatingIndicatorCell', require('./components/rating-indicator-cell/rating-indicator-cell'));
+        .component('waltzRatingIndicatorCell', require('./components/rating-indicator-cell/rating-indicator-cell'))
+        .component('waltzRagLine', require('./components/rag-line/rag-line'));
 
     registerStores(module, [ RatingSchemeStore ]);
 

@@ -34,8 +34,7 @@ import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.Tables.DATA_TYPE;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -137,7 +136,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                 .select(sourceOrgUnitNameField)
                 .select(targetOrgUnitNameField)
                 .select(DATA_TYPE.NAME)
-                .select(LOGICAL_FLOW_DECORATOR.RATING)
+                .select(ENUM_VALUE.DISPLAY_NAME)
                 .from(LOGICAL_FLOW)
                 .leftJoin(sourceAppFlows)
                     .on(sourceFlowId.eq(LOGICAL_FLOW.ID))
@@ -149,6 +148,9 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                 .join(DATA_TYPE)
                     .on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .join(ENUM_VALUE)
+                    .on(ENUM_VALUE.KEY.eq(LOGICAL_FLOW_DECORATOR.RATING)
+                            .and(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")))
                 .where(LOGICAL_FLOW.IS_REMOVED.isFalse())
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()))
@@ -163,7 +165,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                     "Target Asset Code",
                     "Target Org Unit",
                     "Data Type",
-                    "Source Rating");
+                    "Authoritativeness");
 
             data.forEach(r -> {
                 try {
@@ -175,7 +177,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                             r.get(targetAssetCodeField),
                             r.get(targetOrgUnitNameField),
                             r.get(DATA_TYPE.NAME),
-                            r.get(LOGICAL_FLOW_DECORATOR.RATING));
+                            r.get(ENUM_VALUE.DISPLAY_NAME));
                 } catch (IOException ioe) {
                     LOG.warn("Failed to write logical flow: " + r, ioe);
                 }

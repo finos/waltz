@@ -23,8 +23,10 @@
                         ( more &raquo; )
                     </a>
                 </h4>
-                <p class="small text-muted"
-                   ng-bind="$ctrl.selectedMeasurable.description"></p>
+                <p class="small text-muted">
+                    <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
+                </p>
+
                 <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
                                         searchPlaceholderText="Search"

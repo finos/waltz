@@ -28,20 +28,21 @@
                  order-by="'-name'"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions">
-            <span class="waltz-visibility-parent"
-                  uib-popover-template="'wdtt-popover.html'"
-                  popover-trigger="mouseenter"
-                  popover-popup-delay="300"
-                  popover-append-to-body="true">
+            <span class="waltz-visibility-parent">
 
-                <a ui-sref="main.data-type.view ({id: node.id })">
+                <a ui-sref="main.data-type.view ({id: node.id })"
+                   uib-popover-template="'wdtt-popover.html'"
+                   popover-trigger="mouseenter"
+                   popover-popup-delay="300"
+                   popover-append-to-body="true">
                     <strong ng-bind="node.name">
                     </strong>
                 </a>
                 <waltz-rag-line class='waltz-visibility-child-50'
-                                scores="node.cumulativeCounts"
-                                style="padding: 0;"
-                                range="[0, $ctrl.maxTotal]">
+                                 scores="node.cumulativeCounts"
+                                 rating-scheme-items="$ctrl.ratingSchemeItems"
+                                 style="padding-left: 20px;"
+                                 range="[0, $ctrl.maxTotal]">
                 </waltz-rag-line>
 
                 <div class="small" style="padding-left: 5em;" ng-hide="true">

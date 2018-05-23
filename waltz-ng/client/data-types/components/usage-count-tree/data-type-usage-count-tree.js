@@ -17,10 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
-import template from './data-type-usage-count-tree.html';
+import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
+import template from "./data-type-usage-count-tree.html";
+import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 
 const bindings = {
     onSelection: '<'
@@ -91,10 +92,13 @@ function prepareExpandedNodes(hierarchy = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller(displayNameService, serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => {
+
+        vm.ratingSchemeItems = mkAuthoritativeRatingSchemeItems(displayNameService);
+
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll, [])
             .then(r => {
@@ -133,6 +137,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
+    'DisplayNameService',
     'ServiceBroker'
 ];
 
