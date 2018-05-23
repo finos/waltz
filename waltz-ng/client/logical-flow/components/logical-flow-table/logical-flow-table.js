@@ -18,6 +18,7 @@
  */
 import _ from "lodash";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 
 
 const bindings = {
@@ -86,39 +87,6 @@ function prepareGridData(flows = [], decorators = [], displayNameService, rating
                 rating: ratingSchemeItems[dc.authSourceRating]
             },
             flow)));
-}
-
-
-function mkAuthoritativeRatingSchemeItems(displayNameService) {
-
-    const resolveName = k => displayNameService.lookup('AuthoritativenessRating', k);
-
-    return {
-        'DISCOURAGED': {
-            rating: 'R',
-            name: resolveName('DISCOURAGED'),
-            position: 30,
-            color: '#DA524B'
-        },
-        'SECONDARY': {
-            rating: 'A',
-            name: resolveName('SECONDARY'),
-            position: 20,
-            color: '#D9923F'
-        },
-        'PRIMARY': {
-            rating: 'G',
-            name: resolveName('PRIMARY'),
-            position: 10,
-            color: '#5BB65D'
-        },
-        'NO_OPINION': {
-            rating: 'Z',
-            name: resolveName('NO_OPINION'),
-            position: 40,
-            color: '#939393'
-        }
-    };
 }
 
 

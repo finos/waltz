@@ -168,6 +168,7 @@ public class JooqUtilities {
             List<String> wildcardTerms = terms
                     .stream()
                     .map(s -> "\"" + s + "*\"")
+                    .map(s -> s.replace('&', ' '))
                     .collect(Collectors.toList());
 
             return mkContains(wildcardTerms);

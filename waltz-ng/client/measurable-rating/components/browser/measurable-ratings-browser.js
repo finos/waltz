@@ -17,9 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {distinctRatingCodes, indexRatingSchemes} from "../../../ratings/rating-utils";
+import template from "./measurable-ratings-browser.html";
+
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -60,42 +64,17 @@ const initialState = {
 };
 
 
-const template = require('./measurable-ratings-browser.html');
-
-
-function mkEmptyRatingTally() {
-    return { R: 0, A: 0, G: 0, Z: 0, total: 0};
-}
-
-
-function addRatingTallies(r1 = mkEmptyRatingTally(),
-                    r2 = mkEmptyRatingTally()) {
-
-    return {
-        R: (r1.R || 0) + (r2.R || 0),
-        A: (r1.A || 0) + (r2.A || 0),
-        G: (r1.G || 0) + (r2.G || 0),
-        Z: (r1.Z || 0) + (r2.Z || 0),
-        total: (r1.total || 0) + (r2.total || 0)
-    };
+function combineRatingTallies(r1, r2) {
+    return _.mergeWith(
+        {}, r1, r2,
+        (v1, v2) => (v1 || 0) + (v2 || 0));
 }
 
 
 function toRatingsSummaryObj(ratings = []) {
-    const byRating = _.keyBy(ratings, 'rating');
-    const r = _.get(byRating, 'R.count', 0);
-    const a = _.get(byRating, 'A.count', 0);
-    const g = _.get(byRating, 'G.count', 0);
-    const z = _.get(byRating, 'Z.count', 0);
-    const total = r + a + g + z;
-
-    return {
-        R: r,
-        A: a,
-        G: g,
-        Z: z,
-        total
-    };
+    const counts = _.countBy(ratings, 'rating');
+    const total = _.sum(_.values(counts));
+    return Object.assign({}, counts, { total });
 }
 
 
@@ -104,11 +83,12 @@ function prepareTreeData(data = []) {
 }
 
 
-function prepareTabs(categories = [], measurables = []) {
-    const byCategory = _.groupBy(measurables, 'categoryId');
+function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) {
+    const measurablesByCategory = _.groupBy(measurables, 'categoryId');
 
     const tabs = _.map(categories, category => {
-        const treeData = prepareTreeData(byCategory[category.id]);
+        const measurablesForCategory = measurablesByCategory[category.id];
+        const treeData = prepareTreeData(measurablesForCategory);
         const maxSize = _.chain(treeData)
             .map('totalRatings.total')
             .max()
@@ -116,6 +96,7 @@ function prepareTabs(categories = [], measurables = []) {
 
         return {
             category,
+            ratingScheme: ratingSchemesById[category.ratingSchemeId],
             treeData,
             maxSize,
             expandedNodes: []
@@ -132,17 +113,18 @@ function findFirstNonEmptyTab(tabs = []) {
 }
 
 
-function initialiseRatingTalliesMap(ratingTallies, measurables) {
+function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
     const talliesById = _.groupBy(ratingTallies, 'id');
 
     const reducer = (acc, m) => {
-        const summaryObj = talliesById[m.id]
-            ? toRatingsSummaryObj(talliesById[m.id])
-            : mkEmptyRatingTally();
+        const talliesForMeasurable = talliesById[m.id];
+        const summaryObj = talliesForMeasurable
+            ? toRatingsSummaryObj(talliesForMeasurable)
+            : {};
 
         acc[m.id] = {
             direct: _.clone(summaryObj),
-            total: _.clone(summaryObj),
+            compound: _.clone(summaryObj),
         };
         return acc;
     };
@@ -154,14 +136,14 @@ function initialiseRatingTalliesMap(ratingTallies, measurables) {
 function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
     const measurablesById = _.keyBy(measurables, 'id');
     const talliesMap = initialiseRatingTalliesMap(ratingTallies, measurables);
-
     _.each(measurables, m => {
         const rs = talliesMap[m.id];
+
         while (m.parentId) {
             const parent = measurablesById[m.parentId];
             if (! parent) break;
             const parentRating = talliesMap[m.parentId];
-            parentRating.total = addRatingTallies(parentRating.total, rs.direct);
+            parentRating.compound = combineRatingTallies(parentRating.compound, rs.direct);
             m = parent;
         }
     });
@@ -170,34 +152,64 @@ function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
 }
 
 
-function controller() {
+function mkMeasurableToRatingSchemeMap(categories = [], measurables = [], ratingSchemesById = {}) {
+    const categoriesById = _.keyBy(categories, 'id');
+    return _.reduce(
+        measurables,
+        (acc, m) => {
+            const category = categoriesById[m.categoryId];
+            const ratingScheme = ratingSchemesById[category.ratingSchemeId];
+            acc[m.id] = ratingScheme;
+            return acc;
+        },
+        {});
+}
+
+
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (c) => {
-        if (vm.measurables && vm.ratingTallies && vm.categories) {
-            if (_.isEmpty(vm.measurables) || _.isEmpty(vm.ratingTallies)) {
-                return;
-            } else {
-                vm.tabs = prepareTabs(vm.categories, vm.measurables);
-                vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
-                vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
-                vm.maxTotal = _.max(
-                    _.map(
-                        _.values(vm.ratingsMap),
-                        r => _.get(r, 'total.total'), 0));
-            }
+    const prepareData = () => {
+        if (_.isEmpty(vm.measurables) ||
+            _.isEmpty(vm.ratingTallies) ||
+            _.isEmpty(vm.categories) ||
+            _.isEmpty(vm.ratingSchemesById)) {
+            return;
+        } else {
+            vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
+            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
+            vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
+            vm.maxTotal = _.max(
+                _.flatMap(
+                    _.values(vm.ratingsMap),
+                    r => _.get(r, 'compound.total', [0])));
         }
+    };
 
+    vm.$onInit = () => {
+        return serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => {
+                vm.ratingSchemesById = indexRatingSchemes(r.data);
+                vm.distinctRatingCodes = distinctRatingCodes(r.data);
+            })
+            .then(() => prepareData());
+    };
+
+    vm.$onChanges = (c) => {
         if (c.scrollHeight) {
             vm.containerClass = [
                 `waltz-scroll-region-${vm.scrollHeight}`
             ];
         }
+        prepareData();
     };
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    'ServiceBroker'
+];
 
 
 const component = {
