@@ -19,12 +19,13 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
+import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
-import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
-import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 
 const bindings = {
@@ -43,7 +44,10 @@ const initialState = {
     selected: null,
     measurables: [],
     categories: [],
+    plannedDateCache: {},
     ratings: [],
+    ratingSchemesById: {},
+    ratingItemsBySchemeIdByCode: {},
     tabs: [],
     saveInProgress: false,
     visibility: {
@@ -69,7 +73,10 @@ function controller($q,
 
         const ratingSchemePromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
+            .then(r => {
+                vm.ratingSchemesById = _.keyBy(r.data, 'id');
+                vm.ratingItemsBySchemeIdByCode = indexRatingSchemes(r.data || []);
+            });
 
         const categoryPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
@@ -112,21 +119,26 @@ function controller($q,
         ? vm.selected.rating.rating
         : null;
 
-    const doSave = (rating, description) => {
+    const getPlannedDate = () => vm.selected.rating
+        ? vm.selected.rating.plannedDate
+        : null;
+
+    const doSave = (rating, description, plannedDate) => {
         const saveFn = determineSaveFn(vm.selected, measurableRatingStore);
 
         const savePromise = saveFn(
             vm.parentEntityRef,
             vm.selected.measurable.id,
             rating,
-            description);
+            description,
+            plannedDate);
 
         return savePromise
             .then(rs => vm.ratings = rs)
             .then(() => vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings))
             .then(() => {
                 vm.saveInProgress = false;
-                const newRating = { rating, description };
+                const newRating = { rating, description, plannedDate };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             });
     };
@@ -152,6 +164,23 @@ function controller($q,
         vm.selected = {};
     };
 
+
+    // If the new rating is one that doesn't require a plan date, it should be set to null
+    // we persist the old one locally to allow easy retrieval
+    const resetPlannedDate = (ratingSchemeId, measurableId, oldRating, newRating) => {
+        if(getPlannedDate()) {
+            //cache existing date
+            _.set(vm.plannedDateCache, `${ratingSchemeId}.${measurableId}.${oldRating}`, getPlannedDate());
+        }
+
+        if (vm.getNeedsPlannedDate(ratingSchemeId, newRating)) {
+            return _.get(vm.plannedDateCache, `${ratingSchemeId}.${measurableId}.${newRating}`, null);
+        } else {
+            return null;
+        }
+    };
+
+
     vm.backUrl = $state
         .href(
             kindToViewState(vm.parentEntityRef.kind),
@@ -167,15 +196,16 @@ function controller($q,
         if (! vm.selected.measurable.concrete) return; // not concrete
         if (r === getRating()) return; // rating not changed
 
+        const plannedDate = resetPlannedDate(vm.selected.ratingScheme.id, vm.selected.measurable.id, getRating(), r);
         return r === 'X'
             ? doRemove()
                 .then(() => notification.success('Removed'))
-            : doSave(r, getDescription())
+            : doSave(r, getDescription(), plannedDate)
                 .then(() => notification.success('Saved'));
     };
 
     vm.onSaveComment = (comment) => {
-        return doSave(getRating(), comment)
+        return doSave(getRating(), comment, getPlannedDate())
             .then(() => notification.success('Saved Comment'))
     };
 
@@ -196,7 +226,20 @@ function controller($q,
             vm.doCancel);
     };
 
+    vm.getNeedsPlannedDate = (ratingSchemeId, ratingCode) => {
+        if(ratingSchemeId && ratingCode) {
+            return vm.ratingItemsBySchemeIdByCode[ratingSchemeId]
+                .ratingsByCode[ratingCode]
+                .needsPlannedDate;
+        }
+        return false;
+    };
 
+    vm.onUpdatePlannedDate = (itemId, data) => {
+        const newPlannedDate = timeFormat('%Y-%m-%d')(data.newVal);
+        return doSave(getRating(), getDescription(), newPlannedDate)
+            .then(() => notification.success('Saved Planned Date'))
+    };
 }
 
 

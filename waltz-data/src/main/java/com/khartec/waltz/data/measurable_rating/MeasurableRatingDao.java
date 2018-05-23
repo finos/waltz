@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
@@ -61,6 +62,7 @@ public class MeasurableRatingDao {
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
+                .plannedDate(toLocalDate(r.getPlannedDate()))
                 .build();
     };
 
@@ -83,6 +85,7 @@ public class MeasurableRatingDao {
         record.setMeasurableId(command.measurableId());
         record.setRating(Character.toString(command.rating()));
         record.setDescription(command.description());
+        record.setPlannedDate(command.plannedDate().map(t -> Timestamp.valueOf(t.atStartOfDay())).orElse(null));
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
         record.setLastUpdatedBy(command.lastUpdate().by());
         record.setProvenance(command.provenance());

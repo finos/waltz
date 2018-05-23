@@ -31,6 +31,7 @@ public abstract class RatingScheme implements
             .description("dflt - Disinvest")
             .color("#d62728")
             .position(10)
+            .needsPlannedDate(false)
             .build();
 
 
@@ -41,6 +42,7 @@ public abstract class RatingScheme implements
             .description("dflt - Maintain")
             .color("#ff7f0e")
             .position(20)
+            .needsPlannedDate(false)
             .build();
 
 
@@ -51,6 +53,7 @@ public abstract class RatingScheme implements
             .description("dflt - Invest")
             .color("#2ca02c")
             .position(30)
+            .needsPlannedDate(false)
             .build();
 
     private static final RagName dfltT = ImmutableRagName.builder()
@@ -60,6 +63,7 @@ public abstract class RatingScheme implements
             .description("dflt - Future")
             .color("#786aa5")
             .position(35)
+            .needsPlannedDate(true)
             .build();
 
 
@@ -72,6 +76,7 @@ public abstract class RatingScheme implements
             .color("#28a1b6")
             .userSelectable(false)
             .position(40)
+            .needsPlannedDate(false)
             .build();
 
 
@@ -82,6 +87,7 @@ public abstract class RatingScheme implements
             .description("dflt - Not Applicable")
             .color("#eee")
             .position(50)
+            .needsPlannedDate(false)
             .build();
 
 

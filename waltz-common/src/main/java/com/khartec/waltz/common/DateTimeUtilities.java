@@ -65,6 +65,15 @@ public class DateTimeUtilities {
     }
 
 
+    public static LocalDate toLocalDate(Timestamp timestamp) {
+        if (timestamp == null) {
+            return null;
+        }
+        LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
+        return localDate;
+    }
+
+
     public static LocalDateTime toLocalDateTime(Date date) {
         if (date == null) {
             return null;

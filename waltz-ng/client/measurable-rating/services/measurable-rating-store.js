@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { checkIsEntityRef, checkIsIdSelector } from '../../common/checks';
+import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
 
 
 function store($http, baseApiUrl) {
@@ -70,17 +70,17 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const create = (ref, measurableId, rating = 'Z', description = '') => {
+    const create = (ref, measurableId, rating = 'Z', description = '', plannedDate = null) => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
             .then(d => d.data);
     };
 
-    const update = (ref, measurableId, rating = 'Z', description = '') => {
+    const update = (ref, measurableId, rating = 'Z', description = '', plannedDate = null) => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
+            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
             .then(d => d.data);
     };
 
