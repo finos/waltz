@@ -116,8 +116,25 @@
                             <small class="text-muted">
                                 Note: the overall rating for this application is
                                 <span ng-bind="$ctrl.entityRating | toDisplayName:'investmentRating'">
-                                        </span>
+                                </span>
                             </small>
+                        </div>
+                    </div>
+
+
+                    <!-- PLANNED DATE -->
+                    <div class="row"
+                         ng-if="$ctrl.getNeedsPlannedDate($ctrl.selected.ratingScheme.id, $ctrl.selected.rating.rating)">
+                        <hr>
+                        <div class="col-sm-3">
+                            Planned Date:
+                        </div>
+                        <div class="col-sm-9">
+                            <waltz-editable-field on-save="$ctrl.onUpdatePlannedDate"
+                                                  field-type="date"
+                                                  date-format="dd MMM yyyy"
+                                                  initial-val="$ctrl.selected.rating.plannedDate">
+                            </waltz-editable-field>
                         </div>
                     </div>
 

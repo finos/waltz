@@ -63,5 +63,40 @@ Waltz provides sample files:
 Which you may copy and adapt to your environment.
 
 
+## Generating SQL of the changes:
 
+### Sample .bat file (MariaDB)
+```
+C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+--driver=org.mariadb.jdbc.Driver ^
+--classpath=<path to driver>/mariadb-java-client-1.4.6.jar ^
+--changeLogFile=<path to changelog master>/db.changelog-master.xml ^
+--url="jdbc:sqlserver://<host>:<port>;databaseName=<database>" ^
+--username=<user> ^
+--password=<password> ^
+updateSQL
+```
 
+### Sample .bat file (MSSQL)
+```
+C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+--driver=com.microsoft.sqlserver.jdbc.SQLServerDriver ^
+--classpath=<path to driver>/sqljdbc4-4.0.2206.100.jar ^
+--changeLogFile=<path to changelog master>/db.changelog-master.xml ^
+--url="jdbc:sqlserver://<host>:<port>;databaseName=<database>" ^
+--username=<user> ^
+--password=<password> ^
+updateSQL
+```
+
+### Sample .sh file (MariaDB)
+```
+#!/bin/sh
+~/dev/tools/liquibase/liquibase --driver=org.mariadb.jdbc.Driver \
+      --classpath=<path to driver>/mariadb-java-client/1.3.2/mariadb-java-client-1.3.2.jar \
+      --changeLogFile=<path to changelog master>/db.changelog-master.xml \
+      --url="jdbc:mysql://<hostname>:<port>/<database>" \
+      --username=<user> \
+      --password=<password> \
+      updateSQL
+```
