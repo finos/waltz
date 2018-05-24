@@ -19,10 +19,12 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 
-import surveyInstanceStore from './services/survey-instance-store';
-import surveyRunStore from './services/survey-run-store';
+import SurveyInstanceStore from "./services/survey-instance-store";
+import SurveyRunStore from "./services/survey-run-store";
+import SurveyTemplateStore from "./services/survey-template-store";
+import SurveyInstanceList from "./components/instance-list/survey-instance-list";
 
-import surveySection from './components/survey-section';
+import surveySection from "./components/survey-section";
 
 export default () => {
     const module = angular.module('waltz.survey', []);
@@ -41,14 +43,19 @@ export default () => {
         .component('waltzSurveyRunOverview', require('./components/survey-run-overview'))
         .component('waltzSurveyTemplateOverview', require('./components/survey-template-overview'));
 
-    registerStores(module, [
-        surveyInstanceStore,
-        surveyRunStore
-    ]);
 
     module
-        .service('SurveyTemplateStore', require('./services/survey-template-store'))
         .service('SurveyQuestionStore', require('./services/survey-question-store'));
+
+    registerStores(module, [
+        SurveyInstanceStore,
+        SurveyRunStore,
+        SurveyTemplateStore
+    ]);
+
+    registerComponents(module, [
+        SurveyInstanceList
+    ]);
 
     return module.name;
 };

@@ -33,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import java.util.List;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -70,6 +72,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
+        String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
         String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
@@ -146,6 +149,16 @@ public class SurveyRunEndpoint implements Endpoint {
                     newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
         };
 
+        DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
+
+            long runId = getId(request);
+            List<Long> personIds = readIdsFromBody(request);
+            return surveyRunService.createDirectSurveyInstances(
+                    runId,
+                    personIds);
+        };
+
         DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)
                 -> surveyRunService.getCompletionRate(getId(request));
 
@@ -157,6 +170,7 @@ public class SurveyRunEndpoint implements Endpoint {
         postForDatum(BASE_URL, surveyRunCreateRoute);
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
+        postForDatum(createSurveyInstancesPath, createSurveyInstancesRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
         putForDatum(updateSurveyRunDueDatePath, surveyRunUpdateDueDateRoute);
         getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);

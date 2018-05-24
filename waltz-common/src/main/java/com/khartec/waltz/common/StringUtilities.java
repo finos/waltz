@@ -111,12 +111,13 @@ public class StringUtilities {
 
 
     public static <T> List<T> splitThenMap(String str, String separator, Function<String, T> itemTransformer) {
-        if (str == null || separator == null) { return Collections.emptyList(); }
+        if (isEmpty(str) || isEmpty(separator)) { return Collections.emptyList(); }
         if (itemTransformer == null) {
             itemTransformer = s -> (T) s;
         }
 
-        return Arrays.stream(str.split(separator))
+        return Arrays
+                .stream(str.split(separator))
                 .map(itemTransformer)
                 .collect(toList());
     }
