@@ -246,6 +246,8 @@ export const dynamicSectionsByKind = {
         dynamicSections.technologySummarySection,
         dynamicSections.surveySection,
         dynamicSections.flowDiagramsSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.entityStatisticSummarySection,
         dynamicSections.changeLogSection
     ],
     'ORG_UNIT': [
