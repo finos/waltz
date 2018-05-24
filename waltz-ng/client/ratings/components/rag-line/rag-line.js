@@ -77,7 +77,7 @@ function controller($element) {
 
 
     vm.$onChanges = () => {
-        if (vm.scores && vm.range, vm.ratingSchemeItems) {
+        if (vm.scores && vm.range && vm.ratingSchemeItems) {
             update(vm.scores, vm.range, vm.ratingSchemeItems);
         }
     };
