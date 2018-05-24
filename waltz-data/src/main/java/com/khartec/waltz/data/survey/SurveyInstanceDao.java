@@ -19,9 +19,11 @@
 
 package com.khartec.waltz.data.survey;
 
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -262,5 +265,18 @@ public class SurveyInstanceDao {
                 .map(Record2::value2)
                 .orElse(0);
 
+    }
+
+    public int[] createInstanceRecipients(Long instanceId, Collection<Long> personIds) {
+        Collection<SurveyInstanceRecipientRecord> records = CollectionUtilities.map(
+                personIds,
+                p -> {
+                    SurveyInstanceRecipientRecord record = new SurveyInstanceRecipientRecord();
+                    record.setSurveyInstanceId(instanceId);
+                    record.setPersonId(p);
+                    return record;
+                });
+
+        return dsl.batchInsert(records).execute();
     }
 }

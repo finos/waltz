@@ -106,6 +106,13 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const createSurveyInstances = (surveyRunId, personIds = []) => {
+        return $http
+            .post(`${base}/${surveyRunId}/create-instances`, personIds)
+            .then(result => result.data);
+    };
+
+
     return {
         create,
         getById,
@@ -117,7 +124,8 @@ function store($http, baseApiUrl) {
         updateDueDate,
         generateSurveyRunRecipients,
         createSurveyRunInstancesAndRecipients,
-        getCompletionRate
+        getCompletionRate,
+        createSurveyInstances
     };
 }
 
@@ -186,6 +194,11 @@ export const SurveyRunStore_API = {
         serviceName,
         serviceFnName: 'getCompletionRate',
         description: 'get completion rate for a given survey run id'
+    },
+    createSurveyInstances: {
+        serviceName,
+        serviceFnName: 'createSurveyInstances',
+        description: 'create a survey instance for a given survey run and list of person ids'
     }
 };
 

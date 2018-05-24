@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.service.survey;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.IdSelectorFactoryProvider;
 import com.khartec.waltz.data.involvement.InvolvementDao;
@@ -315,6 +316,44 @@ public class SurveyRunService {
 
     public SurveyRunCompletionRate getCompletionRate(long surveyRunId) {
         return surveyInstanceDao.getCompletionRateForSurveyRun(surveyRunId);
+    }
+
+    public boolean createDirectSurveyInstances(long runId, List<Long> personIds) {
+        SurveyRun run = getById(runId);
+        EntityReference subjectRef = run.selectionOptions().entityReference();
+
+        switch (run.issuanceKind()) {
+            case INDIVIDUAL:
+                ListUtilities.map(personIds, p -> mkSurveyInstance(
+                        subjectRef,
+                        run,
+                        ListUtilities.newArrayList(p)));
+                return true;
+            case GROUP:
+                mkSurveyInstance(
+                        subjectRef,
+                        run,
+                        personIds);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private int[] mkSurveyInstance(EntityReference entityRef,
+                                   SurveyRun run,
+                                   List<Long> personIds) {
+        SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
+                .builder()
+                .dueDate(run.dueDate())
+                .entityReference(entityRef)
+                .surveyRunId(run.id().get())
+                .status(SurveyInstanceStatus.NOT_STARTED)
+                .build();
+        long instanceId = surveyInstanceDao.create(instanceCreateCommand);
+        return surveyInstanceDao.createInstanceRecipients(
+                instanceId,
+                personIds);
     }
 }
 
