@@ -96,9 +96,9 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
-    const addRecipient = (id, command) => {
+    const addRecipient = (surveyInstanceId, command) => {
         return $http
-            .post(`${base}/${id}/recipient`, command)
+            .post(`${base}/${surveyInstanceId}/recipient`, command)
             .then(result => result.data);
     };
 
