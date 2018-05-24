@@ -60,12 +60,14 @@ function prepareColumnDefs(measurableCategory) {
         mkLinkGridCell('Name', 'application.name', 'application.id', 'main.app.view'),
         {
             field: 'application.assetCode',
-            name: 'Asset Code'
+            name: 'Asset Code',
+            width: '10%'
         },
         {
-            field: 'ratingName',
+            field: 'rating.name',
             name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating" show-name="true"></waltz-rating-indicator-cell></div>'
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating" show-name="true"></waltz-rating-indicator-cell></div>',
+            width: '10%'
         },
         {
             field: 'measurable.name',
@@ -74,6 +76,12 @@ function prepareColumnDefs(measurableCategory) {
         {
             field: 'rating.description',
             name: 'Comment'
+        },
+        {
+            field: 'rating.plannedDate',
+            name: 'Planned Date',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+            width: '13%'
         }
     ];
 }
@@ -105,7 +113,10 @@ function prepareTableData(measurable,
         .map(r => {
             return {
                 application: appsById[r.entityReference.id],
-                rating: ratingScheme.ratingsByCode[r.rating],
+                rating: Object.assign(
+                    {},
+                    ratingScheme.ratingsByCode[r.rating],
+                    { plannedDate: r.plannedDate, description: r.description}),
                 measurable: measurablesById[r.measurableId]
             };
         })
@@ -210,6 +221,11 @@ function controller($q, serviceBroker) {
             log('was expecting promise, got: ', promise);
             vm.visibility.loading = false;
         }
+    };
+
+
+    vm.onGridInitialise = (e) => {
+        vm.exportGrid = () => e.exportFn(`${vm.selectedMeasurable.name} Ratings.csv`);
     };
 
 }
