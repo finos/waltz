@@ -27,6 +27,13 @@
                     <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
                 </p>
 
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.tableData"
+                                        searchPlaceholderText="Search"
+                                        exportFilename="ratings.csv"
+                                        on-initialise="$ctrl.onGridInitialise">
+                </waltz-grid-with-search>
+                
                 <div class="pull-right" style="margin-bottom: 4px">
                     <a class="clickable waltz-visibility-child-30"
                        ng-click="$ctrl.exportGrid()">
@@ -34,12 +41,6 @@
                         Export ratings
                     </a>
                 </div>
-                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                        entries="$ctrl.tableData"
-                                        searchPlaceholderText="Search"
-                                        exportFilename="ratings.csv"
-                                        on-initialise="$ctrl.onGridInitialise">
-                </waltz-grid-with-search>
             </div>
         </div>
     </div>
