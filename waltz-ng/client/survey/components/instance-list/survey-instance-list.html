@@ -32,11 +32,11 @@
             <tbody>
             <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
                 <td>
-                    <a ng-if="row.surveyInstance.status === 'COMPLETED'"
+                    <a ng-if="row.surveyInstance.status === 'COMPLETED' || row.surveyInstance.status === 'APPROVED'"
                        ng-bind="row.surveyRun.name"
                        class="clickable"
                        ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
-                    <a ng-if="row.surveyInstance.status !== 'COMPLETED'"
+                    <a ng-if="row.surveyInstance.status !== 'COMPLETED' && row.surveyInstance.status !== 'APPROVED'"
                        ng-bind="row.surveyRun.name"
                        class="clickable"
                        ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
