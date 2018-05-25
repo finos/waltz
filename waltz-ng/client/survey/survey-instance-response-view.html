@@ -188,7 +188,7 @@
 
 
     <waltz-section name="Survey Response"
-                   ng-if="ctrl.surveyInstance.status === 'COMPLETED'">
+                   ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
         <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
             <br ng-hide="$first">
 
