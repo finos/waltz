@@ -303,9 +303,9 @@
     </div>
 
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'COMPLETED'">
+         ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
         <h4>Survey Completed</h4>
-        <p>This survey response has been completed and is no longer can be edited. Please follow this <a ui-sref="main.survey.instance.view ({ id: ctrl.surveyInstance.id })">link</a> to view the responses.</p>
+        <p>This survey response has been completed and is no longer can be edited. Please follow this <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyInstance.id })">link</a> to view the responses.</p>
     </div>
 
     <div class="alert alert-warning"

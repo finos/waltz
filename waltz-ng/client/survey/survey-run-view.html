@@ -50,7 +50,7 @@
                 <td>
                     <a class='clickable'
                        ui-sref="main.survey.instance.response.view ({id: instance.id })"
-                       ng-if="instance.status === 'COMPLETED' || instance.status === 'EXPIRED'">
+                       ng-if="instance.status === 'COMPLETED' || instance.status === 'APPROVED' || instance.status === 'EXPIRED'">
                         view response
                     </a>
                     <a class='clickable'
