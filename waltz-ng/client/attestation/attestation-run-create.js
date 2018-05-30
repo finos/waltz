@@ -39,6 +39,7 @@ const initialState = {
         selectorEntityKind: 'APP_GROUP',
         selectorScope: 'EXACT'
     },
+    availableAttestedKinds: [ "LOGICAL_DATA_FLOW", "PHYSICAL_FLOW"],
     targetEntityKinds: [{
         name: 'Application',
         value: 'APPLICATION'
@@ -80,6 +81,7 @@ function mkCreateCommand(attestationRun){
             scope: attestationRun.selectorScope
         },
         targetEntityKind: attestationRun.targetEntityKind,
+        attestedKinds: attestationRun.attestedKinds,
         involvementKindIds: involvementKindIds,
         dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly)
     };

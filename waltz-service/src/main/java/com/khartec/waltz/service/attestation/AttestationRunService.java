@@ -35,11 +35,13 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -141,7 +143,7 @@ public class AttestationRunService {
         Long runId = attestationRunDao.create(userId, command);
 
         // generate instances and recipients
-        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(runId);
+        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(runId, command.attestedKinds());
 
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
@@ -154,7 +156,7 @@ public class AttestationRunService {
     }
 
 
-    private List<AttestationInstanceRecipient> generateAttestationInstanceRecipients(long attestationRunId) {
+    private List<AttestationInstanceRecipient> generateAttestationInstanceRecipients(long attestationRunId, Set<EntityKind> attestedKinds) {
         AttestationRun attestationRun = attestationRunDao.getById(attestationRunId);
         checkNotNull(attestationRun, "attestationRun " + attestationRunId + " not found");
 
@@ -166,7 +168,7 @@ public class AttestationRunService {
         return entityRefToPeople.entrySet()
                 .stream()
                 .flatMap(e -> e.getValue().stream()
-                                .flatMap(p -> mkInstanceRecipients(attestationRunId, e.getKey(), p.email())))
+                                .flatMap(p -> mkInstanceRecipients(attestationRunId, e.getKey(), p.email(), attestedKinds)))
                 .distinct()
                 .collect(toList());
     }
@@ -189,14 +191,9 @@ public class AttestationRunService {
     }
 
 
-    private Stream<AttestationInstanceRecipient> mkInstanceRecipients(long attestationRunId, EntityReference ref, String userId) {
+    private Stream<AttestationInstanceRecipient> mkInstanceRecipients(long attestationRunId, EntityReference ref, String userId, Set<EntityKind> childKinds) {
         switch (ref.kind()) {
             case APPLICATION:
-                ArrayList<EntityKind> childKinds = newArrayList(
-                        EntityKind.LOGICAL_DATA_FLOW,
-                        EntityKind.PHYSICAL_FLOW
-                );
-
                 return childKinds.stream()
                         .map(ck -> ImmutableAttestationInstanceRecipient.builder()
                                 .attestationInstance(ImmutableAttestationInstance.builder()
