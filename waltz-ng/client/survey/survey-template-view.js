@@ -82,13 +82,13 @@ function mkColumnDefs() {
         {
             field: 'issuedOn',
             name: 'Issued',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
             width: '10%'
         },
         {
             field: 'dueDate',
             name: 'Due',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
+            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
             width: '10%'
         },
         {
