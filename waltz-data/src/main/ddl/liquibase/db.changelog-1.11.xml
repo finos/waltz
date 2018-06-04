@@ -24,55 +24,64 @@
 
     <!-- 3184: Cleanup deprecated tables 1.5 and 1.6 -->
     <changeSet id="20180530-3184-1"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.5</comment>
         <dropTable tableName="data_type_15"/>
     </changeSet>
 
     <changeSet id="20180530-3184-2"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.5</comment>
         <dropTable tableName="data_type_usage_15"/>
     </changeSet>
 
     <changeSet id="20180530-3184-3"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.5</comment>
         <dropTable tableName="authoritative_source_15"/>
     </changeSet>
 
     <changeSet id="20180530-3184-4"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.5</comment>
         <dropTable tableName="logical_flow_decorator_15"/>
     </changeSet>
 
     <changeSet id="20180530-3184-5"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.5</comment>
         <dropTable tableName="physical_spec_data_type_15"/>
     </changeSet>
 
     <changeSet id="20180530-3184-6"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.6</comment>
         <dropTable tableName="app_capability_1_6"/>
     </changeSet>
 
     <changeSet id="20180530-3184-7"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.6</comment>
         <dropTable tableName="attestation_1_6"/>
     </changeSet>
 
     <changeSet id="20180530-3184-8"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.6</comment>
         <dropTable tableName="authoritative_source_16"/>
     </changeSet>
 
     <changeSet id="20180530-3184-9"
-               author="kamransaleem">
+               author="kamransaleem"
+               failOnError="false">
         <comment>3184: Cleanup deprecated tables 1.6</comment>
         <dropTable tableName="capability_1_6"/>
     </changeSet>
