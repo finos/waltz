@@ -1,11 +1,11 @@
 <div>
     <waltz-page-header icon="user"
-                       name="{{ ctrl.person.displayName }}"
+                       name="{{ ctrl.person.displayName || ctrl.userId}}"
                        small="profile">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Profile</li>
-            <li ng-bind="ctrl.person.displayName"></li>
+            <li ng-bind="ctrl.person.displayName || ctrl.userId"></li>
         </ol>
     </waltz-page-header>
 
@@ -13,140 +13,148 @@
         <div class="col-sm-12">
             <div class='waltz-page-summary-attach waltz-page-summary'
                            name="Summary">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <table class="table table-condensed">
-                            <thead>
-                            <tr>
-                                <th colspan="2">
-                                    Profile
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><strong>Name</strong></td>
-                                <td><span ng-bind="ctrl.person.displayName"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Email</strong></td>
-                                <td><span ng-bind="ctrl.person.email"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Phone</strong></td>
-                                <td><span ng-bind="ctrl.person.officePhone"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Employee Id</strong></td>
-                                <td><span ng-bind="ctrl.person.employeeId"></span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Person Page</strong></td>
-                                <td>
-                                    <a ui-sref="main.person.view ({ empId: ctrl.person.employeeId })">View</a>
-                                </td>
-                            </tr>
-                            </tbody>
 
-                        </table>
+                <div ng-if="ctrl.person">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        Profile
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><strong>Name</strong></td>
+                                    <td><span ng-bind="ctrl.person.displayName"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email</strong></td>
+                                    <td><span ng-bind="ctrl.person.email"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phone</strong></td>
+                                    <td><span ng-bind="ctrl.person.officePhone"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Employee Id</strong></td>
+                                    <td><span ng-bind="ctrl.person.employeeId"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Person Page</strong></td>
+                                    <td>
+                                        <a ui-sref="main.person.view ({ empId: ctrl.person.employeeId })">View</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                        <div class="col-sm-3">
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>Managers</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="manager in ctrl.managers">
+                                    <td>
+                                        <a ui-sref='main.profile.view ({userId: manager.userId})'
+                                           ng-bind="manager.displayName">
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-3"
+                             ng-if="ctrl.directs.length > 0">
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>Direct Reportees</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="direct in ctrl.directs">
+                                    <td>
+                                        <a ui-sref='main.profile.view ({userId: direct.userId})'
+                                           ng-bind="direct.displayName">
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="col-sm-3">
-                        <table class="table table-condensed">
-                            <thead>
-                            <tr>
-                                <th>Managers</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="manager in ctrl.managers">
-                                <td>
-                                    <a ui-sref='main.profile.view ({userId: manager.userId})'
-                                       ng-bind="manager.displayName">
-                                    </a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-sm-3"
-                         ng-if="ctrl.directs.length > 0">
-                        <table class="table table-condensed">
-                            <thead>
-                            <tr>
-                                <th>Direct Reportees</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="direct in ctrl.directs">
-                                <td>
-                                    <a ui-sref='main.profile.view ({userId: direct.userId})'
-                                       ng-bind="direct.displayName">
-                                    </a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+
+                    <div class="row" ng-if="ctrl.passwordResetEnabled">
+                        <hr>
+                        <div class="col-md-12">
+                            <div ng-if="!ctrl.passwordResetShowing">
+                                <button ng-click="ctrl.passwordResetShowing = true"
+                                        class="btn btn-xs btn-warning">
+                                    Reset password
+                                </button>
+                            </div>
+                            <div ng-if="ctrl.passwordResetShowing">
+                                <form novalidate
+                                      ng-submit="ctrl.resetPassword()">
+                                    <div class="form-group">
+                                        <label for="currentPassword">Current password</label>
+                                        <input ng-model="ctrl.resetForm.currentPassword"
+                                               id="currentPassword"
+                                               type="password"
+                                               name="currentPassword"
+                                               class="form-control"
+                                               placeholder="Enter current password"
+                                               autofocus="true"
+                                               autocomplete="off"
+                                               required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password1">Password</label>
+                                        <input ng-model="ctrl.resetForm.password1"
+                                               type="password"
+                                               id="password1"
+                                               name="password1"
+                                               class="form-control"
+                                               placeholder="Enter new password"
+                                               required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password2">Repeat Password</label>
+                                        <input ng-model="ctrl.resetForm.password2"
+                                               type="password"
+                                               id="password2"
+                                               name="password2"
+                                               class="form-control"
+                                               placeholder="enter password again"
+                                               required>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary">Reset password</button>
+                                        <a class="clickable" ng-click="ctrl.passwordResetShowing = false">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row" ng-if="ctrl.passwordResetEnabled">
-                    <hr>
-                    <div class="col-md-12">
-                        <div ng-if="!ctrl.passwordResetShowing">
-                            <button ng-click="ctrl.passwordResetShowing = true"
-                                    class="btn btn-xs btn-warning">
-                                Reset password
-                            </button>
-                        </div>
-                        <div ng-if="ctrl.passwordResetShowing">
-                            <form novalidate
-                                  ng-submit="ctrl.resetPassword()">
-                                <div class="form-group">
-                                    <label for="currentPassword">Current password</label>
-                                    <input ng-model="ctrl.resetForm.currentPassword"
-                                           id="currentPassword"
-                                           type="password"
-                                           name="currentPassword"
-                                           class="form-control"
-                                           placeholder="Enter current password"
-                                           autofocus="true"
-                                           autocomplete="off"
-                                           required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password1">Password</label>
-                                    <input ng-model="ctrl.resetForm.password1"
-                                           type="password"
-                                           id="password1"
-                                           name="password1"
-                                           class="form-control"
-                                           placeholder="Enter new password"
-                                           required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password2">Repeat Password</label>
-                                    <input ng-model="ctrl.resetForm.password2"
-                                           type="password"
-                                           id="password2"
-                                           name="password2"
-                                           class="form-control"
-                                           placeholder="enter password again"
-                                           required>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-primary">Reset password</button>
-                                    <a class="clickable" ng-click="ctrl.passwordResetShowing = false">Cancel</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                <waltz-no-data ng-if="!ctrl.person">
+                    <message>No profile information for this user</message>
+                </waltz-no-data>
 
             </div>
 
             <br>
 
-            <waltz-section name="Contribution Scores">
+            <waltz-section name="Contribution Scores"
+                           ng-if="ctrl.person">
                 <!-- User score -->
                 <div class="row">
                     <div class="col-sm-4">
@@ -219,7 +227,8 @@
                 </div>
             </waltz-section>
 
-            <waltz-section name="Permissions">
+            <waltz-section name="Permissions"
+                           ng-if="ctrl.person">
                 <div ng-if="ctrl.user.roles.length > 0">
                     This user has the following permissions:
                     <ul class="list-inline">
@@ -237,7 +246,8 @@
 
             <!-- CHANGE LOG -->
             <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
-                                           parent-entity-ref="ctrl.personRef">
+                                           parent-entity-ref="ctrl.personRef"
+                                           ng-if="ctrl.personRef">
             </waltz-dynamic-section-wrapper>
         </div>
     </div>

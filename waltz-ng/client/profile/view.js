@@ -76,7 +76,7 @@ function controller($q,
     const personPromise = personStore
         .findByUserId(userId)
         .then(p => vm.person = p)
-        .then(() => vm.personRef = { kind: 'PERSON', id: vm.person.id });
+        .then(() => vm.personRef = vm.person ? { kind: 'PERSON', id: vm.person.id } : null);
 
     personPromise
         .then(loadManagerAndDirects);
