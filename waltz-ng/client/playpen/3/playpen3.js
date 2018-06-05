@@ -17,16 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
 import {initialiseData} from "../../common/index";
-import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const initialState = {
     parentEntityRef: {
         id: 16,
         kind: 'FLOW_DIAGRAM'
-    }
+    },
+    time: new Date('2018-05-30'),
+    time1: new Date('2018-05-31'),
+    time2: new Date('2018-06-01'),
+    time3: new Date('2018-06-02'),
+    daysOnly: true
 };
 
 function controller($stateParams, serviceBroker) {

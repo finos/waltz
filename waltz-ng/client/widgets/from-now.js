@@ -49,8 +49,12 @@ function controller($scope) {
             ? formats.daysOnly
             : formats.daysAndMinutes;
 
+        const current = vm.daysOnly ? moment().startOf('day') : moment();
+
         vm.hoverValue = m.local().format(hoverFormat);
-        vm.fromNow = m.fromNow();
+        vm.fromNow = !vm.daysOnly
+            ? m.fromNow()
+            : Math.round(current.diff(m, 'days', true)) !== 0 ? m.from(current) : 'today';
     });
 }
 
