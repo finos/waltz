@@ -13,7 +13,8 @@
 
 
     <!-- SUMMARY -->
-    <waltz-person-summary parent-entity-ref='ctrl.entityRef'>
+    <waltz-person-summary parent-entity-ref="ctrl.entityRef"
+                          ng-if="ctrl.entityRef">
     </waltz-person-summary>
 
 
@@ -21,15 +22,21 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
                                           open-sections="ctrl.sections"
-                                          on-select="ctrl.addSection">
+                                          on-select="ctrl.addSection"
+                                          ng-if="ctrl.entityRef">
         </waltz-dynamic-section-navigation>
+
+        <waltz-no-data ng-if="!ctrl.entityRef">
+            <message>No information for this person</message>
+        </waltz-no-data>
     </div>
 
     <br>
 
     <waltz-dynamic-sections-view sections="ctrl.sections"
                                  parent-entity-ref="ctrl.entityRef"
-                                 on-remove="ctrl.removeSection">
+                                 on-remove="ctrl.removeSection"
+                                 ng-if="ctrl.entityRef">
     </waltz-dynamic-sections-view>
 
 </div>
