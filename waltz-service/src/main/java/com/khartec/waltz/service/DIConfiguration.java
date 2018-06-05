@@ -39,7 +39,11 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jndi.JndiPropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.sql.DataSource;
 
@@ -51,7 +55,7 @@ import javax.sql.DataSource;
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = false)
-public class DIConfiguration {
+public class DIConfiguration implements SchedulingConfigurer {
 
     // -- DATABASE ---
 
@@ -183,4 +187,17 @@ public class DIConfiguration {
         }
     }
 
+
+    @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setDaemon(true);
+        return scheduler;
+    }
+
+
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
+        scheduledTaskRegistrar.setTaskScheduler(taskScheduler());
+    }
 }

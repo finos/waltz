@@ -64,13 +64,14 @@ public class FlowSummaryExport {
             fw.write("\n");
         });
 
-        fw.write("Source\tSource code\tTarget\tTarget code\tData Type\tAuthoritative\tLDE\tOLA\n");
+        fw.write("Source\tSource code\tTarget\tTarget code\tData Type\tData Type Code\tAuthoritative\tLDE\tOLA\n");
 
         dsl.select(src.NAME,
                     src.ASSET_CODE,
                     trg.NAME,
                     trg.ASSET_CODE,
                     dt.NAME,
+                    dt.CODE,
                     dec.RATING,
                     logFlow.ID)
                 .from(logFlow)
@@ -92,6 +93,7 @@ public class FlowSummaryExport {
                             r.get(trg.NAME),
                             r.get(trg.ASSET_CODE),
                             r.get(dt.NAME),
+                            r.get(dt.CODE),
                             authRatingToStr(r.get(dec.RATING)),
                             logicalFlowsWithLDEs.contains(logicalFlowId) ? 1 : 0,
                             logicalFlowsWithOLAs.contains(logicalFlowId) ? 1 : 0);
