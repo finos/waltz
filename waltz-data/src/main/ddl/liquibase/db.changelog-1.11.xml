@@ -86,4 +86,13 @@
         <dropTable tableName="capability_1_6"/>
     </changeSet>
 
+
+    <!-- 3166: measurable_rating.planned_date from datetime to date -->
+    <changeSet id="20180606-3166-1"
+               author="kamransaleem">
+        <modifyDataType tableName="measurable_rating"
+                        columnName="planned_date"
+                        newDataType="DATE"/>
+    </changeSet>
+
 </databaseChangeLog>
