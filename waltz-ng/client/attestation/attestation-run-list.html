@@ -75,10 +75,15 @@
                         </div>
                     </td>
                     <td><span ng-bind="r.issuedBy"></span></td>
-                    <td><waltz-from-now timestamp="r.issuedOn"></waltz-from-now></td>
+                    <td>
+                        <waltz-from-now timestamp="r.issuedOn"
+                                        days-only="true">
+                        </waltz-from-now>
+                    </td>
                     <td ng-class="{'text-danger': ctrl.isOverdue(r)}">
                         <waltz-from-now ng-if='r.dueDate'
-                                        timestamp="r.dueDate">
+                                        timestamp="r.dueDate"
+                                        days-only="true">
                         </waltz-from-now>
                     </td>
                 </tr>

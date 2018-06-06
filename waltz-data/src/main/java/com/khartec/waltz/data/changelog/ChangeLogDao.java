@@ -48,7 +48,7 @@ public class ChangeLogDao {
 
     private final DSLContext dsl;
 
-    private RecordMapper<? super Record, ChangeLog> mapper = r -> {
+    public static final RecordMapper<? super Record, ChangeLog> TO_DOMAIN_MAPPER = r -> {
         ChangeLogRecord record = r.into(ChangeLogRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -85,7 +85,7 @@ public class ChangeLogDao {
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()))
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
-                .fetch(mapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -99,7 +99,7 @@ public class ChangeLogDao {
                 .where(PERSON.ID.eq(ref.id()))
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
-                .fetch(mapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -112,7 +112,7 @@ public class ChangeLogDao {
                 .where(CHANGE_LOG.USER_ID.equalIgnoreCase(userName))
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
-                .fetch(mapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 

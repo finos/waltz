@@ -32,11 +32,13 @@ function controller(person,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
-    vm.person = person;
-
-    vm.entityRef = toEntityRef(person, 'PERSON');
 
     vm.$onInit = () => {
+        if (!person) {
+            return;
+        }
+        vm.person = person;
+        vm.entityRef = toEntityRef(person, 'PERSON');
         vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('PERSON');
         vm.sections = dynamicSectionManager.findUserSectionsForKind('PERSON');
         historyStore.put(
