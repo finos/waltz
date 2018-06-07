@@ -70,19 +70,19 @@ function mkCommonColumnDefs() {
             field: 'surveyInstance.status',
             name: 'Status',
             cellFilter: "toDisplayName:'surveyInstanceStatus'",
-            width: '7%'
+            width: '10%'
         },
         {
             field: 'surveyRun.issuedOn',
             name: 'Issued',
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
-            width: '7%'
+            width: '10%'
         },
         {
             field: 'surveyInstance.dueDate',
             name: 'Due',
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
-            width: '7%'
+            width: '10%'
         },
     ];
 }
