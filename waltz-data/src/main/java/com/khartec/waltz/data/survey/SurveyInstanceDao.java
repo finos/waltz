@@ -41,6 +41,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
+import static com.khartec.waltz.data.ExternalIdUtilities.mkExternalIdField;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
 import static java.util.Optional.ofNullable;
@@ -54,6 +55,12 @@ public class SurveyInstanceDao {
                 newArrayList(EntityKind.values()))
             .as("entity_name");
 
+    private static final Field<String> EXTERNAL_ID_FIELD = mkExternalIdField(
+            SURVEY_INSTANCE.ENTITY_ID,
+            SURVEY_INSTANCE.ENTITY_KIND,
+            newArrayList(EntityKind.values()))
+            .as("external_id");
+
 
     private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull();
 
@@ -66,6 +73,7 @@ public class SurveyInstanceDao {
                         EntityKind.valueOf(record.getEntityKind()),
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
+                .surveyEntityExternalId(r.getValue(EXTERNAL_ID_FIELD))
                 .status(SurveyInstanceStatus.valueOf(record.getStatus()))
                 .dueDate(record.getDueDate().toLocalDate())
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
@@ -90,6 +98,7 @@ public class SurveyInstanceDao {
     public SurveyInstance getById(long id) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -99,6 +108,7 @@ public class SurveyInstanceDao {
     public List<SurveyInstance> findForRecipient(long personId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
@@ -111,6 +121,7 @@ public class SurveyInstanceDao {
     public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
@@ -225,6 +236,7 @@ public class SurveyInstanceDao {
     public List<SurveyInstance> findBySurveyInstanceIdSelector(Select<Record1<Long>> selector) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ID.in(selector))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
@@ -235,6 +247,7 @@ public class SurveyInstanceDao {
     public List<SurveyInstance> findPreviousVersionsForInstance(long instanceId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(instanceId))
                 .fetch(TO_DOMAIN_MAPPER);
