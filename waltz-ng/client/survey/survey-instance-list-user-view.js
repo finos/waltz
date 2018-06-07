@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../common/index";
-import {mkLinkGridCell} from "../common/grid-utils";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
 
 import template from "./survey-instance-list-user-view.html";
 
@@ -60,30 +60,29 @@ function mkCommonColumnDefs() {
             name: 'ID',
             width: '5%'
         },
+        mkEntityLinkGridCell('Subject', 'surveyInstance.surveyEntity'),
         {
-            field: 'surveyInstance.surveyEntity.kind',
-            name: 'Subject Kind',
-            cellFilter: "toDisplayName:'entity'"
-        },
-        {
-            field: 'surveyInstance.surveyEntity.name',
-            name: 'Subject',
-            width: '25%'
+            field: 'surveyInstance.surveyEntityExternalId',
+            name: 'Subject External Id',
+            width: '10%'
         },
         {
             field: 'surveyInstance.status',
             name: 'Status',
             cellFilter: "toDisplayName:'surveyInstanceStatus'",
+            width: '7%'
         },
         {
             field: 'surveyRun.issuedOn',
             name: 'Issued',
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
+            width: '7%'
         },
         {
             field: 'surveyInstance.dueDate',
             name: 'Due',
             cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
+            width: '7%'
         },
     ];
 }
