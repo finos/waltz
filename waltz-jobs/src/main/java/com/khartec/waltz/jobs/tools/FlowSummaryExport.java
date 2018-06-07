@@ -83,6 +83,9 @@ public class FlowSummaryExport {
                     .on(logFlow.SOURCE_ENTITY_ID.eq(src.ID))
                 .innerJoin(trg)
                     .on(logFlow.TARGET_ENTITY_ID.eq(trg.ID))
+                .where(logFlow.IS_REMOVED.isFalse()
+                    .and(src.IS_REMOVED.isFalse())
+                    .and(trg.IS_REMOVED.isFalse()))
                 .fetch()
                 .stream()
                 .map(r -> {

@@ -22,6 +22,7 @@ package com.khartec.waltz.service.authoritative_source;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
+import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
@@ -36,6 +37,7 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -73,6 +75,7 @@ public class AuthoritativeSourceService {
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
     private final ChangeLogService changeLogService;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
 
     @Autowired
@@ -84,7 +87,8 @@ public class AuthoritativeSourceService {
                                       ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                       DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                                       OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory,
-                                      ChangeLogService changeLogService) {
+                                      ChangeLogService changeLogService, 
+                                      LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
@@ -94,6 +98,7 @@ public class AuthoritativeSourceService {
         checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(organisationalUnitIdSelectorFactory, "organisationalUnitIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
         this.authoritativeSourceDao = authoritativeSourceDao;
         this.dataTypeDao = dataTypeDao;
@@ -104,6 +109,7 @@ public class AuthoritativeSourceService {
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.organisationalUnitIdSelectorFactory = organisationalUnitIdSelectorFactory;
         this.changeLogService = changeLogService;
+        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
 
@@ -160,6 +166,7 @@ public class AuthoritativeSourceService {
 
 
     public boolean recalculateAllFlowRatings() {
+        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
         findAll()
                 .forEach(authSource -> ratingCalculator.update(
                         authSource.dataType(),

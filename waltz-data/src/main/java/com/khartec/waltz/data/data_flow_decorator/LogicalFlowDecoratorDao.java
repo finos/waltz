@@ -23,11 +23,11 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -43,9 +43,8 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.TO_DOMAIN_MAPPER;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toList;
 
 
@@ -301,5 +300,14 @@ public class LogicalFlowDecoratorDao {
                             .count(count)
                             .build();
                 });
+    }
+
+
+    public int updateRatingsByCondition(AuthoritativenessRating rating, Condition condition) {
+        return dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.name())
+                .where(condition)
+                .execute();
     }
 }
