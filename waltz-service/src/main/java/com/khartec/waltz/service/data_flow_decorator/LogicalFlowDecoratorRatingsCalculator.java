@@ -39,18 +39,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.filter;
 import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class LogicalFlowDecoratorRatingsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorRatingsCalculator.class);
+    private static final Predicate<LogicalFlow> IS_APP_TO_APP_FLOW = f ->
+                f.target().kind() == EntityKind.APPLICATION &&
+                f.source().kind() == EntityKind.APPLICATION;
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
@@ -77,23 +81,23 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
     public Collection<LogicalFlowDecorator> calculate(Collection<LogicalFlowDecorator> decorators) {
 
-        List<LogicalFlow> flows = loadFlows(decorators)
-                .stream()
-                .filter(f -> f.target().kind() == EntityKind.APPLICATION && f.source().kind() == EntityKind.APPLICATION)
-                .collect(toList());
-        
-        if (isEmpty(flows)) return Collections.emptyList();
+        List<LogicalFlow> appToAppFlows = filter(
+                IS_APP_TO_APP_FLOW,
+                loadFlows(decorators));
 
-        List<Application> targetApps = loadTargetApplications(flows);
+        if (isEmpty(appToAppFlows)) return Collections.emptyList();
+
+        List<Application> targetApps = loadTargetApplications(appToAppFlows);
         List<DataType> dataTypes = dataTypeDao.getAll();
 
         Map<Long, DataType> typesById = indexById(dataTypes);
-        Map<Long, LogicalFlow> flowsById = indexById(flows);
+        Map<Long, LogicalFlow> flowsById = indexById(appToAppFlows);
         Map<Long, Application> targetAppsById = indexById(targetApps);
 
         AuthoritativeSourceResolver resolver = createResolver(targetApps);
 
         return decorators.stream()
+                .filter(d -> flowsById.containsKey(d.dataFlowId()))
                 .map(decorator -> {
                     try {
                         if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {

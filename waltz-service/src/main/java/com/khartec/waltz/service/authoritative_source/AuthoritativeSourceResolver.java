@@ -50,14 +50,14 @@ public class AuthoritativeSourceResolver {
 
         byOuThenDataTypeThenApp =
                 groupAndThen(
-                    as -> as.vantagePoint(),
-                        byOus -> groupAndThen(
-                                byOu -> byOu.dataTypeCode(),
-                                byDts -> groupAndThen(
-                                        dt -> dt.applicationId(),
-                                        a -> getBestRanked(a),
-                                        byDts),
-                                byOus),
+                    authRatingVantagePoint -> authRatingVantagePoint.vantagePoint(),
+                    byOus -> groupAndThen(
+                            byOu -> byOu.dataTypeCode(),
+                            byDts -> groupAndThen(
+                                    dt -> dt.applicationId(),
+                                    a -> getBestRanked(a),
+                                    byDts),
+                            byOus),
                     authoritativeRatingVantagePoints);
     }
 
