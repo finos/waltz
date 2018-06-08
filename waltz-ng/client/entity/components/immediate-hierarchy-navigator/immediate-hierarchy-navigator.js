@@ -30,11 +30,11 @@ const initialState = {
     children: []
 };
 
-function controller($state) {
+function controller() {
     const vm = initialiseData(this, initialState);
 }
 
-controller.$inject = ['$state'];
+controller.$inject = [];
 
 const component = {
     template,
