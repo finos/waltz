@@ -46,10 +46,3 @@ export function orgUnitsResolver(orgUnitStore) {
 }
 
 orgUnitsResolver.$inject = ['OrgUnitStore'];
-
-
-export function orgUnitViewDataResolver(viewSvc, params) {
-    return viewSvc.loadAll(params.id);
-}
-
-orgUnitViewDataResolver.$inject = ['OrgUnitViewDataService', '$stateParams'];

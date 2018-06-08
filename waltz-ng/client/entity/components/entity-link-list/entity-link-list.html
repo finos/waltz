@@ -1,0 +1,51 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~  Copyright (C) 2016, 2017 Waltz open source project
+  ~  See README.md for more information
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU Lesser General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU Lesser General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div ng-class="{'waltz-scroll-region-200': $ctrl.list.length > 10}"
+     ng-style="{'width': $ctrl.list.length > 10 ? '85%' : '100%'}">
+    <ul class="list-unstyled"
+        ng-if="$ctrl.list.length > 0">
+        <li ng-repeat="item in $ctrl.list">
+            <span style="display: inline-block"
+                  uib-popover-template="'well/popup.html'"
+                  popover-append-to-body="true"
+                  popover-placement="right"
+                  popover-trigger="mouseenter click"
+                  popover-enable="item.description"
+                  popover-popup-delay="200">
+                <waltz-entity-link entity-ref="item">
+                </waltz-entity-link>
+            </span>
+        </li>
+    </ul>
+    <i ng-if="$ctrl.list.length == 0">
+        -
+    </i>
+</div>
+
+
+
+
+<!-- DESCRIPTION POPUP -->
+<script type="text/ng-template"
+        id="well/popup.html">
+    <div class="small">
+        <waltz-markdown text="item.description"></waltz-markdown>
+    </div>
+</script>

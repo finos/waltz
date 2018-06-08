@@ -17,9 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common/index";
+import {initialiseData} from "../../../common/index";
 
 import template from "./unit-view.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
@@ -47,41 +48,25 @@ function initTour(tourService, holder = {}) {
 
 function controller($stateParams,
                     dynamicSectionManager,
-                    viewDataService,
                     historyStore,
+                    serviceBroker,
                     tourService) {
 
     const vm = initialiseData(this, initialState);
 
-    const id = $stateParams.id;
-
-    vm.parentEntityRef = { kind: 'ORG_UNIT', id };
-    vm.viewData = viewDataService.data;
-    vm.selector =  {
-        entityReference: vm.parentEntityRef,
-        scope: 'CHILDREN'
-    };
-
     vm.$onInit = () => {
+        const id = $stateParams.id;
+        vm.parentEntityRef = { kind: "ORG_UNIT", id };
+
+
         vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('ORG_UNIT');
         vm.sections = dynamicSectionManager.findUserSectionsForKind('ORG_UNIT');
-        viewDataService
-            .loadAll(id)
-            .then(() => addToHistory(historyStore, vm.viewData.orgUnit))
+        serviceBroker
+            .loadViewData(CORE_API.OrgUnitStore.getById, [ id ])
+            .then(r => vm.orgUnit = r.data)
+            .then(() => addToHistory(historyStore, vm.orgUnit))
             .then(() => initTour(tourService, vm))
-            .then(() => vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, {name: vm.viewData.orgUnit.name}));
     };
-
-
-
-    // -- INTERACTIONS ---
-    vm.loadFlowDetail = () => viewDataService
-        .loadFlowDetail()
-        .then(flowData => vm.viewData.dataFlows = flowData);
-
-    vm.loadOrgUnitDescendants = (id) => viewDataService
-        .loadOrgUnitDescendants(id)
-        .then(descendants => vm.viewData.orgUnitDescendants = descendants);
 
 
     // -- DYNAMIC SECTIONS
@@ -94,8 +79,8 @@ function controller($stateParams,
 controller.$inject = [
     '$stateParams',
     'DynamicSectionManager',
-    'OrgUnitViewDataService',
     'HistoryStore',
+    'ServiceBroker',
     'TourService'
 ];
 
