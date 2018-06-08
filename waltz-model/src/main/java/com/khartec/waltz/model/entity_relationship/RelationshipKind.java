@@ -53,7 +53,8 @@ public enum RelationshipKind {
     )),
 
     SUPPORTS(fromArray(
-            tuple(APPLICATION, CHANGE_INITIATIVE)
+            tuple(APPLICATION, CHANGE_INITIATIVE),
+            tuple(ACTOR, CHANGE_INITIATIVE)
     )),
 
     APPLICATION_NEW(fromArray(
