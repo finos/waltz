@@ -31,12 +31,7 @@ const initialState = {
 };
 
 function controller($state) {
-
     const vm = initialiseData(this, initialState);
-
-    vm.$onChanges = ((changes) => {
-        console.log({ parents: vm.parents, children: vm.children })
-    });
 }
 
 controller.$inject = ['$state'];
