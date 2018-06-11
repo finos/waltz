@@ -95,4 +95,13 @@
                         newDataType="DATE"/>
     </changeSet>
 
+
+    <!--3183: Deprecate attestation table -->
+    <changeSet id="20180611-3183-1"
+               author="kamransaleem">
+        <comment>3183: Deprecate attestation table</comment>
+        <renameTable oldTableName="attestation"
+                     newTableName="attestation_1_11"/>
+    </changeSet>
+
 </databaseChangeLog>
