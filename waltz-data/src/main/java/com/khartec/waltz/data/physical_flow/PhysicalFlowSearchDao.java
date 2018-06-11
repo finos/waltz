@@ -71,12 +71,7 @@ public class PhysicalFlowSearchDao {
                 DSL.value(" - "),
                 ACTOR.NAME);
 
-        Condition termMatcher = mkTerms(query)
-                .stream()
-                .reduce(
-                        DSL.trueCondition(),
-                        (acc, t) -> nameField.like("%" + t + "%"),
-                        (acc, t) -> acc.and(t));
+        Condition termMatcher = mkQueryCondition(query, nameField);
 
         return dsl.select(PHYSICAL_FLOW.ID, nameField)
                 .from(PHYSICAL_FLOW)
@@ -95,6 +90,14 @@ public class PhysicalFlowSearchDao {
                         r.value1(),
                         r.value2()))
                 .collect(Collectors.toList());
+    }
+
+
+    private Condition mkQueryCondition(String query, Field<String> nameField) {
+        List<String> terms = mkTerms(query);
+        Condition termMatcher = DSL.trueCondition();
+        terms.forEach(t -> termMatcher.and(nameField.like("%" + t + "%")));
+        return termMatcher;
     }
 
 }
