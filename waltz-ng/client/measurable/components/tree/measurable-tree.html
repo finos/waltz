@@ -26,20 +26,34 @@
              options="$ctrl.treeOptions"
              expanded-nodes="$ctrl.expandedNodes"
              order-by="'-name'">
-    <span title="{{ node.description }}"
-                 ng-class="{ 'text-muted': node.rating == null }"
-                 class="no-overflow">
+    <span uib-popover-template="'wmt/measurable-popup.html'"
+          popover-append-to-body="true"
+          popover-placement="right"
+          popover-trigger="mouseenter click"
+          popover-enable="node.totalCount > 0 || node.description"
+          popover-popup-delay="200"
+          ng-class="{ 'text-muted': node.rating == null }"
+          class="no-overflow">
         <a ui-sref='main.measurable.view ({id: node.id })'
            ng-class="{ 'italics' : ! node.concrete }">
             <span ng-bind="node.name"></span>
             <span class="wml-bar-chart"
                   ng-if="node.totalCount > 0"
-                  ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}"
-                  uib-popover="{{ node.totalCount }} applications"
-                  popover-append-to-body="true"
-                  popover-placement="right"
-                  popover-trigger="mouseenter">
+                  ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}">
             </span>
         </a>
     </span>
 </treecontrol>
+
+
+<!-- DESCRIPTION POPUP -->
+<script type="text/ng-template"
+        id="wmt/measurable-popup.html">
+    <div class="small">
+        <waltz-markdown text="node.description"></waltz-markdown>
+        <div ng-if="node.totalCount > 0" class="small text-muted">
+            <hr>
+            <span ng-bind="node.totalCount"></span> applications
+        </div>
+    </div>
+</script>

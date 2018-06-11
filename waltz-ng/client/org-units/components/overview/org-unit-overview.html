@@ -104,28 +104,38 @@
             <!-- NAV -->
             <div class="row"
                  style="padding: 1em">
-                <div class="col-md-6">
-                    <waltz-immediate-hierarchy-navigator parents="$ctrl.parentOrgUnits"
-                                                         children="$ctrl.childOrgUnits">
-                    </waltz-immediate-hierarchy-navigator>
+                <div class="col-md-4">
+                    <strong>Parents: </strong>
+                    <waltz-entity-link-list list="$ctrl.parentOrgUnits">
+                    </waltz-entity-link-list>
                 </div>
 
-                <div class="col-md-6">
-                    <div>
-                        <strong>Hierarchy:</strong>
-                        <span style="padding-left: 10px">
-                            <a ng-click="$ctrl.loadOrgUnitDescendants($ctrl.orgUnit.id)"
-                               ng-if="$ctrl.childOrgUnits.length > 0 && $ctrl.descendantsTree.length == 0"
-                               class="clickable">
-                                browse ...
+                <div class="col-md-8">
+                    <div ng-if="$ctrl.orgUnit.children.length > 0">
+                        <strong>
+                            Children
+                            <a class='clickable'
+                               ng-if="$ctrl.visibility.childDisplayMode == 'TREE'"
+                               ng-click="$ctrl.visibility.childDisplayMode = 'LIST'">
+                                (tree)
                             </a>
+                            <a class='clickable'
+                               ng-if="$ctrl.visibility.childDisplayMode == 'LIST'"
+                               ng-click="$ctrl.visibility.childDisplayMode = 'TREE'">
+                                (list)
+                            </a>
+                            :
+                        </strong>
+                        <div ng-if="$ctrl.visibility.childDisplayMode == 'LIST'">
+                            <waltz-entity-link-list list="$ctrl.childOrgUnits">
+                            </waltz-entity-link-list>
+                        </div>
 
-                            <div style="display: inline-block; vertical-align: top">
-                                <waltz-org-unit-tree tree="$ctrl.descendantsTree"
-                                                     on-selection="$ctrl.nodeSelected">
-                                </waltz-org-unit-tree>
-                            </div>
-                        </span>
+                        <div ng-if="$ctrl.visibility.childDisplayMode == 'TREE'">
+                            <waltz-org-unit-tree tree="$ctrl.descendantOrgUnitTree"
+                                                 on-selection="$ctrl.nodeSelected">
+                            </waltz-org-unit-tree>
+                        </div>
                     </div>
 
                 </div>
