@@ -62,6 +62,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case ACTOR:
             case APP_GROUP:
             case APPLICATION:
             case MEASURABLE:
