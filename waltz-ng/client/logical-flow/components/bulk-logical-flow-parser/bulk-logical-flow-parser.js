@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import { nest } from "d3-collection";
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from '../../../common';
-import { refToString, sameRef, toEntityRef } from '../../../common/entity-utils';
-import { invokeFunction } from '../../../common/index';
-import { downloadTextFile } from '../../../common/file-utils';
+import _ from "lodash";
+import {nest} from "d3-collection";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {refToString, sameRef, toEntityRef} from "../../../common/entity-utils";
+import {invokeFunction} from "../../../common/index";
+import {downloadTextFile} from "../../../common/file-utils";
 
 
-import template from './bulk-logical-flow-parser.html';
+import template from "./bulk-logical-flow-parser.html";
 
 
 const bindings = {
@@ -54,7 +54,10 @@ const initialState = {
 
 
 function resolveEntityRef(entitiesByIdentifier = {}, kind, identifier) {
-    const search = _.toLower(identifier);
+    const search = _.chain(identifier)
+        .toLower()
+        .trim()
+        .value();
     const app = entitiesByIdentifier[search];
     const entityRef = app ? toEntityRef(app, kind) : null;
 
