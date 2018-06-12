@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerStores} from '../common/module-utils';
-import * as OrgUnitStore from './services/org-unit-store';
+import angular from "angular";
+import {registerComponents, registerStores} from "../common/module-utils";
+import * as OrgUnitStore from "./services/org-unit-store";
+import OrgUnitOverview from "./components/overview/org-unit-overview";
+import OrgUnitTree from "./components/tree/org-unit-tree";
 
 export default () => {
 
@@ -28,16 +30,8 @@ export default () => {
     module
         .config(require('./routes'));
 
-    require('./directives')(module);
-
-    module
-        .service('OrgUnitViewDataService', require('./services/org-unit-view-data'));
-
     registerStores(module, [OrgUnitStore]);
-
-    module
-        .component('waltzOrgUnitOverview', require('./components/overview/org-unit-overview'))
-        .component('waltzOrgUnitTree', require('./components/tree/org-unit-tree'));
+    registerComponents(module, [ OrgUnitOverview, OrgUnitTree ]);
 
     return module.name;
 };

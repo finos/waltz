@@ -18,8 +18,9 @@
  */
 import angular from "angular";
 
-import { registerStore } from "../common/module-utils";
+import {registerComponents, registerStore} from "../common/module-utils";
 import * as EntitySearchStore from "./services/entity-search-store";
+import EntityLinkList from "./components/entity-link-list/entity-link-list";
 
 import entityHierarchyNavigator from "./components/entity-hierarchy-navigator/entity-hierarchy-navigator";
 import entityInvolvementEditor from "./components/entity-involvement-editor/entity-involvement-editor";
@@ -39,6 +40,8 @@ export default () => {
         .component('waltzEntitySelector', entitySelector)
         .component('waltzImmediateHierarchyNavigator', immediateHierarchyNavigator)
         .component('waltzRelatedEntityEditor', relatedEntityEditor);
+
+    registerComponents(module, [ EntityLinkList ]);
 
     return module.name;
 };
