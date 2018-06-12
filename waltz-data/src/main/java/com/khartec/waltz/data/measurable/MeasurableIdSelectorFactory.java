@@ -25,7 +25,10 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,8 +60,9 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case ACTOR:
             case APPLICATION:
-                return mkForApplication(options);
+                return mkForDirectEntityKind(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
             case FLOW_DIAGRAM:
@@ -92,11 +96,11 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
         return mkBaseRatingBasedSelector()
                 .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name()));
     }
 
 

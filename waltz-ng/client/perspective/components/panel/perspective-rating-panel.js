@@ -19,11 +19,12 @@
 
 import _ from "lodash";
 import {mkOverrides} from "../../perpective-utilities";
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common/index';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common/index";
 
 
 import template from "./perspective-rating-panel.html";
+import {loadEntity} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -33,7 +34,7 @@ const bindings = {
 
 
 const initialState = {
-    application: null,
+    parentEntity: null,
     selectedPerspectiveBlock: null,
     perspectiveDefinitions: [],
     perspectiveRatings: [],
@@ -55,22 +56,14 @@ function controller($q,
             scope: 'EXACT'
         };
 
-
-        serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-            .then(r => {
-                const app = r.data;
-                vm.application = app;
-                vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, { name: app.name });
-            });
+        loadEntity(serviceBroker, vm.parentEntityRef)
+            .then(d => vm.parentEntityRef = d);
 
         const defnPromise = serviceBroker
             .loadViewData(CORE_API.PerspectiveDefinitionStore.findAll)
-            .then(r => {
-                vm.perspectives = _.filter(
+            .then(r => vm.perspectives = _.filter(
                     r.data,
-                    pd => pd.categoryX === vm.measurableCategory.id || pd.categoryY === vm.measurableCategory.id);
-            });
+                    pd => pd.categoryX === vm.measurableCategory.id || pd.categoryY === vm.measurableCategory.id));
 
         const ratingPromise = serviceBroker
             .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef])
@@ -81,7 +74,7 @@ function controller($q,
             .then(r => vm.measurables = r.data);
 
         serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [idSelector])
+            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [vm.parentEntityRef])
             .then(r => vm.measurableRatings = r.data);
 
         $q.all([ratingPromise, measurablePromise, defnPromise])
