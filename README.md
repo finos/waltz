@@ -10,7 +10,9 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 [![Build Status](https://travis-ci.org/khartec/waltz.svg?branch=master)](https://travis-ci.org/khartec/waltz)
 
-[LGTM - Automated code reviews](https://lgtm.com/projects/g/khartec/waltz/)
+[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript)
+
+[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:java)
 
 
 ## Corporate Contributors
