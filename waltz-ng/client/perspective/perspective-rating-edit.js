@@ -18,58 +18,58 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../common";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 function controller($stateParams,
-                    applicationStore,
-                    measurableStore,
-                    measurableRatingStore,
-                    perspectiveDefinitionStore,
-                    perspectiveRatingStore)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
     const perspectiveId = $stateParams.perspectiveId;
-    const applicationId = $stateParams.entityId;
+    const entityId = $stateParams.entityId;
+    const entityKind = $stateParams.entityKind;
+    const entityReference = { id: entityId, kind: entityKind };
+    const selector = { entityReference, scope: 'EXACT'};
 
-    const entityReference = {
-        id: applicationId,
-        kind: 'APPLICATION'
+    const loadEntityCallByKind = {
+        'APPLICATION': CORE_API.ApplicationStore.getById,
+        'ACTOR': CORE_API.ActorStore.getById
     };
 
-    const idSelector = {
-        entityReference,
-        scope: 'EXACT'
+    const loadPerspectiveRatings = (pd) => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.PerspectiveRatingStore.findForEntityAxis,
+                [ pd.categoryX, pd.categoryY, entityReference],
+                { force: true })
+            .then(r => vm.perspectiveRatings = r.data);
     };
 
-    applicationStore
-        .getById(applicationId)
-        .then(app => {
-            vm.application = app;
-            vm.entityReference = Object.assign({}, entityReference, { name: app.name });
-        });
+    serviceBroker
+        .loadViewData(loadEntityCallByKind[entityKind], [ entityReference.id ])
+        .then(r => vm.entityReference = r.data);
 
-    perspectiveDefinitionStore
-        .findAll()
+    const defnPromise = serviceBroker
+        .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
+        .then(r => r.data)
         .then(pds => vm.perspectiveDefinition = _.find(pds, { id: perspectiveId || 1 }))
-        .then(pd => perspectiveRatingStore.findForEntityAxis(pd.categoryX, pd.categoryY, entityReference))
-        .then(rs => vm.perspectiveRatings = rs);
+        .then(pd => loadPerspectiveRatings(pd));
 
-    measurableStore
-        .findMeasurablesBySelector(idSelector)
-        .then(measurables => vm.measurables = measurables);
+    serviceBroker
+        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, [ selector ])
+        .then(r => vm.measurables = r.data);
 
-    measurableRatingStore
-        .findByAppSelector(idSelector)
-        .then(ratings => vm.measurableRatings = ratings);
+    serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ entityReference ])
+        .then(r => vm.measurableRatings = r.data);
 
     vm.save = (values = []) => {
-        const p = vm.perspectiveDefinition;
+        const pd = vm.perspectiveDefinition;
         const withoutUnknowns = _.reject(values, { rating: 'Z' });
-        return perspectiveRatingStore
-            .updateForEntityAxis(p.categoryX, p.categoryY, entityReference, withoutUnknowns)
-            .then(() => perspectiveRatingStore.findForEntityAxis(p.categoryX, p.categoryY, entityReference))
-            .then(rs => vm.perspectiveRatings = rs);
+        return serviceBroker
+            .execute(CORE_API.PerspectiveRatingStore.updateForEntityAxis, [pd.categoryX, pd.categoryY, entityReference, withoutUnknowns])
+            .then(() => loadPerspectiveRatings(pd));
     };
 }
 
@@ -89,11 +89,7 @@ const template = require('./perspective-rating-edit.html');
 
 controller.$inject = [
     '$stateParams',
-    'ApplicationStore',
-    'MeasurableStore',
-    'MeasurableRatingStore',
-    'PerspectiveDefinitionStore',
-    'PerspectiveRatingStore'
+    'ServiceBroker'
 ];
 
 

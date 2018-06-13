@@ -32,7 +32,7 @@ import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
  * This component render multiple <code>measurable-rating-panel</code> components
  * within a tab group.
  *
- * It is intended to be used to show measurables and ratings for a single application.
+ * It is intended to be used to show measurables and ratings for a single entity (app or actor).
  */
 
 const bindings = {
@@ -41,9 +41,7 @@ const bindings = {
 
 
 const initialState = {
-    application: null,
     categories: [],
-    selector: {},
     ratings: [],
     perspectiveRatings: [],
     measurables: [],
@@ -82,23 +80,15 @@ function mkOverridesMap(perspectiveRatings = [], measurables = []) {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        vm.selector = {  entityReference: vm.parentEntityRef, scope: 'EXACT'  };
-        loadData();
-    };
-
     vm.viewMode = () => {
-        loadData(true)
+        loadData(true);
         vm.visibility.editor = false;
     };
 
     const loadData = (force = false) => {
-        serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id], { force })
-            .then(r => vm.application = r.data);
 
         const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector], { force })
+            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
             .then(r => vm.ratings = r.data);
 
         const ratingSchemesPromise = serviceBroker
@@ -127,6 +117,8 @@ function controller($q, serviceBroker) {
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });
     };
+
+    vm.$onInit = () => loadData();
 
 }
 
