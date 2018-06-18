@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './physical-flow-editor.html';
+import template from "./physical-flow-editor.html";
 import {initialiseData} from "../../../common/index";
-import {compareCriticalities} from "../../../common/criticality-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 
@@ -63,13 +62,17 @@ function controller(notification, serviceBroker) {
             .execute(
                 CORE_API.PhysicalFlowStore.updateAttribute,
                 [ vm.physicalFlow.id, cmd ])
-            .then(r => notification.success('Updated'))
-            .catch(e => notification.error('Boom'))
+            .then(r => {
+                notification.success('Updated');
+                return load();
+            })
+            .catch(e => notification.error('Could not update value'))
     };
 
     vm.onSaveCriticality = (value, ctx) => doSave('criticality', value);
     vm.onSaveFrequency = (value, ctx) => doSave('frequency', value);
     vm.onSaveTransport = (value, ctx) => doSave('transport', value);
+    vm.onSaveBasisOffset = (itemId, value) => doSave('basisOffset', value.newVal);
 }
 
 
