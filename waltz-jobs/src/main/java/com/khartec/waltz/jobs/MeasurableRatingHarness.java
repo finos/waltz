@@ -19,13 +19,23 @@
 
 package com.khartec.waltz.jobs;
 
+import com.khartec.waltz.common.DebugUtilities;
+import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class MeasurableRatingHarness {
@@ -35,9 +45,31 @@ public class MeasurableRatingHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         MeasurableRatingDao measurableRatingDao = ctx.getBean(MeasurableRatingDao.class);
+        MeasurableIdSelectorFactory measurableIdSelectorFactory = ctx.getBean(MeasurableIdSelectorFactory.class);
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
-        List<MeasurableRatingTally> tallies = measurableRatingDao.statsForRelatedMeasurable(151L);
-        tallies.forEach(System.out::println);
+        IdSelectionOptions mOptions = IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.MEASURABLE, 1188L), HierarchyQueryScope.CHILDREN);
+        Select<Record1<Long>> measurableSelector = measurableIdSelectorFactory.apply(mOptions);
+        Select<Record1<Long>> applicationSelector = applicationIdSelectorFactory.apply(mOptions);
+
+        Set<EntityLifecycleStatus> allStatuses = SetUtilities.fromArray(EntityLifecycleStatus.values());
+        List<MeasurableRating> ratings = measurableRatingDao.findByMeasurableIdSelector(measurableSelector, mOptions.entityLifecycleStatuses()); //allStatuses);
+//        List<MeasurableRating> ratings = measurableRatingDao.findForEntity(EntityReference.mkRef(EntityKind.ACTOR, 15));
+//        Collection<MeasurableRating> ratings = measurableRatingDao.findByCategory(7L);
+//        Collection<MeasurableRating> ratings = measurableRatingDao.findByApplicationIdSelector(applicationSelector);
+
+        Map<EntityLifecycleStatus, Long> byStatus = MapUtilities.countBy(r -> r.entityReference().entityLifecycleStatus(), ratings);
+        Map<EntityKind, Long> byKind = MapUtilities.countBy(r -> r.entityReference().kind(), ratings);
+        DebugUtilities.dump(byStatus);
+        System.out.println("------");
+        DebugUtilities.dump(byKind);
+
+        ratings.stream()
+                .filter(r -> r.entityReference().kind().equals(EntityKind.ACTOR))
+                .forEach(r -> System.out.println(r.entityReference().name()));
+        ratings.stream()
+                .filter(r -> r.entityReference().entityLifecycleStatus().equals(EntityLifecycleStatus.REMOVED))
+                .forEach(r -> System.out.println(r.entityReference().name()));
     }
 
 }

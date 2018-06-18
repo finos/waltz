@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.attestation;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
@@ -37,7 +38,6 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -46,7 +46,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 @Repository
 public class AttestationInstanceDao {
 
-    private static final Field<String> ENTITY_NAME_FIELD = mkEntityNameField(
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
             ATTESTATION_INSTANCE.PARENT_ENTITY_KIND,
             newArrayList(EntityKind.values()))

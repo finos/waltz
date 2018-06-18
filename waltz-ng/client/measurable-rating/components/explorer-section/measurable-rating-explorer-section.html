@@ -18,7 +18,7 @@
     </waltz-source-data-overlay>
 
     <div class="row"
-         ng-if="$ctrl.applications.length === 0">
+         ng-if="$ctrl.tableData.length === 0">
         <div class="col-sm-12">
             <waltz-no-data>
                 <message>
@@ -30,7 +30,7 @@
     </div>
 
     <div class="row"
-         ng-if="$ctrl.applications.length > 0">
+         ng-if="$ctrl.tableData.length > 0">
         <div class="col-sm-3">
             <div style="text-align: center">
                 <waltz-pie data="$ctrl.pie.data"

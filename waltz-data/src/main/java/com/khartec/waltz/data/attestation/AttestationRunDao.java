@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.attestation;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -38,7 +39,6 @@ import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
@@ -46,7 +46,7 @@ import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 @Repository
 public class AttestationRunDao {
 
-    private static final Field<String> ENTITY_NAME_FIELD = mkEntityNameField(
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_RUN.SELECTOR_ENTITY_ID,
             ATTESTATION_RUN.SELECTOR_ENTITY_KIND,
             newArrayList(EntityKind.values()))

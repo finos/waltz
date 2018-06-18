@@ -55,7 +55,7 @@ public class EntityReferenceNameResolver {
         Field<Long> idField = DSL.field("tref_id", Long.class);
         Field<String> kindField = DSL.field("tref_kind", String.class);
 
-        Field<String> nameField = EntityNameUtilities.mkEntityNameField(
+        Field<String> nameField = InlineSelectFieldFactory.mkNameField(
                 idField,
                 kindField);
 

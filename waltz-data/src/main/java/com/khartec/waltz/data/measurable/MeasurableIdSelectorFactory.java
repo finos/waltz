@@ -20,7 +20,7 @@
 package com.khartec.waltz.data.measurable;
 
 
-import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
+import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -41,22 +41,26 @@ import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING
 import static java.lang.String.format;
 
 @Service
-public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
+public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
-    
+    private final DSLContext dsl;
+
     @Autowired
     public MeasurableIdSelectorFactory(DSLContext dsl, 
                                        OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
-        super(dsl, EntityKind.MEASURABLE);
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
+        checkNotNull(dsl, "dsl cannot be null");
+        this.dsl = dsl;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 
     @Override
-    protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
+    public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case MEASURABLE:
+                return mkForMeasurable(options);
             case APPLICATION:
                 return mkForApplication(options);
             case APP_GROUP:
@@ -71,6 +75,7 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
                         options.entityReference().kind()));
         }
     }
+
 
     private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
         Select<Record1<Long>> orgUnitSelector = orgUnitIdSelectorFactory.apply(options);
@@ -140,6 +145,31 @@ public class MeasurableIdSelectorFactory extends AbstractIdSelectorFactory {
                 .innerJoin(MEASURABLE_RATING)
                 .on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+    }
+
+
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = null;
+        final Condition isMeasurable = ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name());
+        switch (options.scope()) {
+            case EXACT:
+                selector = DSL.select(DSL.val(options.entityReference().id()));
+                break;
+            case CHILDREN:
+                selector = DSL.select(ENTITY_HIERARCHY.ID)
+                        .from(ENTITY_HIERARCHY)
+                        .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
+                        .and(isMeasurable);
+                break;
+            case PARENTS:
+                selector = DSL.select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .from(ENTITY_HIERARCHY)
+                        .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
+                        .and(isMeasurable);
+                break;
+        }
+
+        return selector;
     }
 
 }

@@ -250,7 +250,10 @@ export function useBlackAsForeground(r, g, b) {
 
 
 export function mkRatingSchemeColorScale(scheme = {}) {
-    const ratings = scheme.ratings || [];
+    const ratings = _.isArray(scheme)
+        ? scheme
+        : scheme.ratings || [];
+
     return scaleOrdinal()
         .domain(_.map(ratings, "rating"))
         .range(_.map(ratings, d => rgb(d.color)));

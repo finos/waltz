@@ -20,7 +20,7 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -80,7 +80,7 @@ public class FlowLineageHarness {
         System.out.println(anyTargetMatches);
 
 
-        Field<String> SOURCE_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+        Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                 LOGICAL_FLOW.SOURCE_ENTITY_ID,
                 LOGICAL_FLOW.SOURCE_ENTITY_KIND,
                 newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));

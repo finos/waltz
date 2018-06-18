@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.entity_relationship;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_relationship.*;
@@ -37,7 +38,6 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 
@@ -53,13 +53,13 @@ public class EntityRelationshipDao {
             EntityKind.CHANGE_INITIATIVE);
 
 
-    private static Field<String> NAME_A = mkEntityNameField(
+    private static Field<String> NAME_A = InlineSelectFieldFactory.mkNameField(
             ENTITY_RELATIONSHIP.ID_A,
             ENTITY_RELATIONSHIP.KIND_A,
             POSSIBLE_ENTITIES);
 
 
-    private static Field<String> NAME_B = mkEntityNameField(
+    private static Field<String> NAME_B = InlineSelectFieldFactory.mkNameField(
             ENTITY_RELATIONSHIP.ID_B,
             ENTITY_RELATIONSHIP.KIND_B,
             POSSIBLE_ENTITIES);
