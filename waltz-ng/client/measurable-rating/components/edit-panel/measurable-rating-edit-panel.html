@@ -64,8 +64,8 @@
             <div class="col-sm-12">
                 <h4 ng-bind="$ctrl.selected.measurable.name"></h4>
                 <div style="max-height: 160px; overflow-y: auto;">
-                    <div class="text-muted"
-                         ng-bind="$ctrl.selected.measurable.description">
+                    <div class="text-muted small">
+                        <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
                     </div>
                 </div>
                 <!-- ABSTRACT -->
@@ -90,7 +90,7 @@
 
                     <!-- NEW -->
                     <div ng-if="! $ctrl.selected.rating">
-                        This application does not currently exhibit this characteristic.
+                        This entity does not currently exhibit this characteristic.
                         To add it, choose a rating and, optionally, provide a comment.
                     </div>
 
@@ -110,17 +110,6 @@
                             </waltz-rating-picker>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <small class="text-muted">
-                                Note: the overall rating for this application is
-                                <span ng-bind="$ctrl.entityRating | toDisplayName:'investmentRating'">
-                                </span>
-                            </small>
-                        </div>
-                    </div>
-
 
                     <!-- PLANNED DATE -->
                     <div class="row"
@@ -174,8 +163,8 @@
             <div class="col-md-12">
                 <h4>Associated Perspectives</h4>
                 <p class="text-muted small">
-                    Perspectives provide a rated association between applications and two other
-                    architectural elements.  This provides a more detailed view of how an application supports
+                    Perspectives provide a rated association between entities and two other
+                    architectural elements.  This provides a more detailed view of how an entity supports
                     the business.
                 </p>
 

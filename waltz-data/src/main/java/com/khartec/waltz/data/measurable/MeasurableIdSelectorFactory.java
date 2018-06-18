@@ -61,8 +61,9 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         switch (options.entityReference().kind()) {
             case MEASURABLE:
                 return mkForMeasurable(options);
+            case ACTOR:
             case APPLICATION:
-                return mkForApplication(options);
+                return mkForDirectEntityKind(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
             case FLOW_DIAGRAM:
@@ -97,11 +98,11 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
         return mkBaseRatingBasedSelector()
                 .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name()));
     }
 
 

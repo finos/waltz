@@ -223,6 +223,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.changeLogSection
     ],
     'ACTOR': [
+        dynamicSections.measurableRatingAppSection,
         dynamicSections.bookmarksSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.involvedPeopleSection,

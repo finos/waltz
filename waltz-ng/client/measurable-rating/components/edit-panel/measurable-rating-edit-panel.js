@@ -90,12 +90,9 @@ function controller($q,
             .then(r => vm.measurables = r.data);
 
         const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findByAppSelector, [{ entityReference: vm.parentEntityRef, scope: 'EXACT' }], { force })
+            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
             .then(r => vm.ratings = r.data);
 
-        serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id], { force })
-            .then(r => vm.entityRating = r.data.overallRating);
 
         $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
             .then(() => {
@@ -107,6 +104,7 @@ function controller($q,
         serviceBroker
             .loadViewData(CORE_API.PerspectiveDefinitionStore.findAll, [], { force })
             .then(r => vm.perspectiveDefinitions = r.data);
+
     };
 
     // -- INTERACT ---

@@ -23,7 +23,6 @@ public enum EntityKind {
 
     APPLICATION,
     APP_GROUP,
-    APP_RATING,
     ASSET_COST,
     ATTESTATION,
     ATTESTATION_RUN,
