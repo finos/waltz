@@ -41,5 +41,16 @@
                 </waltz-editable-enum>
             </td>
         </tr>
+        <tr>
+            <td class="wft-label">
+                <label>Basis Offset</label>
+            </td>
+            <td>
+                <waltz-editable-field on-save="$ctrl.onSaveBasisOffset"
+                                      field-type="text"
+                                      initial-val="$ctrl.physicalFlow.basisOffset">
+                </waltz-editable-field>
+            </td>
+        </tr>
     </table>
 </div>
