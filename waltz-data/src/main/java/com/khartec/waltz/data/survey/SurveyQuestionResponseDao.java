@@ -21,7 +21,7 @@ package com.khartec.waltz.data.survey;
 
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
@@ -49,7 +49,7 @@ import static org.jooq.impl.DSL.*;
 @Repository
 public class SurveyQuestionResponseDao {
 
-    private static final Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
+    private static final Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.PERSON));

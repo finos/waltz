@@ -20,7 +20,7 @@
 package com.khartec.waltz.jobs;
 
 
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
@@ -45,7 +45,7 @@ public class EntityNameUtilitiesHarness {
 
         for (int i = 0; i < 5; i++) {
             HarnessUtilities.time("with entity names", () -> {
-                Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
+                Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
                         ENTITY_STATISTIC_VALUE.ENTITY_ID,
                         ENTITY_STATISTIC_VALUE.ENTITY_KIND,
                         newArrayList(EntityKind.APPLICATION, EntityKind.ORG_UNIT));

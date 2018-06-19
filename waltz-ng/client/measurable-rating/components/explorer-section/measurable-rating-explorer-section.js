@@ -21,7 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkLinkGridCell} from "../../../common/grid-utils";
-import {ragColorScale} from "../../../common/colors";
+import {mkRatingSchemeColorScale} from "../../../common/colors";
 import template from "./measurable-rating-explorer-section.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
@@ -52,15 +52,19 @@ const initialState = {
 
 
 function preparePie(ratings = [],
-                    ragNames = {},
+                    ratingScheme = {},
                     onSelect) {
     const counts = _.countBy(ratings, 'rating');
-    const data = [
-        { key: "R", count: counts['R'] || 0 },
-        { key: "A", count: counts['A'] || 0 },
-        { key: "G", count: counts['G'] || 0 },
-        { key: "Z", count: counts['Z'] || 0 },
-    ];
+    const schemeItemsByCode = _.keyBy(ratingScheme.ratings, 'rating' );
+    const colorScale = mkRatingSchemeColorScale(ratingScheme);
+
+    const data = _.chain(ratingScheme.ratings)
+        .reject(schemeItem => schemeItem.rating === 'X')
+        .map(schemeItem => ({
+            key: schemeItem.rating,
+            count: counts[schemeItem.rating] || 0
+        }))
+        .value();
 
     return {
         selectedSegmentKey: null,
@@ -68,27 +72,27 @@ function preparePie(ratings = [],
         config: {
             size: 130,
             onSelect,
-            colorProvider: (d) => ragColorScale(d.data.key),
-            labelProvider: (d) => ragNames[d.key] ? ragNames[d.key].name : d.key,
-            descriptionProvider: (d) => ragNames[d.key] ? ragNames[d.key].description : d.key
+            colorProvider: (d) => colorScale(d.data.key),
+            labelProvider: (d) => _.get(schemeItemsByCode, [d.key, "name"], d.key),
+            descriptionProvider: (d) => _.get(schemeItemsByCode, [d.key, "description"], d.key)
         }
     };
 }
 
 
 function prepareTableData(ratings = [],
-                          applications = [],
                           measurables = [],
-                          ragNames = {}) {
+                          scheme = {},
+                          appsById = {}) {
     const measurablesById = _.keyBy(measurables, 'id');
-    const applicationsById = _.keyBy(applications, 'id');
+    const ratingItemsByCode = _.keyBy(scheme.ratings, r => r.rating);
+
     return _.chain(ratings)
         .map(r => {
             return {
-                rating: r,
-                ratingName: ragNames[r.rating] || r.rating,
+                rating: ratingItemsByCode[r.rating],
                 measurable: measurablesById[r.measurableId],
-                application: applicationsById[r.entityReference.id]
+                entityReference: Object.assign({}, r.entityReference, { assetCode: appsById[r.entityReference.id].assetCode })
             };
         })
         .value();
@@ -97,29 +101,29 @@ function prepareTableData(ratings = [],
 
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
-        <waltz-rating-indicator-cell rating="row.entity.rating.rating" 
-                                     label="COL_FIELD.name">
+        <waltz-rating-indicator-cell rating="row.entity.rating" 
+                                     show-name="true">
         </waltz-rating-indicator-cell>
     </div>`;
 
 
 function prepareColumnDefs(measurableCategory, measurables) {
-     // We only want to show the measurable column if there are multiple measurables to
-     // differentiate between.
-
     const initialCols = [
-        mkLinkGridCell('Name', 'application.name', 'application.id', 'main.app.view'),
+        mkLinkGridCell('Name', 'entityReference.name', 'entityReference.id', 'main.app.view'),
         {
-            field: 'application.assetCode',
+            field: 'entityReference.assetCode',
             name: 'Asset Code'
-        },
-        {
-            field: 'ratingName',
+        }, {
+            field: 'rating',
             name: 'Rating',
-            cellTemplate: ratingCellTemplate
+            cellTemplate: ratingCellTemplate,
+            sortingAlgorithm: (a, b) => a.name.localeCompare(b.name),
+            exportFormatter: (input) => input.name
         }
     ];
 
+    // We only want to show the measurable column if there are multiple measurables to
+    // differentiate between.
     const measurableCols = measurables.length > 1
         ? [ { field: 'measurable.name', name: measurableCategory.name } ]
         : [];
@@ -137,27 +141,29 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const onSelect = (d) => {
-        vm.pie.selectedSegmentKey = d ? d.key : null;
+        if (_.get(d, "count", 0) === 0) return;
 
+        vm.pie.selectedSegmentKey = d ? d.key : null;
         const ratings = d
                 ? _.filter(vm.ratings, r => r.rating === d.key)
                 : vm.ratings;
 
         vm.tableData = prepareTableData(
             ratings,
-            vm.applications,
             vm.measurables,
-            vm.measurableCategory.ragNames);
+            vm.ratingScheme);
     };
 
     const loadData = () => {
         const selector = mkSelectionOptions(vm.parentEntityRef);
 
-        const appPromise = serviceBroker
-            .loadViewData(
-                CORE_API.ApplicationStore.findBySelector,
-                [ selector ])
-            .then(r => vm.applications = r.data);
+        const appsPromise = serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ selector ])
+            .then(r => vm.appsById = _.keyBy(r.data, 'id'));
+
+        const schemePromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemes = r.data);
 
         const ratingsPromise = serviceBroker
             .loadViewData(
@@ -173,25 +179,26 @@ function controller($q, serviceBroker) {
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(result => vm.measurableCategories = result.data);
 
-
-        return $q.all([appPromise, ratingsPromise, measurablesPromise, categoriesPromise]);
+        return $q.all([appsPromise, ratingsPromise, measurablesPromise, categoriesPromise, schemePromise]);
     };
 
     const processData = () => {
         const measurable = _.find(vm.measurables, { id: vm.parentEntityRef.id });
         const measurableCategory = _.find(vm.measurableCategories, { id: measurable.categoryId });
+        vm.ratingScheme = _.find(vm.ratingSchemes, { id: measurableCategory.ratingSchemeId });
+
         vm.columnDefs = prepareColumnDefs(
             measurableCategory,
             vm.measurables);
         vm.pie = preparePie(
             vm.ratings,
-            measurableCategory.ragNames,
+            vm.ratingScheme,
             onSelect);
         vm.tableData = prepareTableData(
             vm.ratings,
-            vm.applications,
             vm.measurables,
-            measurableCategory.ragNames);
+            vm.ratingScheme,
+            vm.appsById);
     };
 
     vm.$onInit = () => loadData()

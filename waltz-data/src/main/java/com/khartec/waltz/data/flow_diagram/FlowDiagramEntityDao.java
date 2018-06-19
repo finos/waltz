@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.data.flow_diagram;
 
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
@@ -42,7 +42,7 @@ import static java.util.stream.Collectors.toList;
 @Repository
 public class FlowDiagramEntityDao {
 
-    private static Field<String> ENTITY_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+    private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_DIAGRAM_ENTITY.ENTITY_ID,
             FLOW_DIAGRAM_ENTITY.ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));

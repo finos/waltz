@@ -20,7 +20,7 @@
 package com.khartec.waltz.data.entity_tag;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.EntityTagRecord;
@@ -77,7 +77,7 @@ public class EntityTagDao {
     public List<EntityReference> findByTag(String tag) {
         if (isEmpty(tag)) { return emptyList(); }
 
-        Field<String> entityNameField = EntityNameUtilities.mkEntityNameField(
+        Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
                 ENTITY_TAG.ENTITY_ID,
                 ENTITY_TAG.ENTITY_KIND,
                 newArrayList(EntityKind.APPLICATION, EntityKind.ORG_UNIT));

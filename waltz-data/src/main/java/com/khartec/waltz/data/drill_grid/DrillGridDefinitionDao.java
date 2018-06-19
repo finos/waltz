@@ -20,14 +20,17 @@
 package com.khartec.waltz.data.drill_grid;
 
 
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.drill_grid.DrillGridDefinition;
 import com.khartec.waltz.model.drill_grid.ImmutableDrillGridDefinition;
 import com.khartec.waltz.schema.tables.records.DrillGridDefinitionRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -41,12 +44,12 @@ import static java.util.Optional.ofNullable;
 @Repository
 public class DrillGridDefinitionDao {
 
-    private static final Field<String> X_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+    private static final Field<String> X_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             DRILL_GRID_DEFINITION.X_ENTITY_ID,
             DRILL_GRID_DEFINITION.X_ENTITY_KIND,
             newArrayList(EntityKind.MEASURABLE_CATEGORY));
 
-    private static final Field<String> Y_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+    private static final Field<String> Y_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             DRILL_GRID_DEFINITION.Y_ENTITY_ID,
             DRILL_GRID_DEFINITION.Y_ENTITY_KIND,
             newArrayList(EntityKind.MEASURABLE_CATEGORY));
