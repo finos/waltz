@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.physical_specification;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
@@ -39,7 +40,6 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -51,7 +51,7 @@ import static org.jooq.impl.DSL.*;
 public class PhysicalSpecificationDao {
 
 
-    public static final Field<String> owningEntityNameField = mkEntityNameField(
+    public static final Field<String> owningEntityNameField = InlineSelectFieldFactory.mkNameField(
                 PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID,
                 PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND,
                 newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR))

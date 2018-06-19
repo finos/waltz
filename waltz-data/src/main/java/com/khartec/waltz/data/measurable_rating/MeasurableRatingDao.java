@@ -19,8 +19,11 @@
 
 package com.khartec.waltz.data.measurable_rating;
 
+import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -39,24 +42,36 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 @Repository
 public class MeasurableRatingDao {
 
+    private static final Condition APP_JOIN_CONDITION = APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID)
+            .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+
     private static final RecordMapper<? super Record, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
         MeasurableRatingRecord r = record.into(MEASURABLE_RATING);
+
+        EntityReference ref = ImmutableEntityReference.builder()
+                .kind(EntityKind.valueOf(r.getEntityKind()))
+                .id(r.getEntityId())
+                .name(record.get(APPLICATION.NAME))
+                .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.get(APPLICATION.ENTITY_LIFECYCLE_STATUS)))
+                .build();
+
         return ImmutableMeasurableRating.builder()
-                .entityReference(EntityReference.mkRef(
-                        EntityKind.valueOf(r.getEntityKind()),
-                        r.getEntityId()))
+                .entityReference(ref)
                 .description(r.getDescription())
                 .provenance(r.getProvenance())
                 .rating(firstChar(r.getRating(), 'Z'))
@@ -78,6 +93,7 @@ public class MeasurableRatingDao {
                 .count(count)
                 .build();
     };
+
 
     private final Function<SaveMeasurableRatingCommand, MeasurableRatingRecord> TO_RECORD_MAPPER = command -> {
         MeasurableRatingRecord record = new MeasurableRatingRecord();
@@ -103,44 +119,7 @@ public class MeasurableRatingDao {
         this.dsl = dsl;
     }
 
-
-    public List<MeasurableRating> findForEntity(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
-        return dsl
-                .selectFrom(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
-                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<MeasurableRating> findByMeasurableIdSelector(Select<Record1<Long>> selector) {
-        checkNotNull(selector, "selector cannot be null");
-        return dsl
-                .selectFrom(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public Collection<MeasurableRating> findByApplicationIdSelector(Select<Record1<Long>> selector) {
-        checkNotNull(selector, "selector cannot be null");
-        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(selector)
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
-        return dsl
-                .selectFrom(MEASURABLE_RATING)
-                .where(condition)
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-    public Collection<MeasurableRating> findByCategory(long id) {
-        return dsl
-                .select(MEASURABLE_RATING.fields())
-                .from(MEASURABLE_RATING)
-                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
-                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(id))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
+    // --- update
 
     public boolean create(SaveMeasurableRatingCommand command) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
@@ -163,6 +142,54 @@ public class MeasurableRatingDao {
                 .execute() == 1;
     }
 
+
+    // --- find
+
+    public List<MeasurableRating> findForEntity(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+        return mkBaseQuery()
+                .innerJoin(APPLICATION).on(APP_JOIN_CONDITION)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<MeasurableRating> findByMeasurableIdSelector(Select<Record1<Long>> selector,
+                                                             Set<EntityLifecycleStatus> entityLifecycleStatuses) {
+        checkNotNull(selector, "selector cannot be null");
+
+        SelectConditionStep<Record> qry = mkBaseQuery()
+                .innerJoin(APPLICATION)
+                .on(APP_JOIN_CONDITION)
+                .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .and(mkLifecycleStatusCondition(entityLifecycleStatuses));
+
+        return qry
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<MeasurableRating> findByApplicationIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(selector)
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
+        return mkBaseQuery()
+                .leftJoin(APPLICATION).on(APP_JOIN_CONDITION)
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public Collection<MeasurableRating> findByCategory(long id) {
+        return mkBaseQuery()
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .leftJoin(APPLICATION).on(APP_JOIN_CONDITION)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(id))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    // --- stats
 
     public List<Tally<Long>> tallyByMeasurableId() {
         return calculateLongTallies(
@@ -204,5 +231,22 @@ public class MeasurableRatingDao {
                 .fetch(TO_TALLY_MAPPER);
     }
 
+
+    // --- utils
+
+    private Condition mkLifecycleStatusCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
+        return entityLifecycleStatuses.isEmpty()
+                ? DSL.trueCondition()
+                : APPLICATION.ENTITY_LIFECYCLE_STATUS.in(EnumUtilities.names(entityLifecycleStatuses));
+    }
+
+
+    private SelectJoinStep<Record> mkBaseQuery() {
+        return dsl
+                .select(MEASURABLE_RATING.fields())
+                .select(APPLICATION.NAME)
+                .select(APPLICATION.ENTITY_LIFECYCLE_STATUS)
+                .from(MEASURABLE_RATING);
+    }
 
 }

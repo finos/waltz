@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.survey;
 
 import com.khartec.waltz.common.CollectionUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.*;
@@ -40,8 +41,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
-import static com.khartec.waltz.data.ExternalIdUtilities.mkExternalIdField;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
 import static java.util.Optional.ofNullable;
@@ -49,13 +48,13 @@ import static java.util.Optional.ofNullable;
 @Repository
 public class SurveyInstanceDao {
 
-    private static final Field<String> ENTITY_NAME_FIELD = mkEntityNameField(
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                 SURVEY_INSTANCE.ENTITY_ID,
                 SURVEY_INSTANCE.ENTITY_KIND,
                 newArrayList(EntityKind.values()))
             .as("entity_name");
 
-    private static final Field<String> EXTERNAL_ID_FIELD = mkExternalIdField(
+    private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
             SURVEY_INSTANCE.ENTITY_ID,
             SURVEY_INSTANCE.ENTITY_KIND,
             newArrayList(EntityKind.values()))

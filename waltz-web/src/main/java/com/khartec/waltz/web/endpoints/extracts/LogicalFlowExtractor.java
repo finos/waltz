@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.data.EntityNameUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -48,12 +48,12 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowExtractor.class);
 
-    private static final Field<String> SOURCE_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+    private static final Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
             LOGICAL_FLOW.SOURCE_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
-    private static final Field<String> TARGET_NAME_FIELD = EntityNameUtilities.mkEntityNameField(
+    private static final Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));

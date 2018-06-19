@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.involvement;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.person.PersonDao;
@@ -43,7 +44,6 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -172,7 +172,7 @@ public class InvolvementDao {
             Select<Record1<Long>> entityIdSelector,
             Set<Long> involvementKindIds) {
 
-        Field<String> entityName = mkEntityNameField(
+        Field<String> entityName = InlineSelectFieldFactory.mkNameField(
                     INVOLVEMENT.ENTITY_ID,
                     INVOLVEMENT.ENTITY_KIND,
                     newArrayList(entityKind))

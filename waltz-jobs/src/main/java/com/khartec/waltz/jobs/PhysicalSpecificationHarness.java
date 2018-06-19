@@ -19,25 +19,13 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.PhysicalSpecification;
 import com.khartec.waltz.service.DIConfiguration;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
-
-import static com.khartec.waltz.data.EntityNameUtilities.mkEntityNameField;
-import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 public class PhysicalSpecificationHarness {
