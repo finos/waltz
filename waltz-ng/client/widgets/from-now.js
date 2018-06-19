@@ -40,8 +40,11 @@ function controller($scope) {
     const vm = this;
 
     $scope.$watch('ctrl.timestamp', (nv) => {
-
-        if (! nv) return;
+        if (! nv) {
+            vm.hoverValue = null;
+            vm.fromNow = null;
+            return;
+        }
 
         const m = moment.utc(nv, formats.parse );
 
