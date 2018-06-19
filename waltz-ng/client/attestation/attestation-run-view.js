@@ -23,6 +23,7 @@ import moment from "moment";
 import {CORE_API} from "../common/services/core-api-utils";
 import {formats, initialiseData} from "../common/index";
 import {mkEntityLinkGridCell} from "../common/grid-utils";
+import {amber, green, red} from "../common/colors";
 
 import template from "./attestation-run-view.html";
 
@@ -40,15 +41,15 @@ const initialState = {
 
 function mkRagRating(run = {}, instance = {}) {
     if(instance.attestedBy) {
-        return { rag: 'G', name: 'Complete' }
+        return { rag: 'G', name: 'Complete', color: green }
     }
     const dueDate = moment.utc(run.dueDate, formats.parse );
     const now = moment.utc();
 
     if(now > dueDate) {
-        return { rag: 'R', name: 'Overdue' };
+        return { rag: 'R', name: 'Overdue', color: red };
     } else {
-        return { rag: 'A', name: 'Pending' };
+        return { rag: 'A', name: 'Pending', color: amber };
     }
 }
 
@@ -64,10 +65,10 @@ const ratingOrdinal = {
     'Z': 0
 };
 
+
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
-        <waltz-rating-indicator-cell rating="COL_FIELD.rag" 
-                                     label="COL_FIELD.name">
+        <waltz-rating-indicator-cell rating="COL_FIELD">
         </waltz-rating-indicator-cell>
     </div>`;
 
