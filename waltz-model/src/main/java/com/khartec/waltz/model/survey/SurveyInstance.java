@@ -37,6 +37,8 @@ public abstract class SurveyInstance implements IdProvider {
 
     public abstract Long surveyRunId();
     public abstract EntityReference surveyEntity();
+
+    @Nullable
     public abstract String surveyEntityExternalId();
     public abstract SurveyInstanceStatus status();
     public abstract LocalDate dueDate();
