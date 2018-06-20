@@ -151,7 +151,8 @@ function controller($q, serviceBroker) {
         vm.tableData = prepareTableData(
             ratings,
             vm.measurables,
-            vm.ratingScheme);
+            vm.ratingScheme,
+            vm.appsById);
     };
 
     const loadData = () => {
