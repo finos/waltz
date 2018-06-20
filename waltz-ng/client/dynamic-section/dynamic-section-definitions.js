@@ -314,6 +314,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
         dynamicSections.changeLogSection
     ]
 };
