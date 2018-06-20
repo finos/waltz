@@ -124,8 +124,6 @@ export default [
 
 
         return {
-            enrich,
-            getDataTypes,
             buildGraphTweakers,
             enrichDataTypeCounts
         };

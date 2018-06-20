@@ -1,0 +1,99 @@
+<br>
+
+<!-- LOADING -->
+<waltz-loading-notification show="$ctrl.visibility.loadingFlows"
+                            name="Loading Flow Data">
+</waltz-loading-notification>
+
+<div class="row">
+    <div class="col-sm-4">
+        <waltz-flow-filter-options visible="$ctrl.optionsVisible"
+                                   on-change="$ctrl.filterChanged"
+                                   used-types="$ctrl.usedDataTypes">
+        </waltz-flow-filter-options>
+
+        <hr>
+
+        <!-- APP-INFO -->
+        <div ng-show="$ctrl.selectedNode != null">
+            <h5>
+                <waltz-entity-icon-label entity-ref="$ctrl.selectedNode"></waltz-entity-icon-label>
+                <span class="pull-right clickable"
+                      ng-click="$ctrl.dismissSelectedNode()">
+                    <a class="clickable">&#10006;</a>
+                </span>
+            </h5>
+            <div>
+                <a ng-click="$ctrl.isolate($ctrl.selectedNode)"
+                   class="clickable">
+                    <waltz-icon name="crosshairs"></waltz-icon>
+                    Isolate
+                </a>
+                <span class="small text-muted">
+                    - show only this
+                    <span ng-bind="$ctrl.selectedNode.kind | toDisplayName:'entity'"></span>
+                    and its neighbours
+                </span>
+            </div>
+
+            <hr>
+
+            <waltz-app-centric-flow-table app="$ctrl.selectedNode"
+                                          flows="$ctrl.flows"
+                                          decorators="$ctrl.decorators"
+                                          on-select="$ctrl.refocusApp">
+            </waltz-app-centric-flow-table>
+
+            <div>
+                See more on
+                <waltz-entity-link entity-ref="$ctrl.selectedNode"></waltz-entity-link>
+                &raquo;
+            </div>
+
+        </div>
+
+    </div>
+    <div class="col-sm-8" style="border-left: 1px solid #ccc">
+        <!-- NO DATA -->
+        <div ng-if="$ctrl.filteredFlowData.entities.length == 0  && $ctrl.flows.length > 0">
+            <div class="alert alert-warning">
+                <strong>No data to show</strong> given the current filter options.  Use the
+                filters on the left to change these options.
+            </div>
+        </div>
+
+        <!-- TOO MUCH DATA -->
+        <div ng-if="$ctrl.filteredFlowData.entities.length >= 400 && !$ctrl.visibility.ignoreLimits">
+            <div class="alert alert-warning">
+                This graph will have <strong>too many nodes</strong> to render smoothly.
+                Use the configure button too limit the amount of data to show.  Alternatively
+                the data is available via the 'Table' tab.
+
+                <br>
+
+                If you still want to see the graph click
+                <a class="clickable" ng-click="$ctrl.visibility.ignoreLimits = true">
+                    here
+                </a>
+                - however be aware that your machine may struggle.
+            </div>
+        </div>
+
+        <!-- BOINGY -->
+        <div ng-if="$ctrl.filteredFlowData.flows.length > 0">
+            <div ng-if="$ctrl.filteredFlowData.entities.length < 400  || $ctrl.visibility.ignoreLimits">
+
+                <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
+                                            tweakers="$ctrl.graphTweakers">
+                </waltz-logical-flow-diagram>
+
+
+                <div class="small text-muted">
+                    Dragging nodes will pin them.  Double click to unpin.  If an application is gray
+                    it is not a member of this group.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -59,6 +59,10 @@ const simulation = forceSimulation()
     .force("collide", forceCollide())
     .force("link", forceLink().id(d => d.id).iterations(2).distance(55)); //.strength(0.2));
 
+const actorSymbol = symbol()
+    .size(128)
+    .type(symbolWye);
+
 
 function mkLinkData(flows = []) {
     return _.chain(flows)
@@ -106,10 +110,6 @@ function addNodeLabel(selection) {
 
 
 function addNodeCircle(selection) {
-    const actorSymbol = symbol()
-        .size(128)
-        .type(symbolWye);
-
     selection
         .filter(d => d.kind === 'APPLICATION')
         .append('circle')

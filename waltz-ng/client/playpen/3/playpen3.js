@@ -22,18 +22,15 @@ import {initialiseData} from "../../common/index";
 
 const initialState = {
     parentEntityRef: {
-        id: 16,
-        kind: 'FLOW_DIAGRAM'
+        id: 100,
+        kind: 'ORG_UNIT'
     },
-    time: new Date('2018-05-30'),
-    time1: new Date('2018-05-31'),
-    time2: new Date('2018-06-01'),
-    time3: new Date('2018-06-02'),
-    daysOnly: true
 };
 
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    console.log(vm)
 
     vm.onSelectorEntitySelect = (item, ctx) => {
         console.log({ctx, item});

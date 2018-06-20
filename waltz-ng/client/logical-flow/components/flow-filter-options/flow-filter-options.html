@@ -6,19 +6,43 @@
         <small>Filter</small>
     </h5>
 
-    <span class="small">Show flows for data type: </span>
-
-    <select ng-model="$ctrl.selectedType"
-            ng-change="$ctrl.notifyChanges()">
-        <option value="ALL">
-            All
-        </option>
-        <option ng-repeat="type in $ctrl.types"
-                value="{{ type.id }}"
-                ng-bind="type.name">
-        </option>
-    </select>
     <hr>
+    <div ng-if="!$ctrl.visibility.tree">
+        Showing all flows for all data types.
+        <br>
+        <a class='clickable'
+           ng-click="$ctrl.onShowTree()">
+            Select specific data types
+        </a>
+    </div>
+    <div ng-if="$ctrl.visibility.tree">
+        <treecontrol class="tree-light small"
+                     tree-model="$ctrl.hierarchy"
+                     order-by="'-name'"
+                     options="$ctrl.treeOptions">
+            <span uib-popover="{{node.description}}"
+                  popover-trigger="mouseenter"
+                  popover-popup-delay="400"
+                  popover-append-to-body="true"
+                  class="waltz-visibility-parent">
+                <span ng-bind="node.name"
+                      ng-style="{ 'font-style': node.isUsed ? 'normal' : 'italic' }"
+                      ng-click="$ctrl.onSelectType(node.id)">
+                </span>
+            </span>
+        </treecontrol>
+
+        <br>
+
+        Alternatively,
+            <a class='clickable'
+               ng-click="$ctrl.onShowAll()">
+                show all.
+            </a>
+    </div>
+
+    <hr>
+
 
     <h5>
         <waltz-icon name="filter"></waltz-icon>

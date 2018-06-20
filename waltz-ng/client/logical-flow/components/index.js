@@ -27,6 +27,7 @@ import * as SourceAndTargetGraph from './source-and-target-graph/source-and-targ
 import * as SourceAndTargetPanel from './source-and-target-panel/source-and-target-panel';
 import * as RatedFlowSummaryPanel from './rated-flow-summary/rated-flow-summary-panel';
 import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane';
+import LogicalFlowsBoingyGraph from './logical-flows-boingy-graph/logical-flows-boingy-graph';
 
 
 function setup(module) {
@@ -38,6 +39,7 @@ function setup(module) {
         LogicalFlowEditPanel,
         LogicalFlowTypeEditor,
         LogicalFlowsDataTypeSummaryPane,
+        LogicalFlowsBoingyGraph,
         RatedFlowSummaryPanel,
         SourceAndTargetGraph,
         SourceAndTargetPanel
