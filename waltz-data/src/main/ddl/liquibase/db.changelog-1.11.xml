@@ -104,4 +104,13 @@
                      newTableName="attestation_1_11"/>
     </changeSet>
 
+
+    <!--3226: Increase length of bookmark description column -->
+    <changeSet id="20180619-3226-1"
+               author="kamransaleem">
+        <modifyDataType columnName="description"
+                        newDataType="${description.type}"
+                        tableName="bookmark" />
+    </changeSet>
+
 </databaseChangeLog>
