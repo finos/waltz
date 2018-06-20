@@ -18,27 +18,56 @@
  */
 
 import _ from "lodash";
-
+import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './flow-filter-options.html';
 
 const bindings = {
-    visible: '<',
     onChange: '<',
-    types: '<' // [ dataTypeId... ]
+    usedTypes: '<' // [ dataTypeId... ]
 };
 
 
 const initialState = {
     selectedType: 'ALL',
     selectedScope: 'ALL',
-    visible: false,
+    visibility: {
+        tree: false
+    },
     onChange: () => console.log('No change handler registered for flow-filter-options-overlay::onChange')
 };
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = _.defaults(this, initialState);
 
-    vm.$onChanges = vm.notifyChanges;
+    vm.onShowAll= () => {
+        vm.selectedType = 'ALL';
+        vm.visibility.tree = false;
+        vm.notifyChanges();
+    };
+
+    vm.onShowTree= () => {
+        vm.visibility.tree = true;
+    };
+
+    vm.onSelectType = (id) => {
+        vm.selectedType = id;
+        vm.notifyChanges()
+    };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.allDataTypes = r.data);
+    };
+
+    vm.$onChanges = () => {
+        vm.notifyChanges();
+        const usedTypeIds = _.map(vm.usedTypes, 'id');
+        const enrichedDataTypes = _.map(vm.allDataTypes, dt => Object.assign({}, dt, { isUsed: _.includes(usedTypeIds, dt.id) }));
+        vm.hierarchy = switchToParentIds(buildHierarchies(enrichedDataTypes));
+    };
 
     vm.notifyChanges = () => {
         const options = {
@@ -53,13 +82,13 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ['ServiceBroker'];
 
 
 const component = {
     controller,
     bindings,
-    template: require('./flow-filter-options.html')
+    template
 };
 
 
