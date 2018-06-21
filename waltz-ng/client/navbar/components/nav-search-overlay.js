@@ -17,11 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {entityLifecycleStatuses, initialiseData} from "../../common/index";
 
-import template from './nav-search-overlay.html';
+import template from "./nav-search-overlay.html";
 
 const ESCAPE_KEYCODE = 27;
 
@@ -68,8 +67,7 @@ function isDescendant(parent, child) {
 function controller($element,
                     $document,
                     $timeout,
-                    serviceBroker,
-                    displayNameService) {
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const documentClick = (e) => {
@@ -121,35 +119,10 @@ function controller($element,
 
     // helper fn, to reduce boilerplate
     const handleSearch = (query, entityKind) => {
-        const transformResult = r => {
-            let qualifier = null;
-
-            switch (entityKind) {
-                case 'APP_GROUP':
-                    qualifier = r.kind === 'PUBLIC' ? 'Public group' : 'Private Group'
-                    break;
-                case 'APPLICATION':
-                    qualifier = r.assetCode;
-                    break;
-                case 'MEASURABLE':
-                    qualifier = displayNameService.lookup('measurableCategory', r.categoryId)
-                    break;
-                default:
-                    qualifier = r.externalId || '';
-                    break;
-            }
-
-            return {
-                id: r.id,
-                kind: entityKind,
-                name: r.name || r.displayName,
-                entityLifecycleStatus: r.entityLifecycleStatus || 'ACTIVE',
-                qualifier,
-                description: r.description
-            };
-        };
-
         const statuses = vm.showActiveOnly
+
+
+
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
 
@@ -160,7 +133,7 @@ function controller($element,
 
         return serviceBroker
             .loadViewData(CORE_API.EntitySearchStore.search, [ query, searchOptions ])
-            .then(r => vm.results[entityKind] = _.map(r.data, transformResult));
+            .then(r => vm.results[entityKind] = r.data);
     };
 
 
@@ -218,8 +191,7 @@ controller.$inject = [
     '$element',
     '$document',
     '$timeout',
-    'ServiceBroker',
-    'DisplayNameService'
+    'ServiceBroker'
 ];
 
 
