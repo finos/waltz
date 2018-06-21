@@ -95,13 +95,6 @@
                                                ng-click="$ctrl.dismiss()"
                                                entity-ref="item">
                             </waltz-entity-link>
-                            <small class="text-muted"
-                                   ng-if="item.qualifier">
-                                (
-                                <span ng-bind="item.qualifier | limitTo:60"></span>
-                                <span ng-if="item.qualifier.length > 60">...</span>
-                                )
-                            </small>
                         </td>
                     </tr>
                     </tbody>
