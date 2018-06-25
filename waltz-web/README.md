@@ -18,18 +18,7 @@ To build the web server use:
 
 Currently looks on classpath for `waltz.properties` or falls
 back to `<home>/.waltz/waltz.properties` for options, should look something like this:
-
-    # database connection detail
-    database.url=jdbc:postgresql://localhost:5432/waltz
-    database.user=<user>
-    database.password=<password>
-
-    # minimum number of connections to the database
-    database.pool.min=2
-    # maximum number of connections to the database
-    database.pool.max=10
-
-A fuller example is [here](example.waltz.properties.md)
+`[example.waltz.properties.md]`
 
 # Running
 
