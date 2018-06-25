@@ -8,6 +8,10 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 [Building notes](https://github.com/khartec/waltz/blob/master/docs/build.md).
 
+[Running](https://github.com/khartec/waltz/blob/master/waltz-web/README.md)
+
+---
+
 [![Build Status](https://travis-ci.org/khartec/waltz.svg?branch=master)](https://travis-ci.org/khartec/waltz)
 
 [![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript)
