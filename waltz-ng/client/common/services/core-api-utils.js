@@ -37,6 +37,7 @@ import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/servic
 import {EntityEnumStore_API as EntityEnumStore} from "../../entity-enum/services/entity-enum-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
 import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../entity-named-note/services/entity-named-note-type-store";
+import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../entity-relationship/services/entity-relationship-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {EntityTagStore_API as EntityTagStore} from "../../entity-tags/services/entity-tag-store";
@@ -100,6 +101,7 @@ export const CORE_API = {
     EntityEnumStore,
     EntityNamedNoteStore,
     EntityNamedNoteTypeStore,
+    EntityRelationshipStore,
     EntitySearchStore,
     EntityStatisticStore,
     EntityTagStore,

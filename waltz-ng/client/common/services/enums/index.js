@@ -21,6 +21,7 @@ import _ from "lodash";
 
 import {action} from './action';
 import {applicationKind} from './application-kind';
+import {appGroupKind} from './app-group-kind';
 import {attestationType} from './attestation-type';
 import {BOOLEAN} from './boolean';
 import {criticality} from './criticality';
@@ -58,6 +59,7 @@ export const enums = {
     action,
     applicationKind,
     applicationRating,
+    appGroupKind,
     attestationType,
     BOOLEAN,
     capabilityRating,

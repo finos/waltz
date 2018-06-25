@@ -17,27 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.jobs;
+import angular from 'angular';
 
-import com.khartec.waltz.data.app_group.AppGroupMemberDao;
-import com.khartec.waltz.model.app_group.AppGroupMemberRole;
-import com.khartec.waltz.service.DIConfiguration;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import * as EntityRelationshipStore from './services/entity-relationship-store';
+import {registerStores} from "../common/module-utils";
 
 
-public class AppGroupMemberHarness {
+export default () => {
 
-    public static void main(String[] args) {
+    const module = angular.module('waltz.entity-relationship', []);
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+    registerStores(module, [ EntityRelationshipStore ])
 
-        AppGroupMemberDao dao = ctx.getBean(AppGroupMemberDao.class);
-
-        dao.register(13, "1", AppGroupMemberRole.OWNER);
-
-
-
-
-    }
-
-}
+    return module.name;
+};

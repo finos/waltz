@@ -19,6 +19,8 @@
 
 package com.khartec.waltz.data.app_group;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.AppGroupMemberRole;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
+import static com.khartec.waltz.schema.Tables.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
@@ -106,6 +109,37 @@ public class AppGroupDao {
                 .join(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP.ID.eq(APPLICATION_GROUP_ENTRY.GROUP_ID))
                 .where(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(appId))
                 .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()).or(APPLICATION_GROUP.ID.in(groupsByUser)))
+                .fetch(TO_DOMAIN);
+    }
+
+
+    public List<AppGroup> findRelatedByEntityReferenceAndUser(EntityReference ref, String userId) {
+        SelectConditionStep<Record1<Long>> groupsByUser = DSL
+                .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
+                .from(APPLICATION_GROUP_MEMBER)
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+
+        Condition joinOnA = APPLICATION_GROUP.ID.eq(ENTITY_RELATIONSHIP.ID_A)
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APP_GROUP.name()));
+        Condition joinOnB = APPLICATION_GROUP.ID.eq(ENTITY_RELATIONSHIP.ID_B)
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APP_GROUP.name()));
+
+        Condition aMatchesEntity = ENTITY_RELATIONSHIP.ID_A.eq(ref.id())
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()));
+        Condition bMatchesEntity = ENTITY_RELATIONSHIP.ID_B.eq(ref.id())
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
+
+        Condition isVisibleToUser = APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
+                .or(APPLICATION_GROUP.ID.in(groupsByUser));
+
+        SelectConditionStep<Record> qry = dsl
+                .selectDistinct(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .join(ENTITY_RELATIONSHIP)
+                .on(joinOnA.or(joinOnB))
+                .where((aMatchesEntity.or(bMatchesEntity)).and(isVisibleToUser));
+
+        return qry
                 .fetch(TO_DOMAIN);
     }
 

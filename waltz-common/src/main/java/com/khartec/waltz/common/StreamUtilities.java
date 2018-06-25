@@ -57,6 +57,14 @@ public class StreamUtilities {
         };
     }
 
+
+    public static <T> Stream<T> ofNullableArray(T[] arr) {
+        return arr == null
+                ? Stream.empty()
+                : Stream.of(arr);
+    }
+
+
     public static class Siphon<T> implements Predicate<T> {
         private final Predicate<T> pred;
         private final List<T> results = new ArrayList();
