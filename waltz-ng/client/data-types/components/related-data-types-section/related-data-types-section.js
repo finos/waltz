@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './change-initiative-related-data-type-section.html';
+import template from './related-data-types-section.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
+import {toEntityRef} from "../../../common/entity-utils";
 
 const bindings = {
     parentEntityRef: '<'
 };
+
 
 const initialState = {
     visibility: {
@@ -32,26 +34,33 @@ const initialState = {
     }
 };
 
+
+function alreadyContains(relatedDataTypes = [], dt) {
+    const existingIds = _.map(relatedDataTypes, 'id');
+    return _.includes(existingIds, dt.id);
+}
+
+
 function controller(serviceBroker, notification) {
 
     const vm = initialiseData(this, initialState);
 
     function refresh() {
-        if (vm.parentEntityRef == null || vm.dataTypes == null) {
+        if (vm.parentEntityRef === null || vm.dataTypes === null) {
             return;
         }
 
         const dataTypesById = _.keyBy(vm.dataTypes, 'id');
         serviceBroker
             .loadViewData(
-                CORE_API.ChangeInitiativeStore.findRelatedForId,
-                [ vm.parentEntityRef.id ],
+                CORE_API.EntityRelationshipStore.findForEntity,
+                [ vm.parentEntityRef ],
                 { force: true })
             .then(r => {
                 vm.relatedDataTypes = _
                     .chain(r.data)
                     .filter(rel => rel.b.kind === 'DATA_TYPE')
-                    .map(rel => Object.assign({}, dataTypesById[rel.b.id], { kind: 'DATA_TYPE'}))
+                    .map(rel => Object.assign({}, dataTypesById[rel.b.id]))
                     .sortBy('name')
                     .value()
             });
@@ -68,31 +77,32 @@ function controller(serviceBroker, notification) {
 
     vm.onSelectDataType = (dt) => {
         vm.selectedDataType = dt;
-        const existingIds = _.map(vm.relatedDataTypes, 'id');
-        vm.editMode = _.includes(existingIds, dt.id)
+        vm.editMode = alreadyContains(vm.relatedDataTypes, vm.selectedDataType)
             ? 'REMOVE'
             : 'ADD';
     };
 
     vm.onAction = () => {
-        const operation = vm.editMode;
+        const isRemove = alreadyContains(vm.relatedDataTypes, vm.selectedDataType);
 
-        const command = {
-            operation,
-            entityReference: {
-                id: vm.selectedDataType.id,
-                kind: 'DATA_TYPE',
-                name: vm.selectedDataType.name
-            },
+        const operation = isRemove
+            ? CORE_API.EntityRelationshipStore.remove
+            : CORE_API.EntityRelationshipStore.create;
+
+        const rel = {
+            a: vm.parentEntityRef,
+            b: toEntityRef(vm.selectedDataType),
             relationship: 'RELATES_TO'
         };
 
         serviceBroker
-            .execute(
-                CORE_API.ChangeInitiativeStore.changeRelationship,
-                [vm.parentEntityRef.id, command])
+            .execute(operation, [ rel ])
             .then(() => {
-                notification.success(`Relationship to ${vm.selectedDataType.name} ${vm.editMode === 'REMOVE' ? 'removed' : 'added'}`);
+                const verb = isRemove
+                    ? 'removed'
+                    : 'added';
+                const msg = `Relationship to ${vm.selectedDataType.name} ${verb}`;
+                notification.success(msg);
                 vm.selectedDataType = null;
                 refresh();
             });
@@ -106,11 +116,14 @@ function controller(serviceBroker, notification) {
 controller.$inject= [ 'ServiceBroker', 'Notification'];
 
 
-export const component = {
+const component = {
     controller,
     bindings,
     template
 };
 
 
-export const id = 'waltzChangeInitiativeRelatedDataTypeSection';
+export default {
+    component,
+    id: 'waltzRelatedDataTypeSection'
+};

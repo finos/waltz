@@ -13,11 +13,19 @@
     </waltz-section-actions>
 
 
-    <div class="row">
-        <div ng-class=" {
-                'col-sm-5' : $ctrl.visibility.picker,
-                'col-sm-12' : !$ctrl.visibility.picker
-            }">
+    <!-- VIEW -->
+    <div class="row"
+         ng-if="!$ctrl.visibility.picker">
+        <div class="col-md-12">
+            <waltz-data-type-usage-tree used="$ctrl.relatedDataTypes">
+            </waltz-data-type-usage-tree>
+        </div>
+    </div>
+
+    <!-- EDIT -->
+    <div class="row"
+         ng-if="$ctrl.visibility.picker">
+        <div class="col-sm-5">
             <ul class="list-unstyled">
                 <li ng-repeat="dataType in $ctrl.relatedDataTypes">
 
@@ -33,10 +41,13 @@
             </ul>
 
             <waltz-no-data ng-if="$ctrl.relatedDataTypes.length === 0">
-                <message><strong>No Data Types</strong> have been related</message>
+                <message>
+                    <strong>No Data Types</strong>
+                    have been related
+                </message>
             </waltz-no-data>
         </div>
-        <div class="col-sm-7" ng-if="$ctrl.visibility.picker">
+        <div class="col-sm-7">
             <div style="border-left: 1px solid #eee; padding-left: 1em">
                 <h4>Edit related Data Type</h4>
 
@@ -48,15 +59,15 @@
 
                 <button class="btn btn-sm"
                         ng-class="{
-                    'btn-danger' : $ctrl.editMode === 'REMOVE',
-                    'btn-success' : $ctrl.editMode === 'ADD'
-                }"
+                            'btn-danger' : $ctrl.editMode === 'REMOVE',
+                            'btn-success' : $ctrl.editMode === 'ADD'
+                        }"
                         ng-if="$ctrl.selectedDataType"
                         ng-click="$ctrl.onAction()">
-            <span ng-bind="$ctrl.editMode === 'REMOVE' ? 'Remove' : 'Add'">
-            </span>
+                    <span ng-bind="$ctrl.editMode === 'REMOVE' ? 'Remove' : 'Add'">
+                    </span>
                     <span ng-bind="$ctrl.selectedDataType.name">
-            </span>
+                    </span>
                 </button>
 
                 <a class="clickable"
@@ -66,7 +77,5 @@
             </div>
         </div>
     </div>
-
-
 
 </div>

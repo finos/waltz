@@ -27,6 +27,7 @@ import DataTypeUsageTree from './components/usage-tree/data-type-usage-tree';
 import DataTypeOverview from './components/overview/data-type-overview';
 import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
 import DataTypeOriginators from './components/originators/data-type-originators';
+import RelatedDataTypesSection from './components/related-data-types-section/related-data-types-section';
 
 export default () => {
     const module = angular.module('waltz.data.types', []);
@@ -41,7 +42,8 @@ export default () => {
         DataTypeUsageCountTree,
         DataTypeUsagePanel,
         DataTypeUsageSelector,
-        DataTypeUsageTree
+        DataTypeUsageTree,
+        RelatedDataTypesSection
     ]);
 
     module
