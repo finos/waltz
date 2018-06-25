@@ -104,10 +104,14 @@
                             <strong>
                                 No flows or types
                             </strong>
-                            registered for this application.  Add them
-                            <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                                here.
-                            </a>
+                            registered for this application.
+                            <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                                Add them
+                                <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                   class="clickable">
+                                    here.
+                                </a>
+                            </span>
                         </message>
                     </waltz-no-data>
                 </div>
@@ -127,10 +131,14 @@
                                     <strong>
                                         No Types
                                     </strong>
-                                    registered for this application.  Add them
-                                    <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                                        here.
-                                    </a>
+                                    registered for this application.
+                                    <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                                        Add them
+                                        <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                           class="clickable">
+                                            here.
+                                        </a>
+                                    </span>
                                 </message>
                             </waltz-no-data>
 
@@ -150,10 +158,14 @@
                                     <strong>
                                         No Logical Data Flows
                                     </strong>
-                                    registered for this application.  Add one
-                                    <a ui-sref='main.logical-flow.edit ($ctrl.parentEntityRef)'>
-                                        here
-                                    </a>.
+                                    registered for this application.
+                                    <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                                        Add one
+                                        <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                           class="clickable">
+                                            here.
+                                        </a>
+                                    </span>
                                 </message>
                             </waltz-no-data>
 
