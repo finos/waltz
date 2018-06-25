@@ -18,7 +18,7 @@ To build the web server use:
 
 Currently looks on classpath for `waltz.properties` or falls
 back to `<home>/.waltz/waltz.properties` for options, should look something like this:
-[example.waltz.properties.md]
+[waltz.properties](example.waltz.properties.md)
 
 # Running
 
