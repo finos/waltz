@@ -17,27 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.jobs;
-
-import com.khartec.waltz.data.app_group.AppGroupMemberDao;
-import com.khartec.waltz.model.app_group.AppGroupMemberRole;
-import com.khartec.waltz.service.DIConfiguration;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-
-public class AppGroupMemberHarness {
-
-    public static void main(String[] args) {
-
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-
-        AppGroupMemberDao dao = ctx.getBean(AppGroupMemberDao.class);
-
-        dao.register(13, "1", AppGroupMemberRole.OWNER);
-
-
-
-
-    }
-
+export function isPromise(obj) {
+    return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }

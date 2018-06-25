@@ -46,9 +46,8 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/private`)
         .then(result => result.data);
 
-
-    const findRelatedByApplicationId = (id) => $http
-        .get(`${BASE}/related/application/${id}`)
+    const findRelatedByEntityRef = (ref) => $http
+        .get(`${BASE}/related/${ref.kind}/${ref.id}`)
         .then(result => result.data);
 
 
@@ -124,7 +123,7 @@ export function store($http, BaseApiUrl) {
         findByIds,
         findPublicGroups,
         findPrivateGroups,
-        findRelatedByApplicationId,
+        findRelatedByEntityRef,
 
         subscribe,
         unsubscribe,
@@ -164,6 +163,11 @@ export const AppGroupStore_API = {
         serviceFnName: 'findMyGroupSubscriptions',
         description: 'executes findMyGroupSubscriptions'
     },
+    findRelatedByEntityRef: {
+        serviceName,
+        serviceFnName: 'findRelatedByEntityRef',
+        description: 'executes findRelatedByEntityRef'
+    },
     getById: {
         serviceName,
         serviceFnName: 'getById',
@@ -183,11 +187,6 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'findPrivateGroups',
         description: 'executes findPrivateGroups'
-    },
-    findRelatedByApplicationId: {
-        serviceName,
-        serviceFnName: 'findRelatedByApplicationId',
-        description: 'executes findRelatedByApplicationId'
     },
     subscribe: {
         serviceName,

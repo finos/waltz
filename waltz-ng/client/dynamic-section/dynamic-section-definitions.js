@@ -309,6 +309,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.authSourcesSection,
         dynamicSections.appsSection,
+        dynamicSections.relatedAppGroupsSection,
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.complexitySection,
         dynamicSections.technologySummarySection,

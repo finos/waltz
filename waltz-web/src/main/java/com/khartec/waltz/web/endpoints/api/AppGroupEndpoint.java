@@ -69,7 +69,7 @@ public class AppGroupEndpoint implements Endpoint {
         String findGroupSubscriptionsForUserPath = mkPath(BASE_URL, "my-group-subscriptions");
         String findPublicGroupsPath = mkPath(BASE_URL, "public");
         String findPrivateGroupsPath = mkPath(BASE_URL, "private");
-        String findRelatedGroupsByApplicationPath = mkPath(BASE_URL, "related", "application", ":id");
+        String findRelatedGroupsByEntityReferencePath = mkPath(BASE_URL, "related", ":kind", ":id");
 
         String subscribePath = mkPath(idPath, "subscribe");
         String unsubscribePath = mkPath(idPath, "unsubscribe");
@@ -103,8 +103,10 @@ public class AppGroupEndpoint implements Endpoint {
         ListRoute<AppGroup> findPrivateGroupsRoute = (request, response) ->
                 appGroupService.findPrivateGroupsByOwner(getUsername(request));
 
-        ListRoute<AppGroup> findRelatedGroupsByApplicationRoute = (request, response) ->
-                appGroupService.findRelatedByApplicationAndUser(getId(request), getUsername(request));
+        ListRoute<AppGroup> findRelatedGroupsByEntityReferenceRoute = (request, response) ->
+                appGroupService.findRelatedByEntityReferenceAndUser(
+                        getEntityReference(request),
+                        getUsername(request));
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);
@@ -211,7 +213,7 @@ public class AppGroupEndpoint implements Endpoint {
         postForList(findByIdsPath, findByIdsRoute);
         getForList(findPublicGroupsPath, findPublicGroupsRoute);
         getForList(findPrivateGroupsPath, findPrivateGroupsRoute);
-        getForList(findRelatedGroupsByApplicationPath, findRelatedGroupsByApplicationRoute);
+        getForList(findRelatedGroupsByEntityReferencePath, findRelatedGroupsByEntityReferenceRoute);
 
         postForList(subscribePath, subscribeRoute);
         postForList(unsubscribePath, unsubscribeRoute);

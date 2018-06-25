@@ -90,8 +90,8 @@ function controller($state, serviceBroker) {
     function loadAppGroups() {
         return serviceBroker
             .loadAppData(
-                CORE_API.AppGroupStore.findRelatedByApplicationId,
-                [vm.parentEntityRef.id])
+                CORE_API.AppGroupStore.findRelatedByEntityRef,
+                [vm.parentEntityRef])
             .then(r => vm.appGroups = r.data);
     }
 

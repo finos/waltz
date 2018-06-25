@@ -25,6 +25,8 @@ function store($http, BaseApiUrl) {
     const findForUserId = (userId) => $http.get(`${BASE}/user-id/${userId}`).then(r => r.data);
     const updateRoles = (userName, roles) => $http.post(`${BASE}/${userName}/roles`, roles).then(r => r.data);
     const deleteUser = (userName) => $http.delete(`${BASE}/${userName}`).then(r => r.data);
+    const whoami = () => $http.get(`${BASE}/whoami`).then(r => r.data);
+
     const resetPassword = (userName, newPassword, currentPassword) => {
         const cmd = {
             userName,
@@ -42,7 +44,8 @@ function store($http, BaseApiUrl) {
         findForUserId,
         register,
         resetPassword,
-        updateRoles
+        updateRoles,
+        whoami
     };
 }
 
@@ -82,6 +85,11 @@ export const UserStore_API = {
         serviceName,
         serviceFnName: 'updateRoles',
         description: "update a user's permissions"
+    },
+    whoami: {
+        serviceName,
+        serviceFnName: 'whoami',
+        description: "returns object representing the current user"
     }
 };
 
