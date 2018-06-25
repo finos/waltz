@@ -29,7 +29,7 @@ back to `<home>/.waltz/waltz.properties` for options, should look something like
     # maximum number of connections to the database
     database.pool.max=10
 
-A fuller example is [here](https://github.com/khartec/waltz/blob/master/waltz-web/src/main/resources/waltz.sample.properties)
+A fuller example is [here](example.waltz.properties.md)
 
 # Running
 
