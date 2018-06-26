@@ -150,8 +150,8 @@ export const dynamicSections = {
         icon: 'link',
         id: 22
     },
-    changeInitiativeRelatedDataTypesSection: {
-        componentId: 'change-initiative-related-data-type-section',
+    relatedDataTypesSection: {
+        componentId: 'related-data-type-section',
         name: 'Related Types',
         icon: 'qrcode',
         id: 23
@@ -203,8 +203,10 @@ export const dynamicSections = {
         name: 'Physical Fields',
         icon: 'file-code-o',
         id: 40,
-    },
+    }
+
 };
+
 
 
 export const dynamicSectionsByKind = {
@@ -242,7 +244,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.relatedMeasurablesSection,
         dynamicSections.relatedAppsSection,
         dynamicSections.relatedAppGroupsSection,
-        dynamicSections.changeInitiativeRelatedDataTypesSection,
+        dynamicSections.relatedDataTypesSection,
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
         dynamicSections.surveySection,
@@ -316,6 +318,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
         dynamicSections.entityNamedNotesSection,
+        dynamicSections.relatedDataTypesSection,
         dynamicSections.changeLogSection
     ]
 };

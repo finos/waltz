@@ -23,7 +23,6 @@ import {registerComponents, registerStore} from '../common/module-utils';
 
 import changeInitiativeStore from './services/change-initiative-store';
 import changeInitiativeSelector from './directives/change-initiative-selector';
-import * as changeInitiativeRelatedDataTypeSection from './components/related-data-type-section/change-initiative-related-data-type-section';
 import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
 import changeInitiativeNavigatorSection from './components/change-initiative-navigator-section/change-initiative-navigator-section';
 
@@ -40,8 +39,7 @@ function setup() {
 
     registerComponents(module, [
         changeInitiativeSection,
-        changeInitiativeNavigatorSection,
-        changeInitiativeRelatedDataTypeSection
+        changeInitiativeNavigatorSection
     ]);
 
     return module.name;
