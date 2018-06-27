@@ -64,10 +64,12 @@ function mkGridData(ref,
                     relationships = [],
                     measurables = [],
                     categories = [],
+                    appGroups = [],
                     rowFilterFn = (x) => true)
 {
     const measurablesById = _.keyBy(measurables, 'id');
     const categoriesById = _.keyBy(categories, 'id');
+    const appGroupsById = _.keyBy(appGroups, 'id');
 
     const toGenericCell = r => {
         return Object.assign({}, r, { type: getEnumName(entity, r.kind) });
@@ -78,18 +80,30 @@ function mkGridData(ref,
         return Object.assign({}, r, { type: c.name });
     };
 
+    const toAppGroupCell = r => {
+        const c = appGroupsById[r.id];
+        return Object.assign({}, r, { name: c != null ? c.name : '', type: 'App Group' });
+    };
+
+
+    const mkCell = (kind, side) => {
+        switch (kind) {
+            case 'MEASURABLE':
+                return toMeasurableCell(side);
+            case 'APP_GROUP':
+                return toAppGroupCell(side);
+            default:
+                return toGenericCell(side);
+        }
+    };
+
     return _
         .chain(relationships)
         .filter(rowFilterFn)
         .map(r => {
             const outbound = sameRef(r.a, ref);
-            const a = r.a.kind === 'MEASURABLE'
-                ? toMeasurableCell(r.a)
-                : toGenericCell(r.a);
-
-            const b = r.b.kind === 'MEASURABLE'
-                ? toMeasurableCell(r.b)
-                : toGenericCell(r.b);
+            const a = mkCell(r.a.kind, r.a);
+            const b = mkCell(r.b.kind, r.b);
 
             return {
                 outbound,
@@ -155,6 +169,7 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.relationships,
             vm.measurables,
             vm.categories,
+            vm.appGroups,
             vm.selectionFilterFn);
     };
 
@@ -260,7 +275,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         return serviceBroker
             .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
             .then(r => {
-                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
+                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories, vm.dataTypes);
                 vm.gridData = calcGridData();
             });
     };
@@ -268,13 +283,16 @@ function controller($q, $timeout, serviceBroker, notification) {
     const loadAll = () => {
         const promises = [
             serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
-            serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll).then(r => r.data)
+            serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll).then(r => r.data),
+            serviceBroker.loadAppData(CORE_API.AppGroupStore.findPublicGroups).then(r => r.data),
+            serviceBroker.loadAppData(CORE_API.AppGroupStore.findPrivateGroups).then(r => r.data)
         ];
         return $q
             .all(promises)
-            .then(([categories, measurables]) => {
+            .then(([categories, measurables, publicAppGroups, privateAppGroups]) => {
                 vm.categories = categories;
                 vm.measurables = measurables;
+                vm.appGroups = _.union(publicAppGroups, privateAppGroups);
             })
             .then(loadRelationships)
 

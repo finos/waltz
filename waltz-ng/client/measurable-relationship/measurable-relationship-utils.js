@@ -1,5 +1,3 @@
-
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -18,9 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {checkIsEntityRef} from '../common/checks';
-import {sameRef} from '../common/entity-utils';
+import _ from "lodash";
+import {checkIsEntityRef} from "../common/checks";
+import {sameRef} from "../common/entity-utils";
 
 
 export function determineCounterpart(reference, relationship) {
@@ -42,7 +40,9 @@ export function sanitizeRelationships(relationships, measurables, categories) {
             { a: 'MEASURABLE', b: 'MEASURABLE' },
             { a: 'MEASURABLE', b: 'CHANGE_INITIATIVE' },
             { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
-            { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' }
+            { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' },
+            { a: 'APP_GROUP', b: 'MEASURABLE' },
+            { a: 'APP_GROUP', b: 'APP_GROUP' }
         ];
 
         const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
