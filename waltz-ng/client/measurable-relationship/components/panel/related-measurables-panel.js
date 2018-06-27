@@ -275,7 +275,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         return serviceBroker
             .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
             .then(r => {
-                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories, vm.dataTypes);
+                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
                 vm.gridData = calcGridData();
             });
     };
