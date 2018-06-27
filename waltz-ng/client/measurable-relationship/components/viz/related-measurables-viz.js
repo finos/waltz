@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {event, select} from 'd3-selection';
+import _ from "lodash";
+import {event, select} from "d3-selection";
 
-import {determineCounterpart, sanitizeRelationships} from '../../measurable-relationship-utils';
-import {initialiseData} from '../../../common';
-import {stopPropagation} from '../../../common/browser-utils';
-import {responsivefy} from '../../../common/d3-utils';
+import {determineCounterpart, sanitizeRelationships} from "../../measurable-relationship-utils";
+import {initialiseData} from "../../../common";
+import {stopPropagation} from "../../../common/browser-utils";
+import {responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './related-measurables-viz.html';
+import template from "./related-measurables-viz.html";
 
 /**
  * @name waltz-related-measurables-viz
@@ -298,6 +298,7 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
         .value();
 
     buckets.push(mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId));
+    buckets.push(mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId));
 
     return buckets;
 }
@@ -314,6 +315,17 @@ function mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId)
     };
 }
 
+
+function mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId) {
+    const id = 'APP_GROUP';
+    return {
+        id,
+        name: 'Application Group',
+        relationshipFilter: er => id === determineCounterpart(primaryEntity, er).kind,
+        count: countsById[id] || 0,
+        isSelected: selectedCategoryId === id
+    };
+}
 
 function draw(groups, data, handlers) {
     if (! groups) return;
@@ -377,6 +389,19 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
                     }
                 };
             })
+    } else if (kind === 'APP_GROUP') {
+            return serviceBroker
+                .loadViewData(CORE_API.AppGroupStore.getById, [ref.id])
+                .then(r => {
+                    return {
+                        id: ref.id,
+                        kind: ref.kind,
+                        name: r.data.appGroup.name,
+                        category: {
+                            name: 'Application Group'
+                        }
+                    };
+                })
     } else {
         Promise.reject('Cannot handle kind: ' + kind);
     }

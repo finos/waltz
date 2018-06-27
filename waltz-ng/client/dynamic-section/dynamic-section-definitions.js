@@ -319,6 +319,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.bookmarksSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.relatedDataTypesSection,
+        dynamicSections.relatedMeasurablesSection,
         dynamicSections.changeLogSection
     ]
 };
