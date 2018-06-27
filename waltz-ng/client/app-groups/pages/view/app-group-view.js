@@ -54,6 +54,7 @@ function controller($stateParams,
             .loadViewData(CORE_API.AppGroupStore.getById, [id])
             .then(r => {
                 vm.groupDetail = r.data;
+                vm.entityRef = Object.assign({}, vm.entityRef, {name: vm.groupDetail.appGroup.name});
                 historyStore.put(
                     vm.groupDetail.appGroup.name,
                     'APP_GROUP',
