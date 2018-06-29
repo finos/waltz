@@ -42,7 +42,8 @@ export function sanitizeRelationships(relationships, measurables, categories) {
             { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
             { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' },
             { a: 'APP_GROUP', b: 'MEASURABLE' },
-            { a: 'APP_GROUP', b: 'APP_GROUP' }
+            { a: 'APP_GROUP', b: 'APP_GROUP' },
+            { a: 'APP_GROUP', b: 'CHANGE_INITIATIVE' }
         ];
 
         const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
