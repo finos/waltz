@@ -37,13 +37,15 @@ export function sanitizeRelationships(relationships, measurables, categories) {
 
     const isValidRel = (rel) => {
         const validCombos = [
-            { a: 'MEASURABLE', b: 'MEASURABLE' },
+            { a: 'MEASURABLE', b: 'APP_GROUP' },
             { a: 'MEASURABLE', b: 'CHANGE_INITIATIVE' },
-            { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
+            { a: 'MEASURABLE', b: 'MEASURABLE' },
+            { a: 'CHANGE_INITIATIVE', b: 'APP_GROUP' },
             { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' },
-            { a: 'APP_GROUP', b: 'MEASURABLE' },
+            { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
             { a: 'APP_GROUP', b: 'APP_GROUP' },
-            { a: 'APP_GROUP', b: 'CHANGE_INITIATIVE' }
+            { a: 'APP_GROUP', b: 'CHANGE_INITIATIVE' },
+            { a: 'APP_GROUP', b: 'MEASURABLE' }
         ];
 
         const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
