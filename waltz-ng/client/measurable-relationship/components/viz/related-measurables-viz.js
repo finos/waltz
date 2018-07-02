@@ -25,6 +25,8 @@ import {initialiseData} from "../../../common";
 import {stopPropagation} from "../../../common/browser-utils";
 import {responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {easeLinear} from "d3-ease";
+import {transition} from "d3-transition";
 
 import template from "./related-measurables-viz.html";
 
@@ -78,8 +80,12 @@ const dimensions = {
 };
 
 // initial angle, set to make label overlaps less likely
-const angleOffset = -0.7;
+const ANGLE_OFFSET = -0.7;
+const ANIMATION_DURATION = 300;
 
+const TRANSITION = transition()
+    .ease(easeLinear)
+    .duration(ANIMATION_DURATION);
 
 const styles = {
     centerNodes: 'wrmv-center-nodes',
@@ -169,18 +175,16 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 
 
     // -- ENTER --
-
     const newOuterNodes = outerNodes
         .enter()
         .append('g')
         .classed(styles.outerNode, true)
-        .attr('transform', (d, i) => {
-            const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
-            return `translate(${x}, ${y})`;
-        })
         .on('click', d => {
             handlers.onCategorySelect(d);
             stopPropagation(event);
+        })
+        .attr('transform', (d, i) => {
+            return `translate(${dimensions.width / 2}, ${dimensions.height / 2})`;
         });
 
     newOuterNodes
@@ -201,17 +205,24 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 
 
     // -- UPDATE --
-
     const allOuterNodes = newOuterNodes
         .merge(outerNodes);
+
+
 
     allOuterNodes
         .classed(styles.selected, d => d.isSelected)
         .classed(styles.hasRelationships, d => d.count > 0)
-        .classed(styles.noRelationships, d => d.count === 0);
+        .classed(styles.noRelationships, d => d.count === 0)
+        .transition(TRANSITION)
+        .attr('transform', (d, i) => {
+            const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
+            return `translate(${x}, ${y})`;
+        });
 
     allOuterNodes
         .select(`circle`)
+        .transition(TRANSITION)
         .attr('r', d => {
             const hasRelationships = d.count > 0;
             const scaleFactor = hasRelationships
@@ -228,7 +239,6 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 
 
     // -- EXIT --
-
     outerNodes
         .exit()
         .remove();
@@ -238,22 +248,39 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 function drawBridges(group, categories = [], deltaAngle) {
     if (!group) return;
 
-    return group
+    const bridges = group
         .selectAll(`.${styles.bridge}`)
-        .data(categories, d => d.id)
+        .data(categories, d => d.id);
+
+
+    // -- ENTER
+    const newBridges = bridges
         .enter()
         .append('line')
         .classed(styles.bridge, true)
         .attr('x1', dimensions.width / 2)
         .attr('y1', dimensions.height / 2)
         .attr('stroke', '#aaa')
-        .attr('stroke-width', dimensions.bridge.w)
+        .attr('stroke-width', dimensions.bridge.w);
+
+
+    // -- UPDATE --
+    const allBridges = newBridges
+        .merge(bridges);
+
+    allBridges
         .each(function (d, i) {
             const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
             select(this)
                 .attr('x2', x)
                 .attr('y2', y);
         });
+
+
+    // -- EXIT --
+    bridges
+        .exit()
+        .remove();
 }
 
 
@@ -294,11 +321,13 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
                 isSelected: selectedCategoryId === id
             };
         })
+        .filter(b => b.count > 0)
         .orderBy('name')
         .value();
 
     buckets.push(mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId));
     buckets.push(mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId));
+    buckets.push(mkAddViewpointBucket(selectedCategoryId));
 
     return buckets;
 }
@@ -327,6 +356,19 @@ function mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId) {
     };
 }
 
+
+function mkAddViewpointBucket(selectedCategoryId) {
+    const id = 'MEASURABLE';
+    return {
+        id,
+        name: 'Add Viewpoint',
+        relationshipFilter: er => false,
+        count: null,
+        isSelected: selectedCategoryId === id
+    };
+}
+
+
 function draw(groups, data, handlers) {
     if (! groups) return;
     if (! data.primaryEntity) return;
@@ -339,7 +381,7 @@ function draw(groups, data, handlers) {
         data.relationships,
         data.selectedCategoryId);
 
-    const deltaAngle = i => i * (Math.PI * 2) / buckets.length + angleOffset;
+    const deltaAngle = i => i * (Math.PI * 2) / buckets.length + ANGLE_OFFSET;
 
     drawCenterGroup(groups.centerNodes, data.primaryEntity);
     drawOuterNodes(groups.outerNodes, buckets, deltaAngle, handlers);
@@ -422,13 +464,13 @@ function mkData(vm) {
 function controller($element, $q, $timeout, serviceBroker) {
     const vm = this;
 
-    const loadData = () => {
+    const loadData = (force = false) => {
         const p1 = serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .loadAppData(CORE_API.MeasurableStore.findAll, [], { force })
             .then(r => vm.measurables = r.data);
 
         const p2 = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll, [], { force })
             .then(r => vm.categories = r.data);
 
         return $q.all([p1, p2])
