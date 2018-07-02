@@ -31,8 +31,11 @@
                             </waltz-entity-link>
                         </td>
                         <td>
-                            <span ng-bind="rel.relationship | toDisplayName:'relationshipKind'">
-                            </span>
+                            <waltz-editable-dropdown initial-val="rel.relationship"
+                                                     entries="$ctrl.dropdownEntries"
+                                                     on-save="$ctrl.onRelationshipEdit"
+                                                     ctx="rel">
+                            </waltz-editable-dropdown>
                         </td>
                         <td>
                             <span class="waltz-visibility-child-50">

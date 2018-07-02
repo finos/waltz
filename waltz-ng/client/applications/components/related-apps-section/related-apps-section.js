@@ -114,7 +114,7 @@ function controller($q,
             { force })
             .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
 
-        $q.all([appsPromise, relationsPromise])
+        return $q.all([appsPromise, relationsPromise])
             .then(([apps, relations]) => {
                 vm.gridData = mkGridData(relations, apps);
                 vm.entityRelationships = _.map(relations, r => Object.assign({}, {
@@ -145,7 +145,7 @@ function controller($q,
 
     vm.onAdd = (entityRel) => {
         const changeRelationship = changeRelationshipFunctionsByKind[vm.parentEntityRef.kind];
-        serviceBroker
+        return serviceBroker
             .execute(
                 changeRelationship,
                 [vm.parentEntityRef.id, mkChangeCommand('ADD', entityRel.entity, entityRel.relationship)])
@@ -155,13 +155,13 @@ function controller($q,
                 } else {
                     notification.warning("Failed to add relationship")
                 }
-                loadData(true);
+                return loadData(true);
             });
     };
 
     vm.onRemove = (entityRel) => {
         const changeRelationship = changeRelationshipFunctionsByKind[vm.parentEntityRef.kind];
-        serviceBroker
+        return serviceBroker
             .execute(
                 changeRelationship,
                 [vm.parentEntityRef.id, mkChangeCommand('REMOVE', entityRel.entity, entityRel.relationship)])
@@ -171,7 +171,7 @@ function controller($q,
                 } else {
                     notification.warning("Failed to remove relationship")
                 }
-                loadData(true);
+                return loadData(true);
             });
     };
 }
