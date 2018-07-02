@@ -84,18 +84,23 @@ function mkColumnDefs(parentRef) {
             </div>`
     };
 
+    const ratingCell = {
+        field: 'ratingDisplayName',
+        displayName: 'Rating'
+    };
+
     return _.compact([
         mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
         mkEntityLinkGridCell('Declaring Org Unit', 'declaringOrgUnit', 'none'),
         mkEntityLinkGridCell('Application', 'app', 'none'),
         consumerCell,
-        mkEnumGridCell('Rating', 'rating', false /* showIcon */),
+        ratingCell,
         notesCell
     ]);
 }
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, displayNameService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -111,6 +116,7 @@ function controller(serviceBroker) {
                 declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: 'ORG_UNIT' }),
                 description: d.description,
                 rating: d.rating,
+                ratingDisplayName: displayNameService.lookup('AuthoritativenessRating', d.rating),
                 consumers: vm.consumersByAuthSourceId[d.id] || []
             };
         });
@@ -157,7 +163,7 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ['ServiceBroker', 'DisplayNameService'];
 
 
 export const component = {
