@@ -38,6 +38,7 @@ const template = require('./related-entity-editor.html');
 
 const initialState = {
     allowedRelationships: [],
+    dropdownEntries: [],
     currentRelationship: {},
     currentRelationships: [],
     parentEntityRef: null,
@@ -56,6 +57,8 @@ function controller() {
         if(changes.targetEntityKind) {
             vm.targetEntityDisplayName = _.toLower(getEnumName(entity, vm.targetEntityKind)) + "s";
         }
+
+        vm.dropdownEntries = _.map(vm.allowedRelationships, r => ({ code: r.value, name: r.name}) );
     };
 
     vm.onEntitySelect = (entity) => {
@@ -70,10 +73,18 @@ function controller() {
 
     vm.onRelationshipAdd = () => {
         const currentRelationship = vm.currentRelationship;
-        invokeFunction(vm.onAdd, currentRelationship);
-        vm.currentRelationship = {};
+        return invokeFunction(vm.onAdd, currentRelationship)
+            .then(() => vm.currentRelationship = {});
     };
 
+    vm.onRelationshipEdit = (value, ctx) => {
+        vm.currentRelationship = {
+            entity: ctx.entity,
+            relationship: value
+        };
+        return vm.onRemove(ctx)
+            .then(() => vm.onRelationshipAdd());
+    };
 }
 
 

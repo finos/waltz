@@ -1,0 +1,51 @@
+<div class="waltz-visibility-parent">
+
+    <!-- VIEW -->
+    <span ng-if='!$ctrl.visibility.editor'>
+
+        <span ng-bind="$ctrl.getName($ctrl.currentVal)"></span>
+
+        <a ng-click="$ctrl.onEdit()"
+           ng-if="$ctrl.editRole"
+           waltz-has-role="{{ $ctrl.editRole }}"
+           class="btn btn-xs waltz-visibility-child-30">
+            <waltz-icon name="pencil"></waltz-icon>
+            Edit
+        </a>
+        <a ng-click="$ctrl.onEdit()"
+           ng-if="! $ctrl.editRole"
+           class="btn btn-xs waltz-visibility-child-30">
+            <waltz-icon name="pencil"></waltz-icon>
+            Edit
+        </a>
+    </span>
+
+    <!-- EDIT -->
+    <form class='form-inline'
+           ng-if='$ctrl.visibility.editor'>
+        <select ng-model="$ctrl.currentVal"
+                ng-options="item.code as item.name for item in $ctrl.dropdownValues"
+                class="form-control">
+        </select>
+
+        <button class="btn btn-xs btn-success"
+                ng-disabled="$ctrl.saving"
+                ng-click="$ctrl.doSave()">
+            <waltz-icon name="check"></waltz-icon>
+            Save
+        </button>
+        <button class="btn btn-xs"
+                ng-click="$ctrl.doCancel()"
+                ng-if="!$ctrl.saving">
+            <waltz-icon name="times"></waltz-icon>
+            Cancel
+        </button>
+
+        <span ng-if="$ctrl.saving">
+            <waltz-icon name="spinner"
+                        spin="true">
+            </waltz-icon>
+        </span>
+    </form>
+
+</div>
