@@ -16,14 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {CORE_API} from '../../../common/services/core-api-utils';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
 import {nest} from "d3-collection";
 
 
 const initialState = {
     tabs: [],
+    diagramsByCategory: {},
     visibility: {
         tab: null
     },
@@ -75,13 +76,18 @@ function controller($location,
 
     const measurableCategoryPromise = serviceBroker
         .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-        .then(r => vm.categories = r.data);
+        .then(r => {
+            vm.categories = r.data;
+            vm.categoriesById = _.keyBy(r.data, 'id')
+            return r.data;
+        });
 
     const countPromise = serviceBroker
         .loadViewData(CORE_API.MeasurableRatingStore.countByMeasurable)
         .then(r => r.data);
 
-    const defaultCategoryPromise = settingsService.findOrDefault("settings.measurable.default-category");
+    const defaultCategoryPromise = settingsService
+        .findOrDefault("settings.measurable.default-category");
 
     $q.all([measurablePromise, measurableCategoryPromise, countPromise, defaultCategoryPromise])
         .then(([measurables = [], categories = [], counts = [], defaultCategory]) => {
@@ -91,16 +97,8 @@ function controller($location,
                 .key(d => d.externalId)
                 .rollup(vs => vs[0])
                 .object(measurables);
-            vm.visibility.tab = $stateParams.category || defaultCategory || findFirstNonEmptyTab(vm.tabs);
-        });
-
-    measurableCategoryPromise
-        .then((cs) => serviceBroker
-            .loadViewData(CORE_API.SvgDiagramStore.findByGroups, [_.map(cs, c => `NAVAID.MEASURABLE.${c.id}`)]))
-        .then(r => vm.diagramsByCategory = _.groupBy(r.data, d => d.group.replace('NAVAID.MEASURABLE.', '')));
-
-    measurableCategoryPromise
-        .then(cs => vm.categoriesById = _.keyBy(cs, 'id'));
+            vm.onTabSelect($stateParams.category || defaultCategory || findFirstNonEmptyTab(vm.tabs));
+    });
 
     vm.blockProcessor = b => {
         const extId = b.value;
@@ -114,7 +112,16 @@ function controller($location,
     };
 
     vm.onTabSelect = (tab) => {
-        $location.search('category', tab.category.id)
+        const categoryId = _.isNumber(tab) ? tab : tab.category.id;
+        vm.visibility.tab = categoryId;
+
+        serviceBroker
+            .loadAppData(
+                CORE_API.SvgDiagramStore.findByGroups,
+                [ `NAVAID.MEASURABLE.${categoryId}` ])
+            .then(r => vm.diagramsByCategory[categoryId] = r.data);
+
+        $location.search('category', categoryId);
     };
 
 }
