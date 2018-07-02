@@ -36,24 +36,11 @@
         <!-- TABLE -->
         <div ng-if="$ctrl.gridData.length > 0"
              class="waltz-fade-if small">
-            <div ng-class="{ 'waltz-scroll-region-500' : $ctrl.gridData.length > 10 }">
+            <waltz-related-measurables-table rows="$ctrl.gridData"
+                                             on-row-select="$ctrl.selectRow"
+                                             selected-row="$ctrl.selectedRow">
 
-                <waltz-related-measurables-table rows="$ctrl.gridData"
-                                                 on-row-select="$ctrl.selectRow"
-                                                 selected-row="$ctrl.selectedRow">
-
-                </waltz-related-measurables-table>
-            </div>
-
-            <!-- Export -->
-            <a ng-click="$ctrl.export()"
-               ng-if="!$ctrl.visibility.editor && !$ctrl.selectedRow"
-               class="clickable pull-right"
-               style="text-decoration: none;"
-               role="button">
-                <waltz-icon name="download"></waltz-icon>
-                Export
-            </a>
+            </waltz-related-measurables-table>
         </div>
 
         <!-- NO DATA -->

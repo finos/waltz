@@ -17,9 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
+
 import template from './related-measurables-table.html';
 import {initialiseData} from "../../../common/index";
 import {sameRef} from "../../../common/entity-utils";
+import {downloadTextFile} from "../../../common/file-utils";
+import {getEnumName} from "../../../common/services/enums/index";
+import {relationshipKind} from "../../../common/services/enums/relationship-kind";
 
 
 const bindings = {
@@ -35,6 +40,34 @@ const initialState = {
 };
 
 
+function mkExportData(rows = []) {
+    const columnNames = [[
+        "From",
+        "From type",
+        "To",
+        "To type",
+        "Relationship",
+        "Description",
+        "Last Updated At",
+        "Last Updated By"
+    ]];
+
+    const exportData = _.map(rows, r => [
+        r.a.name,
+        r.a.type,
+        r.b.name,
+        r.b.type,
+        getEnumName(relationshipKind, r.relationship.relationship),
+        r.relationship.description,
+        r.relationship.lastUpdatedAt,
+        r.relationship.lastUpdatedBy
+    ]);
+
+    return columnNames.concat(exportData);
+}
+
+
+
 function controller() {
     const vm = initialiseData(this, initialState);
 
@@ -47,6 +80,13 @@ function controller() {
             return false;
         }
     };
+
+
+    vm.export = () => {
+        const data = mkExportData(vm.rows);
+        downloadTextFile(data, ",", "related_viewpoints.csv");
+    };
+
 }
 
 
