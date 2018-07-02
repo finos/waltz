@@ -75,7 +75,7 @@ function controller() {
     };
 
     vm.getName = (code) => {
-        return vm.dropdownsByCode[code] ? vm.dropdownsByCode[code].name : code;
+        return _.get(vm, ['dropdownsByCode', code, 'name'], code);
     };
 
 }
