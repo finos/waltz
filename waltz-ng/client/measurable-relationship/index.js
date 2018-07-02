@@ -19,8 +19,9 @@
 import angular from "angular";
 import * as measurableRelationshipStore from './services/measurable-relationship-store';
 import {registerComponents, registerStore} from '../common/module-utils';
-import createEditor from './components/editor/create-related-measurable-editor';
-import updateEditor from './components/editor/update-related-measurable-editor';
+import CreateEditor from './components/editor/create-related-measurable-editor';
+import UpdateEditor from './components/editor/update-related-measurable-editor';
+import RelatedMeasurablesTable from './components/table/related-measurables-table';
 
 
 export default () => {
@@ -34,8 +35,9 @@ export default () => {
         ;
 
     registerComponents(module, [
-        createEditor,
-        updateEditor
+        CreateEditor,
+        UpdateEditor,
+        RelatedMeasurablesTable
     ]);
 
 
