@@ -51,6 +51,7 @@ const initialState = {
         isSelectable: node => node.concrete
     },
     visibility: {
+        appGroupSelector: false,
         changeInitiativeSelector: false,
         measurableSelector: false
     }
@@ -71,56 +72,90 @@ function prepareTree(nodes = []) {
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const loadMeasurableTree = (categoryId) => {
+
+        // load measurable tree for category
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => {
+                vm.measurables = _.filter(r.data, { categoryId });
+                vm.nodes = prepareTree(vm.measurables);
+            });
+
+
+        // load existing relationships
+        serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                [vm.parentEntityRef],
+                { force: true })
+            .then(r => {
+                const usedIds = _
+                    .chain(r.data)
+                    .flatMap(rel => {
+                        const ids = [];
+                        if (rel.a.kind === 'MEASURABLE') ids.push(rel.a.id);
+                        if (rel.b.kind === 'MEASURABLE') ids.push(rel.b.id);
+                        return ids;
+                    })
+                    .uniq()
+                    .value();
+
+                vm.treeOptions.isSelectable = (node) => {
+                    return node.concrete && ! _.includes(usedIds, node.id);
+                };
+            });
+    };
+
+
     vm.$onInit = () => {
         const isMeasurable = _.startsWith(vm.type.id, 'MEASURABLE');
 
         if (isMeasurable) {
             vm.visibility.measurableSelector = true;
             const categoryId = readCategoryId(vm.type.id);
-            serviceBroker
-                .loadAppData(CORE_API.MeasurableStore.findAll)
-                .then(r => {
-                    vm.measurables = _.filter(r.data, {categoryId});
-                    vm.nodes = prepareTree(vm.measurables);
-                });
 
+            // load categories
             serviceBroker
                 .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-                .then(r => vm.categories = r.data)
-                .then(cs => vm.category = _.find(cs, {id: categoryId}))
-                .then(c => vm.counterpartType = c.name);
-
-            serviceBroker
-                .loadViewData(
-                    CORE_API.MeasurableRelationshipStore.findByEntityReference,
-                    [vm.parentEntityRef],
-                    { force: true })
                 .then(r => {
-                    const usedIds = _
-                        .chain(r.data)
-                        .flatMap(rel => {
-                            const ids = [];
-                            if (rel.a.kind === 'MEASURABLE') ids.push(rel.a.id);
-                            if (rel.b.kind === 'MEASURABLE') ids.push(rel.b.id);
-                            return ids;
-                        })
-                        .uniq()
-                        .value();
-
-                    vm.treeOptions.isSelectable = (node) => {
-                        return node.concrete && ! _.includes(usedIds, node.id);
-                    };
+                    vm.categories = r.data;
+                    return vm.categories;
                 })
+                .then(cs => {
+                    if(categoryId) {
+                        vm.category = _.find(cs, {id: categoryId});
+                        vm.counterpartType = vm.category.name;
+                    }
+                });
+
+            if(categoryId) {
+                loadMeasurableTree(categoryId);
+            }
+
         } else {
-            vm.visibility.changeInitiativeSelector = true;
-            vm.counterpartType = 'Change Initiative';
+            switch (vm.type.id) {
+                case 'CHANGE_INITIATIVE':
+                    vm.visibility.changeInitiativeSelector = true;
+                    vm.counterpartType = 'Change Initiative';
+                    break;
+
+                case 'APP_GROUP':
+                    vm.visibility.appGroupSelector = true;
+                    vm.counterpartType = 'Application Group';
+                    break;
+            }
         }
 
-        vm.relationshipKindsKey = vm.parentEntityRef.kind + '-' + (isMeasurable ? 'MEASURABLE' : 'CHANGE_INITIATIVE');
+        vm.relationshipKindsKey = vm.parentEntityRef.kind + '-' + (isMeasurable ? 'MEASURABLE' : vm.type.id);
     };
 
 
     // -- INTERACT --
+
+    vm.onAppGroupSelection = (appGroup) => {
+        vm.form.counterpart = appGroup;
+    };
 
     vm.onChangeInitiativeSelection = (changeInitiative) => {
         vm.form.counterpart = changeInitiative;
@@ -128,6 +163,10 @@ function controller(notification, serviceBroker) {
 
     vm.onMeasurableSelection = (node) => {
         vm.form.counterpart = toEntityRef(node, 'MEASURABLE');
+    };
+
+    vm.onMeasurableCategorySelection = (category) => {
+        loadMeasurableTree(category.id);
     };
 
     vm.isFormValid = () => {
