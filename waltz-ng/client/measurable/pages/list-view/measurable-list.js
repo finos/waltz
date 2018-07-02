@@ -121,7 +121,7 @@ function controller($location,
                 [ `NAVAID.MEASURABLE.${categoryId}` ])
             .then(r => vm.diagramsByCategory[categoryId] = r.data);
 
-        $location.search('category', categoryId)
+        $location.search('category', categoryId);
     };
 
 }
