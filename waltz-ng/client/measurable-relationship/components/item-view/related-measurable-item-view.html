@@ -1,0 +1,72 @@
+<h4 ng-if="!$ctrl.item.outbound">
+                <span class="wrmp-relationship-heading">
+                    <span class="wrmp-pill wrmp-counterpart">
+                       <waltz-entity-link entity-ref="$ctrl.item.a"></waltz-entity-link>
+                    </span>
+
+                    <span class="wrmp-pill wrmp-rel">
+                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'"></span>
+                    </span>
+                    <span class="wrmp-pill wrmp-self">
+                        This
+                    </span>
+                </span>
+    <a class='clickable pull-right'
+       ng-click="$ctrl.onDismiss()">
+        (x)
+    </a>
+</h4>
+<h4 ng-if="$ctrl.item.outbound">
+                <span class="wrmp-relationship-heading">
+                    <span class="wrmp-pill wrmp-self">
+                        This
+                    </span>
+
+                    <span class="wrmp-pill wrmp-rel">
+                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'">
+                        </span>
+                    </span>
+
+                    <span class="wrmp-pill wrmp-counterpart">
+                        <waltz-entity-link entity-ref="$ctrl.item.b"></waltz-entity-link>
+                    </span>
+                </span>
+    <a class='clickable pull-right'
+       ng-click="$ctrl.onDismiss()">
+        (x)
+    </a>
+</h4>
+
+<br>
+<label>Description:</label>
+<div ng-if="$ctrl.item.relationship.description">
+    <waltz-markdown text="$ctrl.item.relationship.description"></waltz-markdown>
+</div>
+<div ng-if="!$ctrl.item.relationship.description"
+     class="text-muted">
+    <strong>No description provided</strong>
+</div>
+
+<hr>
+
+<!-- ACTIONS -->
+<div waltz-has-role="CAPABILITY_EDITOR">
+    <button class="btn btn-xs btn-primary"
+            ng-click="$ctrl.onEdit()">
+        Edit
+    </button>
+    <button class="btn btn-xs btn-danger"
+            ng-click="$ctrl.onRemove($ctrl.item.relationship)">
+        Delete
+    </button>
+    <a ng-click="$ctrl.onDismiss()"
+       class="clickable">
+        Dismiss
+    </a>
+    <hr>
+</div>
+
+<div class="small">
+    <waltz-last-updated entity="$ctrl.item.relationship">
+    </waltz-last-updated>
+</div>
