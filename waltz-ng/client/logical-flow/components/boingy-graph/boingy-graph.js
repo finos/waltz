@@ -318,7 +318,7 @@ function controller($timeout, $element) {
             .call(myZoom.transform, zoomIdentity);
 
         debouncedDraw();
-    }
+    };
 }
 
 

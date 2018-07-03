@@ -106,7 +106,7 @@ function loadData($injector,
     if (! $injector.has(serviceName)) {
         const message = "ServiceBroker::loadData - Unable to locate service: " + serviceName;
         console.error(message);
-        return Promise.reject(message)
+        return Promise.reject(message);
     }
 
     const service = $injector.get(serviceName);

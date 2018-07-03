@@ -160,7 +160,7 @@ function controller($q,
                 const related = vm.relatedDefinitions.children;
 
                 const relatedIds = _.chain(related)
-                    .filter(s => s != null)
+                    .filter(s => s !== null)
                     .map('id')
                     .value();
 
@@ -202,7 +202,7 @@ function controller($q,
     vm.onChangeDuration = (d) => {
         vm.duration = d;
         loadHistory();
-    }
+    };
 }
 
 

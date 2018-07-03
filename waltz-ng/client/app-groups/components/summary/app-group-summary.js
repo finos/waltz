@@ -96,7 +96,7 @@ function controller($q, serviceBroker, userService) {
             .loadViewData(
                 CORE_API.ComplexityStore.findBySelector,
                 [ selector ])
-            .then(r => vm.complexitySummary = calcComplexitySummary(r.data))
+            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
 
         serviceBroker
             .loadViewData(

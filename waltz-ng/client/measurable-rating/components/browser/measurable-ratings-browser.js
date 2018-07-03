@@ -152,20 +152,6 @@ function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
 }
 
 
-function mkMeasurableToRatingSchemeMap(categories = [], measurables = [], ratingSchemesById = {}) {
-    const categoriesById = _.keyBy(categories, 'id');
-    return _.reduce(
-        measurables,
-        (acc, m) => {
-            const category = categoriesById[m.categoryId];
-            const ratingScheme = ratingSchemesById[category.ratingSchemeId];
-            acc[m.id] = ratingScheme;
-            return acc;
-        },
-        {});
-}
-
-
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 

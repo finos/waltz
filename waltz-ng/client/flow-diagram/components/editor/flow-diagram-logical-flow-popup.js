@@ -20,7 +20,7 @@
 import _ from "lodash";
 import { initialiseData } from "../../../common";
 import { toGraphId } from "../../flow-diagram-utils";
-import { sameRef, toEntityRef } from "../../../common/entity-utils";
+import { sameRef } from "../../../common/entity-utils";
 import { kindToViewState } from "../../../common/link-utils";
 
 /**

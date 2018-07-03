@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import {initialiseData} from "../common/index";
 
 
@@ -43,7 +42,7 @@ const initialState = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 

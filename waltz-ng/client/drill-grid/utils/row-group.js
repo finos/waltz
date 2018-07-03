@@ -84,11 +84,6 @@ function getAppsFromMappings(mappings, focusApp) {
 }
 
 
-const Strategies = {
-    basic: {
-
-    }
-}
 
 // -- CLASS ---
 

@@ -63,16 +63,6 @@ function controller(
         vm.visibility.mode = 'EDIT';
     };
 
-    const hideDiagram = () => {
-        vm.visibility.diagram = false;
-        vm.visibility.editor = false;
-    };
-
-
-    vm.$onInit = () => {
-        //reload();
-    };
-
 
     const selectDiagram = (diagram) => {
         vm.selected.diagram = diagram;

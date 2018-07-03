@@ -177,7 +177,7 @@ const entityRelationshipChangeCommandShape = {
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
-const assert = (b, msg) => { if (!b) throw msg; }
+const assert = (b, msg) => { if (!b) throw msg; };
 
 
 export function checkNotEmpty(x, msg = 'is empty') {
@@ -293,11 +293,3 @@ export function ensureNotNull(x, message) {
     }
 }
 
-export function ensureIsNumber(x, message) {
-    const num = Number(x);
-    if (_.isNaN(num)) {
-        throw new Error(message ? message : `${x} is not a number`, x);
-    } else {
-        return num;
-    }
-}

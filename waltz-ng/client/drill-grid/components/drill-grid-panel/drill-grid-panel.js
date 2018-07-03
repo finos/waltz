@@ -33,11 +33,6 @@ const bindings = {
     parentEntityRef: '<',
 };
 
-const REG = 7;
-const PROD = 4;
-const FUN = 1;
-const BUS = 6;
-
 
 const initialState = {
     visibility: {

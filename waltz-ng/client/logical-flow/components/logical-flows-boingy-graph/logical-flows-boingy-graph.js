@@ -20,7 +20,6 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {determineStatMethod} from "../../logical-flow-utils";
 import template from './logical-flows-boingy-graph.html';
 
 const bindings = {

@@ -20,8 +20,7 @@
 import {initialiseData} from '../../../common';
 import {kindToViewState} from "../../../common/link-utils";
 import {stringToRef} from "../../../common/entity-utils";
-import {select, selectAll, event} from 'd3-selection';
-import {drag} from 'd3-drag';
+import {select, event} from 'd3-selection';
 import {zoom} from 'd3-zoom';
 
 import template from './entity-svg-diagram-viewer.html';
@@ -120,7 +119,7 @@ function controller($element, $state, $timeout) {
                 });
             })
             .on('mouseleave', function() {
-                const text = select(this)
+                select(this)
                     .attr('data-wesd-node-description');
                 $timeout(() => {
                     vm.popup.style.display = "none";

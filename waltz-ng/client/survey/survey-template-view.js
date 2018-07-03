@@ -163,7 +163,7 @@ function controller($q,
                     }))
                 .value();
 
-             $q.all(personPromises)
+            $q.all(personPromises)
                 .then(() => {
                     vm.issuedAndCompletedRunsEnriched = _.map(
                             vm.issuedAndCompletedRuns,
@@ -218,7 +218,7 @@ function controller($q,
                     $state.go('main.survey.template.view', {id: newTemplateId});
                 });
         }
-    }
+    };
 }
 
 
