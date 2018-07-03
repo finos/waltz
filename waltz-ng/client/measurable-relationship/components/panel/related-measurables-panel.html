@@ -36,63 +36,10 @@
         <!-- TABLE -->
         <div ng-if="$ctrl.gridData.length > 0"
              class="waltz-fade-if small">
-            <div ng-class="{ 'waltz-scroll-region-500' : $ctrl.gridData.length > 10 }">
-                <table class="table table-condensed table-hover">
-                    <colgroup>
-                        <col width="38%">
-                        <col width="20%">
-                        <col width="38%">
-                        <col width="4%">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>From</th>
-                        <th>Relationship</th>
-                        <th>To</th>
-                        <th>..</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- DATA -->
-                    <tr ng-repeat="row in $ctrl.gridData"
-                        class="clickable"
-                        ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelected(row) }"
-                        ng-click="$ctrl.selectRow(row)">
-                        <td>
-                            <span ng-class="{ 'text-muted' : row.outbound }">
-                                <span ng-bind="row.a.name"></span>
-                                ( <small class='text-muted' ng-bind="row.a.type"></small> )
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-bind="row.relationship.relationship | toDisplayName:'relationshipKind'"></span>
-                        </td>
-                        <td>
-                            <span ng-class="{ 'text-muted' : !row.outbound }">
-                                <span ng-bind="row.b.name"></span>
-                                ( <small class='text-muted' ng-bind="row.b.type"></small> )
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-if="row.relationship.description.length > 0"
-                                  title="Additional description available">
-                                <waltz-icon name="file-text-o"></waltz-icon>
-                            </span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Export -->
-            <a ng-click="$ctrl.export()"
-               ng-if="!$ctrl.visibility.editor && !$ctrl.selectedRow"
-               class="clickable pull-right"
-               style="text-decoration: none;"
-               role="button">
-                <waltz-icon name="download"></waltz-icon>
-                Export
-            </a>
+            <waltz-related-measurables-table rows="$ctrl.gridData"
+                                             on-row-select="$ctrl.selectRow"
+                                             selected-row="$ctrl.selectedRow">
+            </waltz-related-measurables-table>
         </div>
 
         <!-- NO DATA -->
@@ -110,6 +57,8 @@
              class="waltz-fade-if">
             Select a category or relationship to make changes.
         </div>
+
+
         <!-- SELECTED CATEGORY -->
         <div ng-if="$ctrl.selectedCategory && !$ctrl.visibility.editor && !$ctrl.selectedRow"
              class="waltz-fade-if">
@@ -137,78 +86,12 @@
              class="waltz-fade-if">
             <hr>
 
-            <h4 ng-if="!$ctrl.selectedRow.outbound">
-                <span class="wrmp-relationship-heading">
-                    <span class="wrmp-pill wrmp-counterpart">
-                       <waltz-entity-link entity-ref="$ctrl.selectedRow.a"></waltz-entity-link>
-                    </span>
+            <waltz-related-measurable-item-view item="$ctrl.selectedRow"
+                                                on-dismiss="$ctrl.clearRowSelection"
+                                                on-edit="$ctrl.updateExistingRelationship"
+                                                on-remove="$ctrl.removeRelationship">
+            </waltz-related-measurable-item-view>
 
-                    <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.selectedRow.relationship.relationship | toDisplayName:'relationshipKind'"></span>
-                    </span>
-                    <span class="wrmp-pill wrmp-self">
-                        This
-                    </span>
-                </span>
-                <a class='clickable pull-right'
-                   ng-click="$ctrl.clearRowSelection()">
-                    (x)
-                </a>
-            </h4>
-            <h4 ng-if="$ctrl.selectedRow.outbound">
-                <span class="wrmp-relationship-heading">
-                    <span class="wrmp-pill wrmp-self">
-                        This
-                    </span>
-
-                    <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.selectedRow.relationship.relationship | toDisplayName:'relationshipKind'">
-                        </span>
-                    </span>
-
-                    <span class="wrmp-pill wrmp-counterpart">
-                        <waltz-entity-link entity-ref="$ctrl.selectedRow.b"></waltz-entity-link>
-                    </span>
-                </span>
-                <a class='clickable pull-right'
-                   ng-click="$ctrl.clearRowSelection()">
-                    (x)
-                </a>
-            </h4>
-
-            <br>
-            <label>Description:</label>
-            <div ng-if="$ctrl.selectedRow.relationship.description">
-                <waltz-markdown text="$ctrl.selectedRow.relationship.description"></waltz-markdown>
-            </div>
-            <div ng-if="!$ctrl.selectedRow.relationship.description"
-                 class="text-muted">
-                <strong>No description provided</strong>
-            </div>
-
-            <hr>
-
-            <!-- ACTIONS -->
-            <div waltz-has-role="CAPABILITY_EDITOR">
-                <button class="btn btn-xs btn-primary"
-                        ng-click="$ctrl.updateExistingRelationship()">
-                    Edit
-                </button>
-                <button class="btn btn-xs btn-danger"
-                        ng-click="$ctrl.removeRelationship($ctrl.selectedRow.relationship)">
-                    Delete
-                </button>
-                <a ng-click="$ctrl.clearRowSelection()"
-                   class="clickable">
-                    Dismiss
-                </a>
-                <hr>
-            </div>
-
-            <div class="small">
-                <waltz-last-updated entity="$ctrl.selectedRow.relationship">
-                </waltz-last-updated>
-            </div>
         </div>
 
         <div ng-if="$ctrl.visibility.createEditor"
