@@ -128,7 +128,7 @@ function restoreDiagram(
         .chain(entityNodes)
         .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
         .map(node => logicalFlowsById[node.entityReference.id])
-        .filter(logicalFlow => logicalFlow != null)
+        .filter(logicalFlow => logicalFlow !== null)
         .map(logicalFlow => {
             return {
                 command: 'ADD_FLOW',
@@ -160,7 +160,7 @@ function restoreDiagram(
         .chain(annotations)
         .filter(ann => {
             const annotatedEntityExists = ann.entityReference.kind === 'LOGICAL_DATA_FLOW'
-                ? logicalFlowsById[ann.entityReference.id] != null
+                ? logicalFlowsById[ann.entityReference.id] !== null
                 : _.includes(entityRefs, toGraphId(ann.entityReference));
 
             if (! annotatedEntityExists) {
@@ -379,7 +379,7 @@ export function service(
                     console.log('Ignoring request to re-add node', payload);
                 } else {
                     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
-                    listener(state)
+                    listener(state);
                 }
                 if (graphNode.data.kind === 'APPLICATION' && !state.detail.applicationsById[graphNode.data.id]) {
                     // load full app detail

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from 'lodash';
-import {select, event} from 'd3-selection';
+import {event} from 'd3-selection';
 import {drag} from 'd3-drag';
 import {forceSimulation, forceCollide, forceManyBody, forceLink, forceX, forceY} from 'd3-force';
 
