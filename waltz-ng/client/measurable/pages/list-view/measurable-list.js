@@ -112,7 +112,7 @@ function controller($location,
     };
 
     vm.onTabSelect = (tab) => {
-        const categoryId = _.isNumber(tab) ? tab : tab.category.id;
+        const categoryId = _.isObject(tab) ? tab.category.id : tab;
         vm.visibility.tab = categoryId;
 
         serviceBroker
