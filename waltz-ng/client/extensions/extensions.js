@@ -19,7 +19,6 @@
 
 // extensions initialisation
 
-import _ from "lodash";
 import {registerComponents} from '../common/module-utils';
 import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section/dynamic-section-definitions";
 
@@ -33,27 +32,9 @@ export const init = (module) => {
         dbChangeInitiativeSection
     ]);
 
-    // overrideChangeInitiativeSection();
     addAttestationSection();
     addEntitySvgDiagramsSection();
 };
-
-
-function overrideChangeInitiativeSection() {
-    dynamicSections.dbChangeInitiativesSection = {
-        componentId: 'db-change-initiative-section',
-        name: 'Change Initiatives',
-        icon: 'paper-plane-o',
-        id: 10000
-    };
-
-    _.forIn(dynamicSectionsByKind, (v, k) => dynamicSectionsByKind[k] = _.map(
-            v,
-            ds => ds.id === dynamicSections.changeInitiativeSection.id
-                ? dynamicSections.dbChangeInitiativesSection
-                : ds
-        ));
-}
 
 
 function addAttestationSection() {

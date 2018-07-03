@@ -31,12 +31,12 @@ const initialData = {
 };
 
 
-function controller($scope) {
-    const vm = initialiseData(this, initialData);
+function controller() {
+    initialiseData(this, initialData);
 }
 
 
-controller.$inject = ['$scope'];
+controller.$inject = [];
 
 
 const component = {

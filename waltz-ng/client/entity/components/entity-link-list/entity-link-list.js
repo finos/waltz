@@ -30,7 +30,7 @@ const initialState = {
 };
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 controller.$inject = [];

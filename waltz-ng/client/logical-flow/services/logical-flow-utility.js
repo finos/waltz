@@ -33,24 +33,6 @@ function pickWorst(ratings = []) {
 export default [
     () => {
 
-        const enrich = (flows, flowEntities) => {
-            const entitiesById = _.keyBy(flowEntities, 'id');
-
-            return _.map(flows, f => ({
-                ...f,
-                sourceEntity: entitiesById[f.source.id],
-                targetEntity: entitiesById[f.target.id]
-            }));
-        };
-
-        const getDataTypes = (flows) => {
-            return _.chain(flows)
-                .map('dataType')
-                .flatten()
-                .uniq()
-                .value();
-        };
-
         const buildGraphTweakers = (appIds = [], decorators = []) => {
 
             const decoratorsByFlowId = _.groupBy(decorators, 'dataFlowId');

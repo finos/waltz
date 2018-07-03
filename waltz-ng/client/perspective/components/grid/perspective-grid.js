@@ -296,8 +296,6 @@ function drawInherited(selection, perspective) {
     const l = cellPadding;
     const b = scales.y.bandwidth() - cellPadding;
     const r = scales.x.bandwidth() - cellPadding;
-    const w = scales.x.bandwidth() - (2 * cellPadding);
-    const h = scales.y.bandwidth() - (2 * cellPadding);
 
     const tl = `${l} ${t}`;
     const bl = `${l} ${b}`;
@@ -400,18 +398,6 @@ function drawColTitles(elem, perspective) {
         .call(drawRect)
         .call(drawText)
         ;
-}
-
-
-function findColTitle(svg, measurableId) {
-    return svg.selectAll('.col-title')
-        .filter(c => c.measurable.id === measurableId)
-}
-
-
-function findRowTitle(svg, measurableId) {
-    return svg.selectAll('.row-title')
-        .filter(c => c.measurable.id === measurableId)
 }
 
 

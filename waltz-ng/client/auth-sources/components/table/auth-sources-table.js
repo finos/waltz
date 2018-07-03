@@ -20,7 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkEntityLinkGridCell, mkEnumGridCell} from "../../../common/grid-utils";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 
 
 const bindings = {

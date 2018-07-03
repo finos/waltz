@@ -24,8 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 import {nest} from 'd3-collection';
-import {ascending} from 'd3-array';
-import {refToString, toEntityRef} from "../../../common/entity-utils";
+import {refToString} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -60,11 +59,11 @@ const combinedDataNester = nest()
  *      ]
  *    },
  *    ..
-*  ]
+ *  ]
  * ```
+ * @param level
  * @param flows
  * @param decorators
- * @param dataTypesById
  */
 function combineFlowsAndDecorators(level = 0, flows = [], decorators = []) {
     const flowsById = _.keyBy(flows, 'id');

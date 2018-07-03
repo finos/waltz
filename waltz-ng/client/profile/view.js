@@ -110,10 +110,6 @@ function controller($q,
             alert("Password too short (requires >= 4 chars)");
             return;
         }
-        const resetCmd = {
-            currentPassword: vm.resetForm.currentPassword,
-            newPassword: vm.resetForm.password1
-        };
 
         userStore
             .resetPassword(vm.userId, vm.resetForm.password1, vm.resetForm.currentPassword)
@@ -121,7 +117,7 @@ function controller($q,
                 if (!r) alert("Password reset failed");
                 else alert("Password updated")
             });
-    }
+    };
 
 }
 

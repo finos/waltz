@@ -48,7 +48,7 @@ function controller($q,
 
     const id = $stateParams.id;
     const ref = { id, kind: 'MEASURABLE' };
-    const childrenSelector = { entityReference: ref, scope: 'CHILDREN' }
+    const childrenSelector = { entityReference: ref, scope: 'CHILDREN' };
 
     const vm = initialiseData(this, initialState);
     vm.entityReference = ref;

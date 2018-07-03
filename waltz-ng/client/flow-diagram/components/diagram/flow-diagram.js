@@ -22,7 +22,7 @@ import {event, select, selectAll} from "d3-selection";
 import {drag} from "d3-drag";
 import {zoom} from "d3-zoom";
 import {initialiseData, perhaps} from "../../../common";
-import {mkCurvedLine, mkCurvedLineWithArrowPath, responsivefy, wrapText} from "../../../common/d3-utils";
+import {mkCurvedLine, responsivefy, wrapText} from "../../../common/d3-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";
 import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
 

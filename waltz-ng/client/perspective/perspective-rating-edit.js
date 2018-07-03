@@ -50,7 +50,7 @@ function controller($stateParams,
         .loadViewData(loadEntityCallByKind[entityKind], [ entityReference.id ])
         .then(r => vm.entityReference = r.data);
 
-    const defnPromise = serviceBroker
+    serviceBroker
         .loadAppData(CORE_API.PerspectiveDefinitionStore.findAll)
         .then(r => r.data)
         .then(pds => vm.perspectiveDefinition = _.find(pds, { id: perspectiveId || 1 }))
