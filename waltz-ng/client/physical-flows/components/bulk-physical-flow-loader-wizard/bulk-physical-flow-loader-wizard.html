@@ -2,6 +2,10 @@
     <h4>Bulk Insert Physical Flows</h4>
 
     <div ng-show="$ctrl.currentStep === 1">
+        <waltz-static-panels group-key="BULK-UPLOAD.PHYSICAL-FLOW"
+                             render-mode="chromeless">
+        </waltz-static-panels>
+
         <waltz-spreadsheet-loader on-spreadsheet-loaded="$ctrl.spreadsheetLoaded">
         </waltz-spreadsheet-loader>
     </div>
