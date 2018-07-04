@@ -1,5 +1,9 @@
 <div class="waltz-bulk-loader-wizard">
     <div ng-show="$ctrl.currentStep === 1">
+        <waltz-static-panels group-key="BULK-UPLOAD.LOGICAL-FLOW"
+                             render-mode="chromeless">
+        </waltz-static-panels>
+
         <waltz-spreadsheet-loader on-spreadsheet-loaded="$ctrl.spreadsheetLoaded">
         </waltz-spreadsheet-loader>
     </div>
