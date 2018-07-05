@@ -1,4 +1,12 @@
-<div ng-class="{ 'waltz-scroll-region-500' : $ctrl.gridData.length > 10 }">
+<input ng-if=" $ctrl.rows.length > 10"
+       ng-model="$ctrl.filterQry"
+       placeholder="Search..."
+       ng-model-options="{ debounce: 100 }"
+       class="form-control"
+       type="search">
+
+<div ng-class="{ 'waltz-scroll-region-500' : $ctrl.rows.length > 10 }">
+
 
     <table class="table table-condensed table-hover">
         <colgroup>
@@ -17,7 +25,7 @@
         </thead>
         <tbody>
         <!-- DATA -->
-        <tr ng-repeat="row in $ctrl.rows"
+        <tr ng-repeat="row in $ctrl.rows | filter:$ctrl.filterQry"
             class="clickable"
             ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelected(row) }"
             ng-click="$ctrl.onRowSelect(row)">
