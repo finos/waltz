@@ -32,4 +32,16 @@
     </changeSet>
 
 
+    <changeSet author="watkdav"
+               id="20180709-3164-1">
+        <comment>3164: Add index on bookmarks (parent ref)</comment>
+        <createIndex indexName="idx_bookmark_parent"
+                     tableName="bookmark"
+                     unique="false">
+            <column name="parent_id" type="${id.type}"/>
+            <column name="parent_kind" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+
 </databaseChangeLog>
