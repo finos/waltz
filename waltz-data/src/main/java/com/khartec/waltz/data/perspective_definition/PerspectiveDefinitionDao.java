@@ -90,11 +90,6 @@ public class PerspectiveDefinitionDao {
             record.setName(perspectiveDefinition.name());
             record.setCategoryX(perspectiveDefinition.categoryX());
             record.setCategoryY(perspectiveDefinition.categoryY());
-            record.setRatingNameR("Disinvest");
-            record.setRatingNameA("Maintain");
-            record.setRatingNameG("Invest");
-            record.setRatingNameZ("Unknown");
-            record.setRatingNameX("Not applicable");
             record.setDescription(mkSafe(perspectiveDefinition.description()));
 
             return record.insert() == 1;
