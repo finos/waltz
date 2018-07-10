@@ -181,17 +181,8 @@ public class BusinessRegionProductHierarchyGenerator {
             mcr.setName("Region Business Products");
             mcr.setDescription("Region Business Products Hierarchy");
             mcr.setExternalId(CATEGORY_EXTERNAL_ID);
-            mcr.setRatingNameR("Poor");
-            mcr.setRatingNameA("Adequate");
-            mcr.setRatingNameG("Good");
-            mcr.setRatingNameZ("Unknown");
             mcr.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
             mcr.setLastUpdatedBy("admin");
-
-            mcr.setRatingDescR("");
-            mcr.setRatingDescA("");
-            mcr.setRatingDescG("");
-            mcr.setRatingDescZ("");
 
             dsl.insertInto(MEASURABLE_CATEGORY)
                     .set(mcr)

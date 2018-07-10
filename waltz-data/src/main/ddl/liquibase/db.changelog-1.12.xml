@@ -1,0 +1,96 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~  Copyright (C) 2016, 2017 Waltz open source project
+  ~  See README.md for more information
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU Lesser General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU Lesser General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.12.xml">
+
+    <changeSet author="davidwatkins73"
+               id="20180709-3239-1"
+               failOnError="false">
+        <comment>3239: Remove process tables</comment>
+        <dropTable tableName="process_file_grouping"/>
+        <dropTable tableName="process"/>
+        <dropTable tableName="process_metadata"/>
+    </changeSet>
+
+
+    <changeSet author="davidwatkins73"
+               id="20180709-3164-1">
+        <comment>3164: Add index on bookmarks (parent ref)</comment>
+        <createIndex indexName="idx_bookmark_parent"
+                     tableName="bookmark"
+                     unique="false">
+            <column name="parent_id" type="${id.type}"/>
+            <column name="parent_kind" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="davidwatkins73"
+               id="20180709-2462-1">
+        <comment>2462: add external_id to org_unit</comment>
+        <addColumn tableName="organisational_unit">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="davidwatkins73"
+               id="20180709-3148-1">
+        <comment>3148: remove rag defn fields from perspective_definition</comment>
+        <dropColumn tableName="perspective_definition"
+                    columnName="rating_name_r" />
+        <dropColumn tableName="perspective_definition"
+                    columnName="rating_name_a" />
+        <dropColumn tableName="perspective_definition"
+                    columnName="rating_name_g" />
+        <dropColumn tableName="perspective_definition"
+                    columnName="rating_name_z" />
+        <dropColumn tableName="perspective_definition"
+                    columnName="rating_name_x" />
+    </changeSet>
+
+    <changeSet author="davidwatkins73"
+               id="20180709-3148-2">
+        <comment>3148: remove rag defn fields from measurable_category</comment>
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_name_r" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_name_a" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_name_g" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_name_z" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_desc_r" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_desc_a" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_desc_g" />
+        <dropColumn tableName="measurable_category"
+                    columnName="rating_desc_z" />
+    </changeSet>
+
+
+</databaseChangeLog>
