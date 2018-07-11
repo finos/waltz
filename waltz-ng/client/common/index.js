@@ -113,7 +113,7 @@ export function perhaps(fn, dflt) {
  *
  * @param items - items to be searched
  * @param searchStr - query string to search for
- * @param searchFields - fields in the items to consider when searching
+ * @param searchFields - fields or function to access the field in the items to consider when searching
  * @returns {Array}
  */
 export function termSearch(items = [], searchStr = '', searchFields = []) {
@@ -125,8 +125,9 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
             : searchFields;
 
         const targetStr = _.chain(fields)
-            .reject(field => field.startsWith('$') || _.isFunction(_.get(item, field)))
-            .map(field => _.get(item, field))
+            .reject(field => !_.isFunction(field) && field.startsWith('$'))
+            .map(field =>  _.isFunction(field) ? invokeFunction(field, item) : _.get(item, field))
+            .reject(val => _.isFunction(val))
             .join(' ')
             .value()
             .toLowerCase();

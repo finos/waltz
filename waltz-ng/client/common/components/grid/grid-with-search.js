@@ -47,7 +47,7 @@ const initialState = {
 function mkSearchFields(columnDefs = []) {
     return _.chain(columnDefs)
         .filter(c => !_.isUndefined(c.field))
-        .map('field')
+        .map(c => !_.isUndefined(c.filterProjectorFn) ? c.filterProjectorFn : c.field)
         .value();
 }
 

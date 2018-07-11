@@ -148,6 +148,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
         {
             field: 'roles',
             displayName: 'Roles',
+            filterProjectorFn: (field) => _.map(_.get(field, 'roles', []), role => _.get(role, 'displayName')),
             sortingAlgorithm: (a, b) => {
                 const aNames = _.join(_.map(a, 'displayName'));
                 const bNames = _.join(_.map(b, 'displayName'));
