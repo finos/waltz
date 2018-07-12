@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
 import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
-import {toEntityRef} from "../../../common/entity-utils";
+import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
 
@@ -72,6 +72,18 @@ function prepareTree(nodes = []) {
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const loadRelationships = () => {
+        return serviceBroker
+            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
+            .then(r => {
+                vm.relationships = r.data;
+                vm.relatedEntityMap = _.chain(r.data)
+                    .flatMap((rel) => [rel.a, rel.b])
+                    .keyBy(ref => refToString(ref))
+                    .value();
+            });
+    };
+
     const loadMeasurableTree = (categoryId) => {
 
         // load measurable tree for category
@@ -109,6 +121,8 @@ function controller(notification, serviceBroker) {
 
 
     vm.$onInit = () => {
+        loadRelationships();
+
         const isMeasurable = _.startsWith(vm.type.id, 'MEASURABLE');
 
         if (isMeasurable) {
@@ -152,6 +166,11 @@ function controller(notification, serviceBroker) {
 
 
     // -- INTERACT --
+
+    vm.selectionFilterFn = (proposed) => {
+        const proposedRefString = refToString(proposed);
+        return vm.relatedEntityMap[proposedRefString] == null;
+    };
 
     vm.onAppGroupSelection = (appGroup) => {
         vm.form.counterpart = appGroup;
