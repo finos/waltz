@@ -93,4 +93,17 @@
     </changeSet>
 
 
+    <changeSet author="davidwatkins73"
+               id="20180712-3264-1">
+        <comment>2462: add external_id to org_unit</comment>
+        <addColumn tableName="application_group">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
 </databaseChangeLog>

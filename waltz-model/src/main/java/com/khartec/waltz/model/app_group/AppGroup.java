@@ -33,7 +33,8 @@ public abstract class AppGroup implements
         EntityKindProvider,
         NameProvider,
         DescriptionProvider,
-        WaltzEntity {
+        WaltzEntity,
+        ExternalIdProvider{
 
     public abstract AppGroupKind appGroupKind();
 
