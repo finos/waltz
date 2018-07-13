@@ -8,7 +8,11 @@ deals with how those viewpoints relate to each other and the technology landscap
 are **assigned to categories and organised hierarchically** within a category.  
 Example categories are:
 
-### Diagram Here!!!
+| Functions | Products |
+| :---: | :---: |
+| ![Function viewpoint](functions.png) | ![Product viewpoint](products.png) |
+
+
 
 As can be seen above, viewpoint categories vary in size and complexity and can be periodically 
 refreshed to capture changing business needs.  The blue bars next to some viewpoints indicate 
@@ -36,22 +40,26 @@ date (for expressing upcoming relationship additions/deletions).
 
 | Application | Rating | Viewpoint |
 | :---: | :---: | :---: |
-| `MyApp` | `Supports` | `Trade Booking` |
+| `Veriflex` | `Strategic` | `Compliance Services` |
 
 
 Applications can have many of these ratings and they are depicted in the ui as a set of trees grouped 
 by the viewpoint category.
 
-For example here are the functions and TBC for the application `MyApp`:
+For example here are the _functions_ and _products_ for the application `Veriflex`:
 
-### Picture Here!
+| Functions | Products |
+| :---: | :---: |
+| ![Function ratings](veriflex-functions.png) | ![Product ratings](veriflex-products.png) |
+
+
 
 
 ####Rating Limitations
 
 - As these ratings are stored as simple relationships it is **not possible to state more complex expressions**.
-    - For example we could **not** say the this application **only** performs the function `Trade Booking` for 
-    product type `OTC Derivatives`
+    - For example we could **not** say the this application **does not** perform the function `Compliance Services` for 
+    product type `Complex Exotic`
   - This leads to Waltz potentially **overstating the scope** of applications.
 - Note this can be somewhat mitigated by introducing **perspectives** 
     - see [Using Perspectives and Drill Grid]() at a cost of increased complexity.
@@ -66,17 +74,18 @@ defined (though is typically left with the default, `Relates To`)
  
 | Viewpoint A | Relationship Kind | Viewpoint B |
 | :---: | :---: | :---: |
-| `Trade Booking` | `Relates To` | ` ` |
+| `Compliance Services` | `Relates To` | `BCBS239` |
 
  Viewpoints can be related to any number of additional viewpoints across any categories.  Relationships
  are **directional**  (e.g. A supports B, does not imply B supports A) and may have supporting text. 
  Within the Waltz user interface these relationships are depicted using the 'spindle' diagram, as shown 
- below for TBC:
+ below for `Compliance Services`:
+ 
+ ![Compliance Spindle](spindle-compliance.png)
  
    
- In this diagram we have filtered on related `TBC` and selected `TBC`.  Note the use of search to further
- **filter** the relationships and also note that these relationships are **navigable** in the user interface 
- so we may quickly refocus on `TBC` if desired.
+ In this diagram we have filtered on related `Regulations` and selected `BCBS239`.  Note that these relationships 
+ are **navigable** in the user interface so we may quickly refocus on `BCBS239` if desired.
  
  
  ### Inter-viewpoint Limitations 
@@ -91,10 +100,10 @@ viewpoints to....
  
 | Relationship | Description | Example |
 | :---: | :---: | :---: |
-| People | via roles. e.g. TBC could have a Data Security Officer associated with it| PICTURE |	
-| Bookmarks |	External documentation/resources | PICTURE |	
-| Application groups | custom groups, visualised via the spindle | PICTURE |	
-| Flow diagrams | Diagrams showing a particular data flow. Each flow effectively becomes a custom application group.| PICTURE |	
+| People | via roles. e.g. _Compliance_ could have a _Data Owner_ associated with it| ![People](people.png) |	
+| Bookmarks |	External documentation/resources | ![Bookmarks](bookmarks.png) |	
+| Application groups | custom groups, visualised via the spindle | ![AppGroup Spindle](spindle-app-groups.png) |	
+| Flow diagrams | Diagrams showing a particular data flow. Each flow effectively becomes a custom application group.| ![Flow diagram](flow-diagram-compliance.png) |	
 
 It is worth discussing the final two categories (groups and diagrams) in more detail as they may allow 
 for more detailed modelling of a problem space.  An application group is simply a collection of applications, 
