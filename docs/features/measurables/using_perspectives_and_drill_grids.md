@@ -23,7 +23,7 @@ The TBC form the rows and the TBC the columns.
 
 ### Picture Here!
 
-From this diagram we can see the third column (DB Direkt GmbH) participates in all activities except 
+From this diagram we can see the third column (TBC) participates in all activities except 
 Investments. The colors indicates the alignment to the *rating scheme* (typically _Invest/Disinvest/Maintain_) 
 which can be configured to suit the domain.  
 
