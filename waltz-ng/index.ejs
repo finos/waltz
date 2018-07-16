@@ -4,15 +4,14 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10,9" >
     <meta charset="utf-8">
-    <title>{%=o.htmlWebpackPlugin.options.title || 'Waltz'%}</title>
+    <title><%=htmlWebpackPlugin.options.title || 'Waltz'%></title>
     <!-- ie9 support for window.atob() required by satellizer -->
     <!--[if lte IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.min.js"></script>
     <![endif]-->
-    <!--<link href='https://fonts.googleapis.com/css?family=Hind' rel='stylesheet' type='text/css'>-->
-    {% if (o.htmlWebpackPlugin.files.favicon) { %}
-    <link rel="icon" href="{%=o.htmlWebpackPlugin.files.favicon%}">
-    {% } %}
+    <!--<% if (htmlWebpackPlugin.files.favicon) { %>-->
+    <link rel="icon" href="<%=htmlWebpackPlugin.files.favicon%>">
+    <!--<% } %>-->
 
     <style type="text/css">
         @keyframes waltz-splash-scale {
@@ -128,12 +127,6 @@
             </div>
         </div>
     </div>
-
-    {% for (var chunk in o.htmlWebpackPlugin.files.chunks) { %}
-    <script type="text/javascript"
-            src="{%=o.htmlWebpackPlugin.files.chunks[chunk].entry%}">
-    </script>
-    {% } %}
 
     <div style="padding-bottom: 60px">
         <!-- prevents page jumping caused by collapsing header -->

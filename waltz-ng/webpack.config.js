@@ -26,16 +26,44 @@ module.exports = {
     entry: {
         app: './client/main.js'
     },
-    devtool: 'source-map',
     output: {
         path: path.join(basePath, '/dist'),
         filename: '[name].js'
+    },
+    mode: 'development',
+    devtool: 'inline-source-map',
+    devServer: {
+        contentBase: './dist',
+        disableHostCheck: true
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'async',
+            minSize: 30000,
+            maxSize: 0,
+            minChunks: 1,
+            maxAsyncRequests: 5,
+            maxInitialRequests: 3,
+            automaticNameDelimiter: '~',
+            name: true,
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true
+                }
+            }
+        }
     },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Waltz',
             filename: 'index.html',
-            template: 'index.template.html',
+            template: 'index.ejs',
             favicon: path.join(basePath, 'images', 'favicon.ico'),
             hash: true,
         }),
@@ -44,12 +72,13 @@ module.exports = {
             '__REVISION__': JSON.stringify(git.long()),
         }),
         new Visualizer(),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: "vendor",
-            minChunks: function(module) {
-                return isExternal(module);
-            }
-        })
+
+        // new webpack.optimize.CommonsChunkPlugin({
+        //     name: "vendor",
+        //     minChunks: function(module) {
+        //         return isExternal(module);
+        //     }
+        // })
     ],
     module: {
         rules: [
@@ -95,9 +124,6 @@ module.exports = {
                 }
             }
         ],
-    },
-    devServer: {
-        disableHostCheck: true
     }
 
 };
