@@ -104,7 +104,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(LOGICAL_FLOW.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()))
-                .and(mLogicalFlowRemovedCondition(options.entityLifecycleStatuses()));
+                .and(mkLogicalFlowRemovedCondition(options.entityLifecycleStatuses()));
     }
 
 
@@ -149,7 +149,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Condition mLogicalFlowRemovedCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
+    private Condition mkLogicalFlowRemovedCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
         return LOGICAL_FLOW.IS_REMOVED.in(convertToIsRemovedFlags(entityLifecycleStatuses));
     }
 }
