@@ -21,13 +21,14 @@
 
 import angular from 'angular';
 import AccessLogStore from "./service/access-log-store";
+import {registerStores} from "../common/module-utils";
 
 
 export default () => {
 
     const module = angular.module('waltz.access-log', []);
 
-    module.service('AccessLogStore', AccessLogStore);
+    registerStores(module, [AccessLogStore]);
 
     return module.name;
 };

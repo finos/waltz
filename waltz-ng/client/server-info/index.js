@@ -21,6 +21,8 @@
 import angular from 'angular';
 import * as ServerInfoStore from './services/server-info-store';
 import {registerStores} from "../common/module-utils";
+import ServerPies from './components/server-pies';
+import ServerList from './directives/server-list';
 
 
 export default () => {
@@ -28,10 +30,10 @@ export default () => {
     const module = angular.module('waltz.server.info', []);
 
     module
-        .component('waltzServerPies', require('./components/server-pies'));
+        .component('waltzServerPies', ServerPies);
 
     module
-        .directive('waltzServerList', require('./directives/server-list'));
+        .directive('waltzServerList', ServerList);
 
     registerStores(module, [ServerInfoStore]);
 

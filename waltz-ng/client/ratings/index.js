@@ -20,14 +20,17 @@
 import angular from "angular";
 import * as RatingSchemeStore from "./services/rating-scheme-store";
 import {registerStores} from "../common/module-utils";
+import RatingPicker from './components/rating-picker/rating-picker';
+import RatingIndicatorCell from './components/rating-indicator-cell/rating-indicator-cell';
+import RagLine from './components/rag-line/rag-line';
 
 export default () => {
     const module = angular.module('waltz.ratings', []);
 
     module
-        .component('waltzRatingPicker', require('./components/rating-picker/rating-picker'))
-        .component('waltzRatingIndicatorCell', require('./components/rating-indicator-cell/rating-indicator-cell'))
-        .component('waltzRagLine', require('./components/rag-line/rag-line'));
+        .component('waltzRatingPicker', RatingPicker)
+        .component('waltzRatingIndicatorCell', RatingIndicatorCell)
+        .component('waltzRagLine', RagLine);
 
     registerStores(module, [ RatingSchemeStore ]);
 

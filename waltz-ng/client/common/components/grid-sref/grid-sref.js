@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
+import template from './grid-sref.html';
 
 
 const bindings = {
@@ -26,9 +27,6 @@ const bindings = {
     params: '<',
     linkText: '@'
 };
-
-
-const template = require('./grid-sref.html');
 
 
 const initialState = {

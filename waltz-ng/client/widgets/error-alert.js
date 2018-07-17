@@ -17,10 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './error-alert.html';
+
 export default () => ({
     restrict: 'E',
     replace: true,
-    template: require('./error-alert.html'),
+    template,
     scope: {
         error: '=',
         retry: '&'

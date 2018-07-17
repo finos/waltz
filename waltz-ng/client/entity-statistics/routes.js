@@ -22,14 +22,17 @@ const baseState = {
 };
 
 
+import PersonEntityStatisticView from './person-entity-statistic-view';
+import EntityStatisticView from './entity-statistic-view';
+
 const personViewState = {
     url: '/PERSON/{id:int}/{statId:int}',
-    views: { 'content@': require('./person-entity-statistic-view') }
+    views: { 'content@': PersonEntityStatisticView }
 };
 
 const genericViewState = {
     url: '/{kind:string}/{id:int}/{statId:int}',
-    views: { 'content@': require('./entity-statistic-view') }
+    views: { 'content@': EntityStatisticView }
 };
 
 

@@ -18,9 +18,9 @@
  */
 
 
-
 import {registerStores} from "../common/module-utils";
 import * as EntityTagStore from './services/entity-tag-store';
+import Routes from './routes';
 
 
 export default () => {
@@ -28,7 +28,7 @@ export default () => {
     const module = angular.module('waltz.entity-tags', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStores(module, [EntityTagStore]);
 

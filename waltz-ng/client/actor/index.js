@@ -17,28 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {registerComponents, registerStores} from "../common/module-utils";
-import actorOverview from "./components/actor-overview";
-import * as actorStore from './services/actor-store';
+import ActorOverview from "./components/actor-overview";
+import ActorStore from './services/actor-store';
+
+import Routes from './routes';
+import ActorService from './services/actor-service';
+import ActorSelector from './components/actor-selector';
+import BasicActorSelector from './components/basic-actor-selector';
 
 export default () => {
 
     const module = angular.module('waltz.actor', []);
 
     module
-        .config(require('./routes'))
-        .service('ActorService', require('./services/actor-service'));
+        .config(Routes)
+        .service('ActorService', ActorService);
 
     registerComponents(
         module,
-        [ actorOverview ]);
+        [ ActorOverview ]);
 
     registerStores(
         module,
-        [ actorStore ]);
+        [ ActorStore ]);
 
     module
-        .component('waltzActorSelector', require('./components/actor-selector'))
-        .component('waltzBasicActorSelector', require('./components/basic-actor-selector'));
+        .component('waltzActorSelector', ActorSelector)
+        .component('waltzBasicActorSelector', BasicActorSelector);
 
     return module.name;
 };

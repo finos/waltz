@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
+import template from './entity-statistic-percentage-renderer.html';
 
 
 const BINDINGS = {
@@ -39,7 +40,7 @@ const directive = {
     bindToController: BINDINGS,
     controller,
     controllerAs: 'ctrl',
-    template: require('./entity-statistic-percentage-renderer.html')
+    template
 };
 
 

@@ -25,6 +25,7 @@ import {initialiseData, perhaps} from "../../../common";
 import {mkCurvedLine, responsivefy, wrapText} from "../../../common/d3-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";
 import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
+import template from './flow-diagram.html';
 
 
 /**
@@ -59,9 +60,6 @@ const DEFAULT_CLICK_HANDLERS  = {
     node: DEFAULT_CLICK_HANDLER,
     flowBucket: DEFAULT_CLICK_HANDLER
 };
-
-
-const template = require('./flow-diagram.html');
 
 
 const styles = {

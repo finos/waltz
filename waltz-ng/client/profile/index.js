@@ -18,13 +18,14 @@
  */
 
 import angular from 'angular';
+import Routes from './routes';
 
 
 export default () => {
     const module = angular.module('waltz.profile', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     return module.name;
 }

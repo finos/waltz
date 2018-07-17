@@ -22,7 +22,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
-const template = require('./flow-diagram-view.html');
+import template from './flow-diagram-view.html';
 
 const initialState = {
     visibility: {},

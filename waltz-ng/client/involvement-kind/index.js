@@ -20,13 +20,14 @@
 import angular from 'angular';
 import * as InvolvementKindStore from './services/involvement-kind-store';
 import {registerStores} from "../common/module-utils";
+import InvolvementKindService from './services/involvement-kind-service';
 
 export default () => {
 
     const module = angular.module('waltz.involvement.kind', []);
 
     module
-        .service('InvolvementKindService', require('./services/involvement-kind-service'));
+        .service('InvolvementKindService', InvolvementKindService);
 
     registerStores(module, [ InvolvementKindStore]);
 

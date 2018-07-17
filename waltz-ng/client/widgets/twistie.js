@@ -18,15 +18,13 @@
  */
 
 import {initialiseData} from "../common";
+import template from './twistie.html';
 
 
 const bindings = {
     collapsed: '<',
     toggleExpansion: '<'
 };
-
-
-const template = require('./twistie.html');
 
 
 const initialState = {

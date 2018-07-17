@@ -24,43 +24,74 @@ import EditableEnum from "./editable-enum/editable-enum";
 import EditableDropdown from "./editable-dropdown/editable-dropdown";
 import SpreadsheetLoader from "./spreadsheet-loader/spreadsheet-loader";
 import {registerComponents} from "../common/module-utils";
+import ChangeTimeline from './change-timeline';
+import ErrorAlert from './error-alert';
+import ExternalLink from './external-link';
+import FromNow from './from-now';
+import JumpTo from './jump-to';
+import LoadingNotification from './loading-notification';
+import MailTo from './mail-to';
+import OverlayPanel from './overlay-panel';
+import PhoneLink from './phone-link';
+import RagIndicator from './rag-indicator';
+import Search from './search';
+import SectionActions from './section-actions';
+import StepCount from './step-count';
+import YqSelect from './yq-select';
+import BasicInfoTile from './basic-info-tile';
+import DataExtractLink from './data-extract-link';
+import EditableField from './editable-field';
+import Icon from './icon';
+import InlineEditArea from './inline-edit-area';
+import KeywordList from './keyword-list';
+import KeywordEdit from './keyword-edit';
+import NoData from './no-data';
+import Markdown from './markdown';
+import PageHeader from './page-header/page-header';
+import Pie from './pie/pie';
+import PieSegmentTable from './pie/pie-segment-table';
+import PieTable from './pie/pie-table';
+import Section from './section';
+import SimpleStackChart from './simple-stack-chart';
+import Toggle from './toggle';
+import Twistie from './twistie';
 
 
 export default () => {
     const module = angular.module('waltz.widgets', []);
 
-    module.directive('waltzChangeTimeline', require('./change-timeline'));
-    module.directive('waltzErrorAlert', require('./error-alert'));
-    module.directive('waltzExternalLink', require('./external-link'));
-    module.directive('waltzFromNow', require('./from-now'));
-    module.directive('waltzJumpTo', require('./jump-to'));
-    module.directive('waltzLoadingNotification', require('./loading-notification'));
-    module.directive('waltzMailTo', require('./mail-to'));
-    module.directive('waltzOverlayPanel', require('./overlay-panel'));
-    module.directive('waltzPhoneLink', require('./phone-link'));
-    module.directive('waltzRagIndicator', require('./rag-indicator'));
-    module.directive('waltzSearch', require('./search'));
-    module.directive('waltzSectionActions', require('./section-actions'));
-    module.directive('waltzStepCount', require('./step-count'));
-    module.directive('waltzYqSelect', require('./yq-select'));
+    module.directive('waltzChangeTimeline', ChangeTimeline);
+    module.directive('waltzErrorAlert', ErrorAlert);
+    module.directive('waltzExternalLink', ExternalLink);
+    module.directive('waltzFromNow', FromNow);
+    module.directive('waltzJumpTo', JumpTo);
+    module.directive('waltzLoadingNotification', LoadingNotification);
+    module.directive('waltzMailTo', MailTo);
+    module.directive('waltzOverlayPanel', OverlayPanel);
+    module.directive('waltzPhoneLink', PhoneLink);
+    module.directive('waltzRagIndicator', RagIndicator);
+    module.directive('waltzSearch', Search);
+    module.directive('waltzSectionActions', SectionActions);
+    module.directive('waltzStepCount', StepCount);
+    module.directive('waltzYqSelect', YqSelect);
     module
-        .component('waltzBasicInfoTile', require('./basic-info-tile'))
-        .component('waltzDataExtractLink', require('./data-extract-link'))
-        .component('waltzEditableField', require('./editable-field'))
-        .component('waltzIcon', require('./icon'))
-        .component('waltzInlineEditArea', require('./inline-edit-area'))
-        .component('waltzKeywordList', require('./keyword-list'))
-        .component('waltzKeywordEdit', require('./keyword-edit'))
-        .component('waltzNoData', require('./no-data'))
-        .component('waltzMarkdown', require('./markdown'))
-        .component('waltzPageHeader', require('./page-header/page-header'))
-        .component('waltzPie', require('./pie/pie'))
-        .component('waltzPieSegmentTable', require('./pie/pie-segment-table'))
-        .component('waltzPieTable', require('./pie/pie-table'))
-        .component('waltzSection', require('./section'))
-        .component('waltzSimpleStackChart', require('./simple-stack-chart'))
-        .component('waltzToggle', require('./toggle'))
-        .component('waltzTwistie', require('./twistie'));
+        .component('waltzBasicInfoTile', BasicInfoTile)
+        .component('waltzDataExtractLink', DataExtractLink)
+        .component('waltzEditableField', EditableField)
+        .component('waltzIcon', Icon)
+        .component('waltzInlineEditArea', InlineEditArea)
+        .component('waltzKeywordList', KeywordList)
+        .component('waltzKeywordEdit', KeywordEdit)
+        .component('waltzNoData', NoData)
+        .component('waltzMarkdown', Markdown)
+        .component('waltzPageHeader', PageHeader)
+        .component('waltzPie', Pie)
+        .component('waltzPieSegmentTable', PieSegmentTable)
+        .component('waltzPieTable', PieTable)
+        .component('waltzSection', Section)
+        .component('waltzSimpleStackChart', SimpleStackChart)
+        .component('waltzToggle', Toggle)
+        .component('waltzTwistie', Twistie);
 
     registerComponents(module, [
         ColumnMapper,

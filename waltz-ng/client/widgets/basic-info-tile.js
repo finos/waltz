@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './basic-info-tile.html';
+
 export default  {
-    template: require('./basic-info-tile.html'),
+    template,
     transclude: true,
     bindings: {
         name: '@',

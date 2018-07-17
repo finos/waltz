@@ -20,6 +20,7 @@
 
 import _ from 'lodash';
 import {nest} from 'd3-collection'
+import template from './tag-explorer.html';
 
 function controller($stateParams, entityTagStore) {
 
@@ -61,7 +62,7 @@ controller.$inject = ['$stateParams', 'EntityTagStore'];
 
 
 export default {
-    template: require('./tag-explorer.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

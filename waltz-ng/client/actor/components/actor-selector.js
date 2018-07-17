@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../common";
+import template from './actor-selector.html';
 
 
 const bindings = {
@@ -27,7 +28,6 @@ const bindings = {
 };
 
 
-const template = require('./actor-selector.html');
 
 
 const initialState = {

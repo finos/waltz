@@ -32,19 +32,22 @@ import PhysicalFlowEditOverview from './components/register/overview/physical-fl
 import PhysicalFlowEditTargetLogicalFlow from './components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow';
 import PhysicalFlowEditSpecification from './components/register/edit-specification/physical-flow-edit-specification';
 import PhysicalFlowAttributeEditor from './components/register/attribute-editor/physical-flow-attribute-editor';
+import Routes from './routes';
+import PhysicalFlowTable from './components/flow-table/physical-flow-table';
+import PhysicalFlowExportButtons from './components/export-buttons/physical-flow-export-buttons';
 
 
 function setup() {
     const module = angular.module('waltz.physical.flows', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStore(module, PhysicalFlowStore);
 
     module
-        .component('waltzPhysicalFlowTable', require('./components/flow-table/physical-flow-table'))
-        .component('waltzPhysicalFlowExportButtons', require('./components/export-buttons/physical-flow-export-buttons'));
+        .component('waltzPhysicalFlowTable', PhysicalFlowTable)
+        .component('waltzPhysicalFlowExportButtons', PhysicalFlowExportButtons);
 
     registerComponents(module, [
         BulkPhysicalFlowLoaderWizard,

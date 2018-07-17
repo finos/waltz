@@ -20,9 +20,14 @@
 import angular from "angular";
 
 import "../style/style.scss";
+import Modules from './modules';
+import Routes from './routes';
+import Networking from './networking';
+import ThirdpartySetup from './thirdparty-setup';
 
 
-const waltzApp = angular.module('waltz.app', require('./modules'));
+
+const waltzApp = angular.module('waltz.app', Modules);
 
 
 if (__ENV__ === 'prod') {
@@ -32,9 +37,9 @@ if (__ENV__ === 'prod') {
     }]);
 }
 
-require('./routes')(waltzApp);
-require('./networking')(waltzApp);
-require('./thirdparty-setup')(waltzApp);
+Routes(waltzApp);
+Networking(waltzApp);
+ThirdpartySetup(waltzApp);
 
 
 function hrefSanitizer($compileProvider) {

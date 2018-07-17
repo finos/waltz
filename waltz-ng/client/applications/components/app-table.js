@@ -18,6 +18,7 @@
  */
 import _ from "lodash";
 import {mapToDisplayNames} from "../application-utils";
+import template from  './app-table.html';
 
 const bindings = {
     applications: '<',
@@ -71,7 +72,7 @@ controller.$inject = [
 
 
 const component = {
-    template: require('./app-table.html'),
+    template,
     bindings,
     controller
 };

@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './manager-list.html';
+
 export default () => ({
     replace: true,
     restrict: 'E',
@@ -26,5 +28,5 @@ export default () => ({
     },
     controllerAs: 'ctrl',
     controller: () => {},
-    template: require('./manager-list.html')
+    template
 });

@@ -21,6 +21,8 @@ import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
+import template from './bookmark-kinds.html';
+
 
 const bindings = {
     bookmarks: '<',
@@ -60,7 +62,6 @@ function createKinds(serviceBroker, bookmarks = []) {
 }
 
 
-const template = require('./bookmark-kinds.html');
 
 
 function controller(serviceBroker) {

@@ -19,6 +19,9 @@
 
 import angular from 'angular';
 import * as measurableStore from './services/measurable-store';
+import MeasurableSummary from './components/summary/measurable-summary';
+import MeasurableTree from './components/tree/measurable-tree';
+import Routes from './routes';
 
 
 export default () => {
@@ -26,14 +29,14 @@ export default () => {
     const module = angular.module('waltz.measurable', []);
 
     module
-        .component('waltzMeasurableSummary', require('./components/summary/measurable-summary'))
-        .component('waltzMeasurableTree', require('./components/tree/measurable-tree'));
+        .component('waltzMeasurableSummary', MeasurableSummary)
+        .component('waltzMeasurableTree', MeasurableTree);
 
     module
         .service(measurableStore.serviceName, measurableStore.store);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     return module.name;
 };

@@ -18,6 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
+import template from './physical-spec-definition-panel.html';
 
 
 const bindings = {
@@ -39,9 +40,6 @@ const initialState = {
     onUpdateFieldDescription: (fieldId, change) => console.log('psdp::onUpdateFieldDescription', { fieldId, change }),
     onUpdateLogicalDataElement: (fieldId, change) => console.log('psdp::onUpdateLogicalDataElement', { fieldId, change })
 };
-
-
-const template = require('./physical-spec-definition-panel.html');
 
 
 function controller($q) {

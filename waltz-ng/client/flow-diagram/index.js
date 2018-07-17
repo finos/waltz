@@ -20,12 +20,12 @@
 import angular from "angular";
 
 
-import * as FlowDiagramStore from './services/flow-diagram-store';
-import * as FlowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
-import * as FlowDiagramEntityStore from './services/flow-diagram-entity-store';
+import FlowDiagramStore from './services/flow-diagram-store';
+import FlowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
+import FlowDiagramEntityStore from './services/flow-diagram-entity-store';
 
-import * as FlowDiagramStarterService from './services/flow-diagram-starter-service';
-import * as FlowDiagramStateService from './services/flow-diagram-state-service';
+import FlowDiagramStarterService from './services/flow-diagram-starter-service';
+import FlowDiagramStateService from './services/flow-diagram-state-service';
 
 import flowDiagram from './components/diagram/flow-diagram';
 import flowDiagramLogicalFlowPopup from './components/editor/flow-diagram-logical-flow-popup';

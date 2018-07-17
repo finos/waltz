@@ -158,12 +158,17 @@ function controller(serviceBroker) {
 
 controller.$inject = ['ServiceBroker'];
 
-
-export const component = {
+const component = {
     bindings,
     controller,
     template
 };
 
-export const id = 'waltzLogicalFlowTypeEditor';
 
+const id = 'waltzLogicalFlowTypeEditor';
+
+
+export default {
+    component,
+    id
+};

@@ -20,7 +20,8 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import {preventDefault, stopPropagation} from "../../browser-utils"
-import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
+import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from '../../../common/hierarchy-utils';
+import template from './multi-select-tree-control.html';
 
 
 const bindings = {
@@ -44,9 +45,6 @@ const initialState = {
     onUncheck: id => console.log('default handler in multi-select-treecontrol for node id uncheck: ', id),
     onClick: node => console.log('default handler in multi-select-treecontrol for node click: ', node),
 };
-
-
-const template = require('./multi-select-tree-control.html');
 
 
 function prepareTree(dataTypes = []) {

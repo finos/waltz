@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './svg-diagrams.html';
+
 
 function controller($timeout) {
     const vm = this;
@@ -37,7 +39,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./svg-diagrams.html'),
+    template,
     bindings: {
         diagrams: '<',
         blockProcessor: '<'

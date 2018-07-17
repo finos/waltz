@@ -18,6 +18,7 @@
  */
 
 import {toDomain} from "../common/string-utils";
+import template from './external-link.html';
 
 const BINDINGS = {
     url: '@',
@@ -60,6 +61,6 @@ export default () => ({
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller,
-    template: require('./external-link.html')
+    template
 });
 

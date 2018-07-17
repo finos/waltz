@@ -68,12 +68,10 @@ function fieldValuesRender(field) {
 
 function fieldDiff(field) {
     const values = fieldValuesRender(field);
-    return {
+    return Object.assign({}, {
         key: field.key,
         name: field.templateOptions.label,
-        dirty: field.formControl.$dirty,
-        ...values
-    };
+        dirty: field.formControl.$dirty }, values);
 }
 
 

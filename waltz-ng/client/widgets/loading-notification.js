@@ -16,20 +16,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './loading-notification.html';
+
 
 const BINDINGS = {
     show: '<',
     name: '@'
-}
+};
+
 
 function controller() {
 
 }
 
+
 export default () => ({
     restrict: 'E',
     replace: true,
-    template: require('./loading-notification.html'),
+    template,
     scope: {},
     bindToController: BINDINGS,
     controller,

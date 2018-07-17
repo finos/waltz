@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import "babel-polyfill";
 import "angular-animate";
 import "angular-loading-bar";
 import "angular-local-storage";
@@ -26,11 +27,84 @@ import "angular-ui-notification";
 import "angular-ui-grid/ui-grid";
 import "angular-ui-router";
 import "angular-ui-bootstrap";
-import "babel-core/polyfill";
 import "ng-tags-input";
 import "ng-showdown";
 import "satellizer";
 import "ui-select";
+
+import AngularFormly from 'angular-formly';
+import AngularFormlyTemplates from 'angular-formly-templates-bootstrap';
+
+import AccessLog from './access-log';
+import Actor from './actor';
+import Alias from './alias';
+import Applications from './applications';
+import AppGroups from './app-groups';
+import AssetCost from './asset-cost';
+import Attestation from './attestation';
+import AuthSources from './auth-sources';
+import Bookmarks from './bookmarks';
+import ChangeInitiative from './change-initiative';
+import Complexity from './complexity';
+import Common_Module from './common/module';
+import ChangeLog from './change-log';
+import DataFlow from './data-flow';
+import DataTypeUsage from './data-type-usage';
+import DataTypes from './data-types';
+import Databases from './databases';
+import DrillGrid from './drill-grid';
+import DynamicSection from './dynamic-section';
+import EndUserApps from './end-user-apps';
+import Entity from './entity';
+import EntityEnum from './entity-enum';
+import EntityNamedNote from './entity-named-note';
+import EntityRelationship from './entity-relationship';
+import EntityStatistics from './entity-statistics';
+import EntitySvgDiagram from './entity-svg-diagram';
+import EntityTags from './entity-tags';
+import EnumValue from './enum-value';
+import Examples from './examples';
+import Extensions from './extensions';
+import FlowDiagram from './flow-diagram';
+import Formly from './formly';
+import History from './history';
+import Involvement from './involvement';
+import InvolvementKind from './involvement-kind';
+import Lineage from './lineage';
+import LogicalDataElement from './logical-data-element';
+import LogicalFlow from './logical-flow';
+import LogicalFlowDecorator from './logical-flow-decorator';
+import Measurable from './measurable';
+import MeasurableCategory from './measurable-category';
+import MeasurableRating from './measurable-rating';
+import MeasurableRelationship from './measurable-relationship';
+import Navbar from './navbar';
+import Notification from './notification';
+import OrgUnits from './org-units';
+import Orphan from './orphan';
+import Person from './person';
+import Perspective from './perspective';
+import PhysicalFlows from './physical-flows';
+import PhysicalSpecifications from './physical-specifications';
+import PhysicalField from './physical-field';
+import Playpen from './playpen';
+import Playpen5 from './playpen/5';
+import Profile from './profile';
+import Ratings from './ratings';
+import SharedPreference from './shared-preference';
+import ServerInfo from './server-info';
+import SoftwareCatalog from './software-catalog';
+import SourceDataRating from './source-data-rating';
+import StaticPanel from './static-panel';
+import Survey from './survey';
+import SvgDiagram from './svg-diagram';
+import System from './system';
+import Technology from './technology';
+import Tour from './tour';
+import User from './user';
+import UserContribution from './user-contribution';
+import Welcome from './welcome';
+import Widgets from './widgets';
 
 const dependencies = [
     'ui.bootstrap',
@@ -48,82 +122,82 @@ const dependencies = [
     'ng-showdown',
     'satellizer',
     'LocalStorageModule',
-    require('angular-formly'),
-    require('angular-formly-templates-bootstrap'),
+    AngularFormly,
+    AngularFormlyTemplates,
     'treeControl',
     'angular-loading-bar',
 
     // -- waltz-modules ---
-    require('./access-log')(),
-    require('./actor')(),
-    require('./alias')(),
-    require('./applications')(),
-    require('./app-groups')(),
-    require('./asset-cost')(),
-    require('./attestation')(),
-    require('./auth-sources')(),
-    require('./bookmarks')(),
-    require('./change-initiative')(),
-    require('./complexity')(),
-    require('./common/module')(),
-    require('./change-log')(),
-    require('./data-flow')(),
-    require('./data-type-usage')(),
-    require('./data-types')(),
-    require('./databases')(),
-    require('./drill-grid')(),
-    require('./dynamic-section')(),
-    require('./end-user-apps')(),
-    require('./entity')(),
-    require('./entity-enum')(),
-    require('./entity-named-note')(),
-    require('./entity-relationship')(),
-    require('./entity-statistics')(),
-    require('./entity-svg-diagram')(),
-    require('./entity-tags')(),
-    require('./enum-value')(),
-    require('./examples')(),
-    require('./extensions')(),
-    require('./flow-diagram')(),
-    require('./formly')(),
-    require('./history')(),
-    require('./involvement')(),
-    require('./involvement-kind')(),
-    require('./lineage')(),
-    require('./logical-data-element')(),
-    require('./logical-flow')(),
-    require('./logical-flow-decorator')(),
-    require('./measurable')(),
-    require('./measurable-category')(),
-    require('./measurable-rating')(),
-    require('./measurable-relationship')(),
-    require('./navbar')(),
-    require('./notification')(),
-    require('./org-units')(),
-    require('./orphan')(),
-    require('./person')(),
-    require('./perspective')(),
-    require('./physical-flows')(),
-    require('./physical-specifications')(),
-    require('./physical-field')(),
-    require('./playpen')(),
-    require('./playpen/5')(),
-    require('./profile')(),
-    require('./ratings')(),
-    require('./shared-preference')(),
-    require('./server-info')(),
-    require('./software-catalog')(),
-    require('./source-data-rating')(),
-    require('./static-panel')(),
-    require('./survey')(),
-    require('./svg-diagram')(),
-    require('./system')(),
-    require('./technology')(),
-    require('./tour')(),
-    require('./user')(),
-    require('./user-contribution')(),
-    require('./welcome')(),
-    require('./widgets')(),
+    AccessLog(),
+    Actor(),
+    Alias(),
+    Applications(),
+    AppGroups(),
+    AssetCost(),
+    Attestation(),
+    AuthSources(),
+    Bookmarks(),
+    ChangeInitiative(),
+    Complexity(),
+    Common_Module(),
+    ChangeLog(),
+    DataFlow(),
+    DataTypeUsage(),
+    DataTypes(),
+    Databases(),
+    DrillGrid(),
+    DynamicSection(),
+    EndUserApps(),
+    Entity(),
+    EntityEnum(),
+    EntityNamedNote(),
+    EntityRelationship(),
+    EntityStatistics(),
+    EntitySvgDiagram(),
+    EntityTags(),
+    EnumValue(),
+    Examples(),
+    Extensions(),
+    FlowDiagram(),
+    Formly(),
+    History(),
+    Involvement(),
+    InvolvementKind(),
+    Lineage(),
+    LogicalDataElement(),
+    LogicalFlow(),
+    LogicalFlowDecorator(),
+    Measurable(),
+    MeasurableCategory(),
+    MeasurableRating(),
+    MeasurableRelationship(),
+    Navbar(),
+    Notification(),
+    OrgUnits(),
+    Orphan(),
+    Person(),
+    Perspective(),
+    PhysicalFlows(),
+    PhysicalSpecifications(),
+    PhysicalField(),
+    Playpen(),
+    Playpen5(),
+    Profile(),
+    Ratings(),
+    SharedPreference(),
+    ServerInfo(),
+    SoftwareCatalog(),
+    SourceDataRating(),
+    StaticPanel(),
+    Survey(),
+    SvgDiagram(),
+    System(),
+    Technology(),
+    Tour(),
+    User(),
+    UserContribution(),
+    Welcome(),
+    Widgets()
 ];
 
 

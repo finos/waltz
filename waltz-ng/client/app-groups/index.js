@@ -24,18 +24,22 @@ import RelatedAppGroupsSection from './components/related-app-groups-section/rel
 import SubscriptionButtons from './components/subscription-buttons/subscription-buttons';
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as AppGroupStore from './services/app-group-store';
+import Routes from './routes';
+import AppGroupList from './directives/app-group-list';
+import AppGroupListSection from './directives/app-group-list-section';
+import AppGroupAppSelectionList from './directives/app-group-app-selection-list';
+
 
 export default () => {
 
     const module = angular.module('waltz.app.group', []);
+    module
+        .config(Routes);
 
     module
-        .config(require('./routes'));
-
-    module
-        .directive('waltzAppGroupList', require('./directives/app-group-list'))
-        .directive('waltzAppGroupListSection', require('./directives/app-group-list-section'))
-        .directive('waltzAppGroupAppSelectionList', require('./directives/app-group-app-selection-list'));
+        .directive('waltzAppGroupList', AppGroupList)
+        .directive('waltzAppGroupListSection', AppGroupListSection)
+        .directive('waltzAppGroupAppSelectionList', AppGroupAppSelectionList);
 
     registerComponents(module, [
         AppGroupSummary,

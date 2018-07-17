@@ -21,13 +21,23 @@ import {registerComponents} from "../../common/module-utils";
 import BulkLogicalFlowLoaderWizard from './bulk-logical-flow-loader-wizard/bulk-logical-flow-loader-wizard';
 import BulkLogicalFlowParser from './bulk-logical-flow-parser/bulk-logical-flow-parser';
 import BulkLogicalFlowUploader from './bulk-logical-flow-uploader/bulk-logical-flow-uploader';
-import * as LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
-import * as LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
-import * as SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
-import * as SourceAndTargetPanel from './source-and-target-panel/source-and-target-panel';
-import * as RatedFlowSummaryPanel from './rated-flow-summary/rated-flow-summary-panel';
+import LogicalFlowTypeEditor from './edit/logical-flow-type-editor';
+import LogicalFlowEditPanel from './logical-flow-edit-panel/logical-flow-edit-panel';
+import SourceAndTargetGraph from './source-and-target-graph/source-and-target-graph';
+import SourceAndTargetPanel from './source-and-target-panel/source-and-target-panel';
+import RatedFlowSummaryPanel from './rated-flow-summary/rated-flow-summary-panel';
 import LogicalFlowsDataTypeSummaryPane from './logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane';
 import LogicalFlowsBoingyGraph from './logical-flows-boingy-graph/logical-flows-boingy-graph';
+import RatedFlowSummaryInfoCell from './rated-flow-summary/rated-flow-summary-info-cell';
+import RatedSummaryTable from './rated-flow-summary/rated-summary-table';
+import RatedSummaryCell from './rated-flow-summary/rated-summary-cell';
+import AppCentricFlowTable from './app-centric-flow-table/app-centric-flow-table';
+import LogicalFlowDiagram from './boingy-graph/boingy-graph';
+import LogicalFlowCounterpartSelector from './edit/logical-flow-counterpart-selector';
+import LogicalFlowsTabgroup from './logical-flows-tabgroup/logical-flows-tabgroup';
+import LogicalFlowsTabgroupSection from './logical-flows-tabgroup-section/logical-flows-tabgroup-section';
+import LogicalFlowTable from './../components/logical-flow-table/logical-flow-table';
+import FlowFilterOptions from './flow-filter-options/flow-filter-options';
 
 
 function setup(module) {
@@ -46,16 +56,16 @@ function setup(module) {
     ]);
 
     module
-        .component('waltzRatedFlowSummaryInfoCell', require('./rated-flow-summary/rated-flow-summary-info-cell'))
-        .component('waltzRatedSummaryTable', require('./rated-flow-summary/rated-summary-table'))
-        .component('waltzRatedSummaryCell', require('./rated-flow-summary/rated-summary-cell'))
-        .component('waltzAppCentricFlowTable', require('./app-centric-flow-table/app-centric-flow-table'))
-        .component('waltzLogicalFlowDiagram', require('./boingy-graph/boingy-graph'))
-        .component('waltzLogicalFlowCounterpartSelector', require('./edit/logical-flow-counterpart-selector'))
-        .component('waltzLogicalFlowsTabgroup', require('./logical-flows-tabgroup/logical-flows-tabgroup'))
-        .component('waltzLogicalFlowsTabgroupSection', require('./logical-flows-tabgroup-section/logical-flows-tabgroup-section'))
-        .component('waltzLogicalFlowTable', require('./../components/logical-flow-table/logical-flow-table'))
-        .component('waltzFlowFilterOptions', require('./flow-filter-options/flow-filter-options'));
+        .component('waltzRatedFlowSummaryInfoCell', RatedFlowSummaryInfoCell)
+        .component('waltzRatedSummaryTable', RatedSummaryTable)
+        .component('waltzRatedSummaryCell', RatedSummaryCell)
+        .component('waltzAppCentricFlowTable', AppCentricFlowTable)
+        .component('waltzLogicalFlowDiagram', LogicalFlowDiagram)
+        .component('waltzLogicalFlowCounterpartSelector', LogicalFlowCounterpartSelector)
+        .component('waltzLogicalFlowsTabgroup', LogicalFlowsTabgroup)
+        .component('waltzLogicalFlowsTabgroupSection', LogicalFlowsTabgroupSection)
+        .component('waltzLogicalFlowTable', LogicalFlowTable)
+        .component('waltzFlowFilterOptions', FlowFilterOptions);
 }
 
 

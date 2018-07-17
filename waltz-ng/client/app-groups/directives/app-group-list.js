@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './app-group-list.html';
+
 
 const BINDINGS = {
     groupSubscriptions: '=',
@@ -36,7 +38,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-list.html'),
+        template,
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

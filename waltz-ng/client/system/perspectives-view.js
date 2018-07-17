@@ -19,6 +19,7 @@
 import _ from 'lodash';
 import {initialiseData} from '../common';
 import {baseRagNames} from '../ratings/rating-utils';
+import template from './perspectives-view.html';
 
 
 const initialState = {
@@ -53,7 +54,7 @@ function controller(notification,
 
     vm.onStartCreate = () => {
         vm.visibility = Object.assign({}, vm.visibility, { editor: true });
-        const ragNames = Object.assign({}, baseRagNames)
+        const ragNames = Object.assign({}, baseRagNames);
         vm.model = Object.assign({}, { ragNames })
     };
 
@@ -97,7 +98,7 @@ controller.$inject = [
 const page = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./perspectives-view.html')
+    template
 };
 
 

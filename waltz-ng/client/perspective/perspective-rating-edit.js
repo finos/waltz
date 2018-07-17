@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
+import template from './perspective-rating-edit.html';
 
 
 function controller($stateParams,
@@ -82,9 +83,6 @@ function controller($stateParams,
 
 
 const initialState = {};
-
-
-const template = require('./perspective-rating-edit.html');
 
 
 controller.$inject = [

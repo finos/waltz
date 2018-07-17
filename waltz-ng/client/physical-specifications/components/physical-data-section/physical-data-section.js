@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import template from './physical-data-section.html';
 
 
 const bindings = {
@@ -38,9 +39,6 @@ const initialState = {
     specifications: [],
     onInitialise: (e) => {}
 };
-
-
-const template = require('./physical-data-section.html');
 
 
 /**

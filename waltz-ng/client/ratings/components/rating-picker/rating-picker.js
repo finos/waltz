@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineForegroundColor} from "../../../common/colors";
+import template from './rating-picker.html';
 
 
 const bindings = {
@@ -29,9 +30,6 @@ const bindings = {
     onKeypress: '<',
     schemeId: '<',
 };
-
-
-const template = require('./rating-picker.html');
 
 
 const initialState = {

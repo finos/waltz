@@ -18,6 +18,7 @@
  */
 
 import angular from 'angular';
+import template from './inline-edit-area.html';
 
 const Modes = {
     SAVING: Symbol(),
@@ -77,9 +78,6 @@ const bindings = {
     value: '<',
     onSave: '<'
 };
-
-
-const template = require('./inline-edit-area.html');
 
 
 const component = {

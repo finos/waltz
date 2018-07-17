@@ -21,6 +21,7 @@ import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {mkSelectionOptions} from '../../../common/selector-utils';
 import {CORE_API} from '../../../common/services/core-api-utils';
+import template from './apps-section.html';
 
 
 const bindings = {
@@ -34,7 +35,6 @@ const initialState = {
 };
 
 
-const template = require('./apps-section.html');
 
 
 const DEFAULT_APP_SETTINGS = {

@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../common";
 import {stringToBoolean} from "../common/string-utils";
+import template from './section.html';
 
 
 const bindings = {
@@ -28,9 +29,6 @@ const bindings = {
     id: '@',
     collapsible: '<'
 };
-
-
-const template = require('./section.html');
 
 
 const initialState = {

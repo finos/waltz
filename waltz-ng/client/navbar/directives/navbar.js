@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../common";
+import template from "./navbar.html";
 
 
 const navItems = [
@@ -71,7 +72,7 @@ controller.$inject = [
 export default () => {
     return {
         restrict: 'E',
-        template: require("./navbar.html"),
+        template,
         controller,
         scope: {},
         controllerAs: 'ctrl'

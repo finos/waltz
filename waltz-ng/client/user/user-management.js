@@ -21,6 +21,8 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
+// ---
+import template from './user-management.html';
 
 
 const initialState = {
@@ -131,9 +133,8 @@ function controller(serviceBroker) {
 controller.$inject = [ 'ServiceBroker' ];
 
 
-// ---
 export default {
-    template: require('./user-management.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

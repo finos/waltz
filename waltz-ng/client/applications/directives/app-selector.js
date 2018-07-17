@@ -18,6 +18,8 @@
  */
 
 import {initialiseData, invokeFunction} from "../../common";
+import template from './app-selector.html';
+
 
 
 const BINDINGS = {
@@ -53,7 +55,7 @@ controller.$inject = ['ApplicationStore'];
 const directive = {
     restrict: 'E',
     replace: true,
-    template: require('./app-selector.html'),
+    template,
     scope: {},
     bindToController: BINDINGS,
     controller,

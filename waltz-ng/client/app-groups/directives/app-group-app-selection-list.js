@@ -23,6 +23,8 @@
  * used to strikethrough text.
  */
 
+import template from './app-group-app-selection-list.html';
+
 const BINDINGS = {
     applications: '=', // [app]
     isMember: '=', // function
@@ -42,7 +44,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-app-selection-list.html'),
+        template,
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

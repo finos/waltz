@@ -19,13 +19,11 @@
 
 import _ from "lodash";
 import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
+import template from './navbar-profile.html';
 
 const bindings = {
     logoOverlayText: '<'
 };
-
-
-const template = require('./navbar-profile.html');
 
 
 const initialState = {

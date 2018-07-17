@@ -626,11 +626,17 @@ controller.$inject = [
 ];
 
 
-export const component = {
+const component = {
     bindings,
     template,
     controller
 };
 
 
-export const id = "waltzSourceAndTargetGraph";
+const id = "waltzSourceAndTargetGraph";
+
+
+export default {
+    component,
+    id
+};

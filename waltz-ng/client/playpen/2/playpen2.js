@@ -19,6 +19,7 @@
 
 import _ from 'lodash';
 import {CORE_API} from "../../common/services/core-api-utils";
+import template from './playpen2.html';
 
 
 function controller(notification,
@@ -342,7 +343,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./playpen2.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

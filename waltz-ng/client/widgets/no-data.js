@@ -18,8 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './no-data.html';
+
 export default  {
-    template: require('./no-data.html'),
+    template,
     transclude: {
         message: 'message'
     }

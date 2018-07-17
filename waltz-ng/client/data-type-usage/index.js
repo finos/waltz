@@ -20,16 +20,19 @@
 import angular from 'angular';
 import * as DataTypeUsageStore from './services/data-type-usage-store';
 import {registerStore} from '../common/module-utils'
+import AppDataTypeUsageList from "./directives/app-data-type-usage-list";
+import DataTypeUsageStatTable from './components/stat-table/data-type-usage-stat-table';
+import AppDataTypeUsageEditor from "./components/editor/app-data-type-usage-editor";
 
 export default () => {
     const module = angular.module('waltz.data.type.usage', []);
 
     module
-        .directive('waltzAppDataTypeUsageList', require("./directives/app-data-type-usage-list"))
+        .directive('waltzAppDataTypeUsageList', AppDataTypeUsageList)
 
     module
-        .component('waltzDataTypeUsageStatTable', require('./components/stat-table/data-type-usage-stat-table'))
-        .component('waltzAppDataTypeUsageEditor', require("./components/editor/app-data-type-usage-editor"));
+        .component('waltzDataTypeUsageStatTable', DataTypeUsageStatTable)
+        .component('waltzAppDataTypeUsageEditor', AppDataTypeUsageEditor);
 
     registerStore(module, DataTypeUsageStore);
 

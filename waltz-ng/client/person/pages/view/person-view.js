@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../../../common/index";
 import {toEntityRef} from "../../../common/entity-utils";
+import template from './person-view.html';
 
 
 const initialState = {
@@ -62,7 +63,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./person-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

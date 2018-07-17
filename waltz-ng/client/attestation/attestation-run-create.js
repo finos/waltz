@@ -21,6 +21,8 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import {formats, initialiseData} from "../common/index";
 import moment from "moment";
+import template from './attestation-run-create.html';
+
 
 const exactScope = {
     value: 'EXACT',
@@ -65,7 +67,6 @@ const initialState = {
 };
 
 
-const template = require('./attestation-run-create.html');
 
 
 function mkCreateCommand(attestationRun){

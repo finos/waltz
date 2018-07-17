@@ -146,4 +146,9 @@ service.$inject = [
     '$stateParams',
     'localStorageService'];
 
-export const serviceName = 'DynamicSectionManager';
+const serviceName = 'DynamicSectionManager';
+
+export default {
+    service,
+    serviceName
+};

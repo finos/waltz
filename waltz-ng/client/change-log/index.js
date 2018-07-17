@@ -20,20 +20,23 @@
 import angular from "angular";
 import {registerStores} from "../common/module-utils";
 import changeLogStore from "./services/change-log-store";
+import Routes from './routes';
+import ChangeLogSection from './components/change-log-section';
+import ChangeLogTable from './components/change-log-table';
 
 export default () => {
     const module = angular.module('waltz.change.log', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStores(module, [
         changeLogStore
     ]);
 
     module
-        .component('waltzChangeLogSection', require('./components/change-log-section'))
-        .component('waltzChangeLogTable', require('./components/change-log-table'));
+        .component('waltzChangeLogSection', ChangeLogSection)
+        .component('waltzChangeLogTable', ChangeLogTable);
 
     return module.name;
 };

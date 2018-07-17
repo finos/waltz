@@ -25,12 +25,13 @@ import changeInitiativeStore from './services/change-initiative-store';
 import changeInitiativeSelector from './directives/change-initiative-selector';
 import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
 import changeInitiativeNavigatorSection from './components/change-initiative-navigator-section/change-initiative-navigator-section';
+import Routes from './routes';
 
 
 function setup() {
     const module = angular.module('waltz.change.initiative', []);
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStore(module, changeInitiativeStore);
 

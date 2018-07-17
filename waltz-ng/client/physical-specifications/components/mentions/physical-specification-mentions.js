@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import template from './physical-specification-mentions.html';
 
 const bindings = {
     mentions: '<',
@@ -30,9 +31,6 @@ const initialState = {
     mentions: [],
     onInitialise: (e) => {}
 };
-
-
-const template = require('./physical-specification-mentions.html');
 
 
 function controller() {

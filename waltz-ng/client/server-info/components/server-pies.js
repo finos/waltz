@@ -20,14 +20,12 @@
 import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
 import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
+import template from './server-pies.html';
 
 
 const bindings = {
     servers : '<'
 };
-
-
-const template = require('./server-pies.html');
 
 
 const PIE_SIZE = 70;

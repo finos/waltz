@@ -18,7 +18,7 @@
  */
 import {initialiseData} from "../common";
 
-const template = require('./editable-field.html');
+import template from './editable-field.html';
 
 
 const bindings = {

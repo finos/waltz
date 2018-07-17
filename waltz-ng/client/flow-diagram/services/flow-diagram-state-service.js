@@ -518,4 +518,10 @@ service.$inject = [
 ];
 
 
-export const serviceName = 'FlowDiagramStateService';
+const serviceName = 'FlowDiagramStateService';
+
+
+export default {
+    serviceName,
+    service
+};

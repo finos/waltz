@@ -28,6 +28,13 @@ import * as PhysicalSpecDefinitionSampleFileStore from "./services/physical-spec
 import DataTypeList from "./components/data-type/physical-spec-data-type-list";
 import DataTypeSection from "./components/data-type/physical-spec-data-type-section";
 import PhysicalSpecDefinitionSection from "./components/spec-definition-section/physical-spec-definition-section";
+import Routes from './routes';
+import PhysicalDataSection from './components/physical-data-section/physical-data-section';
+import PhysicalSpecDefinitionCreatePanel from './components/create/physical-spec-definition-create-panel';
+import PhysicalSpecificationOverview from './components/overview/physical-specification-overview';
+import PhysicalSpecificationConsumers from './components/specification-consumers/physical-specification-consumers';
+import PhysicalSpecificationMentions from './components/mentions/physical-specification-mentions';
+import PhysicalSpecDefintionPanel from './components/spec-definition/physical-spec-definition-panel';
 
 
 function setup() {
@@ -35,7 +42,7 @@ function setup() {
     const module = angular.module('waltz.physical.specification', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerComponents(module, [
         DataTypeList,
@@ -44,12 +51,12 @@ function setup() {
     ]);
 
     module
-        .component('waltzPhysicalDataSection', require('./components/physical-data-section/physical-data-section'))
-        .component('waltzPhysicalSpecDefinitionCreatePanel', require('./components/create/physical-spec-definition-create-panel'))
-        .component('waltzPhysicalSpecificationOverview', require('./components/overview/physical-specification-overview'))
-        .component('waltzPhysicalSpecificationConsumers', require('./components/specification-consumers/physical-specification-consumers'))
-        .component('waltzPhysicalSpecificationMentions', require('./components/mentions/physical-specification-mentions'))
-        .component('waltzPhysicalSpecDefinitionPanel', require('./components/spec-definition/physical-spec-definition-panel'));
+        .component('waltzPhysicalDataSection', PhysicalDataSection)
+        .component('waltzPhysicalSpecDefinitionCreatePanel', PhysicalSpecDefinitionCreatePanel)
+        .component('waltzPhysicalSpecificationOverview', PhysicalSpecificationOverview)
+        .component('waltzPhysicalSpecificationConsumers', PhysicalSpecificationConsumers)
+        .component('waltzPhysicalSpecificationMentions', PhysicalSpecificationMentions)
+        .component('waltzPhysicalSpecDefinitionPanel', PhysicalSpecDefintionPanel);
 
     registerStores(module, [
         PhysicalSpecDataTypeStore,

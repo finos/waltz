@@ -19,6 +19,7 @@
 
 import _ from 'lodash';
 import {initialiseData, invokeFunction} from '../../../common';
+import template from './survey-dropdown-editor.html';
 
 
 const bindings = {
@@ -35,9 +36,6 @@ const initialState = {
     newEntry: null,
     onSave: () => console.log("default onSave ")
 };
-
-
-const template = require('./survey-dropdown-editor.html');
 
 
 function createEntriesString(entries = []) {
@@ -66,7 +64,7 @@ function controller(notification) {
     };
 
     const valueExists = (value) => {
-        return _.find(vm.entries, e => e.value == value) !== undefined;
+        return _.find(vm.entries, e => e.value === value) !== undefined;
     };
 
     vm.startNewEntry = () => {
@@ -123,13 +121,12 @@ function controller(notification) {
     };
 
     vm.bulkEntriesChanged = () => {
-        const newEntries = _.chain(vm.bulkEntriesString)
+        vm.entries = _.chain(vm.bulkEntriesString)
             .trim()
             .split("\n")
             .uniq()
             .map(s => mkEntry(null, null, s))
             .value();
-        vm.entries = newEntries;
         notifyChanges();
     };
 }
