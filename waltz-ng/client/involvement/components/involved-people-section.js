@@ -50,9 +50,15 @@ function mkGridData(involvements = [], displayNameService) {
                     displayName: displayNameService.lookup('involvementKind', ik.kindId)
                 }));
 
+            const rolesDisplayName = _.chain(roles)
+                .map('displayName')
+                .join(', ')
+                .value();
+
             return {
                 person: inv.person,
-                roles: roles
+                roles,
+                rolesDisplayName
             }
         })
         .sortBy('person.displayName')
@@ -146,23 +152,20 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
         { field: 'person.title', displayName: 'Title' },
         { field: 'person.officePhone', displayName: 'Telephone' },
         {
-            field: 'roles',
+            field: 'rolesDisplayName',
             displayName: 'Roles',
             sortingAlgorithm: (a, b) => {
                 const aNames = _.join(_.map(a, 'displayName'));
                 const bNames = _.join(_.map(b, 'displayName'));
                 return aNames.localeCompare(bNames);
             },
-            exportFormatter: (input) => _.join(_.map(input, 'displayName'), ','),
             cellTemplate: `
                 <div class="ui-grid-cell-contents"> 
-                    <span ng-repeat="role in COL_FIELD">
-                        <span ng-bind="role.displayName" 
-                              uib-popover="{{ 'Provenance: ' + role.provenance }}"
-                              popover-trigger="mouseenter"
-                              popover-append-to-body="true">
-                        </span><span ng-if="!$last">, </span>
-                    </span>
+                    <span ng-bind="COL_FIELD" 
+                          uib-popover-template="'wips/roles-popup.html'"
+                          popover-trigger="mouseenter"
+                          popover-append-to-body="true">
+                    </span>   
                 </div>`
         }
     ];
