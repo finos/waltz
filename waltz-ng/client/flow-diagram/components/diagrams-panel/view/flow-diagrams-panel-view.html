@@ -176,6 +176,12 @@
                               state="$ctrl.visibility.layers.flowBuckets"
                               on-toggle="$ctrl.toggleLayer('flowBuckets')">
                 </waltz-toggle>
+                <waltz-toggle style='display:block'
+                              label-on="Removed Flows"
+                              label-off="Removed Flows"
+                              state="$ctrl.visibility.layers.removedFlows"
+                              on-toggle="$ctrl.toggleLayer('removedFlows')">
+                </waltz-toggle>
             </div>
             <div class="help-block small small">
                 Toggle the layers to show more/less detail.

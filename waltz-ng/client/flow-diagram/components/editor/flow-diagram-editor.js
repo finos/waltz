@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../../common';
+import {initialiseData} from "../../../common";
+import template from "./flow-diagram-editor.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 /**
@@ -26,9 +28,6 @@ import {initialiseData} from '../../../common';
  * @description
  * This component ...
  */
-
-import template from './flow-diagram-editor.html';
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -191,44 +190,51 @@ function preparePhysicalFlowPopup(
 
 function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlowStore, physicalSpecificationStore) {
     return (d) => {
-        return [
-            {
-                title: 'Add annotation',
-                action: (elm, d, i) => {
-                    $timeout(() => {
-                        const popup = prepareAddAnnotationPopup(d);
-                        vm.popup = popup;
-                        vm.visibility.annotationPopup = true;
-                        vm.visibility.anyPopup = true;
-                    });
-                }
-            },
-            {
-                title: 'Define physical flows',
-                action: (elm, logicalFlowNode, i) => {
-                    $timeout(() => {
-                        preparePhysicalFlowPopup(
-                            $q,
-                            logicalFlowNode.data,
-                            physicalFlowStore,
-                            physicalSpecificationStore,
-                            flowDiagramStateService)
-                            .then(popup => {
-                                vm.popup = popup;
-                                vm.visibility.physicalFlowPopup = true;
-                                vm.visibility.anyPopup = true;
-                            });
-                    });
 
-                }
-            },
-            { divider: true },
-            {
-                title: 'Remove Flow',
-                action: (elm, d, i) =>
-                    flowDiagramStateService.processCommands([{command: 'REMOVE_FLOW', payload: d}])
-            },
-        ];
+        const removeFlow = {
+            title: 'Remove Flow',
+            action: (elm, d, i) =>
+                flowDiagramStateService.processCommands([{command: 'REMOVE_FLOW', payload: d}])
+        };
+
+        if(d.data.isRemoved) {
+            return [removeFlow];
+        } else {
+            return [
+                {
+                    title: 'Add annotation',
+                    action: (elm, d, i) => {
+                        $timeout(() => {
+                            const popup = prepareAddAnnotationPopup(d);
+                            vm.popup = popup;
+                            vm.visibility.annotationPopup = true;
+                            vm.visibility.anyPopup = true;
+                        });
+                    }
+                },
+                {
+                    title: 'Define physical flows',
+                    action: (elm, logicalFlowNode, i) => {
+                        $timeout(() => {
+                            preparePhysicalFlowPopup(
+                                $q,
+                                logicalFlowNode.data,
+                                physicalFlowStore,
+                                physicalSpecificationStore,
+                                flowDiagramStateService)
+                                .then(popup => {
+                                    vm.popup = popup;
+                                    vm.visibility.physicalFlowPopup = true;
+                                    vm.visibility.anyPopup = true;
+                                });
+                        });
+
+                    }
+                },
+                { divider: true },
+                removeFlow,
+            ];
+        }
     };
 }
 
