@@ -19,15 +19,13 @@
 
 import _ from "lodash";
 import {maturityColorScale, variableScale} from "../../common/colors";
+import template from './simple-software-usage-pies.html';
 
 
 const bindings = {
     usages: '<',
     packages: '<'
 };
-
-
-const template = require('./simple-software-usage-pies.html');
 
 
 const PIE_SIZE = 70;

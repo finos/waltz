@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {timeFormat} from "d3-time-format";
+import template from './survey-instance-view.html';
 
 const initialState = {
     surveyInstance: {},
@@ -137,13 +138,14 @@ function controller($stateParams,
         if (!change.newVal) {
             notification.error('Due date cannot be blank');
         } else {
-            surveyInstanceStore.updateDueDate(instanceId, {
-                newDateVal: timeFormat('%Y-%m-%d')(change.newVal)
-            })
-                .then(r => {
-                        notification.success('Survey instance due date updated successfully');
-                        loadInstanceAndRun();
-                    },
+            surveyInstanceStore
+                .updateDueDate(
+                    instanceId,
+                    {newDateVal: timeFormat('%Y-%m-%d')(change.newVal)})
+                .then(() => {
+                    notification.success('Survey instance due date updated successfully');
+                    loadInstanceAndRun();
+                },
                     r => notification.error('Failed to update survey instance due date')
                 );
         }
@@ -155,7 +157,7 @@ function controller($stateParams,
                 vm.surveyInstance.id,
                 {newStatus: 'WITHDRAWN'}
             )
-                .then(result => {
+                .then(() => {
                     notification.success('Survey instance withdrawn');
                     loadInstanceAndRun();
                 });
@@ -173,7 +175,7 @@ function controller($stateParams,
                     reason
                 }
                 )
-                .then(result => {
+                .then(() => {
                     notification.success('Survey response rejected');
                     $state.reload();
                 });
@@ -196,7 +198,7 @@ controller.$inject = [
 const view = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-instance-view.html')
+    template
 };
 
 

@@ -24,7 +24,7 @@ const BINDINGS = {
     primaryAssetCode: '=?'
 };
 
-function controller($scope, uiGridConstants) {
+function controller(uiGridConstants) {
     const vm = this;
 
 
@@ -58,14 +58,16 @@ function controller($scope, uiGridConstants) {
 
 }
 
-controller.$inject = ['$scope', 'uiGridConstants'];
+controller.$inject = ['uiGridConstants'];
 
+
+import template from './server-list.html';
 
 export default () => ({
     restrict: 'E',
     replace: true,
     scope: {},
-    template: require('./server-list.html'),
+    template,
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller

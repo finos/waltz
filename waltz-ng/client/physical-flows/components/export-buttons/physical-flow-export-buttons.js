@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './physical-flow-export-buttons.html';
+
+
 const bindings = {
     exportConsumes: '<',
     exportProduces: '<',
     exportUnused: '<'
 };
 
-
-const template = require('./physical-flow-export-buttons.html');
 
 
 const component = {

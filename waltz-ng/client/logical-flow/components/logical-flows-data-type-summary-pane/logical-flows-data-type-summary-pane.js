@@ -18,13 +18,13 @@
  */
 
 import _ from 'lodash';
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from "../../../common/index";
-import { color } from "d3-color";
-import { green, red } from "../../../common/colors";
-import { findUnknownDataType } from '../../../data-types/data-type-utils';
+import {CORE_API} from '../../../common/services/core-api-utils';
+import {initialiseData} from "../../../common/index";
+import {color} from "d3-color";
+import {green, red} from "../../../common/colors";
+import {findUnknownDataType} from '../../../data-types/data-type-utils';
 
-const template = require('./logical-flows-data-type-summary-pane.html');
+import template from './logical-flows-data-type-summary-pane.html';
 
 
 const bindings = {

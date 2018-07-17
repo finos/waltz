@@ -26,6 +26,14 @@ import AppCostsSection from './components/app-costs-section/app-costs-section';
 import AppOverview from './components/overview/app-overview';
 import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
 import RelatedAppsSection from './components/related-apps-section/related-apps-section';
+import AppSelector from './directives/app-selector';
+import AssetCodeExplorer from './directives/asset-code-explorer';
+import BasicAppSelector from './directives/basic-app-selector';
+import AppsByInvestmentPie from './components/apps-by-investment-pie';
+import AppsByLifecyclePhasePie from './components/apps-by-lifecycle-phase-pie';
+import AppsSection from './components/apps-section/apps-section';
+import AppSummary from './components/app-summary';
+import AppTable from './components/app-table';
 
 export default () => {
 
@@ -37,16 +45,16 @@ export default () => {
         .config(routes);
 
     module
-        .directive('waltzAppSelector', require('./directives/app-selector'))
-        .directive('waltzAssetCodeExplorer', require('./directives/asset-code-explorer'))
-        .directive('waltzBasicAppSelector', require('./directives/basic-app-selector'));
+        .directive('waltzAppSelector', AppSelector)
+        .directive('waltzAssetCodeExplorer', AssetCodeExplorer)
+        .directive('waltzBasicAppSelector', BasicAppSelector);
 
     module
-        .component('waltzAppsByInvestmentPie', require('./components/apps-by-investment-pie'))
-        .component('waltzAppsByLifecyclePhasePie', require('./components/apps-by-lifecycle-phase-pie'))
-        .component('waltzAppsSection', require('./components/apps-section/apps-section'))
-        .component('waltzAppSummary', require('./components/app-summary'))
-        .component('waltzAppTable', require('./components/app-table'));
+        .component('waltzAppsByInvestmentPie', AppsByInvestmentPie)
+        .component('waltzAppsByLifecyclePhasePie', AppsByLifecyclePhasePie)
+        .component('waltzAppsSection', AppsSection)
+        .component('waltzAppSummary', AppSummary)
+        .component('waltzAppTable', AppTable);
 
     registerComponents(module, [
         AppCostsSection,

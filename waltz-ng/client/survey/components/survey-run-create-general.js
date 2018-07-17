@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common/index";
+import template from './survey-run-create-general.html';
 
 
 const bindings = {
@@ -78,10 +79,6 @@ function mkAllowedEntityKinds(entityKind) {
     }
     return selectors;
 }
-
-
-const template = require('./survey-run-create-general.html');
-
 
 
 function controller(appGroupStore, involvementKindStore) {

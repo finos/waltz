@@ -20,6 +20,7 @@
 
 import {ragColorScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
+import template from './apps-by-investment-pie.html';
 
 
 const bindings = {
@@ -28,7 +29,6 @@ const bindings = {
 };
 
 
-const template = require('./apps-by-investment-pie.html');
 
 
 const DEFAULT_SIZE = 80;

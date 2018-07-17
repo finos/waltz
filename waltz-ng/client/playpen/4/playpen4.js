@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common/index";
+import template from './playpen4.html';
 
 const initialState = {
     parentEntityRef: { kind: 'ORG_UNIT', id: 6018 },
@@ -42,7 +43,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./playpen4.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {buildHierarchies, findNode, switchToParentIds} from "../../../common/hierarchy-utils";
+import template from './entity-hierarchy-navigator.html';
 
 const initialState = {
     model: [],
@@ -63,7 +64,7 @@ function controller() {
 
 
 const component = {
-    template: require('./entity-hierarchy-navigator.html'),
+    template,
     controller,
     bindings: {
         selectedNode: '<',

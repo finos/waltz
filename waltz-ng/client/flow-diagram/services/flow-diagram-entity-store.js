@@ -66,8 +66,13 @@ store.$inject = [
 ];
 
 
+const serviceName = 'FlowDiagramEntityStore';
 
-export const serviceName = 'FlowDiagramEntityStore';
+
+export default {
+    serviceName,
+    store
+};
 
 
 export const FlowDiagramEntityStore_API = {

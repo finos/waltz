@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './entity-statistic-boolean-renderer.html';
 
 const BINDINGS = {
     statistic: '<',
@@ -34,7 +35,7 @@ const directive = {
     bindToController: BINDINGS,
     controller,
     controllerAs: 'ctrl',
-    template: require('./entity-statistic-boolean-renderer.html')
+    template
 };
 
 

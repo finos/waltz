@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
+import template from './grid-with-search.html';
 
 const bindings = {
     columnDefs: '<',
@@ -28,8 +29,6 @@ const bindings = {
     onInitialise: '<',
     onChange: '<'
 };
-
-const template = require('./grid-with-search.html');
 
 
 const initialState = {

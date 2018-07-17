@@ -17,12 +17,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import List from './list';
+
 
 function setup($stateProvider) {
     $stateProvider
         .state('main.source-data-ratings', {
             url: 'source-data-ratings',
-            views: { 'content@': require('./list') }
+            views: { 'content@': List }
         });
 }
 

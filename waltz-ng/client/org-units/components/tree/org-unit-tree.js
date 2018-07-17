@@ -20,6 +20,7 @@
 
 import _ from "lodash";
 import {isEmpty} from "../../../common";
+import template from './org-unit-tree.html';
 
 
 const bindings = {
@@ -71,9 +72,6 @@ function controller() {
 }
 
 controller.$inject = [ ];
-
-
-const template = require('./org-unit-tree.html');
 
 
 const component = {

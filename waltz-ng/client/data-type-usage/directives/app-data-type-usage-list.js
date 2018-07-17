@@ -20,6 +20,7 @@
 import _ from "lodash";
 import allUsageKinds from "../usage-kinds";
 import {notEmpty} from "../../common";
+import template from './app-data-type-usage-list.html';
 
 const BINDINGS = {
     usages: "<"
@@ -82,7 +83,7 @@ controller.$inject = ['$scope'];
 const directive = {
     restrict: 'E',
     replace: false,
-    template: require('./app-data-type-usage-list.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     scope: {},

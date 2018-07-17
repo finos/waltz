@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
+import template from './survey-run-create.html';
 
 
 const initialState = {
@@ -31,9 +32,6 @@ const initialState = {
     onSaveGeneral: (s) => {},
     onSaveRecipient: (r) => {}
 };
-
-
-const template = require('./survey-run-create.html');
 
 
 function controller($document,
@@ -111,7 +109,7 @@ function controller($document,
 
         if (surveyRun.id) {
             surveyRunStore.update(surveyRun.id, command)
-                .then(r => {
+                .then(() => {
                     vm.step = 'RECIPIENT';
                 });
         } else {
@@ -126,7 +124,7 @@ function controller($document,
     vm.onSaveRecipient = (surveyRun, includedRecipients, excludedRecipients) => {
         surveyRunStore.createSurveyRunInstancesAndRecipients(surveyRun.id, excludedRecipients)
             .then(r => surveyRunStore.updateStatus(surveyRun.id, {newStatus: 'ISSUED'})
-                .then(r => {
+                .then(() => {
                     vm.step = 'COMPLETED';
                     generateEmailLink(surveyRun, includedRecipients);
                 })

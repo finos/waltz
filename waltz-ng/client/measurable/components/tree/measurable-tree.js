@@ -21,7 +21,8 @@ import _ from 'lodash';
 import {initialiseData} from '../../../common';
 import {buildPropertySummer} from '../../../common/tally-utils';
 import {scaleLinear} from 'd3-scale';
-import {prepareSearchNodes, doSearch, buildHierarchies, switchToParentIds} from '../../../common/hierarchy-utils';
+import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from '../../../common/hierarchy-utils';
+import template from './measurable-tree.html';
 
 
 /**
@@ -55,9 +56,6 @@ const initialState = {
         }
     }
 };
-
-
-const template = require('./measurable-tree.html');
 
 
 const recursivelySum = buildPropertySummer();

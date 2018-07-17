@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../../common";
+import template from './date-picker-form-input.html';
 
 
 const bindings = {
@@ -32,7 +33,6 @@ const bindings = {
 };
 
 
-const template = require('./date-picker-form-input.html');
 
 
 const initialState = {

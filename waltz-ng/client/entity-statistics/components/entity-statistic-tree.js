@@ -18,6 +18,7 @@
  */
 
 import {buildHierarchies, findNode, switchToParentIds} from "../../common/hierarchy-utils";
+import template from './entity-statistic-tree.html';
 
 const bindings = {
     definitions: '<',
@@ -30,9 +31,6 @@ const initialState = {
     expandedNodes: [],
     currentNode: null
 };
-
-
-const template = require('./entity-statistic-tree.html');
 
 
 function buildDefinitionTree(definitions = []) {

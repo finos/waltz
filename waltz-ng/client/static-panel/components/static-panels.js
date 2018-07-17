@@ -20,15 +20,13 @@
 
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
+import template from './static-panels.html';
 
 
 const bindings = {
     groupKey: '@',
     renderMode: '@'
 };
-
-
-const template = require('./static-panels.html');
 
 
 const initialData = {

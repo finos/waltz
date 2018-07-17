@@ -20,6 +20,7 @@
 import {entityLifecycleStatuses, resetData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
+import template from './entity-statistic-summary-section.html';
 
 
 const bindings = {
@@ -34,9 +35,6 @@ const initData = {
     loading: false,
     summaries: {}
 };
-
-
-const template = require('./entity-statistic-summary-section.html');
 
 
 function controller(serviceBroker) {

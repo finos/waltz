@@ -23,25 +23,38 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import entityStatisticStore from "./services/entity-statistic-store";
 import entityStatisticSection from "./components/section/entity-statistic-section";
 import entityStatisticSummarySection from "./components/entity-statistic-summary-section";
+import Routes from './routes';
+import EntityStatisticsUtilities from './services/entity-statistics-utilities';
+import EntityStatisticBooleanRenderer from './directives/entity-statistic-boolean-renderer';
+import EntityStatisticPercentageRenderer from './directives/entity-statistic-percentage-renderer';
+import EntityStatisticNumericRenderer from './directives/entity-statistic-numeric-renderer';
+import DurationSelector from './components/duration-selector';
+import EntityStatisticDetailTable from './components/entity-statistic-detail-table';
+import EntityStatisticDetailPanel from './components/entity-statistic-detail-panel';
+import EntityStatisticSummaryCard from './components/entity-statistic-summary-card';
+import EntityStatisticHistoryChart from './components/history-chart/entity-statistic-history-chart';
+import EntityStatisticHistoryPanel from './components/history-panel/entity-statistic-history-panel';
+import EntityStatisticTree from './components/entity-statistic-tree';
+import EntityStatisticsSummaries from './components/related-entity-statistics-summaries';
 
 export default () => {
 
     const module = angular.module('waltz.entity.statistics', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStores(module, [
         entityStatisticStore
     ]);
 
     module
-        .service('EntityStatisticUtilities', require('./services/entity-statistics-utilities'));
+        .service('EntityStatisticUtilities', EntityStatisticsUtilities);
 
     module
-        .directive('waltzEntityStatisticBooleanRenderer', require('./directives/entity-statistic-boolean-renderer'))
-        .directive('waltzEntityStatisticPercentageRenderer', require('./directives/entity-statistic-percentage-renderer'))
-        .directive('waltzEntityStatisticNumericRenderer', require('./directives/entity-statistic-numeric-renderer'));
+        .directive('waltzEntityStatisticBooleanRenderer', EntityStatisticBooleanRenderer)
+        .directive('waltzEntityStatisticPercentageRenderer', EntityStatisticPercentageRenderer)
+        .directive('waltzEntityStatisticNumericRenderer', EntityStatisticNumericRenderer);
 
     registerComponents(module, [
         entityStatisticSection,
@@ -49,14 +62,14 @@ export default () => {
     ]);
 
     module
-        .component('waltzDurationSelector', require('./components/duration-selector'))
-        .component('waltzEntityStatisticDetailTable', require('./components/entity-statistic-detail-table'))
-        .component('waltzEntityStatisticDetailPanel', require('./components/entity-statistic-detail-panel'))
-        .component('waltzEntityStatisticSummaryCard', require('./components/entity-statistic-summary-card'))
-        .component('waltzEntityStatisticHistoryChart', require('./components/history-chart/entity-statistic-history-chart'))
-        .component('waltzEntityStatisticHistoryPanel', require('./components/history-panel/entity-statistic-history-panel'))
-        .component('waltzEntityStatisticTree', require('./components/entity-statistic-tree'))
-        .component('waltzRelatedEntityStatisticsSummaries', require('./components/related-entity-statistics-summaries'));
+        .component('waltzDurationSelector', DurationSelector)
+        .component('waltzEntityStatisticDetailTable', EntityStatisticDetailTable)
+        .component('waltzEntityStatisticDetailPanel', EntityStatisticDetailPanel)
+        .component('waltzEntityStatisticSummaryCard', EntityStatisticSummaryCard)
+        .component('waltzEntityStatisticHistoryChart', EntityStatisticHistoryChart)
+        .component('waltzEntityStatisticHistoryPanel', EntityStatisticHistoryPanel)
+        .component('waltzEntityStatisticTree', EntityStatisticTree)
+        .component('waltzRelatedEntityStatisticsSummaries', EntityStatisticsSummaries);
 
     return module.name;
 };

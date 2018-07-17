@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './overlay-panel.html';
+
+
 const BINDINGS = {
     name: '@',
     icon: '@',
@@ -25,10 +28,11 @@ const BINDINGS = {
     visible: '='
 };
 
+
 export default () => ({
     restrict: 'E',
     replace: true,
-    template: require('./overlay-panel.html'),
+    template,
     scope: {},
     bindToController: BINDINGS,
     controller: () => {},

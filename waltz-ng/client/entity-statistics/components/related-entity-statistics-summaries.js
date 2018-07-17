@@ -18,6 +18,7 @@
  */
 
 import _ from "lodash";
+import template from './related-entity-statistics-summaries.html';
 
 
 const bindings = {
@@ -25,9 +26,6 @@ const bindings = {
     definitions: '<',
     summaries: '<'
 };
-
-
-const template = require('./related-entity-statistics-summaries.html');
 
 
 function controller() {

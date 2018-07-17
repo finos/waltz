@@ -20,6 +20,9 @@
 import angular from 'angular';
 import {registerStores} from "../common/module-utils";
 import * as SvgDiagramStore from './services/svg-diagram-store';
+import SvgDiagram from './component/svg-diagram';
+import SvgDiagrams from './component/svg-diagrams';
+import CommonSvgDefs from './component/common-svg-defs';
 
 
 export default () => {
@@ -31,9 +34,9 @@ export default () => {
 
 
     module
-        .component('waltzSvgDiagram', require('./component/svg-diagram'))
-        .component('waltzSvgDiagrams', require('./component/svg-diagrams'))
-        .component('waltzCommonSvgDefs', require('./component/common-svg-defs'));
+        .component('waltzSvgDiagram', SvgDiagram)
+        .component('waltzSvgDiagrams', SvgDiagrams)
+        .component('waltzCommonSvgDefs', CommonSvgDefs);
 
     return module.name;
 

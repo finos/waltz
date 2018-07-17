@@ -23,6 +23,7 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import template from './survey-instance-response-edit.html';
 
 
 const initialState = {
@@ -34,9 +35,6 @@ const initialState = {
     surveyResponses: {},
     user: {}
 };
-
-
-const template = require('./survey-instance-response-edit.html');
 
 
 function indexResponses(responses = []) {
@@ -175,7 +173,7 @@ function controller($location,
                 vm.surveyInstance.id,
                 {newStatus: 'COMPLETED'}
             )
-            .then(result => {
+            .then(() => {
                 notification.success('Survey response submitted successfully');
                 serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
                 $state.go('main.survey.instance.response.view', {id: id});

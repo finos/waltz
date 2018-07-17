@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './lineage-reports-section.html';
+
 
 const bindings = {
     lineageReports: '<',
 };
 
 
-const template = require('./lineage-reports-section.html');
 
 
 function controller() {

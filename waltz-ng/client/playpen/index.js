@@ -29,13 +29,12 @@ import {registerComponents} from '../common/module-utils';
 import * as EntityDataSourcingPanel from './4/entity-data-sourcing-panel/entity-data-sourcing-panel';
 import * as FlowExplorer from './4/flow-explorer/flow-explorer';
 import * as FooWidget from './4/foo-widget/foo-widget';
+import list from './list.html';
 
 export default () => {
 
     const module = angular.module('waltz.playpen', []);
 
-    module
-        .component('waltzSvgManipulator', require('./4/svg-manipulator'));
 
     module.config([
         '$stateProvider',
@@ -44,7 +43,7 @@ export default () => {
                 .state('main.playpen', {
                     url: 'playpen',
                     views: {
-                        'content@': { template: require('./list.html') }
+                        'content@': { template: list }
                     }
                 })
                 .state('main.playpen.1', {

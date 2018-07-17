@@ -18,6 +18,7 @@
  */
 
 import _ from "lodash";
+import template from './search.html';
 
 
 const BINDINGS = {
@@ -49,7 +50,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./search.html'),
+        template,
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

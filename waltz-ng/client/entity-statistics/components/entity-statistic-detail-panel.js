@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings} from "../utilities";
+import template from './entity-statistic-detail-panel.html';
 
 
 const bindings = {
@@ -30,7 +31,6 @@ const bindings = {
 };
 
 
-const template = require('./entity-statistic-detail-panel.html');
 const PIE_SIZE = 140;
 
 

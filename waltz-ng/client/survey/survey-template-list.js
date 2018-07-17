@@ -19,16 +19,15 @@
 import _ from "lodash";
 import {nest} from "d3-collection";
 import {ascending} from "d3-array";
+import template from './survey-template-list.html';
 
 
 function processTemplates(templates = []) {
-    const nested = nest()
+    return nest()
         .key(t => t.targetEntityKind)
         .sortKeys(ascending)
         .sortValues((t1, t2) => t1.name.localeCompare(t2.name))
         .entries(templates);
-
-    return nested;
 }
 
 
@@ -74,7 +73,7 @@ controller.$inject = [
 const page = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-template-list.html')
+    template
 };
 
 

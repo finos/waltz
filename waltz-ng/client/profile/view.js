@@ -18,6 +18,7 @@
  */
 
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import template from './view.html';
 
 
 const initialState = {
@@ -123,7 +124,7 @@ function controller($q,
 
 
 const view = {
-    template: require('./view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

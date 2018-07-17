@@ -28,13 +28,14 @@ import perspectiveEditor from './components/editor/perspective-editor';
 import perspectiveGrid from './components/grid/perspective-grid';
 import perspectiveOverrides from './components/overrides/perspective-overrides';
 import perspectRatingPanel from './components/panel/perspective-rating-panel';
+import Routes from './routes';
 
 
 function setup() {
     const module = angular.module('waltz.perspective', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStores(module, [
         perspectiveDefinitionStore,

@@ -18,13 +18,14 @@
  */
 
 import angular from 'angular';
+import HistoryStore from './services/history-store';
 
 
 export default () => {
     const module = angular.module('waltz.history', []);
 
     module
-        .service('HistoryStore', require('./services/history-store'));
+        .service('HistoryStore', HistoryStore);
 
     return module.name;
 };

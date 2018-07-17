@@ -20,6 +20,7 @@
 import _ from 'lodash';
 import {nest} from 'd3-collection';
 import {notEmpty} from "../../../common";
+import template from './rated-summary-table.html';
 
 
 const bindings = {
@@ -28,9 +29,6 @@ const bindings = {
     decoratorEntities: '<',
     onClick: '<'
 };
-
-
-const template = require('./rated-summary-table.html');
 
 
 function nestByDecoratorThenRating(summaries = []) {

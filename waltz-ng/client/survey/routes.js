@@ -16,6 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import SurveyRunCreate from './survey-run-create';
+import SurveyRunView from './survey-run-view';
+import SurveyInstanceListUserView from './survey-instance-list-user-view';
+import SurveyInstanceView from './survey-instance-view';
+import SurveyInstanceResponseView from './survey-instance-response-view';
+import SurveyInstanceResponseEdit from './survey-instance-response-edit';
+import SurveyTemplateList from './survey-template-list';
+import SurveyTemplateCreate from './survey-template-create';
+import SurveyTemplateEdit from './survey-template-edit';
+import SurveyTemplateView from './survey-template-view';
+
 
 const baseState = {
     url: 'survey'
@@ -44,62 +55,61 @@ const instanceResponseBaseState = {
 
 const runCreateState = {
     url: '/template/{id:int}/new-run',
-    views: {'content@': require('./survey-run-create')}
+    views: {'content@': SurveyRunCreate}
 };
 
 
 const runViewState = {
     url: '/{id:int}',
-    views: {'content@': require('./survey-run-view')}
+    views: {'content@': SurveyRunView}
 };
 
 
 const instanceUserState = {
     url: '/user',
-    views: {'content@': require('./survey-instance-list-user-view')}
+    views: {'content@': SurveyInstanceListUserView}
 };
 
 
 const instanceViewState = {
     url: '/{id:int}/view',
-    views: {'content@': require('./survey-instance-view')}
+    views: {'content@': SurveyInstanceView}
 };
-
 
 
 const instanceResponseViewState = {
     url: '/view',
-    views: {'content@': require('./survey-instance-response-view')}
+    views: {'content@': SurveyInstanceResponseView}
 };
 
 
 const instanceResponseEditState = {
     url: '/edit',
-    views: {'content@': require('./survey-instance-response-edit')}
+    views: {'content@': SurveyInstanceResponseEdit}
 };
 
 
 const templateListState = {
     url: '/list',
-    views: {'content@': require('./survey-template-list')}
+    views: {'content@': SurveyTemplateList}
 };
 
 
 const templateCreateState = {
     url: '/create',
-    views: {'content@': require('./survey-template-create')}
+    views: {'content@': SurveyTemplateCreate}
 };
 
 
 const templateEditState = {
     url: '/{id:int}/edit',
-    views: {'content@': require('./survey-template-edit')}
+    views: {'content@': SurveyTemplateEdit}
 };
 
 
 const templateViewState = {
     url: '/{id:int}/view',
-    views: {'content@': require('./survey-template-view')}
+    views: {'content@': SurveyTemplateView}
 };
 
 

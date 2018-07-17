@@ -22,13 +22,14 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import * as OrgUnitStore from "./services/org-unit-store";
 import OrgUnitOverview from "./components/overview/org-unit-overview";
 import OrgUnitTree from "./components/tree/org-unit-tree";
+import Routes from './routes';
 
 export default () => {
 
     const module = angular.module('waltz.org.units', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStores(module, [OrgUnitStore]);
     registerComponents(module, [ OrgUnitOverview, OrgUnitTree ]);

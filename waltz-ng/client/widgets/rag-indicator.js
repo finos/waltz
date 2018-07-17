@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './rag-indicator.html';
 
 const BINDINGS = {
     name: '@',
@@ -50,7 +51,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./rag-indicator.html'),
+        template,
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

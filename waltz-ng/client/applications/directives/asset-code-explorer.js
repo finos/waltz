@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './asset-code-explorer.html';
 
 
 function controller(appStore) {
@@ -38,7 +39,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./asset-code-explorer.html'),
+        template,
         scope: {},
         controller,
         controllerAs: 'ctrl',
