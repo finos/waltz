@@ -53,6 +53,7 @@ public class AppGroupDao {
                 .name(record.getName())
                 .description(mkSafe(record.getDescription()))
                 .id(record.getId())
+                .externalId(record.getExternalId())
                 .appGroupKind(AppGroupKind.valueOf(record.getKind()))
                 .build();
     };
