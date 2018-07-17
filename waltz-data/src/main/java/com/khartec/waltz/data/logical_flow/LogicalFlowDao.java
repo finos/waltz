@@ -315,7 +315,6 @@ public class LogicalFlowDao {
     public List<LogicalFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.in(flowIdSelector))
-                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

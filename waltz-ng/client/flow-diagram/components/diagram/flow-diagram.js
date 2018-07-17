@@ -68,6 +68,7 @@ const styles = {
     ANNOTATION: 'wfd-annotation',
     ANNOTATIONS: 'wfd-annotations',
     FLOW: 'wfd-flow',
+    FLOW_REMOVED: 'wfd-flow-removed',
     FLOWS: 'wfd-flows',
     FLOW_ARROW: 'wfd-flow-arrow',
     FLOW_ARROW_HEAD: 'wfd-flow-arrow-head',
@@ -246,6 +247,7 @@ function drawFlows(state, group) {
         .enter()
         .append('g')
         .classed(styles.FLOW, true)
+        .classed(styles.FLOW_REMOVED, d => d.data.isRemoved)
         .attr('data-flow-id', d => d.id);
 
     newLinkElems
@@ -465,6 +467,7 @@ function drawAnnotations(state, group, commandProcessor) {
 function enableLayers(visibility) {
     selectAll(`.${styles.FLOW_BUCKET}`).style('display', visibility.flowBuckets ? 'initial' : 'none');
     selectAll(`.${styles.ANNOTATION}`).style('display', visibility.annotations ? 'initial' : 'none');
+    selectAll(`.${styles.FLOW_REMOVED}`).style('display', visibility.removedFlows ? 'initial' : 'none');
 }
 
 

@@ -2,6 +2,7 @@
 
 
 $annotation-color: #a4a2a6;
+$flow-color: #8d8899;
 
 
 .waltz-flow-diagram {
@@ -16,15 +17,47 @@ $annotation-color: #a4a2a6;
         }
     }
 
+
     .wfd-flow-arrow {
-        stroke: #8d8899;
-        fill: none; //#c7c0d5;
+        stroke: $flow-color;
+        fill: none;
     }
 
     .wfd-flow-arrow-head {
-        stroke: #8d8899;
+        stroke: $flow-color;
         fill: #ccc;
     }
+
+
+    .wfd-flow-removed {
+        .wfd-flow-arrow {
+            stroke: $flow-color;
+            stroke-dasharray: 1 4;
+        }
+
+        .wfd-flow-arrow-head {
+            stroke-dasharray: 2;
+            stroke: $flow-color;
+            fill: lighten($flow-color, 30);
+        }
+
+        .wfd-flow-bucket {
+            fill: $flow-color;
+
+            circle {
+                fill: #fff;
+                stroke: #ccc;
+                stroke-dasharray: 2;
+            }
+
+            &:hover circle {
+                stroke-opacity: 1;
+                stroke: $flow-color;
+                cursor: pointer;
+            }
+        }
+    }
+
 
     .wfd-node {
         @extend .no-text-select;

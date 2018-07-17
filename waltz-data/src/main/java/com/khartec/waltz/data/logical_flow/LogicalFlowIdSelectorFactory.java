@@ -23,6 +23,7 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -31,7 +32,10 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.EntityLifecycleStatusUtils.convertToIsRemovedFlags;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -93,12 +97,14 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);
+
         return DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(LOGICAL_FLOW.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name()))
-                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()));
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()))
+                .and(mLogicalFlowRemovedCondition(options.entityLifecycleStatuses()));
     }
 
 
@@ -140,5 +146,10 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .and(NOT_REMOVED);
 
+    }
+
+
+    private Condition mLogicalFlowRemovedCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
+        return LOGICAL_FLOW.IS_REMOVED.in(convertToIsRemovedFlags(entityLifecycleStatuses));
     }
 }
