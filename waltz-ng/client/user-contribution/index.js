@@ -18,13 +18,14 @@
  */
 
 import angular from 'angular';
+import Store from './services/store';
 
 
 export default () => {
     const module = angular.module('waltz.user.contribution', []);
 
     module
-        .service('UserContributionStore', require('./services/store'));
+        .service('UserContributionStore', Store);
 
     return module.name;
 };

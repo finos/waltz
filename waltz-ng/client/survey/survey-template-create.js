@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../common/index";
+import template from './survey-template-create.html';
 
 
 const initialState = {
@@ -43,7 +44,7 @@ function controller($state,
             .then(templateId => {
                 notification.success('Survey template created successfully');
                 $state.go('main.survey.template.edit', {id: templateId});
-            }, errorResponse => {
+            }, () => {
                 notification.error('Failed to create survey template, ensure that the template name is unique');
             });
     }
@@ -60,7 +61,7 @@ controller.$inject = [
 const page = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-template-create.html')
+    template
 };
 
 

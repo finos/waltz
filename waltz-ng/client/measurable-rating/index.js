@@ -17,20 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import { registerComponents, registerStores } from '../common/module-utils';
+import {registerComponents, registerStores} from '../common/module-utils';
 
 import measurableRatingStore from './services/measurable-rating-store';
 
 import MeasurableRatingsBrowserSection from './components/browser-section/measurable-ratings-browser-section';
 import MeasurableRatingsBrowserTreePanel from './components/browser-tree-panel/measurable-ratings-browser-tree-panel';
 import MeasurableRatingEditPanel from './components/edit-panel/measurable-rating-edit-panel';
+import Routes from './routes';
+import AssociatedPerspectives from './components/associated-perspectives/associated-perspectives';
+import MeasurableRatingAppSection from './components/app-section/measurable-rating-app-section';
+import MeasurableRatingExplorerSection from './components/explorer-section/measurable-rating-explorer-section';
+import MeasurableRatingPanel from './components/panel/measurable-rating-panel';
+import MeasurableRatingTree from './components/tree/measurable-rating-tree';
+import MeasurableRatingsBrowser from './components/browser/measurable-ratings-browser';
+import RelatedMeasurablesSection from './components/related-measurables-section/related-measurables-section';
 
 
 export default () => {
     const module = angular.module('waltz.measurable.rating', []);
 
     module
-        .config(require('./routes'))
+        .config(Routes)
         ;
 
 
@@ -38,13 +46,13 @@ export default () => {
 
 
     module
-        .component('waltzAssociatedPerspectives', require('./components/associated-perspectives/associated-perspectives'))
-        .component('waltzMeasurableRatingAppSection', require('./components/app-section/measurable-rating-app-section'))
-        .component('waltzMeasurableRatingExplorerSection', require('./components/explorer-section/measurable-rating-explorer-section'))
-        .component('waltzMeasurableRatingPanel', require('./components/panel/measurable-rating-panel'))
-        .component('waltzMeasurableRatingTree', require('./components/tree/measurable-rating-tree'))
-        .component('waltzMeasurableRatingsBrowser', require('./components/browser/measurable-ratings-browser'))
-        .component('waltzRelatedMeasurablesSection', require('./components/related-measurables-section/related-measurables-section'))
+        .component('waltzAssociatedPerspectives', AssociatedPerspectives)
+        .component('waltzMeasurableRatingAppSection', MeasurableRatingAppSection)
+        .component('waltzMeasurableRatingExplorerSection', MeasurableRatingExplorerSection)
+        .component('waltzMeasurableRatingPanel', MeasurableRatingPanel)
+        .component('waltzMeasurableRatingTree', MeasurableRatingTree)
+        .component('waltzMeasurableRatingsBrowser', MeasurableRatingsBrowser)
+        .component('waltzRelatedMeasurablesSection', RelatedMeasurablesSection)
         ;
 
     registerComponents(module, [

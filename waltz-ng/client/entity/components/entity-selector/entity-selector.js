@@ -19,6 +19,7 @@
 
 import {initialiseData, invokeFunction} from "../../../common";
 import _ from 'lodash';
+import template from './entity-selector.html';
 
 
 const bindings = {
@@ -31,9 +32,6 @@ const bindings = {
     required: '<',
     selectionFilter: '<'
 };
-
-
-const template = require('./entity-selector.html');
 
 
 const initialState = {

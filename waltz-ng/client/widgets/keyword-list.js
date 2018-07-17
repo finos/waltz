@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from '../common';
+import template from './keyword-list.html';
 
 
 /**
@@ -39,9 +40,6 @@ const transclude = {
 
 
 const initialState = {};
-
-
-const template = require('./keyword-list.html');
 
 
 function controller() {

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
+import LineageReportsSection from './components/lineage-reports-section';
 
 
 export default () => {
@@ -24,7 +25,7 @@ export default () => {
     const module = angular.module('waltz.lineage', []);
 
     module
-        .component('waltzLineageReportsSection', require('./components/lineage-reports-section'));
+        .component('waltzLineageReportsSection', LineageReportsSection);
 
     return module.name;
 };

@@ -19,13 +19,16 @@
 
 import angular from 'angular';
 
+import Components from './components';
+import Filters from './filters';
+import Services from './services';
 
 export default () => {
     const module = angular.module('waltz.common', []);
 
-    require('./components')(module);
-    require('./filters')(module);
-    require('./services')(module);
+    Components(module);
+    Filters(module);
+    Services(module);
 
     return module.name;
 }

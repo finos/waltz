@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
+import template from './actors-view.html';
 
 const initialState = {
     actors: [],
@@ -65,7 +66,7 @@ function controller($q,
     vm.saveNewActor = () => {
         actorService
             .create(vm.newActor)
-            .then(id => {
+            .then(() => {
                 notification.success('Created');
                 vm.creatingActor = false;
                 vm.newActor = {};
@@ -87,7 +88,7 @@ function controller($q,
             .then(kinds => {
                 vm.actors = kinds;
             });
-    };
+    }
 
     loadActors();
 }
@@ -101,7 +102,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./actors-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

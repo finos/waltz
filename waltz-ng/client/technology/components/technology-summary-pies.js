@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './technology-summary-pies.html';
 
 const bindings = {
     servers: '<',
@@ -23,7 +24,6 @@ const bindings = {
 };
 
 
-const template = require('./technology-summary-pies.html');
 
 
 const component = {

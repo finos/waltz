@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {nest} from "d3-collection";
+import template from './measurable-list.html';
 
 
 const initialState = {
@@ -78,7 +79,7 @@ function controller($location,
         .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
         .then(r => {
             vm.categories = r.data;
-            vm.categoriesById = _.keyBy(r.data, 'id')
+            vm.categoriesById = _.keyBy(r.data, 'id');
             return r.data;
         });
 
@@ -98,7 +99,7 @@ function controller($location,
                 .rollup(vs => vs[0])
                 .object(measurables);
             vm.onTabSelect($stateParams.category || defaultCategory || findFirstNonEmptyTab(vm.tabs));
-    });
+        });
 
     vm.blockProcessor = b => {
         const extId = b.value;
@@ -138,7 +139,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./measurable-list.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

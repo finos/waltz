@@ -21,6 +21,8 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import template from './auth-sources-table.html';
+
 
 
 const bindings = {
@@ -35,7 +37,6 @@ const initialState = {
 };
 
 
-const template = require('./auth-sources-table.html');
 
 
 function shouldShowConsumers(parentRef) {

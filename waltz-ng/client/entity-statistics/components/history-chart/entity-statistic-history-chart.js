@@ -19,17 +19,18 @@
 
 import _ from 'lodash';
 import moment from 'moment';
-import {max,extent} from 'd3-array';
+import {extent, max} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {nest} from 'd3-collection';
 import {scaleLinear} from 'd3-scale';
 import {select} from 'd3-selection';
-import {curveLinear ,line} from 'd3-shape';
+import {curveLinear, line} from 'd3-shape';
 import {timeFormat} from 'd3-time-format';
 import 'd3-selection-multi';
 
 import {initialiseData, isEmpty} from '../../../common';
 import {variableScale} from '../../../common/colors';
+import template from './entity-statistic-history-chart.html';
 
 
 const bindings = {
@@ -37,9 +38,6 @@ const bindings = {
     onHover: '<',
     highlightedDate: '<'
 };
-
-
-const template = require('./entity-statistic-history-chart.html');
 
 
 const initialState = {

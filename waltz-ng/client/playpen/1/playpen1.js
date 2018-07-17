@@ -18,6 +18,7 @@
  */
 
 import _ from 'lodash';
+import template from './playpen1.html';
 
 
 const flowDiagramsWidget = {
@@ -142,7 +143,7 @@ controller.$inject = ['$compile', 'ServiceBroker'];
 
 
 const view = {
-    template: require('./playpen1.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

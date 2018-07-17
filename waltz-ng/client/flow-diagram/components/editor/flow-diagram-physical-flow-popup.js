@@ -19,6 +19,7 @@
 
 import _ from 'lodash';
 import {initialiseData} from '../../../common';
+import template from './flow-diagram-physical-flow-popup.html';
 
 /**
  * @name waltz-flow-diagram-physical-flow-popup
@@ -44,9 +45,6 @@ const initialState = {
     commandProcessor: () => console.log('wdpfp: default command processor'),
     onDismiss: () => console.log('wdpfp: default on-dismiss'),
 };
-
-
-const template = require('./flow-diagram-physical-flow-popup.html');
 
 
 function sameRef(r1, r2) {

@@ -19,6 +19,7 @@
 
 import {initialiseData} from '../../../common';
 import {toGraphId} from '../../flow-diagram-utils';
+import template from './flow-diagram-annotation-popup.html';
 
 
 /**
@@ -37,9 +38,6 @@ const bindings = {
 
 
 const initialState = {};
-
-
-const template = require('./flow-diagram-annotation-popup.html');
 
 
 function controller() {

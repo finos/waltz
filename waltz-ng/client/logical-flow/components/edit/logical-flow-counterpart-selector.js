@@ -19,6 +19,7 @@
 
 import {initialiseData} from '../../../common';
 import {entity} from '../../../common/services/enums/entity'
+import template from './logical-flow-counterpart-selector.html';
 
 
 /**
@@ -50,9 +51,6 @@ const initialState = {
         addingApplication: true,
     }
 };
-
-
-const template = require('./logical-flow-counterpart-selector.html');
 
 
 function controller() {

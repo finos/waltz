@@ -18,6 +18,7 @@
  */
 
 import _ from "lodash";
+import template from './rated-summary-cell.html';
 
 
 const BINDINGS = {
@@ -48,7 +49,7 @@ function mkStackValues(direct = 0, total = 0) {
 
 
 function controller() {
-    const vm = _.defaultsDeep(this, initialState)
+    const vm = _.defaultsDeep(this, initialState);
 
     vm.cellClick = ($event) => {
         vm.onClick();
@@ -65,7 +66,7 @@ function controller() {
 const component = {
     bindings: BINDINGS,
     controller,
-    template: require('./rated-summary-cell.html')
+    template
 };
 
 

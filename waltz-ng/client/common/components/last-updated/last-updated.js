@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './last-updated.html';
+
 
 /*
  * This component will display last updated information for any object that adheres to the LastUpdatedProvider interface
@@ -27,7 +29,6 @@ const bindings = {
 };
 
 
-const template = require('./last-updated.html');
 
 
 const component = {

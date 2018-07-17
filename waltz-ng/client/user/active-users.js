@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'lodash';
 import {initialiseData} from "../common";
+import template from './active-users.html';
 
 
 const initialState = {
@@ -49,9 +51,8 @@ controller.$inject = [
 ];
 
 
-// ---
 export default {
-    template: require('./active-users.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

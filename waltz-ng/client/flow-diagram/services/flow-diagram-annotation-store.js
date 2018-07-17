@@ -36,7 +36,13 @@ store.$inject = [
 ];
 
 
-export const serviceName = 'FlowDiagramAnnotationStore';
+const serviceName = 'FlowDiagramAnnotationStore';
+
+
+export default {
+    serviceName,
+    store
+};
 
 
 export const FlowDiagramAnnotationStore_API = {

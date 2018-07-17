@@ -27,6 +27,7 @@ import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
 import * as TreePicker from './components/tree-picker/tree-picker';
 import {registerComponents, registerStore} from '../common/module-utils';
+import RatingIndicator from './directives/rating-indicator';
 
 
 export default () => {
@@ -34,7 +35,7 @@ export default () => {
     const module = angular.module('waltz.auth.sources', []);
 
     module
-        .directive('waltzRatingIndicator', require('./directives/rating-indicator'));
+        .directive('waltzRatingIndicator', RatingIndicator);
 
     registerStore(
         module,

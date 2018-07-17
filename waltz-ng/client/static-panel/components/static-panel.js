@@ -16,14 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './static-panel.html';
 
 const bindings = {
     panel: '<',
     renderMode: '<' // section | chromeless | minimal-border
 };
-
-
-const template = require('./static-panel.html');
 
 
 function controller() {

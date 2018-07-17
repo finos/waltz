@@ -61,14 +61,19 @@ function controller(serviceBroker) {
 controller.$inject = ['ServiceBroker'];
 
 
-export const component = {
+const component = {
     controller,
     bindings,
     template
 };
 
 
-export const id = 'waltzAppAuthorityPanel';
+const id = 'waltzAppAuthorityPanel';
+
+export default {
+    id,
+    component
+};
 
 
 

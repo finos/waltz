@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../../common";
+import template from './entity-icon-label.html';
 
 
 const bindings = {
@@ -26,8 +27,6 @@ const bindings = {
     tooltipPlacement: '@'
 };
 
-
-const template = require('./entity-icon-label.html');
 
 
 const initialState = {

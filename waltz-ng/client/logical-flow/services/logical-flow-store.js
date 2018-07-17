@@ -117,9 +117,12 @@ store.$inject = [
     'BaseApiUrl'
 ];
 
+const serviceName = 'LogicalFlowStore';
 
-export const serviceName = 'LogicalFlowStore';
-
+export default {
+    serviceName,
+    store
+};
 
 export const LogicalFlowStore_API = {
     findBySelector: {

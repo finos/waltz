@@ -20,7 +20,7 @@
 import _ from "lodash";
 
 
-function accessLogStore($http, BaseApiUrl) {
+function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/access-log`;
 
     const write = (state, params) => {
@@ -52,10 +52,13 @@ function accessLogStore($http, BaseApiUrl) {
 }
 
 
-accessLogStore.$inject = [
+store.$inject = [
     '$http',
     'BaseApiUrl'
 ];
 
 
-export default accessLogStore;
+export default {
+    store,
+    serviceName: 'AccessLogStore'
+};

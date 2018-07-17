@@ -16,12 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './list.html';
+
 
 const initData = {
     ratings: []
 };
 
-function controller($scope, sourceDataRatingStore) {
+function controller(sourceDataRatingStore) {
     const vm = Object.assign(this, initData);
 
     sourceDataRatingStore
@@ -30,12 +32,13 @@ function controller($scope, sourceDataRatingStore) {
 }
 
 controller.$inject = [
-    '$scope', 'SourceDataRatingStore'
+    'SourceDataRatingStore'
 ];
 
 
+
 export default {
-    template: require('./list.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

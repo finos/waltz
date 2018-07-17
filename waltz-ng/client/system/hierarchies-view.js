@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {kindToViewState} from "../common/link-utils";
+import template from './hierarchies-view.html';
 
 const initialState = {
     combinedTallies: [],
@@ -106,7 +107,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./hierarchies-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

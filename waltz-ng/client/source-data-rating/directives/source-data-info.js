@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './source-data-info.html';
+
 
 const BINDINGS = {
     ratings: '='
 };
 
 
-function controller($scope) {
+function controller() {
 
     const vm = this;
 
@@ -64,12 +66,10 @@ function controller($scope) {
                 return "Unknown";
         }
     };
+}
 
 
-
-};
-
-controller.$inject = ['$scope'];
+controller.$inject = [];
 
 
 export default () => ({
@@ -79,6 +79,6 @@ export default () => ({
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller,
-    template: require('./source-data-info.html')
+    template
 });
 

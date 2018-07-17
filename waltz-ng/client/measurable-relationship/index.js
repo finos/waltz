@@ -23,6 +23,8 @@ import CreateEditor from './components/editor/create-related-measurable-editor';
 import UpdateEditor from './components/editor/update-related-measurable-editor';
 import RelatedMeasurableItemView from './components/item-view/related-measurable-item-view';
 import RelatedMeasurablesTable from './components/table/related-measurables-table';
+import RelatedMeasurablesPanel from './components/panel/related-measurables-panel';
+import RelatedMeasurablesViz from './components/viz/related-measurables-viz';
 
 
 export default () => {
@@ -31,8 +33,8 @@ export default () => {
     registerStore(module, measurableRelationshipStore);
 
     module
-        .component('waltzRelatedMeasurablesPanel', require('./components/panel/related-measurables-panel'))
-        .component('waltzRelatedMeasurablesViz', require('./components/viz/related-measurables-viz'));
+        .component('waltzRelatedMeasurablesPanel', RelatedMeasurablesPanel)
+        .component('waltzRelatedMeasurablesViz', RelatedMeasurablesViz);
 
     registerComponents(module, [
         CreateEditor,

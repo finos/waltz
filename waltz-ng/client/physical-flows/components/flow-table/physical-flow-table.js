@@ -19,14 +19,12 @@
 
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import template from './physical-flow-table.html';
 
 const bindings = {
     lineage: '<',
     onInitialise: '<'
 };
-
-
-const template = require('./physical-flow-table.html');
 
 
 const initialState = {

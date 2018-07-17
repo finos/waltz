@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {baseRagNames} from "../../../ratings/rating-utils";
 import {nest} from "d3-collection";
+import template from './perspective-overrides.html';
 
 /**
  * @name waltz-perspective-overrides
@@ -46,9 +47,6 @@ const initialState = {
     overrides: [],
     perspectiveDefinitions: []
 };
-
-
-const template = require('./perspective-overrides.html');
 
 
 // => [ { key: rating, values: [ { key: categoryId, values: [ measurables... ] } ] } ]

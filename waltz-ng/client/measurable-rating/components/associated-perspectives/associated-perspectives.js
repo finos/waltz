@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {toMap} from "../../../common/map-utils";
 import {containsAll} from "../../../common/list-utils";
+import template from './associated-perspectives.html';
 
 
 /**
@@ -44,9 +45,6 @@ const initialState = {
     measurables: [],
     ratings: []
 };
-
-
-const template = require('./associated-perspectives.html');
 
 
 function calcAssociatedPerspectives(categoryId,

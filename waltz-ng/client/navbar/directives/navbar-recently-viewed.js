@@ -18,13 +18,11 @@
  */
 
 import _ from "lodash";
+import template from './navbar-recently-viewed.html';
 
 const bindings = {
 
 };
-
-
-const template = require('./navbar-recently-viewed.html');
 
 
 const initialState = {

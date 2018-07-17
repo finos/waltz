@@ -19,6 +19,7 @@
 
 import angular from "angular";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import template from './person-home.html';
 
 
 const initialState = {
@@ -58,7 +59,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./person-home.html'),
+    template,
     controllerAs: 'ctrl',
     controller
 };

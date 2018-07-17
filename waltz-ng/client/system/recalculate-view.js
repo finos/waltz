@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const template = require('./recalculate-view.html');
+import template from './recalculate-view.html';
 
 
 function controller(notification,

@@ -18,6 +18,8 @@
  */
 
 import angular from 'angular';
+import tagsTemplate from './tags-input-template.html';
+import orgUnitTemplate from './org-unit-input-template.html';
 
 
 function customFieldSetup(formlyConfig) {
@@ -65,13 +67,7 @@ export default () => {
     const module = angular.module('waltz.formly', []);
 
     module
-        .run(customFieldSetup)
-        .run([
-            'formlyConfig',
-            (formlyConfig) => {
-                require('./ui-select')(formlyConfig);
-            }
-        ]);
+        .run(customFieldSetup);
 
     module
         .config([
@@ -79,12 +75,12 @@ export default () => {
             (formlyConfigProvider) => {
                 formlyConfigProvider.setType({
                     name: 'tags-input',
-                    template: require('./tags-input-template.html')
+                    template: tagsTemplate
                 });
 
                 formlyConfigProvider.setType({
                     name: 'org-unit-input',
-                    template: require('./org-unit-input-template.html')
+                    template: orgUnitTemplate
                 });
             }
         ]);

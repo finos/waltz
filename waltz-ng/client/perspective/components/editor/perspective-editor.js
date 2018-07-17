@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkOverrides} from "../../perpective-utilities";
 import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
+import template from './perspective-editor.html';
 
 
 /**
@@ -48,9 +49,6 @@ const initialState = {
     existingOverrides: {},
     pendingOverrides: {}
 };
-
-
-const template = require('./perspective-editor.html');
 
 
 function updateOverrides(overrides = {}, d, rating) {

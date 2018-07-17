@@ -20,7 +20,7 @@
 import {initialiseData} from '../../../common';
 import {lineWithArrowPath, responsivefy} from '../../../common/d3-utils';
 import {event, select} from 'd3-selection';
-import {forceSimulation, forceLink, forceManyBody, forceCollide, forceCenter} from 'd3-force';
+import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation} from 'd3-force';
 import {drag} from 'd3-drag';
 import {symbol, symbolWye} from 'd3-shape';
 import {zoom, zoomIdentity} from 'd3-zoom';
@@ -28,7 +28,7 @@ import 'd3-selection-multi';
 import _ from "lodash";
 
 
-const template = require('./boingy-graph.html');
+import template from './boingy-graph.html';
 
 const width = 800;
 const height = 500;

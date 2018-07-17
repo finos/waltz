@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
+import template from './related-entity-editor.html';
 
 
 const bindings = {
@@ -31,9 +32,6 @@ const bindings = {
     onAdd: '<',
     onRemove: '<'
 };
-
-
-const template = require('./related-entity-editor.html');
 
 
 const initialState = {

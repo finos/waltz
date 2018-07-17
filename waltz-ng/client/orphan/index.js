@@ -18,13 +18,14 @@
  */
 
 import angular from 'angular';
+import OrphanStore from './services/orphan-store';
 
 export default () => {
 
     const module = angular.module('waltz.orphan', []);
 
     module
-        .service('OrphanStore', require('./services/orphan-store'));
+        .service('OrphanStore', OrphanStore);
 
     return module.name;
 };

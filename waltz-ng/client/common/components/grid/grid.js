@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../../common";
+import template from './grid.html';
 
 
 const bindings = {
@@ -27,9 +28,6 @@ const bindings = {
     onInitialise: '<',
     scopeProvider: '<?'
 };
-
-
-const template = require('./grid.html');
 
 
 const exportDataSeparator = ',';

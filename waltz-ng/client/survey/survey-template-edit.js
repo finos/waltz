@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common/index";
+import template from './survey-template-edit.html';
 
 
 const initialState = {
@@ -121,7 +122,7 @@ function controller($stateParams,
     vm.createQuestion = (qi) => {
         surveyQuestionStore
             .create(qi)
-            .then(questionId => {
+            .then(() => {
                 notification.success('Survey question created successfully');
                 loadQuestions();
                 vm.cancelQuestionForm();
@@ -131,7 +132,7 @@ function controller($stateParams,
     vm.updateQuestion = (qi) => {
         surveyQuestionStore
             .update(qi)
-            .then(updateCount => {
+            .then(() => {
                 notification.success('Survey question updated successfully');
                 loadQuestions();
                 vm.cancelQuestionForm();
@@ -142,7 +143,7 @@ function controller($stateParams,
         if (confirm("Are you sure you want to delete this question?")) {
             surveyQuestionStore
                 .deleteQuestion(qi.question.id)
-                .then(deleteCount => {
+                .then(() => {
                     notification.success('Survey question deleted successfully');
                     loadQuestions();
                     vm.cancelQuestionForm();
@@ -174,7 +175,7 @@ controller.$inject = [
 const page = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-template-edit.html')
+    template
 };
 
 

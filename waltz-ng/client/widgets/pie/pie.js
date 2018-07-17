@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { select } from 'd3-selection';
-import { pie, arc } from 'd3-shape';
-import { easeElasticOut } from 'd3-ease';
+import {select} from 'd3-selection';
+import {arc, pie} from 'd3-shape';
+import {easeElasticOut} from 'd3-ease';
 import "d3-selection-multi";
 
 import _ from "lodash";
 import {isPieEmpty} from "./pie-utils";
+import template from './pie.html';
 
 
 /**
@@ -218,7 +219,7 @@ controller.$inject = [
 const component = {
     bindings,
     controller,
-    template: require('./pie.html')
+    template
 };
 
 

@@ -26,7 +26,7 @@ import {applicationKind} from "../../common/services/enums/application-kind";
 import {criticality} from "../../common/services/enums/criticality";
 import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
 import {getEnumName} from "../../common/services/enums";
-
+import template from './app-summary.html';
 
 const bindings = {
     apps: '<',
@@ -131,7 +131,7 @@ function controller() {
 
 
 const component = {
-    template: require('./app-summary.html'),
+    template,
     controller,
     bindings
 };

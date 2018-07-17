@@ -19,6 +19,7 @@
 
 import {scaleLinear} from 'd3-scale';
 import {max, min} from 'd3-array';
+import template from './flow-cloud-diagram.html';
 
 
 const BINDINGS = {
@@ -166,7 +167,7 @@ controller.$inject = [
 const directive = {
     restrict: 'E',
     replace: true,
-    template: require('./flow-cloud-diagram.html'),
+    template,
     scope: {},
     controller,
     controllerAs: 'ctrl',

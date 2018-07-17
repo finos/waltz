@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
-import {ifPresent} from '../../common';
-import {positionFor, toGraphFlow, toGraphId, toGraphNode} from '../flow-diagram-utils';
+import _ from "lodash";
+import {ifPresent} from "../../common";
+import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
 
 
 const initialState = {
@@ -38,7 +38,8 @@ const initialState = {
     visibility: {
         layers: {
             flowBuckets: true,
-            annotations: true
+            annotations: true,
+            removedFlows: true
         }
     },
     detail: {
@@ -128,7 +129,7 @@ function restoreDiagram(
         .chain(entityNodes)
         .filter(node => node.entityReference.kind === 'LOGICAL_DATA_FLOW')
         .map(node => logicalFlowsById[node.entityReference.id])
-        .filter(logicalFlow => logicalFlow !== null)
+        .filter(logicalFlow => logicalFlow != null)
         .map(logicalFlow => {
             return {
                 command: 'ADD_FLOW',
@@ -285,7 +286,11 @@ export function service(
 
     const load = (id) => {
         const diagramRef = { id: id, kind: 'FLOW_DIAGRAM'};
-        const diagramSelector = { entityReference: diagramRef, scope: 'EXACT' };
+        const diagramSelector = {
+            entityReference: diagramRef,
+            scope: 'EXACT',
+            entityLifecycleStatuses: ['ACTIVE', 'PENDING', 'REMOVED']
+        };
 
         reset();
         state.diagramId = id;
@@ -513,4 +518,10 @@ service.$inject = [
 ];
 
 
-export const serviceName = 'FlowDiagramStateService';
+const serviceName = 'FlowDiagramStateService';
+
+
+export default {
+    serviceName,
+    service
+};

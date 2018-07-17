@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import {groupQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import template from './survey-instance-response-view.html';
 
 
 const initialState = {
@@ -176,7 +177,7 @@ controller.$inject = [
 const view = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./survey-instance-response-view.html')
+    template
 };
 
 export default view;

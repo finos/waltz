@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings, navigateToStatistic} from "../utilities";
+import template from './entity-statistic-summary-card.html';
 
 const bindings = {
     definition: '<',
@@ -27,9 +28,6 @@ const bindings = {
     subTitle: '@',
     summary: '<'
 };
-
-
-const template = require('./entity-statistic-summary-card.html');
 
 
 const PIE_SIZE = 100;

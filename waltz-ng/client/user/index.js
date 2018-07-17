@@ -31,13 +31,14 @@ import hasRole from './directives/has-role';
 import hasRoleForEntityKind from './directives/has-role-for-entity-kind';
 import unlessRole from './directives/unless-role';
 import ifAnonymous from './directives/if-anonymous';
+import Routes from './routes';
 
 
 export default () => {
     const module = angular.module('waltz.user', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStore(module, userStore);
 

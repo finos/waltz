@@ -23,7 +23,8 @@ import {registerStore} from '../common/module-utils';
 
 import directives from './directives';
 import components from './components';
-import * as logicalFlowStore from './services/logical-flow-store';
+import LogicalFlowStore from './services/logical-flow-store';
+import LogicalFlowUtility from './services/logical-flow-utility';
 
 export default () => {
 
@@ -32,10 +33,10 @@ export default () => {
     directives(module);
     components(module);
 
-    registerStore(module, logicalFlowStore);
+    registerStore(module, LogicalFlowStore);
 
     module
-        .service('LogicalFlowUtilityService', require('./services/logical-flow-utility'));
+        .service('LogicalFlowUtilityService', LogicalFlowUtility);
 
     return module.name;
 };

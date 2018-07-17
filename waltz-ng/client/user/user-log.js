@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {CORE_API} from "../common/services/core-api-utils";
+// ---
+import template from './user-log.html';
 
 
 function controller(accessLogStore,
@@ -104,9 +106,8 @@ controller.$inject = [
 ];
 
 
-// ---
 export default {
-    template: require('./user-log.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

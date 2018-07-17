@@ -19,6 +19,7 @@
 
 import {initialiseData, invokeFunction} from "../../../common";
 import _ from "lodash";
+import template from './physical-spec-definition-create-panel.html';
 
 
 const bindings = {
@@ -42,8 +43,6 @@ const initialState = {
 };
 
 const allowedTypes= ['DATE', 'DECIMAL', 'INTEGER', 'STRING', 'BOOLEAN', 'ENUM'];
-
-const template = require('./physical-spec-definition-create-panel.html');
 
 
 function attemptSplit(line, position) {
