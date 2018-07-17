@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from '../../common';
+import template from './survey-template-overview.html';
 
 
 /**
@@ -36,9 +37,6 @@ const bindings = {
 
 const initialState = {
 };
-
-
-const template = require('./survey-template-overview.html');
 
 
 function controller() {

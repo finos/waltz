@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
+import template from './entity-link.html';
 
 
 const bindings = {
@@ -27,9 +28,6 @@ const bindings = {
     tooltipPlacement: '@',
     target: '@', /** if '_blank' the external icon is shown **/
 };
-
-
-const template = require('./entity-link.html');
 
 
 const initialState = {

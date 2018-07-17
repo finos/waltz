@@ -19,7 +19,7 @@
  */
 
 import _ from "lodash";
-
+import template from './app-group-list-section.html';
 
 const BINDINGS = {
     groupSubscriptions: '='
@@ -114,7 +114,7 @@ export default () => {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./app-group-list-section.html'),
+        template,
         scope: {},
         bindToController: BINDINGS,
         controllerAs: 'ctrl',

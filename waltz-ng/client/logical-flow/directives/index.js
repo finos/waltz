@@ -17,9 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import FlowCloudDiagram from './flow-cloud-diagram';
+
+
 export default (module) => {
 
     module
-        .directive('waltzFlowCloudDiagram', require('./flow-cloud-diagram'));
+        .directive('waltzFlowCloudDiagram', FlowCloudDiagram);
 
 };

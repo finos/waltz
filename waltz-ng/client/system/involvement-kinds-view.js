@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
+import template from './involvement-kinds-view.html';
 
 const initialState = {
     involvementKinds: [],
@@ -80,7 +81,7 @@ function controller($q,
             .then(kinds => {
                 vm.involvementKinds = kinds;
             });
-    };
+    }
 
     loadInvolvementKinds();
 }
@@ -94,7 +95,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./involvement-kinds-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

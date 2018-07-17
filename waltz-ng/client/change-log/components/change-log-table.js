@@ -18,13 +18,13 @@
  */
 
 import {initialiseData} from "../../common";
+import template from './change-log-table.html';
 
 const bindings = {
     entries: '<',
     onInitialise: '<'
 };
 
-const template = require('./change-log-table.html');
 
 
 const initialState = {

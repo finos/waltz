@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './welcome.html';
+
+
 const initialState = {
     appGroupSubscriptions: [],
     panels: [],
@@ -55,7 +58,7 @@ controller.$inject = [
 const view = {
     controller,
     controllerAs: 'ctrl',
-    template: require('./welcome.html')
+    template
 };
 
 

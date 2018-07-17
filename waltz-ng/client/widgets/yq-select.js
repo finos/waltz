@@ -19,6 +19,7 @@
  */
 
 import _ from 'lodash';
+import template from './yq-select.html';
 
 
 function controller() {
@@ -46,7 +47,7 @@ export default function() {
     return {
         restrict: 'E',
         replace: true,
-        template: require('./yq-select.html'),
+        template,
         scope: {
             start: '=',
             end: '=',

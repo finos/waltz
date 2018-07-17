@@ -20,6 +20,7 @@
 import _ from 'lodash';
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {determineStatMethod} from "../../logical-flow-utils";
+import template from './logical-flows-tabgroup-section.html';
 
 
 const bindings = {
@@ -63,7 +64,7 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.parentEntityRef) {
             vm.selector = mkSelectionOptions(vm.parentEntityRef);
             load(vm.selector);
@@ -81,7 +82,7 @@ controller.$inject = [
 const component = {
     controller,
     bindings,
-    template: require('./logical-flows-tabgroup-section.html')
+    template
 };
 
 

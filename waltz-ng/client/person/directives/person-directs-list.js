@@ -18,6 +18,8 @@
  */
 
 
+import template from './person-directs-list.html';
+
 export default () => ({
     replace: true,
     restrict: 'E',
@@ -27,5 +29,5 @@ export default () => ({
     },
     controllerAs: 'ctrl',
     controller: () => {},
-    template: require('./person-directs-list.html')
+    template
 });

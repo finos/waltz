@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
+import template from './orphans-view.html';
 
 
 const initialState = {
@@ -61,7 +62,7 @@ function controller($q,
                 physicalFlows,
                 attestations
             ]) => {
-                const orphans = [
+                vm.orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
                     {description: 'Application Measurable Ratings mapping to non-existent Measurables or Apps', values: measurableRatings},
                     {description: 'Authoritative Sources with non-existent Org Unit', values: authSourcesByOrgUnit},
@@ -72,7 +73,6 @@ function controller($q,
                     {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows},
                     {description: 'Attestations referencing non-existent applications', values: attestations}
                 ];
-                vm.orphans = orphans;
             });
 
     };
@@ -123,7 +123,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./orphans-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

@@ -24,6 +24,10 @@ import PersonStore from './services/person-store';
 import PersonSummary from './components/summary/person-summary';
 import PersonAppsSection from './components/person-apps-section/person-apps-section';
 import PersonHierarchySection from './components/person-hierarchy-section/person-hierarchy-section';
+import Routes from './routes';
+import PersonLink from './directives/person-link';
+import ManagersList from './directives/manager-list';
+import PersonDirectsList from './directives/person-directs-list';
 
 
 export default () => {
@@ -31,12 +35,12 @@ export default () => {
     const module = angular.module('waltz.person', []);
 
     module
-        .config(require('./routes'))
+        .config(Routes)
 
     module
-        .directive('waltzPersonLink', require('./directives/person-link'))
-        .directive('waltzManagerList', require('./directives/manager-list'))
-        .directive('waltzPersonDirectsList', require('./directives/person-directs-list'));
+        .directive('waltzPersonLink', PersonLink)
+        .directive('waltzManagerList', ManagersList)
+        .directive('waltzPersonDirectsList', PersonDirectsList);
 
     registerStore(module, PersonStore);
     registerComponents(module, [

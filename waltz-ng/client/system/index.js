@@ -25,6 +25,7 @@ import * as  SettingsStore from "./services/settings-store";
 import settingsService from "./services/settings-service";
 import hierarchiesStore from "./services/hierarchies-store";
 import hasSetting from "./directives/has-setting";
+import Routes from './routes';
 
 
 export default () => {
@@ -42,7 +43,7 @@ export default () => {
         .directive('waltzHasSetting', hasSetting);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
 
     return module.name;

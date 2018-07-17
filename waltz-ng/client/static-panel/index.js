@@ -22,6 +22,8 @@ import angular from 'angular';
 import * as staticPanelStore from './services/static-panel-store';
 
 import {registerStore} from '../common/module-utils'
+import StaticPanels from './components/static-panels';
+import StaticPanel from './components/static-panel';
 
 export default () => {
     const module = angular.module('waltz.static.panel', []);
@@ -29,7 +31,7 @@ export default () => {
     registerStore(module, staticPanelStore);
 
     module
-        .component('waltzStaticPanels', require('./components/static-panels'))
-        .component('waltzStaticPanel', require('./components/static-panel'));
+        .component('waltzStaticPanels', StaticPanels)
+        .component('waltzStaticPanel', StaticPanel);
     return module.name;
 };

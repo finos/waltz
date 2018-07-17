@@ -18,7 +18,7 @@
  */
 import {initialiseData} from "../common";
 
-const template = require('./system-admin-list.html');
+import template from './system-admin-list.html';
 
 const initialState = {
     showUserAdminItems: false

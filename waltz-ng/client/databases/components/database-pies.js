@@ -20,6 +20,7 @@
 import {environmentColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts, notEmpty} from "../../common";
 import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
+import template from './database-pies.html';
 
 
 const bindings = {
@@ -27,7 +28,6 @@ const bindings = {
 };
 
 
-const template = require('./database-pies.html');
 
 
 const PIE_SIZE = 70;

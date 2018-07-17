@@ -107,11 +107,13 @@ const controller = function(applicationStore,
             });
         };
 
-        const newApp = {
-            ...model,
-            aliases: _.map(model.aliases, 'text'),
-            tags: _.map(model.tags, 'text')
-        };
+        const newApp = Object.assign(
+            {},
+            model,
+            {
+                aliases: _.map(model.aliases, 'text'),
+                tags: _.map(model.tags, 'text')
+            });
 
 
         applicationStore

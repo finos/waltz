@@ -18,6 +18,7 @@
  */
 
 import _ from "lodash";
+import template from './simple-software-usage-list.html';
 
 
 const BINDINGS = {
@@ -58,7 +59,7 @@ export default () => ({
     restrict: 'E',
     replace: true,
     scope: {},
-    template: require('./simple-software-usage-list.html'),
+    template,
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller

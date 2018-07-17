@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {termSearch} from "../../common";
+import template from './software-catalog-section.html';
 
 const BINDINGS = {
     catalog: '='
@@ -65,7 +66,7 @@ export default () => ({
     scope: {
         panel: '='
     },
-    template: require('./software-catalog-section.html'),
+    template,
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller

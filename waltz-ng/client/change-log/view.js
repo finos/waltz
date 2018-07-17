@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
+import template from './view.html';
 
 
 const initialState = {
@@ -58,7 +59,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

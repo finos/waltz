@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../common/index";
+import template from './playpen3.html';
 
 
 const initialState = {
@@ -45,7 +46,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./playpen3.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true,

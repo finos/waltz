@@ -21,6 +21,7 @@ import _ from "lodash";
 import {timeFormat} from "d3-time-format";
 import {variableScale} from "../../../common/colors";
 import {initialiseData} from "../../../common";
+import template from './entity-statistic-history-panel.html';
 
 
 const bindings = {
@@ -29,9 +30,6 @@ const bindings = {
     duration: '<',
     onChangeDuration: '<'
 };
-
-
-const template = require('./entity-statistic-history-panel.html');
 
 
 const initialState = {

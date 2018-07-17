@@ -18,6 +18,7 @@
  */
 import {initialiseData} from "../../common/index";
 import _ from "lodash";
+import template from './survey-run-create-recipient.html';
 
 
 const bindings = {
@@ -33,9 +34,6 @@ const initialState = {
     includedRecipients: [],
     excludedRecipients: []
 };
-
-
-const template = require('./survey-run-create-recipient.html');
 
 
 function controller(surveyRunStore) {

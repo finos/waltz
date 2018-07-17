@@ -19,11 +19,10 @@
 
 import {select} from 'd3-selection';
 import {rgb} from 'd3-color';
+import template from './common-svg-defs.html';
 
 const bindings = {};
 
-
-const template = require('./common-svg-defs.html');
 
 function addArrowMarkers(defs) {
     const markers = [

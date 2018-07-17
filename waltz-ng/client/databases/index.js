@@ -20,13 +20,14 @@
 import angular from 'angular';
 import * as DatabaseStore from './services/database-store';
 import {registerStores} from "../common/module-utils";
+import DatabasePies from './components/database-pies';
 
 export default () => {
 
     const module = angular.module('waltz.databases', []);
 
     module
-        .component('waltzDatabasePies', require('./components/database-pies'));
+        .component('waltzDatabasePies', DatabasePies);
 
     registerStores(module, [DatabaseStore]);
 

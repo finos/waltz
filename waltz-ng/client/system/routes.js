@@ -24,63 +24,74 @@ const baseState = {
 };
 
 
+import SystemAdminList from './system-admin-list';
+import SettingsView from './settings-view';
+import HierarchiesView from './hierarchies-view';
+import OrphansView from './orphans-view';
+import RecalculateView from './recalculate-view';
+import ActorsView from './actors-view';
+import EntityNamedNoteTypesView from './entity-named-node-types-view';
+import InvolvementKindsView from './involvement-kinds-view';
+import PerspectivesView from './perspectives-view';
+import StaticPanelsView from './static-panels-view';
+
 const listViewState = {
     url: '/list',
-    views: { 'content@': require('./system-admin-list') }
+    views: { 'content@': SystemAdminList }
 };
 
 
 const settingsState = {
     url: '/settings',
-    views: { 'content@': require('./settings-view') }
+    views: { 'content@': SettingsView }
 };
 
 
 const hierarchiesState = {
     url: '/hierarchies',
-    views: { 'content@': require('./hierarchies-view') }
+    views: { 'content@': HierarchiesView }
 };
 
 
 const orphansState = {
     url: '/orphans',
-    views: { 'content@': require('./orphans-view') }
+    views: { 'content@': OrphansView }
 };
 
 
 const recalculateState = {
     url: '/recalculate',
-    views: { 'content@': require('./recalculate-view') }
+    views: { 'content@': RecalculateView }
 };
 
 
 const actorsState = {
     url: '/actors',
-    views: { 'content@': require('./actors-view') }
+    views: { 'content@': ActorsView }
 };
 
 
 const entityNamedNodeTypesState = {
     url: '/entity-named-note-types',
-    views: { 'content@': require('./entity-named-node-types-view') }
+    views: { 'content@': EntityNamedNoteTypesView }
 };
 
 
 const involvementKindsState = {
     url: '/involvement-kinds',
-    views: { 'content@': require('./involvement-kinds-view') }
+    views: { 'content@': InvolvementKindsView }
 };
 
 
 const perspectivesState = {
     url: '/perspectives',
-    views: { 'content@': require('./perspectives-view') }
+    views: { 'content@': PerspectivesView }
 };
 
 
 const staticPanelsState = {
     url: '/static-panels',
-    views: { 'content@': require('./static-panels-view') }
+    views: { 'content@': StaticPanelsView }
 };
 
 

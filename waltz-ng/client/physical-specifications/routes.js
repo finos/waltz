@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import View from './physical-specification-view';
+
 
 const baseState = {
 };
@@ -23,7 +25,7 @@ const baseState = {
 
 const viewState = {
     url: 'physical-specification/{id:int}',
-    views: {'content@': require('./physical-specification-view') },
+    views: {'content@': View },
 };
 
 

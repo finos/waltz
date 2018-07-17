@@ -20,6 +20,7 @@
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
 import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
+import template from './group-technology-summary.html';
 
 
 const bindings = {
@@ -72,36 +73,38 @@ const prepareForPieChart = (tallies) => _.map(tallies, tallyToPieDatum);
 
 
 function processServerStats(stats) {
+    const serverStats = Object.assign({}, stats, {
+        environment: prepareForPieChart(stats.environmentCounts),
+        operatingSystem: prepareForPieChart(stats.operatingSystemCounts),
+        location: prepareForPieChart(stats.locationCounts),
+        operatingSystemEndOfLifeStatus: prepareForPieChart(stats.operatingSystemEndOfLifeStatusCounts),
+        hardwareEndOfLifeStatus: prepareForPieChart(stats.hardwareEndOfLifeStatusCounts)
+    });
+
     return {
-        serverStats: {
-            ...stats,
-            environment: prepareForPieChart(stats.environmentCounts),
-            operatingSystem: prepareForPieChart(stats.operatingSystemCounts),
-            location: prepareForPieChart(stats.locationCounts),
-            operatingSystemEndOfLifeStatus: prepareForPieChart(stats.operatingSystemEndOfLifeStatusCounts),
-            hardwareEndOfLifeStatus: prepareForPieChart(stats.hardwareEndOfLifeStatusCounts)
-        }
+        serverStats
     };
 }
 
 function processDatabaseStats(stats) {
+    const databaseStats = Object.assign({}, stats, {
+        environment: prepareForPieChart(stats.environmentCounts),
+        vendor: prepareForPieChart(stats.vendorCounts),
+        endOfLifeStatus: prepareForPieChart(stats.endOfLifeStatusCounts)
+    });
+
     return {
-        databaseStats: {
-            ...stats,
-            environment: prepareForPieChart(stats.environmentCounts),
-            vendor: prepareForPieChart(stats.vendorCounts),
-            endOfLifeStatus: prepareForPieChart(stats.endOfLifeStatusCounts)
-        }
+        databaseStats
     };
 }
 
 function processSoftwareCatalogStats(stats) {
+    const softwareStats = Object.assign({}, stats, {
+        vendor: prepareForPieChart(stats.vendorCounts),
+        maturity: prepareForPieChart(stats.maturityCounts)
+    });
     return {
-        softwareStats: {
-            ...stats,
-            vendor: prepareForPieChart(stats.vendorCounts),
-            maturity: prepareForPieChart(stats.maturityCounts)
-        }
+        softwareStats
     };
 }
 
@@ -132,7 +135,7 @@ function controller() {
 
 
 const component = {
-    template: require('./group-technology-summary.html'),
+    template,
     bindings,
     controller
 };

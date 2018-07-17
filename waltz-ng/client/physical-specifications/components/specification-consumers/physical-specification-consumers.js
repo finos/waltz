@@ -18,14 +18,12 @@
  */
 
 import {initialiseData} from '../../../common';
+import template from './physical-specification-consumers.html';
 
 const bindings = {
     physicalFlows: '<',
     onFlowSelect: '<'
 };
-
-
-const template = require('./physical-specification-consumers.html');
 
 
 const initialState = {

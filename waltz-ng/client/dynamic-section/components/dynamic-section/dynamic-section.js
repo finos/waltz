@@ -40,11 +40,17 @@ controller.$inject = [
 ];
 
 
-export const component = {
+const component = {
     controller,
     template,
     bindings,
     transclude: true
 };
 
-export const id = 'waltzDynamicSection';
+const id = 'waltzDynamicSection';
+
+
+export default {
+    id,
+    component
+};

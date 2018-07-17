@@ -19,6 +19,7 @@
  */
 
 import {initialiseData} from "../common/index";
+import template from './toggle.html';
 
 
 const bindings = {
@@ -47,7 +48,7 @@ function controller() {
 
 
 const component = {
-    template: require('./toggle.html'),
+    template,
     bindings,
     controller
 };

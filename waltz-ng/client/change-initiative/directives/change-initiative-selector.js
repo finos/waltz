@@ -20,6 +20,7 @@
 //todo: make this a component (KS)
 
 import {CORE_API} from '../../common/services/core-api-utils';
+import template from './change-initiative-selector.html';
 
 
 const BINDINGS = {
@@ -53,7 +54,7 @@ controller.$inject = [
 const directive = {
     restrict: 'E',
     replace: true,
-    template: require('./change-initiative-selector.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: BINDINGS,

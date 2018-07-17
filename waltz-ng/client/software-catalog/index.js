@@ -18,6 +18,11 @@
  */
 
 import angular from 'angular';
+import SoftwareCatalogStore from './services/software-catalog-store';
+import SimpleSoftwareUsagePies from './components/simple-software-usage-pies';
+import SimpleSoftwareUsageList from './directives/simple-software-usage-list';
+import MaturityStatus from './directives/maturity-status';
+import SoftwareCatalogSection from './directives/software-catalog-section';
 
 
 export default () => {
@@ -25,15 +30,15 @@ export default () => {
     const module = angular.module('waltz.software.catalog', []);
 
     module
-        .service('SoftwareCatalogStore', require('./services/software-catalog-store'));
+        .service('SoftwareCatalogStore', SoftwareCatalogStore);
 
     module
-        .component('waltzSimpleSoftwareUsagePies', require('./components/simple-software-usage-pies'));
+        .component('waltzSimpleSoftwareUsagePies', SimpleSoftwareUsagePies);
 
     module
-        .directive('waltzSimpleSoftwareUsageList', require('./directives/simple-software-usage-list'))
-        .directive('waltzMaturityStatus', require('./directives/maturity-status'))
-        .directive('waltzSoftwareCatalogSection', require('./directives/software-catalog-section'));
+        .directive('waltzSimpleSoftwareUsageList', SimpleSoftwareUsageList)
+        .directive('waltzMaturityStatus', MaturityStatus)
+        .directive('waltzSoftwareCatalogSection', SoftwareCatalogSection);
 
     return module.name;
 };

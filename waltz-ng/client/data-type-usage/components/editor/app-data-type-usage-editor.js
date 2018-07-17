@@ -20,6 +20,8 @@
 import _ from "lodash";
 import allUsageKinds from "../../usage-kinds";
 import {initialiseData} from "../../../common";
+import template from './app-data-type-usage-editor.html';
+
 
 const bindings = {
     primaryEntity: '<',
@@ -55,14 +57,13 @@ function mkUsageRows(usages = []) {
     return _.chain(allUsageKinds)
         .map(usageKind => {
             const currentUsageForThisKind = usagesByKind[usageKind.kind];
-            return {
-                ...usageKind,
+            return Object.assign({}, usageKind, {
                 description: currentUsageForThisKind
                     ? currentUsageForThisKind.description
                     : '',
                 selected: currentUsageForThisKind != null
                 && currentUsageForThisKind.isSelected
-            };
+            });
         })
         .orderBy('kind')
         .value()
@@ -82,7 +83,7 @@ controller.$inject = [];
 
 
 const component = {
-    template: require('./app-data-type-usage-editor.html'),
+    template,
     controller,
     bindings
 };

@@ -25,27 +25,34 @@ import SurveyTemplateStore from "./services/survey-template-store";
 import SurveyInstanceList from "./components/instance-list/survey-instance-list";
 
 import surveySection from "./components/survey-section";
+import Routes from './routes';
+import SurveyDropdownEditor from './components/dropdown/survey-dropdown-editor';
+import SurveyRunCreateGeneral from './components/survey-run-create-general';
+import SurveyRunCreateRecipient from './components/survey-run-create-recipient';
+import SurveyRunOverview from './components/survey-run-overview';
+import SurveyTemplateOverview from './components/survey-template-overview';
+import SurveyQuestionStore from './services/survey-question-store';
 
 export default () => {
     const module = angular.module('waltz.survey', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerComponents(module, [
         surveySection
     ]);
 
     module
-        .component('waltzSurveyDropdownEditor', require('./components/dropdown/survey-dropdown-editor'))
-        .component('waltzSurveyRunCreateGeneral', require('./components/survey-run-create-general'))
-        .component('waltzSurveyRunCreateRecipient', require('./components/survey-run-create-recipient'))
-        .component('waltzSurveyRunOverview', require('./components/survey-run-overview'))
-        .component('waltzSurveyTemplateOverview', require('./components/survey-template-overview'));
+        .component('waltzSurveyDropdownEditor', SurveyDropdownEditor)
+        .component('waltzSurveyRunCreateGeneral', SurveyRunCreateGeneral)
+        .component('waltzSurveyRunCreateRecipient', SurveyRunCreateRecipient)
+        .component('waltzSurveyRunOverview', SurveyRunOverview)
+        .component('waltzSurveyTemplateOverview', SurveyTemplateOverview);
 
 
     module
-        .service('SurveyQuestionStore', require('./services/survey-question-store'));
+        .service('SurveyQuestionStore', SurveyQuestionStore);
 
     registerStores(module, [
         SurveyInstanceStore,

@@ -19,6 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../common";
+import template from './duration-selector.html';
 
 
 const bindings = {
@@ -53,7 +54,6 @@ const initialState = {
 };
 
 
-const template = require('./duration-selector.html');
 
 
 function controller() {

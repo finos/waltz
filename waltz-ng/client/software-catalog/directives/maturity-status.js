@@ -16,14 +16,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import template from './maturity-status.html';
+
 
 const BINDINGS = {
     status: '='
 };
 
+
 function controller() {
 
 }
+
 
 controller.$inject = [];
 
@@ -32,7 +36,7 @@ export default () => ({
     restrict: 'E',
     replace: true,
     scope: {},
-    template: require('./maturity-status.html'),
+    template,
     bindToController: BINDINGS,
     controllerAs: 'ctrl',
     controller

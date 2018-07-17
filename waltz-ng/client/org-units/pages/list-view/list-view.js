@@ -22,6 +22,7 @@ import angular from "angular";
 import {termSearch} from "../../../common";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {buildPropertySummer} from "../../../common/tally-utils";
+import template from './list-view.html';
 
 
 const FIELDS_TO_SEARCH = ['name', 'description'];
@@ -114,7 +115,7 @@ controller.$inject = [
 
 
 export default {
-    template: require('./list-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

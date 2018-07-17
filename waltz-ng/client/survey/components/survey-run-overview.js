@@ -25,6 +25,7 @@
  */
 
 import {initialiseData, invokeFunction} from "../../common";
+import template from './survey-run-overview.html';
 
 
 const bindings = {
@@ -37,9 +38,6 @@ const bindings = {
 const initialState = {
     onUpdateDueDate: () => console.log("SRO: No on-update-due-date method provided")
 };
-
-
-const template = require('./survey-run-overview.html');
 
 
 function controller() {

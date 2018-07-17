@@ -20,6 +20,7 @@
 import _ from 'lodash';
 import {initialiseData} from "../../common/index";
 import {dynamicSections} from '../../dynamic-section/dynamic-section-definitions';
+import template from './dyna-test-view.html';
 
 const initialState = {
     parentEntityRef: {
@@ -50,7 +51,7 @@ controller.$inject = [
 
 
 const view = {
-    template: require('./dyna-test-view.html'),
+    template,
     controller,
     controllerAs: 'ctrl'
 };

@@ -23,18 +23,20 @@ import {registerComponents, registerStore} from '../common/module-utils';
 
 import sourceDataOverlay from './components/overlay/source-data-overlay';
 import sourceDataSectionAddon from './components/section-addon/source-data-section-addon';
+import Routes from './routes';
+import SourceDataInfo from './directives/source-data-info';
 
 
 export default () => {
     const module = angular.module('waltz.source.data.ratings', []);
 
     module
-        .config(require('./routes'));
+        .config(Routes);
 
     registerStore(module, sourceDataRatingStore);
 
     module
-        .directive('waltzSourceDataInfo', require('./directives/source-data-info'));
+        .directive('waltzSourceDataInfo', SourceDataInfo);
 
     registerComponents(module, [
         sourceDataOverlay,

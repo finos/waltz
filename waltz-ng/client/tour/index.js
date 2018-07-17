@@ -18,14 +18,16 @@
  */
 
 import angular from 'angular';
+import TourService from './services/tour-service';
+import TourStore from './services/tour-store';
 
 
 export default () => {
     const module = angular.module('waltz.tour', []);
 
     module
-        .service('TourService', require('./services/tour-service'))
-        .service('TourStore', require('./services/tour-store'));
+        .service('TourService', TourService)
+        .service('TourStore', TourStore);
 
     return module.name;
 }

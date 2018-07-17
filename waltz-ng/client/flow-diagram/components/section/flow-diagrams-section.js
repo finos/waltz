@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../../common/index";
+import template from './flow-diagrams-section.html';
 
 /**
  * @name waltz-flow-diagrams-section
@@ -34,8 +35,6 @@ const bindings = {
 const initialState = {
     canCreate: false
 };
-
-const template = require('./flow-diagrams-section.html');
 
 
 function determineIfCreateAllowed(kind) {

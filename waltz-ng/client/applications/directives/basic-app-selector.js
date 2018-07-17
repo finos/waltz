@@ -19,6 +19,8 @@
 
 import _ from "lodash";
 import {invokeFunction} from "../../common";
+import template from './basic-app-selector.html';
+
 
 const BINDINGS = {
     addLabel: '@',
@@ -58,7 +60,7 @@ controller.$inject = [];
 const directive = {
     restrict: 'E',
     replace: false,
-    template: require('./basic-app-selector.html'),
+    template,
     scope: {},
     bindToController: BINDINGS,
     controller,

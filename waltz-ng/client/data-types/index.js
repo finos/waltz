@@ -28,11 +28,13 @@ import DataTypeOverview from './components/overview/data-type-overview';
 import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
 import DataTypeOriginators from './components/originators/data-type-originators';
 import RelatedDataTypesSection from './components/related-data-types-section/related-data-types-section';
+import Routes from './routes';
+import DataTypeViewData from './services/data-type-view-data';
 
 export default () => {
     const module = angular.module('waltz.data.types', []);
 
-    module.config(require('./routes'));
+    module.config(Routes);
 
     registerStores(module, [ DataTypeStore ]);
     registerComponents(module, [
@@ -47,7 +49,7 @@ export default () => {
     ]);
 
     module
-        .service('DataTypeViewDataService', require('./services/data-type-view-data'));
+        .service('DataTypeViewDataService', DataTypeViewData);
 
 
     return module.name;

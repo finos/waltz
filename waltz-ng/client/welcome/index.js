@@ -18,13 +18,14 @@
  */
 
 import angular from 'angular';
+import RecentlyViewedSection from './components/recently-viewed-section/recently-viewed-section';
 
 
 export default () => {
     const module = angular.module('waltz.welcome', []);
 
     module
-        .component('waltzRecentlyViewedSection', require('./components/recently-viewed-section/recently-viewed-section'));
+        .component('waltzRecentlyViewedSection', RecentlyViewedSection);
 
     return module.name;
 };

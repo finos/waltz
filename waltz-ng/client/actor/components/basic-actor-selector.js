@@ -18,6 +18,7 @@
  */
 
 import {initialiseData, invokeFunction} from "../../common";
+import template from './basic-actor-selector.html';
 
 
 const bindings = {
@@ -30,7 +31,6 @@ const bindings = {
 };
 
 
-const template = require('./basic-actor-selector.html');
 
 
 const initialState = {

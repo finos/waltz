@@ -88,7 +88,13 @@ store.$inject = [
 ];
 
 
-export const serviceName = "ActorStore";
+const serviceName = "ActorStore";
+
+
+export default {
+    serviceName,
+    store
+};
 
 
 export const ActorStore_API = {

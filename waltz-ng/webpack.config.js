@@ -8,34 +8,48 @@ var git = require('git-rev-sync');
 var basePath = path.resolve(__dirname);
 
 
-function isExternal(module) {
-    // this inspects the userRequest field of the require request
-    // e.g. require('lodash') will like have a userRequest like the following:
-    // node_modules/lodash/lib...
-    var userRequest = module.userRequest;
-
-    if (typeof userRequest !== 'string') {
-        return false;
-    }
-
-    return userRequest.indexOf('node_modules') >= 0;
-}
-
-
 module.exports = {
     entry: {
         app: './client/main.js'
     },
-    devtool: 'source-map',
     output: {
         path: path.join(basePath, '/dist'),
         filename: '[name].js'
+    },
+    mode: 'development',
+    devtool: 'inline-source-map',
+    devServer: {
+        contentBase: './dist',
+        disableHostCheck: true
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+            minSize: 30000,
+            maxSize: 0,
+            minChunks: 1,
+            maxAsyncRequests: 5,
+            maxInitialRequests: 3,
+            automaticNameDelimiter: '~',
+            name: true,
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    priority: -10
+                },
+                default: {
+                    minChunks: 2,
+                    priority: -20,
+                    reuseExistingChunk: true
+                }
+            }
+        }
     },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Waltz',
             filename: 'index.html',
-            template: 'index.template.html',
+            template: 'index.ejs',
             favicon: path.join(basePath, 'images', 'favicon.ico'),
             hash: true,
         }),
@@ -43,13 +57,7 @@ module.exports = {
             '__ENV__': JSON.stringify(process.env.BUILD_ENV || 'dev'),
             '__REVISION__': JSON.stringify(git.long()),
         }),
-        new Visualizer(),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: "vendor",
-            minChunks: function(module) {
-                return isExternal(module);
-            }
-        })
+        new Visualizer()
     ],
     module: {
         rules: [
@@ -95,9 +103,6 @@ module.exports = {
                 }
             }
         ],
-    },
-    devServer: {
-        disableHostCheck: true
     }
 
 };

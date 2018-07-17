@@ -20,6 +20,7 @@
 import angular from 'angular';
 import _ from 'lodash';
 import {initialiseData} from '../common';
+import template from './keyword-edit.html';
 
 
 /**
@@ -38,9 +39,6 @@ const bindings = {
 
 
 const initialState = {};
-
-
-const template = require('./keyword-edit.html');
 
 
 function controller() {

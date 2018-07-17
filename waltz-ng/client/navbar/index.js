@@ -21,6 +21,9 @@ import angular from 'angular';
 import {registerComponents} from "../common/module-utils";
 import NavbarSearch from './components/navbar-search';
 import NavSearchOverlay from './components/nav-search-overlay';
+import Navbar from './directives/navbar';
+import NavbarRecentlyViews from './directives/navbar-recently-viewed';
+import NavbarProfile from './directives/navbar-profile';
 
 
 export default () => {
@@ -28,9 +31,9 @@ export default () => {
     const module = angular.module('waltz.navbar', []);
 
     module
-        .directive('waltzNavbar', require('./directives/navbar'))
-        .directive('waltzNavbarRecentlyViewed', require('./directives/navbar-recently-viewed'))
-        .directive('waltzNavbarProfile', require('./directives/navbar-profile'));
+        .directive('waltzNavbar', Navbar)
+        .directive('waltzNavbarRecentlyViewed', NavbarRecentlyViews)
+        .directive('waltzNavbarProfile', NavbarProfile);
 
     registerComponents(module, [
         NavbarSearch,

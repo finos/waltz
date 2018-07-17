@@ -20,6 +20,28 @@
  */
 
 import angular from "angular";
+import Index from './index.html';
+import Toc from './toc.html';
+import DemoDirectiveAppSelector from './demo-directive-app-selector.html';
+import DemoDirectiveYqSelector from './demo-directive-yq-selector.html';
+import DemoDirectiveBookmarkKindSelect from './demo-directive-bookmark-kind-select.html';
+import DemoDirectiveChangeTimeline from './demo-directive-change-timeline.html';
+import DemoDirectiveAppOverview from './demo-directive-app-overview.html';
+import DemoDirectiveKeywordList from './demo-directive-keyword-list.html';
+import DemoEndpointApplication from './demo-endpoint-application.html';
+import DemoEndpointDataFlows from './demo-endpoint-data-flows.html';
+import DemoEndpointDataTypes from './demo-endpoint-data-types.html';
+import DemoEndpointPerson from './demo-endpoint-person.html';
+import DemoEndpointServerInformation from './demo-endpoint-server-information.html';
+import DemoEndpointCapability from './demo-endpoint-capability.html';
+import DemoEndpointAppCapability from './demo-endpoint-app-capability.html';
+import DemoEndpointOrgUnit from './demo-endpoint-organisational-unit.html';
+import DemoEndpointPerspective from './demo-endpoint-perspective.html';
+import DemoEndpointPerspectiveMeasurable from './demo-endpoint-perspective-measurable.html';
+import DemoEndpointInvolvement from './demo-endpoint-involvement.html';
+import DemoEndpointRoadmap from './waltz-roadmap.html';
+import DemoEndpointEngagement from './waltz-engagement.html';
+import DemoEndpointPrerequisites from './waltz-prerequisites.html';
 
 
 export default () => {
@@ -33,18 +55,18 @@ export default () => {
                 .state('main.examples', {
                     url: 'examples',
                     views: {
-                        'docs-content@': { template: require('./index.html') },
-                        'docs-sidebar@': { template: require('./toc.html') }
+                        'docs-content@': { template: Index },
+                        'docs-sidebar@': { template: Toc }
                     }
                 })
                 .state('main.examples.directive-app-selector', {
                     url: '/directive-app-selector',
-                    views: { 'content@': {template: require('./demo-directive-app-selector.html') } }
+                    views: { 'content@': {template: DemoDirectiveAppSelector } }
                 })
                 .state('main.examples.directive-yq-selector', {
                     url: '/directive-yq-selector',
                     views: { 'content@': {
-                        template: require('./demo-directive-yq-selector.html'),
+                        template: DemoDirectiveYqSelector,
                         controller: function() {
                             this.onSelect = (d) => {
                                 this.selected = d;
@@ -57,7 +79,7 @@ export default () => {
                 .state('main.examples.directive-bookmark-kind-select', {
                     url: '/directive-bookmark-kind-select',
                     views: { 'content@': {
-                        template: require('./demo-directive-bookmark-kind-select.html'),
+                        template: DemoDirectiveBookmarkKindSelect,
                         controller: function() {
                             this.onSelect = (d) => {
                                 this.value = d;
@@ -70,7 +92,7 @@ export default () => {
                 .state('main.examples.directive-change-timeline', {
                     url: '/directive-change-timeline',
                     views: { 'content@': {
-                        template: require('./demo-directive-change-timeline.html'),
+                        template: DemoDirectiveChangeTimeline,
                         controller: function() {
                             this.changes = [
                                 { year: 2016, quarter: 3, size: 1 },
@@ -91,7 +113,7 @@ export default () => {
                 .state('main.examples.directive-app-overview', {
                     url: '/directive-app-overview',
                     views: { 'content@': {
-                        template: require('./demo-directive-app-overview.html'),
+                        template: DemoDirectiveAppOverview,
                         controller: ['$scope', function($scope) {
                             $scope.app = {
                                 name: 'example app',
@@ -106,7 +128,7 @@ export default () => {
                 .state('main.examples.directive-keyword-list', {
                     url: '/directive-keyword-list',
                     views: { 'content@': {
-                        template: require('./demo-directive-keyword-list.html'),
+                        template: DemoDirectiveKeywordList,
                         controller: ['$scope', function($scope) {
                             $scope.clicked = function(keyword) {
                                 $scope.selected = keyword;
@@ -116,59 +138,59 @@ export default () => {
                 })
                 .state('main.examples.endpoint-application', {
                     url: '/endpoint-application',
-                    views: { 'content@': {template: require('./demo-endpoint-application.html') } }
+                    views: { 'content@': {template: DemoEndpointApplication } }
                 })
                 .state('main.examples.endpoint-data-flows', {
                     url: '/data-flows',
-                    views: { 'content@': {template: require('./demo-endpoint-data-flows.html') } }
+                    views: { 'content@': {template: DemoEndpointDataFlows } }
                 })
                 .state('main.examples.endpoint-data-types', {
                     url: '/data-types',
-                    views: { 'content@': {template: require('./demo-endpoint-data-types.html') } }
+                    views: { 'content@': {template: DemoEndpointDataTypes } }
                 })
                 .state('main.examples.endpoint-person', {
                     url: '/person',
-                    views: { 'content@': {template: require('./demo-endpoint-person.html') } }
+                    views: { 'content@': {template: DemoEndpointPerson } }
                 })
                 .state('main.examples.endpoint-server-information', {
                     url: '/server-information',
-                    views: { 'content@': {template: require('./demo-endpoint-server-information.html') } }
+                    views: { 'content@': {template: DemoEndpointServerInformation } }
                 })
                 .state('main.examples.endpoint-capability', {
                     url: '/capability',
-                    views: { 'content@': {template: require('./demo-endpoint-capability.html') } }
+                    views: { 'content@': {template: DemoEndpointCapability } }
                 })
                 .state('main.examples.endpoint-app-capability', {
                     url: '/app-capability',
-                    views: { 'content@': {template: require('./demo-endpoint-app-capability.html') } }
+                    views: { 'content@': {template: DemoEndpointAppCapability } }
                 })
                 .state('main.examples.endpoint-organisational-unit', {
                     url: '/organisational-unit',
-                    views: { 'content@': {template: require('./demo-endpoint-organisational-unit.html') } }
+                    views: { 'content@': {template: DemoEndpointOrgUnit } }
                 })
                 .state('main.examples.endpoint-perspective', {
                     url: '/perspective',
-                    views: { 'content@': {template: require('./demo-endpoint-perspective.html') } }
+                    views: { 'content@': {template: DemoEndpointPerspective } }
                 })
                 .state('main.examples.endpoint-perspective-measurable', {
                     url: '/perspective-measurable',
-                    views: { 'content@': {template: require('./demo-endpoint-perspective-measurable.html') } }
+                    views: { 'content@': {template: DemoEndpointPerspectiveMeasurable } }
                 })
                 .state('main.examples.endpoint-involvement', {
                     url: '/involvement',
-                    views: { 'content@': {template: require('./demo-endpoint-involvement.html') } }
+                    views: { 'content@': {template: DemoEndpointInvolvement } }
                 })
                 .state('main.examples.waltz-roadmap', {
                     url: '/waltz-roadmap',
-                    views: { 'content@': {template: require('./waltz-roadmap.html') } }
+                    views: { 'content@': {template: DemoEndpointRoadmap } }
                 })
                 .state('main.examples.waltz-engagement', {
                     url: '/waltz-engagement',
-                    views: { 'content@': {template: require('./waltz-engagement.html') } }
+                    views: { 'content@': {template: DemoEndpointEngagement } }
                 })
                 .state('main.examples.waltz-prerequisites', {
                     url: '/waltz-prerequisites',
-                    views: { 'content@': {template: require('./waltz-prerequisites.html') } }
+                    views: { 'content@': {template: DemoEndpointPrerequisites } }
                 });
         }
     ]);

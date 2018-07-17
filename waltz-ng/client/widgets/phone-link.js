@@ -18,10 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from './phone-link.html';
+
 export default () => ({
     restrict: 'E',
     replace: true,
-    template: require('./phone-link.html'),
+    template,
     scope: {
         number: '@'
     }

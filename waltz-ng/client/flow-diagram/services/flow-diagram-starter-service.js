@@ -22,7 +22,7 @@ import {CORE_API} from "../../common/services/core-api-utils";
 import {toGraphId} from "../flow-diagram-utils";
 
 
-export function service($q, serviceBroker) {
+export function service(serviceBroker) {
 
     const mkForActor = (entityRef) => {
         return serviceBroker
@@ -215,11 +215,16 @@ export function service($q, serviceBroker) {
 
 
 service.$inject = [
-    '$q',
     'ServiceBroker'
 ];
 
 
-export const serviceName = 'FlowDiagramStarterService';
+const serviceName = 'FlowDiagramStarterService';
+
+
+export default {
+    serviceName,
+    service
+};
 
 

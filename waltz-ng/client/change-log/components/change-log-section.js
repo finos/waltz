@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
+import template from './change-log-section.html';
 
 
 const bindings = {
@@ -32,7 +33,6 @@ const initialState = {
 };
 
 
-const template = require('./change-log-section.html');
 
 
 function controller(serviceBroker) {

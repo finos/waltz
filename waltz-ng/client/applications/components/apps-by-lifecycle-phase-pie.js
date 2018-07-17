@@ -21,6 +21,7 @@
 import {lifecyclePhaseColorScale} from "../../common/colors";
 import {lifecyclePhase} from '../../common/services/enums/lifecycle-phase';
 import {toKeyCounts} from "../../common";
+import template from './apps-by-lifecycle-phase-pie.html';
 
 
 const bindings = {
@@ -29,7 +30,6 @@ const bindings = {
 };
 
 
-const template = require('./apps-by-lifecycle-phase-pie.html');
 
 
 const DEFAULT_SIZE = 80;

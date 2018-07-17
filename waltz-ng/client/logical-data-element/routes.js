@@ -18,13 +18,15 @@
  */
 
 import {CORE_API} from "../common/services/core-api-utils";
+import LogicalDataElementView from './logical-data-element-view';
+
 const baseState = {
 };
 
 
 const viewState = {
     url: 'logical-data-element/{id:int}',
-    views: {'content@': require('./logical-data-element-view') },
+    views: {'content@': LogicalDataElementView },
 };
 
 

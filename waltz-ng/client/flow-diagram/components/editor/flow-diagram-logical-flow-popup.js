@@ -18,10 +18,11 @@
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { toGraphId } from "../../flow-diagram-utils";
-import { sameRef } from "../../../common/entity-utils";
-import { kindToViewState } from "../../../common/link-utils";
+import {initialiseData} from "../../../common";
+import {toGraphId} from "../../flow-diagram-utils";
+import {sameRef} from "../../../common/entity-utils";
+import {kindToViewState} from "../../../common/link-utils";
+import template from './flow-diagram-logical-flow-popup.html';
 
 /**
  * @name waltz-flow-diagram-logical-flow-popup
@@ -49,12 +50,6 @@ const initialState = {
     commandProcessor: () => console.log('wfdlfp: default command processor'),
     onDismiss: () => console.log('wfdlfp: default on-dismiss'),
 };
-
-
-const template = require('./flow-diagram-logical-flow-popup.html');
-
-
-
 
 
 function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = []) {

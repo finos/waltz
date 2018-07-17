@@ -20,6 +20,7 @@ import _ from "lodash";
 import moment from "moment";
 import {notEmpty} from "../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../common/grid-utils";
+import template from './entity-statistic-detail-table.html';
 
 
 /**
@@ -211,9 +212,6 @@ controller.$inject = [
     'uiGridExporterConstants',
     'uiGridExporterService'
 ];
-
-
-const template = require('./entity-statistic-detail-table.html');
 
 
 const component = {

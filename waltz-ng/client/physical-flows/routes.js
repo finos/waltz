@@ -21,16 +21,18 @@ const baseState = {
 };
 
 
+import PhysicalFlowView from './physical-flow-view';
+import PhysicalFlowRegistration from './physical-flow-registration';
+
 const viewState = {
     url: 'physical-flow/{id:int}',
-    views: {'content@': require('./physical-flow-view') },
+    views: {'content@': PhysicalFlowView },
 };
-
 
 
 const registrationState = {
     url: 'physical-flow/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}',
-    views: {'content@': require('./physical-flow-registration') },
+    views: {'content@': PhysicalFlowRegistration },
 };
 
 

@@ -19,6 +19,7 @@
  */
 
 import {isEmpty} from "../../common";
+import template from './bookmark-form.html';
 
 
 function controller($scope) {
@@ -70,7 +71,7 @@ export default () => ({
         onCancel: '&',
         confirmLabel: '@'
     },
-    template: require('./bookmark-form.html'),
+    template,
     controller,
     controllerAs: 'ctrl',
     bindToController: true
