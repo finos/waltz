@@ -66,6 +66,10 @@ module.exports = {
                 loader: 'babel-loader',
                 exclude: /node_modules/
             }, {
+                test: /\.tsx?$/,
+                use: ['babel-loader', 'ts-loader'],
+                exclude: /node_modules/
+            }, {
                 test: /\.scss$/,
                 use: ['style-loader', 'css-loader', 'sass-loader']
             }, {

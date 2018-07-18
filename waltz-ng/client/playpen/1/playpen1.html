@@ -26,38 +26,6 @@
 
     </style>
 
-    <waltz-app-overview parent-entity-ref="ctrl.parentEntityRef"></waltz-app-overview>
-
-    <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-2">
-                Navigation:
-            </div>
-            <div class="col-md-10 h-navigation">
-                <ul class="list-unstyled list-inline">
-                    <li ng-repeat="w in ctrl.availableWidgets">
-                        <a ng-click="ctrl.addWidget(w)"
-                           class="clickable">
-                            <waltz-icon name="{{ w.icon }}"></waltz-icon>
-                            <span ng-bind="w.name"></span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-    <br>
-
-
-    <div ng-repeat="widget in ctrl.widgets track by widget.id"
-         class='waltz-animate-repeat'>
-        <waltz-dynamic-section-wrapper widget="widget"
-                                       parent-entity-ref="ctrl.parentEntityRef">
-        </waltz-dynamic-section-wrapper>
-    </div>
-
 
 
 </div>
