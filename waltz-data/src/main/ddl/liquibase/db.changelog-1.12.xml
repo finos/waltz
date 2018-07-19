@@ -105,5 +105,41 @@
     </changeSet>
 
 
+    <!-- 3286: Add entity_lifecycle_status field to logical_flow -->
+    <changeSet id="20180718-3286-1"
+               author="kamransaleem">
+        <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
+        <addColumn tableName="logical_flow">
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180718-3286-2"
+               author="kamransaleem">
+        <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
+
+        <sql>
+            UPDATE logical_flow
+            SET entity_lifecycle_status = 'REMOVED'
+            WHERE is_removed = 1
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180718-3286-3"
+               author="kamransaleem">
+        <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
+
+        <dropDefaultValue tableName="logical_flow"
+                          columnDataType="bit"
+                          columnName="is_removed" />
+
+        <dropColumn tableName="logical_flow"
+                    columnName="is_removed" />
+    </changeSet>
+
 
 </databaseChangeLog>

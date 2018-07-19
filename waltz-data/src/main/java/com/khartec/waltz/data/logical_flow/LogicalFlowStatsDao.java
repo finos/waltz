@@ -44,8 +44,8 @@ import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.safeGet;
-import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -66,7 +66,7 @@ public class LogicalFlowStatsDao {
             lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
                 .and(lf.TARGET_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name())));
 
-    private static final Condition NOT_REMOVED = lf.IS_REMOVED.isFalse();
+    private static final Condition NOT_REMOVED = lf.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
     private final DBExecutorPoolInterface dbExecutorPool;
 

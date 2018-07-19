@@ -21,6 +21,7 @@ package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
@@ -43,9 +44,12 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -84,7 +88,7 @@ public class LogicalFlowDao {
                         .id(record.getTargetEntityId())
                         .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
                         .build())
-                .isRemoved(record.getIsRemoved())
+                .entityLifecycleStatus(readEnum(record.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
@@ -105,12 +109,12 @@ public class LogicalFlowDao {
         record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
         record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setProvenance(flow.provenance());
-        record.setIsRemoved(flow.isRemoved());
+        record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
         return record;
     };
 
 
-    public static final Condition NOT_REMOVED = LOGICAL_FLOW.IS_REMOVED.isFalse();
+    public static final Condition NOT_REMOVED = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
 
     private final DSLContext dsl;
@@ -182,7 +186,7 @@ public class LogicalFlowDao {
 
     public int removeFlow(Long flowId, String user) {
         return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, true)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, REMOVED.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, user)
                 .where(LOGICAL_FLOW.ID.eq(flowId))
@@ -208,7 +212,7 @@ public class LogicalFlowDao {
                 .stream()
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.IS_REMOVED.eq(true)))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
                 .reduce((a, b) -> a.or(b))
                 .get();
 
@@ -252,7 +256,7 @@ public class LogicalFlowDao {
      */
     private boolean restoreFlow(LogicalFlow flow, String username) {
         return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, false)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
@@ -266,7 +270,7 @@ public class LogicalFlowDao {
     public boolean restoreFlow(long logicalFlowId, String username) {
         return dsl
                 .update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, false)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(LOGICAL_FLOW.ID.eq(logicalFlowId))
@@ -283,12 +287,12 @@ public class LogicalFlowDao {
                 .stream()
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.IS_REMOVED.eq(true)))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
                 .reduce((a, b) -> a.or(b))
                 .get();
 
         return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, false)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
                 .where(condition)
@@ -331,7 +335,7 @@ public class LogicalFlowDao {
         Condition targetAppNotFound = LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.notIn(appIds));
 
-        Condition notRemoved = LOGICAL_FLOW.IS_REMOVED.eq(false);
+        Condition notRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
         Condition requiringCleanup = notRemoved
                 .and(sourceAppNotFound.or(targetAppNotFound));
@@ -345,7 +349,7 @@ public class LogicalFlowDao {
 
         return dsl
                 .update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, true)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, REMOVED.name())
                 .where(requiringCleanup)
                 .execute();
     }
@@ -356,7 +360,7 @@ public class LogicalFlowDao {
         Condition selfReferencing = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(LOGICAL_FLOW.TARGET_ENTITY_KIND));
 
-        Condition notRemoved = LOGICAL_FLOW.IS_REMOVED.eq(false);
+        Condition notRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
         Condition requiringCleanup = notRemoved
                 .and(selfReferencing);
@@ -370,7 +374,7 @@ public class LogicalFlowDao {
 
         return dsl
                 .update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.IS_REMOVED, true)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, REMOVED.name())
                 .where(requiringCleanup)
                 .execute();
     }

@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+
 /**
  * An example of a report showing logical flows,
  * alongside authoritativeness, LDE mappings and OLA bookmarks
@@ -83,7 +85,7 @@ public class FlowSummaryExport {
                     .on(logFlow.SOURCE_ENTITY_ID.eq(src.ID))
                 .innerJoin(trg)
                     .on(logFlow.TARGET_ENTITY_ID.eq(trg.ID))
-                .where(logFlow.IS_REMOVED.isFalse()
+                .where(logFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
                     .and(src.IS_REMOVED.isFalse())
                     .and(trg.IS_REMOVED.isFalse()))
                 .fetch()
@@ -119,7 +121,7 @@ public class FlowSummaryExport {
                 .innerJoin(field)
                 .on(field.SPEC_DEFN_ID.eq(physFlow.SPECIFICATION_DEFINITION_ID))
                 .where(field.LOGICAL_DATA_ELEMENT_ID.isNotNull())
-                .andNot(logFlow.IS_REMOVED)
+                .and(logFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                 .fetch(logFlow.ID)
                 .stream()
                 .collect(Collectors.toSet());
@@ -139,7 +141,7 @@ public class FlowSummaryExport {
                     .on(bk.PARENT_ID.eq(physFlow.ID)
                         .and(bk.PARENT_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
                 .where(bk.KIND.eq("OLA"))
-                .andNot(logFlow.IS_REMOVED)
+                .and(logFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                 .fetch(logFlow.ID)
                 .stream()
                 .collect(Collectors.toSet());
