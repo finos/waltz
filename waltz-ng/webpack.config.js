@@ -17,10 +17,14 @@ module.exports = {
         filename: '[name].js'
     },
     mode: 'development',
-    devtool: 'inline-source-map',
+    // devtool: 'inline-source-map',
+    devtool: 'cheap-module-eval-source-map',
     devServer: {
         contentBase: './dist',
         disableHostCheck: true
+    },
+    resolve: {
+        symlinks: false
     },
     optimization: {
         splitChunks: {
@@ -67,7 +71,16 @@ module.exports = {
                 exclude: /node_modules/
             }, {
                 test: /\.scss$/,
-                use: ['style-loader', 'css-loader', 'sass-loader']
+                use: [
+                    {
+                        loader: 'thread-loader',
+                        options: {
+                            workerParallelJobs: 2
+                        }
+                    },
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader']
             }, {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
@@ -86,6 +99,7 @@ module.exports = {
                 }
             }, {
                 test: /\.html?$/,
+                exclude: /node_modules/,
                 loader: 'html-loader'
             }, {
                 test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/,
