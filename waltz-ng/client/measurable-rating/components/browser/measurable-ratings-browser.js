@@ -85,25 +85,27 @@ function prepareTreeData(data = []) {
 
 function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) {
     const measurablesByCategory = _.groupBy(measurables, 'categoryId');
+    return _
+        .chain(categories)
+        .filter(category => _.get(measurablesByCategory, category.id, []).length > 0)
+        .map(category => {
+            const measurablesForCategory = measurablesByCategory[category.id];
+            const treeData = prepareTreeData(measurablesForCategory);
+            const maxSize = _.chain(treeData)
+                .map('totalRatings.total')
+                .max()
+                .value();
 
-    const tabs = _.map(categories, category => {
-        const measurablesForCategory = measurablesByCategory[category.id];
-        const treeData = prepareTreeData(measurablesForCategory);
-        const maxSize = _.chain(treeData)
-            .map('totalRatings.total')
-            .max()
-            .value();
-
-        return {
-            category,
-            ratingScheme: ratingSchemesById[category.ratingSchemeId],
-            treeData,
-            maxSize,
-            expandedNodes: []
-        };
-    });
-
-    return _.sortBy(tabs, 'category.name');
+            return {
+                category,
+                ratingScheme: ratingSchemesById[category.ratingSchemeId],
+                treeData,
+                maxSize,
+                expandedNodes: []
+            };
+        })
+        .sortBy('category.name')
+        .value();
 }
 
 
@@ -128,8 +130,7 @@ function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
         };
         return acc;
     };
-    const talliesMap = _.reduce(measurables, reducer, {});
-    return talliesMap;
+    return _.reduce(measurables, reducer, {});
 }
 
 
@@ -160,7 +161,6 @@ function controller(serviceBroker) {
             _.isEmpty(vm.ratingTallies) ||
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
-            return;
         } else {
             vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
             vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
