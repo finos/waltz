@@ -11,10 +11,11 @@ __ratings__ with optional comments.
 
 ## Model
 
-![Schema Diagram](measurables_schema.png)
+![Schema Diagram](images/measurables_schema.png)
 [Source](https://app.quickdatabasediagrams.com/#/schema/rpoddJhDW0WTKzJiBz80Kw)
 
 
 ## Updating
 
-If the measuables are changed then remember to rebuild the hierarchy  (Profile > System Admin > Hierarchy Maintenance)
+If the measurables are changed then remember to rebuild the 
+measurable hierarchy  (Profile > System Admin > Hierarchy Maintenance)
