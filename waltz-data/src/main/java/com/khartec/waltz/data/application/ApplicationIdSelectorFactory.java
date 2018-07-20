@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
@@ -128,14 +129,14 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .where(logicalFlow.TARGET_ENTITY_ID.eq(actorId)
                         .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                         .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(logicalFlow.IS_REMOVED.isFalse()));
+                        .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())));
 
         Select<Record1<Long>> targetAppIds = DSL.select(logicalFlow.TARGET_ENTITY_ID)
                 .from(logicalFlow)
                 .where(logicalFlow.SOURCE_ENTITY_ID.eq(actorId)
                         .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                         .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(logicalFlow.IS_REMOVED.isFalse()));
+                        .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())));
 
         return sourceAppIds
                 .union(targetAppIds);

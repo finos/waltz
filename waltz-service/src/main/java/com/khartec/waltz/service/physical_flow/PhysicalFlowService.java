@@ -302,9 +302,9 @@ public class PhysicalFlowService {
         if (logicalFlow == null) {
             throw new IllegalArgumentException("Unknown logical flow: " + logicalFlowId);
         } else {
-            if (logicalFlow.isRemoved()) {
+            if (logicalFlow.entityLifecycleStatus().equals(EntityLifecycleStatus.REMOVED)) {
                 logicalFlowService.restoreFlow(logicalFlowId, username);
-                return ImmutableLogicalFlow.copyOf(logicalFlow).withIsRemoved(false);
+                return ImmutableLogicalFlow.copyOf(logicalFlow).withEntityLifecycleStatus(EntityLifecycleStatus.ACTIVE);
             }
         }
         return logicalFlow;

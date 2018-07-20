@@ -39,6 +39,7 @@ const initialState = {
         layers: {
             flowBuckets: true,
             annotations: true,
+            pendingFlows: true,
             removedFlows: true
         }
     },

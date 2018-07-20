@@ -33,6 +33,7 @@ import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -84,7 +85,7 @@ public class DataExtractHarness {
                 .leftJoin(targetOrgUnit).on(targetApp.ORGANISATIONAL_UNIT_ID.eq(targetOrgUnit.ID))
                 .join(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID).and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq("DATA_TYPE")))
                 .where(LOGICAL_FLOW.ID.in(flowIdSelector))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())
+                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                 .fetch();
 
         System.out.printf("got records: %s", fetch.size());

@@ -21,7 +21,6 @@ package com.khartec.waltz.data.orphan;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
@@ -36,6 +35,7 @@ import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -193,7 +193,7 @@ public class OrphanDao {
                                 select(APPLICATION.ID)
                                         .from(APPLICATION)
                                         .where(IS_ACTIVE)))
-                        .and(LOGICAL_FLOW.IS_REMOVED.eq(false))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                         .and(kindField.eq(EntityKind.APPLICATION.name()));
 
         return dsl.selectFrom(queryFactory.apply(LOGICAL_FLOW.SOURCE_ENTITY_KIND, LOGICAL_FLOW.SOURCE_ENTITY_ID).asTable())
@@ -219,7 +219,7 @@ public class OrphanDao {
                             .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
                     .and(APPLICATION.ID.isNull()
-                        .or(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.REMOVED.name()))
+                        .or(APPLICATION.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name()))
                         .or(APPLICATION.IS_REMOVED.eq(true)))
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(mkRef(EntityKind.ATTESTATION, r.value1()))
@@ -232,7 +232,7 @@ public class OrphanDao {
     public List<OrphanRelationship> findOrphanPhysicalFlows() {
         Select<Record1<Long>> allLogicalFlowIds = DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
-                .where(LOGICAL_FLOW.IS_REMOVED.eq(false));
+                .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
         Select<Record1<Long>> allPhysicalSpecs = DSL.select(PHYSICAL_SPECIFICATION.ID)
                 .from(PHYSICAL_SPECIFICATION)

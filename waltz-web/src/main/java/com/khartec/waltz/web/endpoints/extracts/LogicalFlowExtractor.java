@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -151,7 +152,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                 .join(ENUM_VALUE)
                     .on(ENUM_VALUE.KEY.eq(LOGICAL_FLOW_DECORATOR.RATING)
                             .and(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")))
-                .where(LOGICAL_FLOW.IS_REMOVED.isFalse())
+                .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()))
                 .fetch();

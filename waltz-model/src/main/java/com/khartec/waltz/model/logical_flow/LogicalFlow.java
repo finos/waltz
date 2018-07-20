@@ -33,7 +33,7 @@ public abstract class LogicalFlow implements
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
-        IsRemovedProvider {
+        EntityLifecycleStatusProvider {
 
     public abstract EntityReference source();
     public abstract EntityReference target();

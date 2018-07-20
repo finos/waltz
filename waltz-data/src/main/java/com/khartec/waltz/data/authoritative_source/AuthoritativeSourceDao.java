@@ -43,6 +43,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
@@ -242,7 +243,7 @@ public class AuthoritativeSourceDao {
         Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .and(AUTHORITATIVE_SOURCE.DATA_TYPE.in(dataTypeCodeSelector))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
+                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
         Field<Long> authSourceIdField = AUTHORITATIVE_SOURCE.ID.as("auth_source_id");
         Field<Long> applicationIdField = APPLICATION.ID.as("application_id");
@@ -321,7 +322,7 @@ public class AuthoritativeSourceDao {
 
 
     public List<NonAuthoritativeSource> findNonAuthSources(Condition customSelectionCriteria) {
-        Condition flowNotRemoved = LOGICAL_FLOW.IS_REMOVED.isFalse();
+        Condition flowNotRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
         Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
         Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
         Condition decorationIsAboutDataTypes = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name());
@@ -370,7 +371,7 @@ public class AuthoritativeSourceDao {
                     .innerJoin(LOGICAL_FLOW)
                     .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID)
                             .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(LOGICAL_FLOW.IS_REMOVED.isFalse()))
+                            .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
                     .innerJoin(CONSUMER_APP)
                     .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
                             .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))

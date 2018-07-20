@@ -46,6 +46,12 @@
                                   on-toggle="ctrl.toggleLayer('flowBuckets')">
                     </waltz-toggle>
                     <waltz-toggle style='display:block'
+                                  label-on="Pending Flows"
+                                  label-off="Pending Flows"
+                                  state="ctrl.visibility.layers.pendingFlows"
+                                  on-toggle="ctrl.toggleLayer('pendingFlows')">
+                    </waltz-toggle>
+                    <waltz-toggle style='display:block'
                                   label-on="Removed Flows"
                                   label-off="Removed Flows"
                                   state="ctrl.visibility.layers.removedFlows"

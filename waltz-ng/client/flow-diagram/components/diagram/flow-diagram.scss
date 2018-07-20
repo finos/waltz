@@ -1,8 +1,39 @@
 @import "../../../../style/variables";
 
-
 $annotation-color: #a4a2a6;
 $flow-color: #8d8899;
+$flow-color-pending: lighten($waltz-blue, 20);
+
+@mixin wfd-flow($state, $color) {
+    .wfd-flow-#{$state} {
+        .wfd-flow-arrow {
+            stroke: $color;
+            stroke-dasharray: 1 4;
+        }
+
+        .wfd-flow-arrow-head {
+            stroke-dasharray: 2;
+            stroke: $color;
+            fill: lighten($color, 30);
+        }
+
+        .wfd-flow-bucket {
+            fill: #{$color};
+
+            circle {
+                fill: #fff;
+                stroke: $color;
+                stroke-dasharray: 2;
+            }
+
+            &:hover circle {
+                stroke-opacity: 1;
+                stroke: $color;
+                cursor: pointer;
+            }
+        }
+    }
+}
 
 
 .waltz-flow-diagram {
@@ -28,36 +59,8 @@ $flow-color: #8d8899;
         fill: #ccc;
     }
 
-
-    .wfd-flow-removed {
-        .wfd-flow-arrow {
-            stroke: $flow-color;
-            stroke-dasharray: 1 4;
-        }
-
-        .wfd-flow-arrow-head {
-            stroke-dasharray: 2;
-            stroke: $flow-color;
-            fill: lighten($flow-color, 30);
-        }
-
-        .wfd-flow-bucket {
-            fill: $flow-color;
-
-            circle {
-                fill: #fff;
-                stroke: #ccc;
-                stroke-dasharray: 2;
-            }
-
-            &:hover circle {
-                stroke-opacity: 1;
-                stroke: $flow-color;
-                cursor: pointer;
-            }
-        }
-    }
-
+    @include wfd-flow('removed', $flow-color);
+    @include wfd-flow('pending', $flow-color-pending);
 
     .wfd-node {
         @extend .no-text-select;
