@@ -10,7 +10,7 @@ Example categories are:
 
 | Functions | Products |
 | :---: | :---: |
-| ![Function viewpoint](functions.png) | ![Product viewpoint](products.png) |
+| ![Function viewpoint](images/functions.png) | ![Product viewpoint](images/products.png) |
 
 
 
@@ -50,7 +50,7 @@ For example here are the _functions_ and _products_ for the application `Verifle
 
 | Functions | Products |
 | :---: | :---: |
-| ![Function ratings](veriflex-functions.png) | ![Product ratings](veriflex-products.png) |
+| ![Function ratings](images/veriflex-functions.png) | ![Product ratings](veriflex-products.png) |
 
 
 
@@ -81,7 +81,7 @@ defined (though is typically left with the default, `Relates To`)
  Within the Waltz user interface these relationships are depicted using the 'spindle' diagram, as shown 
  below for `Compliance Services`:
  
- ![Compliance Spindle](spindle-compliance.png)
+ ![Compliance Spindle](images/spindle-compliance.png)
  
    
  In this diagram we have filtered on related `Regulations` and selected `BCBS239`.  Note that these relationships 
@@ -100,10 +100,10 @@ viewpoints to....
  
 | Relationship | Description | Example |
 | :---: | :---: | :---: |
-| People | via roles. e.g. _Compliance_ could have a _Data Owner_ associated with it| ![People](people.png) |	
-| Bookmarks |	External documentation/resources | ![Bookmarks](bookmarks.png) |	
-| Application groups | custom groups, visualised via the spindle | ![AppGroup Spindle](spindle-app-groups.png) |	
-| Flow diagrams | Diagrams showing a particular data flow. Each flow effectively becomes a custom application group.| ![Flow diagram](flow-diagram-compliance.png) |	
+| People | via roles. e.g. _Compliance_ could have a _Data Owner_ associated with it| ![People](images/people.png) |	
+| Bookmarks |	External documentation/resources | ![Bookmarks](images/bookmarks.png) |	
+| Application groups | custom groups, visualised via the spindle | ![AppGroup Spindle](images/spindle-app-groups.png) |	
+| Flow diagrams | Diagrams showing a particular data flow. Each flow effectively becomes a custom application group.| ![Flow diagram](images/flow-diagram-compliance.png) |	
 
 It is worth discussing the final two categories (groups and diagrams) in more detail as they may allow 
 for more detailed modelling of a problem space.  An application group is simply a collection of applications, 
