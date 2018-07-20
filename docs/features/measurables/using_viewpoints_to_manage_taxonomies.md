@@ -55,7 +55,7 @@ For example here are the _functions_ and _products_ for the application `Verifle
 
 
 
-####Rating Limitations
+#### Rating Limitations
 
 - As these ratings are stored as simple relationships it is **not possible to state more complex expressions**.
     - For example we could **not** say the this application **does not** perform the function `Compliance Services` for 
