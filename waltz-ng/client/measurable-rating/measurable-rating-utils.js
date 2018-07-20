@@ -22,28 +22,29 @@ import _ from "lodash";
 export function mkTabs(categories = [],
                        ratingSchemesById = {},
                        measurables = [],
-                       ratings = []) {
+                       ratings = [],
+                       includeEmpty = true) {
 
     const measurablesByCategory = _.groupBy(measurables, 'categoryId');
 
-    const tabs = _.map(categories, category => {
-        const measurablesForCategory = measurablesByCategory[category.id] || [];
-        const measurableIds = _.map(measurablesForCategory, 'id');
-        const ratingsForCategory = _.filter(
-            ratings,
-            r => _.includes(measurableIds, r.measurableId));
-        const ratingScheme = ratingSchemesById[category.ratingSchemeId];
-        return {
-            category,
-            ratingScheme,
-            measurables: measurablesForCategory,
-            ratings: ratingsForCategory
-        };
-    });
-
-    return _.sortBy(
-        tabs,
-        g => g.category.name);
+    return _.chain(categories)
+        .map(category => {
+            const measurablesForCategory = measurablesByCategory[category.id] || [];
+            const measurableIds = _.map(measurablesForCategory, 'id');
+            const ratingsForCategory = _.filter(
+                ratings,
+                r => _.includes(measurableIds, r.measurableId));
+            const ratingScheme = ratingSchemesById[category.ratingSchemeId];
+            return {
+                category,
+                ratingScheme,
+                measurables: measurablesForCategory,
+                ratings: ratingsForCategory
+            };
+        })
+        .filter(t => t.ratings.length > 0 || includeEmpty)
+        .sortBy(tab => tab.category.name)
+        .value();
 }
 
 
