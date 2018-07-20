@@ -23,7 +23,6 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -32,10 +31,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.EntityLifecycleStatusUtils.convertToIsRemovedFlags;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -104,7 +101,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(LOGICAL_FLOW.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()))
-                .and(mkLogicalFlowRemovedCondition(options.entityLifecycleStatuses()));
+                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.in(map(options.entityLifecycleStatuses(), e -> e.name())));
     }
 
 
@@ -148,8 +145,4 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
     }
 
-
-    private Condition mkLogicalFlowRemovedCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
-        return LOGICAL_FLOW.IS_REMOVED.in(convertToIsRemovedFlags(entityLifecycleStatuses));
-    }
 }

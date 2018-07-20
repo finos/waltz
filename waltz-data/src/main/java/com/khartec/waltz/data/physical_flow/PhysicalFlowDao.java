@@ -39,6 +39,7 @@ import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
@@ -159,7 +160,7 @@ public class PhysicalFlowDao {
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
+                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
         Condition specMatch = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id())
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
@@ -270,7 +271,7 @@ public class PhysicalFlowDao {
     public int cleanupOrphans() {
         Select<Record1<Long>> allLogicalFlowIds = DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
-                .where(LOGICAL_FLOW.IS_REMOVED.eq(false));
+                .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
         Select<Record1<Long>> allPhysicalSpecs = DSL.select(PHYSICAL_SPECIFICATION.ID)
                 .from(PHYSICAL_SPECIFICATION)
@@ -340,7 +341,7 @@ public class PhysicalFlowDao {
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(consumer.kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
+                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
         return dsl
                 .select(PHYSICAL_FLOW.fields())

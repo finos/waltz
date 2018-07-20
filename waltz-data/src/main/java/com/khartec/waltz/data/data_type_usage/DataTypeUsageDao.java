@@ -45,8 +45,9 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
@@ -63,7 +64,7 @@ public class DataTypeUsageDao {
     private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
     private final com.khartec.waltz.schema.tables.Actor actor = ACTOR.as("actor");
-    private final Condition NOT_REMOVED = lf.IS_REMOVED.isFalse();
+    private final Condition NOT_REMOVED = lf.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
 
