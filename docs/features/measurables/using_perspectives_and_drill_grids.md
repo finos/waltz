@@ -1,3 +1,5 @@
+# Using Perspectives and Drill Grids
+
 This document addresses how two features in Waltz may be used to facilitate a better understanding of the 
 data within Waltz.
 
