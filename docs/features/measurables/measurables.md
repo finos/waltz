@@ -7,7 +7,8 @@ Measurables are hierarchical and are split into configurable __categories__.
 Applications can be associated to many measurables and given individual _RAG_ 
 __ratings__ with optional comments.
   
-
+- [Viewpoints](using_viewpoints_to_manage_taxonomies.md)
+- [Perspectives / Drill Grids](using_perspectives_and_drill_grids.md)
 
 ## Model
 
@@ -19,3 +20,6 @@ __ratings__ with optional comments.
 
 If the measurables are changed then remember to rebuild the 
 measurable hierarchy  (Profile > System Admin > Hierarchy Maintenance)
+
+---
+[Back to ToC](../README.md)
