@@ -1,5 +1,8 @@
 # Using Waltz Viewpoints to manage taxonomies
 
+Viewpoints are used to model taxonomies within Waltz.  These taxonomies are defined by the 
+customer and elements within these taxonomies are used to describe the overall enterprise landscape.
+
 
 ## Viewpoints
 
@@ -118,3 +121,6 @@ Spanish citizens", in this case the data in Waltz held against the viewpoints co
 quickly **narrow the problem space** to a discrete set of applications and a flow diagram could be 
 drawn.  Additional information could be gathered by targeting **surveys** against either the resultant 
 groups or against relevant viewpoints.
+
+---
+[Back to measurables](measurables.md)
