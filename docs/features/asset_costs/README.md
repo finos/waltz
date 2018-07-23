@@ -22,18 +22,8 @@
 
 #### Column: `kind`
 
-Current valid options:
-
-|Value|Meaning|
-| --- | --- |
-| APPLICATION_DEVELOPMENT | Application Development |
-| INFRASTRUCTURE | Infrastructure | 
-| PEOPLE | People Costs |
-| CUMULATIVE | Cumulative |
-| OTHER | Other |
-
-These currency sot kinds will be user definable in an upcoming release 
-( [Github issue](https://github.com/khartec/waltz/issues/2530) )
+The kind of a cost can be configured at a system level via the `enum_value` table.  See the 
+section entitled 'configuration'.
 
 
 #### Column: `currency`
@@ -50,6 +40,20 @@ INSERT INTO settings (name, value, restricted)
 ```
 
 If not set it default to `EUR`.
+
+### Configuration
+
+Asset Cost kinds are are stored in the enum_value table against the `CostKind` type.
+
+e.g.
+
+| Type | Key | DisplayName | Description |
+| --- | --- | --- | --- |
+| CostKind | APPLICATION_DEVELOPMENT | Application Development | ... |
+| CostKind | INFRASTRUCTURE | Infrastructure | ... |
+| CostKind | PEOPLE | People Costs | ... |
+| CostKind | CUMULATIVE | Cumulative | ... |
+| CostKind | OTHER | Other | ... |
 
 
 ### Expected Future Changes
