@@ -23,9 +23,10 @@
 #### Column: `kind`
 
 Current valid options:
+
 |Value|Meaning|
-|---|---|
-|APPLICATION_DEVELOPMENT | Application Development |
+| --- | --- |
+| APPLICATION_DEVELOPMENT | Application Development |
 | INFRASTRUCTURE | Infrastructure | 
 | PEOPLE | People Costs |
 | CUMULATIVE | Cumulative |
