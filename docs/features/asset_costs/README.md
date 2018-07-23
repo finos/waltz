@@ -16,34 +16,15 @@
 | year | year the cost relates to | `2017` |
 | kind | type of the cost (see below) | `INFRASTRUCTURE` |
 | amount | (decimal 10,2) amount |  `100.99` |
-| currency | no longer used (see below) | `USD` |
 | provenance | where this data came from  | `aptio` |
 
 
-#### Column: `kind`
-
-The kind of a cost can be configured at a system level via the `enum_value` table.  See the 
-section entitled 'configuration'.
-
-
-#### Column: `currency`
-
-Waltz has recently (1.6) implemented a change which introduced a system level 
-currency.  This has removed the need fo the column in this table and is scheduled
-for removal in version 1.7  ( [Github issue](https://github.com/khartec/waltz/issues/2529))
-
-The system property can be defined in the settings table, similar to:
-
-```
-INSERT INTO settings (name, value, restricted) 
-  VALUES ('settings.asset-cost.default-currency', 'USD', false);
-```
-
-If not set it default to `EUR`.
 
 ### Configuration
 
-Asset Cost kinds are are stored in the enum_value table against the `CostKind` type.
+#### Kind
+
+The kind of a cost can be configured at a system level via the `enum_value` table. .
 
 e.g.
 
@@ -55,12 +36,19 @@ e.g.
 | CostKind | CUMULATIVE | Cumulative | ... |
 | CostKind | OTHER | Other | ... |
 
+#### Currency
 
-### Expected Future Changes
+Waltz stores currency as a system wide property.  Waltz does **not** intend to support 
+multi-currency in the near future.
 
-- migrate `asset_cost.asset_code` to a standard entity reference (kind & id)
-- drop `asset_cost.currency` and rely on system default currency instead
-- change `asset_cost.kind` to be defined by system admins (via `entity_enum`)
+The system property can be defined in the `settings` table, similar to:
+
+```
+INSERT INTO settings (name, value, restricted) 
+  VALUES ('settings.asset-cost.default-currency', 'USD', false);
+```
+
+If not set it default to `EUR`.
 
 
 
