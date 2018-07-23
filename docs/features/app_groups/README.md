@@ -17,7 +17,7 @@ group at any time.
 ## Model
 
 
-![Schema Diagram](app_groups_schema.png)
+![Schema Diagram](images/app_groups_schema.png)
 
 [Source](https://app.quickdatabasediagrams.com/#/schema/zc5QN1v4SEeBez8OnMJyRQ)
 
@@ -42,3 +42,5 @@ It is anticipated that additional roles will be added to groups in subsequent
 releases.
 
 
+---
+[Back to ToC](../README.md)

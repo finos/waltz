@@ -12,9 +12,13 @@ for the attestation is derived from a Waltz selection mechanism
 (e.g. apps under a specific organisational unit, apps performing
 a specific function etc.).
 
-![Screenshot](attestation_screenshot.png)
+![Screenshot](images/attestation_screenshot.png)
 
 
 ## Model
 
-![Schema Diagram](attestation_schema.png)
+![Schema Diagram](images/attestation_schema.png)
+
+
+---
+[Back to ToC](../README.md)

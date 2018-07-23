@@ -6,7 +6,7 @@ Physical flows describe what, when and how information is transferred over logic
 
 ## Model
 
-![Schema Diagram](physical_flows_schema.png)
+![Schema Diagram](images/physical_flows_schema.png)
 [Source](https://app.quickdatabasediagrams.com/#/schema/-wUbwXJBLUa_nILyAasDBA)
 
 The physical flow data model is comprised of several parts:
@@ -27,3 +27,7 @@ The physical flow data model is comprised of several parts:
 - Physical Flow transport
 - Logical flow id 
                 
+                
+
+---
+[Back to ToC](../README.md)

@@ -54,4 +54,8 @@ references which have been flagged as notable.
 `FLOW_DIAGRAM_ANNOTATION` contains all notes attached to the diagram.  Each note is 
 associated to a specific entity.  It's location in the position map (in the JSON obj) 
 is expressed in terms of deltas (`dx` & `dy`) therefore the annotations position is 
-relative to the annotations subject (the entity). 
+relative to the annotations subject (the entity).
+
+
+---
+[Back to ToC](../README.md) 
