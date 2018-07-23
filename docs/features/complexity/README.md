@@ -54,3 +54,7 @@ Valid complexity kinds:
 
 Plan is to allow for custom complexity kinds to be introduced an provide a simple 
 way for developers to plug in their own calculators.
+
+
+---
+[Back to ToC](../README.md)

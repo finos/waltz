@@ -5,7 +5,7 @@ Logical flows represent the existance of a data flow between two entities  (curr
 
 ## Model
 
-![Schema Diagram](logical_flows_schema.png)
+![Schema Diagram](images/logical_flows_schema.png)
 [Source](https://app.quickdatabasediagrams.com/#/schema/v2wanPo1hUWpGz0Uk9j2Jg)
 
 ### Logical FLow
@@ -33,3 +33,7 @@ Logical flows represent the existance of a data flow between two entities  (curr
 |`last_updated_at`|Date||
 |`last_updated_by`|String||
 |`provenance`|String|Where the information about this flow originated|
+
+
+---
+[Back to ToC](../README.md)
