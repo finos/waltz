@@ -129,6 +129,7 @@
         </sql>
     </changeSet>
 
+    <!-- TODO: enable before release 
     <changeSet id="20180718-3286-3"
                author="kamransaleem">
         <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
@@ -140,6 +141,7 @@
         <dropColumn tableName="logical_flow"
                     columnName="is_removed" />
     </changeSet>
+    -->
 
 
 </databaseChangeLog>
