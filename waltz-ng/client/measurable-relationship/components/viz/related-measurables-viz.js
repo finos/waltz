@@ -315,6 +315,10 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
 
             return {
                 id,
+                ref: {
+                    id: c.id,
+                    kind: c.kind
+                },
                 name: c.name,
                 relationshipFilter: filter,
                 count: countsById[id] || 0,
