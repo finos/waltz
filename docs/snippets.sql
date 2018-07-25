@@ -22,6 +22,12 @@ WHERE
   m.measurable_kind = 'PROCESS'
 ;
 
+-- update parent id's based on external parent ids
+UPDATE child
+SET child.parent_id = parent.id
+FROM measurable AS child
+  INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
+WHERE child.measurable_category_id = 12;
 
 
 --[SURVEYS]---

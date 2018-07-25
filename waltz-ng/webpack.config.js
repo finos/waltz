@@ -23,6 +23,10 @@ module.exports = {
         contentBase: './dist',
         disableHostCheck: true
     },
+    watchOptions: {
+        aggregateTimeout: 800,
+        poll: 1000
+    },
     resolve: {
         symlinks: false
     },

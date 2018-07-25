@@ -57,6 +57,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .concrete(r.getConcrete())
                 .description(r.getDescription())
                 .externalId(ofNullable(r.getExternalId()))
+                .externalParentId(ofNullable(r.getExternalParentId()))
                 .provenance(r.getProvenance())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
