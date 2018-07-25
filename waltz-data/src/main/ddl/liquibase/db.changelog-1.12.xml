@@ -129,7 +129,6 @@
         </sql>
     </changeSet>
 
-    <!-- TODO: enable before release 
     <changeSet id="20180718-3286-3"
                author="kamransaleem">
         <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
@@ -141,7 +140,18 @@
         <dropColumn tableName="logical_flow"
                     columnName="is_removed" />
     </changeSet>
-    -->
 
+
+    <!-- Add external_parent_id to measurable and a util to then populate parent_id's #3299 -->
+    <changeSet id="20180724-3299-1"
+               author="davidwatkins73">
+        <comment>Add external_parent_id to measurable and a util to then populate parent_id's #3299</comment>
+        <addColumn tableName="measurable">
+            <column name="external_parent_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
