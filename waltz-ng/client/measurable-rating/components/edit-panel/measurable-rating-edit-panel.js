@@ -22,14 +22,15 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import {mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: '<',
+    startingCategoryId: '<'
 };
 
 
@@ -50,7 +51,10 @@ const initialState = {
     ratingItemsBySchemeIdByCode: {},
     tabs: [],
     saveInProgress: false,
+    startingCategoryId: 0,
+    unusedCategories: [],
     visibility: {
+        showAllCategories: false,
         tab: null
     }
 };
@@ -67,6 +71,17 @@ function controller($q,
         loadData(true);
     };
 
+
+    const recalcTabs = function () {
+        vm.tabs = mkTabs(
+            vm.categories,
+            vm.ratingSchemesById,
+            vm.measurables,
+            vm.ratings,
+            vm.visibility.showAllCategories);
+
+        vm.hasHiddenTabs = vm.categories.length != vm.tabs.length;
+    };
 
     const loadData = (force) => {
         // -- LOAD ---
@@ -96,9 +111,8 @@ function controller($q,
 
         $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
             .then(() => {
-                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
-                const startingTab = determineStartingTab(vm.tabs);
-                vm.onTabChange(startingTab.category.id);
+                recalcTabs();
+                vm.onTabChange(vm.startingCategoryId);
             });
 
         serviceBroker
@@ -133,7 +147,7 @@ function controller($q,
 
         return savePromise
             .then(rs => vm.ratings = rs)
-            .then(() => vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings))
+            .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
                 const newRating = { rating, description, plannedDate };
@@ -222,6 +236,11 @@ function controller($q,
             ratingScheme.ratings,
             vm.onRatingSelect,
             vm.doCancel);
+    };
+
+    vm.onShowAllTabs = () => {
+        vm.visibility.showAllCategories = true;
+        recalcTabs();
     };
 
     vm.getNeedsPlannedDate = (ratingSchemeId, ratingCode) => {

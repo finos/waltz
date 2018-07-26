@@ -112,7 +112,12 @@ function controller($q, serviceBroker) {
 
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
-                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
+                vm.tabs = mkTabs(
+                    vm.categories,
+                    vm.ratingSchemesById,
+                    vm.measurables,
+                    vm.ratings,
+                    false /*include empty */);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });

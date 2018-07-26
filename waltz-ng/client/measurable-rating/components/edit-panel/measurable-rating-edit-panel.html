@@ -183,6 +183,7 @@
     <div class="col-sm-8">
         <div class="waltz-tabs">
             <!-- TAB HEADERS -->
+            <!-- CATEGORIES -->
             <input type="radio"
                    ng-change="$ctrl.onTabChange(tab.category.id)"
                    ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
@@ -193,14 +194,31 @@
                    id="{{ tab.category.id + '_' + $id }}">
             <label for="{{ tab.category.id + '_' + $id }}"
                    ng-repeat-end>
-                            <span ng-bind="tab.category.name"
-                                  ng-class="{ italics: tab.ratings.length == 0 }"></span>
+                <span ng-bind="tab.category.name"
+                      ng-class="{ italics: tab.ratings.length == 0 }">
+                </span>
                 <span ng-show='tab.ratings.length > 0'
                       class="small text-muted">
-                                -
-                                <span ng-bind="tab.ratings.length"></span>
-                            </span>
+                    -
+                    <span ng-bind="tab.ratings.length"></span>
+                </span>
             </label>
+
+
+            <!-- SHOW ALL CATEGORIES -->
+            <span ng-if="$ctrl.hasHiddenTabs"
+                  ng-click="$ctrl.onShowAllTabs()"
+                  uib-popover="Unused categories (those with no mappings to this entity) are hidden by default.  Click here to show them."
+                  popover-append-to-body="true"
+                  popover-popup-delay="300"
+                  popover-trigger="mouseenter"
+                  style="padding: 5px 10px;
+                         display: block;
+                         float: left;
+                         cursor: pointer;">
+                <waltz-icon name="plus"></waltz-icon>
+                Show all categories
+            </span>
 
             <!-- TAB CONTENT -->
             <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"
