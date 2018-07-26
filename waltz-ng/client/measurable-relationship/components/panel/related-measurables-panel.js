@@ -47,8 +47,13 @@ const initialState = {
     categories: [],
     measurables: [],
     relationships: [],
+    selectedCategory: null,
+    selectedRow: null,
+    gridData: [],
     visibility: {
         editor: false,
+        detailMode: 'table', // table | tree,
+        detailModeChanger: false,
         createEditor: false,
         updateEditor: false,
     }
@@ -132,16 +137,20 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     // -- INTERACT --
 
+    vm.onChangeDetailMode = (mode) => {
+        vm.visibility.detailMode = mode;
+    };
+
     vm.refresh = ()=> {
         vm.cancelEditor();
         loadRelationships()
             .then(() => {
                 if (vm.selectedRow) {
                     vm.selectedRow = _.find(vm.gridData || [], row => {
-                        const sameSrc = sameRef(vm.selectedRow.a, row.a);
-                        const sameTarg = sameRef(vm.selectedRow.b, row.b);
+                        const sameSource = sameRef(vm.selectedRow.a, row.a);
+                        const sameTarget = sameRef(vm.selectedRow.b, row.b);
                         const sameRelKind = vm.selectedRow.relationship.relationship === row.relationship.relationship;
-                        return sameSrc && sameTarg && sameRelKind;
+                        return sameSource && sameTarget && sameRelKind;
                     });
                 }
             });
@@ -149,6 +158,12 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     vm.selectCategory = (c) => $timeout(() => {
         vm.selectedCategory = c;
+        if (_.get(c, 'ref.kind') === 'MEASURABLE_CATEGORY') {
+            vm.visibility.detailModeChanger = true;
+        } else {
+            vm.visibility.detailMode = 'table';
+            vm.visibility.detailModeChanger = false;
+        }
         vm.selectedRow = null;
         vm.selectionFilterFn = c.relationshipFilter;
         vm.gridData = calcGridData();
@@ -160,6 +175,8 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.selectedRow = null;
         vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
         vm.gridData = calcGridData();
+        vm.visibility.detailMode = 'table';
+        vm.visibility.detailModeChanger = false;
     });
 
     vm.selectRow = (r) => {
