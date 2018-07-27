@@ -211,6 +211,7 @@ public class Main {
         });
 
         before((req, res) -> res.header("Access-Control-Allow-Origin", "*"));
+        before((req, res) -> res.header("Access-Control-Expose-Headers", "*"));
         LOG.info("Enabled CORS");
     }
 

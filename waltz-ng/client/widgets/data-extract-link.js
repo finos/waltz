@@ -20,7 +20,7 @@
 import {downloadFile} from "../common/file-utils";
 import {initialiseData} from "../common/index";
 
-import template from './data-extract-link.html';
+import template from "./data-extract-link.html";
 
 
 const bindings = {
@@ -52,6 +52,16 @@ function calcClasses(styling = 'button') {
 }
 
 
+function getFileNameFromHttpResponse(httpResponse) {
+    var contentDispositionHeader = httpResponse.headers('Content-Disposition');
+    if(!contentDispositionHeader) {
+        return null;
+    }
+    var result = contentDispositionHeader.split(';')[1].trim().split('=')[1];
+    return result.replace(/"/g, '');
+}
+
+
 function controller($http, BaseExtractUrl) {
     const vm = initialiseData(this, initialState);
 
@@ -65,11 +75,11 @@ function controller($http, BaseExtractUrl) {
             case 'GET':
                 return $http
                     .get(vm.url)
-                    .then(r => downloadFile(r.data, vm.filename));
+                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
             case 'POST':
                 return $http
                     .post(vm.url, vm.requestBody)
-                    .then(r => downloadFile(r.data, vm.filename));
+                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
             default:
                 throw 'Unrecognised method: ' + vm.method;
         }
