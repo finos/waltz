@@ -307,6 +307,13 @@ public class LogicalFlowDao {
     }
 
 
+    public List<LogicalFlow> findAllActive() {
+        return baseQuery()
+                .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     @Deprecated
     public List<LogicalFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
@@ -402,4 +409,5 @@ public class LogicalFlowDao {
                 .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
                 .from(LOGICAL_FLOW);
     }
+
 }
