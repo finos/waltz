@@ -43,6 +43,7 @@
         <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.9.0</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
+        <jgrapht.version>1.2.0</jgrapht.version>
         <jool.version>0.9.12</jool.version>
         <junit.version>4.12</junit.version>
         <jwt.version>3.2.0</jwt.version>
@@ -161,6 +162,11 @@
                 <groupId>org.pcollections</groupId>
                 <artifactId>pcollections</artifactId>
                 <version>${pcollections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>${jgrapht.version}</version>
             </dependency>
 
 
