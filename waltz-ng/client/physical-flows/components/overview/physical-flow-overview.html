@@ -1,98 +1,113 @@
-<div class="waltz-physical-flow-overview" xmlns="http://www.w3.org/1999/html">
-    <table>
-        <tr>
-            <td class="wpfo-entity-col wpfo-owning-entity">
-                <div>
-                    <waltz-entity-link entity-ref="$ctrl.logicalFlow.source"></waltz-entity-link>
-                </div>
-            </td>
-            <td class="wpfo-arrow-col">
-                <span>&rarr;</span>
-            </td>
-            <td class="wpfo-specification-col">
-                <div>
-                    <div class="wpfo-specification-title"
-                         ng-bind="$ctrl.specification.name"></div>
-                    <div class='small text-muted'
-                         ng-bind="$ctrl.specification.description"></div>
+<div class="waltz-physical-flow-overview">
+    <div class="row">
+        <div class="col-md-12">
+            <table>
+                <tr>
+                    <td class="wpfo-entity-col wpfo-owning-entity">
+                        <div>
+                            <waltz-entity-link entity-ref="$ctrl.logicalFlow.source"></waltz-entity-link>
+                        </div>
+                    </td>
+                    <td class="wpfo-arrow-col">
+                        <span>&rarr;</span>
+                    </td>
+                    <td class="wpfo-specification-col">
+                        <div>
+                            <div class="wpfo-specification-title"
+                                 ng-bind="$ctrl.specification.name"></div>
+                            <div class='small text-muted'
+                                 ng-bind="$ctrl.specification.description"></div>
 
-                    <hr>
+                            <hr>
 
-                    <div class="row small">
-                        <div class="col-sm-12">
-                            <table class="waltz-field-table small">
-                                <tr ng-class="{
+                            <div class="row small">
+                                <div class="col-sm-12">
+                                    <table class="waltz-field-table small">
+                                        <tr ng-class="{
                                         'wft-danger' : $ctrl.hasCriticalityMismatch
                                     }"
-                                    uib-popover="{{$ctrl.criticalityMismatchMessage }}"
-                                    popover-trigger="mouseenter">
-                                    <td class="wft-label">
+                                            uib-popover="{{$ctrl.criticalityMismatchMessage }}"
+                                            popover-trigger="mouseenter">
+                                            <td class="wft-label">
                                         <span>
                                             Criticality:
                                         </span>
-                                    </td>
-                                    <td>
-                                        <waltz-enum-value type="'physicalFlowCriticality'"
-                                                          key="$ctrl.physicalFlow.criticality"
-                                                          show-icon="false"
-                                                          show-popover="false">
-                                        </waltz-enum-value>
-                                        <span ng-show="$ctrl.hasCriticalityMismatch">
+                                            </td>
+                                            <td>
+                                                <waltz-enum-value type="'physicalFlowCriticality'"
+                                                                  key="$ctrl.physicalFlow.criticality"
+                                                                  show-icon="false"
+                                                                  show-popover="false">
+                                                </waltz-enum-value>
+                                                <span ng-show="$ctrl.hasCriticalityMismatch">
                                             <waltz-icon name="warning"></waltz-icon>
                                         </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="wft-label">
-                                        <span>Format:</span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="wft-label">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="wft-label">
+                                                <span>Format:</span>
+                                            </td>
+                                            <td>
+                                                <span ng-bind="$ctrl.specification.format | toDisplayName:'dataFormatKind'"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="wft-label">
                                         <span>
                                             Transport:
                                         </span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="wft-label">
-                                        <span>Frequency:</span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="wft-label">
-                                        <span>Basis Offset:</span>
-                                    </td>
-                                    <td>
-                                        <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
-                                    </td>
-                                </tr>
-                            </table>
+                                            </td>
+                                            <td>
+                                                <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'transportKind'"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="wft-label">
+                                                <span>Frequency:</span>
+                                            </td>
+                                            <td>
+                                                <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="wft-label">
+                                                <span>Basis Offset:</span>
+                                            </td>
+                                            <td>
+                                                <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </td>
-            <td class="wpfo-arrow-col">
-                <span>&rarr;</span>
-            </td>
-            <td class="wpfo-entity-col wpfo-target-entity"
-                ng-class="{
+                    </td>
+                    <td class="wpfo-arrow-col">
+                        <span>&rarr;</span>
+                    </td>
+                    <td class="wpfo-entity-col wpfo-target-entity"
+                        ng-class="{
                     'wpfo-entity-application' : $ctrl.logicalFlow.target.kind == 'APPLICATION',
                     'wpfo-entity-actor' : $ctrl.logicalFlow.target.kind == 'ACTOR'
                 }">
-                <div>
-                    <waltz-entity-link entity-ref="$ctrl.logicalFlow.target"></waltz-entity-link>
-                </div>
-            </td>
-        </tr>
-    </table>
+                        <div>
+                            <waltz-entity-link entity-ref="$ctrl.logicalFlow.target"></waltz-entity-link>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-entity-link entity-ref="{
+                        kind: 'LOGICAL_DATA_FLOW',
+                        id: $ctrl.logicalFlow.id,
+                        name: 'More about this logical flow &raquo;'}"
+                               class="pull-right">
+            </waltz-entity-link>
+        </div>
+    </div>
 </div>

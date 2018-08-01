@@ -16,73 +16,97 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from "lodash";
+import {initialiseData, invokeFunction} from "../../../common";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import {initialiseData, invokeFunction, termSearch} from "../../../common";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
-import template from './physical-flow-table.html';
+import template from "./physical-flow-table.html";
 
 const bindings = {
-    lineage: '<',
+    parentEntityRef: '<',
     onInitialise: '<'
 };
 
 
 const initialState = {
-    filteredLineage: []
+    columnDefs: [],
+    tableData: [],
 };
 
 
-function controller() {
+function mkData(primaryRef,
+                specifications = [],
+                physicalFlows = [])
+{
+    if (!primaryRef) return [];
+
+    const specsById = _.keyBy(specifications, 'id');
+
+    const enrichFlow = (pf) => {
+        return {
+            physicalFlow: pf,
+            specification: specsById[pf.specificationId]
+        };
+    };
+
+    return _.map(physicalFlows, enrichFlow);
+}
+
+
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (changes) => {
-        vm.filteredLineage = vm.lineage;
-    };
-
-
-    const fields = [
-        'targetEntity.name',
-        'flow.description',
-        'flow.basisOffset',
-        'flow.transport',
-        'flow.frequency',
-        'specification.name',
-        'specification.externalId',
-        'specification.format',
-        'specification.description',
-        'specification.owningEntity.name',
-    ];
-
-
-    vm.filterLineage = query => {
-        vm.filteredLineage = termSearch(vm.lineage, query, fields);
-    };
-
-
     vm.columnDefs = [
-        mkLinkGridCell('Name', 'specification.name', 'flow.id', 'main.physical-flow.view'),
-        mkEntityLinkGridCell('Source', 'sourceEntity', 'left'),
-        mkEntityLinkGridCell('Target', 'targetEntity', 'left'),
-        {
-            field: 'specification.format',
-            name: 'Format',
-            cellFilter: 'toDisplayName:"dataFormatKind"'
-        }
+        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
+        { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
+        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
+        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
+        { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
 
+    vm.$onInit = () => {
+        vm.selector = {
+            entityReference: vm.parentEntityRef,
+            scope: 'EXACT'
+        };
+
+        const flowPromise = serviceBroker
+            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [vm.selector])
+            .then(r => r.data);
+        const specPromise = serviceBroker
+            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [vm.selector])
+            .then(r => r.data);
+
+        $q.all([flowPromise, specPromise])
+            .then(([flows, specs]) => {
+                console.log('gt: ', {flows, specs});
+                vm.tableData = mkData(vm.parentEntityRef, specs, flows);
+                console.log('table data: ', vm.tableData);
+            });
+    };
+
+    vm.$onChanges = (changes) => {
+    };
 
     vm.onGridInitialise = (api) => {
         vm.gridApi = api;
     };
 
-
     vm.exportGrid = () => {
-        vm.gridApi.exportFn('lineage-reports.csv');
+        vm.gridApi.exportFn('physical_flows.csv');
     };
 
     invokeFunction(vm.onInitialise, {export: vm.exportGrid });
-
 }
+
+
+controller.$inject = [
+    '$q',
+    'ServiceBroker',
+];
 
 
 const component = {

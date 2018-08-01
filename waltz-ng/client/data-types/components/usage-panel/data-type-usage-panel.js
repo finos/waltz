@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './data-type-usage-panel.html';
+import template from "./data-type-usage-panel.html";
 
 
 const bindings = {
@@ -41,12 +42,33 @@ const initialState = {
 function controller(notification, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
-    const reload = (force = false) => serviceBroker
-        .loadViewData(
-            CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
-            [ vm.parentEntityRef.id ],
-            { force })
-        .then(r => vm.used = r.data);
+    const reload = (force = false) => {
+        const promise = vm.parentEntityRef.kind == 'PHYSICAL_SPECIFICATION'
+            ? serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
+                    [ vm.parentEntityRef.id ],
+                    { force })
+                .then(r => r.data)
+            : serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind,
+                    [ [vm.parentEntityRef.id] ],
+                    { force })
+                .then(r => r.data)
+                .then(decorators => _.map(decorators, d => ({
+                    lastUpdatedAt: d.lastUpdatedAt,
+                    lastUpdatedBy: d.lastUpdatedBy,
+                    provenance: d.provenance,
+                    dataTypeId: d.decoratorEntity.id,
+                    dataFlowId: d.dataFlowId
+                })));
+
+        return promise
+            .then(r => {
+                vm.used = r;
+            });
+    };
 
     vm.$onInit = () => {
         userService

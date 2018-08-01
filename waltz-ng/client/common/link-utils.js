@@ -44,6 +44,9 @@ export function kindToViewState(kind) {
     if (kind === 'LOGICAL_DATA_ELEMENT') {
         return "main.logical-data-element.view";
     }
+    if (kind === 'LOGICAL_DATA_FLOW') {
+        return "main.logical-flow.view";
+    }
     if (kind === 'MEASURABLE') {
         return "main.measurable.view";
     }

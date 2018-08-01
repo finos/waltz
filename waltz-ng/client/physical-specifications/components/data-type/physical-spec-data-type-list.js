@@ -29,7 +29,7 @@ const bindings = {
 
 
 const initialState = {
-    specDataTypes: []
+    dataTypes: []
 };
 
 
@@ -44,7 +44,7 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selectorOptions])
-            .then(result => vm.specDataTypes = result.data);
+            .then(result => vm.dataTypes = result.data);
     };
 }
 
