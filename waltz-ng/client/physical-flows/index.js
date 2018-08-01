@@ -17,24 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import {registerComponents, registerStore} from '../common/module-utils';
+import {registerComponents, registerStore} from "../common/module-utils";
 
-import BulkPhysicalFlowLoaderWizard from './components/bulk-physical-flow-loader-wizard/bulk-physical-flow-loader-wizard';
-import BulkPhysicalFlowParser from './components/bulk-physical-flow-parser/bulk-physical-flow-parser';
-import BulkPhysicalFlowUploader from './components/bulk-physical-flow-uploader/bulk-physical-flow-uploader';
-import * as PhysicalFlowStore from './service/physical-flow-store';
-import PhysicalFlowEditor from './components/flow-editor/physical-flow-editor';
-import PhysicalFlowCloneSelector from './components/register/clone/physical-flow-clone-selector';
-import PhysicalFlowOverview from './components/overview/physical-flow-overview';
-import PhysicalFlowEditOverview from './components/register/overview/physical-flow-edit-overview';
-import PhysicalFlowEditTargetLogicalFlow from './components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow';
-import PhysicalFlowEditSpecification from './components/register/edit-specification/physical-flow-edit-specification';
-import PhysicalFlowAttributeEditor from './components/register/attribute-editor/physical-flow-attribute-editor';
-import Routes from './routes';
-import PhysicalFlowTable from './components/flow-table/physical-flow-table';
-import PhysicalFlowExportButtons from './components/export-buttons/physical-flow-export-buttons';
+import BulkPhysicalFlowLoaderWizard from "./components/bulk-physical-flow-loader-wizard/bulk-physical-flow-loader-wizard";
+import BulkPhysicalFlowParser from "./components/bulk-physical-flow-parser/bulk-physical-flow-parser";
+import BulkPhysicalFlowUploader from "./components/bulk-physical-flow-uploader/bulk-physical-flow-uploader";
+import * as PhysicalFlowStore from "./service/physical-flow-store";
+import PhysicalFlowEditor from "./components/flow-editor/physical-flow-editor";
+import PhysicalFlowCloneSelector from "./components/register/clone/physical-flow-clone-selector";
+import PhysicalFlowOverview from "./components/overview/physical-flow-overview";
+import PhysicalFlowEditOverview from "./components/register/overview/physical-flow-edit-overview";
+import PhysicalFlowEditTargetLogicalFlow from "./components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow";
+import PhysicalFlowEditSpecification from "./components/register/edit-specification/physical-flow-edit-specification";
+import PhysicalFlowAttributeEditor from "./components/register/attribute-editor/physical-flow-attribute-editor";
+import Routes from "./routes";
+import PhysicalFlowTable from "./components/flow-table/physical-flow-table";
+import PhysicalFlowExportButtons from "./components/export-buttons/physical-flow-export-buttons";
+import PhysicalFlowSection from "./components/physical-flow-section/physical-flow-section";
 
 
 function setup() {
@@ -59,7 +60,8 @@ function setup() {
         PhysicalFlowEditOverview,
         PhysicalFlowEditTargetLogicalFlow,
         PhysicalFlowEditSpecification,
-        PhysicalFlowAttributeEditor
+        PhysicalFlowAttributeEditor,
+        PhysicalFlowSection
     ]);
     return module.name;
 }

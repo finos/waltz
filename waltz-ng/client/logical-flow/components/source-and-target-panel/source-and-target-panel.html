@@ -37,8 +37,22 @@
          }"
          class="wsatp-popup waltz-fade-if">
         <h4>
-            <waltz-entity-icon-label entity-ref="$ctrl.selected.entity">
-            </waltz-entity-icon-label>
+            <span ng-if="$ctrl.selected.type === 'source'">
+                <waltz-entity-link entity-ref="$ctrl.selected.logicalFlow.source" >
+                </waltz-entity-link>
+                &rarr;
+                <waltz-entity-icon-label entity-ref="$ctrl.selected.logicalFlow.target">
+                </waltz-entity-icon-label>
+            </span>
+
+            <span ng-if="$ctrl.selected.type === 'target'">
+                <waltz-entity-icon-label entity-ref="$ctrl.selected.logicalFlow.source" >
+                </waltz-entity-icon-label>
+                &rarr;
+                <waltz-entity-link entity-ref="$ctrl.selected.logicalFlow.target">
+                </waltz-entity-link>
+            </span>
+
             <a class="clickable pull-right small"
                style="color: blue"
                ng-click="$ctrl.selected = null">
@@ -49,9 +63,9 @@
 
         <div>
             <waltz-entity-link entity-ref="{
-                    kind: $ctrl.selected.entity.kind,
-                    id: $ctrl.selected.entity.id,
-                    name: 'More about ' + $ctrl.selected.entity.name + '&raquo;'}">
+                    kind: 'LOGICAL_DATA_FLOW',
+                    id: $ctrl.selected.logicalFlow.id,
+                    name: 'More about this logical flow &raquo;'}">
             </waltz-entity-link>
         </div>
 

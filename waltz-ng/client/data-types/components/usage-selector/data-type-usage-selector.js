@@ -32,7 +32,7 @@ const bindings = {
 
 
 const initialState = {
-    specDataTypes: [],
+    dataTypes: [],
     allDataTypes: [],
     checkedItemIds: [],
     originalSelectedItemIds: [],
@@ -42,12 +42,12 @@ const initialState = {
 };
 
 
-function mkSelectedTypeIds(specDataTypes = []) {
-    return _.map(specDataTypes, 'dataTypeId');
+function mkSelectedTypeIds(dataTypes = []) {
+    return _.map(dataTypes, 'dataTypeId');
 }
 
 
-function mkUpdateCommand(specificationId, selectedIds = [], originalIds = []) {
+function mkSpecDataTypeUpdateCommand(specificationId, selectedIds = [], originalIds = []) {
     const addedDataTypeIds = _.difference(selectedIds, originalIds);
     const removedDataTypeIds = _.difference(originalIds, selectedIds);
 
@@ -59,27 +59,62 @@ function mkUpdateCommand(specificationId, selectedIds = [], originalIds = []) {
 }
 
 
+function mkFlowDataTypeDecoratorsUpdateCommand(flowId, selectedIds = [], originalIds = []) {
+    const addedDecorators = _.chain(selectedIds)
+        .difference(originalIds)
+        .map(id => ({kind: 'DATA_TYPE', id}))
+        .value();
+
+    const removedDecorators = _.chain(originalIds)
+        .difference(selectedIds)
+        .map(id => ({kind: 'DATA_TYPE', id}))
+        .value();
+
+    return {
+        flowId,
+        addedDecorators,
+        removedDecorators
+    };
+}
+
+
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const postLoadActions = () => {
-        const selectedDataTypeIds = mkSelectedTypeIds(vm.specDataTypes);
+        const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
     };
 
-    const loadSpecDataTypes = (force = false) => {
+    const loadDataTypes = (force = false) => {
         const selectorOptions = {
             entityReference: vm.parentEntityRef,
             scope: 'EXACT'
         };
-        return serviceBroker
-            .loadViewData(
-                CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
-                [ selectorOptions ],
-                { force })
-            .then(result => vm.specDataTypes = result.data);
+        const promise = vm.parentEntityRef.kind == 'PHYSICAL_SPECIFICATION'
+            ? serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
+                    [ selectorOptions ],
+                    { force })
+                .then(r => r.data)
+            : serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind,
+                    [ [vm.parentEntityRef.id] ],
+                    { force })
+                .then(r => r.data)
+                .then(decorators => _.map(decorators, d => ({
+                    lastUpdatedAt: d.lastUpdatedAt,
+                    lastUpdatedBy: d.lastUpdatedBy,
+                    provenance: d.provenance,
+                    dataTypeId: d.decoratorEntity.id,
+                    dataFlowId: d.dataFlowId
+                })));
+
+        return promise.then(result => vm.dataTypes = result);
     };
 
     serviceBroker
@@ -104,14 +139,26 @@ function controller(serviceBroker) {
     };
 
     vm.save = () => {
-        const updateCommand = mkUpdateCommand(
-            vm.parentEntityRef.id,
-            vm.checkedItemIds,
-            vm.originalSelectedItemIds);
+        let promise = null;
+        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION') {
+            const updateCommand = mkSpecDataTypeUpdateCommand(
+                vm.parentEntityRef.id,
+                vm.checkedItemIds,
+                vm.originalSelectedItemIds);
 
-        return serviceBroker
-            .execute(CORE_API.PhysicalSpecDataTypeStore.save, [vm.parentEntityRef.id, updateCommand])
-            .then(result => loadSpecDataTypes(true))
+            promise = serviceBroker
+                .execute(CORE_API.PhysicalSpecDataTypeStore.save, [vm.parentEntityRef.id, updateCommand]);
+        } else if(vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW') {
+            const updateCommand = mkFlowDataTypeDecoratorsUpdateCommand(
+                vm.parentEntityRef.id,
+                vm.checkedItemIds,
+                vm.originalSelectedItemIds);
+
+            promise = serviceBroker
+                .execute(CORE_API.LogicalFlowDecoratorStore.updateDecorators, [updateCommand]);
+        }
+        return promise
+            .then(result => loadDataTypes(true))
             .then(() => {
                 postLoadActions();
                 vm.onDirty(false);
@@ -122,7 +169,7 @@ function controller(serviceBroker) {
         vm.onDirty(false);
         vm.onRegisterSave(vm.save);
 
-        loadSpecDataTypes()
+        loadDataTypes()
             .then(postLoadActions);
     };
 }

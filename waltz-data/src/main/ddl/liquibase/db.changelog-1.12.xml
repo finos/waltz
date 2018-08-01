@@ -129,17 +129,17 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20180718-3286-3"
-               author="kamransaleem">
-        <comment>3286: Add entity_lifecycle_status field to logical_flow</comment>
+    <!--<changeSet id="20180718-3286-3"-->
+               <!--author="kamransaleem">-->
+        <!--<comment>3286: Add entity_lifecycle_status field to logical_flow</comment>-->
 
-        <dropDefaultValue tableName="logical_flow"
-                          columnDataType="bit"
-                          columnName="is_removed" />
+        <!--<dropDefaultValue tableName="logical_flow"-->
+                          <!--columnDataType="bit"-->
+                          <!--columnName="is_removed" />-->
 
-        <dropColumn tableName="logical_flow"
-                    columnName="is_removed" />
-    </changeSet>
+        <!--<dropColumn tableName="logical_flow"-->
+                    <!--columnName="is_removed" />-->
+    <!--</changeSet>-->
 
 
     <!-- Add external_parent_id to measurable and a util to then populate parent_id's #3299 -->

@@ -30,7 +30,7 @@ const bindings = {
 
 
 const initialState = {
-    specDataTypes: [],
+    dataTypes: [],
     allDataTypes: [],
     checkedItemIds: [],
     originalSelectedItemIds: [],
@@ -60,7 +60,7 @@ function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const postLoadActions = () => {
-        const selectedDataTypeIds = mkSelectedTypeIds(vm.specDataTypes);
+        const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
@@ -76,7 +76,7 @@ function controller(notification, serviceBroker) {
                 CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
                 [selectorOptions],
                 {force})
-            .then(result => vm.specDataTypes = result.data);
+            .then(result => vm.dataTypes = result.data);
     };
 
     serviceBroker

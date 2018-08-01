@@ -1,0 +1,60 @@
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
+                       icon="random">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
+            </li>
+            <li>
+                <waltz-entity-link entity-ref="ctrl.logicalFlow.target"></waltz-entity-link>
+            </li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-data-type-usage-panel parent-entity-ref="ctrl.entityReference"
+                                             help-text="Data types referenced by this logical flow">
+                </waltz-data-type-usage-panel>
+            </div>
+        </div>
+
+        <div class="small text-muted"
+             ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt">
+            Last updated by
+            <span ng-bind="ctrl.logicalFlow.lastUpdatedBy"></span>
+            (<waltz-from-now timestamp="ctrl.logicalFlow.lastUpdatedAt"></waltz-from-now>)
+        </div>
+    </div>
+
+    <br>
+
+    <!--Entity Named Notes-->
+    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+
+
+    <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
+    </waltz-physical-flow-section>
+
+
+    <waltz-dynamic-section-wrapper section="ctrl.flowDiagramsSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+
+
+    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+
+
+    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
+</div>
