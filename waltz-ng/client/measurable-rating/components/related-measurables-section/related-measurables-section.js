@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './related-measurables-section.html';
+import template from "./related-measurables-section.html";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 /**
@@ -68,6 +69,7 @@ function controller($q, serviceBroker) {
             return;
         }
 
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef, 'CHILDREN');
         const categoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
@@ -79,7 +81,7 @@ function controller($q, serviceBroker) {
         const statsPromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableRatingStore.statsForRelatedMeasurables,
-                [ vm.parentEntityRef.id ])
+                [ selectionOptions ])
             .then(r => vm.stats = r.data);
 
         const promises = [

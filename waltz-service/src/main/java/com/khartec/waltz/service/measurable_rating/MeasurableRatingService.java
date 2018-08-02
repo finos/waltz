@@ -145,8 +145,9 @@ public class MeasurableRatingService {
     }
 
 
-    public Collection<MeasurableRatingTally> statsForRelatedMeasurable(long measurableId) {
-        return measurableRatingDao.statsForRelatedMeasurable(measurableId);
+    public Collection<MeasurableRatingTally> statsForRelatedMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
+        return measurableRatingDao.statsForRelatedMeasurable(selector);
     }
 
 

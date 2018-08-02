@@ -210,14 +210,14 @@ public class MeasurableRatingDao {
     }
 
 
-    public List<MeasurableRatingTally> statsForRelatedMeasurable(long measurableId) {
+    public List<MeasurableRatingTally> statsForRelatedMeasurable(Select<Record1<Long>> selector) {
         com.khartec.waltz.schema.tables.MeasurableRating related = MEASURABLE_RATING.as("related");
         com.khartec.waltz.schema.tables.MeasurableRating orig = MEASURABLE_RATING.as("orig");
 
         SelectConditionStep<Record1<Long>> relatedAppIds = DSL
                 .selectDistinct(orig.ENTITY_ID)
                 .from(orig)
-                .where(orig.MEASURABLE_ID.eq(measurableId))
+                .where(orig.MEASURABLE_ID.in(selector))
                 .and(orig.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         return dsl
