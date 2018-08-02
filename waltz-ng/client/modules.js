@@ -90,6 +90,7 @@ import Playpen from "./playpen";
 import Playpen5 from "./playpen/5";
 import Profile from "./profile";
 import Ratings from "./ratings";
+import Roadmap from "./roadmap";
 import SharedPreference from "./shared-preference";
 import ServerInfo from "./server-info";
 import SoftwareCatalog from "./software-catalog";
@@ -106,21 +107,21 @@ import Welcome from "./welcome";
 import Widgets from "./widgets";
 
 const dependencies = [
-    'ui.bootstrap',
-    'ui.router',
-    'ui.select',
-    'ui.grid',
-    'ui.grid.autoResize',
-    'ui.grid.exporter',
-    'ui.grid.resizeColumns',
-    'ui.grid.selection',
-    'ui-notification',
-    'ngAnimate',
-    'ngSanitize',
-    'ngTagsInput',
-    'ng-showdown',
-    'satellizer',
-    'LocalStorageModule',
+    "ui.bootstrap",
+    "ui.router",
+    "ui.select",
+    "ui.grid",
+    "ui.grid.autoResize",
+    "ui.grid.exporter",
+    "ui.grid.resizeColumns",
+    "ui.grid.selection",
+    "ui-notification",
+    "ngAnimate",
+    "ngSanitize",
+    "ngTagsInput",
+    "ng-showdown",
+    "satellizer",
+    "LocalStorageModule",
     AngularFormly,
     AngularFormlyTemplates,
     'treeControl',
@@ -182,6 +183,7 @@ const dependencies = [
     Playpen5(),
     Profile(),
     Ratings(),
+    Roadmap(),
     SharedPreference(),
     ServerInfo(),
     SoftwareCatalog(),

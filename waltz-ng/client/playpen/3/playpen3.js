@@ -18,7 +18,7 @@
  */
 
 import {initialiseData} from "../../common/index";
-import template from './playpen3.html';
+import template from "./playpen3.html";
 
 
 const initialState = {
@@ -30,12 +30,6 @@ const initialState = {
 
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    console.log(vm)
-
-    vm.onSelectorEntitySelect = (item, ctx) => {
-        console.log({ctx, item});
-    };
 }
 
 
