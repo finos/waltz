@@ -32,100 +32,101 @@ import "ng-showdown";
 import "satellizer";
 import "ui-select";
 
-import AngularFormly from 'angular-formly';
-import AngularFormlyTemplates from 'angular-formly-templates-bootstrap';
+import AngularFormly from "angular-formly";
+import AngularFormlyTemplates from "angular-formly-templates-bootstrap";
 
-import AccessLog from './access-log';
-import Actor from './actor';
-import Alias from './alias';
-import Applications from './applications';
-import AppGroups from './app-groups';
-import AssetCost from './asset-cost';
-import Attestation from './attestation';
-import AuthSources from './auth-sources';
-import Bookmarks from './bookmarks';
-import ChangeInitiative from './change-initiative';
-import Complexity from './complexity';
-import Common_Module from './common/module';
-import ChangeLog from './change-log';
-import DataFlow from './data-flow';
-import DataTypeUsage from './data-type-usage';
-import DataTypes from './data-types';
-import Databases from './databases';
-import DrillGrid from './drill-grid';
-import DynamicSection from './dynamic-section';
-import EndUserApps from './end-user-apps';
-import Entity from './entity';
-import EntityEnum from './entity-enum';
-import EntityNamedNote from './entity-named-note';
-import EntityRelationship from './entity-relationship';
-import EntityStatistics from './entity-statistics';
-import EntitySvgDiagram from './entity-svg-diagram';
-import EntityTags from './entity-tags';
-import EnumValue from './enum-value';
-import Examples from './examples';
-import Extensions from './extensions';
-import FlowDiagram from './flow-diagram';
-import Formly from './formly';
-import History from './history';
-import Involvement from './involvement';
-import InvolvementKind from './involvement-kind';
-import Lineage from './lineage';
-import LogicalDataElement from './logical-data-element';
-import LogicalFlow from './logical-flow';
-import LogicalFlowDecorator from './logical-flow-decorator';
-import Measurable from './measurable';
-import MeasurableCategory from './measurable-category';
-import MeasurableRating from './measurable-rating';
-import MeasurableRelationship from './measurable-relationship';
-import Navbar from './navbar';
-import Notification from './notification';
-import OrgUnits from './org-units';
-import Orphan from './orphan';
-import Person from './person';
-import Perspective from './perspective';
-import PhysicalFlows from './physical-flows';
-import PhysicalSpecifications from './physical-specifications';
-import PhysicalField from './physical-field';
-import Playpen from './playpen';
-import Playpen5 from './playpen/5';
-import Profile from './profile';
-import Ratings from './ratings';
-import SharedPreference from './shared-preference';
-import ServerInfo from './server-info';
-import SoftwareCatalog from './software-catalog';
-import SourceDataRating from './source-data-rating';
-import StaticPanel from './static-panel';
-import Survey from './survey';
-import SvgDiagram from './svg-diagram';
-import System from './system';
-import Technology from './technology';
-import Tour from './tour';
-import User from './user';
-import UserContribution from './user-contribution';
-import Welcome from './welcome';
-import Widgets from './widgets';
+import AccessLog from "./access-log";
+import Actor from "./actor";
+import Alias from "./alias";
+import Applications from "./applications";
+import AppGroups from "./app-groups";
+import AssetCost from "./asset-cost";
+import Attestation from "./attestation";
+import AuthSources from "./auth-sources";
+import Bookmarks from "./bookmarks";
+import ChangeInitiative from "./change-initiative";
+import Complexity from "./complexity";
+import Common_Module from "./common/module";
+import ChangeLog from "./change-log";
+import DataFlow from "./data-flow";
+import DataTypeUsage from "./data-type-usage";
+import DataTypes from "./data-types";
+import Databases from "./databases";
+import DrillGrid from "./drill-grid";
+import DynamicSection from "./dynamic-section";
+import EndUserApps from "./end-user-apps";
+import Entity from "./entity";
+import EntityEnum from "./entity-enum";
+import EntityNamedNote from "./entity-named-note";
+import EntityRelationship from "./entity-relationship";
+import EntityStatistics from "./entity-statistics";
+import EntitySvgDiagram from "./entity-svg-diagram";
+import EntityTags from "./entity-tags";
+import EnumValue from "./enum-value";
+import Examples from "./examples";
+import Extensions from "./extensions";
+import FlowDiagram from "./flow-diagram";
+import Formly from "./formly";
+import History from "./history";
+import Involvement from "./involvement";
+import InvolvementKind from "./involvement-kind";
+import Lineage from "./lineage";
+import LogicalDataElement from "./logical-data-element";
+import LogicalFlow from "./logical-flow";
+import LogicalFlowDecorator from "./logical-flow-decorator";
+import Measurable from "./measurable";
+import MeasurableCategory from "./measurable-category";
+import MeasurableRating from "./measurable-rating";
+import MeasurableRelationship from "./measurable-relationship";
+import Navbar from "./navbar";
+import Notification from "./notification";
+import OrgUnits from "./org-units";
+import Orphan from "./orphan";
+import Person from "./person";
+import Perspective from "./perspective";
+import PhysicalFlows from "./physical-flows";
+import PhysicalSpecifications from "./physical-specifications";
+import PhysicalField from "./physical-field";
+import Playpen from "./playpen";
+import Playpen5 from "./playpen/5";
+import Profile from "./profile";
+import Ratings from "./ratings";
+import Roadmap from "./roadmap";
+import SharedPreference from "./shared-preference";
+import ServerInfo from "./server-info";
+import SoftwareCatalog from "./software-catalog";
+import SourceDataRating from "./source-data-rating";
+import StaticPanel from "./static-panel";
+import Survey from "./survey";
+import SvgDiagram from "./svg-diagram";
+import System from "./system";
+import Technology from "./technology";
+import Tour from "./tour";
+import User from "./user";
+import UserContribution from "./user-contribution";
+import Welcome from "./welcome";
+import Widgets from "./widgets";
 
 const dependencies = [
-    'ui.bootstrap',
-    'ui.router',
-    'ui.select',
-    'ui.grid',
-    'ui.grid.autoResize',
-    'ui.grid.exporter',
-    'ui.grid.resizeColumns',
-    'ui.grid.selection',
-    'ui-notification',
-    'ngAnimate',
-    'ngSanitize',
-    'ngTagsInput',
-    'ng-showdown',
-    'satellizer',
-    'LocalStorageModule',
+    "ui.bootstrap",
+    "ui.router",
+    "ui.select",
+    "ui.grid",
+    "ui.grid.autoResize",
+    "ui.grid.exporter",
+    "ui.grid.resizeColumns",
+    "ui.grid.selection",
+    "ui-notification",
+    "ngAnimate",
+    "ngSanitize",
+    "ngTagsInput",
+    "ng-showdown",
+    "satellizer",
+    "LocalStorageModule",
     AngularFormly,
     AngularFormlyTemplates,
-    'treeControl',
-    'angular-loading-bar',
+    "treeControl",
+    "angular-loading-bar",
 
     // -- waltz-modules ---
     AccessLog(),
@@ -184,6 +185,7 @@ const dependencies = [
     Playpen5(),
     Profile(),
     Ratings(),
+    Roadmap(),
     SharedPreference(),
     ServerInfo(),
     SoftwareCatalog(),

@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {perhaps} from './index';
-import {select} from 'd3-selection';
-import _ from 'lodash';
+import {perhaps} from "./index";
+import {select} from "d3-selection";
+import _ from "lodash";
 
 
 /**
@@ -28,7 +28,7 @@ import _ from 'lodash';
  * @param svg
  * @returns {function()} to deregister the resize listener
  */
-export function responsivefy(svg, type = 'both') {
+export function responsivefy(svg, type = "both") {
     // get container + svg aspect ratio
     const container = select(svg.node().parentNode);
     const id = "resize." + container.attr("id");
@@ -41,7 +41,7 @@ export function responsivefy(svg, type = 'both') {
         if (_.isNaN(targetWidth)) return;
         svg.attr("width", targetWidth);
 
-        if (type === 'both') {
+        if (type === "both") {
             svg.attr("height", Math.round(targetWidth / aspect));
         }
     };
@@ -49,7 +49,7 @@ export function responsivefy(svg, type = 'both') {
     // add viewBox and preserveAspectRatio properties,
     // and call resize so that svg resizes on inital page load
     svg.attr("viewBox", `0 0 ${width} ${height}`);
-    if (type === 'both') {
+    if (type === "both") {
         svg.attr("perserveAspectRatio", "xMinYMid");
     }
     svg.call(resize);
@@ -122,7 +122,7 @@ export function mkCurvedLine(x1, y1, x2, y2, flatness = 3) {
 
 
 export function wrapText(selection, width) {
-    selection.each(function(d) {
+    selection.each(function() {
         const textElem = select(this);
         const words = textElem
             .text()
@@ -131,7 +131,7 @@ export function wrapText(selection, width) {
         let line = [];
         let lineNumber = 0;
         const lineHeight = 1.1;
-        const y = textElem.attr('y');
+        const y = textElem.attr("y");
         const dy = 0.1;
         let word;
 
@@ -174,10 +174,42 @@ export function truncateText(selection, maxWidth = 130) {
                 while (textLength > (maxWidth) && text.length > 0) {
                     iterations++;
                     text = text.slice(0, -1);
-                    self.text(text + '...');
+                    self.text(text + "...");
                     textLength = self.node().getComputedTextLength();
                 }
             }, 10)
         });
 }
+
+/**
+ * Example definitions:
+ * <pre>
+ * [
+ *  {
+ *    name: "holder",
+ *    children: [
+ *        { name: "columns", children: [ {name : 'columnHeadings'}, { name: 'columnsBody' } ]},
+ *        { name: "rowGroups", children: [ {name : 'rowGroupHeadings'}, { name: 'rowGroupsBody' } ]},
+ *    ]
+ *  }
+ * ]
+ * </pre>
+ * @param container - where to render elements
+ * @param definitions - what to render
+ */
+export function createGroupElements(container, definitions = []) {
+    const register = {};
+
+    const createGroupElem = (container, definition) => {
+        const g = container
+            .append("g")
+            .classed(definition.name, true);
+        register[definition.name] = g;
+        _.forEach(definition.children || [], c => createGroupElem(g, c));
+    };
+
+    _.forEach(definitions, d => createGroupElem(container, d));
+    return register;
+}
+
 

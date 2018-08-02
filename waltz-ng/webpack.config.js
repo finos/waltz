@@ -15,17 +15,18 @@ module.exports = {
     output: {
         path: path.join(basePath, '/dist'),
         filename: '[name].js'
+        //pathinfo: false  // https://webpack.js.org/guides/build-performance/#output-without-path-info
     },
     mode: 'development',
-    // devtool: 'inline-source-map',
     devtool: 'cheap-module-eval-source-map',
     devServer: {
         contentBase: './dist',
         disableHostCheck: true
     },
     watchOptions: {
-        aggregateTimeout: 800,
-        poll: 1000
+        ignored: /node_modules/,
+        aggregateTimeout: 800
+        //poll: 1000
     },
     resolve: {
         symlinks: false
@@ -71,7 +72,7 @@ module.exports = {
         rules: [
             {
                 test: /\.jsx?$/,
-                loader: 'babel-loader',
+                use: ['babel-loader'],
                 exclude: /node_modules/
             }, {
                 test: /\.scss$/,

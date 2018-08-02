@@ -17,7 +17,8 @@
     "new-cap": 1,
     "indent": [2, 4, { "SwitchCase": 1 }],
     "no-else-return" : 0,
-    "comma-dangle": 0
+    "comma-dangle": 0,
+    "quotes": ["warn", "double"]
   },
   "plugins": [
 //        "airbnb"
