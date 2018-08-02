@@ -16,35 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './lineage-reports-section.html';
+
+import LogicalFlowView from "./pages/view/logical-flow-view";
 
 
-const bindings = {
-    lineageReports: '<',
+const baseState = {
+};
+
+const viewState = {
+    url: 'logical-flow/{id:int}',
+    views: {'content@': LogicalFlowView },
 };
 
 
+function setup($stateProvider) {
 
-
-function controller() {
-    const vm = this;
-
-
-    vm.lineageTableInitialised = (api) => {
-        vm.exportLineageReports = api.export;
-    };
-
+    $stateProvider
+        .state('main.logical-flow', baseState)
+        .state('main.logical-flow.view', viewState)
+    ;
 }
 
 
-controller.$inject = [];
+setup.$inject = ['$stateProvider'];
 
 
-const component = {
-    bindings,
-    template,
-    controller
-};
-
-
-export default component;
+export default setup;

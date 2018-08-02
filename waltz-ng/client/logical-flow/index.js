@@ -18,17 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerStore} from '../common/module-utils';
+import angular from "angular";
+import {registerStore} from "../common/module-utils";
 
-import directives from './directives';
-import components from './components';
-import LogicalFlowStore from './services/logical-flow-store';
-import LogicalFlowUtility from './services/logical-flow-utility';
+import directives from "./directives";
+import components from "./components";
+
+import Routes from "./routes";
+import LogicalFlowStore from "./services/logical-flow-store";
+import LogicalFlowUtility from "./services/logical-flow-utility";
 
 export default () => {
 
     const module = angular.module('waltz.logical.flow', []);
+
+    module
+        .config(Routes);
 
     directives(module);
     components(module);

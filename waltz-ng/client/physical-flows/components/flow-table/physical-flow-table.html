@@ -1,20 +1,17 @@
 <div>
-    <div class="row"
-         ng-if="$ctrl.lineage.length > 10">
-        <div class="col-md-6">
-            <waltz-search-control min-characters="3"
-                                  delay="250"
-                                  on-query="$ctrl.filterLineage"
-                                  placeholder-text="Search reports...">
-            </waltz-search-control>
-        </div>
+    <div ng-if="$ctrl.tableData.length > 0">
+        <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                entries="$ctrl.tableData"
+                                on-initialise="$ctrl.onGridInitialise"
+                                class="small">
+        </waltz-grid-with-search>
     </div>
 
-    <br>
-
-    <waltz-grid column-defs="$ctrl.columnDefs"
-                row-data="$ctrl.filteredLineage"
-                on-initialise="$ctrl.onGridInitialise"
-                class="small">
-    </waltz-grid>
+    <waltz-no-data ng-if="$ctrl.tableData.length == 0">
+        <message>
+            <strong>No Physical Flow</strong> detail available for this
+            <span ng-bind="$ctrl.primaryRef.kind | toDisplayName:'entity'">
+            </span>
+        </message>
+    </waltz-no-data>
 </div>

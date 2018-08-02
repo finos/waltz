@@ -54,6 +54,11 @@ module.exports = {
             }
         }
     },
+    watchOptions: {
+        ignored: /node_modules/,
+            aggregateTimeout: 800
+        //poll: 1000
+    },
     plugins: [
         new HtmlWebpackPlugin({
             title: 'Waltz',

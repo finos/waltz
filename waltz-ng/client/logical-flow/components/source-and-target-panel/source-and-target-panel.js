@@ -19,11 +19,11 @@
 import _ from "lodash";
 import {event} from "d3-selection";
 import {initialiseData} from "../../../common";
-import {downloadTextFile} from '../../../common/file-utils';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {mkTweakers} from '../source-and-target-graph/source-and-target-utilities';
+import {downloadTextFile} from "../../../common/file-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
 
-import template from './source-and-target-panel.html';
+import template from "./source-and-target-panel.html";
 
 
 const bindings = {
@@ -132,9 +132,12 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             vm.entityRef,
             vm.logicalFlows);
 
+        const logicalFlowsById = _.keyBy(vm.logicalFlows, 'id');
+
         function select(entity, type, logicalFlowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
             const types = typeInfoByFlowId[logicalFlowId] || [];
+            const logicalFlow = logicalFlowsById[logicalFlowId];
             return {
                 type,
                 types,
@@ -144,6 +147,7 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                     logicalFlowId),
                 entity,
                 logicalFlowId,
+                logicalFlow,
                 y: evt.layerY
             };
         }

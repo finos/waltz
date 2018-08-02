@@ -70,7 +70,6 @@ import Formly from "./formly";
 import History from "./history";
 import Involvement from "./involvement";
 import InvolvementKind from "./involvement-kind";
-import Lineage from "./lineage";
 import LogicalDataElement from "./logical-data-element";
 import LogicalFlow from "./logical-flow";
 import LogicalFlowDecorator from "./logical-flow-decorator";
@@ -125,8 +124,8 @@ const dependencies = [
     "LocalStorageModule",
     AngularFormly,
     AngularFormlyTemplates,
-    "treeControl",
-    "angular-loading-bar",
+    'treeControl',
+    'angular-loading-bar',
 
     // -- waltz-modules ---
     AccessLog(),
@@ -164,7 +163,6 @@ const dependencies = [
     History(),
     Involvement(),
     InvolvementKind(),
-    Lineage(),
     LogicalDataElement(),
     LogicalFlow(),
     LogicalFlowDecorator(),
