@@ -24,13 +24,13 @@
              on-selection="$ctrl.onSelect(node)"
              order-by="'-name'">
         <span class="no-overflow">
-            <span ng-bind="node.name"
-                  uib-popover-html="node.description"
+            <span ng-bind="node.displayName"
+                  uib-popover-template="'wrmt-popover.html'"
                   popover-trigger="mouseenter"
                   popover-append-to-body="true"
                   popover-placement="top"
                   popover-popup-delay="300"
-                  popover-enable="node.description.length > 0"
+                  popover-enable="node.description.length > 0 || node.name.length > 96"
                   ng-class="{ 'italics' : ! node.direct }">
             </span>
         </span>
@@ -49,3 +49,14 @@
     <div ng-bind="$ctrl.selectedNode.description"></div>
 
 </div>
+
+
+
+<script type="text/ng-template"
+        id="wrmt-popover.html">
+    <div class="small">
+        <strong ng-bind="node.name"></strong>
+        <hr>
+        <waltz-markdown text="node.description"></waltz-markdown>
+    </div>
+</script>
