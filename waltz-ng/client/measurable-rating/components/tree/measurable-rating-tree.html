@@ -33,14 +33,9 @@
                  order-by="'-name'">
 
         <span class="waltz-visibility-parent">
-            <span ng-if="node.concrete">
+            <span ng-style="{ opacity: node.concrete ? 1 : 0.5 }">
                 <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]">
                 </waltz-rating-indicator-cell>
-            </span>
-
-            <span ng-if="! node.concrete">
-                <waltz-icon name='genderless'>
-                </waltz-icon>
             </span>
 
             <span uib-popover-template="'wmrt-popover.html'"
