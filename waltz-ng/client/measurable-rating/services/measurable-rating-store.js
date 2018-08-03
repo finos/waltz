@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks';
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 
 function store($http, baseApiUrl) {
@@ -57,10 +57,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-
-    const statsForRelatedMeasurables = (measurableId) => {
+    const statsForRelatedMeasurables = (options) => {
+        checkIsIdSelector(options);
         return $http
-            .get(`${baseUrl}/related-stats/measurable/${measurableId}`)
+            .post(`${baseUrl}/related-stats/measurable`, options)
             .then(d => d.data);
     };
 
@@ -70,14 +70,14 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const create = (ref, measurableId, rating = 'Z', description = '', plannedDate = null) => {
+    const create = (ref, measurableId, rating = "Z", description = "", plannedDate = null) => {
         checkIsEntityRef(ref);
         return $http
             .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
             .then(d => d.data);
     };
 
-    const update = (ref, measurableId, rating = 'Z', description = '', plannedDate = null) => {
+    const update = (ref, measurableId, rating = "Z", description = "", plannedDate = null) => {
         checkIsEntityRef(ref);
         return $http
             .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
@@ -106,62 +106,62 @@ function store($http, baseApiUrl) {
 
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ["$http", "BaseApiUrl"];
 
 
-const serviceName = 'MeasurableRatingStore';
+const serviceName = "MeasurableRatingStore";
 
 
 export const MeasurableRatingStore_API = {
     findByMeasurableSelector: {
         serviceName,
-        serviceFnName: 'findByMeasurableSelector',
-        description: 'finds measurables by measurable selector'
+        serviceFnName: "findByMeasurableSelector",
+        description: "finds measurables by measurable selector"
     },
     findByAppSelector: {
         serviceName,
-        serviceFnName: 'findByAppSelector',
-        description: 'finds measurables by app selector'
+        serviceFnName: "findByAppSelector",
+        description: "finds measurables by app selector"
     },
     findByCategory: {
         serviceName,
-        serviceFnName: 'findByCategory',
-        description: 'finds measurable ratings for a given category id'
+        serviceFnName: "findByCategory",
+        description: "finds measurable ratings for a given category id"
     },
     findForEntityReference: {
         serviceName,
-        serviceFnName: 'findForEntityReference',
-        description: 'find measurables for an entity reference'
+        serviceFnName: "findForEntityReference",
+        description: "find measurables for an entity reference"
     },
     countByMeasurable: {
         serviceName,
-        serviceFnName: 'countByMeasurable',
-        description: 'return a count by measurable'
+        serviceFnName: "countByMeasurable",
+        description: "return a count by measurable"
     },
     statsByAppSelector: {
         serviceName,
-        serviceFnName: 'statsByAppSelector',
-        description: 'return measurable stats by app selector'
+        serviceFnName: "statsByAppSelector",
+        description: "return measurable stats by app selector"
     },
     statsForRelatedMeasurables: {
         serviceName,
-        serviceFnName: 'statsForRelatedMeasurables',
-        description: 'return stats for related measurables'
+        serviceFnName: "statsForRelatedMeasurables",
+        description: "return stats for related measurables"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'create a measurable'
+        serviceFnName: "create",
+        description: "create a measurable"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'update a measurable'
+        serviceFnName: "update",
+        description: "update a measurable"
     },
     remove: {
         serviceName,
-        serviceFnName: 'remove',
-        description: 'remove a measurable'
+        serviceFnName: "remove",
+        description: "remove a measurable"
     }
 
 };

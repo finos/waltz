@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
 import template from "./measurable-rating-tree.html";
+import {truncateMiddle} from "../../../common/string-utils";
 
 /**
  * @name waltz-measurable-rating-tree
@@ -30,23 +31,23 @@ import template from "./measurable-rating-tree.html";
  * Intended only for use with a single application and a single measurable kind.
  */
 const bindings = {
-    ratings: '<',
-    ratingScheme: '<',
-    measurables: '<',
-    overrides: '<',
-    onKeypress: '<',
-    onSelect: '<',
-    scrollHeight: '@' // should correspond to numeric values in `waltz-scroll-region` classes
+    ratings: "<",
+    ratingScheme: "<",
+    measurables: "<",
+    overrides: "<",
+    onKeypress: "<",
+    onSelect: "<",
+    scrollHeight: "@" // should correspond to numeric values in `waltz-scroll-region` classes
 };
 
 
 const initialState = {
-    containerClass: '',
+    containerClass: "",
     hierarchy: [],
     measurables: [],
     ratings: [],
     ratingScheme: null,
-    searchTerms: '',
+    searchTerms: "",
     treeOptions: {
         nodeChildren: "children",
         dirSelectable: true,
@@ -59,13 +60,13 @@ const initialState = {
         }
     },
     onKeypress: null,
-    onSelect: (m, r) => console.log('default on-select for measurable-rating-tree: ', m, r)
+    onSelect: (m, r) => console.log("default on-select for measurable-rating-tree: ", m, r)
 };
 
 
 // expand nodes with a rating (incl. parents)
 function calculateExpandedNodes(nodes = [], ratingsById = {}) {
-    const byId = _.keyBy(nodes, 'id');
+    const byId = _.keyBy(nodes, "id");
     const startingNodes = _.filter(nodes, n => ratingsById[n.id] != null);
 
     const requiredIds = [];
@@ -96,13 +97,15 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
+        const toDisplayName = m => truncateMiddle(m.name, 96);
+        const measurables = _.map(vm.measurables, m => Object.assign({}, m, { displayName: toDisplayName(m)}));
         vm.searchNodes = prepareSearchNodes(vm.measurables);
-        vm.hierarchy = prepareTree(vm.measurables);
-        vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], 'measurableId');
-        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, 'ratings', []), 'rating');
+        vm.hierarchy = prepareTree(measurables);
+        vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
+        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
 
         if (_.isEmpty(vm.expandedNodes)) {
-            vm.expandedNodes = calculateExpandedNodes(vm.measurables, vm.ratingsByMeasurable);
+            vm.expandedNodes = calculateExpandedNodes(measurables, vm.ratingsByMeasurable);
         }
 
         if (c.scrollHeight) {
@@ -110,13 +113,13 @@ function controller() {
         }
     };
 
-    vm.searchTermsChanged = (termStr = '') => {
+    vm.searchTermsChanged = (termStr = "") => {
         vm.hierarchy = prepareTree(doSearch(termStr, vm.searchNodes));
     };
 
     vm.clearSearch = () => {
-        vm.searchTermsChanged('');
-        vm.searchTerms = '';
+        vm.searchTermsChanged("");
+        vm.searchTerms = "";
     };
 }
 

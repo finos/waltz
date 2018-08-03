@@ -22,7 +22,6 @@
 
 </div>
 
-
 <div ng-class="$ctrl.containerClass"
      ng-attr-tabindex="{{$ctrl.onKeypress ? 1 : undefined}}"
      ng-keydown="$ctrl.onKeypress($event)">
@@ -34,14 +33,9 @@
                  order-by="'-name'">
 
         <span class="waltz-visibility-parent">
-            <span ng-if="node.concrete">
+            <span ng-style="{ opacity: node.concrete ? 1 : 0.5 }">
                 <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]">
                 </waltz-rating-indicator-cell>
-            </span>
-
-            <span ng-if="! node.concrete">
-                <waltz-icon name='genderless'>
-                </waltz-icon>
             </span>
 
             <span uib-popover-template="'wmrt-popover.html'"
@@ -50,15 +44,16 @@
                   popover-placement="right"
                   ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
                   class="no-overflow">
-                <span ng-bind="node.name"
+                <span ng-bind="node.displayName"
                       ng-class="{ 'italics' : ! node.concrete }">
                 </span>
                 <span ng-if="$ctrl.overrides.indexOf(node.id) > -1"
                       class="waltz-visibility-child-50">
                     *
                 </span>
-                 <span ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
-                     ...
+                <span class="small"
+                       ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
+                     <waltz-icon name="sticky-note-o"></waltz-icon>
                 </span>
             </span>
         </span>
@@ -73,6 +68,7 @@
         id="wmrt-popover.html">
     <div class="small">
         <strong ng-bind="node.name"></strong>
+        <hr>
         <waltz-markdown text="node.description"></waltz-markdown>
         <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
             <hr>

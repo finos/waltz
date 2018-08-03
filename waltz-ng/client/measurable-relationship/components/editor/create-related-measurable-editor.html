@@ -57,7 +57,7 @@
                 <label>Viewpoint Category</label>
                 <select ng-model="$ctrl.form.targetCategory"
                         ng-change="$ctrl.onMeasurableCategorySelection($ctrl.form.targetCategory)"
-                        ng-options="category as category.description for category in $ctrl.categories | orderBy:'category.description'"
+                        ng-options="category as category.name for category in $ctrl.categories | orderBy:'category.description'"
                         class="form-control">
                 </select>
                 <div class="help-block">

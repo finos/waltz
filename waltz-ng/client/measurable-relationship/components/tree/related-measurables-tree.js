@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {sameRef} from "../../../common/entity-utils";
 import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {truncateMiddle} from "../../../common/string-utils";
 
 const bindings = {
     parentEntityRef: '<',
@@ -98,7 +99,11 @@ function controller(serviceBroker) {
 
         const measurablesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurablesByCategory = _.groupBy(r.data, 'categoryId'));
+            .then(r => vm.measurablesByCategory = _
+                .chain(r.data)
+                .map(m => Object.assign({}, m, { displayName: truncateMiddle(m.name, 96)}))
+                .groupBy('categoryId')
+                .value());
 
         relationshipPromise
             .then(() => measurablesPromise)
