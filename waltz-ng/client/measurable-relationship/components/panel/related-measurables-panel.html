@@ -87,19 +87,6 @@
                     Select a category or relationship to make changes.
                 </div>
 
-                <!-- SELECTED CATEGORY -->
-                <div ng-if="!$ctrl.visibility.editor && !$ctrl.selectedRow">
-                    <br>
-
-                    <!-- ADD -->
-                    <div waltz-has-role="CAPABILITY_EDITOR">
-                        <a class="clickable"
-                           ng-click="$ctrl.beginNewRelationship()">
-                            Add new relationship...
-                        </a>
-                    </div>
-                </div>
-
                 <!-- SELECTED RELATIONSHIP -->
                 <div ng-if="$ctrl.selectedRow && ! $ctrl.visibility.editor"
                      class="waltz-fade-if">
@@ -113,8 +100,6 @@
 
                 </div>
             </span>
-
-
         </div>
 
         <!-- NO DATA -->
@@ -128,6 +113,18 @@
             </waltz-no-data>
         </div>
 
+        <!-- SELECTED CATEGORY -->
+        <div ng-if="!$ctrl.visibility.editor && !$ctrl.selectedRow && $ctrl.selectedCategory">
+            <br>
+
+            <!-- ADD -->
+            <div waltz-has-role="CAPABILITY_EDITOR">
+                <a class="clickable"
+                   ng-click="$ctrl.beginNewRelationship()">
+                    Add new relationship...
+                </a>
+            </div>
+        </div>
 
         <div ng-if="$ctrl.visibility.createEditor"
              class="waltz-fade-if">
