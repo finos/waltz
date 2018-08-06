@@ -14,5 +14,11 @@ services:
       - "4000:80"
     networks:
       - webnet
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER: 'user'
+      - POSTGRES_PASSWORD: 'password'
 networks:
   webnet:
