@@ -39,7 +39,8 @@ import AccessLog from "./access-log";
 import Actor from "./actor";
 import Alias from "./alias";
 import Applications from "./applications";
-import AppGroups from "./app-groups";
+import AssessmentDefinition from "./app-groups";
+import AppGroups from "./assessment_definition";
 import AssetCost from "./asset-cost";
 import Attestation from "./attestation";
 import AuthSources from "./auth-sources";
@@ -133,6 +134,7 @@ const dependencies = [
     Alias(),
     Applications(),
     AppGroups(),
+    AssessmentDefinition(),
     AssetCost(),
     Attestation(),
     AuthSources(),
