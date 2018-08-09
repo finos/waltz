@@ -21,6 +21,7 @@ import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
 import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
+import {AssessmentDefinitionStore_API as AssessmentDefinitionStore} from "../../assessment_definition/services/assessment-definition-store";
 import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
@@ -88,6 +89,7 @@ export const CORE_API = {
     AttestationInstanceStore,
     AttestationRunStore,
     AssetCostStore,
+    AssessmentDefinitionStore,
     AuthSourcesStore,
     BookmarkStore,
     ChangeInitiativeStore,
