@@ -37,6 +37,7 @@ const rowGroup = {
 
 const column = {
     width: 100,
+    height: 120,
     padding: 0.2,
     dx: rowGroup.label.width + row.label.width,
     label: {

@@ -24,6 +24,7 @@ import {createGroupElements} from "../../../common/d3-utils";
 import {setupZoom} from "./roadmap-diagram-utils";
 import {draw} from "./roadmap-diagram-render";
 
+
 const bindings = {
     parentEntityRef: "<",
     scope: "@"
@@ -33,15 +34,15 @@ const bindings = {
 const initialState = {};
 
 
-
 function setupGroupElements($element) {
     const svg = select($element.find("svg")[0]);
     const definitions = [
         {
             name: "holder",
             children: [
-                { name: "columns", children: [ {name : "colLabels"}, { name: "colMain" } ]},
-                { name: "rowGroups", children: [ {name : "rgLabels"}, { name: "rgMain" } ]},
+                { name: "grid", children: [ { name: 'gridContent' }] },
+                { name: "columns", children: [ { name: 'columnHeaders' }] },
+                { name: "rowGroups", children: [ { name: 'rowGroupHeaders' }]  }
             ]
         }
     ];

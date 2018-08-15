@@ -21,8 +21,7 @@ import {ROADMAP_LAYOUT_OPTIONS} from "./roadmap-diagram-options";
 
 
 function calcRowGroupLayout(rowGroupDefs = [], totalWidth) {
-    const headingPadding = ROADMAP_LAYOUT_OPTIONS.column.label.height * ROADMAP_LAYOUT_OPTIONS.column.padding;
-    let yPtr = ROADMAP_LAYOUT_OPTIONS.column.label.height + (0.5 * headingPadding);
+    let yPtr = 0;
 
     return _.map(
         rowGroupDefs,
@@ -44,7 +43,7 @@ function calcRowGroupLayout(rowGroupDefs = [], totalWidth) {
 }
 
 
-function calcColLayouts(columnDefs = [], totalHeight) {
+function calcColLayouts(columnDefs = []) {
     return _.map(
         columnDefs,
         (c, idx) => {
@@ -54,7 +53,7 @@ function calcColLayouts(columnDefs = [], totalHeight) {
             const layout = {
                 x: (idx * totalColumnWidth) + (0.5 * columnPadding),
                 y: 0,
-                height: totalHeight,
+                height: oc.height,
                 width: oc.width
             };
             return Object.assign({}, c, {layout});
