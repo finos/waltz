@@ -21,6 +21,7 @@ package com.khartec.waltz.service.assessment_definition;
 
 
 import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,5 +52,10 @@ public class AssessmentDefinitionService {
 
     public List<AssessmentDefinition> findAll() {
         return assessmentDefinitionDao.findAll();
+    }
+
+
+    public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
+        return assessmentDefinitionDao.findByEntityKind(kind);
     }
 }

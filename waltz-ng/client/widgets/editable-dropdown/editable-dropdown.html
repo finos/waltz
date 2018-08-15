@@ -4,6 +4,10 @@
     <span ng-if='!$ctrl.visibility.editor'>
 
         <span ng-bind="$ctrl.getName($ctrl.currentVal)"></span>
+        <span ng-if="$ctrl.currentComments"
+              ng-bind="$ctrl.currentComments"
+              class="small text-muted">
+        </span>
 
         <a ng-click="$ctrl.onEdit()"
            ng-if="$ctrl.editRole"
@@ -27,6 +31,11 @@
                 ng-options="item.code as item.name for item in $ctrl.dropdownValues"
                 class="form-control">
         </select>
+
+        <input type="text"
+               ng-if="$ctrl.commentsAllowed"
+               ng-model="$ctrl.currentComments"
+               class="form-control input-sm small text-muted">
 
         <button class="btn btn-xs btn-success"
                 ng-disabled="$ctrl.saving"

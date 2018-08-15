@@ -84,4 +84,11 @@ public class AssessmentDefinitionDao {
                 .fetch(TO_DOMAIN);
     }
 
+
+    public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
+        return dsl.selectFrom(ASSESSMENT_DEFINITION)
+                .where(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name()))
+                .fetch(TO_DOMAIN);
+    }
+
 }

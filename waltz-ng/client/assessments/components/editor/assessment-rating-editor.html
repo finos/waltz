@@ -1,0 +1,31 @@
+<div class="waltz-assessment-rating-editor">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="waltz-field-table"
+                   style="width: 100%">
+                <colgroup>
+                    <col width="30%">
+                    <col width="70%">
+                </colgroup>
+                <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
+                    <td class="wft-label">
+                        <span ng-bind="def.name"></span>
+                        <span ng-if="def.externalId">
+                                (<span ng-bind="def.externalId"> </span>)
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-editable-dropdown initial-val="def.rating.ratingId"
+                                                 entries="def.dropdownEntries"
+                                                 comments-allowed="true"
+                                                 initial-comments="def.rating.description"
+                                                 on-save="$ctrl.onRatingEdit"
+                                                 edit-role="{{ def.permittedRole }}"
+                                                 ctx="def">
+                        </waltz-editable-dropdown>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

@@ -17,11 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {registerStore} from '../../common/module-utils';
+package com.khartec.waltz.model.assessment_rating;
 
-import * as assessmentDefinitionStore from './assessment-definition-store';
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.ProvenanceProvider;
+import org.immutables.value.Value;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableSaveAssessmentRatingCommand.class)
+@JsonDeserialize(as = ImmutableSaveAssessmentRatingCommand.class)
+public abstract class SaveAssessmentRatingCommand extends AssessmentRatingCommand implements
+        DescriptionProvider,
+        ProvenanceProvider {
+
+    public abstract long ratingId();
+}
 
 
-export default (module) => {
-    registerStore(module, assessmentDefinitionStore);
-};

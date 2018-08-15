@@ -17,46 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { registerStores } from '../../common/module-utils';
 
-export function store($http, BaseApiUrl) {
-    const BASE = `${BaseApiUrl}/assessment-definition`;
-
-
-    const getById = (id) => $http
-        .get(`${BASE}/id/${id}`)
-        .then(result => result.data);
-
-    const findAll = (ids) => $http
-        .get(`${BASE}/all`)
-        .then(x => x.data);
+import * as assessmentDefinitionStore from './assessment-definition-store';
+import * as assessmentRatingStore from './assessment-rating-store';
 
 
-    return {
-        getById,
-        findAll,
-    };
-}
-
-
-store.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
-
-
-export const serviceName = 'AssessmentDefinitionStore';
-
-
-export const AssessmentDefinitionStore_API = {
-    getById: {
-        serviceName,
-        serviceFnName: 'getById',
-        description: 'retrieve a single definition (or null) given an id'
-    },
-    findAll: {
-        serviceName,
-        serviceFnName: 'findAll',
-        description: 'find all assessment definitions'
-    },
+export default (module) => {
+    registerStores(module, [
+        assessmentDefinitionStore,
+        assessmentRatingStore
+    ]);
 };
-
