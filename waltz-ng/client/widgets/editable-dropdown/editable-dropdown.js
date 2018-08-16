@@ -26,14 +26,17 @@ import template from "./editable-dropdown.html";
 const bindings = {
     initialVal: "<",
     entries: "<", // [ { code, name, position? }, ... ]
+    commentsAllowed: "@?",
+    initialComments: "<?",
     onSave: "<",
     editRole: "@",
-    ctx: '<?'
+    ctx: "<?"
 };
 
 
 const initialState = {
     currentVal: null,
+    currentComments: null,
     dropdownValues: [],
     dropdownsByCode: {},
     visibility: {
@@ -47,6 +50,7 @@ function controller() {
 
     vm.$onChanges = () => {
         vm.currentVal = vm.initialVal;
+        vm.currentComments = vm.initialComments;
 
         if (vm.entries) {
             vm.dropdownValues = _.orderBy(vm.entries, ['position', 'name']);
@@ -67,7 +71,7 @@ function controller() {
         vm.saving = true;
 
         return vm
-            .onSave(vm.currentVal, vm.ctx)
+            .onSave(vm.currentVal, vm.currentComments, vm.ctx)
             .then(() => {
                 vm.visibility.editor = false;
                 vm.saving = false;

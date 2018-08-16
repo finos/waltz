@@ -1,0 +1,32 @@
+<waltz-sub-section name="Assessments">
+    <content>
+        <div class="waltz-sub-section-content">
+            <div ng-if="! $ctrl.visibility.editor"
+                 class="waltz-highlight-if">
+                <waltz-assessment-rating-panel parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-panel>
+            </div>
+            <div ng-if="$ctrl.visibility.editor"
+                 class="waltz-highlight-if">
+                <waltz-assessment-rating-editor parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-editor>
+            </div>
+        </div>
+        <div class="waltz-sub-section-controls">
+            <span>
+                <a ng-click="$ctrl.visibility.editor = true"
+                   ng-if="! $ctrl.visibility.editor"
+                   class="clickable">
+                    Edit
+                </a>
+
+                <a ng-click="$ctrl.visibility.editor = false"
+                   ng-if="$ctrl.visibility.editor"
+                   class="clickable">
+                    Done
+                </a>
+            </span>
+        </div>
+
+    </content>
+</waltz-sub-section>
