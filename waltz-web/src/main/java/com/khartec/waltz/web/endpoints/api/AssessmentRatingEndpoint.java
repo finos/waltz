@@ -21,8 +21,11 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.*;
+import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +47,22 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "assessment-rating");
 
     private final AssessmentRatingService assessmentRatingService;
+    private final AssessmentDefinitionService assessmentDefinitionService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService) {
+    public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService,
+                                    AssessmentDefinitionService assessmentDefinitionService,
+                                    UserRoleService userRoleService) {
+
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
+        checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
+        this.assessmentDefinitionService = assessmentDefinitionService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -69,21 +81,22 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
 
     private boolean updateRoute(Request request, Response z) throws IOException {
-//        requireRole(userRoleService, request, Role.RATING_EDITOR);
         SaveAssessmentRatingCommand command = mkCommand(request);
+        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
+        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
         return assessmentRatingService.update(command);
     }
 
 
     private boolean createRoute(Request request, Response z) throws IOException {
-//        requireRole(userRoleService, request, Role.RATING_EDITOR);
         SaveAssessmentRatingCommand command = mkCommand(request);
+        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
+        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
         return assessmentRatingService.create(command);
     }
 
 
     private boolean removeRoute(Request request, Response z) throws IOException {
-//        requireRole(userRoleService, request, Role.RATING_EDITOR);
         String username = getUsername(request);
         LastUpdate lastUpdate = LastUpdate.mkForUser(username);
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
@@ -92,6 +105,9 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
+
+        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
+        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
         return assessmentRatingService.remove(command);
     }
 

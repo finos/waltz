@@ -263,4 +263,14 @@
                        tableName="assessment_rating" />
     </changeSet>
 
+    <changeSet id="20180810-3321-3"
+               author="kamransaleem">
+        <createIndex indexName="idx_assessment_rating_entity"
+                     tableName="assessment_rating"
+                     unique="false">
+            <column name="entity_id" type="${id.type}"></column>
+            <column name="entity_kind" type="${enum.type}"></column>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

@@ -27,7 +27,7 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
     const findAll = () => $http
-        .get(`${BASE}`)
+        .get(BASE)
         .then(x => x.data);
 
     const findByKind = (kind) => $http
