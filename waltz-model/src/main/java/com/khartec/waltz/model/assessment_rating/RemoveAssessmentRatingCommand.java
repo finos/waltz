@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import services from './services';
+package com.khartec.waltz.model.assessment_rating;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
 
-export default () => {
+@Value.Immutable
+@JsonSerialize(as = ImmutableRemoveAssessmentRatingCommand.class)
+@JsonDeserialize(as = ImmutableRemoveAssessmentRatingCommand.class)
+public abstract class RemoveAssessmentRatingCommand extends AssessmentRatingCommand {
 
-    const module = angular.module('waltz.assessment.definitions', []);
-
-    services(module);
-
-    return module.name;
-};
+}

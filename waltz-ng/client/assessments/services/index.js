@@ -17,11 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {registerStore} from '../../common/module-utils';
+import { registerStores } from '../../common/module-utils';
 
 import * as assessmentDefinitionStore from './assessment-definition-store';
+import * as assessmentRatingStore from './assessment-rating-store';
 
 
 export default (module) => {
-    registerStore(module, assessmentDefinitionStore);
+    registerStores(module, [
+        assessmentDefinitionStore,
+        assessmentRatingStore
+    ]);
 };

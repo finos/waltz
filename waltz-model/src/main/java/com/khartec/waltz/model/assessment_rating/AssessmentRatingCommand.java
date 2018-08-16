@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,37 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './playpen5.html';
 
+package com.khartec.waltz.model.assessment_rating;
 
-const initialState = {
-};
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.LastUpdatedProvider;
 
+public abstract class AssessmentRatingCommand implements LastUpdatedProvider {
 
-function controller() {
+    public abstract EntityReference entityReference();
 
-    const vm = Object.assign(this, initialState);
-
-    vm.entityReference = {
-        kind: 'CHANGE_INITIATIVE',
-        id: 1
-    };
-
+    public abstract long assessmentDefinitionId();
 }
-
-
-controller.$inject = [
-];
-
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

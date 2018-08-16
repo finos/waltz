@@ -28,8 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -52,13 +51,16 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, ":id");
-        String findAllPath = mkPath(BASE_URL, "all");
+        String findAllPath = mkPath(BASE_URL);
+        String findByKind = mkPath(BASE_URL, "kind", ":kind");
 
         DatumRoute<AssessmentDefinition> getByIdRoute = (request, response) -> assessmentDefinitionService.getById(getId(request));
         ListRoute<AssessmentDefinition> findAllRoute = (request, response) -> assessmentDefinitionService.findAll();
+        ListRoute<AssessmentDefinition> findByKindRoute = (request, response) -> assessmentDefinitionService.findByEntityKind(getKind(request));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
+        getForList(findByKind, findByKindRoute);
     }
 
 }
