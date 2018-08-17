@@ -355,6 +355,8 @@ public class PhysicalFlowService {
                 return physicalFlowDao.updateTransport(flowId, TransportKind.valueOf(command.value()));
             case "basisOffset":
                 return physicalFlowDao.updateBasisOffset(flowId, Integer.parseInt(command.value()));
+            case "description":
+                return physicalFlowDao.updateDescription(flowId, command.value());
             default:
                 String errMsg = String.format(
                         "Cannot update attribute %s on flow as unknown attribute name",
