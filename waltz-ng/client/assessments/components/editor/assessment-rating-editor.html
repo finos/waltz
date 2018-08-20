@@ -15,14 +15,39 @@
                         </span>
                     </td>
                     <td>
-                        <waltz-editable-dropdown initial-val="def.rating.ratingId"
-                                                 entries="def.dropdownEntries"
-                                                 comments-allowed="true"
-                                                 initial-comments="def.rating.description"
-                                                 on-save="$ctrl.onRatingEdit"
-                                                 edit-role="{{ def.permittedRole }}"
-                                                 ctx="def">
-                        </waltz-editable-dropdown>
+                        <span ng-if="def.isReadOnly === false">
+                            <waltz-editable-dropdown initial-val="def.rating.ratingId"
+                                                     entries="def.dropdownEntries"
+                                                     comments-allowed="true"
+                                                     initial-comments="def.rating.description"
+                                                     on-save="$ctrl.onRatingEdit"
+                                                     edit-role="{{ def.permittedRole }}"
+                                                     ctx="def">
+                            </waltz-editable-dropdown>
+                        </span>
+
+                        <span ng-if="def.isReadOnly">
+                             <span ng-bind="def.ratingItem.name">
+                             </span>
+
+                            <span class="text-muted small"
+                                  uib-popover="This assessment is read only and cannot be edited"
+                                  popover-trigger="mouseenter">
+                                (read only)
+                            </span>
+
+                             <span ng-if="def.rating.description">
+                                    <br>
+                                    <span class="small text-muted"
+                                          style="padding-left: 22px"
+                                          ng-bind="def.rating.description | limitTo: 30">
+                                    </span>
+                                    <span ng-if="def.rating.description.length > 30">
+                                        ...
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
                     </td>
                 </tr>
             </table>

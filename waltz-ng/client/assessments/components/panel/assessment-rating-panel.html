@@ -1,50 +1,61 @@
 <div class="waltz-assessment-rating-panel">
     <div class="row">
         <div class="col-md-12">
+            <waltz-no-data ng-if="$ctrl.enrichedAssessmentDefinitions.length === 0">
+                <message>
+                    <strong>
+                        No Assessments Found
+                    </strong>
+                </message>
+            </waltz-no-data>
 
-            <table class="waltz-field-table"
-                   style="width: 100%">
-                <colgroup>
-                    <col width="30%">
-                    <col width="70%">
-                </colgroup>
-                <tbody>
-                    <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
-                        <td class="wft-label">
-                            <span ng-bind="def.name"></span>
-                            <span class="small text-muted"
-                                  ng-if="def.externalId">
-                                (<span ng-bind="def.externalId"> </span>)
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-if="def.rating"
-                                  uib-popover-template="'ado-popover.html'"
-                                  popover-placement="right"
-                                  popover-trigger="mouseenter"
-                                  popover-popup-delay="300"
-                                  popover-append-to-body="true">
-                                <waltz-rating-indicator-cell rating="def.ratingItem">
-                                </waltz-rating-indicator-cell>
-                                <span ng-bind="def.ratingItem.name">
+            <span ng-if="$ctrl.enrichedAssessmentDefinitions.length > 0">
+                <table class="waltz-field-table"
+                       style="width: 100%">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="70%">
+                    </colgroup>
+                    <tbody>
+                        <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
+                            <td class="wft-label">
+                                <span ng-bind="def.name"></span>
+                                <span class="small text-muted"
+                                      ng-if="def.externalId">
+                                    (<span ng-bind="def.externalId"> </span>)
                                 </span>
-
-                                <span ng-if="def.rating.description">
-                                    <br>
-                                    <span class="small text-muted"
-                                          style="padding-left: 22px"
-                                          ng-bind="def.rating.description | limitTo: 30">
+                            </td>
+                            <td>
+                                <span ng-if="def.rating"
+                                      uib-popover-template="'ado-popover.html'"
+                                      popover-placement="right"
+                                      popover-trigger="mouseenter"
+                                      popover-popup-delay="300"
+                                      popover-append-to-body="true">
+                                    <waltz-rating-indicator-cell rating="def.ratingItem">
+                                    </waltz-rating-indicator-cell>
+                                    <span ng-bind="def.ratingItem.name">
                                     </span>
-                                    <span ng-if="def.rating.description.length > 30">...</span>
+
+                                    <span ng-if="def.rating.description">
+                                        <br>
+                                        <span class="small text-muted"
+                                              style="padding-left: 22px"
+                                              ng-bind="def.rating.description | limitTo: 30">
+                                        </span>
+                                        <span ng-if="def.rating.description.length > 30">
+                                            ...
+                                        </span>
+                                    </span>
                                 </span>
-                            </span>
-                            <span ng-if="!def.rating">
-                                N/A
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                <span ng-if="!def.rating">
+                                    N/A
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </span>
         </div>
     </div>
 </div>

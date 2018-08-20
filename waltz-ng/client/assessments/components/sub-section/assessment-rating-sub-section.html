@@ -12,7 +12,8 @@
                 </waltz-assessment-rating-editor>
             </div>
         </div>
-        <div class="waltz-sub-section-controls">
+        <div class="waltz-sub-section-controls"
+             ng-if="$ctrl.visibility.editBtn">
             <span>
                 <a ng-click="$ctrl.visibility.editor = true"
                    ng-if="! $ctrl.visibility.editor"
