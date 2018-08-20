@@ -40,6 +40,7 @@ import Actor from "./actor";
 import Alias from "./alias";
 import Applications from "./applications";
 import AppGroups from "./app-groups";
+import Assessments from "./assessments";
 import AssetCost from "./asset-cost";
 import Attestation from "./attestation";
 import AuthSources from "./auth-sources";
@@ -133,6 +134,7 @@ const dependencies = [
     Alias(),
     Applications(),
     AppGroups(),
+    Assessments(),
     AssetCost(),
     Attestation(),
     AuthSources(),

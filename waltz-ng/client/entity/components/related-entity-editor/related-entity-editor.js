@@ -75,7 +75,7 @@ function controller() {
             .then(() => vm.currentRelationship = {});
     };
 
-    vm.onRelationshipEdit = (value, ctx) => {
+    vm.onRelationshipEdit = (value, comments, ctx) => {
         vm.currentRelationship = {
             entity: ctx.entity,
             relationship: value

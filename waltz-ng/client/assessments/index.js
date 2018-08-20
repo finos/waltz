@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,37 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './playpen5.html';
+
+import services from './services';
+import { registerComponents } from '../common/module-utils';
+import AssessmentRatingEditor from './components/editor/assessment-rating-editor';
+import AssessmentRatingPanel from './components/panel/assessment-rating-panel';
+import AssessmentRatingSubSection from './components/sub-section/assessment-rating-sub-section';
 
 
-const initialState = {
+export default () => {
+
+    const module = angular.module('waltz.assessments', []);
+
+    services(module);
+
+    registerComponents(module, [
+        AssessmentRatingEditor,
+        AssessmentRatingPanel,
+        AssessmentRatingSubSection
+    ]);
+
+    return module.name;
 };
-
-
-function controller() {
-
-    const vm = Object.assign(this, initialState);
-
-    vm.entityReference = {
-        kind: 'CHANGE_INITIATIVE',
-        id: 1
-    };
-
-}
-
-
-controller.$inject = [
-];
-
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: 'ctrl',
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

@@ -118,12 +118,15 @@ export function ragToRatingSchemeItem(code = 'Z', schemeName = 'base') {
 
 /**
  * Given a flat list of rating schemes returns them indexed by their ids.  Also each scheme has
- * an additional map giving 'ratingsByCode'.
+ * an additional maps giving 'ratingsByCode' and 'ratingsById' .
  * @param schemes
  */
 export function indexRatingSchemes(schemes = []) {
     return _.chain(schemes)
-        .map(scheme => Object.assign({}, scheme, { ratingsByCode: _.keyBy(scheme.ratings, 'rating')}))
+        .map(scheme => Object.assign({}, scheme, {
+            ratingsByCode: _.keyBy(scheme.ratings, 'rating'),
+            ratingsById: _.keyBy(scheme.ratings, 'id'),
+        }))
         .keyBy("id")
         .value();
 }
