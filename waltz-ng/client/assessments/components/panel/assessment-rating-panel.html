@@ -1,6 +1,7 @@
 <div class="waltz-assessment-rating-panel">
     <div class="row">
         <div class="col-md-12">
+
             <table class="waltz-field-table"
                    style="width: 100%">
                 <colgroup>
@@ -11,7 +12,8 @@
                     <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
                         <td class="wft-label">
                             <span ng-bind="def.name"></span>
-                            <span ng-if="def.externalId">
+                            <span class="small text-muted"
+                                  ng-if="def.externalId">
                                 (<span ng-bind="def.externalId"> </span>)
                             </span>
                         </td>
@@ -25,6 +27,15 @@
                                 <waltz-rating-indicator-cell rating="def.ratingItem">
                                 </waltz-rating-indicator-cell>
                                 <span ng-bind="def.ratingItem.name">
+                                </span>
+
+                                <span ng-if="def.rating.description">
+                                    <br>
+                                    <span class="small text-muted"
+                                          style="padding-left: 22px"
+                                          ng-bind="def.rating.description | limitTo: 30">
+                                    </span>
+                                    <span ng-if="def.rating.description.length > 30">...</span>
                                 </span>
                             </span>
                             <span ng-if="!def.rating">

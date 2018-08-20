@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.*;
@@ -122,7 +123,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
-                .description(String.valueOf(body.getOrDefault("description", null)))
+                .description(StringUtilities.mkSafe((String) body.get("description")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .provenance("waltz")
