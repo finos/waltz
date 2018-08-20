@@ -3,7 +3,6 @@ package com.khartec.waltz.jobs.tools;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -21,10 +20,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.toSet;
 
 public class ShortestPath {
+
+    private static String[] sourceAssetCodes = new String[] {
+           "assetCode1",
+           "assetCode2",
+           "assetCode3"
+    };
+
+
+    private static String targetAssetCode = "26877-2";
 
 
     public static void main(String[] args) {
@@ -33,29 +40,63 @@ public class ShortestPath {
         ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
         List<LogicalFlow> allActive = logicalFlowDao.findAllActive();
 
-
         Graph<EntityReference, DefaultEdge> g = createGraph(allActive);
 
-        EntityReference start = mkRef(EntityKind.APPLICATION, 404);
-        EntityReference end = mkRef(EntityKind.APPLICATION, 387);
+        Application targetApp = findFirstMatchByCode(applicationDao, targetAssetCode);
+        Stream.of(sourceAssetCodes)
+                .map(assetCode -> findFirstMatchByCode(applicationDao, assetCode))
+                .filter(a -> a != null)
+                .map(sourceApp -> {
+                    System.out.printf("Route from: %s (%s)\n----------------------\n", sourceApp.name(), sourceApp.assetCode().orElse(""));
+                    return sourceApp.entityReference();
+                })
+                .filter(sourceRef -> {
+                    if (!g.containsVertex(sourceRef)) {
+                        System.out.println("No flows defined for application\n\n");
+                        return false;
+                    }
+                    return true;
+                })
+                .map(sourceRef -> findShortestPath(g, sourceRef, targetApp.entityReference()))
+                .filter(route -> {
+                    if (route == null) {
+                        System.out.println("No route found\n\n");
+                        return false;
+                    }
+                    return true;
+                })
+                .forEach(route -> {
+                    List<DefaultEdge> edgeList = route.getEdgeList();
+                    Set<Long> appIds = edgeList.stream()
+                            .flatMap(e -> Stream.of(g.getEdgeSource(e).id(), g.getEdgeTarget(e).id()))
+                            .collect(toSet());
+                    Map<Long, Application> appsById = MapUtilities.indexBy(a -> a.id().get(), applicationDao.findByIds(appIds));
+
+                    edgeList.forEach(edge -> {
+                        Application source = appsById.get(g.getEdgeSource(edge).id());
+                        Application target = appsById.get(g.getEdgeTarget(edge).id());
+                        System.out.printf(
+                                "%s (%s) -> %s (%s) \n",
+                                source.name(),
+                                source.assetCode().orElse(""),
+                                target.name(),
+                                target.assetCode().orElse(""));
+                    });
+
+                    System.out.println();
+                    System.out.println();
+
+                });
 
 
-        GraphPath<EntityReference, DefaultEdge> route = findShortestPath(g, start, end);
+    }
 
-        List<DefaultEdge> edgeList = route.getEdgeList();
-
-
-        Set<Long> appIds = edgeList.stream()
-                .flatMap(e -> Stream.of(g.getEdgeSource(e).id(), g.getEdgeTarget(e).id()))
-                .collect(toSet());
-
-        Map<Long, Application> appsById = MapUtilities.indexBy(a -> a.id().get(), applicationDao.findByIds(appIds));
-
-        edgeList.forEach(edge -> System.out.printf(
-                    "%s -> %s\n",
-                    appsById.get(g.getEdgeSource(edge).id()).name(),
-                    appsById.get(g.getEdgeTarget(edge).id()).name()));
-
+    private static Application findFirstMatchByCode(ApplicationDao applicationDao, String assetCode) {
+        List<Application> apps = applicationDao.findByAssetCode(assetCode);
+        // should be only one
+        return apps.size() > 0
+            ? apps.get(0)
+            : null;
     }
 
 
@@ -68,15 +109,15 @@ public class ShortestPath {
     }
 
 
-    private static Graph<EntityReference, DefaultEdge> createGraph(List<LogicalFlow> allActive) {
+    private static Graph<EntityReference, DefaultEdge> createGraph(List<LogicalFlow> flows) {
         Graph<EntityReference, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
-        allActive
+        flows
                 .stream()
                 .flatMap(f -> Stream.of(f.source(), f.target()))
                 .distinct()
                 .forEach(v -> g.addVertex(v));
 
-        allActive
+        flows
                 .forEach(f -> g.addEdge(f.source(), f.target()));
         return g;
     }
