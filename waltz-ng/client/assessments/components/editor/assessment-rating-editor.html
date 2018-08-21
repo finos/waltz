@@ -21,11 +21,11 @@
                                                      comments-allowed="true"
                                                      initial-comments="def.rating.description"
                                                      on-save="$ctrl.onRatingEdit"
+                                                     on-remove="$ctrl.onRatingRemove"
                                                      edit-role="{{ def.permittedRole }}"
                                                      ctx="def">
                             </waltz-editable-dropdown>
                         </span>
-
                         <span ng-if="def.isReadOnly">
                              <span ng-bind="def.ratingItem.name">
                              </span>

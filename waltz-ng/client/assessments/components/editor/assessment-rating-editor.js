@@ -65,16 +65,20 @@ function controller($q, serviceBroker) {
 
 
     vm.onRatingEdit = (value, comments, ctx) => {
-        let savePromise = $q.when();
-        if(ctx.rating != null) {
-            //update
-            savePromise = serviceBroker.execute(CORE_API.AssessmentRatingStore.update, [vm.parentEntityRef, ctx.id, value, comments]);
-        } else {
-            //create
-            savePromise = serviceBroker.execute(CORE_API.AssessmentRatingStore.create, [vm.parentEntityRef, ctx.id, value, comments]);
-        }
-        return savePromise
-            .then(() => loadAll(true))
+        const saveMethod = ctx.rating
+            ? CORE_API.AssessmentRatingStore.update
+            : CORE_API.AssessmentRatingStore.create;
+        return serviceBroker
+            .execute(saveMethod, [vm.parentEntityRef, ctx.id, value, comments])
+            .then(() => loadAll(true));
+    };
+
+    vm.onRatingRemove = (ctx) => {
+        console.log("REMOVING VALUE", ctx);
+        return serviceBroker
+            .execute(CORE_API.AssessmentRatingStore.remove, [vm.parentEntityRef, ctx.id])
+            .then(() => loadAll(true));
+
     };
 }
 

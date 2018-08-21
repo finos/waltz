@@ -9,6 +9,7 @@
               class="small text-muted">
         </span>
 
+        <!-- role restricted -->
         <a ng-click="$ctrl.onEdit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"
@@ -16,11 +17,21 @@
             <waltz-icon name="pencil"></waltz-icon>
             Edit
         </a>
+
+        <!-- NOT role restricted -->
         <a ng-click="$ctrl.onEdit()"
            ng-if="! $ctrl.editRole"
            class="btn btn-xs waltz-visibility-child-30">
             <waltz-icon name="pencil"></waltz-icon>
             Edit
+        </a>
+
+        <!-- optional based on presence of onRemove fn -->
+        <a class="btn btn-xs waltz-visibility-child-30"
+                ng-if="$ctrl.onRemove && $ctrl.currentVal"
+                ng-click="$ctrl.onRemove($ctrl.ctx)">
+            <waltz-icon name="trash"></waltz-icon>
+            Remove
         </a>
     </span>
 
