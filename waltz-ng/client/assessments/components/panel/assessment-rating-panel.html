@@ -9,8 +9,9 @@
                 </message>
             </waltz-no-data>
 
-            <span ng-if="$ctrl.enrichedAssessmentDefinitions.length > 0">
-                <table class="waltz-field-table"
+            <div ng-if="$ctrl.enrichedAssessmentDefinitions.length > 0"
+                 ng-class="{ 'waltz-scroll-region-200' : $ctrl.enrichedAssessmentDefinitions.length > 7}">
+                <table class="waltz-field-table waltz-field-table-border"
                        style="width: 100%">
                     <colgroup>
                         <col width="30%">
@@ -25,7 +26,7 @@
                                     (<span ng-bind="def.externalId"> </span>)
                                 </span>
                             </td>
-                            <td>
+                            <td valign="top">
                                 <span ng-if="def.rating"
                                       uib-popover-template="'ado-popover.html'"
                                       popover-placement="right"
@@ -55,7 +56,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </span>
+            </div>
         </div>
     </div>
 </div>

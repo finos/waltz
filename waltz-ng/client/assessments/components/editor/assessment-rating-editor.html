@@ -1,7 +1,7 @@
 <div class="waltz-assessment-rating-editor">
     <div class="row">
         <div class="col-md-12">
-            <table class="waltz-field-table"
+            <table class="waltz-field-table waltz-field-table-border"
                    style="width: 100%">
                 <colgroup>
                     <col width="30%">
@@ -14,7 +14,7 @@
                                 (<span ng-bind="def.externalId"> </span>)
                         </span>
                     </td>
-                    <td>
+                    <td valign="top">
                         <span ng-if="def.isReadOnly === false">
                             <waltz-editable-dropdown initial-val="def.rating.ratingId"
                                                      entries="def.dropdownEntries"

@@ -2,6 +2,7 @@ import {initialiseData} from "../../../common";
 
 import template from "./assessment-rating-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import _ from "lodash";
 
 
 const bindings = {
@@ -23,7 +24,6 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
         serviceBroker
             .loadAppData(CORE_API.AssessmentDefinitionStore.findByKind, [ vm.parentEntityRef.kind ])
-            .then(r => console.log(r.data) || r)
             .then(r => {
                 const hasDefinitions = (r.data || []).length > 0;
                 const allReadOnly = _.every(r.data, d => d.isReadOnly);

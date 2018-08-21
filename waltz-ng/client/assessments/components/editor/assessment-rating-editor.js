@@ -17,12 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from '../../../common';
-import { indexRatingSchemes } from '../../../ratings/rating-utils';
-
-
-import template from './assessment-rating-editor.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
+import template from "./assessment-rating-editor.html";
 
 
 const bindings = {
@@ -35,23 +33,6 @@ const initialState = {
     assessmentRatings: [],
     ratingSchemes: [],
 };
-
-
-function mkEnrichedAssessmentDefinitions(assessmentDefinitions, ratingSchemes, assessmentRatings) {
-    const ratingSchemesByIdByItemId = indexRatingSchemes(ratingSchemes);
-    const ratingsByDefinitionId = _.keyBy(assessmentRatings, 'assessmentDefinitionId');
-
-    return _.map(assessmentDefinitions, d => {
-        const ratingScheme = _.get(ratingSchemesByIdByItemId, `[${d.ratingSchemeId}]`);
-        const rating = _.get(ratingsByDefinitionId, `[${d.id}]`, null);
-        const ratingItem = rating != null
-            ? _.get(ratingScheme, `ratingsById[${rating.ratingId}]`)
-            : null;
-
-        const dropdownEntries = _.map(ratingScheme.ratings, r => Object.assign({}, {name: r.name, code: r.id, position: r.position}));
-        return Object.assign({}, d, { rating, ratingItem, dropdownEntries });
-    });
-}
 
 
 function controller($q, serviceBroker) {
