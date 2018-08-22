@@ -29,6 +29,7 @@ const bindings = {
     commentsAllowed: "@?",
     initialComments: "<?",
     onSave: "<",
+    onRemove: "<?",
     editRole: "@",
     ctx: "<?"
 };
