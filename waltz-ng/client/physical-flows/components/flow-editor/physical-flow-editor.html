@@ -52,5 +52,16 @@
                 </waltz-editable-field>
             </td>
         </tr>
+        <tr>
+            <td class="wft-label">
+                <label>Description</label>
+            </td>
+            <td>
+                <waltz-editable-field on-save="$ctrl.onSaveDescription"
+                                      field-type="textarea"
+                                      initial-val="$ctrl.physicalFlow.description">
+                </waltz-editable-field>
+            </td>
+        </tr>
     </table>
 </div>
