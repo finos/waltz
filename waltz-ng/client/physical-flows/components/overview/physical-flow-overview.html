@@ -79,6 +79,15 @@
                                             </td>
                                         </tr>
                                     </table>
+
+                                    <div ng-if="$ctrl.physicalFlow.description">
+                                        <hr>
+
+                                        <waltz-markdown class="small text-muted"
+                                                        text="$ctrl.physicalFlow.description">
+                                        </waltz-markdown>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -99,6 +108,8 @@
             </table>
         </div>
     </div>
+
+    <br>
 
     <div class="row">
         <div class="col-md-12">
