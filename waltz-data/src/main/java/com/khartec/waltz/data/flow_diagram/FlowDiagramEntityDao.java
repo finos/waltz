@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
@@ -149,4 +150,13 @@ public class FlowDiagramEntityDao {
                 .execute() == 1;
     }
 
+    public void clone(long diagramId, Long clonedDiagramId) {
+        List<FlowDiagramEntity> diagramEntities = findForDiagram(diagramId);
+        List<FlowDiagramEntity> clonedDiagramEntities = map(diagramEntities, d -> ImmutableFlowDiagramEntity
+                .copyOf(d)
+                .withDiagramId(clonedDiagramId));
+        createEntities(clonedDiagramEntities);
+
+
+    }
 }

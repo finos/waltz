@@ -43,7 +43,8 @@ public abstract class PhysicalFlow implements
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
-        ExternalIdProvider {
+        ExternalIdProvider,
+        WaltzEntity {
 
     public abstract long logicalFlowId();
 

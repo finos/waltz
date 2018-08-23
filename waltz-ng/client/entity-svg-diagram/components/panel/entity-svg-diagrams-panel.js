@@ -18,12 +18,12 @@
  */
 
 import {initialiseData} from "../../../common/index";
-import {CORE_API} from '../../../common/services/core-api-utils';
-import template from "./entity-svg-diagrams-section.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import template from "./entity-svg-diagrams-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -49,7 +49,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -62,5 +62,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntitySvgDiagramsSection'
+    id: "waltzEntitySvgDiagramsPanel"
 };

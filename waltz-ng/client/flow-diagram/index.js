@@ -20,30 +20,27 @@
 import angular from "angular";
 
 
-import FlowDiagramStore from './services/flow-diagram-store';
-import FlowDiagramAnnotationStore from './services/flow-diagram-annotation-store';
-import FlowDiagramEntityStore from './services/flow-diagram-entity-store';
+import FlowDiagramStore from "./services/flow-diagram-store";
+import FlowDiagramAnnotationStore from "./services/flow-diagram-annotation-store";
+import FlowDiagramEntityStore from "./services/flow-diagram-entity-store";
 
-import FlowDiagramStarterService from './services/flow-diagram-starter-service';
-import FlowDiagramStateService from './services/flow-diagram-state-service';
+import FlowDiagramStateService from "./services/flow-diagram-state-service";
 
-import flowDiagram from './components/diagram/flow-diagram';
-import flowDiagramLogicalFlowPopup from './components/editor/flow-diagram-logical-flow-popup';
-import flowDiagramNodePopup from './components/editor/flow-diagram-node-popup';
-import flowDiagramPhysicalFlowPopup from './components/editor/flow-diagram-physical-flow-popup';
-import flowDiagramAnnotationPopup from './components/editor/flow-diagram-annotation-popup';
-import flowDiagramEditor from './components/editor/flow-diagram-editor';
-import FlowDiagramsPanel from './components/diagrams-panel/flow-diagrams-panel';
-import FlowDiagramsPanelBrowse from './components/diagrams-panel/browse/flow-diagrams-panel-browse';
-import FlowDiagramsPanelView from './components/diagrams-panel/view/flow-diagrams-panel-view';
-import flowDiagramsSection from './components/section/flow-diagrams-section';
-import FlowDiagramMeasurableAssociations from './components/measurable-associations/flow-diagram-measurable-associations';
-import FlowDiagramChangeInitiativeAssociations from './components/change-initiative-associations/flow-diagram-change-initiative-associations';
-import FlowDiagramInfoPopup from './components/editor/flow-diagram-info-popup';
+import flowDiagram from "./components/diagram/flow-diagram";
+import flowDiagramLogicalFlowPopup from "./components/editor/flow-diagram-logical-flow-popup";
+import flowDiagramNodePopup from "./components/editor/flow-diagram-node-popup";
+import flowDiagramPhysicalFlowPopup from "./components/editor/flow-diagram-physical-flow-popup";
+import flowDiagramAnnotationPopup from "./components/editor/flow-diagram-annotation-popup";
+import flowDiagramEditor from "./components/editor/flow-diagram-editor";
+import FlowDiagramsPanelBrowse from "./components/diagrams-panel/browse/flow-diagrams-panel-browse";
+import FlowDiagramsPanelView from "./components/diagrams-panel/view/flow-diagrams-panel-view";
+import FlowDiagramMeasurableAssociations from "./components/measurable-associations/flow-diagram-measurable-associations";
+import FlowDiagramChangeInitiativeAssociations from "./components/change-initiative-associations/flow-diagram-change-initiative-associations";
+import FlowDiagramInfoPopup from "./components/editor/flow-diagram-info-popup";
 
-import {registerComponents, registerServices, registerStores} from '../common/module-utils'
+import {registerComponents, registerServices, registerStores} from "../common/module-utils";
 
-import routes from './routes';
+import routes from "./routes";
 
 
 export default () => {
@@ -57,7 +54,6 @@ export default () => {
         .component('waltzFlowDiagramPhysicalFlowPopup', flowDiagramPhysicalFlowPopup)
         .component('waltzFlowDiagramAnnotationPopup', flowDiagramAnnotationPopup)
         .component('waltzFlowDiagramEditor', flowDiagramEditor)
-        .component('waltzFlowDiagramsSection', flowDiagramsSection)
         ;
 
     module
@@ -65,14 +61,12 @@ export default () => {
         ;
 
     registerServices(module, [
-        FlowDiagramStarterService,
         FlowDiagramStateService
     ]);
 
     registerComponents(module, [
         FlowDiagramMeasurableAssociations,
         FlowDiagramChangeInitiativeAssociations,
-        FlowDiagramsPanel,
         FlowDiagramsPanelBrowse,
         FlowDiagramsPanelView,
         FlowDiagramInfoPopup

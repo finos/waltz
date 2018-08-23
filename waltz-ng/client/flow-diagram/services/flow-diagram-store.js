@@ -28,8 +28,16 @@ export function store($http, base) {
         .delete(`${BASE}/id/${id}`)
         .then(r => r.data);
 
+    const clone = (id, newName ) => $http
+        .post(`${BASE}/id/${id}/clone`, newName)
+        .then(r => r.data);
+
     const findByEntityReference = (ref) => $http
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
+        .then(r => r.data);
+
+    const makeNewForEntityReference = (ref, title) => $http
+        .post(`${BASE}/entity/${ref.kind}/${ref.id}`, title)
         .then(r => r.data);
 
     const findForSelector = (options) => $http
@@ -45,19 +53,21 @@ export function store($http, base) {
         getById,
         deleteForId,
         findByEntityReference,
+        makeNewForEntityReference,
         findForSelector,
+        clone,
         save
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'FlowDiagramStore';
+const serviceName = "FlowDiagramStore";
 
 
 export default {
@@ -69,27 +79,37 @@ export default {
 export const FlowDiagramStore_API = {
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'getById'
+        serviceFnName: "getById",
+        description: "getById"
     },
     deleteForId: {
         serviceName,
-        serviceFnName: 'deleteForId',
-        description: 'deleteForId'
+        serviceFnName: "deleteForId",
+        description: "deleteForId"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'findByEntityReference'
+        serviceFnName: "findByEntityReference",
+        description: "findByEntityReference"
     },
     findForSelector: {
         serviceName,
-        serviceFnName: 'findForSelector',
-        description: 'findForSelector'
+        serviceFnName: "findForSelector",
+        description: "findForSelector"
     },
     save: {
         serviceName,
-        serviceFnName: 'save',
-        description: 'save'
+        serviceFnName: "save",
+        description: "save"
+    },
+    clone: {
+        serviceName,
+        serviceFnName: "clone",
+        description: "clone [title?]"
+    },
+    makeNewForEntityReference: {
+        serviceName,
+        serviceFnName: "makeNewForEntityReference",
+        description: "makeNewForEntityReference [ref, title?]"
     }
 };

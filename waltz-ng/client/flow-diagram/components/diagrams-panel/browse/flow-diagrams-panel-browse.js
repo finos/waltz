@@ -17,22 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
-import template from './flow-diagrams-panel-browse.html';
+import template from "./flow-diagrams-panel-browse.html";
 
 import {initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    canCreate: '<',
-    onSelectDiagram: '<',
-    onCreateDiagram: '<?',
-    onCloneDiagram: '<?',
-    onEditDiagram: '<?',
+    parentEntityRef: "<",
+    canCreate: "<",
+    onSelectDiagram: "<",
+    onCreateDiagram: "<?",
+    onEditDiagram: "<?",
 };
 
 
@@ -49,7 +48,7 @@ function controller(serviceBroker) {
                 [ vm.parentEntityRef ],
                 { force: true })
             .then(r => {
-                vm.diagrams = _.orderBy(r.data, 'name');
+                vm.diagrams = _.orderBy(r.data, "name");
             });
     }
 
@@ -57,7 +56,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -70,5 +69,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzFlowDiagramsPanelBrowse'
+    id: "waltzFlowDiagramsPanelBrowse"
 };
