@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ANNOTATION;
 import static java.util.stream.Collectors.toList;
@@ -102,5 +103,14 @@ public class FlowDiagramAnnotationDao {
         return dsl.deleteFrom(FLOW_DIAGRAM_ANNOTATION)
                 .where(FLOW_DIAGRAM_ANNOTATION.DIAGRAM_ID.eq(diagramId))
                 .execute();
+    }
+
+    public void clone(long diagramId, Long clonedDiagramId) {
+        List<FlowDiagramAnnotation> diagramAnnotations = findByDiagramId(diagramId);
+        List<FlowDiagramAnnotation> clonedDiagramAnnotations = map(diagramAnnotations, d -> ImmutableFlowDiagramAnnotation
+                .copyOf(d)
+                .withDiagramId(clonedDiagramId));
+        createAnnotations(clonedDiagramAnnotations);
+
     }
 }

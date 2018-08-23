@@ -33,9 +33,16 @@ public abstract class LogicalFlow implements
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
-        EntityLifecycleStatusProvider {
+        EntityLifecycleStatusProvider,
+        WaltzEntity {
 
     public abstract EntityReference source();
     public abstract EntityReference target();
 
+    @Override
+    public EntityReference entityReference() {
+        return EntityReference.mkRef(
+                EntityKind.LOGICAL_DATA_FLOW,
+                id().get());
+    }
 }

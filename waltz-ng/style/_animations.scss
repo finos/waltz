@@ -95,3 +95,24 @@ $animation-speed: 0.2s;
 .waltz-animate-repeat.ng-enter.ng-enter-active {
     opacity:1;
 }
+
+
+.waltz-flash-repeat.ng-move,
+.waltz-flash-repeat.ng-enter,
+.waltz-flash-repeat.ng-leave {
+    transition:all ease $animation-speed;
+}
+
+.waltz-flash-repeat.ng-leave.ng-leave-active,
+.waltz-flash-repeat.ng-move,
+.waltz-flash-repeat.ng-enter {
+    opacity:0;
+    background-color: inherit;
+}
+
+.waltz-flash-repeat.ng-leave,
+.waltz-flash-repeat.ng-move.ng-move-active,
+.waltz-flash-repeat.ng-enter.ng-enter-active {
+    opacity:1;
+    background-color: #e0ffdc;
+}

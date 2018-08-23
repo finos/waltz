@@ -16,7 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
+
+
+export function determineIfCreateAllowed(kind) {
+    switch (kind) {
+        case "ACTOR":
+        case "APPLICATION":
+        case "CHANGE_INITIATIVE":
+        case "MEASURABLE":
+        case "PHYSICAL_FLOW":
+        case "PHYSICAL_SPECIFICATION":
+            return true;
+        default:
+            return false;
+    }
+}
 
 
 export function toGraphId(datum) {
@@ -45,22 +60,22 @@ export function toGraphFlow(flow) {
 
 export function drawNodeShape(selection, state) {
     selection
-        .select('path')
-        .attr('d', d => shapeFor(state, d).path)
-        .attr('stroke', '#ccc')
-        .attr('fill', d => {
+        .select("path")
+        .attr("d", d => shapeFor(state, d).path)
+        .attr("stroke", "#ccc")
+        .attr("fill", d => {
             switch (d.data.kind) {
                 case "ACTOR":
-                    return '#dfd7ee';
+                    return "#dfd7ee";
                 case "APPLICATION":
                     const application = state.detail.applicationsById[d.data.id];
                     if (application) {
-                        return application.kind === 'EUC' ? '#f1d0d0' : '#dff1d2';
+                        return application.kind === "EUC" ? "#f1d0d0" : "#dff1d2";
                     } else {
-                        return '#dff1d2';
+                        return "#dff1d2";
                     }
                 default:
-                    return '#dff1d2';
+                    return "#dff1d2";
             };
         });
 }
@@ -68,7 +83,7 @@ export function drawNodeShape(selection, state) {
 
 function initialiseShape(state, graphNode) {
     if (!_.isObject(graphNode)) throw "Cannot initialise shape without an object, was given: " + graphNode;
-    const shape = toNodeShape(_.get(graphNode, 'data.kind', 'DEFAULT'));
+    const shape = toNodeShape(_.get(graphNode, "data.kind", "DEFAULT"));
     state.layout.shapes[graphNode.id] = shape;
     return shape;
 }
@@ -129,10 +144,10 @@ function mkRectShape(widthHint) {
 
 
 const shapes = {
-    ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: '\uf2be'}), // user-circle-o
-    APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf108' }),  // desktop
-    EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf109' }), // laptop
-    DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: '\uf096' })
+    ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: "\uf2be"}), // user-circle-o
+    APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf108" }),  // desktop
+    EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf109" }), // laptop
+    DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf096" })
 };
 
 
@@ -142,15 +157,12 @@ const shapes = {
  * The object contains `{ path: '', cx, cy, title: { dx, dy } }`
  * where cx,cy are the center points of the shape.  Title dx,dy
  * give offsets to locate the title in an appropriate position.
- *
- * @param kind
- * @returns {*}
  */
 export function toNodeShape(d, widthHint = 100) {
     const kind = _.isObject(d) ? d.kind : d;
     const mkShapeFn = shapes[kind];
     if (!mkShapeFn) {
-        console.error('Cannot determine shape function for node', d)
+        console.error("Cannot determine shape function for node", d)
     }
     return mkShapeFn(widthHint);
 }
