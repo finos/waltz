@@ -178,4 +178,8 @@ public class PersonDao {
     }
 
 
+    public int countAllUnderlings(String employeeId){
+        return dsl.fetchCount(PERSON_HIERARCHY, PERSON_HIERARCHY.MANAGER_ID.eq(employeeId));
+    }
+
 }

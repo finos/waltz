@@ -40,12 +40,9 @@ public class PersonHarness {
 
         PersonDao personDao = ctx.getBean(PersonDao.class);
 
-        int c = dsl.fetchCount(PERSON, PERSON.MANAGER_EMPLOYEE_ID.eq("").or(PERSON.MANAGER_EMPLOYEE_ID.isNull()));
+        int count = personDao.countAllUnderlings("wibble");
 
-        int c2 = dsl.fetchCount(DSL.selectDistinct(PERSON_HIERARCHY.MANAGER_ID).from(PERSON_HIERARCHY).where(PERSON_HIERARCHY.LEVEL.eq(1)));
-        System.out.println(c);
-        System.out.println(c2);
-
+        System.out.printf("count: %d\n", count);
 
 
     }
