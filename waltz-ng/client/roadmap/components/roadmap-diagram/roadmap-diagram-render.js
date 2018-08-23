@@ -22,14 +22,21 @@ import {ROADMAP_LAYOUT_OPTIONS} from "./roadmap-diagram-options";
 
 const STYLES = {
     columns: "wrd-col",
+    columnCell: "wrd-col-cell",
     columnLabel: "wrd-column-label",
-    rowGroup: "wrd-row-group"
+    rowGroup: "wrd-row-group",
+    rowGroupCell: "wrd-row-group-cell"
 };
 
 
 function drawRowGroups(svgGroups, gridDefWithLayout) {
-    const rowGroupSelector = svgGroups
+    svgGroups
         .rowGroups
+        .attr('transform', `translate(0 ${ROADMAP_LAYOUT_OPTIONS.column.height})`)
+        .attr("clip-path", "url(#row-groups-clip)");
+
+    const rowGroupSelector = svgGroups
+        .rowGroupHeaders
         .selectAll(`.${STYLES.rowGroup}`)
         .data(gridDefWithLayout.rowGroups, (d) => d.id);
 
@@ -56,7 +63,7 @@ function drawRowGroups(svgGroups, gridDefWithLayout) {
 }
 
 
-function drawColumnLabels(container, columns = []) {
+function drawColumns(svgGroups, columns = []) {
 
     const mkTransform = (d) => {
         const colLabelOpts = ROADMAP_LAYOUT_OPTIONS.column.label;
@@ -66,8 +73,14 @@ function drawColumnLabels(container, columns = []) {
         return `translate(${ dx } ${ dy }) rotate(${ angle })`;
     };
 
-    const colSelector = container
+    svgGroups
+        .columns
         .attr('transform', `translate(${ROADMAP_LAYOUT_OPTIONS.column.dx} 0)`)
+        .attr("clip-path", "url(#columns-clip)");
+
+
+    const colSelector = svgGroups
+        .columnHeaders
         .selectAll(`.${STYLES.columnLabel}`)
         .data(columns, d => d.id);
 
@@ -80,30 +93,35 @@ function drawColumnLabels(container, columns = []) {
 }
 
 
-function drawColumns(svgGroups, gridDefWithLayout) {
-
-    drawColumnLabels(svgGroups.colLabels, gridDefWithLayout.columns);
+function drawGridContent(svgGroups, gridDefWithLayout) {
+    svgGroups
+        .grid
+        .attr('transform', `translate(${ ROADMAP_LAYOUT_OPTIONS.column.dx } ${ ROADMAP_LAYOUT_OPTIONS.column.height })`)
+        .attr("clip-path", "url(#grid-clip)");
 
     const colSelector = svgGroups
-        .colMain
-        .attr('transform', `translate(${ ROADMAP_LAYOUT_OPTIONS.column.dx } ${ ROADMAP_LAYOUT_OPTIONS.column.label.height })`)
-        .selectAll(`.${ STYLES.columns }`)
+        .gridContent
+        .selectAll(`.${ STYLES.columnCell }`)
         .data(gridDefWithLayout.columns, d => d.id);
 
-    const newCols = colSelector
+    colSelector
         .enter()
         .append("g")
-        .classed(STYLES.columns, true);
+        .classed(STYLES.columnCell, true)
+        .attr('transform', d => `translate(${d.layout.x} 0)`)
+        .selectAll(`.${STYLES.rowGroupCell}`)
+        .data(gridDefWithLayout.rowGroups)
+        .enter()
+        .append('g')
+        .classed(STYLES.rowGroupCell, true)
+        .attr('transform', d => `translate(0, ${d.layout.y})`)
+        .append('rect')
+        .attr('width', ROADMAP_LAYOUT_OPTIONS.column.width)
+        .attr('height', d => d.layout.height)
+        .attr('fill', 'red')
+        .attr('stroke', 'black');
 
-    newCols
-        .append("rect");
 
-    newCols
-        .merge(colSelector)
-        .attr("transform", d => `translate(${ d.layout.x } ${ d.layout.y })`)
-        .select("rect")
-        .attr("height", d => d.layout.height)
-        .attr("width", d => d.layout.width);
 }
 
 
@@ -111,6 +129,7 @@ export function draw(svgGroups, gridDef) {
     // console.log("draw", { svgGroups, gridDef});
     const gridDefWithLayout = calcLayout(gridDef);
     console.log("draw", { gridDefWithLayout });
+    drawGridContent(svgGroups, gridDefWithLayout);
     drawRowGroups(svgGroups, gridDefWithLayout);
-    drawColumns(svgGroups, gridDefWithLayout);
+    drawColumns(svgGroups, gridDefWithLayout.columns);
 }

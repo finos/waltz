@@ -33,6 +33,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
 @Service
 public class PersonService {
@@ -99,5 +100,10 @@ public class PersonService {
 
     public Person findPersonByUserId(String userId) {
         return personDao.findPersonByUserId(userId);
+    }
+
+
+    public int countAllUnderlings(String employeeId){
+        return personDao.countAllUnderlings(employeeId);
     }
 }

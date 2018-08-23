@@ -7,7 +7,15 @@
 
 
     <div ng-if="$ctrl.directs.length > 0">
-        <h4>Directs</h4>
+        <h4>
+            Directs
+            <small uib-popover="Directs : Cumulative Reportees"
+                   popover-trigger="mouseenter">
+                <span ng-bind="$ctrl.directs.length"></span>
+                :
+                <span ng-bind="$ctrl.cumulativeCount"></span>
+            </small>
+        </h4>
         <waltz-person-directs-list directs="$ctrl.directs"></waltz-person-directs-list>
     </div>
 </div>
