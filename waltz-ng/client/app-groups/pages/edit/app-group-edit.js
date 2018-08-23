@@ -27,7 +27,8 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 const initialState = {
     changeInitiatives: [],
     selectedChangeInitiative: null,
-    editor: 'SINGLE'
+    editor: 'SINGLE',
+    canDelete: false
 };
 
 
@@ -51,33 +52,79 @@ function handleError(e) {
 }
 
 
+function navigateToLastView($state, historyStore) {
+    const lastHistoryItem = historyStore.getAll()[0];
+    if (lastHistoryItem) {
+        $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
+    } else {
+        $state.go('main.home');
+    }
+}
+
+
+function removeFromHistory(historyStore, appGroup) {
+    if (! appGroup ) { return; }
+
+    const historyObj = mkHistoryObj(appGroup);
+
+    historyStore.remove(
+        historyObj.name,
+        historyObj.kind,
+        historyObj.state,
+        historyObj.stateParams);
+}
+
+
+function mkHistoryObj(appGroup) {
+    return {
+        name: appGroup.name,
+        kind: 'APP_GROUP',
+        state: 'main.app-group.view',
+        stateParams: { id: appGroup.id }
+    };
+}
+
+
 function controller($q,
+                    $state,
                     $scope,
                     $stateParams,
-                    appGroupStore,
                     appStore,
+                    historyStore,
                     logicalFlowStore,
                     notification,
-                    serviceBroker) {
+                    serviceBroker,
+                    userService) {
 
     const { id }  = $stateParams;
     const vm = Object.assign(this, initialState);
 
-
-    appGroupStore.getById(id)
-        .then(groupDetail => setup(groupDetail))
-        .then(data => Object.assign(vm, data));
+    serviceBroker.loadViewData(CORE_API.AppGroupStore.getById, [id])
+        .then(r => setup(r.data))
+        .then(data => Object.assign(vm, data))
+        .then(() => {
+            return userService
+                .whoami()
+                .then(me => {
+                    const owner = _.find(vm.owners, o => o.userId == me.userName && o.role === 'OWNER');
+                    vm.canDelete = owner != null;
+                });
+        });
 
 
     vm.addToGroup = (app) => {
-        appGroupStore.addApplication(id, app.id)
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.addApplication, [id, app.id])
+            .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
             .then(() => notification.success('Added: ' + app.name));
     };
 
 
     vm.removeFromGroup = (app) => {
-        appGroupStore.removeApplication(id, app.id)
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.removeApplication, [id, app.id])
+            .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
             .then(() => notification.warning('Removed: ' + app.name));
     };
@@ -89,7 +136,9 @@ function controller($q,
 
 
     vm.promoteToOwner = (member) => {
-        appGroupStore.addOwner(member.groupId, member.userId)
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.addOwner, [member.groupId, member.userId])
+            .then(r => r.data)
             .then(members => {
                 vm.owners = _.filter(members, m => m.role === 'OWNER');
                 vm.viewers = _.filter(members, m => m.role === 'VIEWER');
@@ -100,7 +149,8 @@ function controller($q,
 
 
     vm.updateGroupOverview = () => {
-        appGroupStore.updateGroupOverview(id, vm.appGroup)
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.updateGroupOverview, [id, vm.appGroup])
             .then(() => notification.success('Group details updated'));
     };
 
@@ -156,17 +206,36 @@ function controller($q,
 
 
         if(appIdsToAdd.length > 0) {
-            appGroupStore.addApplications(id, appIdsToAdd)
+            serviceBroker
+                .execute(CORE_API.AppGroupStore.addApplications, [id, appIdsToAdd])
+                .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
                 .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
         }
 
         if(appIdsToRemove.length > 0) {
-            appGroupStore.removeApplications(id, appIdsToRemove)
+            serviceBroker
+                .execute(CORE_API.AppGroupStore.removeApplications, [id, appIdsToRemove])
+                .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
                 .then(() => notification.success(`Removed ${appIdsToRemove.length} applications`));
         }
     };
+
+
+    vm.deleteGroup = () => {
+        if (! confirm("Really delete this group ? \n " + vm.appGroup.name)) return;
+
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.deleteGroup, [id])
+            .then(() => notification.warning('Deleted group: ' + vm.appGroup.name))
+            .then(() => {
+                removeFromHistory(historyStore, vm.appGroup);
+                navigateToLastView($state, historyStore);
+            });
+    };
+
+
 
     // add app via search
     vm.searchedApp = {};
@@ -183,15 +252,17 @@ function controller($q,
         (changeInitiative) => {
             if (!changeInitiative) return;
 
-            appGroupStore
-                .addChangeInitiative(id, changeInitiative.id)
+            serviceBroker
+                .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, changeInitiative.id])
+                .then(r => r.data)
                 .then(cis => vm.changeInitiatives = cis)
                 .then(() => notification.success('Associated Change Initiative: ' + changeInitiative.name));
 
         });
 
-    vm.removeChangeInitiative = (changeInitiative) => appGroupStore
-        .removeChangeInitiative(id, changeInitiative.id)
+    vm.removeChangeInitiative = (changeInitiative) => serviceBroker
+        .execute(CORE_API.AppGroupStore.removeChangeInitiative, [id, changeInitiative.id])
+        .then(r => r.data)
         .then(cis => vm.changeInitiatives = cis)
         .then(() => notification.warning('Removed Change Initiative: ' + changeInitiative.name));
 
@@ -205,13 +276,15 @@ function controller($q,
 
 controller.$inject = [
     '$q',
+    '$state',
     '$scope',
     '$stateParams',
-    'AppGroupStore',
     'ApplicationStore',
+    'HistoryStore',
     'LogicalFlowStore',
     'Notification',
-    'ServiceBroker'
+    'ServiceBroker',
+    'UserService'
 ];
 
 
