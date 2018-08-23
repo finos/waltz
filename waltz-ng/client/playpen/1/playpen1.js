@@ -17,19 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import template from './playpen1.html';
-
-
-const flowDiagramsWidget = {
-    template: `
-        <waltz-flow-diagrams-section parent-entity-ref="$ctrl.parentEntityRef"
-                                     can-create="true">
-        </waltz-flow-diagrams-section>`,
-    id: 'flow-diagrams-widget',
-    name: 'Flow Diagrams',
-    icon: 'picture-o'
-};
+import _ from "lodash";
+import template from "./playpen1.html";
 
 
 const costsWidget = {
@@ -112,7 +101,6 @@ const initData = {
     widgets: [],
     availableWidgets: [
         flowWidget,
-        flowDiagramsWidget,
         bookmarkWidget,
         entityNamedNoteWidget,
         technologyWidget,

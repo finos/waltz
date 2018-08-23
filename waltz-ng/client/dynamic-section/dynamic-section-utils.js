@@ -21,7 +21,11 @@
 import {checkIsDynamicSection} from "../common/checks";
 
 export function sectionToTemplate(section) {
-    checkIsDynamicSection(section);
+    try {
+        checkIsDynamicSection(section);
+    } catch (e) {
+        console.log("Skipping section", { section, e });
+    }
 
     const tagName = "waltz-" + section.componentId;
 

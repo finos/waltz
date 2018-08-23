@@ -21,7 +21,7 @@ import {initialiseData} from "../common";
 import _ from "lodash";
 
 
-import template from './physical-flow-view.html';
+import template from "./physical-flow-view.html";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -46,7 +46,7 @@ const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    flowDiagramsSection: dynamicSections.flowDiagramsSection
+    entityDiagramsSection: dynamicSections.entityDiagramsSection
 };
 
 

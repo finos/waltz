@@ -1,0 +1,163 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~  Copyright (C) 2016, 2017 Waltz open source project
+  ~  See README.md for more information
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU Lesser General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU Lesser General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU Lesser General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!-- NO DATA -->
+<div ng-if="$ctrl.diagrams.length === 0">
+    <waltz-no-data>
+        <message>
+            <strong>
+                No diagrams
+            </strong>
+            have been associated
+            <div ng-include="'weds-make-new-diagram.html'"></div>
+        </message>
+    </waltz-no-data>
+</div>
+
+
+<!-- LIST (unless showing flow diagram) -->
+<div ng-if="$ctrl.diagrams.length > 0">
+    <div ng-if="$ctrl.selectedDiagram.type !== 'Flow'">
+        <!-- SEARCH -->
+        <div class="row small"
+             ng-if="$ctrl.diagrams.length > 10">
+            <div class="col-sm-6">
+                <div class="input-group input-group-sm">
+                <span class="input-group-addon">
+                    <waltz-icon name="search"></waltz-icon>
+                </span>
+                    <input type="search"
+                           class="form-control"
+                           ng-model="$ctrl.qry"
+                           placeholder="Search...">
+                </div>
+                <br>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div ng-class="{'waltz-scroll-region-300' : $ctrl.diagrams.length > 10}">
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Last Modified</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="diagram in $ctrl.diagrams | filter:$ctrl.qry track by diagram.id"
+                    ng-class="{ 'waltz-highlighted-row' : diagram.name === $ctrl.selectedDiagram.name }"
+                    class="waltz-animate-repeat">
+                    <td>
+                        <!-- NAME -->
+                        <a ng-click="$ctrl.onDiagramSelect(diagram)"
+                           class="clickable">
+                            <waltz-icon name="{{ diagram.icon }}"></waltz-icon>
+                            <span uib-popover-html="diagram.description"
+                                  popover-trigger="mouseenter"
+                                  popover-append-to-body="true"
+                                  ng-bind="diagram.name">
+                            </span>
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="diagram.type"></span>
+                    </td>
+                    <td>
+                        <span class="small">
+                            <waltz-last-updated entity="diagram">
+                            </waltz-last-updated>
+                        </span>
+                    </td>
+                    <td>
+                        <!-- ACTIONS -->
+                        <div waltz-has-role="LINEAGE_EDITOR">
+                            <span ng-repeat="action in diagram.actions">
+                                <a ng-click="action.execute(diagram)"
+                                   class="clickable">
+                                    <waltz-icon name="{{ action.icon }}"></waltz-icon>
+                                    <span ng-bind="action.name"></span>
+                                    <span ng-if="!$last"> | </span>
+                                </a>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div ng-include="'weds-make-new-diagram.html'"></div>
+    </div>
+</div>
+
+
+<!-- ENTITY SVG DIAGRAM -->
+<div ng-if="$ctrl.selectedDiagram.type === 'Generic'">
+    <hr>
+    <h4>
+        <span ng-bind="$ctrl.selectedDiagram.name"></span>
+        <small>
+            <a class="clickable" ng-click="$ctrl.onDiagramDismiss()">
+                ( Dismiss )
+            </a>
+        </small>
+    </h4>
+
+    <waltz-entity-svg-diagram-viewer svg="$ctrl.selectedDiagram.svg">
+    </waltz-entity-svg-diagram-viewer>
+    <waltz-markdown text="$ctrl.selectedDiagram.description">
+    </waltz-markdown>
+</div>
+
+
+<!-- FLOW DIAGRAM -->
+<div ng-if="$ctrl.selectedDiagram.type === 'Flow'">
+    <div ng-switch="$ctrl.visibility.flowDiagramMode">
+        <div ng-switch-when="VIEW">
+            <waltz-flow-diagrams-panel-view parent-entity-ref="$ctrl.selectedDiagram.ref"
+                                            on-edit-diagram="$ctrl.onDiagramEdit"
+                                            on-dismiss-diagram="$ctrl.onDiagramDismiss">
+            </waltz-flow-diagrams-panel-view>
+        </div>
+        <div ng-switch-when="EDIT">
+            <waltz-flow-diagram-editor parent-entity-ref="$ctrl.selectedDiagram.ref"
+                                       on-cancel="$ctrl.onEditorClose">
+            </waltz-flow-diagram-editor>
+        </div>
+    </div>
+</div>
+
+
+<!-- MAKE NEW DIAGRAM (template) -->
+<script type="text/ng-template"
+        id="weds-make-new-diagram.html">
+    <div ng-if="$ctrl.visibility.makeNew">
+        <div waltz-has-role="LINEAGE_EDITOR">
+            <hr>
+            <a ng-click="$ctrl.onMakeNewFlowDiagram()"
+               class="clickable">
+                <waltz-icon name="plus"></waltz-icon>
+                Make new flow diagram
+            </a>
+        </div>
+    </div>
+</script>
+

@@ -30,7 +30,7 @@ const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    flowDiagramsSection: dynamicSections.flowDiagramsSection
+    entityDiagramsSection: dynamicSections.entityDiagramsSection
 };
 
 
@@ -38,8 +38,8 @@ const initialState = {
 function mkHistoryObj(flow) {
     return {
         name: `${flow.source.name} to ${flow.target.name}`,
-        kind: 'LOGICAL_DATA_FLOW',
-        state: 'main.logical-flow.view',
+        kind: "LOGICAL_DATA_FLOW",
+        state: "main.logical-flow.view",
         stateParams: { id: flow.id }
     };
 }
@@ -76,13 +76,12 @@ function navigateToLastView($state, historyStore) {
     if (lastHistoryItem) {
         $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
     } else {
-        $state.go('main.home');
+        $state.go("main.home");
     }
 }
 
 
-function controller($q,
-                    $state,
+function controller($state,
                     $stateParams,
                     historyStore,
                     notification,
@@ -93,7 +92,7 @@ function controller($q,
     const flowId = $stateParams.id;
     vm.entityReference = {
         id: flowId,
-        kind: 'LOGICAL_DATA_FLOW'
+        kind: "LOGICAL_DATA_FLOW"
     };
 
 
@@ -121,7 +120,7 @@ function controller($q,
 
     const handleDeleteFlowResponse = (response) => {
         if (response > 0) {
-            notification.success('Logical flow deleted');
+            notification.success("Logical flow deleted");
             removeFromHistory(historyStore, vm.logicalFlow);
         } else {
             notification.error(response.message);
@@ -129,7 +128,7 @@ function controller($q,
     };
 
     vm.deleteFlow = () => {
-        if (confirm('Are you sure you want to delete this flow ?')) {
+        if (confirm("Are you sure you want to delete this flow ?")) {
             deleteLogicalFlow()
                 .then(r => handleDeleteFlowResponse(r.data));
         }
@@ -138,17 +137,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    '$stateParams',
-    'HistoryStore',
-    'Notification',
-    'ServiceBroker',
+    "$state",
+    "$stateParams",
+    "HistoryStore",
+    "Notification",
+    "ServiceBroker",
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

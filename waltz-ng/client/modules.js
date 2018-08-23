@@ -57,6 +57,7 @@ import DrillGrid from "./drill-grid";
 import DynamicSection from "./dynamic-section";
 import EndUserApps from "./end-user-apps";
 import Entity from "./entity";
+import EntityDiagrams from "./entity-diagrams";
 import EntityEnum from "./entity-enum";
 import EntityNamedNote from "./entity-named-note";
 import EntityRelationship from "./entity-relationship";
@@ -151,6 +152,7 @@ const dependencies = [
     DynamicSection(),
     EndUserApps(),
     Entity(),
+    EntityDiagrams(),
     EntityEnum(),
     EntityNamedNote(),
     EntityRelationship(),

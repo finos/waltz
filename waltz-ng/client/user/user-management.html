@@ -32,6 +32,7 @@
                        class="form-control"
                        placeholder="Filter by username/role...."
                        ng-model="userFilterQuery"
+                       ng-model-options="{debounce: 300}"
                        ng-minlength="3">
                 <div class="text-danger"
                      ng-if="ctrl.users.length > ctrl.numAllowedWithoutFilter && !userFilterQuery">
