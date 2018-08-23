@@ -17,3 +17,13 @@
     }
 }
 
+.waltz-field-table-border {
+    tr:not(:last-child) {
+        border-bottom: 1px solid #ececec;
+    }
+    td {
+        padding-bottom: 2px;
+        padding-top: 2px;
+    }
+}
+

@@ -371,6 +371,13 @@ public class PhysicalFlowDao {
                 .execute();
     }
 
+    public int updateDescription(long flowId, String description) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.DESCRIPTION, description)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
         return dsl.fetchCount(DSL.selectFrom(PHYSICAL_FLOW)

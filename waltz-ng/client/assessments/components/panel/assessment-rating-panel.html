@@ -1,45 +1,74 @@
 <div class="waltz-assessment-rating-panel">
     <div class="row">
         <div class="col-md-12">
-            <table class="waltz-field-table"
-                   style="width: 100%">
-                <colgroup>
-                    <col width="30%">
-                    <col width="70%">
-                </colgroup>
-                <tbody>
-                    <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
-                        <td class="wft-label">
-                            <span ng-bind="def.name"></span>
-                            <span ng-if="def.externalId">
-                                (<span ng-bind="def.externalId"> </span>)
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-if="def.rating"
-                                  uib-popover-template="'ado-popover.html'"
-                                  popover-placement="right"
-                                  popover-trigger="mouseenter"
-                                  popover-popup-delay="300"
-                                  popover-append-to-body="true">
-                                <waltz-rating-indicator-cell rating="def.ratingItem">
-                                </waltz-rating-indicator-cell>
-                                <span ng-bind="def.ratingItem.name">
+            <waltz-no-data ng-if="$ctrl.enrichedAssessmentDefinitions.length === 0">
+                <message>
+                    <strong>
+                        No Assessments Found
+                    </strong>
+                </message>
+            </waltz-no-data>
+
+            <div ng-if="$ctrl.enrichedAssessmentDefinitions.length > 0"
+                 ng-class="{ 'waltz-scroll-region-200' : $ctrl.enrichedAssessmentDefinitions.length > 7}">
+                <table class="waltz-field-table waltz-field-table-border"
+                       style="width: 100%">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="70%">
+                    </colgroup>
+                    <tbody>
+                        <tr ng-repeat="def in $ctrl.enrichedAssessmentDefinitions">
+                            <td class="wft-label">
+                                <span uib-popover-template="'arp-desc-popover.html'"
+                                      popover-placement="right"
+                                      popover-trigger="mouseenter"
+                                      popover-popup-delay="300"
+                                      popover-append-to-body="true">
+                                    <span ng-bind="def.name"></span>
+                                    <span class="small text-muted"
+                                          ng-if="def.externalId">
+                                        (<span ng-bind="def.externalId"> </span>)
+                                    </span>
                                 </span>
-                            </span>
-                            <span ng-if="!def.rating">
-                                N/A
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                            <td valign="top">
+                                <span ng-if="def.rating"
+                                      uib-popover-template="'arp-popover.html'"
+                                      popover-placement="right"
+                                      popover-trigger="mouseenter"
+                                      popover-popup-delay="300"
+                                      popover-append-to-body="true">
+                                    <waltz-rating-indicator-cell rating="def.ratingItem">
+                                    </waltz-rating-indicator-cell>
+                                    <span ng-bind="def.ratingItem.name">
+                                    </span>
+
+                                    <span ng-if="def.rating.description">
+                                        <br>
+                                        <span class="small text-muted"
+                                              style="padding-left: 22px"
+                                              ng-bind="def.rating.description | limitTo: 30">
+                                        </span>
+                                        <span ng-if="def.rating.description.length > 30">
+                                            ...
+                                        </span>
+                                    </span>
+                                </span>
+                                <span ng-if="!def.rating">
+                                    N/A
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/ng-template"
-        id="ado-popover.html">
+        id="arp-popover.html">
     <div>
         <div>
             <div>
@@ -55,6 +84,25 @@
         <div class="small">
             <waltz-last-updated entity="def.rating">
             </waltz-last-updated>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template"
+        id="arp-desc-popover.html">
+    <div>
+        <div>
+            <div>
+                <strong ng-bind="def.name"></strong>
+                <span class="small text-muted"
+                      ng-if="def.externalId">
+                    (<span ng-bind="def.externalId"> </span>)
+                </span>
+            </div>
+            <div ng-bind="def.description"
+                  class="text-muted">
+            </div>
         </div>
     </div>
 </script>

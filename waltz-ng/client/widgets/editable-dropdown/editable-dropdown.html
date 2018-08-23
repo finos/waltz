@@ -9,6 +9,7 @@
               class="small text-muted">
         </span>
 
+        <!-- role restricted -->
         <a ng-click="$ctrl.onEdit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"
@@ -16,11 +17,21 @@
             <waltz-icon name="pencil"></waltz-icon>
             Edit
         </a>
+
+        <!-- NOT role restricted -->
         <a ng-click="$ctrl.onEdit()"
            ng-if="! $ctrl.editRole"
            class="btn btn-xs waltz-visibility-child-30">
             <waltz-icon name="pencil"></waltz-icon>
             Edit
+        </a>
+
+        <!-- optional based on presence of onRemove fn -->
+        <a class="btn btn-xs waltz-visibility-child-30"
+                ng-if="$ctrl.onRemove && $ctrl.currentVal"
+                ng-click="$ctrl.onRemove($ctrl.ctx)">
+            <waltz-icon name="trash"></waltz-icon>
+            Remove
         </a>
     </span>
 
@@ -28,12 +39,15 @@
     <form class='form-inline'
            ng-if='$ctrl.visibility.editor'>
         <select ng-model="$ctrl.currentVal"
+                placeholder="wibble"
                 ng-options="item.code as item.name for item in $ctrl.dropdownValues"
                 class="form-control">
+            <option value="" disabled selected>Select your option</option>
         </select>
 
         <input type="text"
                ng-if="$ctrl.commentsAllowed"
+               placeholder="Comment..."
                ng-model="$ctrl.currentComments"
                class="form-control input-sm small text-muted">
 

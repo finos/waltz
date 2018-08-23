@@ -73,6 +73,7 @@ function controller(notification, serviceBroker) {
     vm.onSaveFrequency = (value, ctx) => doSave('frequency', value);
     vm.onSaveTransport = (value, ctx) => doSave('transport', value);
     vm.onSaveBasisOffset = (itemId, value) => doSave('basisOffset', value.newVal);
+    vm.onSaveDescription = (itemId, value) => doSave('description', value.newVal);
 }
 
 
