@@ -273,4 +273,18 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 3214 - Application Group soft delete -->
+    <changeSet id="20180823-3214-1"
+               author="kamransaleem">
+        <comment>3214 - Application Group soft delete</comment>
+        <addColumn tableName="application_group">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

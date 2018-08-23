@@ -14,7 +14,15 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Overview">
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <div ng-if="ctrl.canDelete">
+                <button class="btn btn-xs btn-danger"
+                        ng-click="ctrl.deleteGroup()">
+                    Delete
+                </button>
+            </div>
+        </waltz-section-actions>
         <div class="waltz-paragraph"
              style="padding: 6px; border-bottom: 1px dotted #eee;">
             <form class="form"
@@ -52,9 +60,9 @@
 
             </form>
         </div>
+    </div>
 
-    </waltz-section>
-
+    <br>
 
     <waltz-section icon="paper-plane-o"
                    name="Associated Change Initiatives">
