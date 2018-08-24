@@ -227,8 +227,6 @@ public class FlowDiagramService {
 
 
     public boolean deleteById(long id, String username) {
-        flowDiagramAnnotationDao.deleteForDiagram(id);
-        flowDiagramEntityDao.deleteForDiagram(id);
         auditChange("removed", mkRef(FLOW_DIAGRAM, id), username, Operation.REMOVE);
         return flowDiagramDao.deleteById(id);
     }

@@ -287,4 +287,19 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 3336 - Flow Diagram soft delete -->
+    <changeSet id="20180824-3336-1"
+               author="kamransaleem">
+        <comment>3336 - Flow Diagram soft delete</comment>
+        <addColumn tableName="flow_diagram">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>
