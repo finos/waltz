@@ -52,7 +52,7 @@ function mkTableData(surveyRuns = [], surveyInstances = []) {
     const now = moment();
     const grouped = _.groupBy(surveys, s => {
         const subMoment = moment(s.surveyInstance.submittedAt);
-        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, 'months') > 12 ? 'ARCHIVE' : 'CURRENT'
+        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, 'months') >= 12 ? 'ARCHIVE' : 'CURRENT'
     });
     return grouped;
 }
