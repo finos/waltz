@@ -19,34 +19,53 @@
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
+import moment from "moment";
+
+
 import template from "./survey-instance-list.html";
 
-const initialState = {
-    surveys: []
-};
 
 const bindings = {
     parentEntityRef: '<'
 };
 
 
+const initialState = {
+    surveys: [],
+    visibility: {
+        dataTab: 0
+    }
+};
+
 
 function mkTableData(surveyRuns = [], surveyInstances = []) {
     const runsById = _.keyBy(surveyRuns, 'id');
 
-    return _.map(surveyInstances, instance => {
+    const surveys = _.map(surveyInstances, instance => {
         return {
             'surveyInstance': instance,
             'surveyRun': runsById[instance.surveyRunId],
             'surveyEntity': instance.surveyEntity
         }
     });
+
+    const now = moment();
+    const grouped = _.groupBy(surveys, s => {
+        const subMoment = moment(s.surveyInstance.submittedAt);
+        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, 'months') > 12 ? 'ARCHIVE' : 'CURRENT'
+    });
+    return grouped;
 }
 
 
 function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
+
+    vm.showTab = (idx) => {
+        vm.visibility.dataTab = idx;
+    };
+
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {
