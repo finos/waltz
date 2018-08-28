@@ -1,85 +1,120 @@
 <div>
-
-    <waltz-no-data ng-if="$ctrl.surveys.length == 0">
+    <waltz-no-data ng-if="$ctrl.surveys | isEmpty">
         <message>
             <strong>No surveys</strong>
         </message>
     </waltz-no-data>
 
+    <div ng-if="!($ctrl.surveys | isEmpty)">
 
-    <div ng-if="$ctrl.surveys.length > 0">
-        <table class="table table-condensed table-striped small">
-            <colgroup>
-                <col width="34%">
-                <col width="10%">
-                <col width="8%">
-                <col width="16%">
-                <col width="8%">
-                <col width="16%">
-                <col width="8%">
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Issued On</th>
-                <th>Submitted By</th>
-                <th>Submitted On</th>
-                <th>Approved By</th>
-                <th>Approved On</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="row in $ctrl.surveys | orderBy:'surveyRun.name'">
-                <td>
-                    <a ng-if="row.surveyInstance.status === 'COMPLETED' || row.surveyInstance.status === 'APPROVED'"
-                       ng-bind="row.surveyRun.name"
-                       class="clickable"
-                       ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
-                    <a ng-if="row.surveyInstance.status !== 'COMPLETED' && row.surveyInstance.status !== 'APPROVED'"
-                       ng-bind="row.surveyRun.name"
-                       class="clickable"
-                       ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
-                </td>
-                <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
-                </td>
-                <td ng-bind="row.surveyRun.issuedOn | date:'dd-MM-yyyy'">
-                </td>
-                <td>
-                    <span ng-if="row.surveyInstance.submittedBy"
-                          ng-bind="row.surveyInstance.submittedBy">
-                    </span>
-                    <span ng-if="! row.surveyInstance.submittedBy">
-                        -
-                    </span>
-                </td>
-                <td>
-                    <span ng-if="row.surveyInstance.submittedAt"
-                          ng-bind="row.surveyInstance.submittedAt | date:'dd-MM-yyyy'">
-                    </span>
-                    <span ng-if="! row.surveyInstance.submittedAt">
-                        -
-                    </span>
-                </td>
-                <td>
-                    <span ng-if="row.surveyInstance.approvedBy">
-                        <span ng-bind="row.surveyInstance.approvedBy">
-                        </span>
-                    </span>
-                    <span ng-if="! row.surveyInstance.approvedBy">
-                        -
-                    </span>
-                </td>
-                <td>
-                    <span ng-if="row.surveyInstance.approvedAt"
-                          ng-bind="row.surveyInstance.approvedAt | date:'dd-MM-yyyy'">
-                    </span>
-                    <span ng-if="! row.surveyInstance.approvedAt">
-                        -
-                    </span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <uib-tabset active="active"
+                    ng-if="!$ctrl.isAnyEditorVisible()">
+
+            <!-- CURRENT TAB -->
+            <uib-tab index="0"
+                     select="$ctrl.showTab(0)"
+                     disable="$ctrl.surveys['CURRENT'] | isEmpty"
+                     heading="Current">
+
+                <div ng-if="$ctrl.visibility.dataTab == 0" style="padding-top: 1em;">
+                    <ng-include src="'sil-table.html'"
+                                ng-init="surveys = $ctrl.surveys['CURRENT']">
+                    </ng-include>
+                </div>
+            </uib-tab>
+
+            <!-- ARCHIVE TAB -->
+            <uib-tab index="1"
+                     select="$ctrl.showTab(1)"
+                     disable="$ctrl.surveys['ARCHIVE'] | isEmpty"
+                     heading="Archive">
+
+                <div ng-if="$ctrl.visibility.dataTab == 1" style="padding-top: 1em;">
+                    <ng-include src="'sil-table.html'"
+                                ng-init="surveys = $ctrl.surveys['ARCHIVE']">
+                    </ng-include>
+                </div>
+
+            </uib-tab>
+        </uib-tabset>
     </div>
 </div>
+
+
+<script type="text/ng-template"
+        id="sil-table.html">
+    <table class="table table-condensed table-striped small"
+           ng-if="surveys.length > 0">
+        <colgroup>
+            <col width="34%">
+            <col width="10%">
+            <col width="8%">
+            <col width="16%">
+            <col width="8%">
+            <col width="16%">
+            <col width="8%">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Issued On</th>
+            <th>Submitted By</th>
+            <th>Submitted On</th>
+            <th>Approved By</th>
+            <th>Approved On</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="row in surveys | orderBy:'surveyRun.name'">
+            <td>
+                <a ng-if="row.surveyInstance.status === 'COMPLETED' || row.surveyInstance.status === 'APPROVED'"
+                   ng-bind="row.surveyRun.name"
+                   class="clickable"
+                   ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
+                <a ng-if="row.surveyInstance.status !== 'COMPLETED' && row.surveyInstance.status !== 'APPROVED'"
+                   ng-bind="row.surveyRun.name"
+                   class="clickable"
+                   ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
+            </td>
+            <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </td>
+            <td ng-bind="row.surveyRun.issuedOn | date:'dd-MM-yyyy'">
+            </td>
+            <td>
+                <span ng-if="row.surveyInstance.submittedBy"
+                      ng-bind="row.surveyInstance.submittedBy">
+                </span>
+                <span ng-if="! row.surveyInstance.submittedBy">
+                    -
+                </span>
+            </td>
+            <td>
+                <span ng-if="row.surveyInstance.submittedAt"
+                      ng-bind="row.surveyInstance.submittedAt | date:'dd-MM-yyyy'">
+                </span>
+                <span ng-if="! row.surveyInstance.submittedAt">
+                            -
+                </span>
+            </td>
+            <td>
+                <span ng-if="row.surveyInstance.approvedBy">
+                    <span ng-bind="row.surveyInstance.approvedBy">
+                    </span>
+                </span>
+                <span ng-if="! row.surveyInstance.approvedBy">
+                            -
+                </span>
+            </td>
+            <td>
+                <span ng-if="row.surveyInstance.approvedAt"
+                      ng-bind="row.surveyInstance.approvedAt | date:'dd-MM-yyyy'">
+                </span>
+                <span ng-if="! row.surveyInstance.approvedAt">
+                            -
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</script>
