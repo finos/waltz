@@ -21,14 +21,13 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
-import template from './auth-sources-table.html';
-
+import template from "./auth-sources-table.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    authSources: '<',
-    orgUnits: '<',
+    parentEntityRef: "<",
+    authSources: "<",
+    orgUnits: "<",
 };
 
 
@@ -40,16 +39,16 @@ const initialState = {
 
 
 function shouldShowConsumers(parentRef) {
-    const kind = _.get(parentRef, 'kind', '');
-    return kind === 'DATA_TYPE';
+    const kind = _.get(parentRef, "kind", "");
+    return kind === "DATA_TYPE";
 }
 
 
 function mkColumnDefs(parentRef) {
     const consumerCell = shouldShowConsumers(parentRef)
         ? {
-            field: 'consumers',
-            displayName: 'Consumers',
+            field: "consumers",
+            displayName: "Consumers",
             cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <span class="label"
@@ -68,8 +67,8 @@ function mkColumnDefs(parentRef) {
         : null;
 
     const notesCell = {
-        field: 'description',
-        displayName: 'Notes',
+        field: "description",
+        displayName: "Notes",
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <span ng-if="COL_FIELD.length > 0">
@@ -86,14 +85,20 @@ function mkColumnDefs(parentRef) {
     };
 
     const ratingCell = {
-        field: 'ratingDisplayName',
-        displayName: 'Rating'
+        field: "ratingValue",
+        displayName: "Rating",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <span ng-bind="COL_FIELD.name"
+                      title="{{COL_FIELD.description}}">
+                </span>
+            </div>`
     };
 
     return _.compact([
-        mkEntityLinkGridCell('Data Type', 'dataType', 'none'),
-        mkEntityLinkGridCell('Declaring Org Unit', 'declaringOrgUnit', 'none'),
-        mkEntityLinkGridCell('Application', 'app', 'none'),
+        mkEntityLinkGridCell("Data Type", "dataType", "none"),
+        mkEntityLinkGridCell("Declaring Org Unit", "declaringOrgUnit", "none"),
+        mkEntityLinkGridCell("Application", "app", "none"),
         consumerCell,
         ratingCell,
         notesCell
@@ -101,29 +106,34 @@ function mkColumnDefs(parentRef) {
 }
 
 
-function controller(serviceBroker, displayNameService) {
+function controller(serviceBroker, enumValueService) {
 
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        const dataTypesByCode= _.keyBy(vm.dataTypes, 'code');
-        const orgUnitsById = _.keyBy(vm.orgUnits, 'id');
+        const dataTypesByCode= _.keyBy(vm.dataTypes, "code");
+        const orgUnitsById = _.keyBy(vm.orgUnits, "id");
 
         vm.gridData = _.map(vm.authSources, d => {
+            const authoritativenessRatingEnum = vm.enums.AuthoritativenessRating[d.rating];
             return {
                 app: d.applicationReference,
-                dataType: Object.assign({}, dataTypesByCode[d.dataType], { kind: 'DATA_TYPE' }),
+                dataType: Object.assign({}, dataTypesByCode[d.dataType], { kind: "DATA_TYPE" }),
                 appOrgUnit: d.appOrgUnitReference,
-                declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: 'ORG_UNIT' }),
+                declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: "ORG_UNIT" }),
                 description: d.description,
                 rating: d.rating,
-                ratingDisplayName: displayNameService.lookup('AuthoritativenessRating', d.rating),
+                ratingValue: authoritativenessRatingEnum,
                 consumers: vm.consumersByAuthSourceId[d.id] || []
             };
         });
     };
 
     vm.$onInit = () => {
+        enumValueService
+            .loadEnums()
+            .then(r => vm.enums = r);
+
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = r.data)
@@ -140,7 +150,7 @@ function controller(serviceBroker, displayNameService) {
         if (shouldShowConsumers(vm.parentEntityRef)) {
             const selector = {
                 entityReference: vm.parentEntityRef,
-                scope: 'CHILDREN'
+                scope: "CHILDREN"
             };
 
             serviceBroker
@@ -151,7 +161,7 @@ function controller(serviceBroker, displayNameService) {
                     vm.consumersByAuthSourceId = _
                         .chain(r.data)
                         .keyBy(d => d.key.id)
-                        .mapValues(v => _.sortBy(v.value, 'name'))
+                        .mapValues(v => _.sortBy(v.value, "name"))
                         .value();
                     refresh();
                 });
@@ -164,7 +174,10 @@ function controller(serviceBroker, displayNameService) {
 }
 
 
-controller.$inject = ['ServiceBroker', 'DisplayNameService'];
+controller.$inject = [
+    "ServiceBroker",
+    "EnumValueService"
+];
 
 
 export const component = {
@@ -173,5 +186,5 @@ export const component = {
     template
 };
 
-export const id = 'waltzAuthSourcesTable';
+export const id = "waltzAuthSourcesTable";
 
