@@ -32,19 +32,19 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'EnumValueStore';
+export const serviceName = "EnumValueStore";
 
 
 export const EnumValueStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'find all enum values'
+        serviceFnName: "findAll",
+        description: "find all enum values"
     }
 };
 
