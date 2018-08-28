@@ -32,7 +32,8 @@ public abstract class FlowDiagram implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        IsRemovedProvider {
 
     public abstract String layoutData();
 
