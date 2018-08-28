@@ -1,6 +1,8 @@
 # Waltz Documentation
 
 - [Features](features/README.md)
+- Integration
+  - [Neo4J](integration/neo4j)
 
 ### License 
 
