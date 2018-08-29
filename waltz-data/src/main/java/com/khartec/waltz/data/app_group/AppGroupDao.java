@@ -140,15 +140,16 @@ public class AppGroupDao {
         Condition isVisibleToUser = APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
                 .or(APPLICATION_GROUP.ID.in(groupsByUser));
 
-        SelectConditionStep<Record> qry = dsl
-                .selectDistinct(APPLICATION_GROUP.fields())
+        SelectConditionStep<Record1<Long>> qry = dsl
+                .selectDistinct(APPLICATION_GROUP.ID)
                 .from(APPLICATION_GROUP)
                 .join(ENTITY_RELATIONSHIP)
                 .on(joinOnA.or(joinOnB))
                 .where((aMatchesEntity.or(bMatchesEntity)).and(isVisibleToUser))
                 .and(notRemoved);
 
-        return qry
+        return dsl.selectFrom(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(qry))
                 .fetch(TO_DOMAIN);
     }
 
