@@ -21,15 +21,24 @@ package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.user.UserRoleDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.person.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -44,12 +53,19 @@ public class UserRoleService {
 
     private final UserRoleDao userRoleDao;
 
+    private final ChangeLogService changeLogService;
+
+    private final PersonService personService;
+
 
     @Autowired
-    public UserRoleService(UserRoleDao userRoleDao) {
+    public UserRoleService(UserRoleDao userRoleDao,
+                           ChangeLogService changeLogService, PersonService personService) {
+        this.personService = personService;
         checkNotNull(userRoleDao, "userRoleDao must not be null");
 
         this.userRoleDao = userRoleDao;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -82,8 +98,24 @@ public class UserRoleService {
     }
 
 
-    public boolean updateRoles(String userName, List<Role> newRoles) {
-        LOG.info("Updating roles for userName: "+userName + ", new roles: " + newRoles);
+    public boolean updateRoles(String userName, String targetUserName, List<Role> newRoles) {
+        LOG.info("Updating roles for userName: " + targetUserName + ", new roles: " + newRoles);
+
+        Person person = personService.findPersonByUserId(targetUserName);
+        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
+                .parentReference(EntityReference.mkRef(EntityKind.PERSON, person.id().get()))
+                .severity(Severity.INFORMATION)
+                .userId(userName)
+                .message(String.format(
+                        "Roles for %s updated to %s",
+                        targetUserName,
+                        newRoles
+                        ))
+                .childKind(Optional.empty())
+                .operation(Operation.UPDATE)
+                .build();
+        changeLogService.write(logEntry);
+
         return userRoleDao.updateRoles(userName, newRoles);
     }
 
