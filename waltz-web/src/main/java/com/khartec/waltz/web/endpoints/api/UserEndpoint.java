@@ -77,13 +77,16 @@ public class UserEndpoint implements Endpoint {
             UserRegistrationRequest userRegRequest = readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
         };
+
         DatumRoute<Boolean> updateRolesRoute = (request, response) -> {
             requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
 
-            String userName = request.params("userName");
+            String userName = getUsername(request);
+            String targetUserName = request.params("userName");
             List<String> roles = (List<String>) readBody(request, List.class);
-            return userRoleService.updateRoles(userName, map(roles, r -> Role.valueOf(r)));
+            return userRoleService.updateRoles(userName, targetUserName, map(roles, r -> Role.valueOf(r)));
         };
+
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
             boolean validate = !userRoleService.hasAnyRole(getUsername(request), Role.USER_ADMIN, Role.ADMIN);
             return userService.resetPassword(readBody(request, PasswordResetRequest.class), validate);
