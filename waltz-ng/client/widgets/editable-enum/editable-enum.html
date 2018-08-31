@@ -29,7 +29,7 @@
         </select>
 
         <button class="btn btn-xs btn-success"
-                ng-disabled="$ctrl.saving"
+                ng-disabled="$ctrl.saving || !$ctrl.isDirty()"
                 ng-click="$ctrl.doSave()">
             <waltz-icon name="check"></waltz-icon>
             Save
