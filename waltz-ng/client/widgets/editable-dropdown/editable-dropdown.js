@@ -66,6 +66,8 @@ function controller() {
     vm.doCancel = () => {
         vm.visibility.editor = false;
         vm.saving = false;
+        vm.currentVal = vm.initialVal;
+        vm.currentComments = vm.initialComments;
     };
 
     vm.doSave = () => {
@@ -83,6 +85,9 @@ function controller() {
         return _.get(vm, ['dropdownsByCode', code, 'name'], code);
     };
 
+    vm.isDirty = () => {
+        return vm.currentVal != null && (vm.currentVal != vm.initialVal || vm.currentComments != vm.initialComments);
+    };
 }
 
 
