@@ -102,6 +102,11 @@ public class UserRoleService {
         LOG.info("Updating roles for userName: " + targetUserName + ", new roles: " + newRoles);
 
         Person person = personService.findPersonByUserId(targetUserName);
+        if(person == null) {
+            LOG.warn(targetUserName + " does not exist, cannot update roles");
+            return false;
+        }
+
         ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
                 .parentReference(EntityReference.mkRef(EntityKind.PERSON, person.id().get()))
                 .severity(Severity.INFORMATION)
@@ -116,7 +121,7 @@ public class UserRoleService {
                 .build();
         changeLogService.write(logEntry);
 
-        return userRoleDao.updateRoles(userName, newRoles);
+        return userRoleDao.updateRoles(targetUserName, newRoles);
     }
 
 
