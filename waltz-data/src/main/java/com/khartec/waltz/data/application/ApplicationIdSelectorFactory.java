@@ -266,7 +266,7 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 .from(involvement)
                 .innerJoin(app)
                     .on(app.ID.eq(involvement.ENTITY_ID))
-                .where(dsl.renderInlined(condition));
+                .where(condition);
     }
 
 
