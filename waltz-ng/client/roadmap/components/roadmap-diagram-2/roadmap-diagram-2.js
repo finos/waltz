@@ -21,17 +21,12 @@ import {initialiseData} from "../../../common";
 import template from "./roadmap-diagram-2.html";
 import {select} from "d3-selection";
 import {createGroupElements, truncateText} from "../../../common/d3-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkRatingSchemeColorScale} from "../../../common/colors";
+import {drawUnit, NODE_STYLES, NODE_DIMENSIONS} from "./roadmap-diagram-node-utils";
 
 
 const bindings = {
-};
-
-
-const STYLES = {
-    node: "wrd-node",
-    nodeTitle: "wrd-node-title",
-    nodeExternalId: "wrd-node-external-id",
-    nodeCell: "wrd-node-cell"
 };
 
 
@@ -46,124 +41,98 @@ function setupGroupElements($element) {
 }
 
 
-function draw(groups) {
+function draw(groups, ratingColorScheme) {
 
     const datum = {
         node: {name: "Test Application with a long name", externalId: "1234-1", description: "about test app"},
         change: {current: {rating: "R"}, future: {rating: "G"}},
         changeInitiative: {name: "Change the bank", externalId: "INV1234", description: "Make some changes"}
     };
+    const datum2 = {
+        node: {name: "Another application", externalId: "5678-1", description: "about test app"},
+        change: {current: {rating: "Z"}, future: {rating: "G"}},
+        changeInitiative: null
+    };
+
+    const datum3 = {
+        node: {name: "Waltz", externalId: "2468-1", description: "about test app"},
+        change: {current: {rating: "A"}, future: {rating: "G"}},
+        changeInitiative: null
+    };
+    const datum4 = {
+        node: {name: "FDW", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "X"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+    const datum5 = {
+        node: {name: "TDH", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "A"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+
+    const datum6 = {
+        node: {name: "Sales Broker", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "G"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
 
     const data  = [
         datum,
-        datum,
-        datum,
-        datum
+        datum2,
+        datum3,
+        datum4,
+        datum5,
+        datum6
     ];
+
+    const gridData = gridLayout(data, { cols: 3});
+
+
 
     // centerpoint
     groups.svg.append("circle").attr("fill", "red").attr("r", 5).attr("cx", 0).attr("cy", 0);
 
     groups.svg
-        .selectAll(`.${STYLES.node}`)
+        .selectAll(`.${NODE_STYLES.node}`)
         .data(data)
         .enter()
         .append("g")
-        .attr("transform", (d, i) => `translate(${(nodeDimensions.width + 20) * (i)} 100)`)
-        .classed(STYLES.node, true)
-        .call(drawUnit)
+        .attr("transform", (d, i) => `translate(${(NODE_DIMENSIONS.width + 20) * (i)} 100)`)
+        .classed(NODE_STYLES.node, true)
+        .call(drawUnit, ratingColorScheme)
+}
+
+function gridLayout(data = [], options = { cols: 3}) {
+    return _.map(data, d => {
+        return {
+            data: d,
+            x:1,
+            y:1
+        };
+    });
 }
 
 
-const nodeDimensions = {
-    width: 140,
-    height: 60,  // 3 * sectionHeight
-    section: {
-        height: 20
-    },
-    text: {
-        dy: 14,
-        dx: 4,
-        fontSize: 12
-    }
-};
 
-
-function drawUnit(selection) {
-    selection
-        .append("rect")
-        .classed(STYLES.nodeCell, true)
-        .attr("width", nodeDimensions.width)
-        .attr("height", nodeDimensions.height)
-        .attr("fill", "#ccc")
-        .attr("stroke", "#888");
-
-    selection
-        .call(drawUnitTitle);
-
-    selection
-        .call(drawUnitExternalId);
-}
-
-
-function drawUnitExternalId(selection) {
-    selection
-        .append("rect")
-        .classed(STYLES.nodeExternalId, true)
-        .attr("width", nodeDimensions.width / 2)
-        .attr("height", nodeDimensions.section.height)
-        .attr("x", nodeDimensions.width / 2)
-        .attr("y", nodeDimensions.section.height)
-        .attr("fill", "#ddd")
-        .attr("stroke", "#888");
-
-    selection
-        .append("text")
-        .classed(STYLES.nodeExternalId, true)
-        .attr("x", nodeDimensions.width / 2)
-        .attr("y", nodeDimensions.section.height)
-        .text(d => d.node.externalId)
-        .attr("dy", nodeDimensions.text.dy)
-        .attr("dx", nodeDimensions.text.dx)
-        .attr("font-size", nodeDimensions.text.fontSize - 2)
-        .call(truncateText, nodeDimensions.width - (2 * nodeDimensions.text.dx));
-}
-
-
-function drawUnitTitle(selection) {
-    selection
-        .append("rect")
-        .classed(STYLES.nodeTitle, true)
-        .attr("width", nodeDimensions.width)
-        .attr("height", nodeDimensions.section.height)
-        .attr("fill", "#eee")
-        .attr("stroke", "#888");
-
-    selection
-        .append("text")
-        .text(d => d.node.name)
-        .classed(STYLES.nodeTitle, true)
-        .attr("dy", nodeDimensions.text.dy)
-        .attr("dx", nodeDimensions.text.dx)
-        .attr("font-size", nodeDimensions.text.fontSize)
-        .call(truncateText, nodeDimensions.width - (2 * nodeDimensions.text.dx));
-}
-
-
-function controller($element) {
+function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     let svgGroups = null;
 
     function redraw() {
-        if (svgGroups) {
-            draw(svgGroups);
+        console.log('redraw', vm)
+        const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
+        if (svgGroups && colorScheme) {
+            draw(svgGroups, colorScheme);
         }
     }
 
     vm.$onInit = () => {
         svgGroups = setupGroupElements($element);
-        redraw();
+        serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemes = r.data)
+            .then(redraw);
     };
 
     vm.$onChanges = (changes) => {
@@ -174,7 +143,7 @@ function controller($element) {
 }
 
 
-controller.$inject = ["$element"];
+controller.$inject = ["$element", "ServiceBroker"];
 
 
 const component = {

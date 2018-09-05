@@ -213,3 +213,13 @@ export function createGroupElements(container, definitions = []) {
 }
 
 
+/**
+ * Given an array of points (absolute coords: {x: 0, y: 0}) will return a path, moving  ('M') to the first then
+ * drawing lines ('L') to subsequent points, finishing with a close shape ('Z')
+ * @param pts
+ * @returns {string}
+ */
+export function toPath(pts) {
+    const toPathCombiner = (acc, p, i) => acc + `${i == 0 ? 'M' : 'L'}${p.x} ${p.y} `;
+    return _.reduce(pts, toPathCombiner, '') + 'Z'
+}
