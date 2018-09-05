@@ -41,75 +41,46 @@ function setupGroupElements($element) {
 }
 
 
-function draw(groups, ratingColorScheme) {
+function draw(data, groups, ratingColorScheme) {
 
-    const datum = {
-        node: {name: "Test Application with a long name", externalId: "1234-1", description: "about test app"},
-        change: {current: {rating: "R"}, future: {rating: "G"}},
-        changeInitiative: {name: "Change the bank", externalId: "INV1234", description: "Make some changes"}
-    };
-    const datum2 = {
-        node: {name: "Another application", externalId: "5678-1", description: "about test app"},
-        change: {current: {rating: "Z"}, future: {rating: "G"}},
-        changeInitiative: null
-    };
+    const gridData = gridLayout(data, { cols: 2 });
 
-    const datum3 = {
-        node: {name: "Waltz", externalId: "2468-1", description: "about test app"},
-        change: {current: {rating: "A"}, future: {rating: "G"}},
-        changeInitiative: null
-    };
-    const datum4 = {
-        node: {name: "FDW", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "X"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-    const datum5 = {
-        node: {name: "TDH", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "A"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
+    // marker
+    //groups.svg.append("circle").attr("fill", "red").attr("r", 5).attr("cx", 0).attr("cy", 0);
 
-    const datum6 = {
-        node: {name: "Sales Broker", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "G"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-
-    const data  = [
-        datum,
-        datum2,
-        datum3,
-        datum4,
-        datum5,
-        datum6
-    ];
-
-    const gridData = gridLayout(data, { cols: 3});
-
-
-
-    // centerpoint
-    groups.svg.append("circle").attr("fill", "red").attr("r", 5).attr("cx", 0).attr("cy", 0);
-
-    groups.svg
+    const grid = groups.svg
         .selectAll(`.${NODE_STYLES.node}`)
-        .data(data)
-        .enter()
+        .data(gridData, d => d.id);
+
+    const newCells = grid.enter()
         .append("g")
-        .attr("transform", (d, i) => `translate(${(NODE_DIMENSIONS.width + 20) * (i)} 100)`)
-        .classed(NODE_STYLES.node, true)
-        .call(drawUnit, ratingColorScheme)
+        .classed(NODE_STYLES.node, true);
+
+    grid.exit()
+        .remove();
+
+    const cellPadding = 10;
+
+    grid.merge(newCells)
+        .attr("transform", d => {
+            const dy = cellPadding + (NODE_DIMENSIONS.height + cellPadding) * d.layout.y;
+            const dx = cellPadding + (NODE_DIMENSIONS.width + cellPadding) * d.layout.x;
+            return `translate(${dx} ${dy})`;
+        })
+        .call(drawUnit, ratingColorScheme);
 }
 
-function gridLayout(data = [], options = { cols: 3}) {
-    return _.map(data, d => {
-        return {
-            data: d,
-            x:1,
-            y:1
-        };
-    });
+
+function gridLayout(data = [], options = { cols: 3 }) {
+    return _.map(
+        data,
+        (d, idx) => {
+            const layout = {
+                x: idx % options.cols,
+                y: Math.floor(idx / options.cols)
+            };
+            return Object.assign({}, d, { layout });
+        });
 }
 
 
@@ -117,13 +88,70 @@ function gridLayout(data = [], options = { cols: 3}) {
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+
+    const datum = {
+        id: 1,
+        node: {name: "Test Application with a long name", externalId: "1234-1", description: "about test app"},
+        change: {current: {rating: "R"}, future: {rating: "G"}},
+        changeInitiative: {name: "Change the bank", externalId: "INV1234", description: "Make some changes"}
+    };
+    const datum2 = {
+        id: 2,
+        node: {name: "Another application", externalId: "5678-1", description: "about test app"},
+        change: {current: {rating: "Z"}, future: {rating: "G"}},
+        changeInitiative: null
+    };
+
+    const datum3 = {
+        id: 3,
+        node: {name: "Waltz", externalId: "2468-1", description: "about test app"},
+        change: {current: {rating: "A"}, future: {rating: "G"}},
+        changeInitiative: null
+    };
+    const datum4 = {
+        id: 4,
+        node: {name: "FDW", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "X"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+    const datum5 = {
+        id: 5,
+        node: {name: "TDH", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "A"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+
+    const datum6 = {
+        id: 6,
+        node: {name: "Sales Broker", externalId: "8529-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "G"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+
+    const datum7 = {
+        id: 7,
+        node: {name: "Risk Calculator", externalId: "9977-1", description: "about test app"},
+        change: {current: {rating: "G"}, future: {rating: "G"}},
+        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+    };
+
+    vm.data  = [
+        datum,
+        datum2,
+        datum3,
+        datum4,
+        datum5,
+        datum6,
+        datum7
+    ];
+
     let svgGroups = null;
 
     function redraw() {
         console.log('redraw', vm)
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
-            draw(svgGroups, colorScheme);
+            draw(vm.data, svgGroups, colorScheme);
         }
     }
 
@@ -137,6 +165,25 @@ function controller($element, serviceBroker) {
 
     vm.$onChanges = (changes) => {
         console.log("roadmap-diagram-2 changes - parentEntityRef: ", vm.parentEntityRef);
+        redraw();
+    };
+
+    vm.onRemoveCell = (idx) => {
+        vm.data = _.filter(vm.data, (d, i) => i != idx);
+        redraw();
+    };
+
+    vm.onAddCell = () => {
+        const t = _.random(0, 10000000);
+        const rs = ["R", "A", "G", "Z", "X"];
+        const mkRating = () => rs[_.random(0, rs.length)]
+        const cell = {
+            id: t,
+            node: {name: `App ${t}`, externalId: `${t}-1`, description: "about test app"},
+            change: {current: {rating: mkRating()}, future: {rating: mkRating()}},
+            changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+        };
+        vm.data = _.concat(vm.data, [ cell ]);
         redraw();
     };
 
