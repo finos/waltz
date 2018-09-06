@@ -24,6 +24,7 @@ import {createGroupElements} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
 import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
+import {mkRandomNode, mkRandomNodes} from "./roadmap-diagram-data-utils";
 
 
 const bindings = {
@@ -48,26 +49,6 @@ function draw(gridData, groups, ratingColorScheme) {
         .call(drawNodeGrid, gridData, ratingColorScheme);
 }
 
-function mkRandomNode() {
-    const t = _.random(0, 10000000);
-    const rs = ["R", "A", "G", "Z", "X"];
-    const mkRating = () => rs[_.random(0, rs.length)]
-    const cell = {
-        id: t,
-        node: {name: `App ${t}`, externalId: `${t}-1`, description: "about test app"},
-        change: {current: {rating: mkRating()}, future: {rating: mkRating()}},
-        changeInitiative: t % 2
-            ? {name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-            : null
-    };
-    return cell;
-}
-
-
-function mkRandomNodes() {
-    const howMany = _.random(1, 16);
-    return _.map(_.range(0, howMany), () => mkRandomNode());
-}
 
 
 function controller($element, serviceBroker) {
@@ -78,7 +59,7 @@ function controller($element, serviceBroker) {
     let svgGroups = null;
 
     function redraw() {
-        console.log('redraw', vm.numCols)
+        console.log('redraw', vm);
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
             const gridData = gridLayout(vm.data, { cols: vm.numCols });
