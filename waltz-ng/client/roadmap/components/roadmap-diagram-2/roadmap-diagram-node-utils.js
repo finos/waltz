@@ -100,7 +100,7 @@ function drawUnitChangeInitiative(selection) {
         .attr("y", NODE_DIMENSIONS.section.height * 2)
         .attr("width", NODE_DIMENSIONS.width / 2)
         .attr("height", NODE_DIMENSIONS.section.height)
-        .attr("fill", "#ddd")
+        .attr("fill", d => d.changeInitiative ? "#eee": "#ddd")
         .attr("stroke", "#888");
 
     selection
@@ -124,7 +124,7 @@ function drawUnitExternalId(selection) {
         .attr("height", NODE_DIMENSIONS.section.height)
         .attr("x", NODE_DIMENSIONS.width / 2)
         .attr("y", NODE_DIMENSIONS.section.height)
-        .attr("fill", "#ddd")
+        .attr("fill", "#eee")
         .attr("stroke", "#888");
 
     selection

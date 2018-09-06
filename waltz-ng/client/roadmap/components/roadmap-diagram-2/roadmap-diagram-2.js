@@ -20,17 +20,19 @@
 import {initialiseData} from "../../../common";
 import template from "./roadmap-diagram-2.html";
 import {select} from "d3-selection";
-import {createGroupElements, truncateText} from "../../../common/d3-utils";
+import {createGroupElements} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {drawUnit, NODE_STYLES, NODE_DIMENSIONS} from "./roadmap-diagram-node-utils";
+import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
 
 
 const bindings = {
 };
 
 
-const initialState = {};
+const initialState = {
+    numCols: 3
+};
 
 
 function setupGroupElements($element) {
@@ -41,117 +43,46 @@ function setupGroupElements($element) {
 }
 
 
-function draw(data, groups, ratingColorScheme) {
+function draw(gridData, groups, ratingColorScheme) {
+    groups.svg
+        .call(drawNodeGrid, gridData, ratingColorScheme);
+}
 
-    const gridData = gridLayout(data, { cols: 2 });
-
-    // marker
-    //groups.svg.append("circle").attr("fill", "red").attr("r", 5).attr("cx", 0).attr("cy", 0);
-
-    const grid = groups.svg
-        .selectAll(`.${NODE_STYLES.node}`)
-        .data(gridData, d => d.id);
-
-    const newCells = grid.enter()
-        .append("g")
-        .classed(NODE_STYLES.node, true);
-
-    grid.exit()
-        .remove();
-
-    const cellPadding = 10;
-
-    grid.merge(newCells)
-        .attr("transform", d => {
-            const dy = cellPadding + (NODE_DIMENSIONS.height + cellPadding) * d.layout.y;
-            const dx = cellPadding + (NODE_DIMENSIONS.width + cellPadding) * d.layout.x;
-            return `translate(${dx} ${dy})`;
-        })
-        .call(drawUnit, ratingColorScheme);
+function mkRandomNode() {
+    const t = _.random(0, 10000000);
+    const rs = ["R", "A", "G", "Z", "X"];
+    const mkRating = () => rs[_.random(0, rs.length)]
+    const cell = {
+        id: t,
+        node: {name: `App ${t}`, externalId: `${t}-1`, description: "about test app"},
+        change: {current: {rating: mkRating()}, future: {rating: mkRating()}},
+        changeInitiative: t % 2
+            ? {name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
+            : null
+    };
+    return cell;
 }
 
 
-function gridLayout(data = [], options = { cols: 3 }) {
-    return _.map(
-        data,
-        (d, idx) => {
-            const layout = {
-                x: idx % options.cols,
-                y: Math.floor(idx / options.cols)
-            };
-            return Object.assign({}, d, { layout });
-        });
+function mkRandomNodes() {
+    const howMany = _.random(1, 16);
+    return _.map(_.range(0, howMany), () => mkRandomNode());
 }
-
 
 
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-
-    const datum = {
-        id: 1,
-        node: {name: "Test Application with a long name", externalId: "1234-1", description: "about test app"},
-        change: {current: {rating: "R"}, future: {rating: "G"}},
-        changeInitiative: {name: "Change the bank", externalId: "INV1234", description: "Make some changes"}
-    };
-    const datum2 = {
-        id: 2,
-        node: {name: "Another application", externalId: "5678-1", description: "about test app"},
-        change: {current: {rating: "Z"}, future: {rating: "G"}},
-        changeInitiative: null
-    };
-
-    const datum3 = {
-        id: 3,
-        node: {name: "Waltz", externalId: "2468-1", description: "about test app"},
-        change: {current: {rating: "A"}, future: {rating: "G"}},
-        changeInitiative: null
-    };
-    const datum4 = {
-        id: 4,
-        node: {name: "FDW", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "X"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-    const datum5 = {
-        id: 5,
-        node: {name: "TDH", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "A"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-
-    const datum6 = {
-        id: 6,
-        node: {name: "Sales Broker", externalId: "8529-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "G"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-
-    const datum7 = {
-        id: 7,
-        node: {name: "Risk Calculator", externalId: "9977-1", description: "about test app"},
-        change: {current: {rating: "G"}, future: {rating: "G"}},
-        changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-    };
-
-    vm.data  = [
-        datum,
-        datum2,
-        datum3,
-        datum4,
-        datum5,
-        datum6,
-        datum7
-    ];
+    vm.data = mkRandomNodes();
 
     let svgGroups = null;
 
     function redraw() {
-        console.log('redraw', vm)
+        console.log('redraw', vm.numCols)
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
-            draw(vm.data, svgGroups, colorScheme);
+            const gridData = gridLayout(vm.data, { cols: vm.numCols });
+            draw(gridData, svgGroups, colorScheme);
         }
     }
 
@@ -174,19 +105,13 @@ function controller($element, serviceBroker) {
     };
 
     vm.onAddCell = () => {
-        const t = _.random(0, 10000000);
-        const rs = ["R", "A", "G", "Z", "X"];
-        const mkRating = () => rs[_.random(0, rs.length)]
-        const cell = {
-            id: t,
-            node: {name: `App ${t}`, externalId: `${t}-1`, description: "about test app"},
-            change: {current: {rating: mkRating()}, future: {rating: mkRating()}},
-            changeInitiative:{name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
-        };
+        const cell = mkRandomNode();
         vm.data = _.concat(vm.data, [ cell ]);
         redraw();
     };
 
+    vm.onAddCol = () => { vm.numCols = vm.numCols + 1; redraw(); };
+    vm.onRemoveCol = () => { vm.numCols = vm.numCols - 1; redraw(); };
 }
 
 
