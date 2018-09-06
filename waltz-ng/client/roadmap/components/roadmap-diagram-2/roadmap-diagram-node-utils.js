@@ -37,7 +37,7 @@ export function drawUnit(selection, ratingColorScheme) {
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
         .call(drawUnitChangeInitiative)
-        .call(drawStateChangeIndicator, ratingColorScheme)
+        .call(drawStateChangeIndicator, ratingColorScheme);
 
     selection
         .on("click", d => console.log("Click ", d));
@@ -58,8 +58,8 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
     const dy = NODE_DIMENSIONS.section.height + padding.y;
 
     const section = selection
-        .append('g')
-        .attr('transform', `translate(${dx} ${dy})`);
+        .append("g")
+        .attr("transform", `translate(${dx} ${dy})`);
 
     const currentStateShape = [
         {x: 0, y: h * 0.3},
@@ -79,16 +79,16 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
     ];
 
     section
-        .append('path')
-        .attr('d', toPath(futureStateShape))
-        .attr('fill', d => ratingColorScale(d.change.future.rating))
-        .attr('stroke', '#959797');
+        .append("path")
+        .attr("d", toPath(futureStateShape))
+        .attr("fill", d => ratingColorScale(d.change.future.rating))
+        .attr("stroke", "#959797");
 
     section
-        .append('path')
-        .attr('d', toPath(currentStateShape))
-        .attr('fill', d => ratingColorScale(d.change.current.rating))
-        .attr('stroke', '#959797');
+        .append("path")
+        .attr("d", toPath(currentStateShape))
+        .attr("fill", d => ratingColorScale(d.change.current.rating))
+        .attr("stroke", "#959797");
 }
 
 

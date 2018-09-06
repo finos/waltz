@@ -59,7 +59,7 @@ function controller($element, serviceBroker) {
     let svgGroups = null;
 
     function redraw() {
-        console.log('redraw', vm);
+        console.log("redraw", vm);
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
             const gridData = gridLayout(vm.data, { cols: vm.numCols });
@@ -75,13 +75,13 @@ function controller($element, serviceBroker) {
             .then(redraw);
     };
 
-    vm.$onChanges = (changes) => {
+    vm.$onChanges = () => {
         console.log("roadmap-diagram-2 changes - parentEntityRef: ", vm.parentEntityRef);
         redraw();
     };
 
     vm.onRemoveCell = (idx) => {
-        vm.data = _.filter(vm.data, (d, i) => i != idx);
+        vm.data = _.filter(vm.data, (d, i) => i !== idx);
         redraw();
     };
 
