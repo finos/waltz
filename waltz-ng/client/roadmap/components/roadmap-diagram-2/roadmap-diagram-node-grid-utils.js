@@ -1,16 +1,11 @@
-import {drawUnit, NODE_DIMENSIONS, NODE_STYLES} from "./roadmap-diagram-node-utils";
+import {drawUnit, NODE_STYLES} from "./roadmap-diagram-node-utils";
 import {checkTrue} from "../../../common/checks";
+import {CELL_DIMENSIONS, NODE_DIMENSIONS} from "./roadmap-diagram-dimensions";
 
-
-const CELL_PADDING = 10;
-const CELL_HEIGHT = NODE_DIMENSIONS.height + CELL_PADDING;
-const CELL_WIDTH = NODE_DIMENSIONS.width + CELL_PADDING;
-
-
-export function drawNodeGrid(selection, gridData, ratingColorScheme) {
+export function drawNodeGrid(selection, ratingColorScheme) {
     const grid = selection
         .selectAll(`.${NODE_STYLES.node}`)
-        .data(gridData.data, d => d.id);
+        .data(d => d.data, d => d.id);
 
     const newCells = grid
         .enter()
@@ -22,8 +17,8 @@ export function drawNodeGrid(selection, gridData, ratingColorScheme) {
 
     grid.merge(newCells)
         .attr("transform", d => {
-            const dy = CELL_PADDING + (CELL_HEIGHT * d.layout.row);
-            const dx = CELL_PADDING + (CELL_WIDTH * d.layout.col);
+            const dy = CELL_DIMENSIONS.padding + (CELL_DIMENSIONS.height * d.layout.row);
+            const dx = CELL_DIMENSIONS.padding + (CELL_DIMENSIONS.width * d.layout.col);
             return `translate(${dx} ${dy})`;
         })
         .call(drawUnit, ratingColorScheme);
@@ -43,14 +38,14 @@ export function gridLayout(data = [], options = { cols: 3 }) {
             return Object.assign({}, d, { layout });
         });
 
-    const dimensions = {
-        cols: options.cols,
-        rows: Math.ceil(data.length / options.cols)
+    const layout = {
+        colCount: Math.min(options.cols, data.length),
+        rowCount: Math.ceil(data.length / options.cols)
     };
 
     return {
         data: dataWithLayout,
-        dimensions
+        layout
     };
 }
 

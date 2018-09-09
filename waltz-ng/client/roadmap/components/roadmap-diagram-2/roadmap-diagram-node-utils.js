@@ -1,4 +1,5 @@
 import {toPath, truncateText} from "../../../common/d3-utils";
+import {NODE_DIMENSIONS} from "./roadmap-diagram-dimensions";
 
 
 export const NODE_STYLES = {
@@ -6,32 +7,14 @@ export const NODE_STYLES = {
     nodeTitle: "wrd-node-title",
     nodeExternalId: "wrd-node-external-id",
     nodeChangeInitiative: "wrd-node-change-initiative",
-    nodeCell: "wrd-node-cell"
-};
-
-
-export const NODE_DIMENSIONS = {
-    width: 120,
-    height: 54,  // 3 * section.height
-    section: {
-        height: 18
-    },
-    text: {
-        dy: 12,
-        dx: 4,
-        fontSize: 12
-    }
+    nodeCell: "wrd-node-cell",
+    nodeCellChangeIndicator: "node-cell-change-indicator",
+    nodeCellChangeIndicatorTargetState: "node-cell-change-indicator-target-state",
+    nodeCellChangeIndicatorBaseState: "node-cell-change-indicator-base-state"
 };
 
 
 export function drawUnit(selection, ratingColorScheme) {
-    selection
-        .append("rect")
-        .classed(NODE_STYLES.nodeCell, true)
-        .attr("width", NODE_DIMENSIONS.width)
-        .attr("height", NODE_DIMENSIONS.height)
-        .attr("fill", "#ffffff")
-        .attr("stroke", "#888");
 
     selection
         .call(drawUnitTitle)
@@ -40,9 +23,16 @@ export function drawUnit(selection, ratingColorScheme) {
         .call(drawStateChangeIndicator, ratingColorScheme);
 
     selection
+        .append("rect")
+        .classed(NODE_STYLES.nodeCell, true)
+        .attr("width", NODE_DIMENSIONS.width)
+        .attr("height", NODE_DIMENSIONS.height)
+        .attr("stroke", "#CBCBCB")
+        .attr("fill", "none");
+
+    selection
         .on("click", d => console.log("Click ", d));
 }
-
 
 
 function drawStateChangeIndicator(selection, ratingColorScale) {
@@ -59,9 +49,10 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
 
     const section = selection
         .append("g")
+        .classed(NODE_STYLES.nodeCellChangeIndicator, true)
         .attr("transform", `translate(${dx} ${dy})`);
 
-    const currentStateShape = [
+    const baseStateShape = [
         {x: 0, y: h * 0.3},
         {x: w * 0.3, y: h * 0.15},
         {x: w * 0.4, y: h * 0.5 },
@@ -70,7 +61,7 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
         {x: w * 0.02, y: h * 0.5}
     ];
 
-    const futureStateShape = [
+    const targetStateShape = [
         {x: w * 0.3, y: h * 0.2},
         {x: w * 0.9, y: 0},
         {x: w, y: h * 0.5 },
@@ -80,14 +71,16 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
 
     section
         .append("path")
-        .attr("d", toPath(futureStateShape))
-        .attr("fill", d => ratingColorScale(d.change.future.rating))
+        .classed(NODE_STYLES.nodeCellChangeIndicatorTargetState, true)
+        .attr("d", toPath(targetStateShape))
+        .attr("fill", d => ratingColorScale(d.change.target.rating))
         .attr("stroke", "#959797");
 
     section
         .append("path")
-        .attr("d", toPath(currentStateShape))
-        .attr("fill", d => ratingColorScale(d.change.current.rating))
+        .classed(NODE_STYLES.nodeCellChangeIndicatorBaseState, true)
+        .attr("d", toPath(baseStateShape))
+        .attr("fill", d => ratingColorScale(d.change.base.rating))
         .attr("stroke", "#959797");
 }
 
@@ -100,8 +93,7 @@ function drawUnitChangeInitiative(selection) {
         .attr("y", NODE_DIMENSIONS.section.height * 2)
         .attr("width", NODE_DIMENSIONS.width / 2)
         .attr("height", NODE_DIMENSIONS.section.height)
-        .attr("fill", d => d.changeInitiative ? "#eee": "#ddd")
-        .attr("stroke", "#888");
+        .attr("fill", d => d.changeInitiative ? "#eee": "#ddd");
 
     selection
         .append("text")
@@ -124,8 +116,7 @@ function drawUnitExternalId(selection) {
         .attr("height", NODE_DIMENSIONS.section.height)
         .attr("x", NODE_DIMENSIONS.width / 2)
         .attr("y", NODE_DIMENSIONS.section.height)
-        .attr("fill", "#eee")
-        .attr("stroke", "#888");
+        .attr("fill", "#eee");
 
     selection
         .append("text")
@@ -146,8 +137,7 @@ function drawUnitTitle(selection) {
         .classed(NODE_STYLES.nodeTitle, true)
         .attr("width", NODE_DIMENSIONS.width)
         .attr("height", NODE_DIMENSIONS.section.height)
-        .attr("fill", "#eee")
-        .attr("stroke", "#888");
+        .attr("fill", "#eee");
 
     selection
         .append("text")

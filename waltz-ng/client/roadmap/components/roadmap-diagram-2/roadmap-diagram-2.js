@@ -24,8 +24,9 @@ import {createGroupElements} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
 import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
-import {mkRandomNode, mkRandomNodes} from "./roadmap-diagram-data-utils";
-
+import {mkRandomNode, mkRandomRowData} from "./roadmap-diagram-data-utils";
+import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
+import {drawRow, rowLayout} from "./roadmap-diagram-row-utils";
 
 const bindings = {
 };
@@ -39,22 +40,28 @@ const initialState = {
 function setupGroupElements($element) {
     const svg = select($element.find("svg")[0]);
     const definitions = [
+        {
+            name: "holder",
+            children: [
+                { name: "grid", children: [ ] },
+                { name: "columnAxis", children: [ ] },
+                { name: "rowAxis", children: [ ]  }
+            ]
+        }
     ];
     return Object.assign({}, { svg }, createGroupElements(svg, definitions));
 }
 
 
-function draw(gridData, groups, ratingColorScheme) {
-    groups.svg
-        .call(drawNodeGrid, gridData, ratingColorScheme);
+function draw(data, holder, colorScheme) {
+    return drawRow(data, holder, colorScheme);
 }
-
 
 
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.data = mkRandomNodes();
+    vm.data = rowLayout(mkRandomRowData(4));
 
     let svgGroups = null;
 
@@ -62,8 +69,7 @@ function controller($element, serviceBroker) {
         console.log("redraw", vm);
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
-            const gridData = gridLayout(vm.data, { cols: vm.numCols });
-            draw(gridData, svgGroups, colorScheme);
+            draw(vm.data, svgGroups.grid, colorScheme);
         }
     }
 
@@ -79,6 +85,8 @@ function controller($element, serviceBroker) {
         console.log("roadmap-diagram-2 changes - parentEntityRef: ", vm.parentEntityRef);
         redraw();
     };
+
+    // -- INTERACT --
 
     vm.onRemoveCell = (idx) => {
         vm.data = _.filter(vm.data, (d, i) => i !== idx);
