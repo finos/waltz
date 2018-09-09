@@ -20,8 +20,17 @@
 <div class="waltz-roadmap-diagram-2">
     <h1>Roadmap diagram</h1>
 
-    <svg width="800"
-         height="400"
+    <input class="form-control small small"
+           type="search"
+           ng-change="$ctrl.doSearch()"
+           ng-model-options="{ debounce: 200 }"
+           ng-model="$ctrl.qry">
+
+    <br>
+    <br>
+
+    <svg width="1200"
+         height="600"
          viewBox="0 0 1400 700">
     </svg>
 

@@ -17,15 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import {initialiseData, isEmpty} from "../../../common";
 import template from "./roadmap-diagram-2.html";
 import {select} from "d3-selection";
-import {createGroupElements} from "../../../common/d3-utils";
+import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
-import {mkRandomNode, mkRandomRowData} from "./roadmap-diagram-data-utils";
-import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
+import {filterData, mkRandomNode, mkRandomRowData} from "./roadmap-diagram-data-utils";
 import {drawRow, rowLayout} from "./roadmap-diagram-row-utils";
 
 const bindings = {
@@ -54,6 +52,7 @@ function setupGroupElements($element) {
 
 
 function draw(data, holder, colorScheme) {
+    console.log("draw");
     return drawRow(data, holder, colorScheme);
 }
 
@@ -61,24 +60,38 @@ function draw(data, holder, colorScheme) {
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.data = rowLayout(mkRandomRowData(4));
+    vm.data = mkRandomRowData(4);
 
     let svgGroups = null;
+    let destructorFn = null;
 
     function redraw() {
         console.log("redraw", vm);
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
-            draw(vm.data, svgGroups.grid, colorScheme);
+            const data = filterData(vm.data, vm.qry);
+            const dataWithLayout = rowLayout(data);
+            draw(dataWithLayout, svgGroups.grid, colorScheme);
         }
     }
 
     vm.$onInit = () => {
         svgGroups = setupGroupElements($element);
+        destructorFn = responsivefy(svgGroups.svg);
         serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
             .then(r => vm.ratingSchemes = r.data)
             .then(redraw);
+    };
+
+    vm.$onDestroy = () => {
+        if (destructorFn) {
+            destructorFn();
+        }
+    };
+
+    vm.doSearch = () => {
+        redraw();
     };
 
     vm.$onChanges = () => {
