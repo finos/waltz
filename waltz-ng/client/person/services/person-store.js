@@ -51,7 +51,7 @@ function store($http,
         .then(result => result.data);
 
 
-    const countCumulativeReports = (empId) => $http
+    const countCumulativeReportsByKind = (empId) => $http
         .get(`${BASE}/employee-id/${empId}/count-cumulative-reports`)
         .then(result => result.data);
 
@@ -67,7 +67,7 @@ function store($http,
         findByUserId,
         findDirects,
         findManagers,
-        countCumulativeReports,
+        countCumulativeReportsByKind,
         search
     };
 }
@@ -108,9 +108,9 @@ export const PersonStore_API = {
         serviceFnName: "findManagers",
         description: "find managers for person"
     },
-    countCumulativeReports: {
+    countCumulativeReportsByKind: {
         serviceName,
-        serviceFnName: "countCumulativeReports",
+        serviceFnName: "countCumulativeReportsByKind",
         description: "count Cumulative Reports [empId]"
     },
     search: {

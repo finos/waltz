@@ -9,8 +9,12 @@
     <div ng-if="$ctrl.directs.length > 0">
         <h4>
             Directs
-            <small uib-popover="Directs : Cumulative Reportees"
-                   popover-trigger="mouseenter">
+            <small uib-popover-template="'wphs-popover.html'"
+                   popover-trigger="mouseenter"
+                   popover-append-to-body="true"
+                   popover-placement="top-left"
+                   popover-popup-delay="300"
+                   popover-enable="$ctrl.cumulativeCount">
                 <span ng-bind="$ctrl.directs.length"></span>
                 :
                 <span ng-bind="$ctrl.cumulativeCount"></span>
@@ -19,3 +23,18 @@
         <waltz-person-directs-list directs="$ctrl.directs"></waltz-person-directs-list>
     </div>
 </div>
+
+<script type="text/ng-template"
+        id="wphs-popover.html">
+    <div class="small">
+        <strong>Reportees</strong>
+        <br>
+        <br>
+        <table class="table table-condensed small">
+            <tr ng-repeat="key in $ctrl.kindKeys">
+                <td><span ng-bind="key | toDisplayName:'PersonKind'"></span></td>
+                <td><span ng-bind="$ctrl.kindCounts[key]"></span></td>
+            </tr>
+        </table>
+    </div>
+</script>

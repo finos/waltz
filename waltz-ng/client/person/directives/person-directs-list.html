@@ -1,22 +1,33 @@
-<table class="table table-condensed table-hover">
-    <colgroup>
-        <col width="30%">
-        <col width="20%">
-        <col width="35%">
-        <col width="15%">
-    </colgroup>
-    <tr ng-repeat="direct in ctrl.directs track by direct.id">
-        <td>
-            <waltz-person-link person="direct"></waltz-person-link>
-        </td>
-        <td>
-            <span ng-bind="direct.title"></span>
-        </td>
-        <td>
-            <waltz-mail-to person="direct"></waltz-mail-to>
-        </td>
-        <td>
-            <waltz-phone-link number="{{ direct.officePhone }}"></waltz-phone-link>
-        </td>
-    </tr>
-</table>
+<div>
+
+
+    <table class="table table-condensed table-hover">
+        <colgroup>
+            <col width="20%">
+            <col width="20%">
+            <col width="20%">
+            <col width="20%">
+            <col width="20%">
+        </colgroup>
+        <tr ng-repeat="direct in ctrl.directs track by direct.id"
+            class="waltz-visibility-parent">
+            <td>
+                <waltz-person-link person="direct"></waltz-person-link>
+            </td>
+            <td>
+                <span class="waltz-visibility-child-30"
+                      ng-bind="direct.personKind | toDisplayName:'PersonKind'">
+                </span>
+            </td>
+            <td>
+                <span ng-bind="direct.title"></span>
+            </td>
+            <td>
+                <waltz-mail-to person="direct"></waltz-mail-to>
+            </td>
+            <td>
+                <waltz-phone-link number="{{ direct.officePhone }}"></waltz-phone-link>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -25,15 +25,16 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.model.person.PersonKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
 @Service
 public class PersonService {
@@ -103,7 +104,7 @@ public class PersonService {
     }
 
 
-    public int countAllUnderlings(String employeeId){
-        return personDao.countAllUnderlings(employeeId);
+    public Map<PersonKind, Integer> countAllUnderlingsByKind(String employeeId){
+        return personDao.countAllUnderlingsByKind(employeeId);
     }
 }

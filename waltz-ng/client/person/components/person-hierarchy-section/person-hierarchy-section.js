@@ -20,7 +20,7 @@
 import template from "./person-hierarchy-section.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
+import _ from "lodash";
 
 const bindings = {
     parentEntityRef: "<"
@@ -28,7 +28,9 @@ const bindings = {
 
 
 const initialState = {
-    cumulativeCount: 0
+    cumulativeCount: null,
+    kindCount: null,
+    kindKeys: null
 };
 
 
@@ -51,8 +53,12 @@ function controller(serviceBroker) {
                     .then(r => vm.managers = r.data);
 
                 serviceBroker
-                    .loadViewData(CORE_API.PersonStore.countCumulativeReports, [ empId ])
-                    .then(r => vm.cumulativeCount = r.data);
+                    .loadViewData(CORE_API.PersonStore.countCumulativeReportsByKind, [ empId ])
+                    .then(r =>{
+                        vm.kindKeys = _.keys(r.data);
+                        vm.kindCounts = r.data;
+                        vm.cumulativeCount = _.sum(_.values(r.data));
+                    })
             });
     };
 }
