@@ -82,7 +82,32 @@ function controller($element, serviceBroker) {
         svgGroups = setupGroupElements($element);
         svgGroups
             .grid
-            .attr("clip-path", "url(#grid-clip)");
+            .attr("clip-path", "url(#grid-clip)")
+            .attr("transform", "translate(150 50)");
+        svgGroups
+            .columnAxis
+            .attr("clip-path", "url(#col-clip)")
+            .attr("transform", "translate(150 0)");
+
+        svgGroups
+            .rowAxis
+            .attr("clip-path", "url(#row-clip)")
+            .attr("transform", "translate(0 50)");
+
+        svgGroups
+            .rowContent
+            .append('rect')
+            .attr('width', 150)
+            .attr('height', 750)
+            .attr('fill', 'red');
+
+        svgGroups
+            .columnContent
+            .append('rect')
+            .attr('width', 1450)
+            .attr('height', 50)
+            .attr('fill', 'green');
+
         setupZoom(svgGroups);
         destructorFn = responsivefy(svgGroups.svg);
         serviceBroker

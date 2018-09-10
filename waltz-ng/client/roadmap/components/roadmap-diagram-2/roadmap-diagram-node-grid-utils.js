@@ -11,7 +11,7 @@ export function drawNodeGrid(selection, ratingColorScheme) {
     const newCells = grid
         .enter()
         .append("g")
-        .classed(NODE_STYLES.node, true);
+        .classed(NODE_STYLES.nodeCell, true);
 
     grid.exit()
         .remove();
