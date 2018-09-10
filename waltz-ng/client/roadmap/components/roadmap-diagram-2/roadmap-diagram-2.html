@@ -33,35 +33,28 @@
          height="800"
          style="border: 1px solid red;"
          viewBox="0 0 1400 700">
+
+        <clipPath id="grid-clip">
+            <rect x="150"
+                  y="50"
+                  width="1450"
+                  height="750" />
+        </clipPath>
+
+        <clipPath id="columns-clip">
+            <rect x="0"
+                  y="0"
+                  width="600"
+                  height="400" />
+        </clipPath>
+
+        <clipPath id="row-clip">
+            <rect x="0"
+                  y="0"
+                  width="400"
+                  height="400" />
+        </clipPath>
+
     </svg>
-
-    <br>
-
-    <button ng-click="$ctrl.onRemoveCell(2)"
-            class="btn btn-mini btn-danger">
-        Remove App
-    </button>
-
-    &nbsp;
-
-    <button ng-click="$ctrl.onAddCell()"
-            class="btn btn-mini btn-success">
-        Add App
-    </button>
-
-    <br>
-    <br>
-
-    <button ng-click="$ctrl.onRemoveCol()"
-            class="btn btn-mini btn-danger">
-        Remove Col
-    </button>
-
-    &nbsp;
-
-    <button ng-click="$ctrl.onAddCol()"
-            class="btn btn-mini btn-success">
-        Add Col
-    </button>
 
 </div>

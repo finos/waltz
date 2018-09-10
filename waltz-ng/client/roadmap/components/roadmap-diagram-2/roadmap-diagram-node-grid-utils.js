@@ -46,7 +46,7 @@ export function drawNodeGrid(selection, ratingColorScheme) {
  * @param options
  * @returns {{data: Array, layout: {colCount: number, rowCount: number}}}
  **/
-export function gridLayout(data = [], options = { cols: 3 }) {
+export function nodeGridLayout(data = [], options = { cols: 3 }) {
     checkTrue(options.cols > 0, "gridLayout: Num cols must be greater than zero");
 
     const dataWithLayout = _.map(

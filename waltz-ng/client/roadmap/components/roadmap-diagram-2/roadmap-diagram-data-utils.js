@@ -2,13 +2,49 @@ import _ from "lodash";
 import {isEmpty, randomPick} from "../../../common";
 
 
+
+export function filterData(data, qry) {
+    const origData = _.cloneDeep(data);
+
+    if (isEmpty(qry)) {
+        return origData;
+    }
+
+    const nodeMatchFn = n => {
+        return n.searchTargetStr.indexOf(qry) > -1;
+    };
+
+    const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
+    const filterRowFn = nodeGrids =>  _.map(nodeGrids, filterNodeGridFn);
+    return _.map(data, row => filterRowFn(row));
+}
+
+
+export function enrichDatumWithSearchTargetString(datum) {
+    const node = datum.node;
+    const nodeName = node.name.toLowerCase();
+    const nodeExtId = node.externalId.toLowerCase();
+
+    const ci = datum.changeInitiative;
+    const ciName = ci ? ci.name.toLowerCase() : "";
+    const ciExtId = ci ? ci.externalId.toLowerCase() : "";
+
+    const searchTargetStr = `${nodeName} ${nodeExtId} ${ ciName } ${ciExtId}`;
+
+    return Object.assign({}, datum, { searchTargetStr });
+}
+
+
+// --- TEST DATA GENERATORS
+
+
 const sourceRatings = ["R", "R", "A", "A", "G", "Z", "X" , "X"];
 const targetRatings = ["G", "G", "G", "X", "X"];
 
 
-export function mkRandomNode() {
+function mkRandomNode() {
     const t = _.random(0, 10000000);
-    return {
+    const node = {
         id: t,
         node: {
             name: `App ${t}`,
@@ -27,10 +63,12 @@ export function mkRandomNode() {
             ? {name: "Change the bank", externalId: "INV6547", description: "Make some changes"}
             : null
     };
+
+    return enrichDatumWithSearchTargetString(node);
 }
 
 
-export function mkRandomNodes() {
+function mkRandomNodes() {
     const howMany = _.random(1, 16);
     return _.map(_.range(0, howMany), () => mkRandomNode());
 }
@@ -39,28 +77,3 @@ export function mkRandomNodes() {
 export function mkRandomRowData(numCols = 3) {
     return _.map(_.range(0, numCols), () => mkRandomNodes());
 }
-
-
-export function filterData(rows, qry) {
-    if (isEmpty(qry)) {
-        return rows;
-    }
-
-    const nodeMatchFn = n => {
-        const node = n.node;
-        const nodeName = node.name.toLowerCase();
-        const nodeExtId = node.externalId.toLowerCase();
-
-        const ci = n.changeInitiative;
-        const ciName = ci ? ci.name.toLowerCase() : "";
-        const ciExtId = ci ? ci.externalId.toLowerCase() : "";
-
-        const searchTargetStr = `${nodeName} ${nodeExtId} ${ ciName } ${ciExtId}`;
-        return searchTargetStr.indexOf(qry) > -1;
-    };
-
-    const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
-    const filterRowFn = nodeGrids =>  _.map(nodeGrids, filterNodeGridFn);
-    return _.map(rows, row => filterRowFn(row));
-}
-

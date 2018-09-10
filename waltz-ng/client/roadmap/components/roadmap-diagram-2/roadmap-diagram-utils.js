@@ -23,22 +23,24 @@ import {event} from "d3-selection";
 export function setupZoom(svgGroups) {
 
     const myZoom = zoom()
-        .scaleExtent([1, 1]) // prevent zoom, we only want panning
+        .scaleExtent([0.2, 1.5]) // prevent zoom, we only want panning
         .on("zoom", () => {
             const tx = event.transform.x;
             const ty = event.transform.y;
 
+
             svgGroups
-                .rowAxis
+                .rowContent
                 .attr("transform", `translate(0 ${ty})`);
 
             svgGroups
-                .columnAxis
+                .columnContent
                 .attr("transform", `translate(${tx} 0)`);
 
             svgGroups
-                .grid
-                .attr("transform", `translate(${tx} ${ty})`);
+                .gridContent
+                .attr("transform", event.transform)
+                // .attr("transform", `translate(${tx} ${ty})`);
         });
 
     return svgGroups

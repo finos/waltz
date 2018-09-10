@@ -1,6 +1,8 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
+import {drawNodeGrid, nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
+import {drawRow, ROW_STYLES} from "./roadmap-diagram-row-utils";
+import {toCumulativeCounts} from "../../../common/list-utils";
 
 
 export const GRID_STYLES = {
@@ -8,6 +10,59 @@ export const GRID_STYLES = {
     rowDivider: "wrd-row-divider"
 };
 
+
+export function gridLayout(rowData = [], options) {
+    const dataWithLayout = _.map(rowData, row => rowLayout(row, options));
+
+    const rowHeights = _.map(dataWithLayout, d => d.layout.maxCellRows);
+
+    const allColWidths = _.map(dataWithLayout, d => d.layout.colWidths);
+    const transposed = _.unzip(allColWidths);
+    const colWidths = _.map(transposed, _.max);
+
+    const cumulativeColWidths = toCumulativeCounts(colWidths);
+    const cumulativeRowHeights = toCumulativeCounts(rowHeights);
+
+    return {
+        layout: {
+            rowHeights,
+            colWidths,
+            cumulativeColWidths,
+            cumulativeRowHeights,
+            totalHeight: _.sum(rowHeights),
+            totalWidth: _.sum(colWidths)
+        },
+        data: dataWithLayout
+    };
+}
+
+
+export function drawGrid(holder, dataWithLayout, colorScheme) {
+    const rows = holder
+        .selectAll(`.${ROW_STYLES.row}`)
+        .data(dataWithLayout.data);
+
+    const newRows = rows
+        .enter()
+        .append("g")
+        .classed(ROW_STYLES.row, true);
+
+    rows.exit()
+        .remove();
+
+    rows
+        .merge(newRows)
+        .attr("transform", (d, i) => {
+            const rowOffset = _.sum(_.take(dataWithLayout.layout.rowHeights, i)) * CELL_DIMENSIONS.height;
+            const padding = (i * ROW_DIMENSIONS.padding);
+            const dy = rowOffset + padding;
+            return `translate(0 ${ dy })`;
+        })
+        .call(drawRow, colorScheme, dataWithLayout.layout.colWidths);
+
+    drawRowDividers(holder, dataWithLayout.layout);
+    drawColumnDividers(holder, dataWithLayout.layout);
+}
 
 
 export function drawColumnDividers(selection, layout) {
@@ -51,7 +106,8 @@ export function drawRowDividers(selection, layout) {
         .append("line")
         .classed(GRID_STYLES.rowDivider, true)
         .attr("x1", 0)
-        .attr("stroke", "#eee");
+        .attr("stroke", "#eee")
+        .attr("stroke-width", 2);
 
     const calcY = (d, i) => layout.cumulativeRowHeights[i] * CELL_DIMENSIONS.height + (i * ROW_DIMENSIONS.padding) + ROW_DIMENSIONS.padding / 2;
 
@@ -85,7 +141,7 @@ export function drawRowDividers(selection, layout) {
  * @returns {{layout: {maxCellRows: *, maxCellCols: *}, data: *}}
  */
 export function rowLayout(data = [], options = { cols: 3 }) {
-    const gridData = _.map(data, d => gridLayout(d, options));
+    const gridData = _.map(data, d => nodeGridLayout(d, options));
 
     const maxCellRows = _
         .chain(gridData)
