@@ -36,8 +36,25 @@ export function drawRow(rowData, holder, ratingColorScheme) {
 }
 
 
-export function rowLayout(data = []) {
-    const gridData = _.map(data, d => gridLayout(d));
+/**
+ * Given an _array of arrays_ (row-cells containing node-cells)
+ * will lay the node-cells into grids and return a new _object_
+ * which looks like:
+ *
+ * ```
+ * {
+ *     layout: {
+ *         maxCellRows:  n,  // largest number of node cell rows  (gives height of row)
+ *         maxCellCols:  n   // where n <= options.cols
+ *     },
+ *     data: originalDataEnrichedWithLayout
+ * }
+ * ```
+ * @param data
+ * @returns {{layout: {maxCellRows: *, maxCellCols: *}, data: *}}
+ */
+export function rowLayout(data = [], options = { cols: 3 }) {
+    const gridData = _.map(data, d => gridLayout(d, options));
 
     const maxCellRows = _
         .chain(gridData)

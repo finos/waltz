@@ -1,6 +1,7 @@
 import {drawUnit, NODE_STYLES} from "./roadmap-diagram-node-utils";
 import {checkTrue} from "../../../common/checks";
-import {CELL_DIMENSIONS, NODE_DIMENSIONS} from "./roadmap-diagram-dimensions";
+import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
+
 
 export function drawNodeGrid(selection, ratingColorScheme) {
     const grid = selection
@@ -25,6 +26,26 @@ export function drawNodeGrid(selection, ratingColorScheme) {
 }
 
 
+/**
+ * Given an _array_ of data will return an _object_ similar to:
+ *
+ * ```
+ * {
+ *     data: [ {
+ *         ...datum,   // original data
+ *         layout: { col: x, row: y }  // position within grid (zero offset)
+ *     }],
+ *     layout: {
+ *       colCount: x,  // max number of cols (<= options.cols)
+ *       rowCount: y   // max number rows
+ *     }
+ * }
+ * ```
+ *
+ * @param data
+ * @param options
+ * @returns {{data: Array, layout: {colCount: number, rowCount: number}}}
+ **/
 export function gridLayout(data = [], options = { cols: 3 }) {
     checkTrue(options.cols > 0, "gridLayout: Num cols must be greater than zero");
 

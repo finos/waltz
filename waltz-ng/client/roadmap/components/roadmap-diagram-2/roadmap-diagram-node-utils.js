@@ -3,7 +3,6 @@ import {NODE_DIMENSIONS} from "./roadmap-diagram-dimensions";
 
 
 export const NODE_STYLES = {
-    node: "wrd-node",
     nodeTitle: "wrd-node-title",
     nodeExternalId: "wrd-node-external-id",
     nodeChangeInitiative: "wrd-node-change-initiative",
