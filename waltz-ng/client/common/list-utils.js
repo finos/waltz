@@ -22,3 +22,25 @@ import _ from "lodash";
 export function containsAll(xs = [], ys = []) {
     return _.every(ys, y => _.includes(xs, y));
 }
+
+
+/**
+ * given an array of numbers (xs) returns the cumulative counts. E.g.
+ *
+ * ```
+ *   toCumulativeCounts([1,2,3]) => [1, 3, 6];
+ * ```
+ *
+ * @param xs
+ * @returns {*}
+ */
+export function toCumulativeCounts(xs) {
+    return _.reduce(
+        xs,
+        (acc, x) => {
+            const last = _.last(acc) || 0;
+            acc.push(last + x);
+            return acc;
+        },
+        []);
+}

@@ -1,17 +1,18 @@
 import _ from "lodash";
-import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
+import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
 import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
 
 
-const STYLES = {
+export const ROW_STYLES = {
+    row: "wrd-row",
     rowCell: "wrd-row-cell"
 };
 
 
-export function drawRow(rowData, holder, ratingColorScheme) {
-    const rows = holder
-        .selectAll(`.${STYLES.rowCell}`)
-        .data(rowData.data);
+export function drawRow(selection, ratingColorScheme, colWidths = []) {
+    const rows = selection
+        .selectAll(`.${ROW_STYLES.rowCell}`)
+        .data(d => d.data);
 
     rows.exit()
         .remove();
@@ -19,20 +20,16 @@ export function drawRow(rowData, holder, ratingColorScheme) {
     const newRows = rows
         .enter()
         .append("g")
-        .classed(STYLES.rowCell, true);
-
-    const rowHeight = rowData.layout.maxCellRows * CELL_DIMENSIONS.height + CELL_DIMENSIONS.padding;
-
-    newRows
-        .filter((d, i) => i > 0)
-        .append("line")
-        .attr("y1", 0)
-        .attr("y2", rowHeight)
-        .attr("stroke", "red");
+        .classed(ROW_STYLES.rowCell, true);
 
     rows.merge(newRows)
-        .attr("transform", (d,i) => `translate(${400 * i} 0)`) // TODO:calc widths
+        .attr("transform", (d,i) => {
+            const colOffset = _.sum(_.take(colWidths, i));
+            const dx = (colOffset || i * 3) * CELL_DIMENSIONS.width + (i * ROW_CELL_DIMENSIONS.padding);
+            return `translate(${dx} 0)`
+        })
         .call(drawNodeGrid, ratingColorScheme);
+
 }
 
 
@@ -62,16 +59,15 @@ export function rowLayout(data = [], options = { cols: 3 }) {
         .max()
         .value();
 
-    const maxCellCols = _
+    const colWidths = _
         .chain(gridData)
         .map(d => d.layout.colCount)
-        .max()
         .value();
 
     return {
         layout: {
             maxCellRows,
-            maxCellCols
+            colWidths
         },
         data: gridData
     };

@@ -41,9 +41,9 @@ export function mkRandomRowData(numCols = 3) {
 }
 
 
-export function filterData(data, qry) {
+export function filterData(rows, qry) {
     if (isEmpty(qry)) {
-        return data;
+        return rows;
     }
 
     const nodeMatchFn = n => {
@@ -60,8 +60,7 @@ export function filterData(data, qry) {
     };
 
     const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
-
-    // console.log("filterData", { data, qry });
-    return _.map(data, filterNodeGridFn);
+    const filterRowFn = nodeGrids =>  _.map(nodeGrids, filterNodeGridFn);
+    return _.map(rows, row => filterRowFn(row));
 }
 
