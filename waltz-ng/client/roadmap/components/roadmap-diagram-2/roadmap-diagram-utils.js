@@ -30,11 +30,11 @@ export function setupZoom(svgGroups) {
             const k = event.transform.k;
 
             svgGroups
-                .rowContent
+                .rowAxisContent
                 .attr("transform", `translate(0 ${ty}) scale(${k})`);
 
             svgGroups
-                .columnContent
+                .columnAxisContent
                 .attr("transform", `translate(${tx} 0) scale(${k})`);
 
             svgGroups

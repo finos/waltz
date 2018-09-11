@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {drawNodeGrid, nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
+import {nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
 import {drawRow, ROW_STYLES} from "./roadmap-diagram-row-utils";
 import {toCumulativeCounts} from "../../../common/list-utils";
 
@@ -23,15 +23,17 @@ export function gridLayout(rowData = [], options) {
     const cumulativeColWidths = toCumulativeCounts(colWidths);
     const cumulativeRowHeights = toCumulativeCounts(rowHeights);
 
+    const layout = {
+        rowHeights,
+        colWidths,
+        cumulativeColWidths,
+        cumulativeRowHeights,
+        totalHeight: _.sum(rowHeights),
+        totalWidth: _.sum(colWidths)
+    };
+
     return {
-        layout: {
-            rowHeights,
-            colWidths,
-            cumulativeColWidths,
-            cumulativeRowHeights,
-            totalHeight: _.sum(rowHeights),
-            totalWidth: _.sum(colWidths)
-        },
+        layout,
         data: dataWithLayout
     };
 }
@@ -54,7 +56,7 @@ export function drawGrid(holder, dataWithLayout, colorScheme) {
         .merge(newRows)
         .attr("transform", (d, i) => {
             const rowOffset = _.sum(_.take(dataWithLayout.layout.rowHeights, i)) * CELL_DIMENSIONS.height;
-            const padding = (i * ROW_DIMENSIONS.padding);
+            const padding = i * ROW_DIMENSIONS.padding;
             const dy = rowOffset + padding;
             return `translate(0 ${ dy })`;
         })
@@ -66,7 +68,6 @@ export function drawGrid(holder, dataWithLayout, colorScheme) {
 
 
 export function drawColumnDividers(selection, layout) {
-
     const colDividers = selection
         .selectAll(`.${GRID_STYLES.columnDivider}`)
         .data(layout.cumulativeColWidths);
@@ -96,7 +97,6 @@ export function drawColumnDividers(selection, layout) {
 
 
 export function drawRowDividers(selection, layout) {
-
     const dividers = selection
         .selectAll(`.${GRID_STYLES.rowDivider}`)
         .data(layout.rowHeights);
@@ -116,11 +116,7 @@ export function drawRowDividers(selection, layout) {
         .attr("x2", _.sum(layout.colWidths) * CELL_DIMENSIONS.width)
         .attr("y1", calcY)
         .attr("y2", calcY);
-
 }
-
-
-
 
 
 /**

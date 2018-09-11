@@ -44,9 +44,28 @@ function setupGroupElements($element) {
         {
             name: "holder",
             children: [
-                { name: "grid", children: [ { name: "gridContent" } ] },
-                { name: "columnAxis", children: [ { name: "columnContent" }] },
-                { name: "rowAxis", children: [ { name: "rowContent" } ]  }
+                {
+                    name: "gridHolder",
+                    attrs: {
+                        "clip-path": "url(#grid-clip)",
+                        "transform": "translate(150 50)"
+                    },
+                    children: [ { name: "gridContent" } ]
+                }, {
+                    name: "columnAxisHolder",
+                    attrs: {
+                        "clip-path": "url(#column-clip)",
+                        "transform": "translate(150 0)"
+                    },
+                    children: [ { name: "columnAxisContent" }]
+                }, {
+                    name: "rowAxisHolder",
+                    attrs: {
+                        "clip-path": "url(#row-clip)",
+                        "transform": "translate(0 50)"
+                    },
+                    children: [ { name: "rowAxisContent" } ]
+                }
             ]
         }
     ];
@@ -63,13 +82,12 @@ function draw(dataWithLayout, holder, colorScheme) {
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.data = _.times(12, () => mkRandomRowData(8));
+    vm.data = _.times(4, () => mkRandomRowData(8));
 
     let svgGroups = null;
     let destructorFn = null;
 
     function redraw() {
-        console.log("redraw", vm);
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
             const filteredData = filterData(vm.data, vm.qry);
@@ -80,29 +98,16 @@ function controller($element, serviceBroker) {
 
     vm.$onInit = () => {
         svgGroups = setupGroupElements($element);
-        svgGroups
-            .grid
-            .attr("clip-path", "url(#grid-clip)")
-            .attr("transform", "translate(150 50)");
-        svgGroups
-            .columnAxis
-            .attr("clip-path", "url(#col-clip)")
-            .attr("transform", "translate(150 0)");
 
         svgGroups
-            .rowAxis
-            .attr("clip-path", "url(#row-clip)")
-            .attr("transform", "translate(0 50)");
-
-        svgGroups
-            .rowContent
+            .rowAxisContent
             .append('rect')
             .attr('width', 150)
             .attr('height', 750)
             .attr('fill', 'red');
 
         svgGroups
-            .columnContent
+            .columnAxisContent
             .append('rect')
             .attr('width', 1450)
             .attr('height', 50)

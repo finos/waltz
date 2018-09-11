@@ -204,6 +204,9 @@ export function createGroupElements(container, definitions = []) {
         const g = container
             .append("g")
             .classed(definition.name, true);
+
+        _.forEach(definition.attrs, (v,k) => g.attr(k, v));
+
         register[definition.name] = g;
         _.forEach(definition.children || [], c => createGroupElem(g, c));
     };

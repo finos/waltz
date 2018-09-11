@@ -16,7 +16,9 @@ export function filterData(data, qry) {
 
     const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
     const filterRowFn = nodeGrids =>  _.map(nodeGrids, filterNodeGridFn);
-    return _.map(data, row => filterRowFn(row));
+    const filteredData = _.map(data, row => filterRowFn(row));
+
+    return filteredData
 }
 
 

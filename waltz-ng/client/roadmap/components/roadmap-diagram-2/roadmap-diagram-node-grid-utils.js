@@ -5,7 +5,7 @@ import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
 
 export function drawNodeGrid(selection, ratingColorScheme) {
     const grid = selection
-        .selectAll(`.${NODE_STYLES.node}`)
+        .selectAll(`.${NODE_STYLES.nodeCell}`)
         .data(d => d.data, d => d.id);
 
     const newCells = grid
