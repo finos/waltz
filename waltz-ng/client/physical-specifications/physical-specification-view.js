@@ -20,9 +20,9 @@
 import _ from "lodash";
 
 import {initialiseData} from "../common";
-import {dynamicSections} from '../dynamic-section/dynamic-section-definitions';
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
-import template from './physical-specification-view.html';
+import template from "./physical-specification-view.html";
 
 
 const initialState = {
@@ -41,7 +41,7 @@ const initialState = {
         creating: false
     },
     bookmarksSection: dynamicSections.bookmarksSection,
-    flowDiagramsSection: dynamicSections.flowDiagramsSection,
+    entityDiagramsSection: dynamicSections.entityDiagramsSection,
     changeLogSection: dynamicSections.changeLogSection
 };
 
@@ -50,8 +50,8 @@ const addToHistory = (historyStore, spec) => {
     if (! spec) { return; }
     historyStore.put(
         spec.name,
-        'PHYSICAL_SPECIFICATION',
-        'main.physical-specification.view',
+        "PHYSICAL_SPECIFICATION",
+        "main.physical-specification.view",
         { id: spec.id });
 };
 
@@ -60,12 +60,12 @@ const addToHistory = (historyStore, spec) => {
 function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) {
     const ref = {
         id: specId,
-        kind: 'PHYSICAL_SPECIFICATION'
+        kind: "PHYSICAL_SPECIFICATION"
     };
 
     const selector = {
         entityReference: ref,
-        scope: 'EXACT'
+        scope: "EXACT"
     };
 
     const promises = [
@@ -93,7 +93,7 @@ function controller($q,
 
     const specId = $stateParams.id;
     const ref = {
-        kind: 'PHYSICAL_SPECIFICATION',
+        kind: "PHYSICAL_SPECIFICATION",
         id: specId
     };
 
@@ -116,10 +116,10 @@ function controller($q,
         .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
     logicalFlowStore
-        .findBySelector({ entityReference: ref, scope: 'EXACT'})
+        .findBySelector({ entityReference: ref, scope: "EXACT"})
         .then(logicalFlows => {
             vm.logicalFlows = logicalFlows;
-            vm.logicalFlowsById = _.keyBy(logicalFlows, 'id')
+            vm.logicalFlowsById = _.keyBy(logicalFlows, "id")
         });
 
     vm.loadFlowDiagrams = () => {
@@ -132,21 +132,21 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$stateParams',
-    'ApplicationStore',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore',
-    'HistoryStore',
-    'LogicalFlowStore',
-    'OrgUnitStore',
-    'PhysicalSpecificationStore',
-    'PhysicalFlowStore'
+    "$q",
+    "$stateParams",
+    "ApplicationStore",
+    "FlowDiagramStore",
+    "FlowDiagramEntityStore",
+    "HistoryStore",
+    "LogicalFlowStore",
+    "OrgUnitStore",
+    "PhysicalSpecificationStore",
+    "PhysicalFlowStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

@@ -21,7 +21,7 @@ function store($http,
                  BaseApiUrl) {
     const BASE = `${BaseApiUrl}/person`;
 
-    const unknownPerson = (id, displayName = 'Unknown') => {
+    const unknownPerson = (id, displayName = "Unknown") => {
         return {
             id: id,
             displayName: displayName
@@ -51,6 +51,11 @@ function store($http,
         .then(result => result.data);
 
 
+    const countCumulativeReportsByKind = (empId) => $http
+        .get(`${BASE}/employee-id/${empId}/count-cumulative-reports`)
+        .then(result => result.data);
+
+
     const search = (query) => $http
         .get(`${BASE}/search/${query}`)
         .then(x => x.data);
@@ -62,50 +67,56 @@ function store($http,
         findByUserId,
         findDirects,
         findManagers,
+        countCumulativeReportsByKind,
         search
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'PersonStore';
+const serviceName = "PersonStore";
 
 
 export const PersonStore_API = {
     getByEmployeeId: {
         serviceName,
-        serviceFnName: 'getByEmployeeId',
-        description: 'get person by employee id'
+        serviceFnName: "getByEmployeeId",
+        description: "get person by employee id"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'get person by id'
+        serviceFnName: "getById",
+        description: "get person by id"
     },
     findByUserId: {
         serviceName,
-        serviceFnName: 'findByUserId',
-        description: 'find person by user id'
+        serviceFnName: "findByUserId",
+        description: "find person by user id"
     },
     findDirects: {
         serviceName,
-        serviceFnName: 'findDirects',
-        description: 'find direct reports for person'
+        serviceFnName: "findDirects",
+        description: "find direct reports for person"
     },
     findManagers: {
         serviceName,
-        serviceFnName: 'findManagers',
-        description: 'find managers for person'
+        serviceFnName: "findManagers",
+        description: "find managers for person"
+    },
+    countCumulativeReportsByKind: {
+        serviceName,
+        serviceFnName: "countCumulativeReportsByKind",
+        description: "count Cumulative Reports [empId]"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'search for people'
+        serviceFnName: "search",
+        description: "search for people"
     }
 };
 

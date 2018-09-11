@@ -24,10 +24,7 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
-import org.jooq.DSLContext;
-import org.jooq.Query;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -93,11 +90,22 @@ public class ChangeLogDao {
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
 
-        return dsl.select(CHANGE_LOG.fields())
+        SelectConditionStep<Record> byParentRef = DSL.select(CHANGE_LOG.fields())
+                .from(CHANGE_LOG)
+                .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
+                .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()));
+
+        SelectConditionStep<Record> byUserId = DSL.select(CHANGE_LOG.fields())
                 .from(CHANGE_LOG)
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(CHANGE_LOG.USER_ID))
-                .where(PERSON.ID.eq(ref.id()))
-                .orderBy(CHANGE_LOG.CREATED_AT.desc())
+                .where(PERSON.ID.eq(ref.id()));
+
+        SelectOrderByStep<Record> union = byParentRef.unionAll(byUserId);
+
+        return dsl
+                .select(union.fields())
+                .from(union)
+                .orderBy(union.field("created_at").desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_DOMAIN_MAPPER);
     }

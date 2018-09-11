@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerComponents, registerStores} from '../common/module-utils';
+import angular from "angular";
+import {registerComponents, registerStores} from "../common/module-utils";
 
-import * as entitySvgDiagramStore from './services/entity-svg-diagram-store';
+import * as entitySvgDiagramStore from "./services/entity-svg-diagram-store";
 
-import entitySvgDiagramsSection from './components/section/entity-svg-diagrams-section';
-import entitySvgDiagramsViewer from './components/viewer/entity-svg-diagram-viewer';
+import entitySvgDiagramsPanel from "./components/panel/entity-svg-diagrams-panel";
+import entitySvgDiagramsViewer from "./components/viewer/entity-svg-diagram-viewer";
 
 
 export default () => {
@@ -35,7 +35,7 @@ export default () => {
     ]);
 
     registerComponents(module, [
-        entitySvgDiagramsSection,
+        entitySvgDiagramsPanel,
         entitySvgDiagramsViewer
     ]);
 

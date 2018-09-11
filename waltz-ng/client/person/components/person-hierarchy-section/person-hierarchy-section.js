@@ -17,17 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './person-hierarchy-section.html';
+import template from "./person-hierarchy-section.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
+import _ from "lodash";
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
+    cumulativeCount: null,
+    kindCount: null,
+    kindKeys: null
 };
 
 
@@ -48,11 +51,19 @@ function controller(serviceBroker) {
                 serviceBroker
                     .loadViewData(CORE_API.PersonStore.findManagers, [ empId ])
                     .then(r => vm.managers = r.data);
+
+                serviceBroker
+                    .loadViewData(CORE_API.PersonStore.countCumulativeReportsByKind, [ empId ])
+                    .then(r =>{
+                        vm.kindKeys = _.keys(r.data);
+                        vm.kindCounts = r.data;
+                        vm.cumulativeCount = _.sum(_.values(r.data));
+                    })
             });
     };
 }
 
-controller.$inject = [ 'ServiceBroker' ];
+controller.$inject = [ "ServiceBroker" ];
 
 
 const component = {
@@ -62,7 +73,7 @@ const component = {
 };
 
 
-const id = 'waltzPersonHierarchySection';
+const id = "waltzPersonHierarchySection";
 
 
 export default {

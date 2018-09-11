@@ -18,18 +18,18 @@
  */
 
 
-import angular from 'angular';
-import * as EnumValueStore from './services/enum-value-store';
-import EnumValueService from './services/enum-value-service';
-import {registerStores, registerComponents} from '../common/module-utils';
-import EnumValue from './components/enum-value/enum-value'
+import angular from "angular";
+import * as EnumValueStore from "./services/enum-value-store";
+import EnumValueService from "./services/enum-value-service";
+import {registerComponents, registerStores} from "../common/module-utils";
+import EnumValue from "./components/enum-value/enum-value";
 
 export default () => {
 
-    const module = angular.module('waltz.enum-value', []);
+    const module = angular.module("waltz.enum-value", []);
 
     module
-        .service('EnumValueService', EnumValueService);
+        .service("EnumValueService", EnumValueService);
 
     registerStores(module, [ EnumValueStore ]);
     registerComponents(module, [ EnumValue ])

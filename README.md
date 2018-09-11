@@ -44,7 +44,7 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 ### Client
 
 - Browser based
-    - IE 9+, Chrome, Safari, Firefox)
+    - IE 10+, Chrome, Safari, Firefox)
 - AngularJS 1.5
 - Bootstrap 3
 - D3 

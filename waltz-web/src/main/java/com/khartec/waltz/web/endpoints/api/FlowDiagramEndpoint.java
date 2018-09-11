@@ -41,6 +41,7 @@ public class FlowDiagramEndpoint implements Endpoint {
     private final FlowDiagramService flowDiagramService;
     private final UserRoleService userRoleService;
 
+
     @Autowired
     public FlowDiagramEndpoint(FlowDiagramService flowDiagramService,
                                UserRoleService userRoleService) {
@@ -54,12 +55,16 @@ public class FlowDiagramEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String getByIdPath = mkPath(BASE_URL, "id", ":id");
-        String deleteByIdPath = mkPath(BASE_URL, "id", ":id");
-        String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findForSelectorPath = mkPath(BASE_URL, "selector");
-        String saveDiagramPath = mkPath(BASE_URL);
+        String diagramIdPath = mkPath(BASE_URL, "id", ":id");
+        String entityIdPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
+        String getByIdPath = diagramIdPath;
+        String deleteByIdPath = diagramIdPath;
+        String findByEntityPath = entityIdPath;
+        String makeNewDiagramPath = entityIdPath;
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
+        String saveDiagramPath = BASE_URL;
+        String cloneDiagramPath = mkPath(diagramIdPath, "clone");
 
         DatumRoute<FlowDiagram> getByIdRoute = (req, res)
                 -> flowDiagramService.getById(getId(req));
@@ -74,15 +79,38 @@ public class FlowDiagramEndpoint implements Endpoint {
                     readBody(req, SaveDiagramCommand.class),
                     getUsername(req));
         };
+
+        DatumRoute<Long> cloneDiagramRoute = (req, res) -> {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
+            return flowDiagramService
+                    .cloneDiagram(
+                            getId(req),
+                            req.body(),
+                            getUsername(req));
+        };
+
+        DatumRoute<Long> makeNewDiagramRoute = (req, res) -> {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
+            return flowDiagramService
+                    .makeNewDiagramForEntity(
+                            getEntityReference(req),
+                            getUsername(req),
+                            req.body());
+        };
+
         DatumRoute<Boolean> deleteByIdRoute = (req, res)
                 -> flowDiagramService.deleteById(getId(req), getUsername(req));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
+
         postForList(findForSelectorPath, findForSelectorRoute);
+
         postForDatum(saveDiagramPath, saveDiagramRoute);
+        postForDatum(cloneDiagramPath, cloneDiagramRoute);
+        postForDatum(makeNewDiagramPath, makeNewDiagramRoute);
+
         deleteForDatum(deleteByIdPath, deleteByIdRoute);
     }
-
 
 }

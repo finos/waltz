@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.flow_diagram;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagram;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,7 @@ public class FlowDiagramDao {
                 .layoutData(record.getLayoutData())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
+                .isRemoved(record.getIsRemoved())
                 .build();
     };
 
@@ -61,11 +64,14 @@ public class FlowDiagramDao {
         record.setLayoutData(fd.layoutData());
         record.setLastUpdatedBy(fd.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(fd.lastUpdatedAt()));
+        record.setIsRemoved(fd.isRemoved());
         return record;
     };
 
 
     private final DSLContext dsl;
+
+    private final Condition notRemoved = FLOW_DIAGRAM.IS_REMOVED.eq(false);
 
 
     @Autowired
@@ -79,6 +85,7 @@ public class FlowDiagramDao {
         return dsl
                 .selectFrom(FLOW_DIAGRAM)
                 .where(FLOW_DIAGRAM.ID.eq(id))
+                .and(notRemoved)
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
@@ -92,6 +99,7 @@ public class FlowDiagramDao {
                 .on(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(FLOW_DIAGRAM.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(ref.id()))
                 .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(ref.kind().name()))
+                .and(notRemoved)
                 .fetch(TO_DOMAIN_MAPPER)
                 .stream()
                 .distinct()
@@ -104,6 +112,7 @@ public class FlowDiagramDao {
                 .select(FLOW_DIAGRAM.fields())
                 .from(FLOW_DIAGRAM)
                 .where(FLOW_DIAGRAM.ID.in(selector))
+                .and(notRemoved)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -127,8 +136,22 @@ public class FlowDiagramDao {
 
     public boolean deleteById(long id) {
         return dsl
-                .delete(FLOW_DIAGRAM)
+                .update(FLOW_DIAGRAM)
+                .set(FLOW_DIAGRAM.IS_REMOVED, true)
                 .where(FLOW_DIAGRAM.ID.eq(id))
                 .execute() == 1;
+    }
+
+    public Long clone(long diagramId, String newName, String userId) {
+        FlowDiagram diagram = getById(diagramId);
+        FlowDiagram copiedDiagram = ImmutableFlowDiagram
+                .copyOf(diagram)
+                .withId(Optional.empty())
+                .withName(newName)
+                .withLastUpdatedBy(userId)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+
+        long clonedId = create(copiedDiagram);
+        return clonedId;
     }
 }

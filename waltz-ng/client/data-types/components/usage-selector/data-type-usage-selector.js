@@ -119,7 +119,10 @@ function controller(serviceBroker) {
 
     serviceBroker
         .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(result => vm.allDataTypes = result.data);
+        .then(result => {
+            vm.allDataTypes = result.data;
+            vm.allDataTypesById = _.keyBy(result.data, 'id');
+        });
 
 
     vm.toggleTypeChecked = (id) => {
@@ -134,6 +137,15 @@ function controller(serviceBroker) {
     };
 
     vm.typeChecked = (id) => {
+        // deselect any parents that are non-concrete
+        let dt = vm.allDataTypesById[id];
+        while (dt) {
+            const parent = vm.allDataTypesById[dt.parentId];
+            if (_.get(parent, 'concrete', true) === false) {
+                vm.typeUnchecked(parent.id);
+            }
+            dt = parent;
+        }
         vm.onDirty(true);
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
     };

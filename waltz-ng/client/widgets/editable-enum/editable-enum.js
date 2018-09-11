@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../common/index";
-import { toOptions } from '../../common/services/enums';
+import {initialiseData} from "../../common/index";
+import {toOptions} from "../../common/services/enums";
 
-import template from './editable-enum.html';
+import template from "./editable-enum.html";
 
 
 const bindings = {
@@ -61,6 +61,7 @@ function controller(displayNameService, enumValueService) {
     vm.doCancel = () => {
         vm.visibility.editor = false;
         vm.saving = false;
+        vm.currentVal = vm.initialVal;
     };
 
     vm.doSave = () => {
@@ -72,6 +73,10 @@ function controller(displayNameService, enumValueService) {
                 vm.visibility.editor = false;
                 vm.saving = false;
             });
+    };
+
+    vm.isDirty = () => {
+        return vm.currentVal != null && vm.currentVal != vm.initialVal;
     };
 
 }

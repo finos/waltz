@@ -56,11 +56,14 @@ public class AppGroupDao {
                 .id(record.getId())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .appGroupKind(AppGroupKind.valueOf(record.getKind()))
+                .isRemoved(record.getIsRemoved())
                 .build();
     };
 
 
     private final DSLContext dsl;
+
+    private final Condition notRemoved = APPLICATION_GROUP.IS_REMOVED.eq(false);
 
 
     @Autowired
@@ -80,7 +83,8 @@ public class AppGroupDao {
     public List<AppGroup> findGroupsForUser(String userId) {
         SelectConditionStep<Record1<Long>> groupIds = DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
                 .from(APPLICATION_GROUP_MEMBER)
-                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId))
+                .and(notRemoved);
 
         return findAppGroupsBySelectorId(groupIds);
     }
@@ -95,7 +99,8 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds)
-                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())))
+                    .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())))
+                    .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
 
@@ -111,6 +116,7 @@ public class AppGroupDao {
                 .join(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP.ID.eq(APPLICATION_GROUP_ENTRY.GROUP_ID))
                 .where(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(appId))
                 .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()).or(APPLICATION_GROUP.ID.in(groupsByUser)))
+                .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
 
@@ -134,14 +140,16 @@ public class AppGroupDao {
         Condition isVisibleToUser = APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
                 .or(APPLICATION_GROUP.ID.in(groupsByUser));
 
-        SelectConditionStep<Record> qry = dsl
-                .selectDistinct(APPLICATION_GROUP.fields())
+        SelectConditionStep<Record1<Long>> qry = dsl
+                .selectDistinct(APPLICATION_GROUP.ID)
                 .from(APPLICATION_GROUP)
                 .join(ENTITY_RELATIONSHIP)
                 .on(joinOnA.or(joinOnB))
-                .where((aMatchesEntity.or(bMatchesEntity)).and(isVisibleToUser));
+                .where((aMatchesEntity.or(bMatchesEntity)).and(isVisibleToUser))
+                .and(notRemoved);
 
-        return qry
+        return dsl.selectFrom(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(qry))
                 .fetch(TO_DOMAIN);
     }
 
@@ -150,6 +158,7 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds))
+                .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
 
@@ -158,6 +167,7 @@ public class AppGroupDao {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
+                .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
 
@@ -171,7 +181,8 @@ public class AppGroupDao {
         Select<Record> publicGroups = dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                        .and(searchCondition));
+                    .and(searchCondition))
+                    .and(notRemoved);
 
 
         Select<Record1<Long>> userGroupIds = DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
@@ -182,8 +193,9 @@ public class AppGroupDao {
         Select<Record> privateGroups = dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(userGroupIds)
-                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
-                        .and(searchCondition));
+                    .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
+                    .and(searchCondition))
+                    .and(notRemoved);
 
         return publicGroups
                 .unionAll(privateGroups)
@@ -211,7 +223,8 @@ public class AppGroupDao {
     }
 
     public int deleteGroup(long groupId) {
-        return dsl.delete(APPLICATION_GROUP)
+        return dsl.update(APPLICATION_GROUP)
+                .set(APPLICATION_GROUP.IS_REMOVED, true)
                 .where(APPLICATION_GROUP.ID.eq(groupId))
                 .execute();
 
@@ -225,6 +238,7 @@ public class AppGroupDao {
                 .where(APPLICATION_GROUP.ID.in(ids))
                 .and(APPLICATION_GROUP_MEMBER.USER_ID.eq(user)
                         .or(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
+                .and(notRemoved)
                 .fetch()
                 .stream()
                 .map(r -> TO_DOMAIN.map(r))

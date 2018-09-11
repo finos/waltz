@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { enums } from '../../common/services/enums';
-import { nest } from 'd3-collection';
+import {enums} from "../../common/services/enums";
+import {nest} from "d3-collection";
 
 let enumsPromise = null;
 
@@ -51,7 +51,7 @@ function service(enumValueStore) {
 
 
 service.$inject = [
-    'EnumValueStore'
+    "EnumValueStore"
 ];
 
 

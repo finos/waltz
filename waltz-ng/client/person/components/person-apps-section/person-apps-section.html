@@ -10,40 +10,48 @@
     </waltz-source-data-section-addon>
 
 
-    <uib-tabset>
-
-        <uib-tab heading="Summary">
-            <waltz-app-summary apps="$ctrl.itApps"
-                               end-user-apps="$ctrl.endUserApps">
-            </waltz-app-summary>
-        </uib-tab>
+    <waltz-no-data ng-if="$ctrl.allApps.length === 0">
+        <message>
+            <strong>No applications</strong> for this person
+        </message>
+    </waltz-no-data>
 
 
-        <uib-tab select="showDirectTab = true"
-                 heading="Direct"
-                 ng-if="$ctrl.direct.length > 0">
+    <div ng-if="$ctrl.allApps.length > 0">
+        <uib-tabset>
 
-            <div ng-if="showDirectTab">
-                <h4> Direct Involvements </h4>
-                <waltz-app-table applications="$ctrl.direct">
-                </waltz-app-table>
-            </div>
-
-        </uib-tab>
+            <uib-tab heading="Summary">
+                <waltz-app-summary apps="$ctrl.itApps"
+                                   end-user-apps="$ctrl.endUserApps">
+                </waltz-app-summary>
+            </uib-tab>
 
 
-        <uib-tab select="showOversightTab=true"
-                 heading="Oversight"
-                 ng-if="$ctrl.indirect.length > 0">
+            <uib-tab select="showDirectTab = true"
+                     heading="Direct"
+                     ng-if="$ctrl.direct.length > 0">
 
-            <div ng-if="showOversightTab">
-                <h4> Oversight Involvements <small>(Inferred via direct reports)</small></h4>
-                <waltz-app-table applications="$ctrl.indirect">
-                </waltz-app-table>
-            </div>
+                <div ng-if="showDirectTab">
+                    <h4> Direct Involvements </h4>
+                    <waltz-app-table applications="$ctrl.direct">
+                    </waltz-app-table>
+                </div>
 
-        </uib-tab>
+            </uib-tab>
 
-    </uib-tabset>
 
+            <uib-tab select="showOversightTab=true"
+                     heading="Oversight"
+                     ng-if="$ctrl.indirect.length > 0">
+
+                <div ng-if="showOversightTab">
+                    <h4> Oversight Involvements <small>(Inferred via direct reports)</small></h4>
+                    <waltz-app-table applications="$ctrl.indirect">
+                    </waltz-app-table>
+                </div>
+
+            </uib-tab>
+
+        </uib-tabset>
+    </div>
 </div>
