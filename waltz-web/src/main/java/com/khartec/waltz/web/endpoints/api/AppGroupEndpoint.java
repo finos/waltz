@@ -74,6 +74,7 @@ public class AppGroupEndpoint implements Endpoint {
         String subscribePath = mkPath(idPath, "subscribe");
         String unsubscribePath = mkPath(idPath, "unsubscribe");
         String addOwnerPath = mkPath(idPath, "members", "owners");
+        String removeOwnerPath = mkPath(idPath, "members", "owners", ":ownerId");
 
         String deleteGroupPath = idPath;
 
@@ -132,6 +133,17 @@ public class AppGroupEndpoint implements Endpoint {
 
             LOG.info("Adding owner: {}, to group: {}", groupId, ownerId);
             appGroupService.addOwner(userId, groupId, ownerId);
+
+            return appGroupService.getMembers(groupId);
+        };
+
+        ListRoute<AppGroupMember> removeOwnerRoute = (request, response) -> {
+            long groupId = getId(request);
+            String ownerToRemoveId = request.params("ownerId"); // get email Of owner
+            String requestorName = getUsername(request); // get userId of requestor
+
+            LOG.info("Removing owner: {} from app group: {}", ownerToRemoveId, groupId);
+            appGroupService.removeOwner(requestorName, groupId, ownerToRemoveId);
 
             return appGroupService.getMembers(groupId);
         };
@@ -218,6 +230,7 @@ public class AppGroupEndpoint implements Endpoint {
         postForList(subscribePath, subscribeRoute);
         postForList(unsubscribePath, unsubscribeRoute);
         postForList(addOwnerPath, addOwnerRoute);
+        deleteForList(removeOwnerPath, removeOwnerRoute);
 
         postForList(addApplicationPath, addApplicationRoute);
         postForList(applicationListPath, addApplicationListRoute);
