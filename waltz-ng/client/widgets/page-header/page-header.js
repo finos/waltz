@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 import angular from "angular";
-import { initialiseData } from "../../common";
+import {initialiseData} from "../../common";
 
 import template from "./page-header.html";
 
+export const pageHeaderDefaultOffset = 60;
 
 const bindings = {
     name: '@',
@@ -50,7 +51,7 @@ function controller($document,
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
-            vm.stickyVisible = $window.pageYOffset > 60
+            vm.stickyVisible = $window.pageYOffset > pageHeaderDefaultOffset
         });
     };
 
