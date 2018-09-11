@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  *  Copyright (C) 2016, 2017 Waltz open source project
@@ -17,16 +16,34 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {zoom} from "d3-zoom";
+import {event} from "d3-selection";
 
-import angular from "angular";
-import RoadmapDiagram from "./components/roadmap-diagram/roadmap-diagram";
-import RoadmapDiagram2 from "./components/roadmap-diagram-2/roadmap-diagram-2";
-import {registerComponents} from "../common/module-utils";
 
-export default () => {
-    const module = angular.module("waltz.roadmap", []);
+export function setupZoom(svgGroups) {
 
-    registerComponents(module, [ RoadmapDiagram, RoadmapDiagram2 ]);
+    const myZoom = zoom()
+        .scaleExtent([0.1, 2])
+        .on("zoom", () => {
+            const tx = event.transform.x;
+            const ty = event.transform.y;
+            const k = event.transform.k;
 
-    return module.name;
-};
+            svgGroups
+                .rowAxisContent
+                .attr("transform", `translate(0 ${ty}) scale(${k})`);
+
+            svgGroups
+                .columnAxisContent
+                .attr("transform", `translate(${tx} 0) scale(${k})`);
+
+            svgGroups
+                .gridContent
+                .attr("transform", event.transform);
+        });
+
+    return svgGroups
+        .svg
+        .call(myZoom);
+}
+

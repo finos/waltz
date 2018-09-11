@@ -180,6 +180,10 @@ const check = (test, x) => myApiCheck.throw(test, x);
 const assert = (b, msg) => { if (!b) throw msg; };
 
 
+export function checkTrue(b, msg) {
+    assert(b, msg);
+}
+
 export function checkNotEmpty(x, msg = 'is empty') {
     assert(notEmpty(x), msg);
 }

@@ -40,9 +40,9 @@ function setupGroupElements($element) {
         {
             name: "holder",
             children: [
-                { name: "grid", children: [ { name: 'gridContent' }] },
-                { name: "columns", children: [ { name: 'columnHeaders' }] },
-                { name: "rowGroups", children: [ { name: 'rowGroupHeaders' }]  }
+                { name: "grid", children: [ { name: "gridContent" }] },
+                { name: "columns", children: [ { name: "columnHeaders" }] },
+                { name: "rowGroups", children: [ { name: "rowGroupHeaders" }]  }
             ]
         }
     ];

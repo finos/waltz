@@ -17,118 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
-import template from "./playpen1.html";
 
-
-const costsWidget = {
-    template: `
-        <waltz-app-costs-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-app-costs-section> `,
-    id: 'app-costs-widget',
-    name: 'Costs',
-    icon: 'money'
-};
-
-
-const peopleWidget = {
-    template: `
-        <waltz-involved-people-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-involved-people-section> `,
-    id: 'people-widget',
-    name: 'People',
-    icon: 'users'
-};
-
-const technologyWidget = {
-    template: `
-        <waltz-technology-section parent-entity-ref="$ctrl.parentEntityRef" >
-        </waltz-technology-section>`,
-    id: 'technology-widget',
-    name: 'Technology',
-    icon: 'server'
-};
-
-
-const entityNamedNoteWidget = {
-    template: `
-        <waltz-entity-named-notes-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-entity-named-notes-section>`,
-    id: 'entity-named-notes-widget',
-    name: 'Notes',
-    icon: 'sticky-note-o'
-};
-
-
-const changesWidget = {
-    template: `
-        <waltz-change-log-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-change-log-section>`,
-    id: 'changes-widget',
-    icon: 'history',
-    name: 'Changes'
-};
-
-const flowWidget = {
-    template: `
-        <waltz-data-flow-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-data-flow-section>`,
-    id: 'data-flow-widget',
-    name: 'Data Flows',
-    icon: 'random'
-};
-
-const bookmarkWidget = {
-    template: `
-        <waltz-bookmarks-section parent-entity-ref="$ctrl.parentEntityRef"
-                                 show-filter="true">
-        </waltz-bookmarks-section>`,
-    id: 'bookmark-widget',
-    name: 'Bookmarks',
-    icon: 'rocket'
-};
-
+import _ from 'lodash';
+import template from './playpen1.html';
+import {select} from "d3-selection";
 
 const initData = {
-    id: 134,
-    parentEntityRef: {
-        kind: 'APPLICATION',
-        id: 28083
-    },
-    visibility: {
-        flows: false
-    },
-    widgets: [],
-    availableWidgets: [
-        flowWidget,
-        bookmarkWidget,
-        entityNamedNoteWidget,
-        technologyWidget,
-        peopleWidget,
-        costsWidget,
-        changesWidget]
+
+
 };
 
 
-function controller()
-{
-    const vm = Object.assign(this, initData);
-
-    vm.$onInit = () => {
-        // vm.addWidget(bookmarkWidget);
-        // vm.addWidget(technologyWidget);
-    };
-
-    vm.addWidget = w => {
-        vm.widgets =  _.reject(vm.widgets, x => x.id === w.id)
-        vm.widgets.unshift(w);
-    };
-
+function controller($element) {
 }
 
-
-controller.$inject = ['$compile', 'ServiceBroker'];
-
+controller.$inject = ['$element', 'ServiceBroker'];
 
 const view = {
     template,
@@ -137,6 +40,5 @@ const view = {
     bindToController: true,
     scope: {}
 };
-
 
 export default view;
