@@ -177,4 +177,14 @@ public class MapUtilities {
         }
         return result;
     }
+
+
+    public static<K, K2, V> Map<K2, V> transformKeys(Map<K, V> original, Function<K, K2> transformation) {
+        Map<K2, V> output = new HashMap<>();
+        original.entrySet()
+                .forEach(d -> output.put(transformation.apply(d.getKey()), d.getValue()));
+        return output;
+    }
+
+
 }

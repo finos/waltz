@@ -5,8 +5,11 @@
             <div class="col-sm-2 waltz-display-field-label">
                 Title
             </div>
-            <div class="col-sm-4"
-                 ng-bind="$ctrl.person.title">
+            <div class="col-sm-4 waltz-visibility-parent">
+                <span ng-bind="$ctrl.person.title"></span>
+                <span class="waltz-visibility-child-30"
+                      ng-bind="$ctrl.person.personKind | toDisplayName:'PersonKind'">
+                </span>
             </div>
 
             <div class="col-sm-2 waltz-display-field-label">

@@ -24,14 +24,17 @@ import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.schema.tables.records.PersonRecord;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -178,8 +181,18 @@ public class PersonDao {
     }
 
 
-    public int countAllUnderlings(String employeeId){
-        return dsl.fetchCount(PERSON_HIERARCHY, PERSON_HIERARCHY.MANAGER_ID.eq(employeeId));
+    public Map<PersonKind, Integer> countAllUnderlingsByKind(String employeeId){
+
+        Field<Integer> countField = DSL.count().as("count");
+
+        return dsl
+                .select(PERSON.KIND, countField)
+                .from(PERSON_HIERARCHY)
+                .innerJoin(PERSON)
+                .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
+                .groupBy(PERSON.KIND)
+                .fetchMap(r -> PersonKind.valueOf(r.get(PERSON.KIND)), r -> r.get(countField));
     }
 
 }
