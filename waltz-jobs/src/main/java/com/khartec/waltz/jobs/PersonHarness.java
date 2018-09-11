@@ -20,13 +20,12 @@
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import java.util.Map;
 
 /**
  * Created by dwatkins on 17/09/2016.
@@ -40,9 +39,9 @@ public class PersonHarness {
 
         PersonDao personDao = ctx.getBean(PersonDao.class);
 
-        int count = personDao.countAllUnderlings("wibble");
+        Map<PersonKind, Integer> count = personDao.countAllUnderlingsByKind("wibble");
 
-        System.out.printf("count: %d\n", count);
+        System.out.printf("count: %s\n", count);
 
 
     }
