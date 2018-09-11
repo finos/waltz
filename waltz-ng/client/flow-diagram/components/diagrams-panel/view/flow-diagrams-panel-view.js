@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
-import template from './flow-diagrams-panel-view.html';
+import template from "./flow-diagrams-panel-view.html";
 
 import {initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
@@ -48,27 +48,46 @@ const initialState = {
 };
 
 
-function determinePopupPosition(evt) {
-    const top = evt.clientY > 550
-        ? 8
-        : 45;
+function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
+    // get the width and height of the element
+    const navOffset = 60; // the nav bar margin
+    const pageHeaderOffset = scrollOffset > 60 ? 40 : 0;  // 60 is the offset of the dynamic page header, 40 is the size approx. refer to page-header.js
+    const dynamicNavOffset = scrollOffset > 250 ? 40 : 0; // 60 is the approx. size of the dynamic nav header, 250 is the threshold, refer to dynamic-section-navigation
 
-    const left = evt.clientX > 400
-        ? 2
-        : 50;
+    const halfHeight = elementHeight / 2;
+
+    // evt.clientY + scrollOffset is for IE support to get the same and pageY accounting for the scroll
+    const pageY = (evt.pageY || evt.clientY + scrollOffset);
+    const shiftedTop = pageY - halfHeight > scrollOffset ? pageY - halfHeight : scrollOffset;
+    return shiftedTop + navOffset + pageHeaderOffset + dynamicNavOffset
+}
+
+
+function determinePopupPosition(evt, $window, $element) {
+    //get the width and height of the element
+    const elementWidth = _.get($element, '[0].parentElement.clientWidth');
+    const elementHeight = _.get($element, '[0].parentElement.clientHeight');
+    const scrollOffset = $window.pageYOffset;
+    const halfWidth = elementWidth / 2;
+
+    const top = determinePopupTopPosition(evt, scrollOffset, elementHeight);
+    const left = evt.clientX < halfWidth
+        ? evt.clientX
+        : evt.clientX - halfWidth;
 
     return {
-        top: `${top}vh`,
-        left: `${left}vw`
+        top: `${top}px`,
+        left: `${left}px`
     };
 }
 
 
-function controller($q,
+function controller($element,
+                    $q,
+                    $window,
                     $timeout,
                     flowDiagramStateService,
-                    serviceBroker)
-{
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadVisibility = () =>
@@ -88,7 +107,6 @@ function controller($q,
             .then(() => loadVisibility());
     };
 
-
     vm.toggleLayer = (layer) => {
         const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
         const cmd = {
@@ -102,7 +120,7 @@ function controller($q,
     const showNodeDetail = (n) => {
         $timeout(() => vm.visibility.contextPopup = false);
 
-        vm.contextPopup.styling = determinePopupPosition(event);
+        vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const nodeRef = n.data;
         if (nodeRef.kind === 'APPLICATION') {
@@ -120,7 +138,7 @@ function controller($q,
 
     const showFlowBucketDetail = (logicalFlow) => {
         $timeout(() => vm.visibility.contextPopup = false);
-        vm.contextPopup.styling = determinePopupPosition(event);
+        vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const state = flowDiagramStateService.getState();
         const physFlowsPath = ['model', 'decorations', logicalFlow.id];
@@ -176,12 +194,13 @@ function controller($q,
         node: showNodeDetail,
         flowBucket: showFlowBucketDetail
     };
-
 }
 
 
 controller.$inject = [
+    '$element',
     '$q',
+    '$window',
     '$timeout',
     'FlowDiagramStateService',
     'ServiceBroker'
