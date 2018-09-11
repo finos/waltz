@@ -79,3 +79,11 @@ function mkRandomNodes() {
 export function mkRandomRowData(numCols = 3) {
     return _.map(_.range(0, numCols), () => mkRandomNodes());
 }
+
+
+export function mkRandomMeasurable(idx, desc) {
+    return {
+        id: `${desc}-${idx}`,
+        name: `${desc}: ${idx} : abcdefghijklmnopqrstuvwxyz`,
+    };
+}

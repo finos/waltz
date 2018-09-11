@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {drawNodeGrid, gridLayout} from "./roadmap-diagram-node-grid-utils";
+import {drawNodeGrid, nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
 
 
 export const ROW_STYLES = {
@@ -29,8 +29,8 @@ export function drawRow(selection, ratingColorScheme, colWidths = []) {
             return `translate(${dx} 0)`
         })
         .call(drawNodeGrid, ratingColorScheme);
-
 }
+
 
 
 /**
@@ -51,7 +51,7 @@ export function drawRow(selection, ratingColorScheme, colWidths = []) {
  * @returns {{layout: {maxCellRows: *, maxCellCols: *}, data: *}}
  */
 export function rowLayout(data = [], options = { cols: 3 }) {
-    const gridData = _.map(data, d => gridLayout(d, options));
+    const gridData = _.map(data, d => nodeGridLayout(d, options));
 
     const maxCellRows = _
         .chain(gridData)
@@ -72,3 +72,4 @@ export function rowLayout(data = [], options = { cols: 3 }) {
         data: gridData
     };
 }
+

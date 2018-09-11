@@ -1,7 +1,7 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
 import {nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
-import {drawRow, ROW_STYLES} from "./roadmap-diagram-row-utils";
+import {drawRow, ROW_STYLES, rowLayout} from "./roadmap-diagram-row-utils";
 import {toCumulativeCounts} from "../../../common/list-utils";
 
 
@@ -11,12 +11,15 @@ export const GRID_STYLES = {
 };
 
 
-export function gridLayout(rowData = [], options) {
-    const dataWithLayout = _.map(rowData, row => rowLayout(row, options));
+export function gridLayout(rowData = [],
+                           columnHeaders = [],
+                           rowHeaders = [],
+                           options) {
+    const gridDataWithLayout = _.map(rowData, row => rowLayout(row, options));
 
-    const rowHeights = _.map(dataWithLayout, d => d.layout.maxCellRows);
+    const rowHeights = _.map(gridDataWithLayout, d => d.layout.maxCellRows);
 
-    const allColWidths = _.map(dataWithLayout, d => d.layout.colWidths);
+    const allColWidths = _.map(gridDataWithLayout, d => d.layout.colWidths);
     const transposed = _.unzip(allColWidths);
     const colWidths = _.map(transposed, _.max);
 
@@ -29,12 +32,16 @@ export function gridLayout(rowData = [], options) {
         cumulativeColWidths,
         cumulativeRowHeights,
         totalHeight: _.sum(rowHeights),
-        totalWidth: _.sum(colWidths)
+        totalWidth: _.sum(colWidths),
+        colCount: colWidths.length,
+        rowCount: rowHeights.length
     };
 
     return {
         layout,
-        data: dataWithLayout
+        gridData: gridDataWithLayout,
+        columnHeaders,
+        rowHeaders
     };
 }
 
@@ -42,7 +49,7 @@ export function gridLayout(rowData = [], options) {
 export function drawGrid(holder, dataWithLayout, colorScheme) {
     const rows = holder
         .selectAll(`.${ROW_STYLES.row}`)
-        .data(dataWithLayout.data);
+        .data(dataWithLayout.gridData);
 
     const newRows = rows
         .enter()
@@ -118,43 +125,3 @@ export function drawRowDividers(selection, layout) {
         .attr("y2", calcY);
 }
 
-
-/**
- * Given an _array of arrays_ (row-cells containing node-cells)
- * will lay the node-cells into grids and return a new _object_
- * which looks like:
- *
- * ```
- * {
- *     layout: {
- *         maxCellRows:  n,  // largest number of node cell rows  (gives height of row)
- *         maxCellCols:  n   // where n <= options.cols
- *     },
- *     data: originalDataEnrichedWithLayout
- * }
- * ```
- * @param data
- * @returns {{layout: {maxCellRows: *, maxCellCols: *}, data: *}}
- */
-export function rowLayout(data = [], options = { cols: 3 }) {
-    const gridData = _.map(data, d => nodeGridLayout(d, options));
-
-    const maxCellRows = _
-        .chain(gridData)
-        .map(d => d.layout.rowCount)
-        .max()
-        .value();
-
-    const colWidths = _
-        .chain(gridData)
-        .map(d => d.layout.colCount)
-        .value();
-
-    return {
-        layout: {
-            maxCellRows,
-            colWidths
-        },
-        data: gridData
-    };
-}

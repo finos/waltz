@@ -23,10 +23,11 @@ import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {filterData, mkRandomRowData} from "./roadmap-diagram-data-utils";
+import {filterData, mkRandomMeasurable, mkRandomRowData} from "./roadmap-diagram-data-utils";
 import {setupZoom} from "./roadmap-diagram-utils";
 import _ from "lodash";
 import {drawGrid, gridLayout} from "./roadmap-diagram-grid-utils";
+import {columnAxisHeight, drawAxis, rowAxisWidth} from "./roadmap-diagram-axis-utils";
 
 
 const bindings = {
@@ -48,21 +49,21 @@ function setupGroupElements($element) {
                     name: "gridHolder",
                     attrs: {
                         "clip-path": "url(#grid-clip)",
-                        "transform": "translate(150 50)"
+                        "transform": `translate(${rowAxisWidth} ${columnAxisHeight})`
                     },
                     children: [ { name: "gridContent" } ]
                 }, {
                     name: "columnAxisHolder",
                     attrs: {
                         "clip-path": "url(#column-clip)",
-                        "transform": "translate(150 0)"
+                        "transform": `translate(${rowAxisWidth} 0)`
                     },
                     children: [ { name: "columnAxisContent" }]
                 }, {
                     name: "rowAxisHolder",
                     attrs: {
                         "clip-path": "url(#row-clip)",
-                        "transform": "translate(0 50)"
+                        "transform": `translate(0 ${columnAxisHeight})`
                     },
                     children: [ { name: "rowAxisContent" } ]
                 }
@@ -73,45 +74,36 @@ function setupGroupElements($element) {
 }
 
 
-function draw(dataWithLayout, holder, colorScheme) {
+function draw(dataWithLayout, svgGroups, colorScheme) {
     console.log("draw", dataWithLayout);
-    drawGrid(holder, dataWithLayout, colorScheme);
+    drawGrid(svgGroups.gridContent, dataWithLayout, colorScheme);
+    drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
 }
 
 
 function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    vm.data = _.times(4, () => mkRandomRowData(8));
-
     let svgGroups = null;
     let destructorFn = null;
+
+    const rowCount = 8;
+    const colCount = 12;
+
+    vm.data = _.times(rowCount, () => mkRandomRowData(colCount));
+    vm.columnHeaders = _.times(colCount, i => mkRandomMeasurable(i, "col"));
+    vm.rowHeaders = _.times(rowCount, i => mkRandomMeasurable(i, "row"));
 
     function redraw() {
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
             const filteredData = filterData(vm.data, vm.qry);
-            const dataWithLayout = gridLayout(filteredData, { cols: 4 });
-            draw(dataWithLayout, svgGroups.gridContent, colorScheme);
+            const dataWithLayout = gridLayout(filteredData, vm.columnHeaders, vm.rowHeaders, { cols: 4 });
+            draw(dataWithLayout, svgGroups, colorScheme);
         }
     }
 
     vm.$onInit = () => {
         svgGroups = setupGroupElements($element);
-
-        svgGroups
-            .rowAxisContent
-            .append('rect')
-            .attr('width', 150)
-            .attr('height', 750)
-            .attr('fill', 'red');
-
-        svgGroups
-            .columnAxisContent
-            .append('rect')
-            .attr('width', 1450)
-            .attr('height', 50)
-            .attr('fill', 'green');
 
         setupZoom(svgGroups);
         destructorFn = responsivefy(svgGroups.svg);
@@ -135,7 +127,6 @@ function controller($element, serviceBroker) {
         console.log("roadmap-diagram-2 changes - parentEntityRef: ", vm.parentEntityRef);
         redraw();
     };
-
 }
 
 
