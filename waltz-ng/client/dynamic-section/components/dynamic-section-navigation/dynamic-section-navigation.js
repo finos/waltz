@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { initialiseData, invokeFunction } from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
 import {scaleLinear} from "d3-scale";
 import {rgb} from "d3-color";
 
+export const dyamicSectionNavigationDefaultOffset = 250;
 
 const bindings = {
     availableSections: '<',
@@ -35,7 +36,7 @@ const bindings = {
 
 const initialState = {
     sections: [],
-    offset: 250,
+    offset: dyamicSectionNavigationDefaultOffset,
     stickyVisible: false,
     onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
 };
