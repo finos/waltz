@@ -25,7 +25,8 @@ import template from "./flow-diagrams-panel-view.html";
 import {initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../../common/selector-utils";
-
+import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
 
 const bindings = {
     parentEntityRef: '<',
@@ -50,9 +51,9 @@ const initialState = {
 
 function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
     // get the width and height of the element
-    const navOffset = 60; // the nav bar margin
-    const pageHeaderOffset = scrollOffset > 60 ? 40 : 0;  // 60 is the offset of the dynamic page header, 40 is the size approx. refer to page-header.js
-    const dynamicNavOffset = scrollOffset > 250 ? 40 : 0; // 60 is the approx. size of the dynamic nav header, 250 is the threshold, refer to dynamic-section-navigation
+    const navOffset = 60; // the nav bar margin (navbar.html)
+    const pageHeaderOffset = scrollOffset > pageHeaderDefaultOffset ? 40 : 0;  // refer to page-header.js
+    const dynamicNavOffset = scrollOffset > dyamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
 
     const halfHeight = elementHeight / 2;
 
