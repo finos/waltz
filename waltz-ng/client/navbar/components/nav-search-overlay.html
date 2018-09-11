@@ -49,14 +49,17 @@
                     <tr ng-repeat="category in $ctrl.categories"
                         class="wnso-category"
                         ng-class="{
-                        'clickable' : $ctrl.results[category].length > 0,
-                        'wnso-selected': $ctrl.selectedCategory === category
-                    }"
+                            'clickable' : $ctrl.results[category].length > 0,
+                            'wnso-selected': $ctrl.selectedCategory === category
+                        }"
                         ng-click="$ctrl.toggleCategory(category)">
                         <td>
-                        <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}"
-                              ng-bind="category | toDisplayName:'entity'">
-                        </span>
+                            <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}">
+                                <waltz-icon fixed-width="true"
+                                            name="{{ category | toIconName:'entity' }}">
+                                </waltz-icon>
+                                <span ng-bind="category | toDisplayName:'entity'"></span>
+                            </span>
                         </td>
                         <td>
                         <span ng-if="$ctrl.results[category].length > 0"
