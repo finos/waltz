@@ -72,11 +72,11 @@ public class AppGroupMemberDao {
     }
 
 
-    public void unregister(long groupId, String userId) {
-        dsl.deleteFrom(APPLICATION_GROUP_MEMBER)
+    public boolean unregister(long groupId, String userId) {
+        return dsl.deleteFrom(APPLICATION_GROUP_MEMBER)
                 .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId))
                 .and(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId))
-                .execute();
+                .execute() == 1;
     }
 
 
