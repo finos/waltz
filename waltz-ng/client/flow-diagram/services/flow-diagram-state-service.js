@@ -285,6 +285,13 @@ export function service(
             });
     };
 
+    const updateName = () => {
+        const cmd = {
+            newName: state.model.title
+        };
+        return flowDiagramStore.updateName(state.diagramId, cmd);
+    };
+
     const load = (id) => {
         const diagramRef = { id: id, kind: "FLOW_DIAGRAM"};
         const diagramSelector = {
@@ -497,6 +504,7 @@ export function service(
         onChange,
         isDirty,
         save,
+        updateName,
         load,
         reset
     };

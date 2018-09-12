@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.UpdateNameCommand;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
 import com.khartec.waltz.model.flow_diagram.SaveDiagramCommand;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
@@ -64,6 +65,7 @@ public class FlowDiagramEndpoint implements Endpoint {
         String makeNewDiagramPath = entityIdPath;
         String findForSelectorPath = mkPath(BASE_URL, "selector");
         String saveDiagramPath = BASE_URL;
+        String updateNamePath = mkPath(BASE_URL, "update-name", ":id");
         String cloneDiagramPath = mkPath(diagramIdPath, "clone");
 
         DatumRoute<FlowDiagram> getByIdRoute = (req, res)
@@ -77,6 +79,15 @@ public class FlowDiagramEndpoint implements Endpoint {
             requireRole(userRoleService, req, LINEAGE_EDITOR);
             return flowDiagramService.save(
                     readBody(req, SaveDiagramCommand.class),
+                    getUsername(req));
+        };
+
+        DatumRoute<Boolean> updateNameRoute = (req, res)
+                ->  {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
+            return flowDiagramService.updateName(
+                    getId(req),
+                    readBody(req, UpdateNameCommand.class),
                     getUsername(req));
         };
 
@@ -107,6 +118,7 @@ public class FlowDiagramEndpoint implements Endpoint {
         postForList(findForSelectorPath, findForSelectorRoute);
 
         postForDatum(saveDiagramPath, saveDiagramRoute);
+        postForDatum(updateNamePath, updateNameRoute);
         postForDatum(cloneDiagramPath, cloneDiagramRoute);
         postForDatum(makeNewDiagramPath, makeNewDiagramRoute);
 
