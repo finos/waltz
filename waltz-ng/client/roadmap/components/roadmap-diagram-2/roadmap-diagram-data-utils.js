@@ -41,10 +41,10 @@ export function enrichDatumWithSearchTargetString(datum) {
 
 
 const sourceRatings = ["R", "R", "A", "A", "G", "Z", "X" , "X"];
-const targetRatings = ["G", "G", "G", "X", "X"];
+const targetRatings = ["R", "A", "G", "G", "G", "X", "X"];
 
 
-function mkRandomNode() {
+function mkRandomDeltaNode() {
     const t = _.random(0, 10000000);
     const node = {
         id: t,
@@ -70,9 +70,29 @@ function mkRandomNode() {
 }
 
 
+
+function mkRandomStaticNode() {
+    const t = _.random(0, 10000000);
+    const node = {
+        id: t,
+        node: {
+            name: `App ${t}`,
+            externalId: `${t}-1`,
+            description: "about test app"
+        },
+        state: {
+            rating: randomPick(targetRatings),
+            comment: "test comment"
+        }
+    };
+
+    return enrichDatumWithSearchTargetString(node);
+}
+
+
 function mkRandomNodes() {
-    const howMany = _.random(1, 16);
-    return _.map(_.range(0, howMany), () => mkRandomNode());
+    const howMany = _.random(1, 8);
+    return _.map(_.range(0, howMany), () => mkRandomStaticNode());
 }
 
 
