@@ -20,7 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {nest} from "d3-collection";
-import template from './measurable-list.html';
+import template from "./measurable-list.html";
 
 
 const initialState = {
@@ -33,14 +33,14 @@ const initialState = {
 
 
 function prepareTabs(categories = [], measurables = [], counts = []) {
-    const countsById = _.keyBy(counts, 'id');
+    const countsById = _.keyBy(counts, "id");
 
     const measurablesByCategory = _.chain(measurables)
         .map(m => {
             const directCount = (countsById[m.id] || { count: 0 }).count;
             return Object.assign({}, m, { directCount })
         })
-        .groupBy('categoryId')
+        .groupBy("categoryId")
         .value();
 
     const tabs = _.map(categories, c => {
@@ -58,7 +58,7 @@ function prepareTabs(categories = [], measurables = [], counts = []) {
 
 function findFirstNonEmptyTab(tabs = []) {
     const tab = _.find(tabs, t => (t.measurables || []).length > 0);
-    return _.get(tab || tabs[0], 'category.id');
+    return _.get(tab || tabs[0], "category.id");
 }
 
 
@@ -79,7 +79,7 @@ function controller($location,
         .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
         .then(r => {
             vm.categories = r.data;
-            vm.categoriesById = _.keyBy(r.data, 'id');
+            vm.categoriesById = _.keyBy(r.data, "id");
             return r.data;
         });
 
@@ -105,8 +105,8 @@ function controller($location,
         const extId = b.value;
         const measurable = vm.measurablesByCategoryThenExternalId[vm.visibility.tab][extId];
         if (measurable) {
-            b.block.onclick = () => $state.go('main.measurable.view', { id: measurable.id });
-            angular.element(b.block).addClass('clickable');
+            b.block.onclick = () => $state.go("main.measurable.view", { id: measurable.id });
+            angular.element(b.block).addClass("clickable");
         } else {
             console.log(`MeasurableList: Could not find measurable with external id: ${extId}`, b)
         }
@@ -122,24 +122,24 @@ function controller($location,
                 [ `NAVAID.MEASURABLE.${categoryId}` ])
             .then(r => vm.diagramsByCategory[categoryId] = r.data);
 
-        $location.search('category', categoryId);
+        $location.search("category", categoryId);
     };
 
 }
 
 
 controller.$inject = [
-    '$location',
-    '$q',
-    '$state',
-    '$stateParams',
-    'ServiceBroker',
-    'SettingsService'
+    "$location",
+    "$q",
+    "$state",
+    "$stateParams",
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

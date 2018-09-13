@@ -1,5 +1,23 @@
 import {toPath, truncateText} from "../../../common/d3-utils";
-import {NODE_DIMENSIONS} from "./roadmap-diagram-dimensions";
+
+
+const nodeWidth = 100;
+const nodeHeight = 54;
+const nodeFontSize = 12;
+
+
+export const NODE_DIMENSIONS = {
+    width: nodeWidth,
+    height: nodeHeight,  // 3 * section.height
+    section: {
+        height: nodeHeight / 3
+    },
+    text: {
+        dy: 12,
+        dx: 4,
+        fontSize: nodeFontSize
+    }
+};
 
 
 export const NODE_STYLES = {
