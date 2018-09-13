@@ -134,6 +134,14 @@ public class FlowDiagramDao {
     }
 
 
+    public boolean updateName(long id, String name) {
+        return dsl
+                .update(FLOW_DIAGRAM)
+                .set(FLOW_DIAGRAM.NAME, name)
+                .where(FLOW_DIAGRAM.ID.eq(id))
+                .execute() == 1;
+    }
+
     public boolean deleteById(long id) {
         return dsl
                 .update(FLOW_DIAGRAM)
@@ -151,7 +159,6 @@ public class FlowDiagramDao {
                 .withLastUpdatedBy(userId)
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc());
 
-        long clonedId = create(copiedDiagram);
-        return clonedId;
+        return create(copiedDiagram);
     }
 }
