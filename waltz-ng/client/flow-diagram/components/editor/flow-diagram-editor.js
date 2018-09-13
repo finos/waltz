@@ -31,9 +31,9 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    onCancel: '<',
-    onView: '<'
+    parentEntityRef: "<",
+    onCancel: "<",
+    onView: "<"
 };
 
 
@@ -46,8 +46,8 @@ const initialState = {
         diagramInfoPopup: false
     },
     popup: {
-        title: '',
-        description: '',
+        title: "",
+        description: "",
     }
 };
 
@@ -94,7 +94,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
         return [
             {
                 title: (d) => `Add upstream source to ${d.data.name}`,
-                action: (elm, d, i) => {
+                action: (elm, d) => {
                     $timeout(() => {
                         prepareAddLogicalFlowPopup(d, true, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
@@ -120,8 +120,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                 title: (d) => `Add annotation to ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
-                        const popup = prepareAddAnnotationPopup(d);
-                        vm.popup = popup;
+                        vm.popup = prepareAddAnnotationPopup(d);
                         vm.visibility.annotationPopup = true;
                     });
                 }
@@ -130,7 +129,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
             }, {
                 title: (d) => `Remove ${d.data.name}`,
                 action: (elm, d, i) =>
-                    vm.issueCommands([{command: 'REMOVE_NODE', payload: d}])
+                    vm.issueCommands([{command: "REMOVE_NODE", payload: d}])
             }
         ]
     }
@@ -141,7 +140,7 @@ function mkDisjointNodeMenu($timeout, vm, flowDiagramStateService) {
     return (d) => {
         return [
             {
-                title: (d) => 'Add an actor or application',
+                title: (d) => "Add an actor or application",
                 action: (elm, d, i) => {
                     $timeout(() => {
                         const popup = {
@@ -167,7 +166,7 @@ function preparePhysicalFlowPopup(
 {
     const selector = {
         entityReference: { id: logicalFlow.id, kind: logicalFlow.kind },
-        scope: 'EXACT'
+        scope: "EXACT"
     };
 
     const physFlowPromise = physicalFlowStore.findByLogicalFlowId(logicalFlow.id);
@@ -192,9 +191,9 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
     return (d) => {
 
         const removeFlow = {
-            title: 'Remove Flow',
+            title: "Remove Flow",
             action: (elm, d, i) =>
-                flowDiagramStateService.processCommands([{command: 'REMOVE_FLOW', payload: d}])
+                flowDiagramStateService.processCommands([{command: "REMOVE_FLOW", payload: d}])
         };
 
         if(d.data.isRemoved) {
@@ -202,7 +201,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
         } else {
             return [
                 {
-                    title: 'Add annotation',
+                    title: "Add annotation",
                     action: (elm, d, i) => {
                         $timeout(() => {
                             const popup = prepareAddAnnotationPopup(d);
@@ -213,7 +212,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
                     }
                 },
                 {
-                    title: 'Define physical flows',
+                    title: "Define physical flows",
                     action: (elm, logicalFlowNode, i) => {
                         $timeout(() => {
                             preparePhysicalFlowPopup(
@@ -243,7 +242,7 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
     return (d) => {
         return [
             {
-                title: 'Edit',
+                title: "Edit",
                 action: (elm, d, i) => {
                     $timeout(() => {
                         const popup = prepareUpdateAnnotationPopup(d);
@@ -255,9 +254,9 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
             },
             { divider: true },
             {
-                title: 'Remove',
+                title: "Remove",
                 action: (elm, d, i) => {
-                    commandProcessor([{ command: 'REMOVE_ANNOTATION', payload: d }]);
+                    commandProcessor([{ command: "REMOVE_ANNOTATION", payload: d }]);
                 }
             },
         ];
@@ -303,7 +302,7 @@ function controller($q,
     vm.doSave = () => {
         flowDiagramStateService.save()
             .then(r => vm.id = r)
-            .then(() => notification.success('Saved'))
+            .then(() => notification.success("Saved"))
     };
 
     vm.$onChanges = (c) => {
@@ -319,10 +318,13 @@ function controller($q,
 
     vm.onSaveTitle = (id, t) => {
         flowDiagramStateService.processCommands([{
-            command: 'SET_TITLE',
+            command: "SET_TITLE",
             payload: t.newVal
         }]);
         vm.title = t.newVal;
+
+        flowDiagramStateService.updateName()
+            .then(() => notification.success("Saved"))
     };
 
     vm.doRemove = () => {
@@ -334,7 +336,7 @@ function controller($q,
                 .then(() => {
                     flowDiagramStateService.reset();
                     vm.onCancel();
-                    notification.warning('Diagram deleted');
+                    notification.warning("Diagram deleted");
                 });
         }
     };
@@ -343,16 +345,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$scope',
-    '$timeout',
-    'FlowDiagramStateService',
-    'LogicalFlowStore',
-    'Notification',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore',
-    'PreventNavigationService',
-    'ServiceBroker'
+    "$q",
+    "$scope",
+    "$timeout",
+    "FlowDiagramStateService",
+    "LogicalFlowStore",
+    "Notification",
+    "PhysicalFlowStore",
+    "PhysicalSpecificationStore",
+    "PreventNavigationService",
+    "ServiceBroker"
 ];
 
 
