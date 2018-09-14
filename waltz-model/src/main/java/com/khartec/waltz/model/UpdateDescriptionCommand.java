@@ -26,9 +26,9 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableDescriptionChangeCommand.class)
-@JsonDeserialize(as = ImmutableDescriptionChangeCommand.class)
-public abstract class DescriptionChangeCommand implements Command {
+@JsonSerialize(as = ImmutableUpdateDescriptionCommand.class)
+@JsonDeserialize(as = ImmutableUpdateDescriptionCommand.class)
+public abstract class UpdateDescriptionCommand implements Command {
 
     @Nullable
     public abstract String newDescription();

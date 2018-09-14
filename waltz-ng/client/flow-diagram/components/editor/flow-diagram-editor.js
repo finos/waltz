@@ -309,6 +309,7 @@ function controller($q,
         const state = flowDiagramStateService.getState();
         vm.title = state.model.title;
         vm.id = state.diagramId;
+        vm.description = state.model.description;
     };
 
     vm.onOpenDiagramInfoPopup = () => {
@@ -324,7 +325,18 @@ function controller($q,
         vm.title = t.newVal;
 
         flowDiagramStateService.updateName()
-            .then(() => notification.success("Saved"))
+            .then(() => notification.success("Saved Title"))
+    };
+
+    vm.onSaveDescription = (id, t) => {
+        flowDiagramStateService.processCommands([{
+            command: "SET_DESCRIPTION",
+            payload: t.newVal
+        }]);
+        vm.description = t.newVal;
+
+        flowDiagramStateService.updateDescription()
+            .then(() => notification.success("Saved Description"))
     };
 
     vm.doRemove = () => {

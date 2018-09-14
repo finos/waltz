@@ -100,7 +100,7 @@ public class PhysicalSpecDefinitionFieldService {
     }
 
 
-    public int updateDescription(String username, long fieldId, DescriptionChangeCommand command) {
+    public int updateDescription(String username, long fieldId, UpdateDescriptionCommand command) {
         checkNotNull(username, "username cannot be null");
         checkNotNull(command, "command cannot be null");
 

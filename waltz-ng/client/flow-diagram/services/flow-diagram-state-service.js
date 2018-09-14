@@ -108,7 +108,7 @@ function prepareSaveCmd(state) {
     return {
         diagramId: state.diagramId,
         name: state.model.title,
-        description: "",
+        description: state.model.description,
         entities,
         annotations,
         layoutData: JSON.stringify(layoutData)
@@ -222,6 +222,11 @@ function restoreDiagram(
         payload: diagram.name
     }];
 
+    const descriptionCommands = [{
+        command: "SET_DESCRIPTION",
+        payload: diagram.description
+    }];
+
     commandProcessor(nodeCommands);
     commandProcessor(flowCommands);
     commandProcessor(annotationCommands);
@@ -229,6 +234,7 @@ function restoreDiagram(
     commandProcessor(transformCommands);
     commandProcessor(decorationCommands);
     commandProcessor(titleCommands);
+    commandProcessor(descriptionCommands);
 }
 
 
@@ -292,6 +298,13 @@ export function service(
         return flowDiagramStore.updateName(state.diagramId, cmd);
     };
 
+    const updateDescription = () => {
+        const cmd = {
+            newDescription: state.model.description
+        };
+        return flowDiagramStore.updateDescription(state.diagramId, cmd);
+    };
+
     const load = (id) => {
         const diagramRef = { id: id, kind: "FLOW_DIAGRAM"};
         const diagramSelector = {
@@ -333,6 +346,10 @@ export function service(
 
             case "SET_TITLE":
                 model.title = payload;
+                break;
+
+            case "SET_DESCRIPTION":
+                model.description = payload;
                 break;
 
             /* MOVE
@@ -505,6 +522,7 @@ export function service(
         isDirty,
         save,
         updateName,
+        updateDescription,
         load,
         reset
     };
