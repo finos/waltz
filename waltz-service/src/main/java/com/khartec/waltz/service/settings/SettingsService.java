@@ -19,13 +19,18 @@
 
 package com.khartec.waltz.service.settings;
 
+import com.khartec.waltz.common.CollectionUtilities;
+import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.settings.SettingsDao;
 import com.khartec.waltz.model.settings.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.khartec.waltz.common.ListUtilities.ensureNotNull;
 
 
 @Service
@@ -34,21 +39,36 @@ public class SettingsService {
     private final SettingsDao settingsDao;
 
     public static final String DEFAULT_ROLES_KEY = "server.authentication.roles.default";
+    private final Map<String, Setting> overridesByName;
 
 
+    /**
+     * Setting service allows the settings table to be interrogated.  For dev purposes then a
+     * collection of overrides may be given, useful when debugging a shared database instance and
+     * you do not wish to change the values in the settings table
+     * @param settingsDao
+     * @param overrides
+     */
     @Autowired
-    public SettingsService(SettingsDao settingsDao) {
+    public SettingsService(SettingsDao settingsDao, Collection<Setting> overrides) {
         this.settingsDao = settingsDao;
+        this.overridesByName = MapUtilities.indexBy(s -> s.name(), ensureNotNull(overrides));
     }
 
 
     public Collection<Setting> findAll() {
-        return settingsDao.findAll();
+        return CollectionUtilities.map(
+                settingsDao.findAll(),
+                s -> Optional
+                        .ofNullable(overridesByName.get(s.name()))
+                        .orElse(s));
     }
 
 
     public Setting getByName(String name) {
-        return settingsDao.getByName(name);
+        return Optional
+                .ofNullable(overridesByName.get(name))
+                .orElse(settingsDao.getByName(name));
     }
 
     /**
@@ -58,10 +78,9 @@ public class SettingsService {
      * @return
      */
     public Optional<String> getValue(String name) {
-        Setting setting = settingsDao.getByName(name);
-        return setting == null
-            ? Optional.empty()
-            : setting.value();
+        return Optional
+                .ofNullable(getByName(name))
+                .flatMap(s -> s.value());
     }
 
 }
