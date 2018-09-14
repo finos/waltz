@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import template from './related-measurables-table.html';
+import template from "./related-measurables-table.html";
 import {initialiseData} from "../../../common/index";
 import {sameRef} from "../../../common/entity-utils";
 import {downloadTextFile} from "../../../common/file-utils";
@@ -28,15 +28,36 @@ import {relationshipKind} from "../../../common/services/enums/relationship-kind
 
 
 const bindings = {
-    rows: '<',
-    onRowSelect: '<',
-    selectedRow: '<'
+    rows: "<",
+    onRowSelect: "<",
+    selectedRow: "<"
 };
 
 
+const columnDefs = [
+    {
+        field: "a.name",
+        name: "From"
+    }, {
+        field: "a.type",
+        name: "(From Type)"
+    }, {
+        field: "relationship.relationship",
+        name: "Relationship",
+        cellFilter: "toDisplayName:'relationshipKind'"
+    }, {
+        field: "b.name",
+        name: "To"
+    }, {
+        field: "b.type",
+        name: "(To Type)"
+    }
+];
+
 const initialState = {
     rows: [],
-    onRowSelect: (row) => console.log('default on row select', { row })
+    columnDefs,
+    onRowSelect: (row) => console.log("default on row select", { row })
 };
 
 
@@ -86,7 +107,6 @@ function controller() {
         const data = mkExportData(vm.rows);
         downloadTextFile(data, ",", "related_viewpoints.csv");
     };
-
 }
 
 
@@ -99,5 +119,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzRelatedMeasurablesTable'
-}
+    id: "waltzRelatedMeasurablesTable"
+};

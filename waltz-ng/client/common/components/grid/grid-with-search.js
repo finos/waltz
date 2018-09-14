@@ -19,15 +19,16 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
-import template from './grid-with-search.html';
+import template from "./grid-with-search.html";
 
 const bindings = {
-    columnDefs: '<',
-    entries: '<',
-    searchPlaceholderText: '@',
-    scopeProvider: '<?',
-    onInitialise: '<',
-    onChange: '<'
+    columnDefs: "<",
+    entries: "<",
+    searchPlaceholderText: "@",
+    scopeProvider: "<?",
+    onInitialise: "<",
+    onChange: "<",
+    onRowSelect: "<?"
 };
 
 
@@ -37,8 +38,8 @@ const initialState = {
     filteredEntries: [],
     scopeProvider: null,
     searchFields: [],
-    searchPlaceholderText: 'Search...',
-    onInitialise: (gridApi) => console.log('Default onInitialise handler for grid-search: ', gridApi),
+    searchPlaceholderText: "Search...",
+    onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),
     onChange: (gridApi) => {}
 };
 
@@ -46,7 +47,7 @@ const initialState = {
 function mkSearchFields(columnDefs = []) {
     return _.chain(columnDefs)
         .filter(c => !_.isUndefined(c.field))
-        .map('field')
+        .map("field")
         .value();
 }
 

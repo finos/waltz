@@ -11,6 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateMeasurableCategory;
@@ -62,12 +63,18 @@ public class MeasurableStressGenerator {
     }
 
 
+    static Random rnd = new Random(System.currentTimeMillis());
+
+
     private static List<Tuple2<String, String>> mkNodes(int level, String path) {
         List<Tuple2<String, String>> ts = new ArrayList<>();
+
+        int siblingCount = rnd.nextInt(2) + 4;
+
         for (int i = 1; i <= level; i++) {
             String id = path + (level > 1 ? "." : "") + i;
             ts.add(tuple(id,path));
-            if (level < 7) {  // 7 == 5K, 8 = 46K
+            if (level < 8) {  // 7 == ~5K, 8 = 46K
                 ts.addAll(mkNodes(level + 1, id));
             }
         }
