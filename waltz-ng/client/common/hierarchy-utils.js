@@ -95,7 +95,9 @@ export function populateParents(nodes, parentsAsRefs = true) {
             const parent = byId[u.parentId];
             if (parent) {
                 parent.children.push(u);
-                u.parent = parentsAsRefs ? parent : parent.id;
+                u.parent = parentsAsRefs
+                    ? parent
+                    : parent.id;
             }
         }
     });
@@ -178,16 +180,23 @@ export function findNode(nodes = [], id) {
 }
 
 
-export function getParents(node) {
+/**
+ *
+ * @param node
+ * @param getParentFn - function to resolve parent, defaults to `n => n.parent`
+ * @returns {Array}
+ */
+
+export function getParents(node, getParentFn = (n) => n.parent) {
     if (! node) return [];
 
-    let ptr = node.parent;
+    let ptr = getParentFn(node);
 
     const result = [];
 
     while (ptr) {
         result.push(ptr);
-        ptr = ptr.parent;
+        ptr = getParentFn(ptr);
     }
 
     return result;
