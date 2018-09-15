@@ -66,7 +66,7 @@ function controller(serviceBroker) {
         vm.notifyChanges();
         const usedTypeIds = _.map(vm.usedTypes, 'id');
         const enrichedDataTypes = _.map(vm.allDataTypes, dt => Object.assign({}, dt, { isUsed: _.includes(usedTypeIds, dt.id) }));
-        vm.hierarchy = switchToParentIds(buildHierarchies(enrichedDataTypes));
+        vm.hierarchy = buildHierarchies(enrichedDataTypes, false);
     };
 
     vm.notifyChanges = () => {

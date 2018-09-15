@@ -81,9 +81,10 @@ export function doSearch(termStr = '', searchNodes = []) {
  *    [ id: "", parentId : ?, parent : {}?, children : [ .. ], ... },  .. ]
  *
  * @param nodes
+ * @param parentsAsRefs - whether to include parent as references or simple ids
  * @returns {Array}
  */
-export function populateParents(nodes) {
+export function populateParents(nodes, parentsAsRefs = true) {
     const byId = _.chain(_.cloneDeep(nodes))
         .map(u => _.merge(u, { children: [], parent: null }))
         .keyBy('id')
@@ -94,7 +95,7 @@ export function populateParents(nodes) {
             const parent = byId[u.parentId];
             if (parent) {
                 parent.children.push(u);
-                u.parent = parent;
+                u.parent = parentsAsRefs ? parent : parent.id;
             }
         }
     });
@@ -103,9 +104,9 @@ export function populateParents(nodes) {
 }
 
 
-export function buildHierarchies(nodes) {
+export function buildHierarchies(nodes, parentsAsRefs = true) {
     // only give back root element/s
-    return _.reject(populateParents(nodes), n => n.parent);
+    return _.reject(populateParents(nodes, parentsAsRefs), n => n.parent);
 }
 
 

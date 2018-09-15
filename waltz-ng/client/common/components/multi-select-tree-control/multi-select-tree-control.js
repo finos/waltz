@@ -48,7 +48,7 @@ const initialState = {
 
 
 function prepareTree(dataTypes = []) {
-    const hierarchy = switchToParentIds(buildHierarchies(dataTypes));
+    const hierarchy = buildHierarchies(dataTypes);
     return hierarchy;
 }
 

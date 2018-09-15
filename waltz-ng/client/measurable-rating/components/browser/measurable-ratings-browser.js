@@ -79,7 +79,7 @@ function toRatingsSummaryObj(ratings = []) {
 
 
 function prepareTreeData(data = []) {
-    return switchToParentIds(buildHierarchies(data));
+    return buildHierarchies(data, false);
 }
 
 

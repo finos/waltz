@@ -72,14 +72,13 @@ function determineRequiredMeasurables(relationships = [], measurables = [], excl
 
 function prepareTreeData(allRelationships = [], measurables = []) {
     const requiredMeasurables = determineRequiredMeasurables(allRelationships, measurables);
-    return switchToParentIds(buildHierarchies(requiredMeasurables));
+    return buildHierarchies(requiredMeasurables, false);
 }
 
 
 function expandTreeData(treeData = []) {
     if (isEmpty(treeData)) return [] ;
-    const expandedNodes =  _.concat(treeData, treeData[0].children);
-    return expandedNodes;
+    return  _.concat(treeData, treeData[0].children);
 }
 
 
