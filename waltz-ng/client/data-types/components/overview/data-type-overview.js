@@ -29,8 +29,6 @@ const bindings = {
 };
 
 
-
-
 function controller(serviceBroker) {
     const vm = this;
 

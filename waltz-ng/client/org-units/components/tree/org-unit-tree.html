@@ -5,19 +5,16 @@
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions">
             <span class="waltz-visibility-parent">
-
-
-
                 <a ui-sref="main.org-unit.view ({id: node.id })">
 
-                    <strong>
+                    <span>
                         <span ng-if="$ctrl.hasOwnApps(node)"
                               ng-bind="node.name">
                         </span>
                         <i ng-bind="node.name"
                            ng-if="! $ctrl.hasOwnApps(node)">
                         </i>
-                    </strong>
+                    </span>
 
                     <span class="waltz-visibility-child-50"
                           title="Applications owned by this unit (direct / inherited)">
