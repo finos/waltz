@@ -17,29 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import UnitView from "./pages/measurable-view/measurable-view";
 import ListView from "./pages/list-view/measurable-list";
 
-import {CORE_API} from '../common/services/core-api-utils';
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const baseState = {};
 
 
 const viewState = {
-    url: 'measurable/{id:int}',
+    url: "measurable/{id:int}",
     views: {
-        'content@': UnitView
+        "content@": UnitView
     }
 };
 
 
 const listState = {
-    url: 'measurable?{category:int}',
+    url: "measurable?{category:int}",
     reloadOnSearch: false,
     views: {
-        'content@': ListView
+        "content@": ListView
     }
 };
 
@@ -59,7 +59,7 @@ function bouncer($q, $state, $stateParams, serviceBroker) {
             if(category) {
                 const m = _.find(measurables, {categoryId: category.id});
                 if (m) {
-                    $state.go('main.measurable.view', {id: m.id});
+                    $state.go("main.measurable.view", {id: m.id});
                 } else {
                     console.log(`Cannot find measure corresponding category: ${categoryExternalId}, external id: ${externalId}`);
                 }
@@ -71,15 +71,15 @@ function bouncer($q, $state, $stateParams, serviceBroker) {
 
 
 bouncer.$inject = [
-    '$q',
-    '$state',
-    '$stateParams',
-    'ServiceBroker'
+    "$q",
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
 const bouncerState = {
-    url: 'measurable/external-id/{category:string}/{externalId:string}',
+    url: "measurable/external-id/{category:string}/{externalId:string}",
     resolve: {
         bouncer
     }
@@ -88,14 +88,14 @@ const bouncerState = {
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.measurableBouncer', bouncerState)
-        .state('main.measurable', baseState)
-        .state('main.measurable.list', listState)
-        .state('main.measurable.view', viewState);
+        .state("main.measurableBouncer", bouncerState)
+        .state("main.measurable", baseState)
+        .state("main.measurable.list", listState)
+        .state("main.measurable.view", viewState);
 }
 
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

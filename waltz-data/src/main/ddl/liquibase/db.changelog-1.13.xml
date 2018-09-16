@@ -58,4 +58,17 @@
         </insert>
     </changeSet>
 
+
+    <!-- 3389: Perf improvements for measurables -->
+    <changeSet id="20180916-3389-1"
+               author="davidwatkins73">
+        <comment> 3389: Perf improvements for measurables </comment>
+        <createIndex indexName="idx_measurable_category"
+                     tableName="measurable"
+                     unique="false">
+            <column name="measurable_category_id"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

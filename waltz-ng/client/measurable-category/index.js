@@ -18,15 +18,20 @@
  */
 
 
-import angular from 'angular';
-import * as categoryStore from './services/measurable-category-store';
+import angular from "angular";
+import * as categoryStore from "./services/measurable-category-store";
+import Routes from "./routes";
 
 export default () => {
 
-    const module = angular.module('waltz.measurable-category', []);
+    const module = angular.module("waltz.measurable-category", []);
 
     module
         .service(categoryStore.serviceName, categoryStore.store);
+
+    module
+        .config(Routes);
+
 
     return module.name;
 };

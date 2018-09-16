@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './svg-diagrams.html';
+import template from "./svg-diagrams.html";
 
 
 function controller($timeout) {
@@ -34,15 +34,15 @@ function controller($timeout) {
 
 
 controller.$inject = [
-    '$timeout'
+    "$timeout"
 ];
 
 
 export default {
     template,
     bindings: {
-        diagrams: '<',
-        blockProcessor: '<'
+        diagrams: "<",
+        blockProcessor: "<"
     },
     controller
 };
