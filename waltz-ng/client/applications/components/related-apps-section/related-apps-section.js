@@ -36,20 +36,20 @@ import template from "./related-apps-section.html";
 
 
 const bindings = {
-    editRole: '@?',
-    parentEntityRef: '<',
+    editRole: "@?",
+    parentEntityRef: "<",
 };
 
 
 const initialState = {
     columnDefs: [
-        Object.assign(mkEntityLinkGridCell('Name', 'app'), { width: "25%"} ),
-        { field: 'relationshipDisplay', name: 'Relationship'},
-        { field: 'app.assetCode'},
-        { field: 'app.kindDisplay', name: 'Kind'},
-        { field: 'app.overallRatingDisplay', name: 'Overall Rating'},
-        { field: 'app.businessCriticalityDisplay', name: 'Business Criticality'},
-        { field: 'app.lifecyclePhaseDisplay', name: 'Lifecycle Phase'},
+        Object.assign(mkEntityLinkGridCell("Name", "app"), { width: "25%"} ),
+        { field: "relationshipDisplay", name: "Relationship"},
+        { field: "app.assetCode"},
+        { field: "app.kindDisplay", name: "Kind"},
+        { field: "app.overallRatingDisplay", name: "Overall Rating"},
+        { field: "app.businessCriticalityDisplay", name: "Business Criticality"},
+        { field: "app.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
     ],
     allowedRelationships: [],
     entityRelationships: [],
@@ -60,7 +60,7 @@ const initialState = {
 
 
 function mkGridData(relations = [], apps = []) {
-    const appsById = _.keyBy(apps, 'id');
+    const appsById = _.keyBy(apps, "id");
 
     return _.map(relations, r => ({
         relationshipDisplay: relationshipKind[r.relationship] ? relationshipKind[r.relationship].name : r.relationship,
@@ -74,7 +74,7 @@ function mkChangeCommand(operation, entityRef, relKind) {
         operation,
         entityReference: {
             id: entityRef.id,
-            kind: 'APPLICATION'
+            kind: "APPLICATION"
         },
         relationship: relKind
     };
@@ -100,8 +100,8 @@ function controller($q,
                     {entity: rel.a, relationship: rel.relationship},
                     {entity: rel.b, relationship: rel.relationship}
                 ]))
-                .filter(rel => rel.entity.kind === 'APPLICATION')
-                .reject(rel => sameRef(rel.entity, vm.parentEntityRef))
+                .filter(rel => rel.entity.kind === "APPLICATION")
+                .reject(rel => sameRef(rel.entity, vm.parentEntityRef, { skipChecks: true }))
                 .value());
 
         const appsPromise = serviceBroker.loadViewData(
@@ -109,7 +109,7 @@ function controller($q,
             [ mkSelectionOptions(
                 vm.parentEntityRef,
                 getDefaultScopeForEntityKind(vm.parentEntityRef.kind),
-                ['ACTIVE', 'PENDING', 'REMOVED'])
+                ["ACTIVE", "PENDING", "REMOVED"])
             ],
             { force })
             .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
@@ -122,7 +122,7 @@ function controller($q,
                     entity: {
                         id: r.entity.id,
                         name: r.entity.name,
-                        kind: 'APPLICATION'
+                        kind: "APPLICATION"
                     }
                 }));
             });
@@ -136,7 +136,7 @@ function controller($q,
     };
 
     vm.onInitialise = (cfg) => {
-        vm.export = () => cfg.exportFn(`app-relationships.csv`);
+        vm.export = () => cfg.exportFn("app-relationships.csv");
     };
 
     vm.editMode = (editMode) => {
@@ -148,7 +148,7 @@ function controller($q,
         return serviceBroker
             .execute(
                 changeRelationship,
-                [vm.parentEntityRef.id, mkChangeCommand('ADD', entityRel.entity, entityRel.relationship)])
+                [vm.parentEntityRef.id, mkChangeCommand("ADD", entityRel.entity, entityRel.relationship)])
             .then(result => {
                 if(result.data) {
                     notification.success("Relationship added successfully");
@@ -164,7 +164,7 @@ function controller($q,
         return serviceBroker
             .execute(
                 changeRelationship,
-                [vm.parentEntityRef.id, mkChangeCommand('REMOVE', entityRel.entity, entityRel.relationship)])
+                [vm.parentEntityRef.id, mkChangeCommand("REMOVE", entityRel.entity, entityRel.relationship)])
             .then(result => {
                 if(result.data) {
                     notification.success("Relationship removed successfully");
@@ -178,9 +178,9 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "Notification",
+    "ServiceBroker"
 ];
 
 
@@ -190,7 +190,7 @@ const component = {
     controller
 };
 
-const id = 'waltzRelatedAppsSection';
+const id = "waltzRelatedAppsSection";
 
 
 export default {

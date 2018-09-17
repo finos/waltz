@@ -73,7 +73,7 @@ function prepareRelationshipStats(stats = [], entityReference) {
         .chain(stats)
         .flatMap(r => { return [r.a, r.b]; })
         .uniqBy(refToString)
-        .reject(r => sameRef(r, entityReference))
+        .reject(r => sameRef(r, entityReference, { skipChecks: true }))
         .countBy(r => r.kind)
         .map((v,k) => { return { kind: k, name: getEnumName(entity, k), count: v }})
         .orderBy('name')

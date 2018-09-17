@@ -60,15 +60,15 @@ const initialState = {
 };
 
 
-const DEFAULT_SELECTION_FILTER_FN = (m) => true;
+const DEFAULT_SELECTION_FILTER_FN = () => true;
 
 
-function mkGridData(ref,
+function mkGridData(selfRef,
                     relationships = [],
                     measurables = [],
                     categories = [],
                     appGroups = [],
-                    rowFilterFn = (x) => true)
+                    rowFilterFn = () => true)
 {
     const measurablesById = _.keyBy(measurables, "id");
     const categoriesById = _.keyBy(categories, "id");
@@ -85,7 +85,7 @@ function mkGridData(ref,
 
     const toAppGroupCell = r => {
         const c = appGroupsById[r.id];
-        return Object.assign({}, r, { name: c != null ? c.name : "", type: "App Group" });
+        return Object.assign({}, r, { name: c !== null ? c.name : "", type: "App Group" });
     };
 
 
@@ -104,7 +104,7 @@ function mkGridData(ref,
         .chain(relationships)
         .filter(rowFilterFn)
         .map(r => {
-            const outbound = sameRef(r.a, ref);
+            const outbound = sameRef(r.a, selfRef, { skipChecks: true });
             const a = mkCell(r.a.kind, r.a);
             const b = mkCell(r.b.kind, r.b);
 
@@ -147,8 +147,8 @@ function controller($q, $timeout, serviceBroker, notification) {
             .then(() => {
                 if (vm.selectedRow) {
                     vm.selectedRow = _.find(vm.gridData || [], row => {
-                        const sameSource = sameRef(vm.selectedRow.a, row.a);
-                        const sameTarget = sameRef(vm.selectedRow.b, row.b);
+                        const sameSource = sameRef(vm.selectedRow.a, row.a, { skipChecks: true });
+                        const sameTarget = sameRef(vm.selectedRow.b, row.b, { skipChecks: true });
                         const sameRelKind = vm.selectedRow.relationship.relationship === row.relationship.relationship;
                         return sameSource && sameTarget && sameRelKind;
                     });
@@ -232,7 +232,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     const loadRelationships = () => {
         return serviceBroker
-            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                [ vm.parentEntityRef ],
+                { force: true })
             .then(r => {
                 vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
                 vm.gridData = calcGridData();
