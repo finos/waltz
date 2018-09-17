@@ -21,9 +21,11 @@ import {checkIsEntityRef} from "../common/checks";
 import {sameRef} from "../common/entity-utils";
 
 
-export function determineCounterpart(reference, relationship) {
-    checkIsEntityRef(reference);
-    return sameRef(reference, relationship.a)
+export function determineCounterpart(reference, relationship, options = { skipChecks: false }) {
+    if (!options.skipChecks) {
+        checkIsEntityRef(reference);
+    }
+    return sameRef(reference, relationship.a, options)
         ? relationship.b
         : relationship.a;
 }
@@ -37,23 +39,23 @@ export function sanitizeRelationships(relationships, measurables, categories) {
 
     const isValidRel = (rel) => {
         const validCombos = [
-            { a: 'MEASURABLE', b: 'APP_GROUP' },
-            { a: 'MEASURABLE', b: 'CHANGE_INITIATIVE' },
-            { a: 'MEASURABLE', b: 'MEASURABLE' },
-            { a: 'CHANGE_INITIATIVE', b: 'APP_GROUP' },
-            { a: 'CHANGE_INITIATIVE', b: 'CHANGE_INITIATIVE' },
-            { a: 'CHANGE_INITIATIVE', b: 'MEASURABLE' },
-            { a: 'APP_GROUP', b: 'APP_GROUP' },
-            { a: 'APP_GROUP', b: 'CHANGE_INITIATIVE' },
-            { a: 'APP_GROUP', b: 'MEASURABLE' }
+            { a: "MEASURABLE", b: "APP_GROUP" },
+            { a: "MEASURABLE", b: "CHANGE_INITIATIVE" },
+            { a: "MEASURABLE", b: "MEASURABLE" },
+            { a: "CHANGE_INITIATIVE", b: "APP_GROUP" },
+            { a: "CHANGE_INITIATIVE", b: "CHANGE_INITIATIVE" },
+            { a: "CHANGE_INITIATIVE", b: "MEASURABLE" },
+            { a: "APP_GROUP", b: "APP_GROUP" },
+            { a: "APP_GROUP", b: "CHANGE_INITIATIVE" },
+            { a: "APP_GROUP", b: "MEASURABLE" }
         ];
 
         const validCombo = _.some(validCombos, c => c.a === rel.a.kind && c.b === rel.b.kind);
 
-        const aValid = rel.a.kind === 'MEASURABLE'
+        const aValid = rel.a.kind === "MEASURABLE"
             ? isValid(rel.a.id)
             : true;
-        const bValid = rel.b.kind === 'MEASURABLE'
+        const bValid = rel.b.kind === "MEASURABLE"
             ? isValid(rel.b.id)
             : true;
 

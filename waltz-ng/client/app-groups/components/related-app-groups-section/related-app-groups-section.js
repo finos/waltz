@@ -78,7 +78,7 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
             return _
                 .chain(relationships)
                 .map(rel => {
-                    return sameRef(entityRef, rel.a)
+                    return sameRef(entityRef, rel.a, { skipChecks: true })
                         ? {counterpartRef: rel.b, side: 'TARGET', relationship: rel}
                         : {counterpartRef: rel.a, side: 'SOURCE', relationship: rel};
                 })

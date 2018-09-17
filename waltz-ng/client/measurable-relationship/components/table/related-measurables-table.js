@@ -94,8 +94,8 @@ function controller() {
 
     vm.isSelected = (row) => {
         if (vm.selectedRow) {
-            const sameA = sameRef(row.a, vm.selectedRow.a);
-            const sameB = sameRef(row.b, vm.selectedRow.b);
+            const sameA = sameRef(row.a, vm.selectedRow.a, { skipChecks: true });
+            const sameB = sameRef(row.b, vm.selectedRow.b, { skipChecks: true });
             return sameA && sameB;
         } else {
             return false;

@@ -44,7 +44,7 @@ function determineRequiredMeasurables(relationships = [], measurables = [], excl
         .flatMap(rel => [rel.a, rel.b])
         .filter(ref => ref.kind === 'MEASURABLE' && measurablesById[ref.id])
         .uniqBy(ref => ref.id)
-        .reject(ref => _.some(exclusions, exclusion => sameRef(exclusion, ref)))
+        .reject(ref => _.some(exclusions, exclusion => sameRef(exclusion, ref, { skipChecks: true })))
         .map(ref => Object.assign({}, measurablesById[ref.id], { direct: true }))
         .value();
 
