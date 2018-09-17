@@ -70,6 +70,12 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const countByMeasurableCategory = (id) => {
+        return $http
+            .get(`${baseUrl}/count-by/measurable/category/${id}`)
+            .then(d => d.data);
+    };
+
     const create = (ref, measurableId, rating = "Z", description = "", plannedDate = null) => {
         checkIsEntityRef(ref);
         return $http
@@ -97,6 +103,7 @@ function store($http, baseApiUrl) {
         findByCategory,
         findForEntityReference,
         countByMeasurable,
+        countByMeasurableCategory,
         statsByAppSelector,
         statsForRelatedMeasurables,
         create,
@@ -137,6 +144,11 @@ export const MeasurableRatingStore_API = {
         serviceName,
         serviceFnName: "countByMeasurable",
         description: "return a count by measurable"
+    },
+    countByMeasurableCategory: {
+        serviceName,
+        serviceFnName: "countByMeasurableCategory",
+        description: "return a count by measurable category [categoryId]"
     },
     statsByAppSelector: {
         serviceName,
