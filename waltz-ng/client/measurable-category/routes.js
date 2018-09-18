@@ -14,7 +14,7 @@ function bouncer($state, $stateParams, userPreferenceService, settingsService) {
         .loadPreferences(true)
         .then(prefs => {
             const lastCategory = prefs[lastViewedMeasurableCategoryKey];
-            if (lastCategory.value > 0) {
+            if (_.get(lastCategory, "value", 0) > 0) {
                 go(lastCategory.value);
             } else {
                 attemptToRouteViaServerSetting();
