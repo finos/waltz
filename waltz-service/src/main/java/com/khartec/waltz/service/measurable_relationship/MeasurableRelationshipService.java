@@ -21,10 +21,7 @@ package com.khartec.waltz.service.measurable_relationship;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.EntityReferenceUtilities;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -34,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -65,6 +63,13 @@ public class MeasurableRelationshipService {
         checkNotNull(entityReference, "entityReference cannot be null");
         return entityRelationshipDao
                 .findRelationshipsInvolving(entityReference);
+    }
+
+
+    public Map<EntityKind, Integer> tallyForEntityReference(EntityReference entityReference) {
+        checkNotNull(entityReference, "entityReference cannot be null");
+        return entityRelationshipDao
+                .tallyRelationshipsInvolving(entityReference);
     }
 
 

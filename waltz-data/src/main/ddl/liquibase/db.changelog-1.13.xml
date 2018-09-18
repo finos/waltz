@@ -71,4 +71,44 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="20180917-3389-2"
+               author="davidwatkins73">
+        <comment> 3389: Perf improvements for svg diagrams and static panels </comment>
+        <createIndex indexName="idx_svg_diagram_group"
+                     tableName="svg_diagram"
+                     unique="false">
+            <column name="group"
+                    type="${group.type}"/>
+        </createIndex>
+
+        <createIndex indexName="idx_static_panel_group"
+                     tableName="static_panel"
+                     unique="false">
+            <column name="group"
+                    type="${group.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20180917-3389-3"
+               author="davidwatkins73">
+        <comment> 3389: Perf improvements for entity_relationships </comment>
+        <createIndex indexName="idx_entity_relationship_a"
+                     tableName="entity_relationship"
+                     unique="false">
+            <column name="kind_a"
+                    type="${enum.type}"/>
+            <column name="id_a"
+                    type="${id.type}"/>
+        </createIndex>
+
+        <createIndex indexName="idx_entity_relationship_b"
+                     tableName="entity_relationship"
+                     unique="false">
+            <column name="kind_b"
+                    type="${enum.type}"/>
+            <column name="id_b"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

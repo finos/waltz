@@ -33,7 +33,9 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -48,6 +50,7 @@ public class EntityRelationshipDao {
 
     private static List<EntityKind> POSSIBLE_ENTITIES = newArrayList(
             EntityKind.APPLICATION,
+            EntityKind.APP_GROUP,
             EntityKind.ACTOR,
             EntityKind.MEASURABLE,
             EntityKind.CHANGE_INITIATIVE);
@@ -120,6 +123,30 @@ public class EntityRelationshipDao {
                 .where(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name())))
                 .or(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name())))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Map<EntityKind, Integer> tallyRelationshipsInvolving(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+
+        return dsl
+                .select(ENTITY_RELATIONSHIP.KIND_B, DSL.count())
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()))
+                .groupBy(ENTITY_RELATIONSHIP.KIND_B)
+                .unionAll(DSL.select(ENTITY_RELATIONSHIP.KIND_A, DSL.count())
+                        .from(ENTITY_RELATIONSHIP)
+                        .where(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
+                        .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()))
+                        .groupBy(ENTITY_RELATIONSHIP.KIND_A))
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        r -> EntityKind.valueOf(r.get(0, String.class)),
+                        r -> r.get(1, Integer.class),
+                        (a, b) -> a + b));
+
     }
 
 
