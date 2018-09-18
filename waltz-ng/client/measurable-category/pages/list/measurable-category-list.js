@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-list.html";
+import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
 
 
 const initialState = {
@@ -31,12 +32,16 @@ function controller($q,
                     $state,
                     $stateParams,
                     serviceBroker,
-                    settingsService) {
+                    userPreferenceService) {
 
     const vm = initialiseData(this, initialState);
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
+
+        userPreferenceService
+            .savePreference(lastViewedMeasurableCategoryKey, categoryId);
+
         const measurablePromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
@@ -98,7 +103,7 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "ServiceBroker",
-    "SettingsService"
+    "UserPreferenceService"
 ];
 
 
