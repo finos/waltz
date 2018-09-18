@@ -50,7 +50,7 @@ function service($q, userPreferenceStore) {
         return loadPreferences()
             .then(preferencesByKey => {
                 const isNewPreference = !preferencesByKey[key];
-                const hasPreferenceChanged = !isNewPreference && stringToBoolean(preferencesByKey[key].value) != value;
+                const hasPreferenceChanged = !isNewPreference && preferencesByKey[key].value != value;
 
                 if(isNewPreference || hasPreferenceChanged) {
                     const preference = {
