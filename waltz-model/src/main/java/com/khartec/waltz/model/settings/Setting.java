@@ -32,6 +32,10 @@ import java.util.Optional;
 public abstract class Setting implements NameProvider {
 
     public abstract Optional<String> value();
-    public abstract boolean restricted();
+
+    @Value.Default
+    public boolean restricted() {
+        return false;
+    }
 
 }
