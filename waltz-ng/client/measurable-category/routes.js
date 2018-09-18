@@ -1,5 +1,5 @@
+import _ from "lodash";
 import ListView from "./pages/list/measurable-category-list.js";
-import {CORE_API} from "../common/services/core-api-utils";
 import {lastViewedMeasurableCategoryKey} from "../user/services/user-preference-service";
 
 
