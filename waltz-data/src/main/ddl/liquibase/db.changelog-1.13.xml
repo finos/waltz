@@ -58,4 +58,22 @@
         </insert>
     </changeSet>
 
+
+    <!-- 3381 - make flow_diagram.description nullable -->
+    <changeSet author="kamransaleem"
+               id="20180913-3381-1">
+        <dropNotNullConstraint columnDataType="${description.type}"
+                               columnName="description"
+                               tableName="flow_diagram" />
+    </changeSet>
+
+    <changeSet author="kamransaleem"
+               id="20180913-3381-2">
+        <sql>
+            UPDATE flow_diagram
+            SET description = NULL
+            WHERE description = ''
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
