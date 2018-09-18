@@ -1,5 +1,5 @@
+import _ from "lodash";
 import ListView from "./pages/list/measurable-category-list.js";
-import {CORE_API} from "../common/services/core-api-utils";
 import {lastViewedMeasurableCategoryKey} from "../user/services/user-preference-service";
 
 
@@ -14,7 +14,7 @@ function bouncer($state, $stateParams, userPreferenceService, settingsService) {
         .loadPreferences(true)
         .then(prefs => {
             const lastCategory = prefs[lastViewedMeasurableCategoryKey];
-            if (lastCategory.value > 0) {
+            if (_.get(lastCategory, "value", 0) > 0) {
                 go(lastCategory.value);
             } else {
                 attemptToRouteViaServerSetting();
