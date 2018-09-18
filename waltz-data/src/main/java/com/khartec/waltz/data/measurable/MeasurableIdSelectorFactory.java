@@ -83,8 +83,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         return mkBaseRatingBasedSelector()
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector)
-                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID))
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)));
     }
 
 
@@ -92,8 +91,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
         return mkBaseRatingBasedSelector()
                 .innerJoin(APPLICATION_GROUP_ENTRY)
-                .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID)
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID))
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
     }
 
@@ -145,7 +143,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
                 .innerJoin(MEASURABLE_RATING)
                 .on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 
