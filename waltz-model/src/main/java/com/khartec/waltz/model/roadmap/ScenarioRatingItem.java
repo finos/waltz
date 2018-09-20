@@ -12,6 +12,7 @@ public abstract class ScenarioRatingItem {
 
     public abstract long scenarioId();
     public abstract char rating();
+    public abstract EntityReference item();
     public abstract EntityReference row();
     public abstract EntityReference column();
 

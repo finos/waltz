@@ -83,7 +83,7 @@ export function drawColumnDividers(selection, layout) {
         .enter()
         .append("line")
         .classed(GRID_STYLES.columnDivider, true)
-        .attr("stroke", "#ddd")
+        .attr("stroke", "#eee")
         .attr("stroke-width", 2);
 
     colDividers
@@ -118,9 +118,13 @@ export function drawRowDividers(selection, layout) {
 
     const calcY = (d, i) => layout.cumulativeRowHeights[i] * CELL_DIMENSIONS.height + (i * ROW_DIMENSIONS.padding) + ROW_DIMENSIONS.padding / 2;
 
+    const columnPadding = ROW_CELL_DIMENSIONS.padding * layout.colCount;
+    const columnWidth = _.sum(layout.colWidths) * CELL_DIMENSIONS.width;
+    const dividerWidth = columnWidth + columnPadding;
+
     dividers
         .merge(newDividers)
-        .attr("x2", _.sum(layout.colWidths) * CELL_DIMENSIONS.width)
+        .attr("x2", dividerWidth)
         .attr("y1", calcY)
         .attr("y2", calcY);
 }

@@ -19,7 +19,7 @@ public class RoadmapService {
             .name("R1")
             .columnType(EntityReference.mkRef(EntityKind.MEASURABLE_CATEGORY, 1))
             .rowType(EntityReference.mkRef(EntityKind.MEASURABLE_CATEGORY, 2))
-            .description("r1 desc")
+            .description("row1 desc")
             .ratingSchemeId(1)
             .lastUpdatedBy("admin")
             .lastUpdatedAt(DateTimeUtilities.nowUtc())

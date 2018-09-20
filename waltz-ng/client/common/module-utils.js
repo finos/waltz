@@ -23,7 +23,7 @@ import {
 } from "./checks";
 
 export const registerComponent = (module, componentDefinition) => {
-    ensureNotNull(module, 'must provide a module');
+    ensureNotNull(module, "must provide a module");
     checkIsComponentDefinition(componentDefinition);
 
     module.component(componentDefinition.id, componentDefinition.component);
@@ -36,7 +36,7 @@ export const registerComponents = (module, componentDefinitions = []) => {
 
 
 export const registerStore = (module, storeDefinition) => {
-    ensureNotNull(module, 'must provide a module');
+    ensureNotNull(module, "must provide a module");
     checkIsStoreDefinition(storeDefinition);
 
     module.service(storeDefinition.serviceName, storeDefinition.store);
@@ -44,13 +44,13 @@ export const registerStore = (module, storeDefinition) => {
 
 
 export const registerStores = (module, storeDefinitions = []) => {
-    checkIsArray(storeDefinitions, 'store definitions must be an array');
+    checkIsArray(storeDefinitions, "store definitions must be an array");
     storeDefinitions.forEach(storeDefinition => registerStore(module, storeDefinition));
 };
 
 
 export const registerService = (module, serviceDefinition) => {
-    ensureNotNull(module, 'must provide a module');
+    ensureNotNull(module, "must provide a module");
     checkIsServiceDefinition(serviceDefinition);
 
     module.service(serviceDefinition.serviceName, serviceDefinition.service);

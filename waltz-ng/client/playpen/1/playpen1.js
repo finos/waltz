@@ -18,25 +18,66 @@
  */
 
 
-import _ from 'lodash';
-import template from './playpen1.html';
-import {select} from "d3-selection";
+import _ from "lodash";
+import template from "./playpen1.html";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {initialiseData} from "../../common";
+import {
+    mkRandomMeasurable,
+    mkRandomRowData,
+    prepareData
+} from "../../roadmap/components/roadmap-diagram/roadmap-diagram-data-utils";
 
 const initData = {
 
 
 };
 
-
-function controller($element) {
+function mkDemoData(colCount, rowCount) {
+    return {
+        rowData: _.times(rowCount, () => mkRandomRowData(colCount)),
+        columnHeadings: _.times(colCount, i => mkRandomMeasurable(i, "col")),
+        rowHeadings: _.times(rowCount, i => mkRandomMeasurable(i, "row"))
+    }
 }
 
-controller.$inject = ['$element', 'ServiceBroker'];
+
+function controller($element, $q, serviceBroker) {
+
+    const vm = initialiseData(this, initData);
+
+
+    vm.$onInit = () => {
+        const scenarioPromise = serviceBroker
+            .loadViewData(CORE_API.RoadmapStore.getScenarioById, [1, 1])
+            .then(r => vm.scenarioDefn = r.data);
+
+        const applicationPromise = scenarioPromise
+            .then(() => _.map(vm.scenarioDefn.ratings, r => r.item.id))
+            .then(appIds => serviceBroker.loadViewData(CORE_API.ApplicationStore.findByIds, [ appIds ]))
+            .then(r => vm.applications = r.data);
+
+        const measurablePromise = scenarioPromise
+            .then(() => serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll))
+            .then(r => {
+                const requiredMeasurableIds = _.map(vm.scenarioDefn.axisDefinitions, d => d.item.id);
+                vm.measurables = _.filter(r.data, m => _.includes(requiredMeasurableIds, m.id));
+            });
+
+        $q.all([scenarioPromise, applicationPromise, measurablePromise])
+            .then(() => vm.realData = prepareData(vm.scenarioDefn, vm.applications, vm.measurables));
+
+        vm.demoData = mkDemoData(3, 4);
+        global.vm = vm;
+    }
+}
+
+controller.$inject = ["$element", "$q", "ServiceBroker"];
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

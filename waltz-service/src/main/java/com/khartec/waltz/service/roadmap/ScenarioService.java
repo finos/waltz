@@ -11,7 +11,7 @@ import java.util.Collection;
 @Service
 public class ScenarioService {
 
-    static Scenario s1 = ImmutableScenario
+    static Scenario exampleScenario = ImmutableScenario
             .builder()
             .id(1L)
             .name("2020 Hard Brexit")
@@ -21,11 +21,11 @@ public class ScenarioService {
             .build();
 
     public Scenario getById(long id) {
-        return s1;
+        return exampleScenario;
     }
 
     public Collection<Scenario> findForRoadmapId(long roadmapId) {
-        return ListUtilities.newArrayList(s1);
+        return ListUtilities.newArrayList(exampleScenario);
     }
 
 }

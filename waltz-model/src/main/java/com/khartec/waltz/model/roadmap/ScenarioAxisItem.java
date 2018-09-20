@@ -15,4 +15,5 @@ public abstract class ScenarioAxisItem implements
     public abstract long scenarioId();
     public abstract EntityReference item();
     public abstract int order();
+    public abstract AxisKind axisKind();
 }

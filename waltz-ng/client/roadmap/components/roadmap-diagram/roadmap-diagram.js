@@ -20,18 +20,25 @@
 import {initialiseData} from "../../../common";
 import template from "./roadmap-diagram.html";
 import {select} from "d3-selection";
-import {createGroupElements} from "../../../common/d3-utils";
+import {createGroupElements, responsivefy} from "../../../common/d3-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkRatingSchemeColorScale} from "../../../common/colors";
+import {filterData, mkRandomMeasurable, mkRandomRowData} from "./roadmap-diagram-data-utils";
 import {setupZoom} from "./roadmap-diagram-utils";
-import {draw} from "./roadmap-diagram-render";
+import _ from "lodash";
+import {drawGrid, gridLayout} from "./roadmap-diagram-grid-utils";
+import {columnAxisHeight, drawAxis, rowAxisWidth} from "./roadmap-diagram-axis-utils";
 
 
 const bindings = {
-    parentEntityRef: "<",
-    scope: "@"
+    rowData: "<",
+    rowHeadings: "<",
+    columnHeadings: "<"
 };
 
 
-const initialState = {};
+const initialState = {
+};
 
 
 function setupGroupElements($element) {
@@ -40,9 +47,28 @@ function setupGroupElements($element) {
         {
             name: "holder",
             children: [
-                { name: "grid", children: [ { name: "gridContent" }] },
-                { name: "columns", children: [ { name: "columnHeaders" }] },
-                { name: "rowGroups", children: [ { name: "rowGroupHeaders" }]  }
+                {
+                    name: "gridHolder",
+                    attrs: {
+                        "clip-path": "url(#grid-clip)",
+                        "transform": `translate(${rowAxisWidth} ${columnAxisHeight})`
+                    },
+                    children: [ { name: "gridContent" } ]
+                }, {
+                    name: "columnAxisHolder",
+                    attrs: {
+                        "clip-path": "url(#column-clip)",
+                        "transform": `translate(${rowAxisWidth} 0)`
+                    },
+                    children: [ { name: "columnAxisContent" }]
+                }, {
+                    name: "rowAxisHolder",
+                    attrs: {
+                        "clip-path": "url(#row-clip)",
+                        "transform": `translate(0 ${columnAxisHeight})`
+                    },
+                    children: [ { name: "rowAxisContent" } ]
+                }
             ]
         }
     ];
@@ -50,104 +76,56 @@ function setupGroupElements($element) {
 }
 
 
-function controller($element) {
-    const vm = initialiseData(this, initialState);
+function draw(dataWithLayout, svgGroups, colorScheme) {
+    console.log("draw", dataWithLayout);
+    drawGrid(svgGroups.gridContent, dataWithLayout, colorScheme);
+    drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
+}
 
+
+function controller($element, serviceBroker) {
+    const vm = initialiseData(this, initialState);
     let svgGroups = null;
+    let destructorFn = null;
 
     function redraw() {
-        if (svgGroups) {
-            draw(
-                svgGroups,
-                gridDefn);
+        const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
+        if (svgGroups && colorScheme) {
+            const filteredData = filterData(vm.rowData, vm.qry);
+            const dataWithLayout = gridLayout(filteredData, vm.columnHeadings, vm.rowHeadings, { cols: 3 });
+            draw(dataWithLayout, svgGroups, colorScheme);
         }
     }
 
     vm.$onInit = () => {
         svgGroups = setupGroupElements($element);
+
         setupZoom(svgGroups);
+        destructorFn = responsivefy(svgGroups.svg);
+        serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemes = r.data)
+            .then(redraw);
+    };
+
+    vm.$onDestroy = () => {
+        if (destructorFn) {
+            destructorFn();
+        }
+    };
+
+    vm.doSearch = () => {
         redraw();
     };
 
-    vm.$onChanges = (changes) => {
+    vm.$onChanges = () => {
         console.log("roadmap-diagram changes - parentEntityRef: ", vm.parentEntityRef);
         redraw();
     };
-
-
-    // --- play
-
-    const columns = [];
-    const rowGroups = [];
-    const gridDefn = { columns, rowGroups };
-
-    let ctr = 10;
-    let rg = null;
-
-    function addRow() {
-        ctr++;
-        const name = (ctr % 2 ? "row definition " : "row def") + ctr;
-        const newElem  = {
-            id: ctr,
-            datum: { name }
-        };
-        rg.rows.push(newElem);
-    }
-
-
-    function addCol() {
-        ctr++;
-        const name = (ctr % 2 ? "column definition " : "col def") + ctr;
-        const newElem  = {
-            id: ctr,
-            datum: { name }
-        };
-        columns.push(newElem);
-    }
-
-
-    function addRowGroup() {
-        ctr++;
-        const name = (ctr % 2 ? "row group definition " : "row grp") + ctr;
-        rg = {
-            id: ctr,
-            datum: { name },
-            rows: []
-        };
-        rowGroups.push(rg);
-    }
-
-
-    vm.onAddRow = () => {
-        addRow();
-        redraw();
-    };
-
-
-    vm.onAddCol = () => {
-        addCol();
-        redraw();
-    };
-
-
-    vm.onAddRowGroup = () => {
-        addRowGroup();
-        redraw();
-    };
-
-
-    // setup sample data
-    addCol();addCol();addCol();
-    addRowGroup();addRow();addRow();
-    addRowGroup();
-    addRowGroup();addRow();
-    addRowGroup();addRow();
-    addRowGroup();addRow();addRow();addRow();addRow();
-
 }
 
 
-controller.$inject = ["$element"];
+controller.$inject = ["$element", "ServiceBroker"];
 
 
 const component = {

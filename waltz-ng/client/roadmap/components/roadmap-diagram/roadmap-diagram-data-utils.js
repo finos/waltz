@@ -10,8 +10,10 @@ export function filterData(data, qry) {
         return origData;
     }
 
+    qry = qry.toLowerCase();
+
     const nodeMatchFn = n => {
-        return n.searchTargetStr.indexOf(qry) > -1;
+        return _.get(n, ["searchTargetStr"], "").indexOf(qry) > -1;
     };
 
     const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
@@ -35,6 +37,89 @@ export function enrichDatumWithSearchTargetString(datum) {
 
     return Object.assign({}, datum, { searchTargetStr });
 }
+
+
+function prepareAxisHeadings(scenarioDefinition, measurablesById) {
+    const axisHeadings = _.chain(scenarioDefinition.axisDefinitions)
+        .map(d => {
+            const measurable = measurablesById[d.item.id];
+            return {
+                id: measurable.id,
+                name: measurable.name,
+                description: measurable.description,
+                axisKind: d.axisKind,
+                order: d.order,
+                data: measurable
+            };
+        })
+        .orderBy(d => d.order)
+        .groupBy(d => d.axisKind)
+        .value();
+    return axisHeadings;
+}
+
+
+function toOffsets(headings) {
+    return _.reduce(headings, (acc, d, idx) => {
+        acc[d.id] = idx;
+        return acc;
+    }, {});
+}
+
+
+export function prepareData(scenarioDefinition, applications = [], measurables = []) {
+    console.log("prepareData", {scenarioDefinition, applications, measurables});
+
+    const applicationsById = _.keyBy(applications, "id");
+    const measurablesById = _.keyBy(measurables, "id");
+    const axisHeadings = prepareAxisHeadings(scenarioDefinition, measurablesById);
+
+    const columnHeadings = axisHeadings["COLUMN"];
+    const rowHeadings = axisHeadings["ROW"];
+
+    const colOffsets = toOffsets(columnHeadings);
+    const rowOffsets = toOffsets(rowHeadings);
+
+    const baseRowData = _.times(rowHeadings.length, () => _.times(columnHeadings.length, () => []));
+
+    const rowData = _.reduce(scenarioDefinition.ratings, (acc, d) => {
+        const rowId = d.row.id;
+        const columnId = d.column.id;
+        const appId = d.item.id;
+        const id = appId + "_" + rowId + "_" + columnId;
+
+        const app = applicationsById[appId];
+
+        const rowOffset = rowOffsets[rowId];
+        const colOffset = colOffsets[columnId];
+
+        const row = acc[rowOffset] || [];
+        const col = row[colOffset] || [];
+
+        const nodeData = {
+            id ,
+            node: Object.assign({}, app, { externalId: app.assetCode }),
+            state: {
+                rating: d.rating
+            },
+            searchTargetStr: `${app.name} ${app.assetCode}`.toLowerCase()
+        };
+
+        const newCol = _.concat(col, [ nodeData ]);
+
+        row[colOffset] = newCol;
+        acc[rowOffset] = row;
+
+        return acc;
+    }, baseRowData);
+
+    return {
+        columnHeadings,
+        rowHeadings,
+        rowData
+    };
+}
+
 
 
 // --- TEST DATA GENERATORS
