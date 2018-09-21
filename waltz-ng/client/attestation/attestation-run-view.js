@@ -77,11 +77,6 @@ function prepareColumnDefs() {
     const initialCols = [
         mkEntityLinkGridCell('Subject', 'parentEntity'),
         {
-            field: 'childEntityKind',
-            name: 'Kind',
-            cellFilter: "toDisplayName:'entity'"
-        },
-        {
             field: 'rating',
             name: 'Status',
             cellTemplate: ratingCellTemplate,

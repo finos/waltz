@@ -22,12 +22,15 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import * as attestationInstanceStore from './services/attestation-instance-store';
 import attestationRunStore from './services/attestation-run-store';
 import attestationConfirmation from './components/confirmation/attestation-confirmation';
+import attestedKind from './components/attested-kind/attested-kind';
 import attestationRunOverview from './components/run-overview/attestation-run-overview';
 import attestationRecipients from './components/recipients/attestation-recipients';
 import attestationSection from './components/section/attestation-section';
 import inlineLogicalFlowPanel from './components/inline-logical-flow-panel/inline-logical-flow-panel';
+import inlineMeasurableRating from './components/inline-measurable-rating-panel/inline-measurable-rating-panel';
 import inlinePhysicalFlowPanel from './components/inline-physical-flow-panel/inline-physical-flow-panel';
 import routes from './routes';
+
 
 export default () => {
     const module = angular.module('waltz.attestation', []);
@@ -42,10 +45,12 @@ export default () => {
 
     registerComponents(module, [
         attestationConfirmation,
+        attestedKind,
         attestationRunOverview,
         attestationRecipients,
         attestationSection,
         inlineLogicalFlowPanel,
+        inlineMeasurableRating,
         inlinePhysicalFlowPanel
     ]);
 

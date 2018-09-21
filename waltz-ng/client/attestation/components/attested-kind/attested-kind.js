@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,36 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, invokeFunction} from '../../../common/index';
-
-import template from './attestation-confirmation.html';
+import template from './attested-kind.html';
 
 
 const bindings = {
-    instance: '<',
-    run: '<',
-    attestedEntityRef: '<?',
-    onConfirm: '<',
-    onCancel: '<'
-};
-
-
-const initialState = {
-    onConfirm: (attestation) => console.log('default onConfirm handler for attestation-confirmation: '+ instance),
-    onCancel: () => console.log('default onCancel handler for attestation-confirmation')
+    run: '<'
 };
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
-
-    vm.confirm = (attestation) => {
-        invokeFunction(vm.onConfirm, attestation);
-    };
-
-    vm.cancel = () => {
-        invokeFunction(vm.onCancel);
-    };
 }
 
 
@@ -56,12 +35,11 @@ controller.$inject = [];
 const component = {
     template,
     bindings,
-    controller,
-    transclude: true
+    controller
 };
 
 
 export default {
     component,
-    id: 'waltzAttestationConfirmation'
+    id: 'waltzAttestedKind'
 };

@@ -58,4 +58,233 @@
         </insert>
     </changeSet>
 
+
+    <!-- 3273: Attestation run - include attested kind and id -->
+    <changeSet id="20180913-3273-1"
+               author="kamransaleem">
+        <comment>3273: Attestation run - include attested kind and id</comment>
+        <addColumn tableName="attestation_run">
+            <column name="attested_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180913-3273-2"
+               author="kamransaleem">
+        <comment>3273: Attestation run - include attested kind and id</comment>
+        <addColumn tableName="attestation_run">
+            <column name="attested_entity_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180913-3273-3a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3273: Attestation run - migrate the existing runs</comment>
+        <sql>
+            -- Build the table of runs which target more than one kind
+            SELECT *
+            INTO #doubleAttRuns
+            FROM (
+                SELECT attestation_run_id
+                from (SELECT DISTINCT  attestation_run_id, child_entity_kind from attestation_instance) a
+                GROUP BY attestation_run_id
+                HAVING count(*) > 1
+            ) as x
+
+
+            -- Update the existing runs to attested kind logical flow
+            UPDATE attestation_run
+            SET attested_entity_kind = 'LOGICAL_DATA_FLOW'
+            WHERE attested_entity_kind IS NULL
+            AND id in (SELECT * FROM #doubleAttRuns)
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20180913-3273-3b"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>3273: Attestation run - migrate the existing runs</comment>
+        <sql>
+            -- Build the table of runs which target more than one kind
+            CREATE TEMPORARY TABLE IF NOT EXISTS doubleAttRuns AS
+            (
+                SELECT attestation_run_id
+                from (SELECT DISTINCT  attestation_run_id, child_entity_kind from attestation_instance) a
+                GROUP BY attestation_run_id
+                HAVING count(*) > 1
+            );
+
+            -- Update the existing runs to attested kind logical flow
+            UPDATE attestation_run
+            SET attested_entity_kind = 'LOGICAL_DATA_FLOW'
+            WHERE attested_entity_kind IS NULL
+            AND id in (SELECT * FROM doubleAttRuns);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-4"
+               author="kamransaleem">
+        <comment>3273: Attestation run - add old_id for new runs</comment>
+        <addColumn tableName="attestation_run">
+            <column name="old_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180913-3273-5a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3273: Attestation run - add old_id for new runs</comment>
+        <sql>
+            -- Create new runs with old ids
+            INSERT INTO attestation_run(target_entity_kind,
+                                        name,
+                                        description,
+                                        selector_entity_kind,
+                                        selector_entity_id,
+                                        selector_hierarchy_scope,
+                                        involvement_kind_ids,
+                                        issued_by,
+                                        issued_on,
+                                        due_date,
+                                        attested_entity_kind,
+                                        attested_entity_id,
+                                        old_id)
+            SELECT
+                target_entity_kind,
+                name,
+                description,
+                selector_entity_kind,
+                selector_entity_id,
+                selector_hierarchy_scope,
+                involvement_kind_ids,
+                issued_by,
+                issued_on,
+                due_date,
+                'PHYSICAL_FLOW',
+                null,
+                id
+            FROM attestation_run
+            WHERE id in (SELECT * FROM #doubleAttRuns)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-5b"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>3273: Attestation run - add old_id for new runs</comment>
+        <sql>
+            -- Create new runs with old ids
+            INSERT INTO attestation_run(target_entity_kind,
+                                        name,
+                                        description,
+                                        selector_entity_kind,
+                                        selector_entity_id,
+                                        selector_hierarchy_scope,
+                                        involvement_kind_ids,
+                                        issued_by,
+                                        issued_on,
+                                        due_date,
+                                        attested_entity_kind,
+                                        attested_entity_id,
+                                        old_id)
+            SELECT
+                target_entity_kind,
+                name,
+                description,
+                selector_entity_kind,
+                selector_entity_id,
+                selector_hierarchy_scope,
+                involvement_kind_ids,
+                issued_by,
+                issued_on,
+                due_date,
+                'PHYSICAL_FLOW',
+                null,
+                id
+            FROM attestation_run
+            WHERE id in (SELECT * FROM doubleAttRuns)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-6a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3273: Attestation run - add old_id for new runs</comment>
+        <sql>
+            -- Update the existing physical attestations which have an id in the doubles temp table
+            -- with the new run id
+            UPDATE ai
+            SET ai.attestation_run_id = ar.id
+            FROM attestation_instance ai
+            JOIN attestation_run ar on ar.old_id = ai.attestation_run_id
+            WHERE ai.attestation_run_id in (SELECT * FROM #doubleAttRuns)
+            AND ai.child_entity_kind = 'PHYSICAL_FLOW'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-6b"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>3273: Attestation run - add old_id for new runs</comment>
+        <sql>
+            -- Update the existing physical attestations which have an id in the doubles temp table
+            -- with the new run id
+            UPDATE attestation_instance ai
+            INNER JOIN attestation_run ar ON ar.old_id = ai.attestation_run_id
+            SET ai.attestation_run_id = ar.id
+            WHERE ai.attestation_run_id IN (SELECT * FROM doubleAttRuns) AND ai.child_entity_kind = 'PHYSICAL_FLOW'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-6"
+               author="kamransaleem">
+        <comment>3273: Attestation run - cleanup - drop old_id column</comment>
+        <dropColumn tableName="attestation_run"
+                    columnName="old_id" />
+    </changeSet>
+
+    <changeSet id="20180913-3273-7a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3273: Attestation run - cleanup - drop temp table</comment>
+        <sql>
+            IF OBJECT_ID('tempdb..#doubleAttRuns') IS NOT NULL DROP TABLE #doubleAttRuns
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-7b"
+               author="kamransaleem"
+               dbms="mysql">
+        <comment>3273: Attestation run - cleanup - drop temp table</comment>
+        <sql>
+            DROP TEMPORARY TABLE IF EXISTS doubleAttRuns
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180913-3273-8"
+               author="kamransaleem">
+        <comment>3273: Attestation Instance - drop child kind column</comment>
+        <dropColumn tableName="attestation_instance"
+                    columnName="child_entity_kind" />
+    </changeSet>
+
+    <changeSet id="20180913-3273-9"
+               author="kamransaleem">
+        <comment>3273: Attestation Run - make attested_entity_kind non-nullable</comment>
+        <addNotNullConstraint columnDataType="${enum.type}"
+                              columnName="attested_entity_kind"
+                              tableName="attestation_run"/>
+    </changeSet>
+
+
 </databaseChangeLog>

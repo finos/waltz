@@ -17,6 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
+import { mergeKeyedLists, toGroupedMap } from '../common/map-utils';
 
 
 export function mkTabs(categories = [],
@@ -54,3 +55,24 @@ export function determineStartingTab(tabs = []) {
 }
 
 
+export function mkOverridesMap(perspectiveRatings = [], measurables = []) {
+    const ratings = _.map(perspectiveRatings, 'value');
+    const measurablesById = _.keyBy(measurables, 'id');
+
+    const byX = toGroupedMap(
+        ratings,
+        r => r.measurableX,
+        r => ({
+            measurable: measurablesById[r.measurableY],
+            rating: r.rating
+        }));
+    const byY = toGroupedMap(
+        ratings,
+        r => r.measurableY,
+        r => ({
+            measurable: measurablesById[r.measurableX],
+            rating: r.rating
+        }));
+
+    return mergeKeyedLists(byX, byY);
+}

@@ -25,6 +25,7 @@ import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -37,6 +38,9 @@ public abstract class AttestationRun implements IdProvider, NameProvider, Descri
     public abstract EntityKind targetEntityKind();
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
+
+    public abstract EntityKind attestedEntityKind();
+    public abstract Optional<EntityReference> attestedEntityRef();
 
     public abstract String issuedBy();
 

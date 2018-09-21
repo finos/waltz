@@ -33,6 +33,16 @@
             <div class="row">
                 <div class="col-sm-3">
 
+                    <!-- Attested Ref -->
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Attested entity
+                        </div>
+                        <div class="col-sm-8">
+                            <waltz-attested-kind run="run"></waltz-attested-kind>
+                        </div>
+                    </div>
+
                     <!-- Description -->
                     <div class="row">
                         <div class="col-sm-4 waltz-display-field-label">
@@ -120,15 +130,16 @@
                             <td>
                                 <a class="btn btn-primary btn-xs"
                                    ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance"
-                                   ng-bind="'Attest ' + (instance.childEntityKind | toDisplayName:'entity' | lowercase)+'s'"
                                    ng-click="ctrl.selectedAttestation = instance">
+                                    Attest <waltz-attested-kind run="run"></waltz-attested-kind>
                                 </a>
                                 <div ng-if="instance.attestedAt"
                                      class="wailuv-attested">
                                     <waltz-icon name="check"
                                                 size="lg">
                                     </waltz-icon>
-                                    <span ng-bind="(instance.childEntityKind | toDisplayName:'entity')+'s'">
+                                    <span>
+                                        <waltz-attested-kind run="run"></waltz-attested-kind>
                                     </span>
                                 </div>
                             </td>
@@ -138,14 +149,25 @@
                             <td colspan="3"
                                 style="padding-right: 3em; border-top: none">
                                 <waltz-attestation-confirmation instance="ctrl.selectedAttestation"
+                                                                run="run"
+                                                                attested-entity-ref="run.attestedEntityRef"
                                                                 on-confirm="ctrl.attestEntity"
-                                                                on-cancel="ctrl.cancelAttestation">
-                                    <waltz-inline-logical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                      ng-if="ctrl.selectedAttestation.childEntityKind === 'LOGICAL_DATA_FLOW'">
+                                                                on-cancel="ctrl.cancelAttestation"
+                                                                ng-switch="run.attestedEntityKind">
+
+                                    <waltz-inline-logical-flow-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
+                                                                     ng-switch-when="LOGICAL_DATA_FLOW">
                                     </waltz-inline-logical-flow-panel>
-                                    <waltz-inline-physical-flow-panel  parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                       ng-if="ctrl.selectedAttestation.childEntityKind === 'PHYSICAL_FLOW'">
+
+                                    <waltz-inline-physical-flow-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
+                                                                      ng-switch-when="PHYSICAL_FLOW">
                                     </waltz-inline-physical-flow-panel>
+
+                                    <waltz-inline-measurable-rating-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
+                                                                          measurable-category-ref="run.attestedEntityRef"
+                                                                          ng-switch-when="MEASURABLE_CATEGORY">
+                                    </waltz-inline-measurable-rating-panel>
+
                                 </waltz-attestation-confirmation>
                             </td>
                         </tr>
