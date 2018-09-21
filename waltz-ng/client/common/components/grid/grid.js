@@ -18,19 +18,20 @@
  */
 
 import {initialiseData} from "../../../common";
-import template from './grid.html';
+import template from "./grid.html";
 
 
 const bindings = {
-    columnDefs: '<',
-    rowData: '<',
-    rowTemplate: '<',
-    onInitialise: '<',
-    scopeProvider: '<?'
+    columnDefs: "<",
+    rowData: "<",
+    rowTemplate: "<",
+    onInitialise: "<",
+    scopeProvider: "<?",
+    onRowSelect: "<"
 };
 
 
-const exportDataSeparator = ',';
+const exportDataSeparator = ",";
 
 
 const initialState = {
@@ -40,15 +41,55 @@ const initialState = {
     rowTemplate: null,
     scopeProvider: null,
     onInitialise: (e) => {}
-};
+  };
 
 
 function controller(uiGridExporterConstants,
                     uiGridExporterService) {
     const vm = initialiseData(this, initialState);
 
+    vm.$onInit = () => {
+        vm.gridOptions = {
+            appScopeProvider: vm.scopeProvider,
+            columnDefs: vm.columnDefs,
+            data: vm.rowData,
+            enableColumnMenus: false,
+            enableGridMenu: false,
+            minRowsToShow: vm.minRowsToShow,
+            enableRowHeaderSelection: false,
+            enableRowSelection: vm.onRowSelect ? true: false,
+            onRegisterApi: function(gridApi){
+                vm.gridApi = gridApi;
+                vm.onInitialise({
+                    exportFn: vm.exportData,
+                    gridApi: vm.gridApi
+                });
+
+                if (vm.onRowSelect) {
+                    gridApi.selection.setMultiSelect(false);
+                    gridApi.selection.toggleRowSelection(true);
+                    gridApi.selection.on.rowSelectionChanged(null, function(row){
+                        vm.onRowSelect(_.first(gridApi.selection.getSelectedRows()));
+                    });
+
+                }
+
+            },
+            exporterFieldCallback: function (grid, row, col, input) {
+                const formatter = col.colDef.exportFormatter;
+                return formatter
+                    ? formatter(input)
+                    : input;
+            },
+            rowTemplate: vm.rowTemplate
+        };
+    };
+
+
     vm.$onChanges = (changes) => {
-        if(changes.columnDefs) {
+        if (! vm.gridOptions) return;
+
+        if (changes.columnDefs) {
             vm.gridOptions.columnDefs = vm.columnDefs;
         }
 
@@ -56,7 +97,7 @@ function controller(uiGridExporterConstants,
         vm.gridOptions.data = vm.rowData;
     };
 
-    vm.exportData = (fileName = 'download.csv') => {
+    vm.exportData = (fileName = "download.csv") => {
         const grid = vm.gridApi.grid;
         const rowVisibility = uiGridExporterConstants.ALL;
         const colVisibility = uiGridExporterConstants.ALL;
@@ -73,35 +114,15 @@ function controller(uiGridExporterConstants,
             });
     };
 
-    vm.gridOptions = {
-        appScopeProvider: vm.scopeProvider,
-        columnDefs: vm.columnDefs,
-        data: vm.rowData,
-        enableGridMenu: false,
-        enableColumnMenus: false,
-        minRowsToShow: vm.minRowsToShow,
-        onRegisterApi: function(gridApi){
-            vm.gridApi = gridApi;
-            vm.onInitialise({
-                exportFn: vm.exportData,
-                gridApi: vm.gridApi
-            });
-        },
-        exporterFieldCallback: function (grid, row, col, input) {
-            const formatter = col.colDef.exportFormatter;
-            return formatter
-                ? formatter(input)
-                : input;
-        },
-        rowTemplate: vm.rowTemplate
-    };
+
+
 
 }
 
 
 controller.$inject = [
-    'uiGridExporterConstants',
-    'uiGridExporterService'
+    "uiGridExporterConstants",
+    "uiGridExporterService"
 ];
 
 

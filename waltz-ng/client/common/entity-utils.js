@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from './checks';
+import {checkIsEntityRef} from "./checks";
 import {CORE_API} from "./services/core-api-utils";
 
-export function sameRef(r1, r2) {
-    checkIsEntityRef(r1);
-    checkIsEntityRef(r2);
+export function sameRef(r1, r2, options = { skipChecks: false }) {
+    if (! options.skipChecks) {
+        checkIsEntityRef(r1);
+        checkIsEntityRef(r2);
+    }
     return r1.kind === r2.kind && r1.id === r2.id;
 }
 
@@ -34,7 +36,7 @@ export function refToString(r) {
 
 
 export function stringToRef(s) {
-    const bits = s.split('/');
+    const bits = s.split("/");
     return {
         kind: bits[0],
         id: bits[1]
@@ -58,14 +60,15 @@ export function toEntityRef(obj, kind = obj.kind) {
 
 function determineLoadByIdCall(kind) {
     switch (kind) {
-        case 'APPLICATION':
+        case "APPLICATION":
             return CORE_API.ApplicationStore.getById;
-        case 'ACTOR':
+        case "ACTOR":
             return CORE_API.ActorStore.getById;
         default:
             throw "Unsupported kind for loadEntity: " + kind;
     }
 }
+
 
 export function loadEntity(serviceBroker, entityRef) {
     checkIsEntityRef(entityRef);

@@ -23,6 +23,8 @@ import com.khartec.waltz.data.DBExecutorPool;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
 import com.khartec.waltz.model.WaltzVersionInfo;
+import com.khartec.waltz.model.settings.ImmutableSetting;
+import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.service.jmx.PersonMaintenance;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import com.zaxxer.hikari.HikariConfig;
@@ -46,6 +48,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 
 
 @Configuration
@@ -99,6 +106,8 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Value("${build.revision}")
     private String buildRevision;
 
+    @Value("${settings.override:#{null}}")
+    private String settingsOverrideStr;
 
     @Bean
     public DataSource dataSource() {
@@ -152,6 +161,17 @@ public class DIConfiguration implements SchedulingConfigurer {
                 dslSettings);
     }
 
+    @Bean
+    public Collection<Setting> settingOverrides() {
+        return Stream.of(mkSafe(settingsOverrideStr).split(";"))
+                .map(setting -> setting.split("="))
+                .filter(nv -> nv.length == 2)
+                .map(nv -> ImmutableSetting.builder()
+                        .name(nv[0])
+                        .value(nv[1])
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     /**
      * Required for property interpolation to work correctly

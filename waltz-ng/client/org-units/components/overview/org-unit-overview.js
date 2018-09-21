@@ -27,15 +27,15 @@ import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
+
 
 const initialState = {
     visibility: {
-        childDisplayMode: 'LIST'
+        childDisplayMode: "LIST"
     }
 };
-
 
 
 function controller(serviceBroker) {
@@ -44,7 +44,7 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'CHILDREN'
+            scope: "CHILDREN"
         };
 
         serviceBroker
@@ -80,18 +80,17 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.OrgUnitStore.findAll)
             .then(r => {
-                vm.orgUnits = populateParents(r.data);
-                vm.orgUnit = _.find(vm.orgUnits, { id: vm.parentEntityRef.id });
+                const orgUnits = populateParents(r.data, true);
+                vm.orgUnit = _.find(orgUnits, { id: vm.parentEntityRef.id });
                 vm.parentOrgUnits = _.reverse(getParents(vm.orgUnit));
-                vm.childOrgUnits = _.get(vm, 'orgUnit.children', []);
+                vm.childOrgUnits = _.get(vm, "orgUnit.children", []);
                 vm.descendantOrgUnitTree = switchToParentIds([ vm.orgUnit ]);
             });
     };
-
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 
 const component = {

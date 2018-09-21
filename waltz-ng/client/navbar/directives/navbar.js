@@ -24,16 +24,16 @@ import template from "./navbar.html";
 
 const navItems = [
     // { uiSref, icon, displayName, <role>, id }
-    { uiSref: 'main.org-unit.list', icon: 'sitemap', displayName: 'Org Units', id: 'navbar-org-units' },
-    { uiSref: 'main.person', icon: 'users', displayName: 'People', id: 'navbar-people' },
-    { uiSref: 'main.data-type.list', icon: 'qrcode', displayName: 'Data', id: 'navbar-data-types' },
-    { uiSref: 'main.measurable.list', icon: 'puzzle-piece', displayName: 'Other Viewpoints', id: 'navbar-measurables' },
+    { uiSref: "main.org-unit.list", icon: "sitemap", displayName: "Org Units", id: "navbar-org-units" },
+    { uiSref: "main.person", icon: "users", displayName: "People", id: "navbar-people" },
+    { uiSref: "main.data-type.list", icon: "qrcode", displayName: "Data", id: "navbar-data-types" },
+    { uiSref: "main.measurable-category.index", icon: "puzzle-piece", displayName: "Other Viewpoints", id: "navbar-measurables" },
 ];
 
 
 const initialState = {
-    logoOverlayText: '',
-    logoOverlayColor: '#444',
+    logoOverlayText: "",
+    logoOverlayColor: "#444",
     navItemsForRole: []
 };
 
@@ -64,17 +64,17 @@ function controller(settingsService, userService) {
 
 
 controller.$inject = [
-    'SettingsService',
-    'UserService'
+    "SettingsService",
+    "UserService"
 ];
 
 
 export default () => {
     return {
-        restrict: 'E',
+        restrict: "E",
         template,
         controller,
         scope: {},
-        controllerAs: 'ctrl'
+        controllerAs: "ctrl"
     };
 };

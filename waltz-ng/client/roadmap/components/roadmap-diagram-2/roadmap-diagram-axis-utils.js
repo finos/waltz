@@ -1,4 +1,5 @@
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
+import {NODE_DIMENSIONS} from "./roadmap-diagram-static-node-utils";
 
 export const rowAxisWidth = 150;
 export const columnAxisHeight = 50;
@@ -31,7 +32,7 @@ function drawRowHeaders(holder, headerData, layout) {
             const padding = ROW_DIMENSIONS.padding * i;
             const rowOffset = layout.cumulativeRowHeights[i] * CELL_DIMENSIONS.height;
             const actualRowHeight = layout.rowHeights[i] * CELL_DIMENSIONS.height;
-            return rowOffset + padding - actualRowHeight / 2;
+            return rowOffset + padding - actualRowHeight / 2 + NODE_DIMENSIONS.text.fontSize;
         });
 }
 

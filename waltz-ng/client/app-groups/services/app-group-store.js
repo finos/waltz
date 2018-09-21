@@ -66,6 +66,11 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const removeOwner = (id, ownerId) => $http
+        .delete(`${BASE}/id/${id}/members/owners/${ownerId}`)
+        .then(result => result.data);
+
+
     const deleteGroup = (id) => $http
         .delete(`${BASE}/id/${id}`)
         .then(result => result.data);
@@ -128,6 +133,7 @@ export function store($http, BaseApiUrl) {
         subscribe,
         unsubscribe,
         addOwner,
+        removeOwner,
 
         createNewGroup,
         deleteGroup,
@@ -202,7 +208,13 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'addOwner',
         description: 'executes addOwner'
-    },    createNewGroup: {
+    },
+    removeOwner: {
+        serviceName,
+        serviceFnName: 'removeOwner',
+        description: 'executes removeOwner'
+    },
+    createNewGroup: {
         serviceName,
         serviceFnName: 'createNewGroup',
         description: 'executes createNewGroup'

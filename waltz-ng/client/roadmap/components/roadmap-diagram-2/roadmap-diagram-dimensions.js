@@ -1,18 +1,6 @@
+import {NODE_DIMENSIONS} from "./roadmap-diagram-static-node-utils";
+
 const CELL_PADDING = 10;
-
-
-export const NODE_DIMENSIONS = {
-    width: 120,
-    height: 54,  // 3 * section.height
-    section: {
-        height: 18
-    },
-    text: {
-        dy: 12,
-        dx: 4,
-        fontSize: 12
-    }
-};
 
 
 export const CELL_DIMENSIONS = {
@@ -28,6 +16,6 @@ export const ROW_CELL_DIMENSIONS = {
 
 
 export const ROW_DIMENSIONS = {
-    padding: CELL_PADDING * 3,
+    padding: CELL_PADDING * 3
 };
 

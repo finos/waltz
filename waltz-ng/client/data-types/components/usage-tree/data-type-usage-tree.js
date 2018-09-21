@@ -72,9 +72,7 @@ function controller(serviceBroker) {
                     .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
                     .value();
 
-                const hierarchy = switchToParentIds(
-                    buildHierarchies(
-                        requiredDataTypes));
+                const hierarchy = buildHierarchies(requiredDataTypes, false);
 
                 vm.expandedNodes = requiredDataTypes;
                 vm.hierarchy = hierarchy;

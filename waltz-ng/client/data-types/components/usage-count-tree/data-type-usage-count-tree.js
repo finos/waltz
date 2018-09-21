@@ -57,7 +57,7 @@ function prepareTree(dataTypes = [], usageCounts = []) {
         })
         .value();
 
-    const hierarchy = switchToParentIds(buildHierarchies(_.values(dataTypesById)));
+    const hierarchy = buildHierarchies(_.values(dataTypesById), false);
 
     const sumBy = (rating, n) => {
         if (!n) return 0;
