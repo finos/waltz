@@ -1,12 +1,15 @@
 package com.khartec.waltz.service.roadmap;
 
+import com.khartec.waltz.data.roadmap.ScenarioAxisItemDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.roadmap.ImmutableScenarioAxisItem;
 import com.khartec.waltz.model.roadmap.ScenarioAxisItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.roadmap.AxisKind.COLUMN;
@@ -47,8 +50,17 @@ public class ScenarioAxisItemService {
             .withOrder(20);
 
 
+    private final ScenarioAxisItemDao scenarioAxisItemDao;
+
+    
+    @Autowired
+    public ScenarioAxisItemService(ScenarioAxisItemDao scenarioAxisItemDao) {
+        checkNotNull(scenarioAxisItemDao, "scenarioAxisItemDao cannot be null");
+        this.scenarioAxisItemDao = scenarioAxisItemDao;
+    }
+
     public Collection<ScenarioAxisItem> findForScenarioId(long scenarioId) {
-        return newArrayList(row1, row2, col1, col2);
+        return scenarioAxisItemDao.findForScenarioId(scenarioId);
     }
 
 

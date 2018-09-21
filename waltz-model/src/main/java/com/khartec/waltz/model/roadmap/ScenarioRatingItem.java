@@ -3,12 +3,14 @@ package com.khartec.waltz.model.roadmap;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.LastUpdatedProvider;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableScenarioRatingItem.class)
 @JsonDeserialize(as = ImmutableScenarioRatingItem.class)
-public abstract class ScenarioRatingItem {
+public abstract class ScenarioRatingItem implements
+        LastUpdatedProvider {
 
     public abstract long scenarioId();
     public abstract char rating();

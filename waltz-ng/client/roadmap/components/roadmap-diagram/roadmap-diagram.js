@@ -23,7 +23,7 @@ import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {filterData, mkRandomMeasurable, mkRandomRowData} from "./roadmap-diagram-data-utils";
+import {filterData} from "./roadmap-diagram-data-utils";
 import {setupZoom} from "./roadmap-diagram-utils";
 import _ from "lodash";
 import {drawGrid, gridLayout} from "./roadmap-diagram-grid-utils";
@@ -33,9 +33,15 @@ import {columnAxisHeight, drawAxis, rowAxisWidth} from "./roadmap-diagram-axis-u
 const bindings = {
     rowData: "<",
     rowHeadings: "<",
-    columnHeadings: "<"
+    columnHeadings: "<",
+    handlers: "<?"
 };
 
+const defaultHandlers = {
+    onNodeClick: (n) => console.log("WRD: NodeClick", n),
+    onRowCellClick: (rc) => console.log("WRD: RowCellClick", rc),
+    onRowClick: (r) => console.log("WRD: RowClick", r),
+};
 
 const initialState = {
 };
@@ -76,9 +82,9 @@ function setupGroupElements($element) {
 }
 
 
-function draw(dataWithLayout, svgGroups, colorScheme) {
+function draw(dataWithLayout, svgGroups, options) {
     console.log("draw", dataWithLayout);
-    drawGrid(svgGroups.gridContent, dataWithLayout, colorScheme);
+    drawGrid(svgGroups.gridContent, dataWithLayout, options);
     drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
 }
 
@@ -89,17 +95,27 @@ function controller($element, serviceBroker) {
     let destructorFn = null;
 
     function redraw() {
-        const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
-        if (svgGroups && colorScheme) {
+        const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
+        if (svgGroups && colorScale) {
             const filteredData = filterData(vm.rowData, vm.qry);
-            const dataWithLayout = gridLayout(filteredData, vm.columnHeadings, vm.rowHeadings, { cols: 3 });
-            draw(dataWithLayout, svgGroups, colorScheme);
+            const layoutOptions = { cols: 3 };
+            const dataWithLayout = gridLayout(
+                filteredData,
+                vm.columnHeadings,
+                vm.rowHeadings,
+                layoutOptions);
+
+            const drawingOptions = {
+                colorScale,
+                handlers: vm.handlers
+            };
+            draw(dataWithLayout, svgGroups, drawingOptions);
         }
     }
 
     vm.$onInit = () => {
+        vm.handlers = Object.assign({}, defaultHandlers, vm.handlers);
         svgGroups = setupGroupElements($element);
-
         setupZoom(svgGroups);
         destructorFn = responsivefy(svgGroups.svg);
         serviceBroker

@@ -111,4 +111,187 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 3398: Roadmaps -->
+
+    <changeSet id="20180920-3398-1"
+               author="davidwatkins73">
+        <comment>3398: Roadmap model objects - roadmap</comment>
+        <createTable tableName="roadmap">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="roadmap_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="row_type_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_scheme_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="row_type_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_type_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_type_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20180920-3398-2"
+               author="davidwatkins73">
+        <comment>3398: Roadmap model objects - scenario</comment>
+        <createTable tableName="scenario">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="scenario_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="lifecycle_status"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="roadmap_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20180920-3398-3"
+               author="davidwatkins73">
+        <comment>3398: Roadmap model objects - scenario axis item</comment>
+        <createTable tableName="scenario_axis_item">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="scenario_axis_item_pkey"/>
+            </column>
+            <column name="axis_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scenario_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20180920-3398-4"
+               author="davidwatkins73">
+        <comment>3398: Roadmap model objects - scenario rating item</comment>
+        <createTable tableName="scenario_rating_item">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="scenario_rating_item_pkey"/>
+            </column>
+            <column name="scenario_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating"
+                    type="${rag.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="row_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="row_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
 </databaseChangeLog>

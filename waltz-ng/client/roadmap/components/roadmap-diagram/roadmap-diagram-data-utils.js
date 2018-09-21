@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {isEmpty, randomPick} from "../../../common";
-
+import {toOffsetMap} from "../../../common/list-utils";
 
 
 export function filterData(data, qry) {
@@ -59,17 +59,10 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById) {
 }
 
 
-function toOffsets(headings) {
-    return _.reduce(headings, (acc, d, idx) => {
-        acc[d.id] = idx;
-        return acc;
-    }, {});
-}
+
 
 
 export function prepareData(scenarioDefinition, applications = [], measurables = []) {
-    console.log("prepareData", {scenarioDefinition, applications, measurables});
-
     const applicationsById = _.keyBy(applications, "id");
     const measurablesById = _.keyBy(measurables, "id");
     const axisHeadings = prepareAxisHeadings(scenarioDefinition, measurablesById);
@@ -77,8 +70,8 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
     const columnHeadings = axisHeadings["COLUMN"];
     const rowHeadings = axisHeadings["ROW"];
 
-    const colOffsets = toOffsets(columnHeadings);
-    const rowOffsets = toOffsets(rowHeadings);
+    const colOffsets = toOffsetMap(columnHeadings);
+    const rowOffsets = toOffsetMap(rowHeadings);
 
     const baseRowData = _.times(rowHeadings.length, () => _.times(columnHeadings.length, () => []));
 
@@ -86,7 +79,7 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
         const rowId = d.row.id;
         const columnId = d.column.id;
         const appId = d.item.id;
-        const id = appId + "_" + rowId + "_" + columnId;
+        const id = `${appId}_${rowId}_${columnId}`;
 
         const app = applicationsById[appId];
 

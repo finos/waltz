@@ -31,28 +31,31 @@ export const NODE_STYLES = {
 };
 
 
-export function drawUnit(selection, ratingColorScale) {
+export function drawUnit(selection, options) {
+
+    const colorScale = options.colorScale;
 
     selection
         .append("rect")
         .classed(NODE_STYLES.nodeCell, true)
         .attr("width", NODE_DIMENSIONS.width)
         .attr("height", NODE_DIMENSIONS.height)
-        .attr("stroke",  d => ratingColorScale(d.state.rating))
-        .attr("fill", d => ratingColorScale(d.state.rating).brighter(2.5));
+        .attr("stroke",  d => colorScale(d.state.rating))
+        .attr("fill", d => colorScale(d.state.rating).brighter(2.5));
 
     selection
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
-        .call(drawRatingIndicator, ratingColorScale);
+        .call(drawRatingIndicator, options);
 
     selection
-        .on("click", d => console.log("Click ", d));
+        .on("click", options.handlers.onNodeClick);
 }
 
 
-function drawRatingIndicator(selection, ratingColorScale) {
+function drawRatingIndicator(selection, options) {
 
+    const colorScale = options.colorScale;
     const w = (NODE_DIMENSIONS.width / 8);
     const h = NODE_DIMENSIONS.height;
 
@@ -61,8 +64,8 @@ function drawRatingIndicator(selection, ratingColorScale) {
         .classed(NODE_STYLES.nodeCellChangeIndicator, true)
         .attr("width", w)
         .attr("height", h)
-        .attr("fill", d => ratingColorScale(d.state.rating))
-        .attr("stroke",  d => ratingColorScale(d.state.rating));
+        .attr("fill", d => colorScale(d.state.rating))
+        .attr("stroke",  d => colorScale(d.state.rating));
 }
 
 

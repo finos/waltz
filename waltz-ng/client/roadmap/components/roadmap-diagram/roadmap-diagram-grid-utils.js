@@ -1,8 +1,8 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
 import {drawRow, ROW_STYLES, rowLayout} from "./roadmap-diagram-row-utils";
 import {toCumulativeCounts} from "../../../common/list-utils";
+import {defaultOptions} from "./roadmap-diagram-utils";
 
 
 export const GRID_STYLES = {
@@ -14,8 +14,10 @@ export const GRID_STYLES = {
 export function gridLayout(rowData = [],
                            columnHeaders = [],
                            rowHeaders = [],
-                           options) {
-    const gridDataWithLayout = _.map(rowData, row => rowLayout(row, options));
+                           options = defaultOptions) {
+    const activeOptions = Object.assign({}, defaultOptions, options);
+
+    const gridDataWithLayout = _.map(rowData, (row, i) => rowLayout(row, i, activeOptions));
 
     const rowHeights = _.map(gridDataWithLayout, d => d.layout.maxCellRows);
 
@@ -25,10 +27,14 @@ export function gridLayout(rowData = [],
 
     const cumulativeColWidths = toCumulativeCounts(colWidths);
     const cumulativeRowHeights = toCumulativeCounts(rowHeights);
+    const colOffsets = _.concat([0], cumulativeColWidths);
+    const rowOffsets = _.concat([0], cumulativeRowHeights);
 
     const layout = {
         rowHeights,
         colWidths,
+        colOffsets,
+        rowOffsets,
         cumulativeColWidths,
         cumulativeRowHeights,
         totalHeight: _.sum(rowHeights),
@@ -46,7 +52,7 @@ export function gridLayout(rowData = [],
 }
 
 
-export function drawGrid(holder, dataWithLayout, colorScheme) {
+export function drawGrid(holder, dataWithLayout, options) {
     const rows = holder
         .selectAll(`.${ROW_STYLES.row}`)
         .data(dataWithLayout.gridData);
@@ -67,65 +73,34 @@ export function drawGrid(holder, dataWithLayout, colorScheme) {
             const dy = rowOffset + padding;
             return `translate(0 ${ dy })`;
         })
-        .call(drawRow, colorScheme, dataWithLayout.layout.colWidths);
-
-    drawRowDividers(holder, dataWithLayout.layout);
-    drawColumnDividers(holder, dataWithLayout.layout);
+        .call(drawBackgroundCells, dataWithLayout)
+        .call(drawRow, options, dataWithLayout.layout.colWidths);
 }
 
 
-export function drawColumnDividers(selection, layout) {
-    const colDividers = selection
-        .selectAll(`.${GRID_STYLES.columnDivider}`)
-        .data(layout.cumulativeColWidths);
+function drawBackgroundCells(selection, dataWithLayout) {
+    const backgroundCells = selection
+        .selectAll(".foo")
+        .data((d, rowIdx) => _.map(
+            dataWithLayout.columnHeaders,
+            (c, colIdx) => ({
+                id: `${rowIdx}.${colIdx}`,
+                colOffset: dataWithLayout.layout.colOffsets[colIdx],
+                colWidth: dataWithLayout.layout.colWidths[colIdx],
+                rowHeight: d.layout.maxCellRows
+            })), d => d.id);
 
-    const newColDividers = colDividers
+    const newBackgroundCells = backgroundCells
         .enter()
-        .append("line")
-        .classed(GRID_STYLES.columnDivider, true)
+        .append("rect")
+        .classed("foo", true)
+        .attr("fill", "#fafafa")
         .attr("stroke", "#eee")
-        .attr("stroke-width", 2);
+        .attr("stroke-width", 1.5);
 
-    colDividers
-        .exit()
-        .remove();
-
-    const dividerHeight = (layout.totalHeight * CELL_DIMENSIONS.height) + (layout.rowHeights.length * ROW_DIMENSIONS.padding);
-
-    const calcX = (d, i) => d * CELL_DIMENSIONS.width + (i * ROW_CELL_DIMENSIONS.padding) + ROW_DIMENSIONS.padding / 2;
-
-    colDividers
-        .merge(newColDividers)
-        .attr("x1", calcX)
-        .attr("x2", calcX)
-        .attr("y1", 0)
-        .attr("y2", dividerHeight);
+    newBackgroundCells
+        .merge(backgroundCells)
+        .attr("x", (d,i) => (d.colOffset * CELL_DIMENSIONS.width) + (i * ROW_CELL_DIMENSIONS.padding))
+        .attr("width", (d, i) => d.colWidth * CELL_DIMENSIONS.width + CELL_DIMENSIONS.padding)
+        .attr("height", (d, i) => d.rowHeight * CELL_DIMENSIONS.height + CELL_DIMENSIONS.padding);
 }
-
-
-export function drawRowDividers(selection, layout) {
-    const dividers = selection
-        .selectAll(`.${GRID_STYLES.rowDivider}`)
-        .data(layout.rowHeights);
-
-    const newDividers = dividers
-        .enter()
-        .append("line")
-        .classed(GRID_STYLES.rowDivider, true)
-        .attr("x1", 0)
-        .attr("stroke", "#eee")
-        .attr("stroke-width", 2);
-
-    const calcY = (d, i) => layout.cumulativeRowHeights[i] * CELL_DIMENSIONS.height + (i * ROW_DIMENSIONS.padding) + ROW_DIMENSIONS.padding / 2;
-
-    const columnPadding = ROW_CELL_DIMENSIONS.padding * layout.colCount;
-    const columnWidth = _.sum(layout.colWidths) * CELL_DIMENSIONS.width;
-    const dividerWidth = columnWidth + columnPadding;
-
-    dividers
-        .merge(newDividers)
-        .attr("x2", dividerWidth)
-        .attr("y1", calcY)
-        .attr("y2", calcY);
-}
-

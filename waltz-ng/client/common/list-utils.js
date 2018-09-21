@@ -19,6 +19,12 @@
 import _ from "lodash";
 
 
+/**
+ *
+ * @param xs
+ * @param ys
+ * @returns boolean - `true` iff all elements of `ys` occur in `xs`
+ */
 export function containsAll(xs = [], ys = []) {
     return _.every(ys, y => _.includes(xs, y));
 }
@@ -31,8 +37,8 @@ export function containsAll(xs = [], ys = []) {
  *   toCumulativeCounts([1,2,3]) => [1, 3, 6];
  * ```
  *
- * @param xs
- * @returns {*}
+ * @param xs - array of integers
+ * @returns [] - cumulative counts
  */
 export function toCumulativeCounts(xs) {
     return _.reduce(
@@ -43,4 +49,19 @@ export function toCumulativeCounts(xs) {
             return acc;
         },
         []);
+}
+
+
+/**
+ * Given a list of items and a mechanism to extract a key this function
+ * will return a map giving the offset in `arr` of a key.
+ * @param arr
+ * @param keyFn - defaults to `d => d.id`
+ * @returns {*} - map of `result[key]` -> offset of key in arr
+ */
+export function toOffsetMap(arr = [], keyFn = d => d.id) {
+    return _.reduce(arr, (acc, d, idx) => {
+        acc[keyFn(d)] = idx;
+        return acc;
+    }, {});
 }

@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.currentDate;
 import static org.jooq.impl.DSL.inline;
@@ -47,6 +48,13 @@ import static org.jooq.impl.DSL.inline;
 public class JooqUtilities {
 
     public static final Field<Integer> TALLY_COUNT_FIELD = DSL.field("count", Integer.class);
+
+
+    public static EntityReference readRef(Record record, Field<String> kindField, Field<Long> idField) {
+        return mkRef(
+                EntityKind.valueOf(record.getValue(kindField)),
+                record.getValue(idField));
+    }
 
 
     /**
