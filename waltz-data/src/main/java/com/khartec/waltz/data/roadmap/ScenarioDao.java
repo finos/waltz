@@ -11,6 +11,8 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
@@ -29,7 +31,9 @@ public class ScenarioDao {
                 .build();
     };
 
+
     private final DSLContext dsl;
+
 
     @Autowired
     public ScenarioDao(DSLContext dsl) {
@@ -44,5 +48,14 @@ public class ScenarioDao {
                 .from(SCENARIO)
                 .where(SCENARIO.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<Scenario> findForRoadmapId(long roadmapId) {
+        return dsl
+                .select(SCENARIO.fields())
+                .from(SCENARIO)
+                .where(SCENARIO.ROADMAP_ID.eq(roadmapId))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }
