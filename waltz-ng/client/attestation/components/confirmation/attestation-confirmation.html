@@ -3,9 +3,9 @@
     <div class="wac-header">
         <span class="wac-declaration">
             You are attesting that the
-            <span ng-bind="$ctrl.instance.childEntityKind | toDisplayName:'entity'"
-                  class="wac-entity">
-            </span>s
+            <waltz-attested-kind run="$ctrl.run"
+                                 class="wac-entity">
+            </waltz-attested-kind>
             for
             <span ng-bind="$ctrl.instance.parentEntity.name"
                   class="wac-entity">

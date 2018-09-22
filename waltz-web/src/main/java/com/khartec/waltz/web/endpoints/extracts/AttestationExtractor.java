@@ -63,6 +63,7 @@ public class AttestationExtractor extends BaseDataExtractor {
                     "Application",
                     "External Id",
                     "Attesting Kind",
+                    "Attesting Kind Id",
                     "Attestation Id",
                     "Attested By",
                     "Attested At",
@@ -71,14 +72,17 @@ public class AttestationExtractor extends BaseDataExtractor {
             Select<Record> qry = dsl
                     .select(ATTESTATION_INSTANCE.fields())
                     .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                    .select(ATTESTATION_RUN.ATTESTED_ENTITY_KIND, ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                     .select(APPLICATION.NAME, APPLICATION.ASSET_CODE)
                     .from(ATTESTATION_INSTANCE)
                     .join(ATTESTATION_INSTANCE_RECIPIENT)
-                    .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                    .join(ATTESTATION_RUN)
+                        .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                     .join(APPLICATION)
-                    .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
+                        .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
                     .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
-                    .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
             qry.fetch()
                     .forEach(r -> {
@@ -86,7 +90,8 @@ public class AttestationExtractor extends BaseDataExtractor {
                             csvWriter.write(
                                     r.get(APPLICATION.NAME),
                                     r.get(APPLICATION.ASSET_CODE),
-                                    r.get(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND),
+                                    r.get(ATTESTATION_RUN.ATTESTED_ENTITY_KIND),
+                                    r.get(ATTESTATION_RUN.ATTESTED_ENTITY_ID),
                                     r.get(ATTESTATION_INSTANCE.ID),
                                     r.get(ATTESTATION_INSTANCE.ATTESTED_BY),
                                     r.get(ATTESTATION_INSTANCE.ATTESTED_AT),

@@ -63,7 +63,6 @@ public class AttestationInstanceDao {
                         EntityKind.valueOf(record.getParentEntityKind()),
                         record.getParentEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
-                .childEntityKind(EntityKind.valueOf(record.getChildEntityKind()))
                 .attestedAt(Optional.ofNullable(record.getAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .attestedBy(Optional.ofNullable(record.getAttestedBy()))
                 .build();
@@ -94,7 +93,6 @@ public class AttestationInstanceDao {
         record.setAttestationRunId(attestationInstance.attestationRunId());
         record.setParentEntityKind(attestationInstance.parentEntity().kind().name());
         record.setParentEntityId(attestationInstance.parentEntity().id());
-        record.setChildEntityKind(attestationInstance.childEntityKind().name());
 
         record.store();
 
@@ -126,8 +124,8 @@ public class AttestationInstanceDao {
      */
     public List<AttestationInstance> findHistoricalForPendingByUserId(String userId) {
         // fetch the parent refs for attestations currently pending for the user
-        Select<Record3<String, Long, String>> currentlyPendingAttestationParentRefs = dsl
-                .selectDistinct(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND, ATTESTATION_INSTANCE.PARENT_ENTITY_ID, ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)
+        Select<Record2<String, Long>> currentlyPendingAttestationParentRefs = dsl
+                .selectDistinct(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND, ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
@@ -141,7 +139,7 @@ public class AttestationInstanceDao {
                 .innerJoin(currentlyPendingAttestationParentRefs)
                 .on(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)
                         .and(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
-                        .and(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND).eq(ATTESTATION_INSTANCE.CHILD_ENTITY_KIND)))
+                )
                 .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc())
                 .fetch(TO_DOMAIN_MAPPER);

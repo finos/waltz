@@ -35,11 +35,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -143,7 +139,7 @@ public class AttestationRunService {
         Long runId = attestationRunDao.create(userId, command);
 
         // generate instances and recipients
-        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(runId, command.attestedKinds());
+        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(runId, command.attestedEntityKind());
 
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
@@ -156,7 +152,8 @@ public class AttestationRunService {
     }
 
 
-    private List<AttestationInstanceRecipient> generateAttestationInstanceRecipients(long attestationRunId, Set<EntityKind> attestedKinds) {
+    private List<AttestationInstanceRecipient> generateAttestationInstanceRecipients(long attestationRunId,
+                                                                                     EntityKind attestedEntityKind) {
         AttestationRun attestationRun = attestationRunDao.getById(attestationRunId);
         checkNotNull(attestationRun, "attestationRun " + attestationRunId + " not found");
 
@@ -168,7 +165,7 @@ public class AttestationRunService {
         return entityRefToPeople.entrySet()
                 .stream()
                 .flatMap(e -> e.getValue().stream()
-                                .flatMap(p -> mkInstanceRecipients(attestationRunId, e.getKey(), p.email(), attestedKinds)))
+                                .map(p -> mkInstanceRecipient(attestationRunId, e.getKey(), p.email(), attestedEntityKind)))
                 .distinct()
                 .collect(toList());
     }
@@ -191,18 +188,19 @@ public class AttestationRunService {
     }
 
 
-    private Stream<AttestationInstanceRecipient> mkInstanceRecipients(long attestationRunId, EntityReference ref, String userId, Set<EntityKind> childKinds) {
+    private AttestationInstanceRecipient mkInstanceRecipient(long attestationRunId,
+                                                             EntityReference ref,
+                                                             String userId,
+                                                             EntityKind attestedKind) {
         switch (ref.kind()) {
             case APPLICATION:
-                return childKinds.stream()
-                        .map(ck -> ImmutableAttestationInstanceRecipient.builder()
+                return ImmutableAttestationInstanceRecipient.builder()
                                 .attestationInstance(ImmutableAttestationInstance.builder()
                                         .attestationRunId(attestationRunId)
                                         .parentEntity(ref)
-                                        .childEntityKind(ck)
                                         .build())
                                 .userId(userId)
-                                .build());
+                                .build();
             default:
                 throw new IllegalArgumentException("Cannot create attestation instances for entity kind: " + ref.kind());
         }

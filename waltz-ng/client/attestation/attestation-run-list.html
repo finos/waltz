@@ -23,15 +23,17 @@
             <table class="table table-condensed table-striped">
                 <colgroup>
                     <col width="20%">
+                    <col width="10%">
                     <col width="30%">
-                    <col width="15%">
-                    <col width="15%">
+                    <col width="10%">
+                    <col width="10%">
                     <col width="10%">
                     <col width="10%">
                 </colgroup>
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Attested Kind</th>
                     <th>Description</th>
                     <th>Responses</th>
                     <th>Issuer</th>
@@ -44,6 +46,9 @@
                         <a ng-bind="r.name"
                            class="clickable"
                            ui-sref="main.attestation.run.view ({id: r.id})"></a>
+                    </td>
+                    <td>
+                        <waltz-attested-kind run="r"></waltz-attested-kind>
                     </td>
                     <td>
                         <div ng-bind="r.description | truncate:150"
