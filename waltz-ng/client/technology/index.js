@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import angular from "angular";
-import {registerService, registerComponents} from '../common/module-utils';
-import TechnologyStatisticsService from './services/technology-statistics-service';
-import TechnologySummarySection from './components/technology-summary-section';
-import GroupTechnologySummary from './components/group-technology-summary';
-import TechnologySummaryPies from './components/technology-summary-pies';
-import TechnologySection from './components/technology-section/technology-section';
+import {registerServices, registerComponents} from "../common/module-utils";
+import TechnologyStatisticsService from "./services/technology-statistics-service";
+import TechnologySummarySection from "./components/technology-summary-section";
+import GroupTechnologySummary from "./components/group-technology-summary";
+import TechnologySummaryPies from "./components/technology-summary-pies";
+import TechnologySection from "./components/technology-section/technology-section";
 
 export default () => {
-    const module = angular.module('waltz.technology', []);
+    const module = angular.module("waltz.technology", []);
 
-    registerService(module, TechnologyStatisticsService);
+    registerServices(module, [ TechnologyStatisticsService ]);
 
     registerComponents(module, [
         GroupTechnologySummary,

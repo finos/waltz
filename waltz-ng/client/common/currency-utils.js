@@ -19,850 +19,850 @@
 
 
 export const currenciesByCode = {
-    'AFN': {
-        text: 'Afghani',
+    "AFN": {
+        text: "Afghani",
         fraction: 2,
-        symbol: '؋'
+        symbol: "؋"
     },
-    'EUR': {
-        text: 'Euro',
+    "EUR": {
+        text: "Euro",
         fraction: 2,
-        symbol: '€'
+        symbol: "€"
     },
-    'ALL': {
-        text: 'Lek',
+    "ALL": {
+        text: "Lek",
         fraction: 2,
-        symbol: 'Lek'
+        symbol: "Lek"
     },
-    'DZD': {
-        text: 'Algerian Dinar',
+    "DZD": {
+        text: "Algerian Dinar",
         fraction: 2,
-        symbol: 'د.ج'
+        symbol: "د.ج"
     },
-    'USD': {
-        text: 'US Dollar',
+    "USD": {
+        text: "US Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'AOA': {
-        text: 'Kwanza',
+    "AOA": {
+        text: "Kwanza",
         fraction: 2,
-        symbol: 'Kz'
+        symbol: "Kz"
     },
-    'XCD': {
-        text: 'East Caribbean Dollar',
+    "XCD": {
+        text: "East Caribbean Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'ARS': {
-        text: 'Argentine Peso',
+    "ARS": {
+        text: "Argentine Peso",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'AMD': {
-        text: 'Armenian Dram',
+    "AMD": {
+        text: "Armenian Dram",
         fraction: 2,
         symbol: false
     },
-    'AWG': {
-        text: 'Aruban Florin',
+    "AWG": {
+        text: "Aruban Florin",
         fraction: 2,
-        symbol: 'ƒ'
+        symbol: "ƒ"
     },
-    'AUD': {
-        text: 'Australian Dollar',
+    "AUD": {
+        text: "Australian Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'AZN': {
-        text: 'Azerbaijanian Manat',
+    "AZN": {
+        text: "Azerbaijanian Manat",
         fraction: 2,
-        symbol: 'ман'
+        symbol: "ман"
     },
-    'BSD': {
-        text: 'Bahamian Dollar',
+    "BSD": {
+        text: "Bahamian Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'BHD': {
-        text: 'Bahraini Dinar',
+    "BHD": {
+        text: "Bahraini Dinar",
         fraction: 3,
-        symbol: 'BD'
+        symbol: "BD"
     },
-    'BDT': {
-        text: 'Taka',
+    "BDT": {
+        text: "Taka",
         fraction: 2,
-        symbol: '৳'
+        symbol: "৳"
     },
-    'BBD': {
-        text: 'Barbados Dollar',
+    "BBD": {
+        text: "Barbados Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'BYR': {
-        text: 'Belarussian Ruble',
+    "BYR": {
+        text: "Belarussian Ruble",
         fraction: 0,
-        symbol: 'p.'
+        symbol: "p."
     },
-    'BZD': {
-        text: 'Belize Dollar',
+    "BZD": {
+        text: "Belize Dollar",
         fraction: 2,
-        symbol: 'BZ$'
+        symbol: "BZ$"
     },
-    'XOF': {
-        text: 'CF Franc BCEAO',
+    "XOF": {
+        text: "CF Franc BCEAO",
         fraction: 0,
-        symbol: 'CFA'
+        symbol: "CFA"
     },
-    'BMD': {
-        text: 'Bermudian Dollar',
+    "BMD": {
+        text: "Bermudian Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'BTN': {
-        text: 'Ngultrum',
+    "BTN": {
+        text: "Ngultrum",
         fraction: 2,
-        symbol: 'Nu'
+        symbol: "Nu"
     },
-    'INR': {
-        text: 'Indian Rupee',
+    "INR": {
+        text: "Indian Rupee",
         fraction: 2,
-        symbol: '₹'
+        symbol: "₹"
     },
-    'BOB': {
-        text: 'Boliviano',
+    "BOB": {
+        text: "Boliviano",
         fraction: 2,
-        symbol: '$b'
+        symbol: "$b"
     },
-    'BOV': {
-        text: 'Mvdol',
+    "BOV": {
+        text: "Mvdol",
         fraction: 2,
-        symbol: '$b'
+        symbol: "$b"
     },
-    'BAM': {
-        text: 'Convertible Mark',
+    "BAM": {
+        text: "Convertible Mark",
         fraction: 2,
-        symbol: 'KM'
+        symbol: "KM"
     },
-    'BWP': {
-        text: 'Pula',
+    "BWP": {
+        text: "Pula",
         fraction: 2,
-        symbol: 'P'
+        symbol: "P"
     },
-    'NOK': {
-        text: 'Norwegian Krone',
+    "NOK": {
+        text: "Norwegian Krone",
         fraction: 2,
-        symbol: 'kr'
+        symbol: "kr"
     },
-    'BRL': {
-        text: 'Brazilian Real',
+    "BRL": {
+        text: "Brazilian Real",
         fraction: 2,
-        symbol: 'R$'
+        symbol: "R$"
     },
-    'BND': {
-        text: 'Brunei Dollar',
+    "BND": {
+        text: "Brunei Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'BGN': {
-        text: 'Bulgarian Lev',
+    "BGN": {
+        text: "Bulgarian Lev",
         fraction: 2,
-        symbol: 'лв'
+        symbol: "лв"
     },
-    'BIF': {
-        text: 'Burundi Franc',
+    "BIF": {
+        text: "Burundi Franc",
         fraction: 0,
-        symbol: 'BIF'
+        symbol: "BIF"
     },
-    'KHR': {
-        text: 'Riel',
+    "KHR": {
+        text: "Riel",
         fraction: 2,
-        symbol: '៛'
+        symbol: "៛"
     },
-    'XAF': {
-        text: 'CF Franc BEAC',
+    "XAF": {
+        text: "CF Franc BEAC",
         fraction: 0,
         symbol: false
     },
-    'CAD': {
-        text: 'Canadian Dollar',
+    "CAD": {
+        text: "Canadian Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'CVE': {
-        text: 'Cabo Verde Escudo',
+    "CVE": {
+        text: "Cabo Verde Escudo",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'KYD': {
-        text: 'Cayman Islands Dollar',
+    "KYD": {
+        text: "Cayman Islands Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'CLF': {
-        text: 'Unidad de Fomento',
+    "CLF": {
+        text: "Unidad de Fomento",
         fraction: 4,
         symbol: false
     },
-    'CLP': {
-        text: 'Chilean Peso',
+    "CLP": {
+        text: "Chilean Peso",
         fraction: 0,
-        symbol: '$'
+        symbol: "$"
     },
-    'CNY': {
-        text: 'Yuan Renminbi',
+    "CNY": {
+        text: "Yuan Renminbi",
         fraction: 2,
-        symbol: '¥'
+        symbol: "¥"
     },
-    'COP': {
-        text: 'Colombian Peso',
+    "COP": {
+        text: "Colombian Peso",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'COU': {
-        text: 'Unidad de Valor Real',
-        fraction: 2,
-        symbol: false
-    },
-    'KMF': {
-        text: 'Comoro Franc',
-        fraction: 0,
-        symbol: false
-    },
-    'CDF': {
-        text: 'Congolese Franc',
+    "COU": {
+        text: "Unidad de Valor Real",
         fraction: 2,
         symbol: false
     },
-    'NZD': {
-        text: 'New Zealand Dollar',
-        fraction: 2,
-        symbol: '$'
-    },
-    'CRC': {
-        text: 'Cost Rican Colon',
-        fraction: 2,
-        symbol: '₡'
-    },
-    'HRK': {
-        text: 'Croatian Kuna',
-        fraction: 2,
-        symbol: 'kn'
-    },
-    'CUC': {
-        text: 'Peso Convertible',
-        fraction: 2,
-        symbol: false
-    },
-    'CUP': {
-        text: 'Cuban Peso',
-        fraction: 2,
-        symbol: '₱'
-    },
-    'ANG': {
-        text: 'Netherlands Antillean Guilder',
-        fraction: 2,
-        symbol: 'ƒ'
-    },
-    'CZK': {
-        text: 'Czech Koruna',
-        fraction: 2,
-        symbol: 'Kč'
-    },
-    'DKK': {
-        text: 'Danish Krone',
-        fraction: 2,
-        symbol: 'kr'
-    },
-    'DJF': {
-        text: 'Djibouti Franc',
+    "KMF": {
+        text: "Comoro Franc",
         fraction: 0,
         symbol: false
     },
-    'DOP': {
-        text: 'Dominican Peso',
-        fraction: 2,
-        symbol: 'RD$'
-    },
-    'EGP': {
-        text: 'Egyptian Pound',
-        fraction: 2,
-        symbol: '£'
-    },
-    'SVC': {
-        text: 'El Salvador Colon',
-        fraction: 2,
-        symbol: '$'
-    },
-    'ERN': {
-        text: 'Nakfa',
+    "CDF": {
+        text: "Congolese Franc",
         fraction: 2,
         symbol: false
     },
-    'ETB': {
-        text: 'Ethiopian Birr',
+    "NZD": {
+        text: "New Zealand Dollar",
+        fraction: 2,
+        symbol: "$"
+    },
+    "CRC": {
+        text: "Cost Rican Colon",
+        fraction: 2,
+        symbol: "₡"
+    },
+    "HRK": {
+        text: "Croatian Kuna",
+        fraction: 2,
+        symbol: "kn"
+    },
+    "CUC": {
+        text: "Peso Convertible",
         fraction: 2,
         symbol: false
     },
-    'FKP': {
-        text: 'Falkland Islands Pound',
+    "CUP": {
+        text: "Cuban Peso",
         fraction: 2,
-        symbol: '£'
+        symbol: "₱"
     },
-    'FJD': {
-        text: 'Fiji Dollar',
+    "ANG": {
+        text: "Netherlands Antillean Guilder",
         fraction: 2,
-        symbol: '$'
+        symbol: "ƒ"
     },
-    'XPF': {
-        text: 'CFP Franc',
+    "CZK": {
+        text: "Czech Koruna",
+        fraction: 2,
+        symbol: "Kč"
+    },
+    "DKK": {
+        text: "Danish Krone",
+        fraction: 2,
+        symbol: "kr"
+    },
+    "DJF": {
+        text: "Djibouti Franc",
         fraction: 0,
         symbol: false
     },
-    'GMD': {
-        text: 'Dalasi',
+    "DOP": {
+        text: "Dominican Peso",
+        fraction: 2,
+        symbol: "RD$"
+    },
+    "EGP": {
+        text: "Egyptian Pound",
+        fraction: 2,
+        symbol: "£"
+    },
+    "SVC": {
+        text: "El Salvador Colon",
+        fraction: 2,
+        symbol: "$"
+    },
+    "ERN": {
+        text: "Nakfa",
         fraction: 2,
         symbol: false
     },
-    'GEL': {
-        text: 'Lari',
+    "ETB": {
+        text: "Ethiopian Birr",
         fraction: 2,
         symbol: false
     },
-    'GHS': {
-        text: 'Ghan Cedi',
+    "FKP": {
+        text: "Falkland Islands Pound",
         fraction: 2,
-        symbol: false
+        symbol: "£"
     },
-    'GIP': {
-        text: 'Gibraltar Pound',
+    "FJD": {
+        text: "Fiji Dollar",
         fraction: 2,
-        symbol: '£'
+        symbol: "$"
     },
-    'GTQ': {
-        text: 'Quetzal',
-        fraction: 2,
-        symbol: 'Q'
-    },
-    'GBP': {
-        text: 'Pound Sterling',
-        fraction: 2,
-        symbol: '£'
-    },
-    'GNF': {
-        text: 'Guine Franc',
+    "XPF": {
+        text: "CFP Franc",
         fraction: 0,
         symbol: false
     },
-    'GYD': {
-        text: 'Guyan Dollar',
-        fraction: 2,
-        symbol: '$'
-    },
-    'HTG': {
-        text: 'Gourde',
+    "GMD": {
+        text: "Dalasi",
         fraction: 2,
         symbol: false
     },
-    'HNL': {
-        text: 'Lempira',
+    "GEL": {
+        text: "Lari",
         fraction: 2,
-        symbol: 'L'
+        symbol: false
     },
-    'HKD': {
-        text: 'Hong Kong Dollar',
+    "GHS": {
+        text: "Ghan Cedi",
         fraction: 2,
-        symbol: '$'
+        symbol: false
     },
-    'HUF': {
-        text: 'Forint',
+    "GIP": {
+        text: "Gibraltar Pound",
         fraction: 2,
-        symbol: 'Ft'
+        symbol: "£"
     },
-    'ISK': {
-        text: 'Iceland Krona',
-        fraction: 0,
-        symbol: 'kr'
-    },
-    'IDR': {
-        text: 'Rupiah',
+    "GTQ": {
+        text: "Quetzal",
         fraction: 2,
-        symbol: 'Rp'
+        symbol: "Q"
     },
-    'XDR': {
-        text: 'SDR (Special Drawing Right)',
+    "GBP": {
+        text: "Pound Sterling",
+        fraction: 2,
+        symbol: "£"
+    },
+    "GNF": {
+        text: "Guine Franc",
         fraction: 0,
         symbol: false
     },
-    'IRR': {
-        text: 'Iranian Rial',
+    "GYD": {
+        text: "Guyan Dollar",
         fraction: 2,
-        symbol: '﷼'
+        symbol: "$"
     },
-    'IQD': {
-        text: 'Iraqi Dinar',
+    "HTG": {
+        text: "Gourde",
+        fraction: 2,
+        symbol: false
+    },
+    "HNL": {
+        text: "Lempira",
+        fraction: 2,
+        symbol: "L"
+    },
+    "HKD": {
+        text: "Hong Kong Dollar",
+        fraction: 2,
+        symbol: "$"
+    },
+    "HUF": {
+        text: "Forint",
+        fraction: 2,
+        symbol: "Ft"
+    },
+    "ISK": {
+        text: "Iceland Krona",
+        fraction: 0,
+        symbol: "kr"
+    },
+    "IDR": {
+        text: "Rupiah",
+        fraction: 2,
+        symbol: "Rp"
+    },
+    "XDR": {
+        text: "SDR (Special Drawing Right)",
+        fraction: 0,
+        symbol: false
+    },
+    "IRR": {
+        text: "Iranian Rial",
+        fraction: 2,
+        symbol: "﷼"
+    },
+    "IQD": {
+        text: "Iraqi Dinar",
         fraction: 3,
         symbol: false
     },
-    'ILS': {
-        text: 'New Israeli Sheqel',
+    "ILS": {
+        text: "New Israeli Sheqel",
         fraction: 2,
-        symbol: '₪'
+        symbol: "₪"
     },
-    'JMD': {
-        text: 'Jamaican Dollar',
+    "JMD": {
+        text: "Jamaican Dollar",
         fraction: 2,
-        symbol: 'J$'
+        symbol: "J$"
     },
-    'JPY': {
-        text: 'Yen',
+    "JPY": {
+        text: "Yen",
         fraction: 0,
-        symbol: '¥'
+        symbol: "¥"
     },
-    'JOD': {
-        text: 'Jordanian Dinar',
+    "JOD": {
+        text: "Jordanian Dinar",
         fraction: 3,
         symbol: false
     },
-    'KZT': {
-        text: 'Tenge',
+    "KZT": {
+        text: "Tenge",
         fraction: 2,
-        symbol: 'лв'
+        symbol: "лв"
     },
-    'KES': {
-        text: 'Kenyan Shilling',
+    "KES": {
+        text: "Kenyan Shilling",
         fraction: 2,
         symbol: false
     },
-    'KPW': {
-        text: 'North Korean Won',
+    "KPW": {
+        text: "North Korean Won",
         fraction: 2,
-        symbol: '₩'
+        symbol: "₩"
     },
-    'KRW': {
-        text: 'Won',
+    "KRW": {
+        text: "Won",
         fraction: 0,
-        symbol: '₩'
+        symbol: "₩"
     },
-    'KWD': {
-        text: 'Kuwaiti Dinar',
+    "KWD": {
+        text: "Kuwaiti Dinar",
         fraction: 3,
         symbol: false
     },
-    'KGS': {
-        text: 'Som',
+    "KGS": {
+        text: "Som",
         fraction: 2,
-        symbol: 'лв'
+        symbol: "лв"
     },
-    'LAK': {
-        text: 'Kip',
+    "LAK": {
+        text: "Kip",
         fraction: 2,
-        symbol: '₭'
+        symbol: "₭"
     },
-    'LBP': {
-        text: 'Lebanese Pound',
+    "LBP": {
+        text: "Lebanese Pound",
         fraction: 2,
-        symbol: '£'
+        symbol: "£"
     },
-    'LSL': {
-        text: 'Loti',
+    "LSL": {
+        text: "Loti",
         fraction: 2,
         symbol: false
     },
-    'ZAR': {
-        text: 'Rand',
+    "ZAR": {
+        text: "Rand",
         fraction: 2,
-        symbol: 'R'
+        symbol: "R"
     },
-    'LRD': {
-        text: 'Liberian Dollar',
+    "LRD": {
+        text: "Liberian Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'LYD': {
-        text: 'Libyan Dinar',
+    "LYD": {
+        text: "Libyan Dinar",
         fraction: 3,
         symbol: false
     },
-    'CHF': {
-        text: 'Swiss Franc',
+    "CHF": {
+        text: "Swiss Franc",
         fraction: 2,
-        symbol: 'CHF'
+        symbol: "CHF"
     },
-    'LTL': {
-        text: 'Lithuanian Litas',
+    "LTL": {
+        text: "Lithuanian Litas",
         fraction: 2,
-        symbol: 'Lt'
+        symbol: "Lt"
     },
-    'MOP': {
-        text: 'Pataca',
-        fraction: 2,
-        symbol: false
-    },
-    'MKD': {
-        text: 'Denar',
-        fraction: 2,
-        symbol: 'ден'
-    },
-    'MGA': {
-        text: 'Malagasy riary',
+    "MOP": {
+        text: "Pataca",
         fraction: 2,
         symbol: false
     },
-    'MWK': {
-        text: 'Kwacha',
+    "MKD": {
+        text: "Denar",
+        fraction: 2,
+        symbol: "ден"
+    },
+    "MGA": {
+        text: "Malagasy riary",
         fraction: 2,
         symbol: false
     },
-    'MYR': {
-        text: 'Malaysian Ringgit',
-        fraction: 2,
-        symbol: 'RM'
-    },
-    'MVR': {
-        text: 'Rufiyaa',
+    "MWK": {
+        text: "Kwacha",
         fraction: 2,
         symbol: false
     },
-    'MRO': {
-        text: 'Ouguiya',
+    "MYR": {
+        text: "Malaysian Ringgit",
+        fraction: 2,
+        symbol: "RM"
+    },
+    "MVR": {
+        text: "Rufiyaa",
         fraction: 2,
         symbol: false
     },
-    'MUR': {
-        text: 'Mauritius Rupee',
+    "MRO": {
+        text: "Ouguiya",
         fraction: 2,
-        symbol: '₨'
+        symbol: false
     },
-    'XUA': {
-        text: 'ADB Unit of ccount',
+    "MUR": {
+        text: "Mauritius Rupee",
+        fraction: 2,
+        symbol: "₨"
+    },
+    "XUA": {
+        text: "ADB Unit of ccount",
         fraction: 0,
         symbol: false
     },
-    'MXN': {
-        text: 'Mexican Peso',
+    "MXN": {
+        text: "Mexican Peso",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'MXV': {
-        text: 'Mexican Unidad de Inversion (UDI)',
-        fraction: 2,
-        symbol: false
-    },
-    'MDL': {
-        text: 'Moldovan Leu',
+    "MXV": {
+        text: "Mexican Unidad de Inversion (UDI)",
         fraction: 2,
         symbol: false
     },
-    'MNT': {
-        text: 'Tugrik',
-        fraction: 2,
-        symbol: '₮'
-    },
-    'MAD': {
-        text: 'Moroccan Dirham',
+    "MDL": {
+        text: "Moldovan Leu",
         fraction: 2,
         symbol: false
     },
-    'MZN': {
-        text: 'Mozambique Metical',
+    "MNT": {
+        text: "Tugrik",
         fraction: 2,
-        symbol: 'MT'
+        symbol: "₮"
     },
-    'MMK': {
-        text: 'Kyat',
+    "MAD": {
+        text: "Moroccan Dirham",
         fraction: 2,
         symbol: false
     },
-    'NAD': {
-        text: 'Namibi Dollar',
+    "MZN": {
+        text: "Mozambique Metical",
         fraction: 2,
-        symbol: '$'
+        symbol: "MT"
     },
-    'NPR': {
-        text: 'Nepalese Rupee',
+    "MMK": {
+        text: "Kyat",
         fraction: 2,
-        symbol: '₨'
+        symbol: false
     },
-    'NIO': {
-        text: 'Cordob Oro',
+    "NAD": {
+        text: "Namibi Dollar",
         fraction: 2,
-        symbol: 'C$'
+        symbol: "$"
     },
-    'NGN': {
-        text: 'Naira',
+    "NPR": {
+        text: "Nepalese Rupee",
         fraction: 2,
-        symbol: '₦'
+        symbol: "₨"
     },
-    'OMR': {
-        text: 'Rial Omani',
+    "NIO": {
+        text: "Cordob Oro",
+        fraction: 2,
+        symbol: "C$"
+    },
+    "NGN": {
+        text: "Naira",
+        fraction: 2,
+        symbol: "₦"
+    },
+    "OMR": {
+        text: "Rial Omani",
         fraction: 3,
-        symbol: '﷼'
+        symbol: "﷼"
     },
-    'PKR': {
-        text: 'Pakistan Rupee',
+    "PKR": {
+        text: "Pakistan Rupee",
         fraction: 2,
-        symbol: '₨'
+        symbol: "₨"
     },
-    'PAB': {
-        text: 'Balboa',
+    "PAB": {
+        text: "Balboa",
         fraction: 2,
-        symbol: 'B/.'
+        symbol: "B/."
     },
-    'PGK': {
-        text: 'Kina',
+    "PGK": {
+        text: "Kina",
         fraction: 2,
-        symbol: 'K'
+        symbol: "K"
     },
-    'PYG': {
-        text: 'Guarani',
+    "PYG": {
+        text: "Guarani",
         fraction: 0,
-        symbol: 'Gs'
+        symbol: "Gs"
     },
-    'PEN': {
-        text: 'Nuevo Sol',
+    "PEN": {
+        text: "Nuevo Sol",
         fraction: 2,
-        symbol: 'S/.'
+        symbol: "S/."
     },
-    'PHP': {
-        text: 'Philippine Peso',
+    "PHP": {
+        text: "Philippine Peso",
         fraction: 2,
-        symbol: '₱'
+        symbol: "₱"
     },
-    'PLN': {
-        text: 'Zloty',
+    "PLN": {
+        text: "Zloty",
         fraction: 2,
-        symbol: 'zł'
+        symbol: "zł"
     },
-    'QAR': {
-        text: 'Qatari Rial',
+    "QAR": {
+        text: "Qatari Rial",
         fraction: 2,
-        symbol: '﷼'
+        symbol: "﷼"
     },
-    'RON': {
-        text: 'New Romanian Leu',
+    "RON": {
+        text: "New Romanian Leu",
         fraction: 2,
-        symbol: 'lei'
+        symbol: "lei"
     },
-    'RUB': {
-        text: 'Russian Ruble',
+    "RUB": {
+        text: "Russian Ruble",
         fraction: 2,
-        symbol: 'руб'
+        symbol: "руб"
     },
-    'RWF': {
-        text: 'Rwand Franc',
+    "RWF": {
+        text: "Rwand Franc",
         fraction: 0,
-        symbol: 'R₣'
+        symbol: "R₣"
     },
-    'SHP': {
-        text: 'Saint Helen Pound',
+    "SHP": {
+        text: "Saint Helen Pound",
         fraction: 2,
-        symbol: '£'
+        symbol: "£"
     },
-    'WST': {
-        text: 'Tala',
+    "WST": {
+        text: "Tala",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'STD': {
-        text: 'Dobra',
+    "STD": {
+        text: "Dobra",
         fraction: 2,
         symbol: false
     },
-    'SAR': {
-        text: 'Saudi Riyal',
+    "SAR": {
+        text: "Saudi Riyal",
         fraction: 2,
-        symbol: '﷼'
+        symbol: "﷼"
     },
-    'RSD': {
-        text: 'Serbian Dinar',
+    "RSD": {
+        text: "Serbian Dinar",
         fraction: 2,
-        symbol: 'Дин.'
+        symbol: "Дин."
     },
-    'SCR': {
-        text: 'Seychelles Rupee',
+    "SCR": {
+        text: "Seychelles Rupee",
         fraction: 2,
-        symbol: '₨'
+        symbol: "₨"
     },
-    'SLL': {
-        text: 'Leone',
+    "SLL": {
+        text: "Leone",
         fraction: 2,
-        symbol: 'Le'
+        symbol: "Le"
     },
-    'SGD': {
-        text: 'Singapore Dollar',
+    "SGD": {
+        text: "Singapore Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'XSU': {
-        text: 'Sucre',
+    "XSU": {
+        text: "Sucre",
         fraction: 0,
         symbol: false
     },
-    'SBD': {
-        text: 'Solomon Islands Dollar',
+    "SBD": {
+        text: "Solomon Islands Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     },
-    'SOS': {
-        text: 'Somali Shilling',
+    "SOS": {
+        text: "Somali Shilling",
         fraction: 2,
-        symbol: 'S'
+        symbol: "S"
     },
-    'SSP': {
-        text: 'South Sudanese Pound',
-        fraction: 2,
-        symbol: false
-    },
-    'LKR': {
-        text: 'Sri Lank Rupee',
-        fraction: 2,
-        symbol: '₨'
-    },
-    'SDG': {
-        text: 'Sudanese Pound',
+    "SSP": {
+        text: "South Sudanese Pound",
         fraction: 2,
         symbol: false
     },
-    'SRD': {
-        text: 'Surinam Dollar',
+    "LKR": {
+        text: "Sri Lank Rupee",
         fraction: 2,
-        symbol: '$'
+        symbol: "₨"
     },
-    'SZL': {
-        text: 'Lilangeni',
-        fraction: 2,
-        symbol: false
-    },
-    'SEK': {
-        text: 'Swedish Krona',
-        fraction: 2,
-        symbol: 'kr'
-    },
-    'CHE': {
-        text: 'WIR Euro',
+    "SDG": {
+        text: "Sudanese Pound",
         fraction: 2,
         symbol: false
     },
-    'CHW': {
-        text: 'WIR Franc',
+    "SRD": {
+        text: "Surinam Dollar",
+        fraction: 2,
+        symbol: "$"
+    },
+    "SZL": {
+        text: "Lilangeni",
         fraction: 2,
         symbol: false
     },
-    'SYP': {
-        text: 'Syrian Pound',
+    "SEK": {
+        text: "Swedish Krona",
         fraction: 2,
-        symbol: '£'
+        symbol: "kr"
     },
-    'TWD': {
-        text: 'New Taiwan Dollar',
-        fraction: 2,
-        symbol: 'NT$'
-    },
-    'TJS': {
-        text: 'Somoni',
+    "CHE": {
+        text: "WIR Euro",
         fraction: 2,
         symbol: false
     },
-    'TZS': {
-        text: 'Tanzanian Shilling',
+    "CHW": {
+        text: "WIR Franc",
         fraction: 2,
         symbol: false
     },
-    'THB': {
-        text: 'Baht',
+    "SYP": {
+        text: "Syrian Pound",
         fraction: 2,
-        symbol: '฿'
+        symbol: "£"
     },
-    'TOP': {
-        text: 'Pa’anga',
+    "TWD": {
+        text: "New Taiwan Dollar",
+        fraction: 2,
+        symbol: "NT$"
+    },
+    "TJS": {
+        text: "Somoni",
         fraction: 2,
         symbol: false
     },
-    'TTD': {
-        text: 'Trinidad nd Tobago Dollar',
+    "TZS": {
+        text: "Tanzanian Shilling",
         fraction: 2,
-        symbol: 'TT$'
+        symbol: false
     },
-    'TND': {
-        text: 'Tunisian Dinar',
+    "THB": {
+        text: "Baht",
+        fraction: 2,
+        symbol: "฿"
+    },
+    "TOP": {
+        text: "Pa’anga",
+        fraction: 2,
+        symbol: false
+    },
+    "TTD": {
+        text: "Trinidad nd Tobago Dollar",
+        fraction: 2,
+        symbol: "TT$"
+    },
+    "TND": {
+        text: "Tunisian Dinar",
         fraction: 3,
         symbol: false
     },
-    'TRY': {
-        text: 'Turkish Lira',
+    "TRY": {
+        text: "Turkish Lira",
         fraction: 2,
-        symbol: '₺'
+        symbol: "₺"
     },
-    'TMT': {
-        text: 'Turkmenistan New Manat',
+    "TMT": {
+        text: "Turkmenistan New Manat",
         fraction: 2,
         symbol: false
     },
-    'UGX': {
-        text: 'Ugand Shilling',
+    "UGX": {
+        text: "Ugand Shilling",
         fraction: 0,
         symbol: false
     },
-    'UAH': {
-        text: 'Hryvnia',
+    "UAH": {
+        text: "Hryvnia",
         fraction: 2,
-        symbol: '₴'
+        symbol: "₴"
     },
-    'AED': {
-        text: 'UAE Dirham',
-        fraction: 2,
-        symbol: false
-    },
-    'USN': {
-        text: 'US Dollar (Next day)',
+    "AED": {
+        text: "UAE Dirham",
         fraction: 2,
         symbol: false
     },
-    'UYI': {
-        text: 'Uruguay Peso en Unidades Indexadas (URUIURUI)',
+    "USN": {
+        text: "US Dollar (Next day)",
+        fraction: 2,
+        symbol: false
+    },
+    "UYI": {
+        text: "Uruguay Peso en Unidades Indexadas (URUIURUI)",
         fraction: 0,
         symbol: false
     },
-    'UYU': {
-        text: 'Peso Uruguayo',
+    "UYU": {
+        text: "Peso Uruguayo",
         fraction: 2,
-        symbol: '$U'
+        symbol: "$U"
     },
-    'UZS': {
-        text: 'Uzbekistan Sum',
+    "UZS": {
+        text: "Uzbekistan Sum",
         fraction: 2,
-        symbol: 'лв'
+        symbol: "лв"
     },
-    'VUV': {
-        text: 'Vatu',
+    "VUV": {
+        text: "Vatu",
         fraction: 0,
         symbol: false
     },
-    'VEF': {
-        text: 'Bolivar',
+    "VEF": {
+        text: "Bolivar",
         fraction: 2,
-        symbol: 'Bs'
+        symbol: "Bs"
     },
-    'VND': {
-        text: 'Dong',
+    "VND": {
+        text: "Dong",
         fraction: 0,
-        symbol: '₫'
+        symbol: "₫"
     },
-    'YER': {
-        text: 'Yemeni Rial',
+    "YER": {
+        text: "Yemeni Rial",
         fraction: 2,
-        symbol: '﷼'
+        symbol: "﷼"
     },
-    'ZMW': {
-        text: 'Zambian Kwacha',
+    "ZMW": {
+        text: "Zambian Kwacha",
         fraction: 2,
         symbol: false
     },
-    'ZWL': {
-        text: 'Zimbabwe Dollar',
+    "ZWL": {
+        text: "Zimbabwe Dollar",
         fraction: 2,
-        symbol: '$'
+        symbol: "$"
     }
 };
 

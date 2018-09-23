@@ -1,38 +1,38 @@
-import assert from 'assert';
-import * as eu from '../../client/common/entity-utils';
+import assert from "assert";
+import * as eu from "../../client/common/entity-utils";
 
 const ref1app = {
     id: 1,
-    kind: 'APPLICATION'
+    kind: "APPLICATION"
 };
 
 const ref1ou = {
     id: 1,
-    kind: 'ORG_UNIT'
+    kind: "ORG_UNIT"
 };
 
 const ref2app = {
     id: 2,
-    kind: 'APPLICATION'
+    kind: "APPLICATION"
 };
 
 const notARef = {
     id: 2,
-    wibble: 'ORG_UNIT'
+    wibble: "ORG_UNIT"
 };
 
 
-describe('sameRef', () => {
+describe("sameRef", () => {
 
-    it('matches if references are same', () => {
+    it("matches if references are same", () => {
         assert(eu.sameRef(ref1app, ref1app));
     });
 
-    it('matches if references are equivalent', () => {
+    it("matches if references are equivalent", () => {
         assert(eu.sameRef(ref1app, Object.assign({}, ref1app)));
     });
 
-    it('matches if references are the same in essence', () => {
+    it("matches if references are the same in essence", () => {
         assert(eu.sameRef(ref1app, Object.assign({}, ref1app, { name: "Superfluous name"})));
     });
 
@@ -64,7 +64,7 @@ describe("refToString", () => {
     it("ignores name and description", () =>
         assert.equal(
             "APPLICATION/1",
-            eu.refToString(Object.assign({}, ref1app, {name: 'n', description: 'd'}))));
+            eu.refToString(Object.assign({}, ref1app, {name: "n", description: "d"}))));
 });
 
 
@@ -83,13 +83,13 @@ describe("toEntityRef", () => {
 
     it("throws if the given object has no 'id'", () => {
         assert.throws(() => {
-            eu.toEntityRef({name: 'bob'});
+            eu.toEntityRef({name: "bob"});
         })
     });
 
     it("preserves name and description if possible", () => {
-        const r = eu.toEntityRef(Object.assign({} , ref1app, { name: 'n', description: 'd'}));
-        assert.equal('n', r.name);
-        assert.equal('d', r.description);
+        const r = eu.toEntityRef(Object.assign({} , ref1app, { name: "n", description: "d"}));
+        assert.equal("n", r.name);
+        assert.equal("d", r.description);
     });
 });

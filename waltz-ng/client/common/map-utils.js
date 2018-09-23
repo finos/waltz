@@ -70,8 +70,7 @@ export function toGroupedMap(xs = [], keyFn, valFn = _.identity) {
 export function toMap(xs, keyFn, valFn = _.identity) {
     const reducer = (acc, x) => {
         const k = keyFn(x);
-        const v = valFn(x);
-        acc[k] = v;
+        acc[k] = valFn(x);
         return acc;
     };
     return _.reduce(xs, reducer, {});

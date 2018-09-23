@@ -1,11 +1,12 @@
-import assert from 'assert';
-import * as lu from '../../client/common/list-utils';
-
-const abc = ['a', 'b', 'c'];
-const abcd = ['a', 'b', 'c', 'd'];
+import assert from "assert";
+import * as lu from "../../client/common/list-utils";
 
 
-describe('containsAll', () => {
+const abc = ["a", "b", "c"];
+const abcd = ["a", "b", "c", "d"];
+
+
+describe("containsAll", () => {
     it ("returns true if all items in the second list are contained in the first",
         () => assert(lu.containsAll(abc, abc)));
 
@@ -29,6 +30,40 @@ describe('containsAll', () => {
 });
 
 
+describe("cumulativeCounts", () => {
+    it ("returns [] if given counts of [0]",
+        () => assert.deepEqual(lu.toCumulativeCounts([]), []));
+    it ("returns [] if given counts of -nothing-",
+        () => assert.deepEqual(lu.toCumulativeCounts(), []));
+    it ("returns [] if given counts of -null-",
+        () => assert.deepEqual(lu.toCumulativeCounts(null), []));
+    it ("returns [1] if given counts of [1]",
+        () => assert.deepEqual(lu.toCumulativeCounts([1]), [1]));
+    it ("returns [8] if given counts of [8]",
+        () => assert.deepEqual(lu.toCumulativeCounts([8]), [8]));
+    it ("returns [1,4] if given counts of [1,3]",
+        () => assert.deepEqual(lu.toCumulativeCounts([1, 3]), [1, 4]));
+    it ("returns [1,4,6] if given counts of [1,3,2]",
+        () => assert.deepEqual(lu.toCumulativeCounts([1, 3, 2]), [1, 4, 6]));
+});
+
+
+describe("toOffsetMap", () => {
+    it ("gives an offset map into an array of items",
+        () => {
+            const offsets = lu.toOffsetMap(["a", "b", "c"], x => x);
+            assert.equal(offsets["a"], 0);
+            assert.equal(offsets["b"], 1);
+            assert.equal(offsets["c"], 2);
+            assert.equal(offsets["d"], null);
+        });
+    it ("gives an empty map if given no items",
+        () => assert.deepEqual(lu.toOffsetMap([]), []));
+    it ("gives an empty map if given -nothing-",
+        () => assert.deepEqual(lu.toOffsetMap(), []));
+    it ("gives an empty map if given -null-",
+        () => assert.deepEqual(lu.toOffsetMap(null), []));
+});
 
 
 

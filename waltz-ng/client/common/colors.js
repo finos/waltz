@@ -21,26 +21,26 @@ import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
 
-export const amber = rgb('#D9923F');
-export const green = rgb('#5BB65D');
-export const red = rgb('#DA524B');
-export const pink = rgb('#ffcffc');
-export const grey = rgb('#939393');
-export const lightGrey = rgb('#d1d1d1');
-export const blue = rgb('#5271CC');
-export const purple= rgb('#B687CC');
-export const gold = rgb('#b7b04e');
-export const actor = rgb('#d7bbdb');
+export const amber = rgb("#D9923F");
+export const green = rgb("#5BB65D");
+export const red = rgb("#DA524B");
+export const pink = rgb("#ffcffc");
+export const grey = rgb("#939393");
+export const lightGrey = rgb("#d1d1d1");
+export const blue = rgb("#5271CC");
+export const purple= rgb("#B687CC");
+export const gold = rgb("#b7b04e");
+export const actor = rgb("#d7bbdb");
 
-export const amberBg = rgb('#FCF2D7');
-export const greenBg = rgb('#DFF1D2');
-export const redBg = rgb('#F2D7D7');
-export const greyBg = rgb('#F5F5F5');
-export const actorBg = rgb('#ede5ee');
+export const amberBg = rgb("#FCF2D7");
+export const greenBg = rgb("#DFF1D2");
+export const redBg = rgb("#F2D7D7");
+export const greyBg = rgb("#F5F5F5");
+export const actorBg = rgb("#ede5ee");
 
 
 export const ragColorScale = scaleOrdinal()
-    .domain(['R', 'A', 'G', 'Z', 'X'])
+    .domain(["R", "A", "G", "Z", "X"])
     .range([red, amber, green, grey, lightGrey]);
 
 
@@ -52,12 +52,12 @@ export const investmentRatingColorScale = ragColorScale;
 
 export const maturityColorScale = scaleOrdinal()
     .domain([
-        'PLANNED',
-        'INVEST',
-        'HOLD',
-        'DISINVEST',
-        'UNSUPPORTED',
-        'RESTRICTED'
+        "PLANNED",
+        "INVEST",
+        "HOLD",
+        "DISINVEST",
+        "UNSUPPORTED",
+        "RESTRICTED"
     ])
     .range([
         blue,
@@ -69,150 +69,150 @@ export const maturityColorScale = scaleOrdinal()
 
 
 export const authoritativeSourceColorScale = scaleOrdinal()
-    .domain(['NON_STRATEGIC', 'SECONDARY', 'PRIMARY', 'NOT_APPLICABLE'])
+    .domain(["NON_STRATEGIC", "SECONDARY", "PRIMARY", "NOT_APPLICABLE"])
     .range([red, amber, green, grey]);
 
 
 export const authoritativeRatingColorScale = scaleOrdinal()
-    .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
+    .domain(["DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION"])
     .range([red, amber, green, grey.darker()]);
 
 
 export const authoritativeRatingBackgroundColorScale = scaleOrdinal()
-    .domain(['DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION'])
+    .domain(["DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION"])
     .range([redBg, amberBg, greenBg, greyBg]);
 
 
 export const environmentColorScale = scaleOrdinal()
-    .domain(['DEV', 'PREPROD', 'PROD', 'QA', 'UAT', 'DR'])
+    .domain(["DEV", "PREPROD", "PROD", "QA", "UAT", "DR"])
     .range([green, amber, gold, purple, pink, blue]);
 
 
 export const operatingSystemColorScale = scaleOrdinal()
-    .domain(['Windows', 'Linux', 'AS/400', 'OS/390', 'AIX', 'Solaris'])
-    .range([blue, green, rgb('#777'), rgb('#555'), rgb('#473'), amber]);
+    .domain(["Windows", "Linux", "AS/400", "OS/390", "AIX", "Solaris"])
+    .range([blue, green, rgb("#777"), rgb("#555"), rgb("#473"), amber]);
 
 
 export const lifecyclePhaseColorScale = scaleOrdinal()
-    .domain(['PRODUCTION', 'CONCEPTUAL', 'DEVELOPMENT', 'RETIRED'])
+    .domain(["PRODUCTION", "CONCEPTUAL", "DEVELOPMENT", "RETIRED"])
     .range([gold, blue, green, grey]);
 
 
 export const criticalityColorScale = scaleOrdinal()
-    .domain(['LOW', 'MEDIUM', 'HIGH', 'VERY_HIGH', 'NONE', 'UNKNOWN'])
+    .domain(["LOW", "MEDIUM", "HIGH", "VERY_HIGH", "NONE", "UNKNOWN"])
     .range([green, amber, red, red.darker(), grey, grey.darker()]);
 
 
 export const flowDirectionColorScale = scaleOrdinal()
-    .domain(['Inbound', 'Outbound', 'Intra', 'UNKNOWN'])
+    .domain(["Inbound", "Outbound", "Intra", "UNKNOWN"])
     .range([green, amber, blue, grey]);
 
 
 const variableColorList = [
     {
         color: pink,
-        keys: ['UAT']
+        keys: ["UAT"]
     },
     {
         color: red,
         keys: [
-            'NO',
-            'FAIL',
-            'DISINVEST',
-            'UNSUPPORTED',
-            'RESTRICTED',
-            'DISCOURAGED',
-            'NON_STRATEGIC',
-            'NON_COMPLIANT',
-            'R',
-            'RED',
-            'OVERDUE',
-            'LATE',
-            'BAD',
-            'END_OF_LIFE',
-            'NON PAAS'
+            "NO",
+            "FAIL",
+            "DISINVEST",
+            "UNSUPPORTED",
+            "RESTRICTED",
+            "DISCOURAGED",
+            "NON_STRATEGIC",
+            "NON_COMPLIANT",
+            "R",
+            "RED",
+            "OVERDUE",
+            "LATE",
+            "BAD",
+            "END_OF_LIFE",
+            "NON PAAS"
         ]
     }, {
         color: green,
         keys: [
-            'YES',
-            'PASS',
-            'COMPLETED',
-            'SUCCESS',
-            'INVEST',
-            'SUPPORTED',
-            'PRIMARY',
-            'COMPLIANT',
-            'ENCOURAGED',
-            'STRATEGIC',
-            'G',
-            'DEV',
-            'GREEN',
-            'GOOD',
-            'NOT_END_OF_LIFE',
-            'PAAS'
+            "YES",
+            "PASS",
+            "COMPLETED",
+            "SUCCESS",
+            "INVEST",
+            "SUPPORTED",
+            "PRIMARY",
+            "COMPLIANT",
+            "ENCOURAGED",
+            "STRATEGIC",
+            "G",
+            "DEV",
+            "GREEN",
+            "GOOD",
+            "NOT_END_OF_LIFE",
+            "PAAS"
         ]
     }, {
         color: amber,
         keys: [
-            'MAYBE',
-            'PARTIAL',
-            'HOLD',
-            'IN_PROGRESS',
-            'SECONDARY',
-            'STRATEGIC_WITH_ISSUES',
-            'PART_COMPLIANT',
-            'PARTIALLY_COMPLIANT',
-            'A',
-            'AMBER',
-            'YELLOW',
-            'OKAY',
-            'PREPROD'
+            "MAYBE",
+            "PARTIAL",
+            "HOLD",
+            "IN_PROGRESS",
+            "SECONDARY",
+            "STRATEGIC_WITH_ISSUES",
+            "PART_COMPLIANT",
+            "PARTIALLY_COMPLIANT",
+            "A",
+            "AMBER",
+            "YELLOW",
+            "OKAY",
+            "PREPROD"
         ]
     }, {
         color: blue,
         keys: [
-            'PLANNED',
-            'OTHER',
-            'CONCEPTUAL',
-            'DR',
-            'B',
-            'NOT_STARTED',
-            'BLUE',
-            'MEDIUM',
-            'VIRTUAL',
-            'DR'
+            "PLANNED",
+            "OTHER",
+            "CONCEPTUAL",
+            "DR",
+            "B",
+            "NOT_STARTED",
+            "BLUE",
+            "MEDIUM",
+            "VIRTUAL",
+            "DR"
         ]
     }, {
         color: blue.darker(),
-        keys: ['HIGH']
+        keys: ["HIGH"]
     }, {
         color: blue.brighter(),
-        keys: ['LOW']
+        keys: ["LOW"]
     }, {
         color: purple,
-        keys: ['OTHER', 'UAT']
+        keys: ["OTHER", "UAT"]
     }, {
     },{
         color: gold,
         keys: [
-            'PROD',
-            'PRD'
+            "PROD",
+            "PRD"
         ]
     }, {
         color: grey,
         keys: [
-            'UNKNOWN',
-            'EXEMPT',
-            'RETIRED',
-            'GREY',
-            'GRAY',
-            'POSTPONED',
-            'N/A',
-            'NA',
-            'NOT_APPLICABLE',
-            'MEH',
-            'PHYSICAL'
+            "UNKNOWN",
+            "EXEMPT",
+            "RETIRED",
+            "GREY",
+            "GRAY",
+            "POSTPONED",
+            "N/A",
+            "NA",
+            "NOT_APPLICABLE",
+            "MEH",
+            "PHYSICAL"
         ]
     }
 ];
@@ -228,12 +228,11 @@ const variableScaleMap = _.reduce(
 export const randomColorScale = scaleOrdinal(schemeCategory20c);
 
 
-export const variableScale = (x = '') => {
+export const variableScale = (x = "") => {
     const key = x.toUpperCase();
     const foundColor = variableScaleMap[key];
     return foundColor || rgb(randomColorScale(x));
 };
-
 
 
 export function useBlackAsForeground(r, g, b) {
@@ -262,6 +261,6 @@ export function mkRatingSchemeColorScale(scheme = {}) {
 
 export function determineForegroundColor(r, g, b) {
     return useBlackAsForeground(r, g, b)
-        ? '#000'
-        : '#fff'
+        ? "#000"
+        : "#fff"
 }

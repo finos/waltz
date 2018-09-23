@@ -26,49 +26,52 @@
  * @returns String state name
  */
 export function kindToViewState(kind) {
-    if (kind === 'APPLICATION') {
+    if (kind === "APPLICATION") {
         return "main.app.view";
     }
-    if (kind === 'ACTOR') {
+    if (kind === "ACTOR") {
         return "main.actor.view";
     }
-    if (kind === 'APP_GROUP') {
+    if (kind === "APP_GROUP") {
         return "main.app-group.view";
     }
-    if (kind === 'DATA_TYPE') {
+    if (kind === "DATA_TYPE") {
         return "main.data-type.view";
     }
-    if (kind === 'FLOW_DIAGRAM') {
+    if (kind === "FLOW_DIAGRAM") {
         return "main.flow-diagram.view";
     }
-    if (kind === 'LOGICAL_DATA_ELEMENT') {
+    if (kind === "LOGICAL_DATA_ELEMENT") {
         return "main.logical-data-element.view";
     }
-    if (kind === 'LOGICAL_DATA_FLOW') {
+    if (kind === "LOGICAL_DATA_FLOW") {
         return "main.logical-flow.view";
     }
-    if (kind === 'MEASURABLE') {
+    if (kind === "MEASURABLE") {
         return "main.measurable.view";
     }
-    if (kind === 'ORG_UNIT') {
+    if (kind === "MEASURABLE_CATEGORY") {
+        return "main.measurable-category.view";
+    }
+    if (kind === "ORG_UNIT") {
         return "main.org-unit.view";
     }
-    if (kind === 'CHANGE_INITIATIVE') {
+    if (kind === "CHANGE_INITIATIVE") {
         return "main.change-initiative.view";
     }
-    if (kind === 'ENTITY_STATISTIC') {
+    if (kind === "ENTITY_STATISTIC") {
         return "main.entity-statistic.view";
     }
-    if (kind === 'PERSON') {
+    if (kind === "PERSON") {
         return "main.person.id";
     }
-    if (kind === 'PROCESS') {
+    if (kind === "PROCESS") {
         return "main.process.view";
     }
-    if (kind === 'PHYSICAL_SPECIFICATION') {
+    if (kind === "PHYSICAL_SPECIFICATION") {
         return "main.physical-specification.view";
     }
-    if (kind === 'PHYSICAL_FLOW') {
+    if (kind === "PHYSICAL_FLOW") {
         return "main.physical-flow.view";
     }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";

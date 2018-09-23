@@ -29,11 +29,11 @@
  * @param end
  * @returns {*}
  */
-export function truncate(origStr = '',
+export function truncate(origStr = "",
                          maxLength = 16,
-                         end = '...') {
+                         end = "...") {
     if (! origStr) {
-        return '';
+        return "";
     }
     if (origStr.length <= maxLength) {
         return origStr;
@@ -60,9 +60,9 @@ export function truncate(origStr = '',
  * @param separator
  * @returns {*}
  */
-export function truncateMiddle(origStr = '',
+export function truncateMiddle(origStr = "",
                          maxLength = 16,
-                         separator = ' ... ') {
+                         separator = " ... ") {
     if (origStr.length <= maxLength) {
         return origStr;
     }
@@ -93,7 +93,7 @@ export function truncateMiddle(origStr = '',
  * @param str
  * @returns {boolean}
  */
-export function stringToBoolean(str = ''){
+export function stringToBoolean(str = ""){
     switch(str.toLowerCase().trim()){
         case "true":
         case "yes":
@@ -122,16 +122,16 @@ export function toDomain(url) {
     let domain;
     //find & remove protocol (http, ftp, etc.) and get domain
     if (url.indexOf("://") > -1) {
-        domain = url.split('/')[2];
+        domain = url.split("/")[2];
     } else if(url.indexOf("mailto:") > -1) {
-        domain = url.split('mailto:')[1];
+        domain = url.split("mailto:")[1];
     }
     else {
-        domain = url.split('/')[0];
+        domain = url.split("/")[0];
     }
 
     //find & remove port number
-    domain = domain.split(':')[0];
+    domain = domain.split(":")[0];
 
     return domain;
 }
@@ -141,7 +141,7 @@ export function toDomain(url) {
  * https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
  */
 export function escapeRegexCharacters(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 
@@ -192,7 +192,7 @@ export function numberFormatter(num, digits = 0, simplify = true) {
  */
 export function toPercentage(numerator = 0, denominator = 0, fixedPlaces = 1) {
     return denominator === 0
-        ? '-'
+        ? "-"
         : Number(((numerator / denominator) * 100).toFixed(fixedPlaces)).toString();
 }
 

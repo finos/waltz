@@ -40,7 +40,7 @@ export function containsAll(xs = [], ys = []) {
  * @param xs - array of integers
  * @returns [] - cumulative counts
  */
-export function toCumulativeCounts(xs) {
+export function toCumulativeCounts(xs = []) {
     return _.reduce(
         xs,
         (acc, x) => {

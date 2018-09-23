@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common";
-import {strToBool} from "../bool-utils";
+import {stringToBoolean} from "../string-utils";
 
 
 const bindings = {
-    value: '<'
+    value: "<"
 };
 
 
@@ -38,10 +38,10 @@ const initialState = {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (changes) => {
-        if (vm.value === true || strToBool(vm.value) === true) {
+    vm.$onChanges = () => {
+        if (vm.value === true || stringToBoolean(vm.value) === true) {
             vm.booleanValue = true;
-        } else if (vm.value === false || strToBool(vm.value) === false) {
+        } else if (vm.value === false || stringToBoolean(vm.value) === false) {
             vm.booleanValue = false;
         } else {
             vm.booleanValue = null;
