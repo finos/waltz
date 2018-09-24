@@ -86,8 +86,8 @@ function controller($element, serviceBroker) {
     let svgGroups = null;
     let destructorFn = null;
 
-    const rowCount = 8;
-    const colCount = 12;
+    const rowCount = 4;
+    const colCount = 3;
 
     vm.data = _.times(rowCount, () => mkRandomRowData(colCount));
     vm.columnHeaders = _.times(colCount, i => mkRandomMeasurable(i, "col"));
@@ -97,7 +97,7 @@ function controller($element, serviceBroker) {
         const colorScheme = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScheme) {
             const filteredData = filterData(vm.data, vm.qry);
-            const dataWithLayout = gridLayout(filteredData, vm.columnHeaders, vm.rowHeaders, { cols: 4 });
+            const dataWithLayout = gridLayout(filteredData, vm.columnHeaders, vm.rowHeaders, { cols: 3 });
             draw(dataWithLayout, svgGroups, colorScheme);
         }
     }

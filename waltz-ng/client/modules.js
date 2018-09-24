@@ -126,8 +126,8 @@ const dependencies = [
     "LocalStorageModule",
     AngularFormly,
     AngularFormlyTemplates,
-    'treeControl',
-    'angular-loading-bar',
+    "treeControl",
+    "angular-loading-bar",
 
     // -- waltz-modules ---
     AccessLog(),

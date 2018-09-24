@@ -1,5 +1,14 @@
 # Settings
 
+These options are configured in the `settings` table.  Optionally they may
+be overriden in the `waltz.properties` configuration by specifying a property 
+name `settings.override` consisting of semicolon delimited, name value pairs.  
+For example:
+
+```
+settings.override=ui.logo.overlay.text=Hello World;database.pool.max=20
+```
+
 ## Presentation
 
 * ```ui.logo.overlay.text``` - optional text to overlay on the logo, keep it short

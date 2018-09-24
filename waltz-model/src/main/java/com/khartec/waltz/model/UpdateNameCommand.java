@@ -17,21 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.khartec.waltz.model;
 
-import angular from "angular";
-import * as categoryStore from "./services/measurable-category-store";
-import Routes from "./routes";
-
-export default () => {
-
-    const module = angular.module("waltz.measurable-category", []);
-
-    module
-        .service(categoryStore.serviceName, categoryStore.store);
-
-    module
-        .config(Routes);
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.command.Command;
+import org.immutables.value.Value;
 
 
-    return module.name;
-};
+@Value.Immutable
+@JsonSerialize(as = ImmutableUpdateNameCommand.class)
+@JsonDeserialize(as = ImmutableUpdateNameCommand.class)
+public abstract class UpdateNameCommand implements Command {
+    public abstract String newName();
+}

@@ -40,10 +40,10 @@ import template from "./related-measurables-viz.html";
  */
 
 const bindings = {
-    parentEntityRef: '<',
-    relationships: '<',
-    onCategorySelect: '<',
-    onCategoryClear: '<'
+    parentEntityRef: "<",
+    relationships: "<",
+    onCategorySelect: "<",
+    onCategoryClear: "<"
 };
 
 
@@ -53,8 +53,8 @@ const initialState = {
     measurables: [],
     parentEntityRef: null,
     relationships: {},
-    onCategorySelect: (c) => console.log('wrmv: default on-category-select', c),
-    onCategoryClear: (c) => console.log('wrmv: default on-category-clear')
+    onCategorySelect: (c) => console.log("wrmv: default on-category-select", c),
+    onCategoryClear: () => console.log("wrmv: default on-category-clear")
 };
 
 
@@ -88,29 +88,29 @@ const TRANSITION = transition()
     .duration(ANIMATION_DURATION);
 
 const styles = {
-    centerNodes: 'wrmv-center-nodes',
-    centerNode: 'wrmv-center-node',
-    nodeName: 'wrmv-name',
-    nodeDetail: 'wrmv-detail',
-    outerNodes: 'wrmv-outer-nodes',
-    outerNode: 'wrmv-outer-node',
-    bridges: 'wrmv-bridges',
-    bridge: 'wrmv-bridge',
-    hasRelationships: 'has-relationships',
-    noRelationships: 'no-relationships',
-    selected: 'wrmv-selected'
+    centerNodes: "wrmv-center-nodes",
+    centerNode: "wrmv-center-node",
+    nodeName: "wrmv-name",
+    nodeDetail: "wrmv-detail",
+    outerNodes: "wrmv-outer-nodes",
+    outerNode: "wrmv-outer-node",
+    bridges: "wrmv-bridges",
+    bridge: "wrmv-bridge",
+    hasRelationships: "has-relationships",
+    noRelationships: "no-relationships",
+    selected: "wrmv-selected"
 };
 
 
 function prepareGroups(holder, onCategoryClear) {
     const svg = select(holder)
-        .attr('width', dimensions.width)
-        .attr('height', dimensions.height)
-        .on('click', () => onCategoryClear());
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height)
+        .on("click", () => onCategoryClear());
 
-    const bridges = svg.append('g').classed(styles.bridges, true);
-    const centerNodes = svg.append('g').classed(styles.centerNodes, true);
-    const outerNodes = svg.append('g').classed(styles.outerNodes, true);
+    const bridges = svg.append("g").classed(styles.bridges, true);
+    const centerNodes = svg.append("g").classed(styles.centerNodes, true);
+    const outerNodes = svg.append("g").classed(styles.outerNodes, true);
 
     return {
         svg,
@@ -135,34 +135,34 @@ function drawCenterGroup(group, primaryEntity) {
         .selectAll(`.${styles.centerNode}`)
         .data([primaryEntity], d => d.id)
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.centerNode, true);
 
     centerGroup
-        .append('circle')
-        .attr('cx', dimensions.width / 2)
-        .attr('cy', dimensions.height / 2)
-        .attr('r', dimensions.centerNode.r)
-        .attr('fill', 'white')
-        .attr('stroke', 'red');
+        .append("circle")
+        .attr("cx", dimensions.width / 2)
+        .attr("cy", dimensions.height / 2)
+        .attr("r", dimensions.centerNode.r)
+        .attr("fill", "white")
+        .attr("stroke", "red");
 
     centerGroup
-        .append('text')
-        .text((d, i) => d.name)
+        .append("text")
+        .text(d => d.name)
         .classed(styles.nodeName, true)
-        .attr('text-anchor', 'middle')
-        .attr('x', dimensions.width / 2)
-        .attr('y', dimensions.height / 2)
-        .attr('dy', dimensions.nodeName.dy);
+        .attr("text-anchor", "middle")
+        .attr("x", dimensions.width / 2)
+        .attr("y", dimensions.height / 2)
+        .attr("dy", dimensions.nodeName.dy);
 
     centerGroup
-        .append('text')
-        .text((d, i) => d.category.name)
+        .append("text")
+        .text(d => d.category.name)
         .classed(styles.nodeDetail, true)
-        .attr('text-anchor', 'middle')
-        .attr('x', dimensions.width / 2)
-        .attr('y', dimensions.height / 2)
-        .attr('dy', dimensions.nodeDescription.dy);
+        .attr("text-anchor", "middle")
+        .attr("x", dimensions.width / 2)
+        .attr("y", dimensions.height / 2)
+        .attr("dy", dimensions.nodeDescription.dy);
 }
 
 
@@ -177,30 +177,28 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
     // -- ENTER --
     const newOuterNodes = outerNodes
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.outerNode, true)
-        .on('click', d => {
+        .on("click", d => {
             handlers.onCategorySelect(d);
             stopPropagation(event);
         })
-        .attr('transform', (d, i) => {
-            return `translate(${dimensions.width / 2}, ${dimensions.height / 2})`;
-        });
+        .attr("transform", `translate(${dimensions.width / 2}, ${dimensions.height / 2})`);
 
     newOuterNodes
-        .append('circle')
-        .attr('stroke', '#ccc')
-        .attr('fill', 'white');
+        .append("circle")
+        .attr("stroke", "#ccc")
+        .attr("fill", "white");
 
     newOuterNodes
-        .append('text')
+        .append("text")
         .classed(styles.nodeName, true)
         .text(d => d.name)
-        .attr('text-anchor', 'middle')
-        .attr('dy', dimensions.nodeName.dy);
+        .attr("text-anchor", "middle")
+        .attr("dy", dimensions.nodeName.dy);
 
     newOuterNodes
-        .append('text')
+        .append("text")
         .classed(styles.nodeDetail, true);
 
 
@@ -215,15 +213,15 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .classed(styles.hasRelationships, d => d.count > 0)
         .classed(styles.noRelationships, d => d.count === 0)
         .transition(TRANSITION)
-        .attr('transform', (d, i) => {
+        .attr("transform", (d, i) => {
             const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
             return `translate(${x}, ${y})`;
         });
 
     allOuterNodes
-        .select(`circle`)
+        .select("circle")
         .transition(TRANSITION)
-        .attr('r', d => {
+        .attr("r", d => {
             const hasRelationships = d.count > 0;
             const scaleFactor = hasRelationships
                 ? 1
@@ -233,9 +231,9 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 
     allOuterNodes
         .select(`.${styles.nodeDetail}`)
-        .text(d => d.count ? d.count : '-')
-        .attr('text-anchor', 'middle')
-        .attr('dy', dimensions.nodeDescription.dy);
+        .text(d => d.count ? d.count : "-")
+        .attr("text-anchor", "middle")
+        .attr("dy", dimensions.nodeDescription.dy);
 
 
     // -- EXIT --
@@ -256,12 +254,12 @@ function drawBridges(group, categories = [], deltaAngle) {
     // -- ENTER
     const newBridges = bridges
         .enter()
-        .append('line')
+        .append("line")
         .classed(styles.bridge, true)
-        .attr('x1', dimensions.width / 2)
-        .attr('y1', dimensions.height / 2)
-        .attr('stroke', '#aaa')
-        .attr('stroke-width', dimensions.bridge.w);
+        .attr("x1", dimensions.width / 2)
+        .attr("y1", dimensions.height / 2)
+        .attr("stroke", "#aaa")
+        .attr("stroke-width", dimensions.bridge.w);
 
 
     // -- UPDATE --
@@ -272,8 +270,8 @@ function drawBridges(group, categories = [], deltaAngle) {
         .each(function (d, i) {
             const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
             select(this)
-                .attr('x2', x)
-                .attr('y2', y);
+                .attr("x2", x)
+                .attr("y2", y);
         });
 
 
@@ -291,12 +289,12 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
     const measurablesByCategory = _.groupBy(measurables, m => m.categoryId);
     const measurablesById = _.keyBy(measurables, m => m.id);
 
-    const counterparts = _.map(relationships, r => determineCounterpart(primaryEntity, r));
+    const counterparts = _.map(relationships, r => determineCounterpart(primaryEntity, r, { skipChecks: true }));
 
     const countsById = _.countBy(counterparts, c =>  {
-        if (c.kind === 'MEASURABLE') {
+        if (c.kind === "MEASURABLE") {
             const counterpartMeasurable = measurablesById[c.id];
-            return 'MEASURABLE_CATEGORY/'+counterpartMeasurable.categoryId;
+            return "MEASURABLE_CATEGORY/"+counterpartMeasurable.categoryId;
         } else {
             return c.kind;
         }
@@ -307,11 +305,11 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
         .map(c => {
             const relatedMeasurableIds = _.map(measurablesByCategory[c.id] || [], m => m.id);
             const filter = er => {
-                const counterpart = determineCounterpart(primaryEntity, er);
-                return counterpart.kind === 'MEASURABLE' && _.includes(relatedMeasurableIds, counterpart.id);
+                const counterpart = determineCounterpart(primaryEntity, er, { skipChecks: true });
+                return counterpart.kind === "MEASURABLE" && _.includes(relatedMeasurableIds, counterpart.id);
             };
 
-            const id = 'MEASURABLE_CATEGORY/'+c.id;
+            const id = "MEASURABLE_CATEGORY/"+c.id;
 
             return {
                 id,
@@ -326,7 +324,7 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
             };
         })
         .filter(b => b.count > 0)
-        .orderBy('name')
+        .orderBy("name")
         .value();
 
     buckets.push(mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId));
@@ -338,10 +336,10 @@ function mkBuckets(categories = [], measurables = [], primaryEntity, relationshi
 
 
 function mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId) {
-    const id = 'CHANGE_INITIATIVE';
+    const id = "CHANGE_INITIATIVE";
     return {
         id,
-        name: 'Change Initiative',
+        name: "Change Initiative",
         relationshipFilter: er => id === determineCounterpart(primaryEntity, er).kind,
         count: countsById[id] || 0,
         isSelected: selectedCategoryId === id
@@ -350,10 +348,10 @@ function mkChangeInitiativeBucket(primaryEntity, countsById, selectedCategoryId)
 
 
 function mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId) {
-    const id = 'APP_GROUP';
+    const id = "APP_GROUP";
     return {
         id,
-        name: 'Application Group',
+        name: "Application Group",
         relationshipFilter: er => id === determineCounterpart(primaryEntity, er).kind,
         count: countsById[id] || 0,
         isSelected: selectedCategoryId === id
@@ -362,11 +360,11 @@ function mkAppGroupBucket(primaryEntity, countsById, selectedCategoryId) {
 
 
 function mkAddViewpointBucket(selectedCategoryId) {
-    const id = 'MEASURABLE';
+    const id = "MEASURABLE";
     return {
         id,
-        name: 'Add Viewpoint',
-        relationshipFilter: er => false,
+        name: "Add Viewpoint",
+        relationshipFilter: () => false,
         count: null,
         isSelected: selectedCategoryId === id
     };
@@ -413,7 +411,7 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
 
     const kind = ref.kind;
 
-    if (kind === 'MEASURABLE') {
+    if (kind === "MEASURABLE") {
         const measurable = _.find(measurables, { id: ref.id });
         const category = _.find(categories, { id: measurable.categoryId });
         return Promise.resolve({
@@ -422,7 +420,7 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
             name: measurable.name,
             category
         });
-    } else if (kind === 'CHANGE_INITIATIVE') {
+    } else if (kind === "CHANGE_INITIATIVE") {
         return serviceBroker
             .loadViewData(CORE_API.ChangeInitiativeStore.getById, [ref.id])
             .then(r => {
@@ -431,12 +429,12 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
                     kind: ref.kind,
                     name: r.data.name,
                     category: {
-                        name: 'Change Initiative'
+                        name: "Change Initiative"
                     }
                 };
             })
-    } else if (kind === 'APP_GROUP') {
-            return serviceBroker
+    } else if (kind === "APP_GROUP") {
+        return serviceBroker
                 .loadViewData(CORE_API.AppGroupStore.getById, [ref.id])
                 .then(r => {
                     return {
@@ -444,12 +442,12 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
                         kind: ref.kind,
                         name: r.data.appGroup.name,
                         category: {
-                            name: 'Application Group'
+                            name: "Application Group"
                         }
                     };
                 })
     } else {
-        Promise.reject('Cannot handle kind: ' + kind);
+        return Promise.reject("Cannot handle kind: " + kind);
     }
 }
 
@@ -459,7 +457,7 @@ function mkData(vm) {
     data.categories = vm.categories || [];
     data.measurables = vm.measurables || [];
     data.relationships = sanitizeRelationships(vm.relationships || [], data.measurables, data.categories);
-    data.primaryEntity = vm.primaryEntity || { name: 'Loading', category: { name: '...' }, id: -1, kind: 'ZZZ'};
+    data.primaryEntity = vm.primaryEntity || { name: "Loading", category: { name: "..." }, id: -1, kind: "ZZZ"};
     data.selectedCategoryId = vm.selectedCategoryId;
     return data;
 }
@@ -491,7 +489,7 @@ function controller($element, $q, $timeout, serviceBroker) {
 
     vm.$onInit = () => {
         initialiseData(vm, initialState);
-        const holder = $element.find('svg')[0];
+        const holder = $element.find("svg")[0];
         const handlers = mkHandlers(vm, $timeout);
         groups = prepareGroups(holder, handlers.onCategoryClear);
         destroyResizeListener = responsivefy(groups.svg);
@@ -499,7 +497,7 @@ function controller($element, $q, $timeout, serviceBroker) {
             .then(() => draw(groups, mkData(vm), handlers));
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         draw(groups, mkData(vm), mkHandlers(vm, $timeout));
     };
 
@@ -510,10 +508,10 @@ function controller($element, $q, $timeout, serviceBroker) {
 
 
 controller.$inject = [
-    '$element',
-    '$q',
-    '$timeout',
-    'ServiceBroker'
+    "$element",
+    "$q",
+    "$timeout",
+    "ServiceBroker"
 ];
 
 

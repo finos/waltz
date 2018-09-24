@@ -44,7 +44,7 @@ function determineRequiredMeasurables(relationships = [], measurables = [], excl
         .flatMap(rel => [rel.a, rel.b])
         .filter(ref => ref.kind === 'MEASURABLE' && measurablesById[ref.id])
         .uniqBy(ref => ref.id)
-        .reject(ref => _.some(exclusions, exclusion => sameRef(exclusion, ref)))
+        .reject(ref => _.some(exclusions, exclusion => sameRef(exclusion, ref, { skipChecks: true })))
         .map(ref => Object.assign({}, measurablesById[ref.id], { direct: true }))
         .value();
 
@@ -72,14 +72,13 @@ function determineRequiredMeasurables(relationships = [], measurables = [], excl
 
 function prepareTreeData(allRelationships = [], measurables = []) {
     const requiredMeasurables = determineRequiredMeasurables(allRelationships, measurables);
-    return switchToParentIds(buildHierarchies(requiredMeasurables));
+    return buildHierarchies(requiredMeasurables, false);
 }
 
 
 function expandTreeData(treeData = []) {
     if (isEmpty(treeData)) return [] ;
-    const expandedNodes =  _.concat(treeData, treeData[0].children);
-    return expandedNodes;
+    return  _.concat(treeData, treeData[0].children);
 }
 
 

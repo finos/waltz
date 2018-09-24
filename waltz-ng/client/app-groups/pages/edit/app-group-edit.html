@@ -297,10 +297,20 @@
             <thead>
             <tr>
                 <th>Owners</th>
+                <th>Operations</th>
             </tr>
             </thead>
             <tr ng-repeat="owner in ctrl.owners | orderBy:'userId'">
-                <td>{{ owner.userId }}</td>
+                <td><span ng-bind="owner.userId"></span></td>
+                <td>
+                    <div class="waltz-visibility-child-50"
+                         ng-if="owner.userId != ctrl.user.userName">
+                        <a ng-click="ctrl.demoteToViewer(owner)"
+                           class="clickable">
+                            Demote to subscribers
+                        </a>
+                    </div>
+                </td>
             </tr>
         </table>
 
@@ -321,7 +331,7 @@
                 </thead>
                 <tr ng-repeat="viewer in ctrl.viewers | orderBy:'userId'" class="waltz-visibility-parent">
                     <td>
-                        {{ viewer.userId }}
+                        <span ng-bind="viewer.userId"></span>
                     </td>
                     <td>
                         <div class="waltz-visibility-child-50">

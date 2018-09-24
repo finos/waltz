@@ -62,9 +62,8 @@ const recursivelySum = buildPropertySummer();
 
 
 function prepareTree(measurables = []) {
-    const hierarchy = switchToParentIds(buildHierarchies(measurables));
+    const hierarchy = buildHierarchies(measurables, false);
     _.each(hierarchy, root => recursivelySum(root));
-
     return hierarchy;
 }
 

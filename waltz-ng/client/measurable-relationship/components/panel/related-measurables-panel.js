@@ -39,7 +39,7 @@ import template from "./related-measurables-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -52,7 +52,7 @@ const initialState = {
     gridData: [],
     visibility: {
         editor: false,
-        detailMode: 'table', // table | tree,
+        detailMode: "table", // table | tree,
         detailModeChanger: false,
         createEditor: false,
         updateEditor: false,
@@ -60,19 +60,19 @@ const initialState = {
 };
 
 
-const DEFAULT_SELECTION_FILTER_FN = (m) => true;
+const DEFAULT_SELECTION_FILTER_FN = () => true;
 
 
-function mkGridData(ref,
+function mkGridData(selfRef,
                     relationships = [],
                     measurables = [],
                     categories = [],
                     appGroups = [],
-                    rowFilterFn = (x) => true)
+                    rowFilterFn = () => true)
 {
-    const measurablesById = _.keyBy(measurables, 'id');
-    const categoriesById = _.keyBy(categories, 'id');
-    const appGroupsById = _.keyBy(appGroups, 'id');
+    const measurablesById = _.keyBy(measurables, "id");
+    const categoriesById = _.keyBy(categories, "id");
+    const appGroupsById = _.keyBy(appGroups, "id");
 
     const toGenericCell = r => {
         return Object.assign({}, r, { type: getEnumName(entity, r.kind) });
@@ -85,15 +85,15 @@ function mkGridData(ref,
 
     const toAppGroupCell = r => {
         const c = appGroupsById[r.id];
-        return Object.assign({}, r, { name: c != null ? c.name : '', type: 'App Group' });
+        return Object.assign({}, r, { name: c !== null ? c.name : "", type: "App Group" });
     };
 
 
     const mkCell = (kind, side) => {
         switch (kind) {
-            case 'MEASURABLE':
+            case "MEASURABLE":
                 return toMeasurableCell(side);
-            case 'APP_GROUP':
+            case "APP_GROUP":
                 return toAppGroupCell(side);
             default:
                 return toGenericCell(side);
@@ -104,7 +104,7 @@ function mkGridData(ref,
         .chain(relationships)
         .filter(rowFilterFn)
         .map(r => {
-            const outbound = sameRef(r.a, ref);
+            const outbound = sameRef(r.a, selfRef, { skipChecks: true });
             const a = mkCell(r.a.kind, r.a);
             const b = mkCell(r.b.kind, r.b);
 
@@ -116,7 +116,7 @@ function mkGridData(ref,
             };
         })
         .filter(r => r !== null)
-        .sortBy(['a.name', 'b.name'])
+        .sortBy(["a.name", "b.name"])
         .value()
 }
 
@@ -147,8 +147,8 @@ function controller($q, $timeout, serviceBroker, notification) {
             .then(() => {
                 if (vm.selectedRow) {
                     vm.selectedRow = _.find(vm.gridData || [], row => {
-                        const sameSource = sameRef(vm.selectedRow.a, row.a);
-                        const sameTarget = sameRef(vm.selectedRow.b, row.b);
+                        const sameSource = sameRef(vm.selectedRow.a, row.a, { skipChecks: true });
+                        const sameTarget = sameRef(vm.selectedRow.b, row.b, { skipChecks: true });
                         const sameRelKind = vm.selectedRow.relationship.relationship === row.relationship.relationship;
                         return sameSource && sameTarget && sameRelKind;
                     });
@@ -158,10 +158,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     vm.selectCategory = (c) => $timeout(() => {
         vm.selectedCategory = c;
-        if (_.get(c, 'ref.kind') === 'MEASURABLE_CATEGORY') {
+        if (_.get(c, "ref.kind") === "MEASURABLE_CATEGORY") {
             vm.visibility.detailModeChanger = true;
         } else {
-            vm.visibility.detailMode = 'table';
+            vm.visibility.detailMode = "table";
             vm.visibility.detailModeChanger = false;
         }
         vm.selectedRow = null;
@@ -175,7 +175,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.selectedRow = null;
         vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
         vm.gridData = calcGridData();
-        vm.visibility.detailMode = 'table';
+        vm.visibility.detailMode = "table";
         vm.visibility.detailModeChanger = false;
     });
 
@@ -194,10 +194,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
 
     vm.removeRelationship = (rel) => {
-        if (confirm('Are you sure you want to delete this relationship ?')) {
+        if (confirm("Are you sure you want to delete this relationship ?")) {
             remove(rel)
                 .then(() => {
-                    notification.warning('Relationship removed');
+                    notification.warning("Relationship removed");
                     vm.clearRowSelection();
                     loadRelationships();
                 })
@@ -232,7 +232,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     const loadRelationships = () => {
         return serviceBroker
-            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                [ vm.parentEntityRef ],
+                { force: true })
             .then(r => {
                 vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
                 vm.gridData = calcGridData();
@@ -272,10 +275,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
 
 controller.$inject = [
-    '$q',
-    '$timeout',
-    'ServiceBroker',
-    'Notification'
+    "$q",
+    "$timeout",
+    "ServiceBroker",
+    "Notification"
 ];
 
 

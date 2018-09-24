@@ -18,8 +18,8 @@
  */
 
 import {CORE_API} from "./common/services/core-api-utils";
-import WelcomeJs from './welcome/welcome.js';
-import WelcomeHtml from './welcome/welcome.html';
+import WelcomeJs from "./welcome/welcome.js";
+import WelcomeHtml from "./welcome/welcome.html";
 
 
 function warmUpCache($q, serviceBroker) {
@@ -36,44 +36,44 @@ function warmUpCache($q, serviceBroker) {
 
 
 warmUpCache.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
 function configureRoutes($stateProvider, $urlRouterProvider) {
 
-    $urlRouterProvider.when('', '/home');
+    $urlRouterProvider.when("", "/home");
 
     $stateProvider
-        .state('main', {
-            url: '/',
+        .state("main", {
+            url: "/",
             resolve: {
                 warmUp: warmUpCache
             },
             views: {
-                'header': {template: '<waltz-navbar></waltz-navbar>'},
-                'content': WelcomeJs
+                "header": {template: "<waltz-navbar></waltz-navbar>"},
+                "content": WelcomeJs
             }
         })
-        .state('main.home', {
-            url: 'home',
+        .state("main.home", {
+            url: "home",
             views: {
-                'content': {template: WelcomeHtml}
+                "content": {template: WelcomeHtml}
             }
         });
 }
 
 configureRoutes.$inject = [
-    '$stateProvider',
-    '$urlRouterProvider'
+    "$stateProvider",
+    "$urlRouterProvider"
 ];
 
 
 // -- SCROLLER ---
 
 function configureScrollToTopOnChange($rootScope, $doc) {
-    $rootScope.$on('$stateChangeSuccess', () => {
+    $rootScope.$on("$stateChangeSuccess", () => {
         $doc[0].body.scrollTop = 0;
         $doc[0].documentElement.scrollTop = 0;
     });
@@ -81,8 +81,8 @@ function configureScrollToTopOnChange($rootScope, $doc) {
 
 
 configureScrollToTopOnChange.$inject = [
-    '$rootScope',
-    '$document'
+    "$rootScope",
+    "$document"
 ];
 
 
@@ -93,7 +93,7 @@ function configureBetaNagMessageNotification($rootScope,
                                              notification) {
 
     const nagFunction = (message = "") => {
-        $rootScope.$on('$stateChangeSuccess', () => {
+        $rootScope.$on("$stateChangeSuccess", () => {
             notification.info(message);
         });
     };
@@ -103,9 +103,9 @@ function configureBetaNagMessageNotification($rootScope,
 
 
 configureBetaNagMessageNotification.$inject = [
-    '$rootScope',
-    'NagMessageService',
-    'Notification'
+    "$rootScope",
+    "NagMessageService",
+    "Notification"
 ];
 
 
@@ -113,16 +113,16 @@ configureBetaNagMessageNotification.$inject = [
 
 function configureStateChangeListener($rootScope, $window, accessLogStore) {
     $rootScope.$on(
-        '$stateChangeSuccess',
+        "$stateChangeSuccess",
         (event, toState, toParams /* fromState, fromParams */ ) => {
             const {name} = toState;
             const infoPromise = accessLogStore.write(name, toParams);
 
-            if (__ENV__ === 'prod') {
+            if (__ENV__ === "prod") {
                 infoPromise.then(info => {
                     if (info.revision != __REVISION__) {
                         console.log(
-                            'Waltz reloading as server reported version does not match client. Server:',
+                            "Waltz reloading as server reported version does not match client. Server:",
                             info,
                             "client: ",
                             __REVISION__);
@@ -137,46 +137,46 @@ function configureStateChangeListener($rootScope, $window, accessLogStore) {
 
 
 configureStateChangeListener.$inject = [
-    '$rootScope',
-    '$window',
-    'AccessLogStore'
+    "$rootScope",
+    "$window",
+    "AccessLogStore"
 ];
 
 // -- ROUTE DEBUGGER ---
 
 function configureRouteDebugging($rootScope) {
 
-    $rootScope.$on('$stateChangeError',function(event, toState, toParams, fromState, fromParams, error){
-        console.log('$stateChangeError - fired when an error occurs during transition.');
+    $rootScope.$on("$stateChangeError",function(event, toState, toParams, fromState, fromParams, error){
+        console.log("$stateChangeError - fired when an error occurs during transition.");
         console.log(arguments);
     });
 
-    $rootScope.$on('$stateNotFound',function(event, unfoundState, fromState, fromParams){
+    $rootScope.$on("$stateNotFound",function(event, unfoundState, fromState, fromParams){
         console.log(`$stateNotFound ${unfoundState.to} - fired when a state cannot be found by its name.`);
         console.log(unfoundState, fromState, fromParams);
     });
 
     // UNCOMMENT FOR FINE GRAINED LOGGING
-
-    // $rootScope.$on('$stateChangeStart',function(event, toState, toParams, fromState, fromParams){
+    //
+    // $rootScope.$on("$stateChangeStart",function(event, toState, toParams, fromState, fromParams){
     //     console.log(`$stateChangeStart to ${toState.name} - fired when the transition begins.`, {toState, toParams} );
     // });
-    // $rootScope.$on('$stateChangeSuccess',function(event, toState, toParams, fromState, fromParams){
+    // $rootScope.$on("$stateChangeSuccess",function(event, toState, toParams, fromState, fromParams){
     //     console.log(`$stateChangeSuccess to ${toState.name} - fired once the state transition is complete.`);
     // });
-    // $rootScope.$on('$viewContentLoading',function(event, viewConfig){
-    //     console.log('$viewContentLoading - view begins loading - dom not rendered', viewConfig);
+    // $rootScope.$on("$viewContentLoading",function(event, viewConfig){
+    //     console.log("$viewContentLoading - view begins loading - dom not rendered", viewConfig);
     // });
 
 }
 
-configureRouteDebugging.$inject = ['$rootScope'];
+configureRouteDebugging.$inject = ["$rootScope"];
 
 
 // -- INACTIVITY TIMER ---
 
 function configureInactivityTimer($rootScope, $timeout, $window, settingsService) {
-    const uiInactivityTimeoutSettingKey = 'ui.inactivity-timeout';
+    const uiInactivityTimeoutSettingKey = "ui.inactivity-timeout";
 
     const reloadPage = () => {
         console.log("Reloading page due to inactivity");
@@ -188,11 +188,11 @@ function configureInactivityTimer($rootScope, $timeout, $window, settingsService
         .then(inactivityTime  => {
 
             if(inactivityTime) {
-                console.log('Configuring inactivity timer for ' + inactivityTime + " ms");
+                console.log("Configuring inactivity timer for " + inactivityTime + " ms");
                 let timeoutPromise = $timeout(reloadPage, inactivityTime);
 
                 $rootScope.$on(
-                    '$stateChangeSuccess',
+                    "$stateChangeSuccess",
                     (event, toState, toParams /* fromState, fromParams */) => {
 
                         //if existing timeout promise, then cancel
@@ -212,10 +212,10 @@ function configureInactivityTimer($rootScope, $timeout, $window, settingsService
 
 
 configureInactivityTimer.$inject = [
-    '$rootScope',
-    '$timeout',
-    '$window',
-    'SettingsService'
+    "$rootScope",
+    "$timeout",
+    "$window",
+    "SettingsService"
 ];
 
 

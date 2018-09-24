@@ -195,9 +195,17 @@ public class FlowDiagramService {
         createEntities(diagramId, command.entities());
         createAnnotations(diagramId, command.annotations());
 
-        List<EntityReference> newEntities = map(command.entities(), fde -> fde.entityReference());
+        List<EntityReference> newEntities = map(command.entities(), FlowDiagramEntity::entityReference);
         auditEntityChange(mkRef(FLOW_DIAGRAM, diagramId), existingEntities, newEntities, username);
         return diagramId;
+    }
+
+
+    public boolean updateName(long id, UpdateNameCommand command, String username) {
+        checkNotNull(command, "command cannot be null");
+        checkNotNull(username, "username cannot be null");
+
+        return flowDiagramDao.updateName(id, command.newName());
     }
 
 

@@ -35,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import java.util.Map;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -64,6 +66,7 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
     public void register() {
 
         String findForEntityReferencePath = mkPath(BASE_URL, ":kind", ":id");
+        String tallyForEntityReferencePath = mkPath(BASE_URL, ":kind", ":id", "tally");
         String removeRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
         String updateRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
         String createRelationshipPath = mkPath(BASE_URL, ":kindA", ":idA", ":kindB", ":idB", ":relationshipKind");
@@ -71,6 +74,9 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
 
         ListRoute<EntityRelationship> findForEntityReferenceRoute = (request, response)
                 -> measurableRelationshipService.findForEntityReference(getEntityReference(request));
+
+        DatumRoute<Map<EntityKind, Integer>> tallyForEntityReferenceRoute = (request, response)
+                -> measurableRelationshipService.tallyForEntityReference(getEntityReference(request));
 
         DatumRoute<Boolean> removeRelationshipRoute = (request, response) ->{
             requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
@@ -104,6 +110,7 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
 
 
         getForList(findForEntityReferencePath, findForEntityReferenceRoute);
+        getForDatum(tallyForEntityReferencePath, tallyForEntityReferenceRoute);
         deleteForDatum(removeRelationshipPath, removeRelationshipRoute);
         putForDatum(updateRelationshipPath, updateRelationshipRoute);
         postForDatum(createRelationshipPath, createRelationshipRoute);

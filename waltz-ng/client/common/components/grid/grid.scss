@@ -1,3 +1,9 @@
+
+.waltz-grid-row-select .ui-grid-row:hover .ui-grid-cell {
+    background-color: #e9e9e9 !important;
+    cursor: pointer;
+}
+
 .waltz-grid {
     border: none;
     min-height: 250px;
@@ -6,7 +12,7 @@
         background: none;
     }
 
-    .ui-grid-row:nth-child(odd) .ui-grid-cell {
+    .ui-grid-row:nth-child(odd) {
         background-color: #f9f9f9 !important;
     }
 

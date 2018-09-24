@@ -18,9 +18,9 @@
  */
 
 import _ from "lodash";
-import {CORE_API} from '../../../common/services/core-api-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './app-group-edit.html';
+import template from "./app-group-edit.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
@@ -84,6 +84,16 @@ function mkHistoryObj(appGroup) {
     };
 }
 
+function recalcMembers(data) {
+    const owners = _.filter(data, m => m.role === 'OWNER');
+    const viewers = _.filter(data, m => m.role === 'VIEWER');
+
+    return {
+        owners,
+        viewers
+    };
+}
+
 
 function controller($q,
                     $state,
@@ -98,6 +108,11 @@ function controller($q,
 
     const { id }  = $stateParams;
     const vm = Object.assign(this, initialState);
+
+    userService
+        .whoami()
+        .then(user => vm.user = user);
+
 
     serviceBroker.loadViewData(CORE_API.AppGroupStore.getById, [id])
         .then(r => setup(r.data))
@@ -138,13 +153,16 @@ function controller($q,
     vm.promoteToOwner = (member) => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.addOwner, [member.groupId, member.userId])
-            .then(r => r.data)
-            .then(members => {
-                vm.owners = _.filter(members, m => m.role === 'OWNER');
-                vm.viewers = _.filter(members, m => m.role === 'VIEWER');
-            })
-            .then(() => notification.success('User: ' + member.userId + ' is now an owner of the group'));
+            .then(r => Object.assign(vm, recalcMembers(r.data)))
+            .then(() => notification.success(`User: ${member.userId} is now an owner of the group`));
+    };
 
+
+    vm.demoteToViewer = (member) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.removeOwner, [member.groupId, member.userId])
+            .then(r => Object.assign(vm, recalcMembers(r.data)))
+            .then(() => notification.success(`User: ${member.userId} is now an viewer of the group`));
     };
 
 

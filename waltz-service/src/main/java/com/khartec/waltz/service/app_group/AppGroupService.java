@@ -247,6 +247,15 @@ public class AppGroupService {
     }
 
 
+    public boolean removeOwner(String userId, long groupId, String ownerToRemoveId) throws InsufficientPrivelegeException {
+        verifyUserCanUpdateGroup(userId, groupId);
+        boolean result = appGroupMemberDao.unregister(groupId, ownerToRemoveId);
+        subscribe(ownerToRemoveId, groupId);
+        audit(groupId, userId, String.format("Removed owner %s from group %d", ownerToRemoveId, groupId), EntityKind.PERSON, Operation.REMOVE);
+        return result;
+    }
+
+
     public List<AppGroupMember> getMembers(long groupId) {
         return appGroupMemberDao.getMembers(groupId);
     }

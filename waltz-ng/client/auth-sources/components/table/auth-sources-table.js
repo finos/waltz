@@ -145,7 +145,7 @@ function controller(serviceBroker, enumValueService) {
             .then(refresh);
 
         vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
-        vm.gridData = []; //gridData;
+        vm.gridData = [];
 
         if (shouldShowConsumers(vm.parentEntityRef)) {
             const selector = {

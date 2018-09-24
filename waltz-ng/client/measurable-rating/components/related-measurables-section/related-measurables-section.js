@@ -32,7 +32,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
  * This component ...
  */
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -40,8 +40,8 @@ const initialState = {};
 
 
 function calcRelatedMeasurables(ratingTallies = [], allMeasurables = []) {
-    const relatedMeasurableIds = _.map(ratingTallies, 'id');
-    const measurablesById = _.keyBy(allMeasurables, 'id');
+    const relatedMeasurableIds = _.map(ratingTallies, "id");
+    const measurablesById = _.keyBy(allMeasurables, "id");
     return _
         .chain(allMeasurables)
         .filter(m => _.includes(relatedMeasurableIds, m.id))
@@ -69,7 +69,7 @@ function controller($q, serviceBroker) {
             return;
         }
 
-        const selectionOptions = mkSelectionOptions(vm.parentEntityRef, 'CHILDREN');
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
         const categoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.categories = r.data);
@@ -96,13 +96,12 @@ function controller($q, serviceBroker) {
     };
 
     vm.onSelect = (m) => vm.selectedMeasurable = m;
-
 }
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 

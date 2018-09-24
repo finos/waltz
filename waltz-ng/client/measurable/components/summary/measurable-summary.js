@@ -19,27 +19,26 @@
 import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {refToString, sameRef} from '../../../common/entity-utils';
-import {entity} from '../../../common/services/enums/entity';
-import {getEnumName} from '../../../common/services/enums';
-import template from './measurable-summary.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {entity} from "../../../common/services/enums/entity";
+import {getEnumName} from "../../../common/services/enums";
+import template from "./measurable-summary.html";
 import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    scope: '@?',
-    applications: '<',
-    children: '<',
-    measurable: '<',
-    parents: '<',
-    serverStats: '<'
+    parentEntityRef: "<",
+    scope: "@?",
+    applications: "<",
+    children: "<",
+    measurable: "<",
+    parents: "<",
+    serverStats: "<"
 };
 
 
 const initialState = {
-    scope: 'CHILDREN'
+    scope: "CHILDREN"
 };
 
 
@@ -49,34 +48,30 @@ function enrichWithRefs(measurables = []) {
         d => Object.assign(
             {},
             d,
-            { entityReference: {kind: 'MEASURABLE', id: d.id, name: d.name, description: d.description }}));
+            { entityReference: {kind: "MEASURABLE", id: d.id, name: d.name, description: d.description }}));
 }
 
 
 function prepareChildRefs(children = [], measurable = {}) {
     const cs = _.chain(children)
-        .filter(c => c.id != measurable.id)  // not self
-        .filter(c => c.parentId == measurable.id) // only immediate children
+        .filter(c => c.id !== measurable.id)  // not self
+        .filter(c => c.parentId === measurable.id) // only immediate children
         .value();
     return enrichWithRefs(cs);
 }
 
 
 function prepareParentRefs(parents = [], measurable = {}) {
-    const ps = _.filter(parents, p => p.id != measurable.id)  // not self
+    const ps = _.filter(parents, p => p.id !== measurable.id); // not self
     return enrichWithRefs(ps);
 }
 
 
-function prepareRelationshipStats(stats = [], entityReference) {
+function prepareRelationshipStats(stats = []) {
     return _
         .chain(stats)
-        .flatMap(r => { return [r.a, r.b]; })
-        .uniqBy(refToString)
-        .reject(r => sameRef(r, entityReference))
-        .countBy(r => r.kind)
         .map((v,k) => { return { kind: k, name: getEnumName(entity, k), count: v }})
-        .orderBy('name')
+        .orderBy("name")
         .value();
 }
 
@@ -110,20 +105,22 @@ function controller(serviceBroker) {
 
         if (vm.measurable) {
             vm.entityRef = {
-                kind: 'MEASURABLE',
+                kind: "MEASURABLE",
                 id: vm.measurable.id
             };
 
             serviceBroker
-                .loadViewData(CORE_API.MeasurableRelationshipStore.findByMeasurable, [vm.measurable.id])
-                .then(r => vm.relationshipStats = prepareRelationshipStats(r.data, vm.entityRef));
+                .loadViewData(
+                    CORE_API.MeasurableRelationshipStore.tallyByEntityReference,
+                    [ { id: vm.measurable.id, kind: "MEASURABLE" }])
+                .then(r => vm.relationshipStats = prepareRelationshipStats(r.data));
         }
     };
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 

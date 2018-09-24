@@ -1,4 +1,4 @@
-import {drawUnit, NODE_STYLES} from "./roadmap-diagram-node-utils";
+import {drawUnit, NODE_STYLES} from "./roadmap-diagram-static-node-utils";
 import {checkTrue} from "../../../common/checks";
 import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
 

@@ -38,7 +38,14 @@ public class EntityRelationshipHarness {
 
         EntityRelationshipDao dao = ctx.getBean(EntityRelationshipDao.class);
 
-        Collection<EntityRelationship> rels = dao.findRelationshipsInvolving(EntityReference.mkRef(EntityKind.MEASURABLE, 134));
+        EntityReference ref = EntityReference.mkRef(EntityKind.MEASURABLE, 613);
+
+        Collection<EntityRelationship> rels = dao.findRelationshipsInvolving(ref);
         rels.forEach(r -> System.out.println(r.a().name()));
+
+        System.out.println("----");
+        System.out.println(dao.tallyRelationshipsInvolving(ref));
+
+
     }
 }

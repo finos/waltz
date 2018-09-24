@@ -10,6 +10,7 @@
     <div class='waltz-page-summary-attach waltz-page-summary'>
         <div class="row">
             <div class="col-sm-12">
+                <a ui-sref="main.measurable-category.list ({id:1})">Open new view</a>
                 <div class="waltz-tabs">
                     <!-- TAB HEADERS -->
                     <input type="radio"
@@ -34,46 +35,48 @@
 
                         <br>
 
-                        <!-- DIAGRAMS -->
-                        <div class="row"
-                             ng-if="ctrl.diagramsByCategory[tab.category.id].length > 0">
-                            <div class="col-sm-12"
-                                 ng-if="tab.category.id == ctrl.visibility.tab">
-                                <waltz-svg-diagrams diagrams="ctrl.diagramsByCategory[tab.category.id]"
-                                                    block-processor="ctrl.blockProcessor">
-                                </waltz-svg-diagrams>
-                                <hr>
+                        <div ng-if="tab.category.id == ctrl.visibility.tab">
+                            <!-- DIAGRAMS -->
+                            <div class="row"
+                                 ng-if="ctrl.diagramsByCategory[tab.category.id].length > 0">
+                                <div class="col-sm-12">
+                                    <waltz-svg-diagrams diagrams="ctrl.diagramsByCategory[tab.category.id]"
+                                                        block-processor="ctrl.blockProcessor">
+                                    </waltz-svg-diagrams>
+                                    <hr>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- TREE -->
+                                <div class="col-sm-7">
+                                    <waltz-measurable-tree measurables="tab.measurables">
+                                    </waltz-measurable-tree>
+                                </div>
+
+                                <!-- PANELS -->
+                                <div class="col-sm-5">
+                                    <strong ng-bind="tab.category.description">
+                                    </strong>
+
+                                    <waltz-static-panels render-mode="chromeless"
+                                                         group-key="HOME.MEASURABLE.{{tab.category.id}}">
+                                    </waltz-static-panels>
+
+                                    <hr>
+
+                                    <waltz-data-extract-link name="Export"
+                                                             uib-popover="Exports this taxonomy and the key people associated with it"
+                                                             popover-trigger="mouseenter"
+                                                             extract="measurable-category/{{tab.category.id}}"
+                                                             filename="{{tab.category.name}}.csv">
+                                    </waltz-data-extract-link>
+
+
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <!-- TREE -->
-                            <div class="col-sm-7">
-                                <waltz-measurable-tree measurables="tab.measurables">
-                                </waltz-measurable-tree>
-                            </div>
-
-                            <!-- PANELS -->
-                            <div class="col-sm-5">
-                                <strong ng-bind="tab.category.description">
-                                </strong>
-
-                                <waltz-static-panels render-mode="chromeless"
-                                                     group-key="HOME.MEASURABLE.{{tab.category.id}}">
-                                </waltz-static-panels>
-
-                                <hr>
-
-                                <waltz-data-extract-link name="Export"
-                                                         uib-popover="Exports this taxonomy and the key people associated with it"
-                                                         popover-trigger="mouseenter"
-                                                         extract="measurable-category/{{tab.category.id}}"
-                                                         filename="{{tab.category.name}}.csv">
-                                </waltz-data-extract-link>
-
-
-                            </div>
-                        </div>
 
                     </div>
                 </div>
