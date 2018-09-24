@@ -65,7 +65,7 @@ function readCategoryId(compoundId) {
 
 
 function prepareTree(nodes = []) {
-    return switchToParentIds(buildHierarchies(nodes));
+    return buildHierarchies(nodes, false);
 }
 
 

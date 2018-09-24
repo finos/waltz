@@ -30,7 +30,7 @@ const initialState = {
 
 
 function recalcHierarchy(model = []) {
-    return switchToParentIds(buildHierarchies(model));
+    return buildHierarchies(model, false);
 }
 
 

@@ -19,10 +19,9 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
-import {mergeKeyedLists, toGroupedMap} from "../../../common/map-utils";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import { determineStartingTab, mkOverridesMap, mkTabs } from "../../measurable-rating-utils";
 
 
 /**
@@ -52,29 +51,6 @@ const initialState = {
     },
     byCategory: {}
 };
-
-
-function mkOverridesMap(perspectiveRatings = [], measurables = []) {
-    const ratings = _.map(perspectiveRatings, 'value');
-    const measurablesById = _.keyBy(measurables, 'id');
-
-    const byX = toGroupedMap(
-        ratings,
-        r => r.measurableX,
-        r => ({
-            measurable: measurablesById[r.measurableY],
-            rating: r.rating
-        }));
-    const byY = toGroupedMap(
-        ratings,
-        r => r.measurableY,
-        r => ({
-            measurable: measurablesById[r.measurableX],
-            rating: r.rating
-        }));
-
-    return mergeKeyedLists(byX, byY);
-}
 
 
 function controller($q, serviceBroker) {

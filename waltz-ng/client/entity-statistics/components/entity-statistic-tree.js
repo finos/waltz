@@ -34,7 +34,7 @@ const initialState = {
 
 
 function buildDefinitionTree(definitions = []) {
-    return switchToParentIds(buildHierarchies(definitions));
+    return buildHierarchies(definitions, false);
 }
 
 

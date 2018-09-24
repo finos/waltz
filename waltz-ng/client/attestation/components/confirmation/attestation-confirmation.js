@@ -24,6 +24,8 @@ import template from './attestation-confirmation.html';
 
 const bindings = {
     instance: '<',
+    run: '<',
+    attestedEntityRef: '<?',
     onConfirm: '<',
     onCancel: '<'
 };

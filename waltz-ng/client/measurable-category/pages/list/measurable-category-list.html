@@ -1,0 +1,85 @@
+<div>
+    <waltz-page-header name="{{$ctrl.category.name}}"
+                       small="Viewpoints"
+                       icon="puzzle-piece">
+        <ol class="waltz-breadcrumbs">
+            <li>
+                <a ui-sref="main">
+                    Home
+                </a>
+            </li>
+            <li>
+                <span ng-bind="$ctrl.category.name">
+                </span>
+            </li>
+        </ol>
+    </waltz-page-header>
+
+
+    <div class='waltz-page-summary-attach waltz-page-summary'>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="waltz-tabs">
+                    <span class="wt-tab-header"
+                          ng-repeat="tab in $ctrl.categories track by tab.id"
+                          ng-class="{
+                                'wt-active' : tab.id === $ctrl.category.id,
+                                'wt-disabled' : ! $ctrl.measurablesByCategory[tab.id]
+                          }">
+                        <a ng-if="$ctrl.measurablesByCategory[tab.id]"
+                           ui-sref="main.measurable-category.list ({ id:tab.id })">
+                            <span ng-bind="tab.name">
+                            </span>
+                        </a>
+
+                        <span ng-bind="tab.name"
+                              ng-if="! $ctrl.measurablesByCategory[tab.id]">
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row"
+             ng-if="$ctrl.diagrams.length > 0">
+            <!-- DIAGRAMS -->
+            <div class="col-sm-12">
+                <waltz-svg-diagrams diagrams="$ctrl.diagrams"
+                                    block-processor="$ctrl.blockProcessor">
+                </waltz-svg-diagrams>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- TREE -->
+            <div class="col-sm-7">
+                <waltz-measurable-tree measurables="$ctrl.measurables">
+                </waltz-measurable-tree>
+            </div>
+
+            <!-- PANELS -->
+            <div class="col-sm-5">
+                <strong ng-bind="$ctrl.category.description">
+                </strong>
+
+                <waltz-static-panels render-mode="chromeless"
+                                     group-key="HOME.MEASURABLE.{{$ctrl.category.id}}">
+                </waltz-static-panels>
+
+                <hr>
+
+                <waltz-data-extract-link name="Export"
+                                         uib-popover="Exports this taxonomy and the key people associated with it"
+                                         popover-trigger="mouseenter"
+                                         extract="measurable-category/{{$ctrl.category.id}}"
+                                         filename="{{$ctrl.category.name}}.csv">
+                </waltz-data-extract-link>
+            </div>
+        </div>
+    </div>
+</div>
+

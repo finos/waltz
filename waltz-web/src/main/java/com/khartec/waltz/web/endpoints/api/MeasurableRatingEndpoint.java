@@ -73,6 +73,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String findByAppSelectorPath = mkPath(BASE_URL, "app-selector");
         String findByCategoryPath = mkPath(BASE_URL, "category", ":id");
         String countByMeasurablePath = mkPath(BASE_URL, "count-by", "measurable");
+        String countByMeasurableCategoryPath = mkPath(BASE_URL, "count-by", "measurable", "category", ":id");
         String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
         String statsForRelatedMeasurablePath = mkPath(BASE_URL, "related-stats", "measurable");
 
@@ -91,6 +92,9 @@ public class MeasurableRatingEndpoint implements Endpoint {
         ListRoute<Tally<Long>> countByMeasurableRoute = (request, response)
                 -> measurableRatingService.tallyByMeasurableId();
 
+        ListRoute<Tally<Long>> countByMeasurableCategoryRoute = (request, response)
+                -> measurableRatingService.tallyByMeasurableCategoryId(getId(request));
+
         ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
                 -> measurableRatingService.statsByAppSelector(readIdSelectionOptionsFromBody(request));
 
@@ -105,6 +109,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         putForList(modifyPath, this::updateRoute);
         deleteForList(modifyPath, this::removeRoute);
         getForList(countByMeasurablePath, countByMeasurableRoute);
+        getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
         postForList(statsForRelatedMeasurablePath, statsForRelatedMeasurableRoute);
         postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
     }

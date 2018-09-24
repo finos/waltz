@@ -19,7 +19,7 @@
 
 import template from './tree-picker.html';
 import {initialiseData} from "../../../common/index";
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import _ from "lodash";
 
 const bindings = {
@@ -34,8 +34,7 @@ const initialState = {
 
 
 function prepareTree(items = []) {
-    const hierarchy = switchToParentIds(buildHierarchies(items));
-    return hierarchy;
+    return buildHierarchies(items, false);
 }
 
 

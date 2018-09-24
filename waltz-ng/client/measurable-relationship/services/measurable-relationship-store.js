@@ -17,19 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from '../../common/checks';
+import {checkIsEntityRef} from "../../common/checks";
+
 
 export function store($http, base) {
     const BASE = `${base}/measurable-relationship`;
-
-    const findByMeasurable = (id) => $http
-        .get(`${BASE}/MEASURABLE/${id}`)
-        .then(r => r.data);
 
     const findByEntityReference = (ref) => {
         checkIsEntityRef(ref);
         return $http
             .get(`${BASE}/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
+    const tallyByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/${ref.kind}/${ref.id}/tally`)
             .then(r => r.data);
     };
 
@@ -62,8 +66,8 @@ export function store($http, base) {
     };
 
     return {
-        findByMeasurable,
         findByEntityReference,
+        tallyByEntityReference,
         remove,
         create,
         update
@@ -72,38 +76,38 @@ export function store($http, base) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'MeasurableRelationshipStore';
+export const serviceName = "MeasurableRelationshipStore";
 
 
 export const MeasurableRelationshipStore_API = {
-    findByMeasurable: {
-        serviceName,
-        serviceFnName: 'findByMeasurable',
-        description: 'finds relationships by given measurable id'
-    },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'finds relationships by given entity reference'
+        serviceFnName: "findByEntityReference",
+        description: "finds relationships by given entity reference"
+    },
+    tallyByEntityReference: {
+        serviceName,
+        serviceFnName: "tallyByEntityReference",
+        description: "tallies relationships by given entity reference"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'creates a relationship'
+        serviceFnName: "create",
+        description: "creates a relationship"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'updates a relationship (key, changes)'
+        serviceFnName: "update",
+        description: "updates a relationship (key, changes)"
     },
     remove: {
         serviceName,
-        serviceFnName: 'remove',
-        description: 'removes a relationship'
+        serviceFnName: "remove",
+        description: "removes a relationship"
     }
 };

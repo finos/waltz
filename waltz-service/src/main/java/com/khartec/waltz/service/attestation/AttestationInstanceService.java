@@ -21,10 +21,12 @@ package com.khartec.waltz.service.attestation;
 
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -41,17 +43,21 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 public class AttestationInstanceService {
 
     private final AttestationInstanceDao attestationInstanceDao;
+    private final AttestationRunService attestationRunService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
 
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
+                                      AttestationRunService attestationRunService,
                                       PersonDao personDao, ChangeLogService changeLogService) {
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
+        checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.attestationInstanceDao = attestationInstanceDao;
+        this.attestationRunService = attestationRunService;
         this.personDao = personDao;
         this.changeLogService = changeLogService;
     }
@@ -84,7 +90,8 @@ public class AttestationInstanceService {
         boolean success = attestationInstanceDao.attestInstance(instanceId, attestedBy, nowUtc());
         if(success) {
             AttestationInstance instance = attestationInstanceDao.getById(instanceId);
-            logChange(attestedBy, instance);
+            AttestationRun run = attestationRunService.getById(instance.attestationRunId());
+            logChange(attestedBy, instance, run.attestedEntityKind());
         }
         return success;
     }
@@ -105,14 +112,14 @@ public class AttestationInstanceService {
     }
 
 
-    private void logChange (String username, AttestationInstance instance) {
+    private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
 
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(String.format("Attestation of %s", instance.childEntityKind()))
+                .message(String.format("Attestation of %s", attestedKind))
                 .parentReference(instance.parentEntity())
                 .userId(username)
                 .severity(Severity.INFORMATION)
-                .childKind(instance.childEntityKind())
+                .childKind(attestedKind)
                 .operation(Operation.ADD)
                 .build());
     }

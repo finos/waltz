@@ -1,59 +1,10 @@
-<input ng-if=" $ctrl.rows.length > 10"
-       ng-model="$ctrl.filterQry"
-       placeholder="Search..."
-       ng-model-options="{ debounce: 100 }"
-       class="form-control"
-       type="search">
 
-<div ng-class="{ 'waltz-scroll-region-500' : $ctrl.rows.length > 10 }">
-
-
-    <table class="table table-condensed table-hover">
-        <colgroup>
-            <col width="38%">
-            <col width="20%">
-            <col width="38%">
-            <col width="4%">
-        </colgroup>
-        <thead>
-        <tr>
-            <th>From</th>
-            <th>Relationship</th>
-            <th>To</th>
-            <th>..</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- DATA -->
-        <tr ng-repeat="row in $ctrl.rows | filter:$ctrl.filterQry"
-            class="clickable"
-            ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelected(row) }"
-            ng-click="$ctrl.onRowSelect(row)">
-            <td>
-                <span ng-class="{ 'text-muted' : row.outbound }">
-                    <span ng-bind="row.a.name"></span>
-                    ( <small class='text-muted' ng-bind="row.a.type"></small> )
-                </span>
-            </td>
-            <td>
-                <span ng-bind="row.relationship.relationship | toDisplayName:'relationshipKind'"></span>
-            </td>
-            <td>
-                <span ng-class="{ 'text-muted' : !row.outbound }">
-                    <span ng-bind="row.b.name"></span>
-                    ( <small class='text-muted' ng-bind="row.b.type"></small> )
-                </span>
-            </td>
-            <td>
-                <span ng-if="row.relationship.description.length > 0"
-                      title="Additional description available">
-                    <waltz-icon name="file-text-o"></waltz-icon>
-                </span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+<waltz-grid-with-search  ng-if="$ctrl.rows.length > 0"
+                         column-defs="$ctrl.columnDefs"
+                         entries="$ctrl.rows"
+                         on-row-select="$ctrl.onRowSelect"
+                         search-placeholder-text="Search relationships...">
+</waltz-grid-with-search>
 
 <!-- Export -->
 <a ng-click="$ctrl.export()"

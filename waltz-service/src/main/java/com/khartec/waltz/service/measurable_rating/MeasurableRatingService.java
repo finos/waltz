@@ -145,6 +145,10 @@ public class MeasurableRatingService {
     }
 
 
+    public List<Tally<Long>> tallyByMeasurableCategoryId(long categoryId) {
+        return measurableRatingDao.tallyByMeasurableCategoryId(categoryId);
+    }
+
     public Collection<MeasurableRatingTally> statsForRelatedMeasurable(IdSelectionOptions options) {
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
         return measurableRatingDao.statsForRelatedMeasurable(selector);
@@ -201,4 +205,5 @@ public class MeasurableRatingService {
     public Collection<MeasurableRating> findByCategory(long id) {
         return measurableRatingDao.findByCategory(id);
     }
+
 }

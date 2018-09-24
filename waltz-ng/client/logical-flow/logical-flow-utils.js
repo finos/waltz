@@ -38,7 +38,7 @@ export const NEITHER = 'NEITHER';
 export function isLogicalFlowInbound(flow, ref) {
     checkIsLogicalFlow(flow);
     checkIsEntityRef(ref);
-    return sameRef(flow.target, ref);
+    return sameRef(flow.target, ref, { skipChecks: true });
 }
 
 
@@ -53,7 +53,7 @@ export function isLogicalFlowInbound(flow, ref) {
 export function isLogicalFlowOutbound(flow, ref) {
     checkIsLogicalFlow(flow);
     checkIsEntityRef(ref);
-    return sameRef(flow.source, ref);
+    return sameRef(flow.source, ref, { skipChecks: true });
 }
 
 

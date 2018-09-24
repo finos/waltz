@@ -41,7 +41,7 @@ const initialState = {
         selectorEntityKind: 'APP_GROUP',
         selectorScope: 'EXACT'
     },
-    availableAttestedKinds: [ "LOGICAL_DATA_FLOW", "PHYSICAL_FLOW"],
+    availableAttestedKinds: [ "LOGICAL_DATA_FLOW", "PHYSICAL_FLOW", "MEASURABLE_CATEGORY"],
     targetEntityKinds: [{
         name: 'Application',
         value: 'APPLICATION'
@@ -82,7 +82,8 @@ function mkCreateCommand(attestationRun){
             scope: attestationRun.selectorScope
         },
         targetEntityKind: attestationRun.targetEntityKind,
-        attestedKinds: attestationRun.attestedKinds,
+        attestedEntityKind: attestationRun.attestedEntityKind,
+        attestedEntityId: attestationRun.attestedEntityId,
         involvementKindIds: involvementKindIds,
         dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly)
     };
@@ -109,6 +110,15 @@ function controller($state,
 
     vm.onSelectorEntitySelect = (entity) => {
         vm.attestationRun.selectorEntity = entity;
+    };
+
+    vm.onAttestedKindChange = () => {
+        if(vm.attestationRun.attestedEntityKind === 'MEASURABLE_CATEGORY') {
+            serviceBroker
+                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .then(r => vm.measurableCategories = r.data);
+        }
+
     };
 
     vm.loadCreateSummary = () => {

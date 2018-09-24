@@ -21,14 +21,12 @@
 import {buildHierarchies, findNode, getParents} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import template from './data-type-overview.html';
+import template from "./data-type-overview.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
-
-
 
 
 function controller(serviceBroker) {
@@ -39,10 +37,10 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
                 const dataTypes = r.data;
-                const roots = buildHierarchies(dataTypes);
-                const node = findNode(roots, vm.parentEntityRef.id);
-                vm.dataType = node;
-                vm.parents = getParents(node);
+                const dataTypesById = _.keyBy(dataTypes, "id");
+                const dataType = dataTypesById[vm.parentEntityRef.id];
+                vm.dataType = dataType;
+                vm.parents = getParents(dataType, n => dataTypesById[n.parentId]);
             });
 
         serviceBroker
@@ -61,7 +59,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -72,7 +70,7 @@ const component = {
 };
 
 
-const id = 'waltzDataTypeOverview';
+const id = "waltzDataTypeOverview";
 
 export default {
     component,

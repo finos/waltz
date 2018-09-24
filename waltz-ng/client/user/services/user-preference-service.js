@@ -21,6 +21,10 @@
 import _ from "lodash";
 import {stringToBoolean} from "../../common/string-utils";
 
+
+export const lastViewedMeasurableCategoryKey = "main.measurable-category.list.lastCategory";
+
+
 let preferencePromise = null;
 
 function service($q, userPreferenceStore) {
@@ -30,7 +34,7 @@ function service($q, userPreferenceStore) {
             preferencePromise = userPreferenceStore.findAllForUser();
         }
         return preferencePromise
-            .then(preferences => _.keyBy(preferences, 'key'));
+            .then(preferences => _.keyBy(preferences, "key"));
     };
 
 
@@ -46,7 +50,7 @@ function service($q, userPreferenceStore) {
         return loadPreferences()
             .then(preferencesByKey => {
                 const isNewPreference = !preferencesByKey[key];
-                const hasPreferenceChanged = !isNewPreference && stringToBoolean(preferencesByKey[key].value) != value;
+                const hasPreferenceChanged = !isNewPreference && preferencesByKey[key].value != value;
 
                 if(isNewPreference || hasPreferenceChanged) {
                     const preference = {
@@ -73,8 +77,8 @@ function service($q, userPreferenceStore) {
 
 
 service.$inject = [
-    '$q',
-    'UserPreferenceStore'
+    "$q",
+    "UserPreferenceStore"
 ];
 
 

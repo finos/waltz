@@ -180,6 +180,7 @@ public class MeasurableRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
     public Collection<MeasurableRating> findByCategory(long id) {
         return mkBaseQuery()
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
@@ -197,6 +198,20 @@ public class MeasurableRatingDao {
                 MEASURABLE_RATING,
                 MEASURABLE_RATING.MEASURABLE_ID,
                 DSL.trueCondition());
+    }
+
+
+    public List<Tally<Long>> tallyByMeasurableCategoryId(long categoryId) {
+        SelectConditionStep<Record1<Long>> measurableIds = dsl
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId));
+
+        return calculateLongTallies(
+                dsl,
+                MEASURABLE_RATING,
+                MEASURABLE_RATING.MEASURABLE_ID,
+                MEASURABLE_RATING.MEASURABLE_ID.in(measurableIds));
     }
 
 

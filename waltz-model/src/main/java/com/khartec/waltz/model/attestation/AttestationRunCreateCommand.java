@@ -28,6 +28,7 @@ import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 @Value.Immutable
@@ -40,7 +41,9 @@ public abstract class AttestationRunCreateCommand implements
     public abstract EntityKind targetEntityKind();
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
-    public abstract Set<EntityKind> attestedKinds();
+
+    public abstract EntityKind attestedEntityKind();
+    public abstract Optional<Long> attestedEntityId();
 
     @Value.Default
     public LocalDate issuedOn() {
