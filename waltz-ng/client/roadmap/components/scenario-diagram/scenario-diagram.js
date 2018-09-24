@@ -18,16 +18,16 @@
  */
 
 import {initialiseData} from "../../../common";
-import template from "./roadmap-diagram.html";
+import template from "./scenario-diagram.html";
 import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {filterData} from "./roadmap-diagram-data-utils";
-import {setupZoom} from "./roadmap-diagram-utils";
+import {filterData} from "./scenario-diagram-data-utils";
+import {setupZoom} from "./scenario-diagram-utils";
 import _ from "lodash";
-import {drawGrid, gridLayout} from "./roadmap-diagram-grid-utils";
-import {columnAxisHeight, drawAxis, rowAxisWidth} from "./roadmap-diagram-axis-utils";
+import {drawGrid, gridLayout} from "./scenario-diagram-grid-utils";
+import {columnAxisHeight, drawAxis, rowAxisWidth} from "./scenario-diagram-axis-utils";
 
 
 const bindings = {
@@ -153,5 +153,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzRoadmapDiagram"
+    id: "waltzScenarioDiagram"
 };

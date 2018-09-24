@@ -1,5 +1,5 @@
-import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {NODE_DIMENSIONS} from "./roadmap-diagram-static-node-utils";
+import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./scenario-diagram-dimensions";
+import {NODE_DIMENSIONS} from "./scenario-diagram-static-node-utils";
 
 export const rowAxisWidth = 150;
 export const columnAxisHeight = 50;

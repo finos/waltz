@@ -1,7 +1,7 @@
 import _ from "lodash";
-import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {drawNodeGrid, nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
-import {defaultOptions} from "./roadmap-diagram-utils";
+import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
+import {drawNodeGrid, nodeGridLayout} from "./scenario-diagram-node-grid-utils";
+import {defaultOptions} from "./scenario-diagram-utils";
 
 
 export const ROW_STYLES = {

@@ -26,7 +26,7 @@ import {
     mkRandomMeasurable,
     mkRandomRowData,
     prepareData
-} from "../../roadmap/components/roadmap-diagram/roadmap-diagram-data-utils";
+} from "../../roadmap/components/scenario-diagram/scenario-diagram-data-utils";
 
 const initData = {
 

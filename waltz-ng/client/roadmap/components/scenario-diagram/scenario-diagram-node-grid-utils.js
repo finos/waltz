@@ -1,7 +1,7 @@
-import {drawUnit, NODE_STYLES} from "./roadmap-diagram-static-node-utils";
+import {drawUnit, NODE_STYLES} from "./scenario-diagram-static-node-utils";
 import {checkTrue} from "../../../common/checks";
-import {CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {defaultOptions} from "./roadmap-diagram-utils";
+import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
+import {defaultOptions} from "./scenario-diagram-utils";
 
 
 export function drawNodeGrid(selection, options) {

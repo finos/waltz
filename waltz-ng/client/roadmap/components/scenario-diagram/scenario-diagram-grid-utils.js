@@ -1,8 +1,8 @@
 import _ from "lodash";
-import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./roadmap-diagram-dimensions";
-import {drawRow, ROW_STYLES, rowLayout} from "./roadmap-diagram-row-utils";
+import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./scenario-diagram-dimensions";
+import {drawRow, ROW_STYLES, rowLayout} from "./scenario-diagram-row-utils";
 import {toCumulativeCounts} from "../../../common/list-utils";
-import {defaultOptions} from "./roadmap-diagram-utils";
+import {defaultOptions} from "./scenario-diagram-utils";
 
 
 export const GRID_STYLES = {
