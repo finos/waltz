@@ -69,11 +69,8 @@ function drawColumnHeaders(holder, headerData, layout) {
 
 
 export function drawAxis(columnAxisContent, rowAxisContent, dataWithLayout) {
-
-    console.log("drawAxis", dataWithLayout);
     const layout = dataWithLayout.layout;
     drawRowHeaders(rowAxisContent, dataWithLayout.rowHeaders, layout);
     drawColumnHeaders(columnAxisContent, dataWithLayout.columnHeaders, layout);
-
 }
 

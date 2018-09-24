@@ -37,11 +37,11 @@ const bindings = {
     handlers: "<?"
 };
 
+
 const defaultHandlers = {
-    onNodeClick: (n) => console.log("WRD: NodeClick", n),
-    onRowCellClick: (rc) => console.log("WRD: RowCellClick", rc),
-    onRowClick: (r) => console.log("WRD: RowClick", r),
+    onNodeClick: (n) => console.log("WRD: NodeClick", n)
 };
+
 
 const initialState = {
 };
@@ -83,7 +83,7 @@ function setupGroupElements($element) {
 
 
 function draw(dataWithLayout, svgGroups, options) {
-    console.log("draw", dataWithLayout);
+    console.log("WRD: draw", { dataWithLayout, options });
     drawGrid(svgGroups.gridContent, dataWithLayout, options);
     drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
 }
@@ -134,8 +134,8 @@ function controller($element, serviceBroker) {
         redraw();
     };
 
-    vm.$onChanges = () => {
-        console.log("roadmap-diagram changes - parentEntityRef: ", vm.parentEntityRef);
+    vm.$onChanges = (c) => {
+        console.log("roadmap-diagram changes: ", c);
         redraw();
     };
 }

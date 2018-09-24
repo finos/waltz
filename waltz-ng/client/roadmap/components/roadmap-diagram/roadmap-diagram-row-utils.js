@@ -28,7 +28,6 @@ export function drawRow(selection, options, colWidths = []) {
         .attr("transform", (d, i) => {
             const colOffset = _.sum(_.take(colWidths, i));
             const dx = (colOffset * CELL_DIMENSIONS.width) + (i * ROW_CELL_DIMENSIONS.padding);
-            console.log({ d, i, colOffset, colWidths, dx });
             return `translate(${dx} 0)`;
         })
         .call(drawNodeGrid, options);
