@@ -35,10 +35,9 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 ### Supported Databases
 
-- Postgresql 
 - MariaDB
 - Microsoft SQL Server (2012+)  
-  - requires JOOQ Pro license to build from source
+  - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
 
 
 ### Client
@@ -49,11 +48,11 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 - Bootstrap 3
 - D3 
 
+(see [package.json](https://github.com/khartec/waltz/blob/master/waltz-ng/package.json) for full list)
 
 ## Contact
 
-- email: dwatkins@khartec.com
-- irc: #waltzdev
+- email: [mailto:dwatkins@khartec.com]
 
 
 ## Contributors
