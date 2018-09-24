@@ -22,23 +22,23 @@ import {checkIsEntityRef} from "./checks";
 
 export function getDefaultScopeForEntityKind(kind) {
     switch (kind) {
-        case 'ACTOR':
-        case 'APPLICATION':
-        case 'APP_GROUP':
-        case 'CHANGE_INITIATIVE':
-        case 'FLOW_DIAGRAM':
-        case 'LOGICAL_DATA_ELEMENT':
-        case 'LOGICAL_FLOW':
-        case 'PHYSICAL_FLOW':
-        case 'PHYSICAL_SPECIFICATION':
-            return 'EXACT';
+        case "ACTOR":
+        case "APPLICATION":
+        case "APP_GROUP":
+        case "CHANGE_INITIATIVE":
+        case "FLOW_DIAGRAM":
+        case "LOGICAL_DATA_ELEMENT":
+        case "LOGICAL_FLOW":
+        case "PHYSICAL_FLOW":
+        case "PHYSICAL_SPECIFICATION":
+            return "EXACT";
         default:
-            return 'CHILDREN';
+            return "CHILDREN";
     }
 }
 
 
-export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ['ACTIVE']) {
+export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"]) {
     checkIsEntityRef(entityReference);
 
     return {

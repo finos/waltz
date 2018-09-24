@@ -69,19 +69,8 @@ function drawColumnHeaders(holder, headerData, layout) {
 
 
 export function drawAxis(columnAxisContent, rowAxisContent, dataWithLayout) {
-
-    console.log("drawAxis", dataWithLayout);
     const layout = dataWithLayout.layout;
-    //
-    // const numRows = layout.rowCount;
-    // const numColumns = layout.colCount;
-    // const gridHeight = layout.totalHeight;
-    // const gridWidth = layout.totalWidth;
-    //
-    // const actualTotalWidth = gridWidth * CELL_DIMENSIONS.width + numColumns * ROW_CELL_DIMENSIONS.padding;
-    // const actualTotalHeight = gridHeight * CELL_DIMENSIONS.height + numRows * ROW_DIMENSIONS.padding;
     drawRowHeaders(rowAxisContent, dataWithLayout.rowHeaders, layout);
     drawColumnHeaders(columnAxisContent, dataWithLayout.columnHeaders, layout);
-
 }
 

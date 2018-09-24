@@ -17,31 +17,44 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<div class="waltz-roadmap-diagram">
+<div class="waltz-roadmap-diagram-2">
     <h1>Roadmap diagram</h1>
 
-    <svg width="800"
-         height="600"
-         viewBox="0 0 1000 1000">
+    <input class="form-control small small"
+           type="search"
+           ng-change="$ctrl.doSearch()"
+           ng-model-options="{ debounce: 200 }"
+           ng-model="$ctrl.qry">
+
+    <br>
+    <br>
+
+    <svg width="1600"
+         height="1200"
+         style="xxborder: 1px solid red;"
+         viewBox="0 0 1600 1200">
+
         <clipPath id="grid-clip">
-            <rect x="0" y="0" width="600" height="400" />
+            <rect x="0"
+                  y="0"
+                  width="1450"
+                  height="1150" />
         </clipPath>
 
         <clipPath id="columns-clip">
-            <rect x="0" y="0" width="600" height="400" />
+            <rect x="0"
+                  y="0"
+                  width="1450"
+                  height="50" />
         </clipPath>
 
-        <clipPath id="row-groups-clip">
-            <rect x="0" y="0" width="400" height="400" />
+        <clipPath id="row-clip">
+            <rect x="0"
+                  y="0"
+                  width="150"
+                  height="1150" />
         </clipPath>
 
     </svg>
 
-    <div>
-        <button class="btn btn-primary" ng-click="$ctrl.onAddRowGroup()">Add Row Group</button>
-        <br>
-        <button class="btn btn-primary" ng-click="$ctrl.onAddRow()">Add Row</button>
-        <br>
-        <button class="btn btn-primary" ng-click="$ctrl.onAddCol()">Add Col</button>
-    </div>
 </div>

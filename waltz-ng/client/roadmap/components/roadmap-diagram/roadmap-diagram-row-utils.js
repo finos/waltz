@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS} from "./roadmap-diagram-dimensions";
 import {drawNodeGrid, nodeGridLayout} from "./roadmap-diagram-node-grid-utils";
+import {defaultOptions} from "./roadmap-diagram-utils";
 
 
 export const ROW_STYLES = {
@@ -9,10 +10,10 @@ export const ROW_STYLES = {
 };
 
 
-export function drawRow(selection, ratingColorScheme, colWidths = []) {
+export function drawRow(selection, options, colWidths = []) {
     const rows = selection
-        .selectAll(`.${ROW_STYLES.rowCell}`)
-        .data(d => d.data);
+        .selectAll(`g.${ROW_STYLES.rowCell}`)
+        .data(d => d.data, d => d.id);
 
     rows.exit()
         .remove();
@@ -22,15 +23,15 @@ export function drawRow(selection, ratingColorScheme, colWidths = []) {
         .append("g")
         .classed(ROW_STYLES.rowCell, true);
 
-    rows.merge(newRows)
-        .attr("transform", (d,i) => {
+    newRows
+        .merge(rows)
+        .attr("transform", (d, i) => {
             const colOffset = _.sum(_.take(colWidths, i));
-            const dx = (colOffset || i * 3) * CELL_DIMENSIONS.width + (i * ROW_CELL_DIMENSIONS.padding);
-            return `translate(${dx} 0)`
+            const dx = (colOffset * CELL_DIMENSIONS.width) + (i * ROW_CELL_DIMENSIONS.padding);
+            return `translate(${dx} 0)`;
         })
-        .call(drawNodeGrid, ratingColorScheme);
+        .call(drawNodeGrid, options);
 }
-
 
 
 /**
@@ -48,10 +49,12 @@ export function drawRow(selection, ratingColorScheme, colWidths = []) {
  * }
  * ```
  * @param data
+ * @param rowIdx - row index, used to create ids
+ * @param options
  * @returns {{layout: {maxCellRows: *, maxCellCols: *}, data: *}}
  */
-export function rowLayout(data = [], options = { cols: 3 }) {
-    const gridData = _.map(data, d => nodeGridLayout(d, options));
+export function rowLayout(data = [], rowIdx, options = defaultOptions) {
+    const gridData = _.map(data, (d, i) => nodeGridLayout(d, { row: rowIdx, col: i }, options));
 
     const maxCellRows = _
         .chain(gridData)
@@ -65,6 +68,8 @@ export function rowLayout(data = [], options = { cols: 3 }) {
         .value();
 
     return {
+        type: "rowLayout",
+        id: rowIdx,
         layout: {
             maxCellRows,
             colWidths
@@ -72,4 +77,3 @@ export function rowLayout(data = [], options = { cols: 3 }) {
         data: gridData
     };
 }
-

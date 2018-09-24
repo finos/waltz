@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 const criticalities = [
-    'UNKNOWN',
-    'NONE',
-    'LOW',
-    'MEDIUM',
-    'HIGH',
-    'VERY_HIGH',
+    "UNKNOWN",
+    "NONE",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "VERY_HIGH",
 ];
 
 
@@ -34,11 +34,11 @@ const cmp = (a, b) => a > b ? +1 : a < b ? -1 : 0;
 
 export function compareCriticalities(a, b) {
     const aIdx = _.indexOf(criticalities, a);
-    if (aIdx == -1) {
+    if (aIdx === -1) {
         throw "Not a recognized criticality" + a;
     }
     const bIdx = _.indexOf(criticalities, b);
-    if (bIdx == -1) {
+    if (bIdx === -1) {
         throw "Not a recognized criticality" + a;
     }
 
