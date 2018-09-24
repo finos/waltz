@@ -131,9 +131,26 @@
                                 required
                                 class="form-control"
                                 ng-options="kind as kind | toDisplayName:'entity' for kind in ctrl.availableAttestedKinds | orderBy:'kind'"
-                                ng-model="ctrl.attestationRun.attestedKinds"
-                                multiple
-                                style="height: 75px;">
+                                ng-model="ctrl.attestationRun.attestedEntityKind"
+                                ng-change="ctrl.onAttestedKindChange()">
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Measurable Category selector -->
+                <div class="form-group"
+                     ng-if="ctrl.attestationRun.attestedEntityKind === 'MEASURABLE_CATEGORY'">
+                    <label for="attestedKinds"
+                           class="col-sm-2 control-label">
+                        Which <span ng-bind="ctrl.attestationRun.attestedEntityKind | toDisplayName:'entity'"></span>?
+                        <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-sm-10">
+                        <select id="measurableCategory"
+                                required
+                                class="form-control"
+                                ng-options="category.id as category.name for category in ctrl.measurableCategories | orderBy:'category.name'"
+                                ng-model="ctrl.attestationRun.attestedEntityId">
                         </select>
                     </div>
                 </div>

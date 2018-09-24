@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,50 +16,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {initialiseData} from "../../../common";
 
-import template from "./measurable-rating-app-section.html";
-import { determineStartingTab, mkOverridesMap, mkTabs } from "../../measurable-rating-utils";
+import { CORE_API } from '../../../common/services/core-api-utils';
+import { initialiseData } from '../../../common';
+import { mkOverridesMap } from '../../../measurable-rating/measurable-rating-utils';
 
+import template from './inline-measurable-rating-panel.html';
 
-/**
- * @name waltz-measurable-rating-panel
- *
- * @description
- * This component render multiple <code>measurable-rating-panel</code> components
- * within a tab group.
- *
- * It is intended to be used to show measurables and ratings for a single entity (app or actor).
- */
 
 const bindings = {
     parentEntityRef: '<',
+    measurableCategoryRef: '<',
 };
 
 
 const initialState = {
     categories: [],
+    measurableCategory: {},
     ratings: [],
+    ratingSchemesById: {},
     perspectiveRatings: [],
     measurables: [],
-    visibility: {
-        editor: false,
-        overlay: false,
-        tab: null
-    },
-    byCategory: {}
+    overridesByMeasurableId: {}
 };
 
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    vm.viewMode = () => {
-        loadData(true);
-        vm.visibility.editor = false;
-    };
 
     const loadData = (force = false) => {
 
@@ -72,8 +55,8 @@ function controller($q, serviceBroker) {
             .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
 
         const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.categories = r.data);
+            .loadAppData(CORE_API.MeasurableCategoryStore.getById, [vm.measurableCategoryRef.id])
+            .then(r => vm.measurableCategory = r.data);
 
         const measurablesPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
@@ -88,19 +71,15 @@ function controller($q, serviceBroker) {
 
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
-                vm.tabs = mkTabs(
-                    vm.categories,
-                    vm.ratingSchemesById,
-                    vm.measurables,
-                    vm.ratings,
-                    false /*include empty */);
-                const firstNonEmptyTab = determineStartingTab(vm.tabs);
-                vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
+                vm.ratingScheme = vm.ratingSchemesById[vm.measurableCategory.ratingSchemeId];
+                console.log('got data: ', {parentRef: vm.parentEntityRef, cat: vm.measurableCategory, vm} );
             });
     };
 
     vm.$onInit = () => loadData();
 
+    vm.$onChanges = (changes) => {
+    };
 }
 
 
@@ -117,4 +96,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: 'waltzInlineMeasurableRatingPanel'
+};

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
@@ -52,6 +53,12 @@ public class AttestationRunDao {
             newArrayList(EntityKind.values()))
             .as("entity_name");
 
+    private static final Field<String> ATTESTED_ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            ATTESTATION_RUN.ATTESTED_ENTITY_ID,
+            ATTESTATION_RUN.ATTESTED_ENTITY_KIND,
+            newArrayList(EntityKind.values()))
+            .as("attested_entity_name");
+
     private static final Field<BigDecimal> COMPLETE_SUM = DSL.sum(DSL
             .when(ATTESTATION_INSTANCE.ATTESTED_BY.isNotNull(), DSL.val(1))
             .otherwise(DSL.val(0))).as("Complete");
@@ -64,6 +71,15 @@ public class AttestationRunDao {
 
     private static final RecordMapper<Record, AttestationRun> TO_DOMAIN_MAPPER = r -> {
         AttestationRunRecord record = r.into(ATTESTATION_RUN);
+
+        Optional<EntityReference> attestedEntityRef = Optional.empty();
+        if(record.getAttestedEntityKind() != null && record.getAttestedEntityId() != null) {
+            attestedEntityRef = Optional.of(EntityReference.mkRef(
+                    EntityKind.valueOf(record.getAttestedEntityKind()),
+                    record.getAttestedEntityId(),
+                    r.getValue(ATTESTED_ENTITY_NAME_FIELD)));
+        }
+
 
         return ImmutableAttestationRun.builder()
                 .id(record.getId())
@@ -83,6 +99,8 @@ public class AttestationRunDao {
                 .issuedBy(record.getIssuedBy())
                 .issuedOn(record.getIssuedOn().toLocalDate())
                 .dueDate(record.getDueDate().toLocalDate())
+                .attestedEntityKind(EntityKind.valueOf(record.getAttestedEntityKind()))
+                .attestedEntityRef(attestedEntityRef)
                 .build();
     };
 
@@ -110,6 +128,7 @@ public class AttestationRunDao {
     public AttestationRun getById(long attestationRunId) {
         return dsl.select(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .where(ATTESTATION_RUN.ID.eq(attestationRunId))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -119,6 +138,7 @@ public class AttestationRunDao {
     public List<AttestationRun> findAll() {
         return dsl.select(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -127,6 +147,7 @@ public class AttestationRunDao {
     public List<AttestationRun> findByRecipient(String userId) {
         return dsl.selectDistinct(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .innerJoin(ATTESTATION_INSTANCE)
                     .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
@@ -140,6 +161,7 @@ public class AttestationRunDao {
     public List<AttestationRun> findByEntityReference(EntityReference ref) {
         return dsl.select(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
                 .innerJoin(ATTESTATION_INSTANCE)
                     .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
@@ -175,6 +197,8 @@ public class AttestationRunDao {
         record.setIssuedBy(userId);
         record.setIssuedOn(toSqlDate(command.issuedOn()));
         record.setDueDate(toSqlDate(command.dueDate()));
+        record.setAttestedEntityKind(command.attestedEntityKind().name());
+        record.setAttestedEntityId(command.attestedEntityId().orElse(null));
 
         record.insert();
 

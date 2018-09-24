@@ -33,8 +33,7 @@
                     popover-trigger="mouseenter">
                 </td>
                 <td>
-                    <span ng-bind="attestation.instance.childEntityKind | toDisplayName:'entity'">
-                    </span>s
+                    <waltz-attested-kind run="attestation.run"></waltz-attested-kind>
                 </td>
                 <td>
                     <waltz-from-now timestamp="attestation.run.issuedOn"
