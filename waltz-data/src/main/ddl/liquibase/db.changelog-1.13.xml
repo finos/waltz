@@ -60,6 +60,14 @@
 
   
     <!-- 3273: Attestation run - include attested kind and id -->
+    <changeSet id="20180913-3273-0"
+               author="kamransaleem">
+        <sql>
+            DELETE FROM attestation_run
+            WHERE id NOT IN (SELECT attestation_run_id FROM attestation_instance)
+        </sql>
+    </changeSet>
+
     <changeSet id="20180913-3273-1"
                author="kamransaleem">
         <comment>3273: Attestation run - include attested kind and id</comment>
