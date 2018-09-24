@@ -6,8 +6,15 @@
             <h4>
                 <waltz-editable-field type="text"
                                       on-save="$ctrl.onSaveTitle"
-                                      save-label="Ok"
+                                      save-label="Save"
                                       initial-val="$ctrl.title">
+                </waltz-editable-field>
+                <waltz-editable-field type="text"
+                                      on-save="$ctrl.onSaveDescription"
+                                      save-label="Save"
+                                      initial-val="$ctrl.description"
+                                      empty-label="No description provided"
+                                      class="small text-muted">
                 </waltz-editable-field>
             </h4>
 

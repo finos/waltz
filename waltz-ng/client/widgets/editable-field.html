@@ -24,6 +24,10 @@
             </span>
         </span>
 
+        <span ng-bind="$ctrl.emptyLabel"
+              ng-if="$ctrl.newVal == null">
+        </span>
+
         <a ng-click="$ctrl.edit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"

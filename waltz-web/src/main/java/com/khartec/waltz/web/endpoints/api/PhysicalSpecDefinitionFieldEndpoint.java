@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.DescriptionChangeCommand;
+import com.khartec.waltz.model.UpdateDescriptionCommand;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
@@ -37,9 +37,7 @@ import java.util.Arrays;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.putForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -96,7 +94,7 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
             requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
 
             res.type(WebUtilities.TYPE_JSON);
-            DescriptionChangeCommand command = readBody(req, DescriptionChangeCommand.class);
+            UpdateDescriptionCommand command = readBody(req, UpdateDescriptionCommand.class);
 
             return specDefinitionFieldService.updateDescription(
                     WebUtilities.getUsername(req),

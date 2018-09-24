@@ -53,6 +53,10 @@ export function store($http, base) {
         .post(`${BASE}/update-name/${id}`, cmd)
         .then(r => r.data);
 
+    const updateDescription = (id, cmd) => $http
+        .post(`${BASE}/update-description/${id}`, cmd)
+        .then(r => r.data);
+
     return {
         getById,
         deleteForId,
@@ -61,7 +65,8 @@ export function store($http, base) {
         findForSelector,
         clone,
         save,
-        updateName
+        updateName,
+        updateDescription
     };
 }
 
@@ -111,6 +116,11 @@ export const FlowDiagramStore_API = {
         serviceName,
         serviceFnName: "updateName",
         description: "update name"
+    },
+    updateDescription: {
+        serviceName,
+        serviceFnName: "updateDescription",
+        description: "update description"
     },
     clone: {
         serviceName,

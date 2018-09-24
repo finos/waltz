@@ -18,18 +18,19 @@
  */
 import {initialiseData} from "../common";
 
-import template from './editable-field.html';
+import template from "./editable-field.html";
 
 
 const bindings = {
-    initialVal: '<',
-    onSave: '<',
-    fieldType: '@',  // logical-data-element | person | text | textarea | boolean | date
-    dateFormat: '@',
-    itemId: '<',
-    buttonLabel: '@',
-    saveLabel: '@?',
-    editRole: '@'
+    initialVal: "<",
+    onSave: "<",
+    fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date
+    dateFormat: "@",
+    itemId: "<",
+    buttonLabel: "@",
+    saveLabel: "@?",
+    editRole: "@",
+    emptyLabel: "@"
 };
 
 
@@ -37,15 +38,15 @@ const initialState = {
     errorMessage: "",
     editing: false,
     saving: false,
-    fieldType: 'text',
-    buttonLabel: 'Edit',
-    saveLabel:  'Save',
+    fieldType: "text",
+    buttonLabel: "Edit",
+    saveLabel:  "Save",
     onSave: () => console.log("WEF: No on-save method provided")
 };
 
 
 function mkNewVal(initialVal, fieldType) {
-    return initialVal && fieldType === 'date' ?
+    return initialVal && fieldType === "date" ?
         new Date(initialVal)
         : initialVal;
 }
@@ -111,7 +112,7 @@ function controller($timeout) {
 }
 
 
-controller.$inject = ['$timeout'];
+controller.$inject = ["$timeout"];
 
 
 const component = {
