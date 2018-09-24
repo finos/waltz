@@ -208,6 +208,13 @@ public class FlowDiagramService {
         return flowDiagramDao.updateName(id, command.newName());
     }
 
+    public boolean updateDescription(long id, UpdateDescriptionCommand command, String username) {
+        checkNotNull(command, "command cannot be null");
+        checkNotNull(username, "username cannot be null");
+
+        return flowDiagramDao.updateDescription(id, command.newDescription());
+    }
+
 
     private int[] createEntities(long diagramId,
                                  List<FlowDiagramEntity> entities) {

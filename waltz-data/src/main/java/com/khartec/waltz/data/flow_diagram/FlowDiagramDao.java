@@ -142,6 +142,14 @@ public class FlowDiagramDao {
                 .execute() == 1;
     }
 
+    public boolean updateDescription(long id, String des) {
+        return dsl
+                .update(FLOW_DIAGRAM)
+                .set(FLOW_DIAGRAM.DESCRIPTION, des)
+                .where(FLOW_DIAGRAM.ID.eq(id))
+                .execute() == 1;
+    }
+
     public boolean deleteById(long id) {
         return dsl
                 .update(FLOW_DIAGRAM)
