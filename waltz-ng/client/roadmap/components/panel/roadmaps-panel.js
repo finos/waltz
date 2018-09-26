@@ -12,6 +12,7 @@ const bindings = {
 const modes = {
     LOADING: "LOADING",
     LIST: "LIST",
+    ADD_ROADMAP: "ADD_ROADMAP",
     ADD_SCENARIO: "ADD_SCENARIO",
     VIEW_SCENARIO: "VIEW_SCENARIO"
 };
@@ -64,6 +65,10 @@ function controller($q, serviceBroker, notification) {
 
     vm.onAddScenario = (roadmap) => {
         vm.visibility.mode = modes.ADD_SCENARIO;
+    };
+
+    vm.onAddRoadmap = () => {
+        vm.visibility.mode = modes.ADD_ROADMAP;
     };
 
     vm.onSelectScenario = (scenario, roadmap) => {

@@ -16,12 +16,38 @@ const component = {
     controller
 };
 
-const initialState = {
 
+const initialState = {
+    handlers: {
+        onNodeClick: (n) => console.log("WRSD: NodeClick", n)
+    }
 };
 
 
-function controller($q, serviceBroker) {
+function mkNodeMenu($timeout) {
+    return (d) => {
+        return [
+            {
+                title: "Add comment",
+                action: (elm, d, i) => {
+                    $timeout(() => {
+                        console.log("Add comment")
+                    });
+                }
+            },
+            { divider: true },
+            {
+                title: "Remove",
+                action: (elm, d, i) => {
+                    console.log("remove");
+                }
+            },
+        ];
+    };
+}
+
+
+function controller($q, $timeout, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -44,12 +70,19 @@ function controller($q, serviceBroker) {
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
             .then(() => vm.vizData = prepareData(vm.scenarioDefn, vm.applications, vm.measurables));
+
+        vm.handlers.contextMenus = {
+            node: mkNodeMenu($timeout),
+            nodeGrid: mkNodeMenu($timeout),
+        };
+
     };
 
 }
 
 controller.$inject = [
     "$q",
+    "$timeout",
     "ServiceBroker"
 ];
 

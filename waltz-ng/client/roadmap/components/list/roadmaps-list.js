@@ -6,6 +6,7 @@ import _ from "lodash";
 const bindings = {
     roadmaps: "<",
     scenarios: "<",
+    onAddRoadmap: "<",
     onAddScenario: "<",
     onCloneScenario: "<",
     onSelectScenario: "<"
