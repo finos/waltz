@@ -57,6 +57,14 @@ public class JooqUtilities {
     }
 
 
+    public static EntityReference readRef(Record record, Field<String> kindField, Field<Long> idField, Field<String> nameField) {
+        return mkRef(
+                EntityKind.valueOf(record.getValue(kindField)),
+                record.getValue(idField),
+                record.getValue(nameField));
+    }
+
+
     /**
      * Expects result set like: { Id, Count }
      */

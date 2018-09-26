@@ -1,9 +1,10 @@
-package com.khartec.waltz.data.roadmap;
+package com.khartec.waltz.data.scenario;
 
 
-import com.khartec.waltz.model.roadmap.AxisKind;
-import com.khartec.waltz.model.roadmap.ImmutableScenarioAxisItem;
-import com.khartec.waltz.model.roadmap.ScenarioAxisItem;
+import com.khartec.waltz.model.AxisKind;
+import com.khartec.waltz.model.scenario.ImmutableScenarioAxisItem;
+import com.khartec.waltz.model.scenario.ScenarioAxisItem;
+import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.schema.tables.records.ScenarioAxisItemRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;

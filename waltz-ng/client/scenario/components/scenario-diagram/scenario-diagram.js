@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import {initialiseData} from "../../../common/index";
 import template from "./scenario-diagram.html";
 import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";

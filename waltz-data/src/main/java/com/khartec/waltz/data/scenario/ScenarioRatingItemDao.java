@@ -1,8 +1,8 @@
-package com.khartec.waltz.data.roadmap;
+package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.roadmap.ImmutableScenarioRatingItem;
-import com.khartec.waltz.model.roadmap.ScenarioRatingItem;
+import com.khartec.waltz.model.scenario.ImmutableScenarioRatingItem;
+import com.khartec.waltz.model.scenario.ScenarioRatingItem;
 import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;

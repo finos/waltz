@@ -1,9 +1,9 @@
-package com.khartec.waltz.data.roadmap;
+package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.roadmap.ImmutableScenario;
-import com.khartec.waltz.model.roadmap.Scenario;
+import com.khartec.waltz.model.scenario.ImmutableScenario;
+import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.schema.tables.records.ScenarioRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;

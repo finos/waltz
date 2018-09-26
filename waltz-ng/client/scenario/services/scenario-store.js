@@ -21,24 +21,13 @@ import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 function store($http, baseUrl) {
 
-    const BASE = `${baseUrl}/roadmap`;
+    const BASE = `${baseUrl}/scenario`;
 
-    const getRoadmapById = (roadmapId) =>
-        $http
-            .get(`${BASE}/id/${roadmapId}`)
-            .then(result => result.data);
-
-    const findRoadmapsBySelector = (selectionOptions) => {
-        checkIsIdSelector(selectionOptions);
-        return $http
-            .post(`${BASE}/by-selector`, selectionOptions)
-            .then(result => result.data);
-    };
 
     const findScenariosByRoadmapSelector = (selectionOptions) => {
         checkIsIdSelector(selectionOptions);
         return $http
-            .post(`${BASE}/scenarios/by-roadmap-selector`, selectionOptions)
+            .post(`${BASE}/by-roadmap-selector`, selectionOptions)
             .then(result => result.data);
     };
 

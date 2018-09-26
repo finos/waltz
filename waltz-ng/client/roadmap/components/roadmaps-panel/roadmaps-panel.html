@@ -1,0 +1,51 @@
+
+<div>
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="! $ctrl.roadmaps">
+        <message>
+            <strong>No Roadmaps</strong> associated with this entity
+        </message>
+    </waltz-no-data>
+
+    <div ng-repeat="roadmap in $ctrl.roadmaps">
+        <waltz-sub-section name="{{roadmap.name}}">
+            <content>
+                <div style="padding: 12px">
+                    <h4>Overview</h4>
+                    <table class="waltz-mini-table">
+                        <tr>
+                            <td><strong>Columns:</strong></td>
+                            <td><span ng-bind="roadmap.rowType.name"></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rows:</strong></td>
+                            <td><span ng-bind="roadmap.columnType.name"></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Description:</strong></td>
+                            <td><waltz-markdown text="roadmap.description"></waltz-markdown></td>
+                        </tr>
+                    </table>
+
+                    <h4>Scenarios</h4>
+
+                    <table class="waltz-mini-table">
+                        <tr ng-repeat="scenario in $ctrl.scenariosByRoadmapId[r.id]">
+                            <td>
+                                <span ng-bind="scenario.name"></span>
+                            </td>
+                            <td>
+                                <pre ng-bind="scenario | json"></pre>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <pre ng-bind="roadmap | json"></pre>
+
+
+            </content>
+        </waltz-sub-section>
+    </div>
+
+</div>
