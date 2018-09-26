@@ -24,7 +24,7 @@ import template from "./playpen3.html";
 const initialState = {
     parentEntityRef: {
         id: 100,
-        kind: 'ORG_UNIT'
+        kind: "ORG_UNIT"
     },
 };
 
@@ -34,15 +34,15 @@ function controller($stateParams, serviceBroker) {
 
 
 controller.$inject = [
-    '$stateParams',
-    'ServiceBroker'
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

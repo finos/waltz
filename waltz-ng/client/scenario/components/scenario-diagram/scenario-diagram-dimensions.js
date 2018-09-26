@@ -1,4 +1,4 @@
-import {NODE_DIMENSIONS} from "./roadmap-diagram-static-node-utils";
+import {NODE_DIMENSIONS} from "./scenario-diagram-static-node-utils";
 
 const CELL_PADDING = 10;
 

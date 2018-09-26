@@ -19,25 +19,17 @@
  */
 
 import angular from "angular";
-import RoadmapsPanel from "./components/panel/roadmaps-panel";
-import RoadmapsList from "./components/list/roadmaps-list";
-import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
 import {registerComponents, registerStores} from "../common/module-utils";
-import RoadmapStore from "./services/roadmap-store";
+import ScenarioStore from "./services/scenario-store";
+import ScenarioDiagram from "./components/scenario-diagram/scenario-diagram";
 
 
 export default () => {
-    const module = angular.module("waltz.roadmap", []);
+    const module = angular.module("waltz.scenario", []);
 
-    registerComponents(module, [
-        RoadmapScenarioDiagram,
-        RoadmapsList,
-        RoadmapsPanel
-    ]);
+    registerComponents(module, [ ScenarioDiagram ]);
 
-    registerStores(module, [
-        RoadmapStore
-    ]);
+    registerStores(module, [ ScenarioStore ]);
 
     return module.name;
 };

@@ -28,6 +28,11 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 
 public class SetUtilities {
 
+    public static <T> Set<T> asSet(T... ts) {
+        return fromArray(ts);
+    }
+
+
     public static <T> Set<T> fromArray(T... ts) {
         if (ts == null || ts.length == 0) return new HashSet<>();
 

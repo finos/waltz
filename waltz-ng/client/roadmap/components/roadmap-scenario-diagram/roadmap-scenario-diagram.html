@@ -1,0 +1,65 @@
+
+
+<div>
+    <!-- HEADER -->
+    <h3 class="waltz-visibility-parent">
+        <span ng-bind="$ctrl.scenarioDefn.scenario.name"></span>
+        <small>
+            <span ng-bind="$ctrl.scenarioDefn.roadmap.name"></span>
+            <a ng-click="$ctrl.onCancel()"
+               class="clickable">
+                <span class="waltz-visibility-child-50">
+                    <waltz-icon name="close"></waltz-icon>
+                    Cancel
+                </span>
+            </a>
+        </small>
+    </h3>
+
+
+    <!-- DETAILS -->
+    <table class="waltz-mini-table">
+        <tr>
+            <td>
+                <strong>Target Date:</strong></td>
+            <td>
+                <span ng-bind="$ctrl.scenarioDefn.scenario.targetDate"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>Status:</strong>
+            </td>
+            <td>
+                <span ng-bind="$ctrl.scenarioDefn.scenario.status | toDisplayName:'releaseLifecycleStatus'"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>Description:</strong>
+            </td>
+            <td>
+                <waltz-markdown text="$ctrl.scenarioDefn.scenario.description">
+                </waltz-markdown>
+            </td>
+        </tr>
+    </table>
+
+
+    <br>
+
+
+    <!-- VIZ -->
+    <waltz-scenario-diagram row-data="$ctrl.vizData.rowData"
+                            column-headings="$ctrl.vizData.columnHeadings"
+                            row-headings="$ctrl.vizData.rowHeadings"
+                            handlers="$ctrl.handlers">
+    </waltz-scenario-diagram>
+
+
+    <!-- CANCEL -->
+    <a ng-click="$ctrl.onCancel()"
+       class="clickable">
+        Cancel
+    </a>
+</div>

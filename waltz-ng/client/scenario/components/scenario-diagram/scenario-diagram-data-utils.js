@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {isEmpty, randomPick} from "../../../common";
+import {isEmpty, randomPick} from "../../../common/index";
 import {toOffsetMap} from "../../../common/list-utils";
 
 

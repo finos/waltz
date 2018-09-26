@@ -548,4 +548,41 @@
 
     </changeSet>
 
+    <!-- 3403: Roadmap improvments -->
+    <changeSet id="20180926-3403-1"
+               author="davidwatkins73">
+        <addColumn tableName="scenario">
+            <column name="target_date"
+                    type="DATE"
+                    defaultValue="2018-12-25">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <dropDefaultValue columnDataType="DATE"
+                          columnName="target_date"
+                          tableName="scenario"/>
+    </changeSet>
+
+    <changeSet id="20180926-3403-2"
+               author="davidwatkins73">
+        <createIndex indexName="idx_scenario_roadmap_id"
+                     tableName="scenario"
+                     unique="false">
+            <column name="roadmap_id"
+                    type="${id.type}"/>
+        </createIndex>
+        <createIndex indexName="idx_scenario_axis_scenario_id"
+                     tableName="scenario_axis_item"
+                     unique="false">
+            <column name="scenario_id"
+                    type="${id.type}"/>
+        </createIndex>
+        <createIndex indexName="idx_scenario_rating_scenario_id"
+                     tableName="scenario_rating_item"
+                     unique="false">
+            <column name="scenario_id"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

@@ -17,34 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './last-updated.html';
-import {initialiseData} from "../../index";
+package com.khartec.waltz.jobs;
+
+import com.khartec.waltz.data.roadmap.RoadmapDao;
+import com.khartec.waltz.model.roadmap.Roadmap;
+import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.roadmap.RoadmapService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
-/*
- * This component will display last updated information for any object that adheres to the LastUpdatedProvider interface
- */
+public class RoadmapHarness {
 
-const bindings = {
-    entity: '<',
-    showLabel: '<?'
-};
+    public static void main(String[] args) {
 
-const initialState = {
-    showLabel: true
-};
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        RoadmapDao roadmapDao = ctx.getBean(RoadmapDao.class);
+        RoadmapService roadmapService = ctx.getBean(RoadmapService.class);
 
-function controller() {
-    const vm = initialiseData(this, initialState);
+        Roadmap r = roadmapDao.getById(1L);
+        System.out.println(r);
+
+    }
+
 }
-
-
-const component = {
-    bindings,
-    template,
-    controller
-};
-
-
-export default component;

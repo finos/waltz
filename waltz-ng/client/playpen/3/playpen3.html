@@ -1,9 +1,15 @@
 <div>
 
     <waltz-section>
+        <waltz-roadmaps-panel parent-entity-ref="ctrl.parentEntityRef">
 
-        <waltz-roadmap-diagram></waltz-roadmap-diagram>
-
+        </waltz-roadmaps-panel>
     </waltz-section>
 
+
+
+
+    <waltz-section name="debug">
+        <pre ng-bind="ctrl.parentEntityRef | json"></pre>
+    </waltz-section>
 </div>
