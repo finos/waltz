@@ -26,6 +26,7 @@ public class ScenarioService {
         return scenarioDao.getById(id);
     }
 
+
     public Collection<Scenario> findForRoadmapId(long roadmapId) {
         return scenarioDao.findForRoadmapId(roadmapId);
     }
