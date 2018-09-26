@@ -304,7 +304,7 @@
                     columnName="child_entity_kind" />
     </changeSet>
 
-    <changeSet id="20180913-3273-0"
+    <changeSet id="20180913-3273-9a"
                author="kamransaleem">
         <sql>
             DELETE FROM attestation_run
