@@ -3,11 +3,13 @@ import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./scenario-d
 import {drawRow, ROW_STYLES, rowLayout} from "./scenario-diagram-row-utils";
 import {toCumulativeCounts} from "../../../common/list-utils";
 import {defaultOptions} from "./scenario-diagram-utils";
+import {d3ContextMenu} from "../../../common/d3-context-menu";
 
 
 export const GRID_STYLES = {
     columnDivider: "wrd-column-divider",
-    rowDivider: "wrd-row-divider"
+    rowDivider: "wrd-row-divider",
+    nodeGridBackground: "wrd-node-grid-background"
 };
 
 
@@ -73,30 +75,38 @@ export function drawGrid(holder, dataWithLayout, options) {
             const dy = rowOffset + padding;
             return `translate(0 ${ dy })`;
         })
-        .call(drawBackgroundCells, dataWithLayout)
+        .call(drawBackgroundCells, options, dataWithLayout)
         .call(drawRow, options, dataWithLayout.layout.colWidths);
 }
 
 
-function drawBackgroundCells(selection, dataWithLayout) {
-    const backgroundCells = selection
-        .selectAll(".foo")
-        .data((d, rowIdx) => _.map(
-            dataWithLayout.columnHeaders,
-            (c, colIdx) => ({
+function drawBackgroundCells(selection, options, dataWithLayout) {
+    const dataProvider = (d, rowIdx) => _
+        .map(dataWithLayout.columnHeaders,
+            (col, colIdx) => ({
                 id: `${rowIdx}.${colIdx}`,
                 colOffset: dataWithLayout.layout.colOffsets[colIdx],
                 colWidth: dataWithLayout.layout.colWidths[colIdx],
+                column: col.data,
+                row: dataWithLayout.rowHeaders[rowIdx].data,
                 rowHeight: d.layout.maxCellRows
-            })), d => d.id);
+            }));
+
+    const backgroundCells = selection
+        .selectAll(`.${GRID_STYLES.nodeGridBackground}`)
+        .data(dataProvider, d => d.id);
+
+    const contextMenu = _.get(options, ["handlers", "contextMenus", "nodeGrid"], null);
 
     const newBackgroundCells = backgroundCells
         .enter()
         .append("rect")
-        .classed("foo", true)
+        .classed(GRID_STYLES.nodeGridBackground, true)
         .attr("fill", "#fafafa")
         .attr("stroke", "#eee")
-        .attr("stroke-width", 1.5);
+        .attr("stroke-width", 1.5)
+        .on("click", options.handlers.onNodeGridClick)
+        .on("contextmenu", contextMenu ?  d3ContextMenu(contextMenu) : null);
 
     newBackgroundCells
         .merge(backgroundCells)

@@ -39,7 +39,8 @@ const bindings = {
 
 
 const defaultHandlers = {
-    onNodeClick: (n) => console.log("WRD: NodeClick", n)
+    onNodeClick: (d) => console.log("WRD: NodeClick", d),
+    onNodeGridClick: (d) => console.log("WRD: NodeGridClick", d)
 };
 
 

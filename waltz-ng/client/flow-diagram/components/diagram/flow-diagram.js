@@ -37,8 +37,8 @@ import template from "./flow-diagram.html";
 
 
 const bindings = {
-    contextMenus: '<',
-    clickHandlers: '<'
+    contextMenus: "<",
+    clickHandlers: "<"
 };
 
 
@@ -53,7 +53,7 @@ const DEFAULT_CONTEXT_MENUS = {
 };
 
 
-const DEFAULT_CLICK_HANDLER = (d) => console.log('wfd: default on-click handler', d);
+const DEFAULT_CLICK_HANDLER = (d) => console.log("wfd: default on-click handler", d);
 
 
 const DEFAULT_CLICK_HANDLERS  = {
@@ -63,21 +63,21 @@ const DEFAULT_CLICK_HANDLERS  = {
 
 
 const styles = {
-    ANNOTATION: 'wfd-annotation',
-    ANNOTATIONS: 'wfd-annotations',
-    FLOW: 'wfd-flow',
-    FLOW_REMOVED: 'wfd-flow-removed',
-    FLOW_PENDING: 'wfd-flow-pending',
-    FLOWS: 'wfd-flows',
-    FLOW_ARROW: 'wfd-flow-arrow',
-    FLOW_ARROW_HEAD: 'wfd-flow-arrow-head',
-    FLOW_BUCKET: 'wfd-flow-bucket',
-    FLOW_BUCKETS: 'wfd-flow-buckets',
-    NODE: 'wfd-node',
-    NODES: 'wfd-nodes',
-    SUBJECT: 'wfd-subject',
-    TITLE: 'wdf-title',
-    TITLE_ICON: 'wdf-title-icon',
+    ANNOTATION: "wfd-annotation",
+    ANNOTATIONS: "wfd-annotations",
+    FLOW: "wfd-flow",
+    FLOW_REMOVED: "wfd-flow-removed",
+    FLOW_PENDING: "wfd-flow-pending",
+    FLOWS: "wfd-flows",
+    FLOW_ARROW: "wfd-flow-arrow",
+    FLOW_ARROW_HEAD: "wfd-flow-arrow-head",
+    FLOW_BUCKET: "wfd-flow-bucket",
+    FLOW_BUCKETS: "wfd-flow-buckets",
+    NODE: "wfd-node",
+    NODES: "wfd-nodes",
+    SUBJECT: "wfd-subject",
+    TITLE: "wdf-title",
+    TITLE_ICON: "wdf-title-icon",
 };
 
 
@@ -125,7 +125,7 @@ function dragStarted(d) {
 function dragger(commandProcessor) {
     return (d) => {
         const cmd = {
-            command: 'MOVE',
+            command: "MOVE",
             payload: {id: d.id, dx: event.dx, dy: event.dy}
         };
         commandProcessor([cmd]);
@@ -170,10 +170,10 @@ function drawNodes(state, group, commandProcessor) {
 
     const newNodeElems = nodeElems
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.NODE, true)
-        .on('click.node', clickHandler)
-        .on('contextmenu', contextMenu)
+        .on("click.node", clickHandler)
+        .on("contextmenu", contextMenu)
         .call(dragHandler);
 
 
@@ -181,7 +181,7 @@ function drawNodes(state, group, commandProcessor) {
 
     newNodeElems
         .merge(nodeElems)
-        .attr('transform', d => {
+        .attr("transform", d => {
             const position = positionFor(state, d);
             return `translate(${position.x}, ${position.y})`;
         });
@@ -189,7 +189,7 @@ function drawNodes(state, group, commandProcessor) {
     // draw shape
 
     newNodeElems
-        .append('path');
+        .append("path");
 
     nodeElems
         .merge(newNodeElems)
@@ -198,24 +198,24 @@ function drawNodes(state, group, commandProcessor) {
     // icon
 
     newNodeElems
-        .append('text')
+        .append("text")
         .classed(styles.TITLE_ICON, true)
-        .attr('font-family', 'FontAwesome')
+        .attr("font-family", "FontAwesome")
         .text(d => shapeFor(state, d).icon);
 
     nodeElems
         .merge(newNodeElems)
         .select(`.${styles.TITLE_ICON}`)
-        .attr('dx', d => shapeFor(state, d).title.dx)
-        .attr('dy', d => shapeFor(state, d).title.dy);
+        .attr("dx", d => shapeFor(state, d).title.dx)
+        .attr("dy", d => shapeFor(state, d).title.dy);
 
     // title
 
     newNodeElems
-        .append('text')
+        .append("text")
         .classed(styles.TITLE, true)
-        .attr('dx', d => shapeFor(state, d).title.dx + 14)
-        .attr('dy', d => shapeFor(state, d).title.dy);
+        .attr("dx", d => shapeFor(state, d).title.dx + 14)
+        .attr("dy", d => shapeFor(state, d).title.dy);
 
     nodeElems
         .merge(newNodeElems)
@@ -244,44 +244,44 @@ function drawFlows(state, group) {
 
     const newLinkElems = linkElems
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.FLOW, true)
-        .classed(styles.FLOW_REMOVED, d => d.data.entityLifecycleStatus === 'REMOVED')
-        .classed(styles.FLOW_PENDING, d => d.data.entityLifecycleStatus === 'PENDING')
-        .attr('data-flow-id', d => d.id);
+        .classed(styles.FLOW_REMOVED, d => d.data.entityLifecycleStatus === "REMOVED")
+        .classed(styles.FLOW_PENDING, d => d.data.entityLifecycleStatus === "PENDING")
+        .attr("data-flow-id", d => d.id);
 
     newLinkElems
-        .append('path')
+        .append("path")
         .classed(styles.FLOW_ARROW, true);
 
     newLinkElems
-        .append('path')
+        .append("path")
         .classed(styles.FLOW_ARROW_HEAD, true)
-        .attr('d', 'M -8,-4 8,0 -8,4 Z');
+        .attr("d", "M -8,-4 8,0 -8,4 Z");
 
     const newBucketElems = newLinkElems
-        .append('g')
+        .append("g")
         .classed(styles.FLOW_BUCKET, true)
-        .on('contextmenu', contextMenus.flowBucket
+        .on("contextmenu", contextMenus.flowBucket
             ? d3ContextMenu(contextMenus.flowBucket)
             : null)
-        .on('click.flowBucket', clickHandlers.flowBucket);
+        .on("click.flowBucket", clickHandlers.flowBucket);
 
     newBucketElems
-        .append('circle');
+        .append("circle");
 
     newBucketElems
-        .append('text')
-        .classed('fa-fw', true)
-        .attr('font-family', 'FontAwesome')
-        .attr('dx', -6)
-        .attr('dy', 5);
+        .append("text")
+        .classed("fa-fw", true)
+        .attr("font-family", "FontAwesome")
+        .attr("dx", -6)
+        .attr("dy", 5);
 
 
     newLinkElems
         .merge(linkElems)
         .select(`.${styles.FLOW_ARROW}`)
-        .attr('d', d => {
+        .attr("d", d => {
             const sourcePos = positionFor(state, d.source);
             const targetPos = positionFor(state, d.target);
 
@@ -306,16 +306,16 @@ function decorateFlows(selection, state) {
 
         const bucketGroup = parentGroup
             .select(`.${styles.FLOW_BUCKET}`)
-            .attr('transform', `translate(${bucketPt.x}, ${bucketPt.y})`);
+            .attr("transform", `translate(${bucketPt.x}, ${bucketPt.y})`);
 
         bucketGroup
-            .select('circle')
-            .attr('r', d => _.size(state.model.decorations[d.id]) > 0
+            .select("circle")
+            .attr("r", d => _.size(state.model.decorations[d.id]) > 0
                 ? dimensions.flowBucket.r * 1.5
                 : dimensions.flowBucket.r );
 
         bucketGroup
-            .select('text')
+            .select("text")
             .text(d => {
                 const decorationCount = _.size(state.model.decorations[d.id]);
                 if (decorationCount === 0) {
@@ -351,7 +351,7 @@ function mkArrowHeadPath(arrowHeadSelection, linkPath) {
 
     arrowHeadSelection
         .attr(
-            'transform',
+            "transform",
             `translate(${arrowPt1.x}, ${arrowPt1.y}) rotate(${theta * (180 / Math.PI)})`)
 }
 
@@ -365,9 +365,9 @@ function drawAnnotations(state, group, commandProcessor) {
 
     const newAnnotationElems = annotationElems
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.ANNOTATION, true)
-        .on('contextmenu', contextMenus.annotation
+        .on("contextmenu", contextMenus.annotation
             ? d3ContextMenu(contextMenus.annotation)
             : null);
 
@@ -377,15 +377,15 @@ function drawAnnotations(state, group, commandProcessor) {
 
     // line
     newAnnotationElems
-        .append('path');
+        .append("path");
 
     const allLines = annotationElems
         .merge(newAnnotationElems)
-        .select('path');
+        .select("path");
 
     const determineAnnotationGeometry = (state, d) => {
         const ref = d.data.entityReference;
-        if (ref.kind === 'LOGICAL_DATA_FLOW') {
+        if (ref.kind === "LOGICAL_DATA_FLOW") {
             const geometry = {
                 subjectPosition: {x: 0, y: 0},
                 subjectShape: { cx: 0, cy: 0},
@@ -407,7 +407,7 @@ function drawAnnotations(state, group, commandProcessor) {
     };
 
     allLines
-        .attr('d', d => {
+        .attr("d", d => {
             const p = determineAnnotationGeometry(state, d);
             const bar = dimensions.annotation.text.w * (p.annotationPosition.x > 0 ? 1 : -1);
             const sx = p.subjectPosition.x + p.subjectShape.cx;
@@ -421,8 +421,8 @@ function drawAnnotations(state, group, commandProcessor) {
 
     // joint
     newAnnotationElems
-        .append('circle')
-        .attr('draggy', 10)
+        .append("circle")
+        .attr("draggy", 10)
         .call(drag()
             .on("start", dragStarted)
             .on("drag", dragger(commandProcessor))
@@ -430,31 +430,31 @@ function drawAnnotations(state, group, commandProcessor) {
 
     annotationElems
         .merge(newAnnotationElems)
-        .select('circle')
-        .attr('r', dimensions.annotation.circle.r)
+        .select("circle")
+        .attr("r", dimensions.annotation.circle.r)
         .each(function(d) {
             const p = determineAnnotationGeometry(state, d);
             const cx = p.subjectPosition.x + p.annotationPosition.x + p.subjectShape.cx;
             const cy = p.subjectPosition.y + p.annotationPosition.y + p.subjectShape.cy;
             select(this)
-                .attr('cx', cx)
-                .attr('cy', cy);
+                .attr("cx", cx)
+                .attr("cy", cy);
         });
 
     // text
     newAnnotationElems
-        .append('text');
+        .append("text");
 
     annotationElems
         .merge(newAnnotationElems)
-        .select('text')
+        .select("text")
         .each(function(d) {
             const p = determineAnnotationGeometry(state, d);
             const bar = p.annotationPosition.x > 0 ? 10 : dimensions.annotation.text.w * -1;
             const x = p.subjectPosition.x + p.annotationPosition.x + bar + p.subjectShape.cx;
             const y = p.subjectPosition.y + p.annotationPosition.y + 18;
             select(this)
-                .attr('transform', `translate(${x}, ${y})`);
+                .attr("transform", `translate(${x}, ${y})`);
         })
         .text(d => d.data.note)
         .call(wrapText, dimensions.annotation.text.w - 5);
@@ -465,14 +465,14 @@ function drawAnnotations(state, group, commandProcessor) {
  * Toggles layers by setting their css display style
  */
 function enableLayers(visibility) {
-    selectAll(`.${styles.FLOW_BUCKET}`).style('display', visibility.flowBuckets ? 'initial' : 'none');
-    selectAll(`.${styles.ANNOTATION}`).style('display', visibility.annotations ? 'initial' : 'none');
-    selectAll(`.${styles.FLOW_PENDING}`).style('display', visibility.pendingFlows ? 'initial' : 'none');
-    selectAll(`.${styles.FLOW_REMOVED}`).style('display', visibility.removedFlows ? 'initial' : 'none');
+    selectAll(`.${styles.FLOW_BUCKET}`).style("display", visibility.flowBuckets ? "initial" : "none");
+    selectAll(`.${styles.ANNOTATION}`).style("display", visibility.annotations ? "initial" : "none");
+    selectAll(`.${styles.FLOW_PENDING}`).style("display", visibility.pendingFlows ? "initial" : "none");
+    selectAll(`.${styles.FLOW_REMOVED}`).style("display", visibility.removedFlows ? "initial" : "none");
 }
 
 
-function draw(state, commandProcessor = () => console.log('no command processor given')) {
+function draw(state, commandProcessor = () => console.log("no command processor given")) {
     // console.log('draw', state);
 
     if (state.layout.diagramTransform) {
@@ -491,25 +491,25 @@ function draw(state, commandProcessor = () => console.log('no command processor 
 
 function prepareGroups(holder) {
     const svg = select(holder)
-        .append('svg')
+        .append("svg")
         .attr("width", dimensions.svg.w)
         .attr("height", dimensions.svg.h)
-        .attr('viewBox', `0 0 ${dimensions.svg.w} ${dimensions.svg.h}`);
+        .attr("viewBox", `0 0 ${dimensions.svg.w} ${dimensions.svg.h}`);
 
     const container = svg
-        .append('g')
-        .attr('transform', 'translate(0,0) scale(1)');
+        .append("g")
+        .attr("transform", "translate(0,0) scale(1)");
 
     const annotations = container
         .append("g")
         .classed(styles.ANNOTATIONS, true);
 
     const flows = container
-        .append('g')
+        .append("g")
         .classed(styles.FLOWS, true);
 
     const nodes = container
-        .append('g')
+        .append("g")
         .classed(styles.NODES, true);
 
     return {
@@ -529,7 +529,7 @@ function prepareGroups(holder) {
 function setupPanAndZoom(commandProcessor) {
     function zoomed() {
         const t = event.transform;
-        commandProcessor([{ command: 'TRANSFORM_DIAGRAM', payload: t }]);
+        commandProcessor([{ command: "TRANSFORM_DIAGRAM", payload: t }]);
     }
 
     const myZoom = zoom()
@@ -537,17 +537,17 @@ function setupPanAndZoom(commandProcessor) {
         .on("zoom", zoomed);
 
 
-    select('body').on('keyup.zoom', () => {
+    select("body").on("keyup.zoom", () => {
         groups.svg
-            .on('.zoom', null);
+            .on(".zoom", null);
     });
 
-    select('body').on('keydown.zoom', () => {
+    select("body").on("keydown.zoom", () => {
         const active = event.metaKey || event.ctrlKey;
         if (active) {
             groups.svg
                 .call(myZoom)
-                .on('dblclick.zoom', null);
+                .on("dblclick.zoom", null);
         }
     });
 }
@@ -560,12 +560,12 @@ function controller($element, flowDiagramStateService) {
 
     vm.$onInit = () => {
         initialiseData(vm, initialState);
-        const holder = $element.find('div')[0];
+        const holder = $element.find("div")[0];
         Object.assign(groups, prepareGroups(holder));
 
         groups
             .svg
-            .on('contextmenu', contextMenus.canvas
+            .on("contextmenu", contextMenus.canvas
                 ? d3ContextMenu(contextMenus.canvas)
                 : null);
 
@@ -595,8 +595,8 @@ function controller($element, flowDiagramStateService) {
 
 
 controller.$inject = [
-    '$element',
-    'FlowDiagramStateService'
+    "$element",
+    "FlowDiagramStateService"
 ];
 
 
