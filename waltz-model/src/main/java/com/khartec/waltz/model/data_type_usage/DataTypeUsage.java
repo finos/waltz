@@ -33,7 +33,7 @@ public abstract class DataTypeUsage implements
         ProvenanceProvider {
 
     public abstract EntityReference entityReference();
-    public abstract String dataTypeCode();
+    public abstract Long dataTypeId();
     public abstract UsageInfo usage();
 
 }

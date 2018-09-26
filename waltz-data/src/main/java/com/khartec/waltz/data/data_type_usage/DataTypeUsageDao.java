@@ -71,7 +71,7 @@ public class DataTypeUsageDao {
 
 
     private final Field<Long> nodeIdInner = DSL.field("node_id_inner", Long.class);
-    private final Field<String> dataTypeCodeInner = DSL.field("dt_code_inner", String.class);
+    private final Field<Long> dataTypeIdInner = DSL.field("dt_id_inner", Long.class);
     private final Field<String> usageKindInner = DSL.field("usage_kind_inner", String.class);
 
     private static final RecordMapper<Record, DataTypeUsage> TO_USAGE_MAPPER = r -> {
@@ -81,7 +81,7 @@ public class DataTypeUsageDao {
                         .kind(EntityKind.valueOf(record.getEntityKind()))
                         .id(record.getEntityId())
                         .build())
-                .dataTypeCode(record.getDataTypeCode())
+                .dataTypeId(record.getDataTypeId())
                 .usage(ImmutableUsageInfo.builder()
                         .kind(UsageKind.valueOf(record.getUsageKind()))
                         .description(record.getDescription())
@@ -96,7 +96,7 @@ public class DataTypeUsageDao {
         DataTypeUsageRecord record = new DataTypeUsageRecord();
         record.setEntityKind(domain.entityReference().kind().name());
         record.setEntityId(domain.entityReference().id());
-        record.setDataTypeCode(domain.dataTypeCode());
+        record.setDataTypeId(domain.dataTypeId());
         record.setProvenance(domain.provenance());
         record.setUsageKind(domain.usage().kind().name());
         record.setDescription(
@@ -136,13 +136,9 @@ public class DataTypeUsageDao {
 
 
     public List<Tally<String>> findUsageStatsForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
-        SelectConditionStep<Record1<String>> codeSelector = DSL.select(DATA_TYPE.CODE)
-                .from(DATA_TYPE)
-                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
-
         return dsl.select(DATA_TYPE_USAGE.USAGE_KIND, DSL.count())
                 .from(DATA_TYPE_USAGE)
-                .where(DATA_TYPE_USAGE.DATA_TYPE_CODE.in(codeSelector))
+                .where(DATA_TYPE_USAGE.DATA_TYPE_ID.in(dataTypeIdSelector))
                 .groupBy(DATA_TYPE_USAGE.USAGE_KIND)
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
@@ -150,25 +146,18 @@ public class DataTypeUsageDao {
 
     public List<DataTypeUsage> findForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
         checkNotNull(dataTypeIdSelector, "dataTypeIdSelector cannot be null");
-
-        SelectConditionStep<Record1<String>> codeSelector = DSL
-                .select(DATA_TYPE.CODE)
-                .from(DATA_TYPE)
-                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
-
-        return findByCondition(DATA_TYPE_USAGE.DATA_TYPE_CODE.in(codeSelector));
+        return findByCondition(DATA_TYPE_USAGE.DATA_TYPE_ID.in(dataTypeIdSelector));
     }
 
 
-    public List<DataTypeUsage> findForEntityAndDataType(EntityReference ref, String dataTypeCode) {
+    public List<DataTypeUsage> findForEntityAndDataType(EntityReference ref, Long dataTypeId) {
         checkNotNull(ref, "ref cannot be null");
-        checkNotNull(dataTypeCode, "dataTypeCode cannot be null");
 
         return dsl.select(DATA_TYPE_USAGE.fields())
                 .from(DATA_TYPE_USAGE)
                 .where(DATA_TYPE_USAGE.ENTITY_KIND.eq(ref.kind().name())
                         .and(DATA_TYPE_USAGE.ENTITY_ID.eq(ref.id()))
-                        .and(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dataTypeCode)))
+                        .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(dataTypeId)))
                 .fetch(TO_USAGE_MAPPER);
     }
 
@@ -184,13 +173,12 @@ public class DataTypeUsageDao {
 
 
     public int[] insertUsageInfo(EntityReference ref,
-                                 String dataTypeCode,
+                                 Long dataTypeId,
                                  List<UsageInfo> inserts) {
         checkNotNull(ref, "ref cannot be null");
-        checkNotNull(dataTypeCode, "dataTypeCode cannot be null");
         checkNotNull(inserts, "inserts cannot be null");
 
-        Set<DataTypeUsageRecord> records = toRecords(ref, dataTypeCode, inserts);
+        Set<DataTypeUsageRecord> records = toRecords(ref, dataTypeId, inserts);
 
         return dsl
                 .batchInsert(records)
@@ -199,29 +187,27 @@ public class DataTypeUsageDao {
 
 
     public int deleteUsageInfo(EntityReference ref,
-                               String dataTypeCode,
+                               Long dataTypeId,
                                List<UsageKind> deletes) {
         checkNotNull(ref, "ref cannot be null");
-        checkNotNull(dataTypeCode, "dataTypeCode cannot be null");
         checkNotNull(deletes, "deletes cannot be null");
 
         return dsl.deleteFrom(DATA_TYPE_USAGE)
                 .where(DATA_TYPE_USAGE.ENTITY_KIND.eq(ref.kind().name()))
                 .and(DATA_TYPE_USAGE.ENTITY_ID.eq(ref.id()))
-                .and(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dataTypeCode))
+                .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(dataTypeId))
                 .and(DATA_TYPE_USAGE.USAGE_KIND.in(deletes))
                 .execute();
     }
 
 
     public int[] updateUsageInfo(EntityReference ref,
-                                 String dataTypeCode,
+                                 Long dataTypeId,
                                  List<UsageInfo> updates) {
         checkNotNull(ref, "ref cannot be null");
-        checkNotNull(dataTypeCode, "dataTypeCode cannot be null");
         checkNotNull(updates, "updates cannot be null");
 
-        Set<DataTypeUsageRecord> records = toRecords(ref, dataTypeCode, updates);
+        Set<DataTypeUsageRecord> records = toRecords(ref, dataTypeId, updates);
 
         return dsl
                 .batchUpdate(records)
@@ -229,11 +215,11 @@ public class DataTypeUsageDao {
     }
 
 
-    private Set<DataTypeUsageRecord> toRecords(EntityReference ref, String dataTypeCode, List<UsageInfo> usages) {
+    private Set<DataTypeUsageRecord> toRecords(EntityReference ref, Long dataTypeId, List<UsageInfo> usages) {
         ImmutableDataTypeUsage.Builder recordBuilder = ImmutableDataTypeUsage.builder()
                 .provenance("waltz")
                 .entityReference(ref)
-                .dataTypeCode(dataTypeCode);
+                .dataTypeId(dataTypeId);
 
         return usages.stream()
                 .map(i -> recordBuilder.usage(i).build())
@@ -311,12 +297,12 @@ public class DataTypeUsageDao {
     }
 
     private void insertUsages(DSLContext tx,
-                              Select<Record7<Long, String, String, String, String, String, Boolean>> usagesSelector) {
+                              Select<Record7<Long, String, Long, String, String, String, Boolean>> usagesSelector) {
         tx.insertInto(DATA_TYPE_USAGE)
                 .columns(
                         DATA_TYPE_USAGE.ENTITY_ID,
                         DATA_TYPE_USAGE.ENTITY_KIND,
-                        DATA_TYPE_USAGE.DATA_TYPE_CODE,
+                        DATA_TYPE_USAGE.DATA_TYPE_ID,
                         DATA_TYPE_USAGE.USAGE_KIND,
                         DATA_TYPE_USAGE.DESCRIPTION,
                         DATA_TYPE_USAGE.PROVENANCE,
@@ -327,7 +313,7 @@ public class DataTypeUsageDao {
 
 
     private void updateUsageKinds(DSLContext tx,
-                                  Table<Record3<Long, String, String>> flowTable) {
+                                  Table<Record3<Long, Long, String>> flowTable) {
         tx.update(DATA_TYPE_USAGE)
                 .set(DATA_TYPE_USAGE.IS_SELECTED, true)
                 .where(DATA_TYPE_USAGE.IS_SELECTED.eq(false))
@@ -335,13 +321,13 @@ public class DataTypeUsageDao {
                         selectFrom(flowTable)
                             .where(DATA_TYPE_USAGE.ENTITY_ID.eq(nodeIdInner))
                             .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(DATA_TYPE_USAGE.DATA_TYPE_CODE.eq(dataTypeCodeInner))
+                            .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(dataTypeIdInner))
                             .and(DATA_TYPE_USAGE.USAGE_KIND.eq(usageKindInner))))
                 .execute();
     }
 
 
-    private Select<Record7<Long, String, String, String, String, String, Boolean>> mkOriginatorUsagesToInsertSelector(
+    private Select<Record7<Long, String, Long, String, String, String, Boolean>> mkOriginatorUsagesToInsertSelector(
             EntityKind nodeKind,
             Select<Record1<Long>> nodeIdSelector)
     {
@@ -352,7 +338,7 @@ public class DataTypeUsageDao {
                         nodeIdSelector));
     }
 
-    private Select<Record7<Long, String, String, String, String, String, Boolean>> mkConsumerDistributorUsagesToInsertSelector(
+    private Select<Record7<Long, String, Long, String, String, String, Boolean>> mkConsumerDistributorUsagesToInsertSelector(
             EntityKind kind,
             Select<Record1<Long>> idSelector)
     {
@@ -364,14 +350,14 @@ public class DataTypeUsageDao {
     }
 
 
-    private Select<Record7<Long, String, String, String, String, String, Boolean>> mkUsagesToInsertSelector(
+    private Select<Record7<Long, String, Long, String, String, String, Boolean>> mkUsagesToInsertSelector(
             EntityKind nodeKind,
-            Table<Record3<Long, String, String>> flowsWithTypesTable)
+            Table<Record3<Long, Long, String>> flowsWithTypesTable)
     {
         return selectDistinct(
                 nodeIdInner,
                 val(nodeKind.name()),
-                dataTypeCodeInner,
+                dataTypeIdInner,
                 usageKindInner,
                 val(""),
                 val("waltz"),
@@ -383,7 +369,7 @@ public class DataTypeUsageDao {
     }
 
 
-    private Table<Record3<Long, String, String>> mkFlowWithTypesForConsumerDistributors(
+    private Table<Record3<Long, Long, String>> mkFlowWithTypesForConsumerDistributors(
             EntityKind nodeKind,
             Select<Record1<Long>> nodeIdSelector)
     {
@@ -399,14 +385,14 @@ public class DataTypeUsageDao {
     }
 
 
-    private Table<Record3<Long, String, String>> mkFlowWithTypesForConsumerDistributors(EntityKind nodeKind,
+    private Table<Record3<Long, Long, String>> mkFlowWithTypesForConsumerDistributors(EntityKind nodeKind,
                                                                                         Table nodeTable,
                                                                                         TableField<? extends Record, Long> nodeIdField,
                                                                                         Select<Record1<Long>> nodeIdSelector) {
         return DSL
                 .select(
                     nodeIdField.as(nodeIdInner),
-                    dt.CODE.as(dataTypeCodeInner),
+                    dt.ID.as(dataTypeIdInner),
                     mkConsumerDistributorCaseField(nodeIdField).as(usageKindInner))
                 .from(lf)
                 .innerJoin(nodeTable)
@@ -437,14 +423,14 @@ public class DataTypeUsageDao {
     }
 
 
-    private Table<Record3<Long, String, String>> mkFlowWithTypesForOriginators(EntityKind nodeKind,
+    private Table<Record3<Long, Long, String>> mkFlowWithTypesForOriginators(EntityKind nodeKind,
                                                                                Select<Record1<Long>> nodeIdSelector) {
 
         com.khartec.waltz.schema.tables.DataTypeUsage dtuConsumer = DATA_TYPE_USAGE.as("dtu_consumer");
 
         return DSL.select(
                     dtu.ENTITY_ID.as(nodeIdInner),
-                    dtu.DATA_TYPE_CODE.as(dataTypeCodeInner),
+                    dtu.DATA_TYPE_ID.as(dataTypeIdInner),
                     originatorUsageKindField.as(usageKindInner))
                 .from(dtu)
                 .where(dtu.ENTITY_ID.in(nodeIdSelector))
@@ -454,7 +440,7 @@ public class DataTypeUsageDao {
                 .and(DSL.notExists(DSL.selectFrom(dtuConsumer)
                         .where(dtuConsumer.ENTITY_ID.eq(dtu.ENTITY_ID))
                         .and(dtuConsumer.ENTITY_KIND.eq(dtu.ENTITY_KIND))
-                        .and(dtuConsumer.DATA_TYPE_CODE.eq(dtu.DATA_TYPE_CODE))
+                        .and(dtuConsumer.DATA_TYPE_ID.eq(dtu.DATA_TYPE_ID))
                         .and(dtuConsumer.USAGE_KIND.eq(UsageKind.CONSUMER.name()))
                         .and(dtuConsumer.IS_SELECTED.eq(true))))
                 .asTable("originators");
@@ -465,7 +451,7 @@ public class DataTypeUsageDao {
     private Condition mkDataTypeUsageJoin(Field<String> usageKindField) {
         return dtu.ENTITY_ID.eq(nodeIdInner)
                         .and(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(dtu.DATA_TYPE_CODE.eq(dataTypeCodeInner))
+                        .and(dtu.DATA_TYPE_ID.eq(dataTypeIdInner))
                         .and(dtu.USAGE_KIND.eq(usageKindField))
                         .and(dtu.IS_SELECTED.eq(false));
     }
@@ -479,7 +465,7 @@ public class DataTypeUsageDao {
                 .innerJoin(app)
                 .on(dtu.ENTITY_ID.eq(app.ID))
                 .innerJoin(dt)
-                .on(dt.CODE.eq(dtu.DATA_TYPE_CODE))
+                .on(dt.ID.eq(dtu.DATA_TYPE_ID))
                 .where(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(dt.ID.in(dataTypeIdSelector))
                 .and(dtu.USAGE_KIND.eq(kind.name()))
