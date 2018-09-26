@@ -49,7 +49,7 @@ function controller($element, $q, serviceBroker) {
 
     vm.$onInit = () => {
         const scenarioPromise = serviceBroker
-            .loadViewData(CORE_API.RoadmapStore.getScenarioById, [1, 1])
+            .loadViewData(CORE_API.ScenarioStore.getById, [1])
             .then(r => vm.scenarioDefn = r.data);
 
         const applicationPromise = scenarioPromise

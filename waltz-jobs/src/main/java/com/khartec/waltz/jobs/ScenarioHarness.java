@@ -19,24 +19,34 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.model.roadmap.Roadmap;
+import com.khartec.waltz.model.scenario.CloneScenarioCommand;
+import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
+import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.roadmap.RoadmapService;
+import com.khartec.waltz.service.scenario.ScenarioService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
-public class RoadmapHarness {
+public class ScenarioHarness {
 
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        RoadmapDao roadmapDao = ctx.getBean(RoadmapDao.class);
-        RoadmapService roadmapService = ctx.getBean(RoadmapService.class);
+        ScenarioService scenarioService = ctx.getBean(ScenarioService.class);
 
-        Roadmap r = roadmapDao.getById(1L);
-        System.out.println(r);
+        CloneScenarioCommand cloneCommand = ImmutableCloneScenarioCommand.builder()
+                .scenarioId(1L)
+                .newName("2020 Clone" + System.currentTimeMillis())
+                .userId("admin")
+                .build();
+
+        Scenario c = scenarioService.cloneScenario(cloneCommand);
+
+        System.out.println(c);
+
+
+
 
     }
 

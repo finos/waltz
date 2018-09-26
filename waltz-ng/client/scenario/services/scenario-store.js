@@ -24,29 +24,33 @@ function store($http, baseUrl) {
     const BASE = `${baseUrl}/scenario`;
 
 
-    const findScenariosByRoadmapSelector = (selectionOptions) => {
+    const findByRoadmapSelector = (selectionOptions) => {
         checkIsIdSelector(selectionOptions);
         return $http
             .post(`${BASE}/by-roadmap-selector`, selectionOptions)
             .then(result => result.data);
     };
 
-    const findScenariosForRoadmap = (roadmapId) =>
+    const findForRoadmap = (roadmapId) =>
         $http
             .get(`${BASE}/id/${roadmapId}/scenario`)
             .then(result => result.data);
 
-    const getScenarioById = (roadmapId, scenarioId) =>
+    const getById = (scenarioId) =>
         $http
-            .get(`${BASE}/id/${roadmapId}/scenario/${scenarioId}`)
+            .get(`${BASE}/id/${scenarioId}`)
+            .then(result => result.data);
+
+    const cloneById = (scenarioId, newName = "Clone") =>
+        $http
+            .post(`${BASE}/id/${scenarioId}/clone`, newName)
             .then(result => result.data);
 
     return {
-        getRoadmapById,
-        findRoadmapsBySelector,
-        findScenariosForRoadmap,
-        findScenariosByRoadmapSelector,
-        getScenarioById
+        findForRoadmap,
+        findByRoadmapSelector,
+        getById,
+        cloneById
     };
 }
 
@@ -57,34 +61,29 @@ store.$inject = [
 ];
 
 
-const serviceName = "RoadmapStore";
+const serviceName = "ScenarioStore";
 
 
-export const RoadmapStore_API = {
-    getRoadmapById: {
+export const ScenarioStore_API = {
+    findByRoadmapSelector: {
         serviceName,
-        serviceFnName: "getRoadmapById",
-        description: "executes findScenariosForRoadmap [roadmapId]"
+        serviceFnName: "findByRoadmapSelector",
+        description: "executes findByRoadmapSelector [roadmapSelectorOptions]"
     },
-    findRoadmapsBySelector: {
+    findForRoadmap: {
         serviceName,
-        serviceFnName: "findRoadmapsBySelector",
-        description: "executes findRoadmapsBySelector [selectorOptions]"
+        serviceFnName: "findForRoadmap",
+        description: "executes findForRoadmap [roadmapId]"
     },
-    findScenariosByRoadmapSelector: {
+    getById: {
         serviceName,
-        serviceFnName: "findScenariosByRoadmapSelector",
-        description: "executes findScenariosByRoadmapSelector [roadmapSelectorOptions]"
+        serviceFnName: "getById",
+        description: "executes getById [scenarioId]"
     },
-    findScenariosForRoadmap: {
+    cloneById: {
         serviceName,
-        serviceFnName: "findScenariosForRoadmap",
-        description: "executes findScenariosForRoadmap [roadmapId]"
-    },
-    getScenarioById: {
-        serviceName,
-        serviceFnName: "getScenarioById",
-        description: "executes getScenarioById [roadmapId, scenarioId]"
+        serviceFnName: "cloneById",
+        description: "executes cloneById [scenarioId, newName]"
     }
 };
 

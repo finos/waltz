@@ -18,6 +18,7 @@
  */
 
 import template from './last-updated.html';
+import {initialiseData} from "../../index";
 
 
 /*
@@ -25,15 +26,24 @@ import template from './last-updated.html';
  */
 
 const bindings = {
-    entity: '<'
+    entity: '<',
+    showLabel: '<?'
+};
+
+const initialState = {
+    showLabel: true
 };
 
 
+function controller() {
+    const vm = initialiseData(this, initialState);
+}
 
 
 const component = {
     bindings,
     template,
+    controller
 };
 
 

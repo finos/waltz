@@ -1,5 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
+import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
 import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
@@ -10,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getLong;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class ScenarioEndpoint implements Endpoint {
@@ -44,22 +44,42 @@ public class ScenarioEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        registerFindScenariosForRoadmapId(mkPath("by-roadmap-id", ":roadmapId"));
-        registerGetScenarioById(mkPath("id", ":id"));
+        registerFindScenariosForRoadmapId(mkPath(BASE_URL, "by-roadmap-id", ":roadmapId"));
+        registerFindScenariosByRoadmapSelector(mkPath(BASE_URL, "by-roadmap-selector"));
+        registerGetScenarioById(mkPath(BASE_URL, "id", ":id"));
+        registerCloneScenario(mkPath(BASE_URL, "id", ":id", "clone"));
     }
+
+
+    private void registerFindScenariosByRoadmapSelector(String path) {
+        postForList(path, (request, response) ->
+            scenarioService.findScenariosByRoadmapSelector(readIdSelectionOptionsFromBody(request)));
+    }
+
+
+    private void registerCloneScenario(String path) {
+        postForDatum(path, (request, response) ->
+                scenarioService.cloneScenario(ImmutableCloneScenarioCommand
+                        .builder()
+                        .newName(request.body())
+                        .scenarioId(getId(request))
+                        .userId(getUsername(request))
+                        .build()));
+    }
+
 
 
     private void registerGetScenarioById(String path) {
         getForDatum(path, (req, resp) -> {
-            long roadmapId = getLong(req, "roadmapId");
-            long scenarioId = getLong(req, "scenarioId");
+            long scenarioId = getId(req);
 
+            Scenario scenario = scenarioService.getById(scenarioId);
             return ImmutableFullScenario
                     .builder()
-                    .roadmap(roadmapService.getById(roadmapId))
-                    .scenario(scenarioService.getById(scenarioId))
+                    .scenario(scenario)
                     .axisDefinitions(scenarioAxisItemService.findForScenarioId(scenarioId))
                     .ratings(scenarioRatingItemService.findForScenarioId(scenarioId))
+                    .roadmap(roadmapService.getById(scenario.roadmapId()))
                     .build();
         });
     }

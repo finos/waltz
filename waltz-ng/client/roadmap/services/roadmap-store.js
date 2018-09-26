@@ -35,29 +35,10 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const findScenariosByRoadmapSelector = (selectionOptions) => {
-        checkIsIdSelector(selectionOptions);
-        return $http
-            .post(`${BASE}/scenarios/by-roadmap-selector`, selectionOptions)
-            .then(result => result.data);
-    };
-
-    const findScenariosForRoadmap = (roadmapId) =>
-        $http
-            .get(`${BASE}/id/${roadmapId}/scenario`)
-            .then(result => result.data);
-
-    const getScenarioById = (roadmapId, scenarioId) =>
-        $http
-            .get(`${BASE}/id/${roadmapId}/scenario/${scenarioId}`)
-            .then(result => result.data);
 
     return {
         getRoadmapById,
-        findRoadmapsBySelector,
-        findScenariosForRoadmap,
-        findScenariosByRoadmapSelector,
-        getScenarioById
+        findRoadmapsBySelector
     };
 }
 
@@ -81,21 +62,6 @@ export const RoadmapStore_API = {
         serviceName,
         serviceFnName: "findRoadmapsBySelector",
         description: "executes findRoadmapsBySelector [selectorOptions]"
-    },
-    findScenariosByRoadmapSelector: {
-        serviceName,
-        serviceFnName: "findScenariosByRoadmapSelector",
-        description: "executes findScenariosByRoadmapSelector [roadmapSelectorOptions]"
-    },
-    findScenariosForRoadmap: {
-        serviceName,
-        serviceFnName: "findScenariosForRoadmap",
-        description: "executes findScenariosForRoadmap [roadmapId]"
-    },
-    getScenarioById: {
-        serviceName,
-        serviceFnName: "getScenarioById",
-        description: "executes getScenarioById [roadmapId, scenarioId]"
     }
 };
 

@@ -19,7 +19,9 @@
  */
 
 import angular from "angular";
-import RoadmapsPanel from "./components/roadmaps-panel/roadmaps-panel";
+import RoadmapsPanel from "./components/panel/roadmaps-panel";
+import RoadmapsList from "./components/list/roadmaps-list";
+import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
 import {registerComponents, registerStores} from "../common/module-utils";
 import RoadmapStore from "./services/roadmap-store";
 
@@ -28,6 +30,8 @@ export default () => {
     const module = angular.module("waltz.roadmap", []);
 
     registerComponents(module, [
+        RoadmapScenarioDiagram,
+        RoadmapsList,
         RoadmapsPanel
     ]);
 

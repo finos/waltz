@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+import java.time.LocalDate;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableScenario.class)
 @JsonDeserialize(as = ImmutableScenario.class)
@@ -16,5 +18,6 @@ public abstract class Scenario implements
 
     public abstract long roadmapId();
     public abstract ReleaseLifecycleStatus status();
+    public abstract LocalDate targetDate();
 
 }

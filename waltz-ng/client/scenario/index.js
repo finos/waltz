@@ -19,16 +19,15 @@
  */
 
 import angular from "angular";
-import RoadmapsPanel from "./components/roadmaps-panel/roadmaps-panel";
-import ScenarioDiagram from "./components/scenario-diagram/scenario-diagram";
 import {registerComponents, registerStores} from "../common/module-utils";
 import ScenarioStore from "./services/scenario-store";
+import ScenarioDiagram from "./components/scenario-diagram/scenario-diagram";
 
 
 export default () => {
     const module = angular.module("waltz.scenario", []);
 
-    registerComponents(module, []);
+    registerComponents(module, [ ScenarioDiagram ]);
 
     registerStores(module, [ ScenarioStore ]);
 
