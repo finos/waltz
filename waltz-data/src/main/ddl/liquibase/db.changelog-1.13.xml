@@ -304,6 +304,14 @@
                     columnName="child_entity_kind" />
     </changeSet>
 
+    <changeSet id="20180913-3273-9a"
+               author="kamransaleem">
+        <sql>
+            DELETE FROM attestation_run
+            WHERE attested_entity_kind is null
+        </sql>
+    </changeSet>
+
     <changeSet id="20180913-3273-9"
                author="kamransaleem">
         <comment>3273: Attestation Run - make attested_entity_kind non-nullable</comment>
@@ -546,6 +554,81 @@
             </column>
         </createTable>
 
+    </changeSet>
+
+
+    <!-- 3387 - add type_id to data_type_usage -->
+    <changeSet id="20180914-3387-1"
+               author="kamransaleem">
+        <comment>3387: add new column data_type_id to data_type_usage</comment>
+        <addColumn tableName="data_type_usage">
+            <column name="data_type_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20180914-3387-2a"
+               dbms="mysql"
+               author="kamransaleem">
+    <comment>3387:[mysql] assign related data_type_id with code in data_type_usage using data_type table</comment>
+        <sql>
+            UPDATE data_type_usage dtu
+            INNER JOIN data_type dt
+            ON dtu.data_type_code = dt.code
+            SET dtu.data_type_id = dt.id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180914-3387-2b"
+               dbms="mssql"
+               author="kamransaleem">
+    <comment>3387:[mssql] assign related data_type_id with code in data_type_usage using data_type table</comment>
+        <sql>
+            UPDATE data_type_usage
+            SET data_type_usage.data_type_id = dt.id
+            FROM data_type_usage dtu
+            INNER JOIN data_type dt
+            ON dtu.data_type_code = dt.code
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180914-3387-3"
+               author="kamransaleem">
+    <comment>3387: delete old data in data_type_usage</comment>
+        <sql>
+            DELETE FROM data_type_usage
+            WHERE data_type_usage.data_type_id is NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180914-3387-4"
+               author="kamransaleem">
+    <comment>3387: make data_type_id non nullable</comment>
+        <addNotNullConstraint tableName="data_type_usage"
+                              columnDataType="${id.type}"
+                              columnName="data_type_id" />
+    </changeSet>
+
+    <changeSet id="20180914-3387-5"
+               author="kamransaleem" >
+        <dropPrimaryKey constraintName="data_type_usage_pkey"
+                        tableName="data_type_usage"/>
+    </changeSet>
+
+    <changeSet id="20180914-3387-6"
+               author="kamransaleem">
+        <addPrimaryKey columnNames="entity_kind, entity_id, data_type_id, usage_kind"
+                       constraintName="data_type_usage_pkey"
+                       tableName="data_type_usage"/>
+    </changeSet>
+
+    <changeSet id="20180914-3387-7"
+               author="kamransaleem">
+    <comment>3387: drop data_type_code from data_type_usage</comment>
+        <dropColumn tableName="data_type_usage"
+                    columnName="data_type_code"/>
     </changeSet>
 
 </databaseChangeLog>

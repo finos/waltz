@@ -87,8 +87,8 @@ public class DataTypeUsageService {
     }
 
 
-    public List<DataTypeUsage> findForEntityAndDataType(EntityReference entityReference, String dataTypeCode) {
-        return dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeCode);
+    public List<DataTypeUsage> findForEntityAndDataType(EntityReference entityReference, Long dataTypeId) {
+        return dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeId);
     }
 
 
@@ -119,20 +119,20 @@ public class DataTypeUsageService {
 
     public SystemChangeSet<UsageInfo, UsageKind> save(
             EntityReference entityReference,
-            String dataTypeCode,
+            Long dataTypeId,
             List<UsageInfo> usages) {
 
         Collection<UsageInfo> base = CollectionUtilities.map(
-                dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeCode),
+                dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeId),
                 dtu -> dtu.usage());
 
         SystemChangeSet<UsageInfo, UsageKind> changeSet = mkChangeSet(
                 SetUtilities.fromCollection(base),
                 SetUtilities.fromCollection(usages));
 
-        dataTypeUsageDao.insertUsageInfo(entityReference, dataTypeCode, changeSet.inserts());
-        dataTypeUsageDao.deleteUsageInfo(entityReference, dataTypeCode, changeSet.deletes());
-        dataTypeUsageDao.updateUsageInfo(entityReference, dataTypeCode, changeSet.updates());
+        dataTypeUsageDao.insertUsageInfo(entityReference, dataTypeId, changeSet.inserts());
+        dataTypeUsageDao.deleteUsageInfo(entityReference, dataTypeId, changeSet.deletes());
+        dataTypeUsageDao.updateUsageInfo(entityReference, dataTypeId, changeSet.updates());
 
         return changeSet;
     }

@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
-import {mkTweakers} from '../source-and-target-graph/source-and-target-utilities';
+import * as _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
 
-import template from './logical-flow-edit-panel.html';
+import template from "./logical-flow-edit-panel.html";
 
 
 const bindings = {
@@ -200,7 +200,7 @@ function controller($q,
         vm.setMode('editDataTypeUsage');
         vm.selectedDataType = type;
         vm.selectedUsages = _.chain(vm.dataTypeUsages)
-            .filter({ dataTypeCode: type.code })
+            .filter({ dataTypeId: type.id })
             .map('usage')
             .value();
     };
@@ -256,11 +256,11 @@ function controller($q,
     };
 
     vm.saveUsages = (usages = []) => {
-        const dataTypeCode = vm.selectedDataType.code;
+        const dataTypeId = vm.selectedDataType.id;
         serviceBroker
             .execute(
                 CORE_API.DataTypeUsageStore.save,
-                [vm.parentEntityRef, dataTypeCode, usages])
+                [vm.parentEntityRef, dataTypeId, usages])
             .then(() => reload())
             .then(() => notification.success('Data usage updated'));
     };

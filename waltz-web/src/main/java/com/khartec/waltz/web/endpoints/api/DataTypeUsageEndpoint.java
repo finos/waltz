@@ -33,6 +33,7 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
         String findForUsageKindByDataTypeSelectorPath = mkPath(BASE_URL, "usage-kind", ":usage-kind");
         String calculateForAllApplicationsPath = mkPath(BASE_URL, "calculate-all", "application");
         String findForSelectorPath = mkPath(BASE_URL, "selector");
-        String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":type");
+        String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":typeId");
 
         ListRoute<DataTypeUsage> findForEntityRoute = (request, response)
                 -> dataTypeUsageService.findForEntity(getEntityReference(request));
@@ -131,52 +132,52 @@ public class DataTypeUsageEndpoint implements Endpoint {
 
         String user = getUsername(request);
         EntityReference ref = getEntityReference(request);
-        String dataTypeCode = request.params("type");
+        Long dataTypeId = WebUtilities.getLong(request,"typeId");
         UsageInfo[] usages = readBody(request, UsageInfo[].class);
 
-        SystemChangeSet<UsageInfo, UsageKind> changes = dataTypeUsageService.save(ref, dataTypeCode, newArrayList(usages));
+        SystemChangeSet<UsageInfo, UsageKind> changes = dataTypeUsageService.save(ref, dataTypeId, newArrayList(usages));
 
-        logChanges(user, ref, dataTypeCode, changes);
+        logChanges(user, ref, dataTypeId, changes);
 
-        return dataTypeUsageService.findForEntityAndDataType(ref, dataTypeCode);
+        return dataTypeUsageService.findForEntityAndDataType(ref, dataTypeId);
     }
 
 
     private void logChanges(String user,
                             EntityReference ref,
-                            String dataTypeCode,
+                            Long dataTypeId,
                             SystemChangeSet<UsageInfo, UsageKind> changes) {
-        maybe(changes.deletes(), deletes -> logDeletes(user, ref, dataTypeCode, deletes));
-        maybe(changes.updates(), updates -> logUpdates(user, ref, dataTypeCode, updates));
-        maybe(changes.inserts(), inserts -> logInserts(user, ref, dataTypeCode, inserts));
+        maybe(changes.deletes(), deletes -> logDeletes(user, ref, dataTypeId, deletes));
+        maybe(changes.updates(), updates -> logUpdates(user, ref, dataTypeId, updates));
+        maybe(changes.inserts(), inserts -> logInserts(user, ref, dataTypeId, inserts));
     }
 
 
     private void logDeletes(String user,
                             EntityReference ref,
-                            String dataTypeCode,
+                            Long dataTypeId,
                             Collection<UsageKind> deletes) {
-        String message = "Removed usage kind/s: " + deletes + " for data type: " + dataTypeCode;
+        String message = "Removed usage kind/s: " + deletes + " for data type id: " + dataTypeId;
         logChange(user, ref, message);
     }
 
 
     private void logInserts(String user,
                             EntityReference ref,
-                            String dataTypeCode,
+                            Long dataTypeId,
                             Collection<UsageInfo> inserts) {
         Collection<UsageKind> kinds = CollectionUtilities.map(inserts, u -> u.kind());
-        String message = "Added usage kind/s: " + kinds + " for data type: " + dataTypeCode;
+        String message = "Added usage kind/s: " + kinds + " for data type: " + dataTypeId;
         logChange(user, ref, message);
     }
 
 
     private void logUpdates(String user,
                             EntityReference ref,
-                            String dataTypeCode,
+                            Long dataTypeId,
                             Collection<UsageInfo> updates) {
         Collection<UsageKind> kinds = CollectionUtilities.map(updates, u -> u.kind());
-        String message = "Updated usage kind/s: " + kinds + " for data type: " + dataTypeCode;
+        String message = "Updated usage kind/s: " + kinds + " for data type: " + dataTypeId;
         logChange(user, ref, message);
     }
 
