@@ -17,25 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import template from './loading-notification.html';
+import {initialiseData} from "../common";
 
 
-const BINDINGS = {
-    show: '<',
+const bindings = {
+    show: '<?',
     name: '@'
 };
 
 
-function controller() {
+const initialState = {
+    show: true
+};
 
+
+function controller() {
+    const vm = initialiseData(this, initialState);
 }
 
 
-export default () => ({
-    restrict: 'E',
-    replace: true,
+const component = {
     template,
-    scope: {},
-    bindToController: BINDINGS,
+    bindings,
     controller,
-    controllerAs: 'ctrl'
-});
+};
+
+
+export default {
+    id: "waltzLoadingNotification",
+    component
+};

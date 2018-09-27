@@ -1,7 +1,7 @@
-package com.khartec.waltz.service.roadmap;
+package com.khartec.waltz.service.scenario;
 
-import com.khartec.waltz.data.roadmap.ScenarioRatingItemDao;
-import com.khartec.waltz.model.roadmap.ScenarioRatingItem;
+import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
+import com.khartec.waltz.model.scenario.ScenarioRatingItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

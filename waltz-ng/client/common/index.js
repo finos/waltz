@@ -22,10 +22,10 @@ import {nest} from "d3-collection";
 
 
 export const formats = {
-    daysAndMinutes: 'ddd Do MMM YYYY - HH:mm:ss',
-    daysOnly: 'ddd Do MMM YYYY',
-    parse: 'YYYY-MM-DDThh:mm:ss.SSS',
-    parseDateOnly: 'YYYY-MM-DD'
+    daysAndMinutes: "ddd Do MMM YYYY - HH:mm:ss",
+    daysOnly: "ddd Do MMM YYYY",
+    parse: "YYYY-MM-DDThh:mm:ss.SSS",
+    parseDateOnly: "YYYY-MM-DD"
 };
 
 
@@ -78,12 +78,8 @@ export function groupAndMap(coll = [], keyFn = d => d.id, valFn = d => d) {
 }
 
 
-
-export function noop() {}
-
-
 export function randomPick(xs) {
-    if (!xs) throw new Error('Cannot pick from a null set of options');
+    if (!xs) throw new Error("Cannot pick from a null set of options");
 
     const choiceCount = xs.length - 1;
     const idx = Math.round(Math.random() * choiceCount);
@@ -116,7 +112,7 @@ export function perhaps(fn, dflt) {
  * @param searchFields - fields in the items to consider when searching
  * @returns {Array}
  */
-export function termSearch(items = [], searchStr = '', searchFields = []) {
+export function termSearch(items = [], searchStr = "", searchFields = []) {
     const terms = searchStr.toLowerCase().split(/\W/);
 
     return _.filter(items, item => {
@@ -125,9 +121,9 @@ export function termSearch(items = [], searchStr = '', searchFields = []) {
             : searchFields;
 
         const targetStr = _.chain(fields)
-            .reject(field => field.startsWith('$') || _.isFunction(_.get(item, field)))
+            .reject(field => field.startsWith("$") || _.isFunction(_.get(item, field)))
             .map(field => _.get(item, field))
-            .join(' ')
+            .join(" ")
             .value()
             .toLowerCase();
 
@@ -167,6 +163,12 @@ export function resetData(vm, initData = {}) {
 }
 
 
+/**
+ * Deep copies `initData` into `vm`
+ * @param vm
+ * @param initData
+ * @returns {*} - `vm` enriched with `initData`
+ */
 export function initialiseData(vm, initData) {
     return _.defaultsDeep(vm, _.cloneDeep(initData));
 }

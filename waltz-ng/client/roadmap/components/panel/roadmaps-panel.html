@@ -1,0 +1,58 @@
+
+<div>
+    <!-- NO DATA -->
+
+    <div ng-switch="$ctrl.visibility.mode">
+
+        <div ng-switch-when="LOADING">
+            <waltz-loading-notification name="Loading roadmaps">
+            </waltz-loading-notification>
+        </div>
+
+
+        <div ng-switch-when="LIST">
+            <waltz-no-data ng-if="! $ctrl.roadmaps">
+                <message>
+                    <strong>No Roadmaps</strong> associated with this entity
+                </message>
+            </waltz-no-data>
+
+            <waltz-roadmaps-list roadmaps="$ctrl.roadmaps"
+                                 scenarios="$ctrl.scenarios"
+                                 on-add-roadmap="$ctrl.onAddRoadmap"
+                                 on-add-scenario="$ctrl.onAddScenario"
+                                 on-select-scenario="$ctrl.onSelectScenario"
+                                 on-clone-scenario="$ctrl.onCloneScenario">
+            </waltz-roadmaps-list>
+        </div>
+
+
+        <div ng-switch-when="ADD_SCENARIO">
+            <h1>Add scenario</h1>
+
+            <a ng-click="$ctrl.onCancel()"
+               class="clickable">
+                Cancel
+            </a>
+        </div>
+
+
+        <div ng-switch-when="ADD_ROADMAP">
+            <h1>Add roadmap</h1>
+            <a ng-click="$ctrl.onCancel()"
+               class="clickable">
+                Cancel
+            </a>
+        </div>
+
+
+        <div ng-switch-when="VIEW_SCENARIO">
+            <waltz-roadmap-scenario-diagram scenario-id="$ctrl.selectedScenario.id"
+                                            on-cancel="$ctrl.onCancel">
+            </waltz-roadmap-scenario-diagram>
+        </div>
+
+    </div>
+
+
+</div>

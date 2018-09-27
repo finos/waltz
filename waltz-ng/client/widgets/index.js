@@ -65,7 +65,7 @@ export default () => {
     module.directive('waltzExternalLink', ExternalLink);
     module.directive('waltzFromNow', FromNow);
     module.directive('waltzJumpTo', JumpTo);
-    module.directive('waltzLoadingNotification', LoadingNotification);
+
     module.directive('waltzMailTo', MailTo);
     module.directive('waltzOverlayPanel', OverlayPanel);
     module.directive('waltzPhoneLink', PhoneLink);
@@ -98,6 +98,7 @@ export default () => {
         CurrencyAmount,
         EditableEnum,
         EditableDropdown,
+        LoadingNotification,
         SpreadsheetLoader,
         SubSection
     ]);

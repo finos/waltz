@@ -1,13 +1,13 @@
-package com.khartec.waltz.data.roadmap;
+package com.khartec.waltz.data.scenario;
 
 
-import com.khartec.waltz.model.roadmap.AxisKind;
-import com.khartec.waltz.model.roadmap.ImmutableScenarioAxisItem;
-import com.khartec.waltz.model.roadmap.ScenarioAxisItem;
+import com.khartec.waltz.model.AxisKind;
+import com.khartec.waltz.model.scenario.CloneScenarioCommand;
+import com.khartec.waltz.model.scenario.ImmutableScenarioAxisItem;
+import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.schema.tables.records.ScenarioAxisItemRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,11 +43,36 @@ public class ScenarioAxisItemDao {
         this.dsl = dsl;
     }
 
+
     public Collection<ScenarioAxisItem> findForScenarioId(long scenarioId) {
         return dsl
                 .select(SCENARIO_AXIS_ITEM.fields())
                 .from(SCENARIO_AXIS_ITEM)
                 .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int cloneItems(CloneScenarioCommand command, Long clonedScenarioId) {
+        SelectConditionStep<Record5<Long, Long, String, String, Integer>> originalData = DSL
+                .select(
+                    DSL.value(clonedScenarioId),
+                    SCENARIO_AXIS_ITEM.ITEM_ID,
+                    SCENARIO_AXIS_ITEM.ITEM_KIND,
+                    SCENARIO_AXIS_ITEM.AXIS_KIND,
+                    SCENARIO_AXIS_ITEM.POSITION)
+                .from(SCENARIO_AXIS_ITEM)
+                .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(command.scenarioId()));
+
+        return dsl
+                .insertInto(
+                    SCENARIO_AXIS_ITEM,
+                    SCENARIO_AXIS_ITEM.SCENARIO_ID,
+                    SCENARIO_AXIS_ITEM.ITEM_ID,
+                    SCENARIO_AXIS_ITEM.ITEM_KIND,
+                    SCENARIO_AXIS_ITEM.AXIS_KIND,
+                    SCENARIO_AXIS_ITEM.POSITION)
+                .select(originalData)
+                .execute();
     }
 }

@@ -3,9 +3,9 @@ package com.khartec.waltz.web.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.roadmap.Roadmap;
-import com.khartec.waltz.model.roadmap.Scenario;
-import com.khartec.waltz.model.roadmap.ScenarioAxisItem;
-import com.khartec.waltz.model.roadmap.ScenarioRatingItem;
+import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.model.scenario.ScenarioAxisItem;
+import com.khartec.waltz.model.scenario.ScenarioRatingItem;
 import org.immutables.value.Value;
 
 import java.util.Collection;

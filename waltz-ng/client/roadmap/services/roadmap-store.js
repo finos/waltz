@@ -17,29 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+
 function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/roadmap`;
 
     const getRoadmapById = (roadmapId) =>
         $http
-            .get(`${BASE}/by-id/${roadmapId}`)
+            .get(`${BASE}/id/${roadmapId}`)
             .then(result => result.data);
 
-    const findScenariosForRoadmap = (roadmapId) =>
-        $http
-            .get(`${BASE}/by-id/${roadmapId}/scenario`)
+    const findRoadmapsBySelector = (selectionOptions) => {
+        checkIsIdSelector(selectionOptions);
+        return $http
+            .post(`${BASE}/by-selector`, selectionOptions)
             .then(result => result.data);
+    };
 
-    const getScenarioById = (roadmapId, scenarioId) =>
-        $http
-            .get(`${BASE}/by-id/${roadmapId}/scenario/${scenarioId}`)
-            .then(result => result.data);
 
     return {
         getRoadmapById,
-        findScenariosForRoadmap,
-        getScenarioById
+        findRoadmapsBySelector
     };
 }
 
@@ -59,15 +58,10 @@ export const RoadmapStore_API = {
         serviceFnName: "getRoadmapById",
         description: "executes findScenariosForRoadmap [roadmapId]"
     },
-    findScenariosForRoadmap: {
+    findRoadmapsBySelector: {
         serviceName,
-        serviceFnName: "findScenariosForRoadmap",
-        description: "executes findScenariosForRoadmap [roadmapId]"
-    },
-    getScenarioById: {
-        serviceName,
-        serviceFnName: "getScenarioById",
-        description: "executes getScenarioById [roadmapId, scenarioId]"
+        serviceFnName: "findRoadmapsBySelector",
+        description: "executes findRoadmapsBySelector [selectorOptions]"
     }
 };
 
