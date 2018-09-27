@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsIdSelector, checkIsEntityRef} from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 import {isEmpty} from "../../common";
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export function store($http,
@@ -77,11 +77,11 @@ export function store($http,
             .then(result => result.data);
     };
 
-    const save = (ref, dataTypeCode, usages = []) => {
+    const save = (ref, dataTypeId, usages = []) => {
         checkIsEntityRef(ref);
         if (isEmpty(usages)) return;
         return $http
-            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${dataTypeCode}`, usages)
+            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${dataTypeId}`, usages)
             .then(r => r.data);
     };
 
