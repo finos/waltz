@@ -10,7 +10,7 @@
                class="clickable">
                 <span class="waltz-visibility-child-50">
                     <waltz-icon name="close"></waltz-icon>
-                    Cancel
+                    Close
                 </span>
             </a>
         </small>
@@ -60,6 +60,39 @@
     <!-- CANCEL -->
     <a ng-click="$ctrl.onCancel()"
        class="clickable">
-        Cancel
+        Close
     </a>
+</div>
+
+
+<!-- DIALOG -->
+<div ng-if="$ctrl.dialog"
+     ng-style="$ctrl.dialog.style">
+    <div style="background-color: #fafafa; border: 2px solid #ccc; border-radius: 3px; padding: 6px; width: 500px">
+        <h4>Add Application</h4>
+        Add application to:
+        <table class="waltz-mini-table">
+            <tr>
+                <td>Column:</td>
+                <td>
+                    <span ng-bind="$ctrl.dialog.column.name"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>Row:</td>
+                <td>
+                    <span ng-bind="$ctrl.dialog.row.name"></span>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <waltz-basic-app-selector on-add="$ctrl.onAddApplication"
+                                  on-cancel="$ctrl.onCloseDialog">
+        </waltz-basic-app-selector>
+
+        <br>
+
+    <div>
 </div>

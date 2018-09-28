@@ -18,9 +18,7 @@ export function filterData(data, qry) {
 
     const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);
     const filterRowFn = nodeGrids =>  _.map(nodeGrids, filterNodeGridFn);
-    const filteredData = _.map(data, row => filterRowFn(row));
-
-    return filteredData
+    return _.map(data, filterRowFn);
 }
 
 
@@ -40,7 +38,7 @@ export function enrichDatumWithSearchTargetString(datum) {
 
 
 function prepareAxisHeadings(scenarioDefinition, measurablesById) {
-    const axisHeadings = _.chain(scenarioDefinition.axisDefinitions)
+    return _.chain(scenarioDefinition.axisDefinitions)
         .map(d => {
             const measurable = measurablesById[d.item.id];
             return {
@@ -55,7 +53,6 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById) {
         .orderBy(d => d.order)
         .groupBy(d => d.axisKind)
         .value();
-    return axisHeadings;
 }
 
 
@@ -89,9 +86,15 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
         const row = acc[rowOffset] || [];
         const col = row[colOffset] || [];
 
+        const domainCoordinates = {
+            row: measurablesById[d.row.id],
+            column: measurablesById[d.column.id]
+        };
+
         const nodeData = {
             id ,
             node: Object.assign({}, app, { externalId: app.assetCode }),
+            domainCoordinates,
             state: {
                 rating: d.rating
             },
@@ -112,7 +115,6 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
         rowData
     };
 }
-
 
 
 // --- TEST DATA GENERATORS
