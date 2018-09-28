@@ -2,20 +2,31 @@ import {drawUnit, NODE_STYLES} from "./scenario-diagram-static-node-utils";
 import {checkTrue} from "../../../common/checks";
 import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {defaultOptions} from "./scenario-diagram-utils";
+import {d3ContextMenu} from "../../../common/d3-context-menu";
 
 
 export function drawNodeGrid(selection, options) {
+    const dataProvider = d => {
+        console.log('nodegrid', { d })
+
+        return d.data;
+    };
+
     const cells = selection
         .selectAll(`g.${NODE_STYLES.nodeCell}`)
         .data(
-            d => d.data, //_.orderBy(d.data, d => d.node.name),
+            dataProvider, //_.orderBy(d.data, d => d.node.name),
             d => d.id);
+
+
+    const contextMenu = _.get(options, ["handlers", "contextMenus", "node"], null);
 
     const newCells = cells
         .enter()
         .append("g")
         .classed(NODE_STYLES.nodeCell, true)
-        .call(drawUnit, options);
+        .call(drawUnit, options)
+        .on("contextmenu", contextMenu ? d3ContextMenu(contextMenu) : null);
 
     cells
         .exit()

@@ -46,11 +46,23 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/clone`, newName)
             .then(result => result.data);
 
+    const removeRating = (scenarioId, appId, columnId, rowId) =>
+        $http
+            .delete(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}`)
+            .then(result => result.data);
+
+    const addRating = (scenarioId, appId, columnId, rowId, rating) =>
+        $http
+            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
+            .then(result => result.data);
+
     return {
         findForRoadmap,
         findByRoadmapSelector,
         getById,
-        cloneById
+        cloneById,
+        removeRating,
+        addRating
     };
 }
 
@@ -84,6 +96,16 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "cloneById",
         description: "executes cloneById [scenarioId, newName]"
+    },
+    removeRating: {
+        serviceName,
+        serviceFnName: "removeRating",
+        description: "executes removeRating [scenarioId, appId, columnId, rowId]"
+    },
+    addRating: {
+        serviceName,
+        serviceFnName: "addRating",
+        description: "executes addRating [scenarioId, appId, columnId, rowId, rating]"
     }
 };
 
