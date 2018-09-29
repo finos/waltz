@@ -96,7 +96,8 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
             node: Object.assign({}, app, { externalId: app.assetCode }),
             domainCoordinates,
             state: {
-                rating: d.rating
+                rating: d.rating,
+                comment: d.description
             },
             searchTargetStr: `${app.name} ${app.assetCode}`.toLowerCase()
         };

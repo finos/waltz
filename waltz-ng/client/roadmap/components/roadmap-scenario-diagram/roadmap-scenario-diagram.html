@@ -91,7 +91,7 @@
                 /
                 <span ng-bind="$ctrl.dialog.data.domainCoordinates.row.name"></span>
             </p>
-            <textarea ng-bind="$ctrl.dialog.workingComment" cols="60" rows="6">
+            <textarea ng-model="$ctrl.dialog.workingComment" cols="60" rows="6">
             </textarea>
             <div>
                 <button ng-click="$ctrl.onSaveComment(
@@ -163,15 +163,28 @@
                             Select from applications already mentioned
                             in this scenario
                         </p>
-                        <div ng-class="{'waltz-scroll-region-150': $ctrl.dialog.applicationPickList.length > 10}">
-                            <ul>
-                                <li ng-repeat="app in $ctrl.dialog.applicationPickList">
-                                    <a ng-click="$ctrl.onAddApplication(app)"
-                                       class="clickable">
-                                        <span ng-bind="app.name"></span>
-                                    </a>
-                                </li>
-                            </ul>
+                        <div ng-if="$ctrl.dialog.applicationPickList.length === 0">
+                            <div class="small alert alert-warning">
+                                No additional applications to pick from. Perhaps use
+                                <a ng-click="$ctrl.dialog.tab = 'SEARCH'"
+                                   class="clickable">
+                                    search
+                                </a>
+                                to add one
+                            </div>
+                        </div>
+
+                        <div ng-if="$ctrl.dialog.applicationPickList.length > 0">
+                            <div ng-class="{'waltz-scroll-region-150': $ctrl.dialog.applicationPickList.length > 10}">
+                                <ul>
+                                    <li ng-repeat="app in $ctrl.dialog.applicationPickList">
+                                        <a ng-click="$ctrl.onAddApplication(app)"
+                                           class="clickable">
+                                            <span ng-bind="app.name"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
                     </div>

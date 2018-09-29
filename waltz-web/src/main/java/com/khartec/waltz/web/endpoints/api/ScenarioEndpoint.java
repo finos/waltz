@@ -49,7 +49,20 @@ public class ScenarioEndpoint implements Endpoint {
         registerGetScenarioById(mkPath(BASE_URL, "id", ":id"));
         registerCloneScenario(mkPath(BASE_URL, "id", ":id", "clone"));
         registerRemoveRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId"));
+        registerSaveComment(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", "comment"));
         registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
+    }
+
+    private void registerSaveComment(String path) {
+        postForDatum(path, (request, response) ->
+            scenarioRatingItemService.saveComment(
+                    getId(request),
+                    getLong(request, "appId"),
+                    getLong(request, "columnId"),
+                    getLong(request, "rowId"),
+                    request.body(),
+                    getUsername(request)
+                    ));
     }
 
     private void registerAddRating(String path) {

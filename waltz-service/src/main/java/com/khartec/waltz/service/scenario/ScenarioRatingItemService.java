@@ -33,4 +33,8 @@ public class ScenarioRatingItemService {
     public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {
         return scenarioRatingItemDao.add(scenarioId, appId, columnId, rowId, rating, userId);
     }
+
+    public boolean saveComment(long scenarioId, long appId, long columnId, long rowId, String comment, String userId) {
+        return scenarioRatingItemDao.saveComment(scenarioId, appId, columnId, rowId, comment, userId);
+    }
 }
