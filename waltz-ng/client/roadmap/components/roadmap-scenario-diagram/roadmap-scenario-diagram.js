@@ -10,9 +10,12 @@ const bindings = {
     onCancel: "<"
 };
 
+
 const dialogs = {
-    ADD_APPLICATION: "ADD_APPLICATION"
+    ADD_APPLICATION: "ADD_APPLICATION",
+    EDIT_COMMENT: "EDIT_COMMENT"
 };
+
 
 const component = {
     bindings,
@@ -29,31 +32,98 @@ const initialState = {
 };
 
 
+function determineApplicationPickList(applications = [], ratings = [], column, row) {
+
+    const usedAppIds = _
+        .chain(ratings)
+        .filter(r => r.column.id ===  column.id && r.row.id === row.id)
+        .map(r => r.item.id)
+        .value();
+
+    return _
+        .chain(applications)
+        .reject(a => _.includes(usedAppIds, a.id))
+        .orderBy(a => a.name.toLowerCase())
+        .value();
+}
+
+
 function controller($q, $timeout, serviceBroker, notification) {
 
+    const vm = initialiseData(this, initialState);
+
+    const mkDialogStyle = () => ({
+        display: "block",
+        position: "absolute",
+        left: `${event.pageX - 2}px`,
+        top:`${event.pageY - 100}px`
+    });
+
+    const addApplicationAction = (domainCoordinates) => {
+        const column = domainCoordinates.column;
+        const row = domainCoordinates.row;
+
+        const applicationPickList = determineApplicationPickList(
+            vm.applications,
+            vm.scenarioDefn.ratings,
+            column,
+            row);
+
+        const style = mkDialogStyle();
+
+        $timeout(() => {
+            vm.selectedRow = row;
+            vm.selectedColumn = column;
+            vm.dialog = {
+                type: dialogs.ADD_APPLICATION,
+                row,
+                column,
+                applicationPickList,
+                tabs: [
+                    { name: "Pick app", value: "PICK" },
+                    { name: "Search for any app", value: "SEARCH" }
+                ],
+                tab: "PICK",
+                style
+            };
+        });
+    };
 
     function mkNodeMenu() {
-        return (d) => {
+        return () => {
             return [
                 {
                     title: "Update rating",
-                    action: (elm, d, i) => {
+                    action: (elm, d) => {
                         $timeout(() => {
                             console.log("Update rating")
                         });
                     }
                 },  {
-                    title: "Add comment",
-                    action: (elm, d, i) => {
+                    title: "Edit comment",
+                    action: (elm, d) => {
+                        console.log({ elm, d })
+                        const style = mkDialogStyle();
                         $timeout(() => {
-                            console.log("Add comment")
+                            const row = d.domainCoordinates.row;
+                            const column = d.domainCoordinates.column;
+
+                            vm.dialog = {
+                                type: dialogs.EDIT_COMMENT,
+                                data: d,
+                                workingComment: "Hello mum",
+                                style
+                            };
                         });
                     }
+                },  {
+                    title: "Add another application",
+                    action:  (elm, d) => addApplicationAction(d.domainCoordinates)
                 }, {
                     divider: true
                 }, {
                     title: "Remove",
-                    action: (elm, d, i) => {
+                    action: (elm, d) => {
                         const args = [
                             vm.scenarioDefn.scenario.id,
                             d.node.id,
@@ -67,42 +137,21 @@ function controller($q, $timeout, serviceBroker, notification) {
                             .then(() => notification.success("Item removed"))
                             .then(() => reload());
                     }
-                },
-            ];
-        };
-    }
-
-    function mkNodeGridMenu() {
-        return (d) => {
-            return [
-                {
-                    title: "Add Application",
-                    action: (elm, d, i) => {
-                        const style = {
-                            display: "block",
-                            position: "absolute",
-                            //"z-index": 1200,
-                            left: (event.pageX - 2) + "px",
-                            top: (event.pageY - 100) + "px"
-                        };
-
-                        $timeout(() => {
-                            vm.selectedRow = d.row;
-                            vm.selectedColumn = d.column;
-                            vm.dialog = {
-                                type: dialogs.ADD_APPLICATION,
-                                row: d.row,
-                                column: d.column,
-                                style
-                            };
-                        });
-                    }
                 }
             ];
         };
     }
 
-    const vm = initialiseData(this, initialState);
+    function mkNodeGridMenu() {
+        return () => {
+            return [
+                {
+                    title: "Add application",
+                    action:  (elm, d) => addApplicationAction({ row: d.row, column: d.column })
+                }
+            ];
+        };
+    }
 
     function reload() {
         loadScenario()
@@ -138,6 +187,7 @@ function controller($q, $timeout, serviceBroker, notification) {
             });
     }
 
+
     vm.$onInit = () => {
         const scenarioPromise = loadScenario();
         const applicationPromise = loadApplications(scenarioPromise);
@@ -167,7 +217,6 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.selectedRow.id,
             "G"
         ];
-        console.log({args});
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.addRating,
@@ -178,6 +227,12 @@ function controller($q, $timeout, serviceBroker, notification) {
                 vm.onCloseDialog();
             });
     };
+
+
+    vm.onSaveComment =(item, column, row, comment) => {
+        console.log("Saving comment", { item, column, row, comment });
+    };
+
 
     vm.onCloseDialog = () => {
         vm.dialog = null;
