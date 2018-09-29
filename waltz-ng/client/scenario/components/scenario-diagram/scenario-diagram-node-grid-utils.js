@@ -1,4 +1,4 @@
-import {drawUnit, NODE_STYLES} from "./scenario-diagram-static-node-utils";
+import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-static-node-utils";
 import {checkTrue} from "../../../common/checks";
 import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {defaultOptions} from "./scenario-diagram-utils";
@@ -6,18 +6,13 @@ import {d3ContextMenu} from "../../../common/d3-context-menu";
 
 
 export function drawNodeGrid(selection, options) {
-    const dataProvider = d => {
-        console.log('nodegrid', { d })
-
-        return d.data;
-    };
+    const dataProvider = d => d.data;
 
     const cells = selection
         .selectAll(`g.${NODE_STYLES.nodeCell}`)
         .data(
-            dataProvider, //_.orderBy(d.data, d => d.node.name),
+            dataProvider,
             d => d.id);
-
 
     const contextMenu = _.get(options, ["handlers", "contextMenus", "node"], null);
 
@@ -38,7 +33,8 @@ export function drawNodeGrid(selection, options) {
             const dy = CELL_DIMENSIONS.padding + (CELL_DIMENSIONS.height * d.layout.row);
             const dx = CELL_DIMENSIONS.padding + (CELL_DIMENSIONS.width * d.layout.col);
             return `translate(${dx} ${dy})`;
-        });
+        })
+        .call(updateUnit, options);
 }
 
 

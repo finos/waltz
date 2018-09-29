@@ -25,10 +25,29 @@ export const NODE_STYLES = {
     nodeExternalId: "wrd-node-external-id",
     nodeChangeInitiative: "wrd-node-change-initiative",
     nodeCell: "wrd-node-cell",
-    nodeCellChangeIndicator: "node-cell-change-indicator",
-    nodeCellChangeIndicatorTargetState: "node-cell-change-indicator-target-state",
-    nodeCellChangeIndicatorBaseState: "node-cell-change-indicator-base-state"
+    nodeCellRatingIndicator: "node-cell-rating-indicator",
 };
+
+
+
+export function updateUnit(selection, options) {
+
+    const colorScale = options.colorScale;
+
+    selection
+        .select(`rect.${NODE_STYLES.nodeCell}`)
+        .attr("stroke",  d => colorScale(d.state.rating))
+        .attr("fill", d => colorScale(d.state.rating).brighter(2.5));
+
+    selection
+        .select(`rect.${NODE_STYLES.nodeCellRatingIndicator}`)
+        .attr("fill", d => colorScale(d.state.rating))
+        .attr("stroke",  d => colorScale(d.state.rating));
+
+    selection
+        .select(`text.${NODE_STYLES.nodeTitle}`)
+        .text(d => (d.state.comment ? "!!" : "") + d.node.name);
+}
 
 
 export function drawUnit(selection, options) {
@@ -39,9 +58,7 @@ export function drawUnit(selection, options) {
         .append("rect")
         .classed(NODE_STYLES.nodeCell, true)
         .attr("width", NODE_DIMENSIONS.width)
-        .attr("height", NODE_DIMENSIONS.height)
-        .attr("stroke",  d => colorScale(d.state.rating))
-        .attr("fill", d => colorScale(d.state.rating).brighter(2.5));
+        .attr("height", NODE_DIMENSIONS.height);
 
     selection
         .call(drawUnitTitle)
@@ -61,11 +78,9 @@ function drawRatingIndicator(selection, options) {
 
     selection
         .append("rect")
-        .classed(NODE_STYLES.nodeCellChangeIndicator, true)
+        .classed(NODE_STYLES.nodeCellRatingIndicator, true)
         .attr("width", w)
-        .attr("height", h)
-        .attr("fill", d => colorScale(d.state.rating))
-        .attr("stroke",  d => colorScale(d.state.rating));
+        .attr("height", h);
 }
 
 
@@ -85,8 +100,7 @@ function drawUnitExternalId(selection) {
         .attr("y", NODE_DIMENSIONS.section.height)
         .attr("dy", NODE_DIMENSIONS.text.dy)
         .attr("dx", NODE_DIMENSIONS.text.dx)
-        .attr("font-size", NODE_DIMENSIONS.text.fontSize - 2)
-        .call(truncateText, NODE_DIMENSIONS.width - (2 * NODE_DIMENSIONS.text.dx));
+        .attr("font-size", NODE_DIMENSIONS.text.fontSize - 2);
 }
 
 
@@ -100,7 +114,6 @@ function drawUnitTitle(selection) {
 
     selection
         .append("text")
-        .text(d => d.node.name)
         .classed(NODE_STYLES.nodeTitle, true)
         .attr("dy", NODE_DIMENSIONS.text.dy)
         .attr("dx", NODE_DIMENSIONS.text.dx)

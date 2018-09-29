@@ -29,6 +29,7 @@ public class ScenarioRatingItemDao {
                 .column(readRef(record, SCENARIO_RATING_ITEM.COLUMN_KIND, SCENARIO_RATING_ITEM.COLUMN_ID))
                 .rating(record.getRating().charAt(0))
                 .scenarioId(record.getScenarioId())
+                .description(record.getDescription())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .build();
@@ -55,7 +56,7 @@ public class ScenarioRatingItemDao {
 
 
     public int cloneItems(CloneScenarioCommand command, Long clonedScenarioId) {
-        SelectConditionStep<Record10<Long, Long, String, String, Long, String, Long, String, Timestamp, String>> originalData = DSL
+        SelectConditionStep<Record11<Long, Long, String, String, Long, String, Long, String, String, Timestamp, String>> originalData = DSL
                 .select(
                         DSL.value(clonedScenarioId),
                         SCENARIO_RATING_ITEM.ITEM_ID,
@@ -65,6 +66,7 @@ public class ScenarioRatingItemDao {
                         SCENARIO_RATING_ITEM.ROW_KIND,
                         SCENARIO_RATING_ITEM.COLUMN_ID,
                         SCENARIO_RATING_ITEM.COLUMN_KIND,
+                        SCENARIO_RATING_ITEM.DESCRIPTION,
                         SCENARIO_RATING_ITEM.LAST_UPDATED_AT,
                         SCENARIO_RATING_ITEM.LAST_UPDATED_BY)
                 .from(SCENARIO_RATING_ITEM)
@@ -81,19 +83,18 @@ public class ScenarioRatingItemDao {
                         SCENARIO_RATING_ITEM.ROW_KIND,
                         SCENARIO_RATING_ITEM.COLUMN_ID,
                         SCENARIO_RATING_ITEM.COLUMN_KIND,
+                        SCENARIO_RATING_ITEM.DESCRIPTION,
                         SCENARIO_RATING_ITEM.LAST_UPDATED_AT,
                         SCENARIO_RATING_ITEM.LAST_UPDATED_BY)
                 .select(originalData)
                 .execute();
     }
 
+
     public boolean remove(long scenarioId, long appId, long columnId, long rowId) {
         return dsl
                 .deleteFrom(SCENARIO_RATING_ITEM)
-                .where(SCENARIO_RATING_ITEM.ITEM_ID.eq(appId))
-                .and(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(scenarioId))
-                .and(SCENARIO_RATING_ITEM.ROW_ID.eq(rowId))
-                .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(columnId))
+                .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
                 .execute() == 1;
     }
 
@@ -109,8 +110,30 @@ public class ScenarioRatingItemDao {
                 .set(SCENARIO_RATING_ITEM.ROW_ID, rowId)
                 .set(SCENARIO_RATING_ITEM.ROW_KIND, EntityKind.MEASURABLE.name())
                 .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(rating))
+                .set(SCENARIO_RATING_ITEM.DESCRIPTION, "")
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .execute() == 1;
+    }
+
+
+    public boolean saveComment(long scenarioId, long appId, long columnId, long rowId, String comment, String userId) {
+        return dsl
+                .update(SCENARIO_RATING_ITEM)
+                .set(SCENARIO_RATING_ITEM.DESCRIPTION, comment)
+
+                .set(SCENARIO_RATING_ITEM.RATING, DSL.when(SCENARIO_RATING_ITEM.RATING.eq("R"), "G").otherwise("R"))
+                .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
+                .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
+                .execute() == 1;
+    }
+
+
+    private Condition mkCoordinatesCondition(long scenarioId, long appId, long columnId, long rowId) {
+        return SCENARIO_RATING_ITEM.ITEM_ID.eq(appId)
+                .and(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(scenarioId))
+                .and(SCENARIO_RATING_ITEM.ROW_ID.eq(rowId))
+                .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(columnId));
     }
 }

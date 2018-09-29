@@ -239,9 +239,6 @@ function controller($scope,
             vm.applications,
             vm.filteredFlowData.decorators,
             node => $scope.$applyAsync(() => vm.selectedNode = node));
-
-        global.vm = vm;
-        console.log('fc')
     };
 
     vm.isolate = (node) => {
@@ -270,11 +267,9 @@ function controller($scope,
     };
 
     vm.$onInit = () => {
-        console.log('init')
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.allDataTypes = r.data);
-
     };
 
 }

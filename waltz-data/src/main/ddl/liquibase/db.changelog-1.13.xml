@@ -670,4 +670,17 @@
         </createIndex>
     </changeSet>
 
+
+    <!-- 3403: Roadmap improvments -->
+    <changeSet id="20180929-3403-3"
+               author="davidwatkins73">
+        <addColumn tableName="scenario_rating_item">
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -102,7 +102,6 @@ function controller($q, $timeout, serviceBroker, notification) {
                 },  {
                     title: "Edit comment",
                     action: (elm, d) => {
-                        console.log({ elm, d })
                         const style = mkDialogStyle();
                         $timeout(() => {
                             const row = d.domainCoordinates.row;
@@ -111,7 +110,7 @@ function controller($q, $timeout, serviceBroker, notification) {
                             vm.dialog = {
                                 type: dialogs.EDIT_COMMENT,
                                 data: d,
-                                workingComment: "Hello mum",
+                                workingComment: "" + d.state.comment,
                                 style
                             };
                         });
@@ -154,7 +153,7 @@ function controller($q, $timeout, serviceBroker, notification) {
     }
 
     function reload() {
-        loadScenario()
+        loadApplications(loadScenario())
             .then(() => vm.vizData =
                 prepareData(
                     vm.scenarioDefn,
@@ -174,7 +173,11 @@ function controller($q, $timeout, serviceBroker, notification) {
     function loadApplications(scenarioPromise) {
         return scenarioPromise
             .then(() => _.map(vm.scenarioDefn.ratings, r => r.item.id))
-            .then(appIds => serviceBroker.loadViewData(CORE_API.ApplicationStore.findByIds, [appIds]))
+            .then(appIds => serviceBroker
+                .loadViewData(
+                    CORE_API.ApplicationStore.findByIds,
+                    [ appIds ],
+                    { force: true }))
             .then(r => vm.applications = r.data);
     }
 
@@ -186,7 +189,6 @@ function controller($q, $timeout, serviceBroker, notification) {
                 vm.measurables = _.filter(r.data, m => _.includes(requiredMeasurableIds, m.id));
             });
     }
-
 
     vm.$onInit = () => {
         const scenarioPromise = loadScenario();
@@ -205,9 +207,10 @@ function controller($q, $timeout, serviceBroker, notification) {
             columnAxisItem: mkNodeMenu(),
             rowAxisItem: mkNodeMenu(),
         };
-
     };
 
+
+    // -- INTERACT --
 
     vm.onAddApplication = (app) => {
         const args = [
@@ -228,11 +231,24 @@ function controller($q, $timeout, serviceBroker, notification) {
             });
     };
 
-
     vm.onSaveComment =(item, column, row, comment) => {
-        console.log("Saving comment", { item, column, row, comment });
+        const args = [
+            vm.scenarioDefn.scenario.id,
+            item.id,
+            column.id,
+            row.id,
+            comment
+        ];
+        serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.saveComment,
+                args)
+            .then(() => {
+                reload();
+                notification.success("Edited comment");
+                vm.onCloseDialog();
+            });
     };
-
 
     vm.onCloseDialog = () => {
         vm.dialog = null;

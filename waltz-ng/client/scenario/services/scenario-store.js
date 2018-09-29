@@ -56,13 +56,19 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
             .then(result => result.data);
 
+    const saveComment = (scenarioId, appId, columnId, rowId, comment) =>
+        $http
+            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/comment`, comment)
+            .then(result => result.data);
+
     return {
         findForRoadmap,
         findByRoadmapSelector,
         getById,
         cloneById,
         removeRating,
-        addRating
+        addRating,
+        saveComment
     };
 }
 
@@ -106,6 +112,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "addRating",
         description: "executes addRating [scenarioId, appId, columnId, rowId, rating]"
+    },
+    saveComment: {
+        serviceName,
+        serviceFnName: "saveComment",
+        description: "executes saveComment [scenarioId, appId, columnId, rowId, comment]"
     }
 };
 
