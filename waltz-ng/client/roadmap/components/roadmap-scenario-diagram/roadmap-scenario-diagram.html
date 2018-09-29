@@ -67,32 +67,130 @@
 
 <!-- DIALOG -->
 <div ng-if="$ctrl.dialog"
-     ng-style="$ctrl.dialog.style">
-    <div style="background-color: #fafafa; border: 2px solid #ccc; border-radius: 3px; padding: 6px; width: 500px">
-        <h4>Add Application</h4>
-        Add application to:
-        <table class="waltz-mini-table">
-            <tr>
-                <td>Column:</td>
-                <td>
-                    <span ng-bind="$ctrl.dialog.column.name"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>Row:</td>
-                <td>
-                    <span ng-bind="$ctrl.dialog.row.name"></span>
-                </td>
-            </tr>
-        </table>
+     ng-style="$ctrl.dialog.style"
+     style="background-color: #fafafa; border: 2px solid #ccc; border-radius: 3px; padding: 6px; width: 500px">
 
-        <br>
+    <div ng-switch="$ctrl.dialog.type">
+        <!-- EDIT COMMENT -->
+        <div ng-switch-when="EDIT_COMMENT">
+            <h4>
+                <span>Edit Comment</span>
+                <small>
+                    <a ng-click="$ctrl.onCloseDialog()"
+                       class="clickable">
+                        <waltz-icon name="close"></waltz-icon>
+                        Close
+                    </a>
+                </small>
+            </h4>
+            <p class="help-block">
+                Editing comment for application:
+                <span ng-bind="$ctrl.dialog.data.node.name"></span>
+                in position:
+                <span ng-bind="$ctrl.dialog.data.domainCoordinates.column.name"></span>
+                /
+                <span ng-bind="$ctrl.dialog.data.domainCoordinates.row.name"></span>
+            </p>
+            <textarea ng-bind="$ctrl.dialog.workingComment" cols="60" rows="6">
+            </textarea>
+            <div>
+                <button ng-click="$ctrl.onSaveComment(
+                            $ctrl.dialog.data.node,
+                            $ctrl.dialog.data.domainCoordinates.column,
+                            $ctrl.dialog.data.domainCoordinates.row,
+                            $ctrl.dialog.workingComment)"
+                        class="btn btn-primary btn-sm">
+                    Save
+                </button>
+                <a ng-click="$ctrl.onCloseDialog()"
+                   class="clickable">
+                    Cancel
+                </a>
+            </div>
 
-        <waltz-basic-app-selector on-add="$ctrl.onAddApplication"
-                                  on-cancel="$ctrl.onCloseDialog">
-        </waltz-basic-app-selector>
+        </div>
 
-        <br>
+            <!-- ADD APPLICATION -->
+        <div ng-switch-when="ADD_APPLICATION">
+            <h4>
+                <span>Add Application</span>
+                <small>
+                    <a ng-click="$ctrl.onCloseDialog()"
+                       class="clickable">
+                        <waltz-icon name="close"></waltz-icon>
+                        Close
+                    </a>
+                </small>
+            </h4>
+            Add application to:
+            <table class="waltz-mini-table">
+                <tr>
+                    <td>Column:</td>
+                    <td>
+                        <span ng-bind="$ctrl.dialog.column.name"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Row:</td>
+                    <td>
+                        <span ng-bind="$ctrl.dialog.row.name"></span>
+                    </td>
+                </tr>
+            </table>
 
+            <br>
+
+
+            <div class="waltz-tabs">
+                <!-- TAB HEADERS -->
+                <input type="radio"
+                       ng-repeat-start="tab in $ctrl.dialog.tabs"
+                       ng-model="$ctrl.dialog.tab"
+                       ng-value="tab.value"
+                       name="{{tab.name}}"
+                       id="{{tab.id + $id}}">
+                <label for="{{tab.id + $id}}"
+                       ng-bind="tab.name"
+                       ng-repeat-end>
+                </label>
+
+                <!-- TAB CONTENT -->
+                <div ng-switch="$ctrl.dialog.tab" class="wt-tab wt-active">
+
+                    <!-- PICK -->
+                    <div ng-switch-when="PICK">
+                        <p class="help-block">
+                            Select from applications already mentioned
+                            in this scenario
+                        </p>
+                        <div ng-class="{'waltz-scroll-region-150': $ctrl.dialog.applicationPickList.length > 10}">
+                            <ul>
+                                <li ng-repeat="app in $ctrl.dialog.applicationPickList">
+                                    <a ng-click="$ctrl.onAddApplication(app)"
+                                       class="clickable">
+                                        <span ng-bind="app.name"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- SEARCH -->
+                    <div ng-switch-when="SEARCH">
+                        <p class="help-block">
+                            Search for an application using it's name or asset code
+                        </p>
+                        <waltz-basic-app-selector on-add="$ctrl.onAddApplication"
+                                                  on-cancel="$ctrl.onCloseDialog">
+                        </waltz-basic-app-selector>
+                    </div>
+                </div>
+
+            </div>
+
+            <br>
+
+        </div>
     <div>
 </div>
