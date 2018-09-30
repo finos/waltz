@@ -45,19 +45,6 @@ function mkHistoryObj(flow) {
 }
 
 
-function addToHistory(historyStore, flow) {
-    if (! flow) { return; }
-
-    const historyObj = mkHistoryObj(flow);
-
-    historyStore.put(
-        historyObj.name,
-        historyObj.kind,
-        historyObj.state,
-        historyObj.stateParams);
-}
-
-
 function removeFromHistory(historyStore, flow) {
     if (! flow) { return; }
 

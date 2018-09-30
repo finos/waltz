@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import template from "./measurable-rating-tree.html";
 import {truncateMiddle} from "../../../common/string-utils";
 

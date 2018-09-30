@@ -23,13 +23,13 @@ import {scaleLinear} from "d3-scale";
 import "d3-selection-multi";
 
 const bindings = {
-    scores: '<',
-    range: '<',
-    ratingSchemeItems: '<'
+    scores: "<",
+    range: "<",
+    ratingSchemeItems: "<"
 };
 
 
-const template = '<svg class="rag-line"></svg>';
+const template = "<svg class=\"rag-line\"></svg>";
 
 function controller($element) {
 
@@ -39,7 +39,7 @@ function controller($element) {
     const vm = this;
 
     const svg = select($element[0])
-        .select('svg')
+        .select("svg")
         .attrs({ width: `${width}px`, height: `${height}px` });
 
     const update = (scores, range = [0, 0], ratingSchemeItems) => {
@@ -60,19 +60,19 @@ function controller($element) {
             .value();
 
         const rects = svg
-            .selectAll('rect')
+            .selectAll("rect")
             .data(data, d => d.rating);
 
         const newRects = rects
             .enter()
-            .append('rect')
-            .attr('fill', d => d.color)
-            .attr('height', height)
-            .attr('y', 0);
+            .append("rect")
+            .attr("fill", d => d.color)
+            .attr("height", height)
+            .attr("y", 0);
 
         newRects.merge(rects)
-            .attr('x', d => xScale(d.start))
-            .attr('width', d => xScale(d.width));
+            .attr("x", d => xScale(d.start))
+            .attr("width", d => xScale(d.width));
     };
 
 
@@ -86,7 +86,7 @@ function controller($element) {
 
 
 controller.$inject = [
-    '$element'
+    "$element"
 ];
 
 const component = {
@@ -96,4 +96,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzRagLine",
+    component
+};

@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+import {checkIsIdSelector} from "../../common/checks";
+
 
 function store($http, baseUrl) {
 

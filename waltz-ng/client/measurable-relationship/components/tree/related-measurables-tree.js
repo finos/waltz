@@ -21,7 +21,7 @@ import {initialiseData, isEmpty} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {sameRef} from "../../../common/entity-utils";
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {truncateMiddle} from "../../../common/string-utils";
 
 const bindings = {

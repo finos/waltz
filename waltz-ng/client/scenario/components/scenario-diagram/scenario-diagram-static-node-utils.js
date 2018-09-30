@@ -1,4 +1,4 @@
-import {toPath, truncateText} from "../../../common/d3-utils";
+import {truncateText} from "../../../common/d3-utils";
 
 
 const nodeWidth = 160;
@@ -29,7 +29,6 @@ export const NODE_STYLES = {
 };
 
 
-
 export function updateUnit(selection, options) {
 
     const colorScale = options.colorScale;
@@ -52,8 +51,6 @@ export function updateUnit(selection, options) {
 
 export function drawUnit(selection, options) {
 
-    const colorScale = options.colorScale;
-
     selection
         .append("rect")
         .classed(NODE_STYLES.nodeCell, true)
@@ -63,16 +60,15 @@ export function drawUnit(selection, options) {
     selection
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
-        .call(drawRatingIndicator, options);
+        .call(drawRatingIndicator);
 
     selection
         .on("click", options.handlers.onNodeClick);
 }
 
 
-function drawRatingIndicator(selection, options) {
+function drawRatingIndicator(selection) {
 
-    const colorScale = options.colorScale;
     const w = (NODE_DIMENSIONS.width / 8);
     const h = NODE_DIMENSIONS.height;
 

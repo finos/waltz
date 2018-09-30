@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildHierarchies, findNode, getParents} from "../../../common/hierarchy-utils";
+import {getParents} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./data-type-overview.html";

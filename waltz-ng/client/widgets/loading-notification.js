@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './loading-notification.html';
+import template from "./loading-notification.html";
 import {initialiseData} from "../common";
 
 
 const bindings = {
-    show: '<?',
-    name: '@'
+    show: "<?",
+    name: "@"
 };
 
 
@@ -32,7 +32,7 @@ const initialState = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 

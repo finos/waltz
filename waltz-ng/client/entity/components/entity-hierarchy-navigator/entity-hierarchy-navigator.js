@@ -18,14 +18,14 @@
  */
 
 import _ from "lodash";
-import {buildHierarchies, findNode, switchToParentIds} from "../../../common/hierarchy-utils";
-import template from './entity-hierarchy-navigator.html';
+import {buildHierarchies, findNode} from "../../../common/hierarchy-utils";
+import template from "./entity-hierarchy-navigator.html";
 
 const initialState = {
     model: [],
     expandedNodes: [],
     selectedNode: null,
-    onSelect: (n) => console.log('No handler provided for entity-hierarchy-navigator:onSelect', n)
+    onSelect: (n) => console.log("No handler provided for entity-hierarchy-navigator:onSelect", n)
 };
 
 
@@ -67,12 +67,12 @@ const component = {
     template,
     controller,
     bindings: {
-        selectedNode: '<',
-        model: '<',
-        onSelect: '<'
+        selectedNode: "<",
+        model: "<",
+        onSelect: "<"
     },
     transclude: {
-        'nodeTemplate': '?nodeTemplate'
+        "nodeTemplate": "?nodeTemplate"
     }
 };
 

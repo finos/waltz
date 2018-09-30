@@ -18,23 +18,23 @@
  */
 
 import _ from "lodash";
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './flow-filter-options.html';
+import template from "./flow-filter-options.html";
 
 const bindings = {
-    onChange: '<',
-    usedTypes: '<' // [ dataTypeId... ]
+    onChange: "<",
+    usedTypes: "<" // [ dataTypeId... ]
 };
 
 
 const initialState = {
-    selectedType: 'ALL',
-    selectedScope: 'ALL',
+    selectedType: "ALL",
+    selectedScope: "ALL",
     visibility: {
         tree: false
     },
-    onChange: () => console.log('No change handler registered for flow-filter-options-overlay::onChange')
+    onChange: () => console.log("No change handler registered for flow-filter-options-overlay::onChange")
 };
 
 
@@ -42,7 +42,7 @@ function controller(serviceBroker) {
     const vm = _.defaults(this, initialState);
 
     vm.onShowAll= () => {
-        vm.selectedType = 'ALL';
+        vm.selectedType = "ALL";
         vm.visibility.tree = false;
         vm.notifyChanges();
     };
@@ -64,15 +64,15 @@ function controller(serviceBroker) {
 
     vm.$onChanges = () => {
         vm.notifyChanges();
-        const usedTypeIds = _.map(vm.usedTypes, 'id');
+        const usedTypeIds = _.map(vm.usedTypes, "id");
         const enrichedDataTypes = _.map(vm.allDataTypes, dt => Object.assign({}, dt, { isUsed: _.includes(usedTypeIds, dt.id) }));
         vm.hierarchy = buildHierarchies(enrichedDataTypes, false);
     };
 
     vm.notifyChanges = () => {
         const options = {
-            type: vm.selectedType || 'ALL',
-            scope: vm.selectedScope || 'ALL'
+            type: vm.selectedType || "ALL",
+            scope: vm.selectedScope || "ALL"
         };
         vm.onChange(options);
     };
@@ -82,7 +82,7 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 
 const component = {

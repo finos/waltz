@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './last-updated.html';
+import template from "./last-updated.html";
 import {initialiseData} from "../../index";
 
 
@@ -26,8 +26,8 @@ import {initialiseData} from "../../index";
  */
 
 const bindings = {
-    entity: '<',
-    showLabel: '<?'
+    entity: "<",
+    showLabel: "<?"
 };
 
 const initialState = {
@@ -36,7 +36,7 @@ const initialState = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 

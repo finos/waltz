@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {distinctRatingCodes, indexRatingSchemes} from "../../../ratings/rating-utils";
 import template from "./measurable-ratings-browser.html";

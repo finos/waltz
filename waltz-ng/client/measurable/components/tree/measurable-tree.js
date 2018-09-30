@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {buildPropertySummer} from '../../../common/tally-utils';
-import {scaleLinear} from 'd3-scale';
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from '../../../common/hierarchy-utils';
-import template from './measurable-tree.html';
+import _ from "lodash";
+import {initialiseData} from "../../../common";
+import {buildPropertySummer} from "../../../common/tally-utils";
+import {scaleLinear} from "d3-scale";
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import template from "./measurable-tree.html";
 
 
 /**
@@ -34,7 +34,7 @@ import template from './measurable-tree.html';
 
 
 const bindings = {
-    measurables: '<',
+    measurables: "<",
 };
 
 
@@ -42,7 +42,7 @@ const initialState = {
     expandedNodes: [],
     hierarchy: [],
     searchNodes: [],
-    searchTerms: '',
+    searchTerms: "",
     chartScale: () => 0,
     treeOptions: {
         nodeChildren: "children",
@@ -77,8 +77,8 @@ function prepareExpandedNodes(hierarchy = []) {
 
 function prepareChartScale(hierarchy) {
     const maxCount = _.get(
-            _.maxBy(hierarchy, 'totalCount'),
-            'totalCount') || 0;
+            _.maxBy(hierarchy, "totalCount"),
+            "totalCount") || 0;
     return scaleLinear()
         .range([0, 100])
         .domain([0, maxCount])
@@ -88,13 +88,13 @@ function prepareChartScale(hierarchy) {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.searchTermsChanged = (termStr = '') => {
+    vm.searchTermsChanged = (termStr = "") => {
         vm.hierarchy = prepareTree(doSearch(termStr, vm.searchNodes));
     };
 
     vm.clearSearch = () => {
-        vm.searchTermsChanged('');
-        vm.searchTerms = '';
+        vm.searchTermsChanged("");
+        vm.searchTerms = "";
     };
 
     vm.$onChanges = (c) => {

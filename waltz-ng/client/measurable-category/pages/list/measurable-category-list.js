@@ -49,7 +49,7 @@ function controller($q,
                 return vm.measurablesByCategory[categoryId];
             });
 
-        const measurableCategoryPromise = serviceBroker
+        serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => {
                 vm.categories = r.data;
