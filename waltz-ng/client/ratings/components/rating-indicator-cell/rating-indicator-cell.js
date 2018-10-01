@@ -22,8 +22,8 @@ import {initialiseData} from "../../../common/index";
 
 
 const bindings = {
-    rating: '<',
-    showName: '<'
+    rating: "<",
+    showName: "<"
 };
 
 const initialData = {
@@ -46,4 +46,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzRatingIndicatorCell",
+    component
+};

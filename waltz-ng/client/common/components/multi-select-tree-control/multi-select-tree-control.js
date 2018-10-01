@@ -20,17 +20,17 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import {preventDefault, stopPropagation} from "../../browser-utils"
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from '../../../common/hierarchy-utils';
-import template from './multi-select-tree-control.html';
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import template from "./multi-select-tree-control.html";
 
 
 const bindings = {
-    items: '<',
-    onClick: '<',
-    onCheck: '<',
-    onUncheck: '<',
-    checkedItemIds: '<',
-    expandedItemIds: '<'
+    items: "<",
+    onClick: "<",
+    onCheck: "<",
+    onUncheck: "<",
+    checkedItemIds: "<",
+    expandedItemIds: "<"
 };
 
 
@@ -41,9 +41,9 @@ const initialState = {
     checkedItemIds: [],
     checkedMap: {},
     hierarchy: [],
-    onCheck: id => console.log('default handler in multi-select-treecontrol for node id check: ', id),
-    onUncheck: id => console.log('default handler in multi-select-treecontrol for node id uncheck: ', id),
-    onClick: node => console.log('default handler in multi-select-treecontrol for node click: ', node),
+    onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
+    onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
+    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
 };
 
 
@@ -73,7 +73,7 @@ function expandSelectedNodes(nodes = [], expandedIds = []) {
         const filteredNodes = _.filter(nodes, n => ids.includes(n.id));
         const newParentIds = _.chain(filteredNodes)
             .filter(n => n.parentId)
-            .map('parentId')
+            .map("parentId")
             .value();
 
         if(newParentIds.length > 0) {
@@ -96,7 +96,7 @@ function controller() {
         equality: (a, b) => a && b && a.id === b.id,
         multiSelection: false,
         isSelectable: (node) => {
-            return _.get(node, 'concrete', true);
+            return _.get(node, "concrete", true);
         }
     };
 
@@ -139,7 +139,7 @@ function controller() {
         vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
     };
 
-    vm.searchTermsChanged = (termStr = '') => {
+    vm.searchTermsChanged = (termStr = "") => {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
 
@@ -149,8 +149,8 @@ function controller() {
     };
 
     vm.clearSearch = () => {
-        vm.searchTermsChanged('');
-        vm.searchTerms = '';
+        vm.searchTermsChanged("");
+        vm.searchTerms = "";
         vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
     };
 }

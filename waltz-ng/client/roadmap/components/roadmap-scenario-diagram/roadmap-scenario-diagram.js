@@ -270,6 +270,6 @@ const id = "waltzRoadmapScenarioDiagram";
 export default {
     id,
     component
-}
+};
 
 

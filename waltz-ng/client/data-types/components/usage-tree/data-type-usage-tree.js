@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {buildHierarchies, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 
-import template from './data-type-usage-tree.html';
+import template from "./data-type-usage-tree.html";
 
 
 const bindings = {
-    used: '<'
+    used: "<"
 };
 
 
@@ -55,20 +55,20 @@ function enrichDataTypeWithExplicitFlag(dataType, explicitIds = []) {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (! vm.used) return;
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
-                const dataTypesById = _.keyBy(r.data, 'id');
-                const explicitIds = _.map(vm.used, r => r.kind === 'DATA_TYPE'
+                const dataTypesById = _.keyBy(r.data, "id");
+                const explicitIds = _.map(vm.used, r => r.kind === "DATA_TYPE"
                         ? r.id
                         : r.dataTypeId);
 
                 const requiredDataTypes = _
                     .chain(explicitIds)
                     .flatMap(dtId => findParents(dtId, dataTypesById))
-                    .uniqBy('id')
+                    .uniqBy("id")
                     .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
                     .value();
 
@@ -91,7 +91,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -103,6 +103,6 @@ const component = {
 
 
 export default {
-    id: 'waltzDataTypeUsageTree',
+    id: "waltzDataTypeUsageTree",
     component
 }

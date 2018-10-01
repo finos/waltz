@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {buildHierarchies, findNode, switchToParentIds} from "../../common/hierarchy-utils";
-import template from './entity-statistic-tree.html';
+import {buildHierarchies, findNode} from "../../common/hierarchy-utils";
+import template from "./entity-statistic-tree.html";
+
 
 const bindings = {
-    definitions: '<',
-    onSelection: '<',
-    currentDefinitionId: '<'
+    definitions: "<",
+    onSelection: "<",
+    currentDefinitionId: "<"
 };
 
 

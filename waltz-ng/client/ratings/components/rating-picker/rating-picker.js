@@ -20,21 +20,21 @@ import {initialiseData} from "../../../common";
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineForegroundColor} from "../../../common/colors";
-import template from './rating-picker.html';
+import template from "./rating-picker.html";
 
 
 const bindings = {
-    selected: '<',
-    editDisabled: '<',
-    onSelect: '<',
-    onKeypress: '<',
-    schemeId: '<',
+    selected: "<",
+    editDisabled: "<",
+    onSelect: "<",
+    onKeypress: "<",
+    schemeId: "<",
 };
 
 
 const initialState = {
     pickerStyle: {},
-    onSelect: (rating) => 'No onSelect handler defined for rating-picker: ' + rating,
+    onSelect: (rating) => "No onSelect handler defined for rating-picker: " + rating,
 };
 
 
@@ -64,7 +64,7 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = [ 'ServiceBroker' ];
+controller.$inject = [ "ServiceBroker" ];
 
 
 const component = {
@@ -74,4 +74,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzRatingPicker",
+    component
+};

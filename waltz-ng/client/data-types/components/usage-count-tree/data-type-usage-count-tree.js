@@ -19,25 +19,25 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {buildHierarchies, doSearch, prepareSearchNodes, switchToParentIds} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import template from "./data-type-usage-count-tree.html";
 import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 
 const bindings = {
-    onSelection: '<'
+    onSelection: "<"
 };
 
 
 function ratingToRag(r) {
     switch(r){
-        case 'PRIMARY':
-            return 'G';
-        case 'SECONDARY':
-            return 'A';
-        case 'DISCOURAGED':
-            return 'R';
-        case 'NO_OPINION':
-            return 'Z';
+        case "PRIMARY":
+            return "G";
+        case "SECONDARY":
+            return "A";
+        case "DISCOURAGED":
+            return "R";
+        case "NO_OPINION":
+            return "Z";
         default:
             return r;
     }
@@ -45,15 +45,17 @@ function ratingToRag(r) {
 
 
 function prepareTree(dataTypes = [], usageCounts = []) {
-    const dataTypesById = _.keyBy(dataTypes, 'id');
+    const dataTypesById = _.keyBy(dataTypes, "id");
     _.chain(usageCounts)
-        .filter(uc => uc.decoratorEntityReference.kind === 'DATA_TYPE')
+        .filter(uc => uc.decoratorEntityReference.kind === "DATA_TYPE")
         .forEach(uc => {
             const dtId = uc.decoratorEntityReference.id;
             const dt = dataTypesById[dtId];
             const rag = ratingToRag(uc.rating);
-            const directCounts = Object.assign({}, dt.directCounts, { [rag] : uc.count });
-            dt.directCounts = directCounts;
+            dt.directCounts = Object.assign(
+                {},
+                dt.directCounts,
+                { [rag] : uc.count });
         })
         .value();
 
@@ -68,10 +70,10 @@ function prepareTree(dataTypes = [], usageCounts = []) {
     };
 
     _.forEach(hierarchy, root => {
-        const R = sumBy('R', root);
-        const A = sumBy('A', root);
-        const G = sumBy('G', root);
-        const Z = sumBy('Z', root);
+        const R = sumBy("R", root);
+        const A = sumBy("A", root);
+        const G = sumBy("G", root);
+        const Z = sumBy("Z", root);
         root.cumulativeCounts = {
             R,
             A,
@@ -110,7 +112,7 @@ function controller(displayNameService, serviceBroker) {
                 vm.hierarchy = prepareTree(vm.dataTypes, r.data);
                 vm.maxTotal = _
                     .chain(vm.hierarchy)
-                    .map('cumulativeCounts.total')
+                    .map("cumulativeCounts.total")
                     .max()
                     .value();
             });
@@ -123,22 +125,22 @@ function controller(displayNameService, serviceBroker) {
         equality: (a, b) => a && b && a.id === b.id
     };
 
-    vm.searchTermsChanged = (termStr = '') => {
+    vm.searchTermsChanged = (termStr = "") => {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
         vm.expandedNodes = prepareExpandedNodes(vm.hierarchy);
     };
 
     vm.clearSearch = () => {
-        vm.searchTermsChanged('');
-        vm.searchTerms = '';
+        vm.searchTermsChanged("");
+        vm.searchTerms = "";
     };
 }
 
 
 controller.$inject = [
-    'DisplayNameService',
-    'ServiceBroker'
+    "DisplayNameService",
+    "ServiceBroker"
 ];
 
 
@@ -149,7 +151,7 @@ const component = {
 };
 
 
-const id = 'waltzDataTypeUsageCountTree';
+const id = "waltzDataTypeUsageCountTree";
 
 
 export default {

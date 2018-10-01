@@ -8,7 +8,6 @@ const baseState = {};
 
 function bouncer($state, $stateParams, userPreferenceService, settingsService) {
     const go = id => $state.go("main.measurable-category.list", { id }, { location: "replace" });
-    const goHome = () => $state.go("main.home", {}, { location: "replace" });
 
     const attemptToRouteViaLastVisited = () => userPreferenceService
         .loadPreferences(true)
