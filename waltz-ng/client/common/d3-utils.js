@@ -223,6 +223,6 @@ export function createGroupElements(container, definitions = []) {
  * @returns {string}
  */
 export function toPath(pts) {
-    const toPathCombiner = (acc, p, i) => acc + `${i == 0 ? 'M' : 'L'}${p.x} ${p.y} `;
-    return _.reduce(pts, toPathCombiner, '') + 'Z'
+    const toPathCombiner = (acc, p, i) => acc + `${i == 0 ? "M" : "L"}${p.x} ${p.y} `;
+    return _.reduce(pts, toPathCombiner, "") + "Z"
 }

@@ -57,9 +57,9 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
             .then(result => result.data);
 
-    const saveComment = (scenarioId, appId, columnId, rowId, comment) =>
+    const updateRating = (scenarioId, appId, columnId, rowId, rating, comment) =>
         $http
-            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/comment`, comment)
+            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/rating/${rating}`, comment)
             .then(result => result.data);
 
     return {
@@ -69,7 +69,7 @@ function store($http, baseUrl) {
         cloneById,
         removeRating,
         addRating,
-        saveComment
+        updateRating
     };
 }
 
@@ -114,10 +114,10 @@ export const ScenarioStore_API = {
         serviceFnName: "addRating",
         description: "executes addRating [scenarioId, appId, columnId, rowId, rating]"
     },
-    saveComment: {
+    updateRating: {
         serviceName,
-        serviceFnName: "saveComment",
-        description: "executes saveComment [scenarioId, appId, columnId, rowId, comment]"
+        serviceFnName: "updateRating",
+        description: "executes updateRating [scenarioId, appId, columnId, rowId, rating, comment]"
     }
 };
 

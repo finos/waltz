@@ -13,7 +13,7 @@ const bindings = {
 
 const dialogs = {
     ADD_APPLICATION: "ADD_APPLICATION",
-    EDIT_COMMENT: "EDIT_COMMENT"
+    EDIT_CELL: "EDIT_CELL"
 };
 
 
@@ -93,14 +93,10 @@ function controller($q, $timeout, serviceBroker, notification) {
         return () => {
             return [
                 {
-                    title: "Update rating",
-                    action: (elm, d) => {
-                        $timeout(() => {
-                            console.log("Update rating")
-                        });
-                    }
-                },  {
-                    title: "Edit comment",
+                    title: "Add another application",
+                    action:  (elm, d) => addApplicationAction(d.domainCoordinates)
+                }, {
+                    title: "Edit",
                     action: (elm, d) => {
                         const style = mkDialogStyle();
                         $timeout(() => {
@@ -108,17 +104,14 @@ function controller($q, $timeout, serviceBroker, notification) {
                             const column = d.domainCoordinates.column;
 
                             vm.dialog = {
-                                type: dialogs.EDIT_COMMENT,
+                                type: dialogs.EDIT_CELL,
                                 data: d,
-                                workingComment: "" + d.state.comment,
+                                workingState: Object.assign({ rating: "G", comment: "" }, d.state),
                                 style
                             };
                         });
                     }
                 },  {
-                    title: "Add another application",
-                    action:  (elm, d) => addApplicationAction(d.domainCoordinates)
-                }, {
                     divider: true
                 }, {
                     title: "Remove",
@@ -212,6 +205,10 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     // -- INTERACT --
 
+    vm.onRatingSelect = (rating) => {
+        vm.dialog.workingState.rating = rating;
+    };
+
     vm.onAddApplication = (app) => {
         const args = [
             vm.scenarioDefn.scenario.id,
@@ -231,21 +228,22 @@ function controller($q, $timeout, serviceBroker, notification) {
             });
     };
 
-    vm.onSaveComment =(item, column, row, comment) => {
+    vm.onSaveCell =(item, column, row, workingState) => {
         const args = [
             vm.scenarioDefn.scenario.id,
             item.id,
             column.id,
             row.id,
-            comment
+            workingState.rating,
+            workingState.comment
         ];
         serviceBroker
             .execute(
-                CORE_API.ScenarioStore.saveComment,
+                CORE_API.ScenarioStore.updateRating,
                 args)
             .then(() => {
                 reload();
-                notification.success("Edited comment");
+                notification.success("Edited rating");
                 vm.onCloseDialog();
             });
     };
