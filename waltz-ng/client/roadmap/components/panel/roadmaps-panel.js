@@ -14,6 +14,7 @@ const modes = {
     LIST: "LIST",
     ADD_ROADMAP: "ADD_ROADMAP",
     ADD_SCENARIO: "ADD_SCENARIO",
+    CONFIGURE_SCENARIO: "CONFIGURE_SCENARIO",
     VIEW_SCENARIO: "VIEW_SCENARIO"
 };
 
@@ -33,7 +34,9 @@ function controller($q, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        loadData();
+        vm.visibility.mode = modes.LOADING;
+        reloadAllData()
+            .then(() => vm.visibility.mode = modes.LIST);
     };
 
 
@@ -53,11 +56,16 @@ function controller($q, serviceBroker, notification) {
     };
 
     vm.onCloneScenario = (scenario) => {
-        const newName = prompt("Please enter a new name for the scenario", `Clone of ${scenario.name}`);
+        const newName = prompt(
+            "Please enter a new name for the scenario",
+            `Clone of ${scenario.name}`);
+
         if (newName) {
             serviceBroker
-                .execute(CORE_API.ScenarioStore.cloneById, [scenario.id, newName])
-                .then(() => loadData())
+                .execute(
+                    CORE_API.ScenarioStore.cloneById,
+                    [ scenario.id, newName ])
+                .then(() => reloadAllData())
                 .then(() => notification.success("Scenario cloned"));
         } else {
             notification.warning("Aborting clone")
@@ -66,25 +74,51 @@ function controller($q, serviceBroker, notification) {
 
     vm.onSaveRoadmapName = (ctx, data) => {
         return updateField(
-            ctx.id,
-            CORE_API.RoadmapStore.updateName,
-            data,
-            true,
-            "Roadmap name updated");
+                ctx.id,
+                CORE_API.RoadmapStore.updateName,
+                data,
+                true,
+                "Roadmap name updated")
+            .then(() => reloadAllData());
     };
 
     vm.onSaveRoadmapDescription = (ctx, data) => {
         return updateField(
-            ctx.id,
-            CORE_API.RoadmapStore.updateDescription,
-            data,
-            false,
-            "Roadmap description updated");
+                ctx.id,
+                CORE_API.RoadmapStore.updateDescription,
+                data,
+                false,
+                "Roadmap description updated")
+            .then(() => reloadAllData());
+    };
+
+    vm.onSaveScenarioName = (ctx, data) => {
+        return updateField(
+                ctx.id,
+                CORE_API.ScenarioStore.updateName,
+                data,
+                true,
+                "Scenario name updated");
+    };
+
+    vm.onSaveScenarioDescription = (ctx, data) => {
+        return updateField(
+                ctx.id,
+                CORE_API.ScenarioStore.updateDescription,
+                data,
+                false,
+                "Scenario description updated");
+    };
+
+    vm.onConfigureScenario = (scenario) => {
+        vm.visibility.mode = modes.CONFIGURE_SCENARIO;
+        vm.selectedScenario = scenario;
     };
 
     vm.onCancel = () => {
         vm.visibility.mode = modes.LIST;
         vm.selectedScenario = null;
+        reloadAllData();
     };
 
 
@@ -103,7 +137,6 @@ function controller($q, serviceBroker, notification) {
                 .execute(
                     method,
                     [ roadmapId, data.newVal ])
-                .then(() => loadData())
                 .then(() => notification.success(message));
         } else {
             return Promise.reject("Nothing updated")
@@ -111,10 +144,8 @@ function controller($q, serviceBroker, notification) {
     }
 
 
-    function loadData() {
+    function reloadAllData() {
         const roadmapSelectorOptions = mkSelectionOptions(vm.parentEntityRef);
-
-        vm.visibility.mode = modes.LOADING;
 
         const roadmapPromise = serviceBroker
             .loadViewData(
@@ -131,8 +162,7 @@ function controller($q, serviceBroker, notification) {
             .then(r => vm.scenarios = r.data);
 
         return $q
-            .all([roadmapPromise, scenarioPromise])
-            .then(() => vm.visibility.mode = modes.LIST);
+            .all([roadmapPromise, scenarioPromise]);
     }
 
 }

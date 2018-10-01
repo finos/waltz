@@ -52,6 +52,8 @@ public class ScenarioEndpoint implements Endpoint {
         registerRemoveRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId"));
         registerUpdateRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", "rating", ":rating"));
         registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
+        registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
+        registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
     }
 
     private void registerUpdateRating(String path) {
@@ -66,6 +68,25 @@ public class ScenarioEndpoint implements Endpoint {
                     getUsername(request)
                     ));
     }
+
+
+    private void registerUpdateName(String path) {
+        postForDatum(path, (req, resp) ->
+                scenarioService.updateName(
+                        getId(req),
+                        req.body(),
+                        getUsername(req)));
+    }
+
+
+    private void registerUpdateDescription(String path) {
+        postForDatum(path, (req, resp) ->
+                scenarioService.updateDescription(
+                        getId(req),
+                        req.body(),
+                        getUsername(req)));
+    }
+
 
     private void registerAddRating(String path) {
         postForDatum(path, (request, response) ->

@@ -9,6 +9,8 @@
                     <span ng-bind="roadmap.name"></span>
                 </h4>
 
+                <br>
+
                 <table class="table table-condensed table-hover small">
                     <colgroup>
                         <col width="30%">
@@ -101,6 +103,11 @@
                                 <a ng-click="$ctrl.onCloneScenario(scenario)"
                                    class="clickable">
                                     Clone
+                                </a>
+                                |
+                                <a ng-click="$ctrl.onConfigureScenario(scenario)"
+                                   class="clickable">
+                                    Configure
                                 </a>
                             </span>
                         </td>

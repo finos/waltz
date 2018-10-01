@@ -11,7 +11,8 @@ const bindings = {
     onCloneScenario: "<",
     onSelectScenario: "<",
     onSaveRoadmapName: "<",
-    onSaveRoadmapDescription: "<"
+    onSaveRoadmapDescription: "<",
+    onConfigureScenario: "<"
 };
 
 

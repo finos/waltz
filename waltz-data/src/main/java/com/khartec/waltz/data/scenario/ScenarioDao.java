@@ -107,4 +107,37 @@ public class ScenarioDao {
                 .withId(clonedRecord.getId());
 
     }
+
+
+    public Boolean updateName(long scenarioId, String newValue, String userId) {
+        return updateField(
+                scenarioId,
+                SCENARIO.NAME,
+                newValue,
+                userId) == 1;
+    }
+
+
+    public Boolean updateDescription(long scenarioId, String newValue, String userId) {
+        return updateField(
+                scenarioId,
+                SCENARIO.DESCRIPTION,
+                newValue,
+                userId) == 1;
+    }
+
+
+    // -- helpers --
+
+
+
+    private <T> int updateField(long id, Field<T> field, T value, String userId) {
+        return dsl
+                .update(SCENARIO)
+                .set(field, value)
+                .set(SCENARIO.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(SCENARIO.LAST_UPDATED_BY, userId)
+                .where(SCENARIO.ID.eq(id))
+                .execute();
+    }
 }

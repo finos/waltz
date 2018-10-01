@@ -1,0 +1,55 @@
+<div>
+    <!-- HEADER -->
+    <h4 class="waltz-visibility-parent">
+        <span class="text-muted">Configure Scenario:</span>
+        <span ng-bind="$ctrl.scenario.name"></span>
+        <small>
+            <a ng-click="$ctrl.onCancel()"
+               class="clickable">
+                <span class="waltz-visibility-child-50">
+                    <waltz-icon name="close"></waltz-icon>
+                    Close
+                </span>
+            </a>
+        </small>
+    </h4>
+
+    <br>
+
+    <table class="table table-condensed table-hover small">
+        <colgroup>
+            <col width="30%">
+            <col width="70%">
+        </colgroup>
+        <tr>
+            <td>Name:</td>
+            <td>
+                <waltz-editable-field field-type="text"
+                                      on-save="$ctrl.onSaveName"
+                                      item-id="$ctrl.scenario"
+                                      save-label="Save"
+                                      initial-val="$ctrl.scenario.name">
+                </waltz-editable-field>
+            </td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td>
+                <waltz-editable-field field-type="textarea"
+                                      on-save="$ctrl.onSaveDescription"
+                                      item-id="$ctrl.scenario"
+                                      save-label="Save"
+                                      initial-val="$ctrl.scenario.description"
+                                      empty-label="No description provided"
+                                      class="text-muted">
+                </waltz-editable-field>
+            </td>
+        </tr>
+    </table>
+
+    <a ng-click="$ctrl.onCancel()"
+       class="clickable">
+        <waltz-icon name="close"></waltz-icon>
+        Close
+    </a>
+</div>
