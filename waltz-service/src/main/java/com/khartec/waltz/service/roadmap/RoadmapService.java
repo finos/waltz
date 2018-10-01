@@ -44,10 +44,19 @@ public class RoadmapService {
         throw new UnsupportedOperationException("TODO"); //TODO: implement
     }
 
+
     public Collection<Roadmap> findRoadmapsBySelector(IdSelectionOptions selectionOptions) {
         Select<Record1<Long>> selector = roadmapIdSelectorFactory.apply(selectionOptions);
         return roadmapDao.findRoadmapsBySelector(selector);
     }
 
 
+    public Boolean updateDescription(long id, String newDescription, String userId) {
+        return roadmapDao.updateDescription(id, newDescription, userId);
+    }
+
+
+    public Boolean updateName(long id, String newName, String userId) {
+        return roadmapDao.updateName(id, newName, userId);
+    }
 }

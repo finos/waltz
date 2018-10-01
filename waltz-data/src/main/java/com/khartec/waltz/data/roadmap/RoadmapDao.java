@@ -72,6 +72,24 @@ public class RoadmapDao {
     }
 
 
+    public Boolean updateDescription(long id, String newValue, String userId) {
+        return updateField(
+                id,
+                ROADMAP.DESCRIPTION,
+                newValue,
+                userId) == 1;
+    }
+
+
+    public Boolean updateName(long id, String newValue, String userId) {
+        return updateField(
+                id,
+                ROADMAP.NAME,
+                newValue,
+                userId) == 1;
+    }
+
+
     // -- helpers
 
     private SelectJoinStep<Record> baseSelect() {
@@ -82,4 +100,13 @@ public class RoadmapDao {
     }
 
 
+    private <T> int updateField(long id, Field<T> field, T value, String userId) {
+        return dsl
+                .update(ROADMAP)
+                .set(field, value)
+                .set(ROADMAP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ROADMAP.LAST_UPDATED_BY, userId)
+                .where(ROADMAP.ID.eq(id))
+                .execute();
+    }
 }

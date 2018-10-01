@@ -40,7 +40,8 @@ function controller($q, serviceBroker, notification) {
         const roadmapPromise = serviceBroker
             .loadViewData(
                 CORE_API.RoadmapStore.findRoadmapsBySelector,
-                [ roadmapSelectorOptions ])
+                [ roadmapSelectorOptions ],
+                { force: true })
             .then(r => vm.roadmaps = r.data);
 
         const scenarioPromise = serviceBroker
@@ -61,6 +62,22 @@ function controller($q, serviceBroker, notification) {
     };
 
 
+    function updateField(roadmapId, method, data, preventNull = true, message = "Updated") {
+        if (preventNull && _.isEmpty(data.newVal)) {
+            return Promise.reject("Cannot set an empty value");
+        }
+        if (data.newVal !== data.oldVal) {
+            return serviceBroker
+                .execute(
+                    method,
+                    [ roadmapId, data.newVal ])
+                .then(() => loadData())
+                .then(() => notification.success(message));
+        } else {
+            return Promise.reject("Nothing updated")
+        }
+    }
+
     // -- INTERACT --
 
     vm.onAddScenario = (roadmap) => {
@@ -71,7 +88,7 @@ function controller($q, serviceBroker, notification) {
         vm.visibility.mode = modes.ADD_ROADMAP;
     };
 
-    vm.onSelectScenario = (scenario, roadmap) => {
+    vm.onSelectScenario = (scenario) => {
         vm.visibility.mode = modes.VIEW_SCENARIO;
         vm.selectedScenario = scenario;
     };
@@ -86,6 +103,24 @@ function controller($q, serviceBroker, notification) {
         } else {
             notification.warning("Aborting clone")
         }
+    };
+
+    vm.onSaveRoadmapName = (ctx, data) => {
+        return updateField(
+            ctx.id,
+            CORE_API.RoadmapStore.updateName,
+            data,
+            true,
+            "Roadmap name updated");
+    };
+
+    vm.onSaveRoadmapDescription = (ctx, data) => {
+        return updateField(
+            ctx.id,
+            CORE_API.RoadmapStore.updateDescription,
+            data,
+            false,
+            "Roadmap description updated");
     };
 
     vm.onCancel = () => {

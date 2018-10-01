@@ -52,7 +52,7 @@ function mkNewVal(initialVal, fieldType) {
 }
 
 
-function controller($timeout) {
+function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
@@ -112,7 +112,7 @@ function controller($timeout) {
 }
 
 
-controller.$inject = ["$timeout"];
+controller.$inject = [];
 
 
 const component = {
