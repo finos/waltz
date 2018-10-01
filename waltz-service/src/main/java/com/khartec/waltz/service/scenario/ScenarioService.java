@@ -24,6 +24,7 @@ public class ScenarioService {
     private final ScenarioRatingItemDao scenarioRatingItemDao;
     private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
 
+
     @Autowired
     public ScenarioService(ScenarioDao scenarioDao,
                            ScenarioAxisItemDao scenarioAxisItemDao,
@@ -49,18 +50,27 @@ public class ScenarioService {
         return scenarioDao.findForRoadmapId(roadmapId);
     }
 
+
     public Collection<Scenario> findScenariosByRoadmapSelector(IdSelectionOptions selectionOptions) {
         Select<Record1<Long>> selector = roadmapIdSelectorFactory.apply(selectionOptions);
         return scenarioDao.findByRoadmapSelector(selector);
     }
 
-    public Scenario cloneScenario(CloneScenarioCommand command) {
 
+    public Scenario cloneScenario(CloneScenarioCommand command) {
         Scenario clonedScenario = scenarioDao.cloneScenario(command);
         scenarioRatingItemDao.cloneItems(command, clonedScenario.id().get());
         scenarioAxisItemDao.cloneItems(command, clonedScenario.id().get());
-
         return clonedScenario;
+    }
 
+
+    public Boolean updateName(long scenarioId, String newValue, String userId) {
+        return scenarioDao.updateName(scenarioId, newValue, userId);
+    }
+
+
+    public Boolean updateDescription(long scenarioId, String newValue, String userId) {
+        return scenarioDao.updateDescription(scenarioId, newValue, userId);
     }
 }

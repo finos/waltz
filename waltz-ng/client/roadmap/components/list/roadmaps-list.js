@@ -9,7 +9,10 @@ const bindings = {
     onAddRoadmap: "<",
     onAddScenario: "<",
     onCloneScenario: "<",
-    onSelectScenario: "<"
+    onSelectScenario: "<",
+    onSaveRoadmapName: "<",
+    onSaveRoadmapDescription: "<",
+    onConfigureScenario: "<"
 };
 
 

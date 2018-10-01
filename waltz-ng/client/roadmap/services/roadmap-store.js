@@ -35,10 +35,24 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateDescription = (roadmapId, newDescription) => {
+        return $http
+            .post(`${BASE}/id/${roadmapId}/description`, newDescription)
+            .then(result => result.data);
+    };
+
+    const updateName = (roadmapId, newName) => {
+        return $http
+            .post(`${BASE}/id/${roadmapId}/name`, newName)
+            .then(result => result.data);
+    };
+
 
     return {
         getRoadmapById,
-        findRoadmapsBySelector
+        findRoadmapsBySelector,
+        updateDescription,
+        updateName
     };
 }
 
@@ -62,6 +76,16 @@ export const RoadmapStore_API = {
         serviceName,
         serviceFnName: "findRoadmapsBySelector",
         description: "executes findRoadmapsBySelector [selectorOptions]"
+    },
+    updateDescription: {
+        serviceName,
+        serviceFnName: "updateDescription",
+        description: "executes updateDescription [roadmapId, newDescription]"
+    },
+    updateName: {
+        serviceName,
+        serviceFnName: "updateName",
+        description: "executes updateName [roadmapId, newName]"
     }
 };
 

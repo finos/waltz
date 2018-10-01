@@ -3,21 +3,59 @@
     <waltz-sub-section>
         <content>
             <div style="padding: 12px">
-                    <!-- TITLE -->
+
+                <!-- ROADMAP: overview -->
                 <h4>
                     <span ng-bind="roadmap.name"></span>
-                    <small>
-                        ( <span ng-bind="roadmap.columnType.name"></span>
-                        /
-                        <span ng-bind="roadmap.rowType.name"></span> )
-                    </small>
                 </h4>
 
-                <!-- DESC -->
-                <label>Description:</label>
-                <waltz-markdown text="roadmap.description"></waltz-markdown>
-
                 <br>
+
+                <table class="table table-condensed table-hover small">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="70%">
+                    </colgroup>
+                    <tr>
+                        <td>Name:</td>
+                        <td>
+                            <waltz-editable-field field-type="text"
+                                                  on-save="$ctrl.onSaveRoadmapName"
+                                                  item-id="roadmap"
+                                                  save-label="Save"
+                                                  initial-val="roadmap.name">
+                            </waltz-editable-field>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dimensions:
+                            <p class="help-block small">
+                                Column Type / Row Type
+                            </p>
+                        </td>
+                        <td>
+                            <span ng-bind="roadmap.columnType.name"></span>
+                            /
+                            <span ng-bind="roadmap.rowType.name"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Description:</td>
+                        <td>
+                            <waltz-editable-field field-type="textarea"
+                                                  on-save="$ctrl.onSaveRoadmapDescription"
+                                                  item-id="roadmap"
+                                                  save-label="Save"
+                                                  initial-val="roadmap.description"
+                                                  empty-label="No description provided"
+                                                  class="text-muted">
+                            </waltz-editable-field>
+                        </td>
+                    </tr>
+                </table>
+
+                <hr>
 
                 <!-- SCENARIOS -->
                 <table class="small table table-condensed">
@@ -65,6 +103,11 @@
                                 <a ng-click="$ctrl.onCloneScenario(scenario)"
                                    class="clickable">
                                     Clone
+                                </a>
+                                |
+                                <a ng-click="$ctrl.onConfigureScenario(scenario)"
+                                   class="clickable">
+                                    Configure
                                 </a>
                             </span>
                         </td>

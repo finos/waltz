@@ -62,6 +62,19 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/rating/${rating}`, comment)
             .then(result => result.data);
 
+    const updateDescription = (scenarioId, newDescription) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/description`, newDescription)
+            .then(result => result.data);
+    };
+
+    const updateName = (scenarioId, newName) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/name`, newName)
+            .then(result => result.data);
+    };
+
+
     return {
         findForRoadmap,
         findByRoadmapSelector,
@@ -69,6 +82,8 @@ function store($http, baseUrl) {
         cloneById,
         removeRating,
         addRating,
+        updateDescription,
+        updateName,
         updateRating
     };
 }
@@ -118,7 +133,18 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "updateRating",
         description: "executes updateRating [scenarioId, appId, columnId, rowId, rating, comment]"
+    },
+    updateDescription: {
+        serviceName,
+        serviceFnName: "updateDescription",
+        description: "executes updateDescription [scenarioId, newDescription]"
+    },
+    updateName: {
+        serviceName,
+        serviceFnName: "updateName",
+        description: "executes updateName [scenarioId, newName]"
     }
+
 };
 
 
