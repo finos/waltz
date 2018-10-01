@@ -99,7 +99,7 @@ function controller($element, serviceBroker) {
         const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
         if (svgGroups && colorScale) {
             const filteredData = filterData(vm.rowData, vm.qry);
-            const layoutOptions = { cols: 3 };
+            const layoutOptions = { cols: 2 };
             const dataWithLayout = gridLayout(
                 filteredData,
                 vm.columnHeadings,

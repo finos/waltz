@@ -1,4 +1,4 @@
-import {truncateText} from "../../../common/d3-utils";
+import {toPath, truncateText} from "../../../common/d3-utils";
 
 
 const nodeWidth = 160;
@@ -26,6 +26,7 @@ export const NODE_STYLES = {
     nodeChangeInitiative: "wrd-node-change-initiative",
     nodeCell: "wrd-node-cell",
     nodeCellRatingIndicator: "node-cell-rating-indicator",
+    nodeCellCommentIndicator: "node-cell-comment-indicator"
 };
 
 
@@ -44,8 +45,8 @@ export function updateUnit(selection, options) {
         .attr("stroke",  d => colorScale(d.state.rating));
 
     selection
-        .select(`text.${NODE_STYLES.nodeTitle}`)
-        .text(d => (d.state.comment ? "!!" : "") + d.node.name);
+        .select(`path.${NODE_STYLES.nodeCellCommentIndicator}`)
+        .attr("fill", d => colorScale(d.state.rating).brighter(d.state.comment ? 0 : 2.5));
 }
 
 
@@ -60,15 +61,35 @@ export function drawUnit(selection, options) {
     selection
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
-        .call(drawRatingIndicator);
+        .call(drawRatingIndicator)
+        .call(drawCommentIndicator);
 
     selection
         .on("click", options.handlers.onNodeClick);
 }
 
 
-function drawRatingIndicator(selection) {
+function drawCommentIndicator(selection) {
 
+    const w = NODE_DIMENSIONS.width / 12;
+    const h = NODE_DIMENSIONS.height / 2;
+
+
+    const trianglePath = `
+        M${NODE_DIMENSIONS.width - w} ${NODE_DIMENSIONS.height} 
+        h ${w}
+        v ${h * -1}
+        Z
+    `;
+    selection
+        .append("path")
+        .attr("transform", "translate(-1 -1)")
+        .classed(NODE_STYLES.nodeCellCommentIndicator, true)
+        .attr("d", trianglePath);
+}
+
+
+function drawRatingIndicator(selection) {
     const w = (NODE_DIMENSIONS.width / 8);
     const h = NODE_DIMENSIONS.height;
 
@@ -114,6 +135,7 @@ function drawUnitTitle(selection) {
         .attr("dy", NODE_DIMENSIONS.text.dy)
         .attr("dx", NODE_DIMENSIONS.text.dx)
         .attr("font-size", NODE_DIMENSIONS.text.fontSize)
+        .text(d => d.node.name)
         .call(truncateText, NODE_DIMENSIONS.width - (2 * NODE_DIMENSIONS.text.dx));
 }
 

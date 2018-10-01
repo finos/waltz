@@ -10,6 +10,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.ImmutableFullScenario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -49,17 +50,18 @@ public class ScenarioEndpoint implements Endpoint {
         registerGetScenarioById(mkPath(BASE_URL, "id", ":id"));
         registerCloneScenario(mkPath(BASE_URL, "id", ":id", "clone"));
         registerRemoveRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId"));
-        registerSaveComment(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", "comment"));
+        registerUpdateRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", "rating", ":rating"));
         registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
     }
 
-    private void registerSaveComment(String path) {
+    private void registerUpdateRating(String path) {
         postForDatum(path, (request, response) ->
-            scenarioRatingItemService.saveComment(
+            scenarioRatingItemService.updateRating(
                     getId(request),
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
                     getLong(request, "rowId"),
+                    getRating(request),
                     request.body(),
                     getUsername(request)
                     ));
@@ -72,9 +74,13 @@ public class ScenarioEndpoint implements Endpoint {
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
                     getLong(request, "rowId"),
-                    request.params("rating").charAt(0),
+                    getRating(request),
                     getUsername(request)
                     ));
+    }
+
+    private char getRating(Request request) {
+        return request.params("rating").charAt(0);
     }
 
     private void registerRemoveRating(String path) {

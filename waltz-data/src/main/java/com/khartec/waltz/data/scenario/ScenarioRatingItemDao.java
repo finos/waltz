@@ -117,12 +117,11 @@ public class ScenarioRatingItemDao {
     }
 
 
-    public boolean saveComment(long scenarioId, long appId, long columnId, long rowId, String comment, String userId) {
+    public boolean updateRating(long scenarioId, long appId, long columnId, long rowId, char rating, String comment, String userId) {
         return dsl
                 .update(SCENARIO_RATING_ITEM)
+                .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(rating))
                 .set(SCENARIO_RATING_ITEM.DESCRIPTION, comment)
-
-                .set(SCENARIO_RATING_ITEM.RATING, DSL.when(SCENARIO_RATING_ITEM.RATING.eq("R"), "G").otherwise("R"))
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))

@@ -68,13 +68,19 @@
 <!-- DIALOG -->
 <div ng-if="$ctrl.dialog"
      ng-style="$ctrl.dialog.style"
-     style="background-color: #fafafa; border: 2px solid #ccc; border-radius: 3px; padding: 6px; width: 500px">
+     style="
+        background-color: #fafafa;
+        border: 2px solid #ccc;
+        border-radius: 3px;
+        padding: 6px;
+        min-width: 500px">
 
     <div ng-switch="$ctrl.dialog.type">
-        <!-- EDIT COMMENT -->
-        <div ng-switch-when="EDIT_COMMENT">
+        <!-- EDIT CELL -->
+        <div ng-switch-when="EDIT_CELL">
             <h4>
-                <span>Edit Comment</span>
+                <span>Edit:</span>
+                <span ng-bind="$ctrl.dialog.data.node.name"></span>
                 <small>
                     <a ng-click="$ctrl.onCloseDialog()"
                        class="clickable">
@@ -84,21 +90,45 @@
                 </small>
             </h4>
             <p class="help-block">
-                Editing comment for application:
+                Editing application:
                 <span ng-bind="$ctrl.dialog.data.node.name"></span>
                 in position:
                 <span ng-bind="$ctrl.dialog.data.domainCoordinates.column.name"></span>
                 /
                 <span ng-bind="$ctrl.dialog.data.domainCoordinates.row.name"></span>
             </p>
-            <textarea ng-model="$ctrl.dialog.workingComment" cols="60" rows="6">
-            </textarea>
+
+            <!-- EDIT CELL: widgets -->
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="help-block">
+                        Select a rating for this application:
+                    </p>
+                    <div class="small">
+                        <waltz-rating-picker selected="$ctrl.dialog.workingState.rating"
+                                             scheme-id="1"
+                                             on-select="$ctrl.onRatingSelect">
+                        </waltz-rating-picker>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <p class="help-block">
+                        Adding a comment to a rating will help users to understand why and application
+                        has been placed in this state.
+                    </p>
+                    <textarea ng-model="$ctrl.dialog.workingState.comment" cols="30" rows="6">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- EDIT CELL : controls -->
             <div>
-                <button ng-click="$ctrl.onSaveComment(
+                <button ng-click="$ctrl.onSaveCell(
                             $ctrl.dialog.data.node,
                             $ctrl.dialog.data.domainCoordinates.column,
                             $ctrl.dialog.data.domainCoordinates.row,
-                            $ctrl.dialog.workingComment)"
+                            $ctrl.dialog.workingState)"
                         class="btn btn-primary btn-sm">
                     Save
                 </button>
@@ -110,7 +140,7 @@
 
         </div>
 
-            <!-- ADD APPLICATION -->
+        <!-- ADD APPLICATION -->
         <div ng-switch-when="ADD_APPLICATION">
             <h4>
                 <span>Add Application</span>
@@ -140,9 +170,8 @@
 
             <br>
 
-
             <div class="waltz-tabs">
-                <!-- TAB HEADERS -->
+                <!-- ADD APP: tab headers -->
                 <input type="radio"
                        ng-repeat-start="tab in $ctrl.dialog.tabs"
                        ng-model="$ctrl.dialog.tab"
@@ -154,10 +183,10 @@
                        ng-repeat-end>
                 </label>
 
-                <!-- TAB CONTENT -->
+                <!-- ADD APP: tab content -->
                 <div ng-switch="$ctrl.dialog.tab" class="wt-tab wt-active">
 
-                    <!-- PICK -->
+                    <!-- ADD APP: pick -->
                     <div ng-switch-when="PICK">
                         <p class="help-block">
                             Select from applications already mentioned
@@ -189,7 +218,7 @@
 
                     </div>
 
-                    <!-- SEARCH -->
+                    <!-- ADD APP: search -->
                     <div ng-switch-when="SEARCH">
                         <p class="help-block">
                             Search for an application using it's name or asset code
