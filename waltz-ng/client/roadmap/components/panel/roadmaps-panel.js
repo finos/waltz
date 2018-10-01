@@ -32,51 +32,10 @@ const initialState = {
 function controller($q, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = () => {
-        const roadmapSelectorOptions = mkSelectionOptions(vm.parentEntityRef);
-
-        vm.visibility.mode = modes.LOADING;
-
-        const roadmapPromise = serviceBroker
-            .loadViewData(
-                CORE_API.RoadmapStore.findRoadmapsBySelector,
-                [ roadmapSelectorOptions ],
-                { force: true })
-            .then(r => vm.roadmaps = r.data);
-
-        const scenarioPromise = serviceBroker
-            .loadViewData(
-                CORE_API.ScenarioStore.findByRoadmapSelector,
-                [ roadmapSelectorOptions ],
-                { force: true })
-            .then(r => vm.scenarios = r.data);
-
-        return $q
-            .all([roadmapPromise, scenarioPromise])
-            .then(() => vm.visibility.mode = modes.LIST);
-    };
-
-
     vm.$onInit = () => {
         loadData();
     };
 
-
-    function updateField(roadmapId, method, data, preventNull = true, message = "Updated") {
-        if (preventNull && _.isEmpty(data.newVal)) {
-            return Promise.reject("Cannot set an empty value");
-        }
-        if (data.newVal !== data.oldVal) {
-            return serviceBroker
-                .execute(
-                    method,
-                    [ roadmapId, data.newVal ])
-                .then(() => loadData())
-                .then(() => notification.success(message));
-        } else {
-            return Promise.reject("Nothing updated")
-        }
-    }
 
     // -- INTERACT --
 
@@ -127,6 +86,55 @@ function controller($q, serviceBroker, notification) {
         vm.visibility.mode = modes.LIST;
         vm.selectedScenario = null;
     };
+
+
+    // -- helpers --
+
+    function updateField(roadmapId,
+                         method,
+                         data,
+                         preventNull = true,
+                         message = "Updated") {
+        if (preventNull && _.isEmpty(data.newVal)) {
+            return Promise.reject("Cannot set an empty value");
+        }
+        if (data.newVal !== data.oldVal) {
+            return serviceBroker
+                .execute(
+                    method,
+                    [ roadmapId, data.newVal ])
+                .then(() => loadData())
+                .then(() => notification.success(message));
+        } else {
+            return Promise.reject("Nothing updated")
+        }
+    }
+
+
+    function loadData() {
+        const roadmapSelectorOptions = mkSelectionOptions(vm.parentEntityRef);
+
+        vm.visibility.mode = modes.LOADING;
+
+        const roadmapPromise = serviceBroker
+            .loadViewData(
+                CORE_API.RoadmapStore.findRoadmapsBySelector,
+                [ roadmapSelectorOptions ],
+                { force: true })
+            .then(r => vm.roadmaps = r.data);
+
+        const scenarioPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ScenarioStore.findByRoadmapSelector,
+                [ roadmapSelectorOptions ],
+                { force: true })
+            .then(r => vm.scenarios = r.data);
+
+        return $q
+            .all([roadmapPromise, scenarioPromise])
+            .then(() => vm.visibility.mode = modes.LIST);
+    }
+
 }
 
 

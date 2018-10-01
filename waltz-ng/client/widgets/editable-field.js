@@ -24,7 +24,7 @@ import template from "./editable-field.html";
 const bindings = {
     initialVal: "<",
     onSave: "<",
-    fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date
+    fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date | markdown
     dateFormat: "@",
     itemId: "<",
     buttonLabel: "@",
