@@ -101,6 +101,15 @@ function controller($q, serviceBroker, notification) {
                 "Scenario name updated");
     };
 
+    vm.onSaveScenarioTargetDate = (ctx, data) => {
+        return updateField(
+                ctx.id,
+                CORE_API.ScenarioStore.updateTargetDate,
+                data,
+                true,
+                "Scenario target date updated");
+    };
+
     vm.onSaveScenarioDescription = (ctx, data) => {
         return updateField(
                 ctx.id,
@@ -129,7 +138,7 @@ function controller($q, serviceBroker, notification) {
                          data,
                          preventNull = true,
                          message = "Updated") {
-        if (preventNull && _.isEmpty(data.newVal)) {
+        if (preventNull && (_.isEmpty(data.newVal) && !_.isDate(data.newVal))) {
             return Promise.reject("Cannot set an empty value");
         }
         if (data.newVal !== data.oldVal) {

@@ -38,8 +38,9 @@
         <!-- SCENARIO: configure -->
         <div ng-switch-when="CONFIGURE_SCENARIO">
             <waltz-roadmap-scenario-config scenario-id="$ctrl.selectedScenario.id"
-                                           on-save-scenario-name="$ctrl.onSaveScenarioName"
                                            on-save-scenario-description="$ctrl.onSaveScenarioDescription"
+                                           on-save-scenario-name="$ctrl.onSaveScenarioName"
+                                           on-save-scenario-target-date="$ctrl.onSaveScenarioTargetDate"
                                            on-cancel="$ctrl.onCancel">
             </waltz-roadmap-scenario-config>
         </div>

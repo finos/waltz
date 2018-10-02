@@ -12,10 +12,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
 @Repository
@@ -127,9 +129,16 @@ public class ScenarioDao {
     }
 
 
+    public Boolean updateTargetDate(long scenarioId, LocalDate newValue, String userId) {
+        return updateField(
+                scenarioId,
+                SCENARIO.TARGET_DATE,
+                toSqlDate(newValue),
+                userId) == 1;
+    }
+
+
     // -- helpers --
-
-
 
     private <T> int updateField(long id, Field<T> field, T value, String userId) {
         return dsl
@@ -140,4 +149,6 @@ public class ScenarioDao {
                 .where(SCENARIO.ID.eq(id))
                 .execute();
     }
+
+
 }
