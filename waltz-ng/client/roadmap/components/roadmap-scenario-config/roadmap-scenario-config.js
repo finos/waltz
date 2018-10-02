@@ -9,7 +9,8 @@ const bindings = {
     scenarioId: "<",
     onCancel: "<",
     onSaveScenarioName: "<",
-    onSaveScenarioDescription: "<"
+    onSaveScenarioDescription: "<",
+    onSaveScenarioTargetDate: "<"
 };
 
 
@@ -46,6 +47,13 @@ function controller(serviceBroker) {
         vm.onSaveScenarioDescription(ctx, data)
             .then(() => reload());
     };
+
+    vm.onSaveTargetDate = (ctx, data) => {
+        vm.onSaveScenarioTargetDate(ctx, data)
+            .then(() => reload());
+    };
+
+
 }
 
 

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import java.time.LocalDate;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
@@ -54,6 +56,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
+        registerUpdateTargetDate(mkPath(BASE_URL, "id", ":id", "target-date"));
     }
 
     private void registerUpdateRating(String path) {
@@ -67,6 +70,14 @@ public class ScenarioEndpoint implements Endpoint {
                     request.body(),
                     getUsername(request)
                     ));
+    }
+
+    private void registerUpdateTargetDate(String path) {
+        postForDatum(path, (req, resp) ->
+                scenarioService.updateTargetDate(
+                        getId(req),
+                        readBody(req, LocalDate.class),
+                        getUsername(req)));
     }
 
 

@@ -33,6 +33,17 @@
             </td>
         </tr>
         <tr>
+            <td>Target Date:</td>
+            <td>
+                <waltz-editable-field field-type="date"
+                                      on-save="$ctrl.onSaveTargetDate"
+                                      item-id="$ctrl.scenario"
+                                      save-label="Save"
+                                      initial-val="$ctrl.scenario.targetDate">
+                </waltz-editable-field>
+            </td>
+        </tr>
+        <tr>
             <td>Description:</td>
             <td>
                 <waltz-editable-field field-type="textarea"

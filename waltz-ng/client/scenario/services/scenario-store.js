@@ -74,6 +74,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateTargetDate = (scenarioId, newDate) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/target-date`, newDate)
+            .then(result => result.data);
+    };
+
 
     return {
         findForRoadmap,
@@ -84,7 +90,8 @@ function store($http, baseUrl) {
         addRating,
         updateDescription,
         updateName,
-        updateRating
+        updateRating,
+        updateTargetDate
     };
 }
 
@@ -143,6 +150,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "updateName",
         description: "executes updateName [scenarioId, newName]"
+    },
+    updateTargetDate: {
+        serviceName,
+        serviceFnName: "updateTargetDate",
+        description: "executes updateTargetDate [scenarioId, newDate]"
     }
 
 };

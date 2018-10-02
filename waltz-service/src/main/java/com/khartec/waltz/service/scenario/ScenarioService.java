@@ -12,6 +12,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -72,5 +73,10 @@ public class ScenarioService {
 
     public Boolean updateDescription(long scenarioId, String newValue, String userId) {
         return scenarioDao.updateDescription(scenarioId, newValue, userId);
+    }
+
+
+    public Boolean updateTargetDate(long scenarioId, LocalDate newValue, String userId) {
+        return scenarioDao.updateTargetDate(scenarioId, newValue, userId);
     }
 }
