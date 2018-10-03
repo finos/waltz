@@ -12,6 +12,7 @@
                    ng-bind="tab.name"
                    ng-repeat-end>
             </label>
+
             <!-- TABS: tab content -->
             <div ng-switch="$ctrl.activeTabId"
                  class="wt-tab wt-active">
@@ -23,15 +24,22 @@
                         <br>
                         Use the 'pick' and 'sort' tabs to alter this list.
                     </p>
-                    <ul ng-if="$ctrl.axisDefinitions.length > 0">
-                        <li ng-repeat="item in $ctrl.axisItems">
-                            <span ng-bind="item.name"></span>
+                    <ul ng-if="$ctrl.usedItems.length > 0">
+                        <li ng-repeat="item in $ctrl.usedItems">
+                            <span ng-bind="item.domainItem.name"></span>
+                            <span class="text-muted">
+                                (<span ng-bind="item.position"></span>)
+                            </span>
                         </li>
                     </ul>
-                    <waltz-no-data ng-if="$ctrl.axisDefinitions.length === 0">
+                    <waltz-no-data ng-if="$ctrl.usedItems.length === 0">
                         <message>
                             <strong>No axis items defined</strong>.
-                            Use the <a ng-click="$ctrl.activeTabId = 'PICK'" class="clickable">Pick</a>
+                            Use the
+                            <a ng-click="$ctrl.activeTabId = 'PICK'"
+                               class="clickable">
+                                pick
+                            </a>
                             tab to select some.
                         </message>
                     </waltz-no-data>
@@ -42,9 +50,8 @@
                     <p class="help-block">
                         Select the items to use in the axis.
                     </p>
-                    <waltz-multi-select-tree-control items="$ctrl.items"
-
-                                                     on-click="$ctrl.onItemClick"
+                    <waltz-multi-select-tree-control items="$ctrl.allItems"
+                                                     on-click="$ctrl.onItemToggle"
                                                      on-check="$ctrl.onItemCheck"
                                                      on-uncheck="$ctrl.onItemUncheck"
                                                      checked-item-ids="$ctrl.checkedItemIds"

@@ -1,7 +1,9 @@
 package com.khartec.waltz.data.scenario;
 
 
-import com.khartec.waltz.model.AxisKind;
+import com.khartec.waltz.model.AxisOrientation;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.ImmutableScenarioAxisItem;
 import com.khartec.waltz.model.scenario.ScenarioAxisItem;
@@ -14,11 +16,18 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITEM;
 
 @Repository
 public class ScenarioAxisItemDao {
+
+    private static final Field<String> DOMAIN_ITEM_NAME_FIELD = mkNameField(
+            SCENARIO_AXIS_ITEM.ITEM_ID,
+            SCENARIO_AXIS_ITEM.ITEM_KIND,
+            newArrayList(EntityKind.MEASURABLE));
 
 
     private static final RecordMapper<? super Record, ScenarioAxisItem> TO_DOMAIN_MAPPER = r -> {
@@ -26,10 +35,10 @@ public class ScenarioAxisItemDao {
 
         return ImmutableScenarioAxisItem.builder()
                 .id(record.getId())
-                .axisKind(AxisKind.valueOf(record.getAxisKind()))
-                .order(record.getPosition())
+                .axisOrientation(AxisOrientation.valueOf(record.getAxisKind()))
+                .position(record.getPosition())
                 .scenarioId(record.getScenarioId())
-                .item(readRef(record, SCENARIO_AXIS_ITEM.ITEM_KIND, SCENARIO_AXIS_ITEM.ITEM_ID))
+                .domainItem(readRef(r, SCENARIO_AXIS_ITEM.ITEM_KIND, SCENARIO_AXIS_ITEM.ITEM_ID, DOMAIN_ITEM_NAME_FIELD))
                 .build();
     };
 
@@ -47,8 +56,10 @@ public class ScenarioAxisItemDao {
     public Collection<ScenarioAxisItem> findForScenarioId(long scenarioId) {
         return dsl
                 .select(SCENARIO_AXIS_ITEM.fields())
+                .select(DOMAIN_ITEM_NAME_FIELD)
                 .from(SCENARIO_AXIS_ITEM)
                 .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
+                .orderBy(SCENARIO_AXIS_ITEM.POSITION, DOMAIN_ITEM_NAME_FIELD)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -75,4 +86,47 @@ public class ScenarioAxisItemDao {
                 .select(originalData)
                 .execute();
     }
+
+
+    public Boolean add(long scenarioId,
+                       AxisOrientation orientation,
+                       EntityReference domainItem,
+                       Integer position) {
+        ScenarioAxisItemRecord record = dsl.newRecord(SCENARIO_AXIS_ITEM);
+
+        record.setScenarioId(scenarioId);
+        record.setItemId(domainItem.id());
+        record.setItemKind(domainItem.kind().name());
+        record.setAxisKind(orientation.name());
+        record.setPosition(position);
+
+        return record.store() == 1;
+    }
+
+
+    public Boolean remove(long scenarioId,
+                          AxisOrientation orientation,
+                          EntityReference domainItem) {
+        return dsl
+                .deleteFrom(SCENARIO_AXIS_ITEM)
+                .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
+                .and(SCENARIO_AXIS_ITEM.AXIS_KIND.eq(orientation.name()))
+                .and(SCENARIO_AXIS_ITEM.ITEM_KIND.eq(domainItem.kind().name()))
+                .and(SCENARIO_AXIS_ITEM.ITEM_ID.eq(domainItem.id()))
+                .execute() == 1;
+    }
+
+
+    public Collection<ScenarioAxisItem> findForScenarioAndOrientation(long scenarioId,
+                                                                      AxisOrientation orientation) {
+        return dsl
+                .select(SCENARIO_AXIS_ITEM.fields())
+                .select(DOMAIN_ITEM_NAME_FIELD)
+                .from(SCENARIO_AXIS_ITEM)
+                .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
+                .and(SCENARIO_AXIS_ITEM.AXIS_KIND.eq(orientation.name()))
+                .orderBy(SCENARIO_AXIS_ITEM.POSITION, DOMAIN_ITEM_NAME_FIELD)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
 }

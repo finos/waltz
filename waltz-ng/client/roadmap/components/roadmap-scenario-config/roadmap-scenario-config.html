@@ -39,10 +39,10 @@
             <td>Effective Date:</td>
             <td>
                 <waltz-editable-field field-type="date"
-                                      on-save="$ctrl.onSaveTargetDate"
+                                      on-save="$ctrl.onSaveEffectiveDate"
                                       item-id="$ctrl.scenario"
                                       save-label="Save"
-                                      initial-val="$ctrl.scenario.targetDate">
+                                      initial-val="$ctrl.scenario.effectiveDate">
                 </waltz-editable-field>
             </td>
         </tr>
@@ -56,11 +56,13 @@
                 </p>
             </td>
             <td>
-                <waltz-roadmap-scenario-axis-config axis="{ type: $ctrl.roadmap.columnType }"
+                <waltz-roadmap-scenario-axis-config axis-domain="$ctrl.roadmap.columnType"
                                                     axis-orientation="COLUMN"
-                                                    axis-items="$ctrl.scenarioAxisItems">
+                                                    scenario-id="$ctrl.scenario.id"
+                                                    on-add-axis-item="$ctrl.onAddAxisItem"
+                                                    on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                                    on-repostion-axis-items="$ctrl.onRepositionAxisItems">
                 </waltz-roadmap-scenario-axis-config>
-
             </td>
         </tr>
 
@@ -73,9 +75,12 @@
                 </p>
             </td>
             <td>
-                <waltz-roadmap-scenario-axis-config axis-type="$ctrl.roadmap.rowType"
+                <waltz-roadmap-scenario-axis-config axis-domain="$ctrl.roadmap.rowType"
                                                     axis-orientation="ROW"
-                                                    axis-definitions="$ctrl.axisDefinitions">
+                                                    scenario-id="$ctrl.scenario.id"
+                                                    on-add-axis-item="$ctrl.onAddAxisItem"
+                                                    on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                                    on-repostion-axis-items="$ctrl.onRepositionAxisItems">
                 </waltz-roadmap-scenario-axis-config>
             </td>
         </tr>

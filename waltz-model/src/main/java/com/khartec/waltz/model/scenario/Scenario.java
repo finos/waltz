@@ -18,6 +18,6 @@ public abstract class Scenario implements
 
     public abstract long roadmapId();
     public abstract ReleaseLifecycleStatus status();
-    public abstract LocalDate targetDate();
+    public abstract LocalDate effectiveDate();
 
 }

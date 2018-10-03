@@ -10,7 +10,10 @@ const bindings = {
     onCancel: "<",
     onSaveScenarioName: "<",
     onSaveScenarioDescription: "<",
-    onSaveScenarioTargetDate: "<"
+    onSaveScenarioEffectiveDate: "<",
+    onAddAxisItem: "<",
+    onRemoveAxisItem: "<",
+    onRepositionAxisItems: "<"
 };
 
 
@@ -51,10 +54,11 @@ function controller($q, serviceBroker) {
             .then(() => reload());
     };
 
-    vm.onSaveTargetDate = (ctx, data) => {
-        vm.onSaveScenarioTargetDate(ctx, data)
+    vm.onSaveEffectiveDate = (ctx, data) => {
+        vm.onSaveScenarioEffectiveDate(ctx, data)
             .then(() => reload());
     };
+
 }
 
 

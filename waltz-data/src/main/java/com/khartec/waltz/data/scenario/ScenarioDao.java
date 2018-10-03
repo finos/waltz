@@ -31,7 +31,7 @@ public class ScenarioDao {
                 .roadmapId(record.getRoadmapId())
                 .description(record.getDescription())
                 .status(ReleaseLifecycleStatus.valueOf(record.getLifecycleStatus()))
-                .targetDate(DateTimeUtilities.toLocalDate(record.getTargetDate()))
+                .effectiveDate(DateTimeUtilities.toLocalDate(record.getTargetDate()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .build();
@@ -45,7 +45,7 @@ public class ScenarioDao {
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
         record.setLifecycleStatus(domainObj.status().name());
-        record.setTargetDate(Date.valueOf(domainObj.targetDate()));
+        record.setTargetDate(Date.valueOf(domainObj.effectiveDate()));
         record.setLastUpdatedBy(domainObj.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(domainObj.lastUpdatedAt()));
 
@@ -96,7 +96,7 @@ public class ScenarioDao {
                 .description(orig.description())
                 .roadmapId(orig.roadmapId())
                 .status(ReleaseLifecycleStatus.DRAFT)
-                .targetDate(orig.targetDate())
+                .effectiveDate(orig.effectiveDate())
                 .lastUpdatedAt(DateTimeUtilities.nowUtc())
                 .lastUpdatedBy(command.userId())
                 .build();
@@ -129,7 +129,7 @@ public class ScenarioDao {
     }
 
 
-    public Boolean updateTargetDate(long scenarioId, LocalDate newValue, String userId) {
+    public Boolean updateEffectiveDate(long scenarioId, LocalDate newValue, String userId) {
         return updateField(
                 scenarioId,
                 SCENARIO.TARGET_DATE,

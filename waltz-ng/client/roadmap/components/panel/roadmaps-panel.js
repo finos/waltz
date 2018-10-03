@@ -104,10 +104,10 @@ function controller($q,
                 "Scenario name updated");
     };
 
-    vm.onSaveScenarioTargetDate = (ctx, data) => {
+    vm.onSaveScenarioEffectiveDate = (ctx, data) => {
         return updateField(
                 ctx.id,
-                CORE_API.ScenarioStore.updateTargetDate,
+                CORE_API.ScenarioStore.updateEffectiveDate,
                 data,
                 true,
                 "Scenario target date updated");
@@ -131,6 +131,36 @@ function controller($q,
         vm.visibility.mode = modes.LIST;
         vm.selectedScenario = null;
         reloadAllData();
+    };
+
+    vm.onAddAxisItem = (axisItem) => {
+        const args = [
+            vm.selectedScenario.id,
+            axisItem.orientation,
+            axisItem.domainItem,
+            axisItem.position
+        ];
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.addAxisItem,
+                args);
+
+    };
+
+    vm.onRemoveAxisItem = (axisItem) => {
+        const args = [
+            vm.selectedScenario.id,
+            axisItem.orientation,
+            axisItem.domainItem
+        ];
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.removeAxisItem,
+                args);
+    };
+
+    vm.onRepositionAxisItems = (axisItems) => {
+        console.log("wrp: onRepositionAxisItems", axisItems);
     };
 
 
