@@ -178,7 +178,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         return scenarioPromise
             .then(() => serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll))
             .then(r => {
-                const requiredMeasurableIds = _.map(vm.scenarioDefn.axisDefinitions, d => d.item.id);
+                const requiredMeasurableIds = _.map(vm.scenarioDefn.axisDefinitions, d => d.domainItem.id);
                 vm.measurables = _.filter(r.data, m => _.includes(requiredMeasurableIds, m.id));
             });
     }

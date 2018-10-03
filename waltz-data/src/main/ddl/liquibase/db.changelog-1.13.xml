@@ -682,5 +682,28 @@
         </addColumn>
     </changeSet>
 
+    <!-- 3404: Unique axis items -->
+    <!-- TODO: re-enable after column rename of item => domainItem, axis_kind => orientation
+    <changeSet id="20181003-3404-1"
+               author="davidwatkins73">
+        <comment>3387: make data_type_id non nullable</comment>
+        <createIndex indexName="idx_scenario_axis_uniq"
+                     tableName="scenario_axis_item"
+                     unique="true">
+             <column name="scenario_id"
+                    type="${id.type}">
+            </column>
+            <column name="orientation"
+                    type="${enum.type}">
+            </column>
+            <column name="domain_item_kind"
+                    type="${enum.type}">
+            </column>
+            <column name="domain_item_id"
+                    type="${id.type}">
+            </column>
+        </createIndex>
 
+    </changeSet>
+    -->
 </databaseChangeLog>

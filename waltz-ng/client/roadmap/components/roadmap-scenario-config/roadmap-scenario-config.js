@@ -10,7 +10,10 @@ const bindings = {
     onCancel: "<",
     onSaveScenarioName: "<",
     onSaveScenarioDescription: "<",
-    onSaveScenarioTargetDate: "<"
+    onSaveScenarioEffectiveDate: "<",
+    onAddAxisItem: "<",
+    onRemoveAxisItem: "<",
+    onRepositionAxisItems: "<"
 };
 
 
@@ -19,7 +22,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function reload() {
@@ -32,32 +35,37 @@ function controller(serviceBroker) {
     }
 
 
+    // -- boot ---
+
     vm.$onInit = () => {
         reload();
     };
 
+
+    // -- interact ---
 
     vm.onSaveName = (ctx, data) => {
         vm.onSaveScenarioName(ctx, data)
             .then(() => reload());
     };
 
-
     vm.onSaveDescription = (ctx, data) => {
         vm.onSaveScenarioDescription(ctx, data)
             .then(() => reload());
     };
 
-    vm.onSaveTargetDate = (ctx, data) => {
-        vm.onSaveScenarioTargetDate(ctx, data)
+    vm.onSaveEffectiveDate = (ctx, data) => {
+        vm.onSaveScenarioEffectiveDate(ctx, data)
             .then(() => reload());
     };
-
 
 }
 
 
-controller.$inject = [ "ServiceBroker" ];
+controller.$inject = [
+    "$q",
+    "ServiceBroker"
+];
 
 
 const component = {

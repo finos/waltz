@@ -19,12 +19,13 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.model.scenario.CloneScenarioCommand;
-import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
-import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
+import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.scenario.ScenarioService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
 public class ScenarioHarness {
@@ -34,19 +35,15 @@ public class ScenarioHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         ScenarioService scenarioService = ctx.getBean(ScenarioService.class);
+        ScenarioAxisItemDao scenarioAxisItemDao = ctx.getBean(ScenarioAxisItemDao.class);
 
-        CloneScenarioCommand cloneCommand = ImmutableCloneScenarioCommand.builder()
-                .scenarioId(1L)
-                .newName("2020 Clone" + System.currentTimeMillis())
-                .userId("admin")
-                .build();
+        int[] result = scenarioAxisItemDao
+                .reorder(
+                    22L,
+                    AxisOrientation.ROW,
+                    newArrayList(118L, 161L));
 
-        Scenario c = scenarioService.cloneScenario(cloneCommand);
-
-        System.out.println(c);
-
-
-
+        System.out.println(result);
 
     }
 

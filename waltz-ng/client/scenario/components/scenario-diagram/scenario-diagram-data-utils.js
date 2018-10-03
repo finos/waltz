@@ -40,18 +40,18 @@ export function enrichDatumWithSearchTargetString(datum) {
 function prepareAxisHeadings(scenarioDefinition, measurablesById) {
     return _.chain(scenarioDefinition.axisDefinitions)
         .map(d => {
-            const measurable = measurablesById[d.item.id];
+            const measurable = measurablesById[d.domainItem.id];
             return {
                 id: measurable.id,
                 name: measurable.name,
                 description: measurable.description,
-                axisKind: d.axisKind,
-                order: d.order,
+                axisOrientation: d.axisOrientation,
+                position: d.position,
                 data: measurable
             };
         })
-        .orderBy(d => d.order)
-        .groupBy(d => d.axisKind)
+        .orderBy(d => d.position)
+        .groupBy(d => d.axisOrientation)
         .value();
 }
 
@@ -102,9 +102,7 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
             searchTargetStr: `${app.name} ${app.assetCode}`.toLowerCase()
         };
 
-        const newCol = _.concat(col, [ nodeData ]);
-
-        row[colOffset] = newCol;
+        row[colOffset] = _.concat(col, [nodeData]);
         acc[rowOffset] = row;
 
         return acc;

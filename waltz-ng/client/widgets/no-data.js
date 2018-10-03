@@ -18,11 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './no-data.html';
+import template from "./no-data.html";
 
 export default  {
     template,
     transclude: {
-        message: 'message'
+        message: "message"
     }
 };

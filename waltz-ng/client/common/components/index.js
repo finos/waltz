@@ -16,33 +16,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import BooleanRenderer from './boolean-renderer';
-import BucketChart from './bucket-chart';
-import LastUpdated from './last-updated/last-updated';
-import MultiSelectTreeControl from './multi-select-tree-control/multi-select-tree-control';
-import SearchControl from './search-control/search-control';
-import EntityIconLabel from './entity-link/entity-icon-label';
-import EntityLink from './entity-link/entity-link';
-import Grid from './grid/grid';
-import GridSref from './grid-sref/grid-sref';
-import GridWithSearch from './grid/grid-with-search';
-import DatePickerFormInput from './date-picker/date-picker-form-input';
+import BooleanRenderer from "./boolean-renderer";
+import BucketChart from "./bucket-chart";
+import LastUpdated from "./last-updated/last-updated";
+import MultiSelectTreeControl from "./multi-select-tree-control/multi-select-tree-control";
+import SearchControl from "./search-control/search-control";
+import EntityIconLabel from "./entity-link/entity-icon-label";
+import EntityLink from "./entity-link/entity-link";
+import Grid from "./grid/grid";
+import GridSref from "./grid-sref/grid-sref";
+import GridWithSearch from "./grid/grid-with-search";
+import DatePickerFormInput from "./date-picker/date-picker-form-input";
 
 
 export default (module) => {
 
     module
-        .component('waltzBooleanRenderer', BooleanRenderer)
-        .component('waltzBucketChart', BucketChart)
-        .component('waltzLastUpdated', LastUpdated)
-        .component('waltzMultiSelectTreeControl', MultiSelectTreeControl)
-        .component('waltzSearchControl', SearchControl)
-        .component('waltzEntityIconLabel', EntityIconLabel)
-        .component('waltzEntityLink', EntityLink)
-        .component('waltzGrid', Grid)
-        .component('waltzGridSref', GridSref)
-        .component('waltzGridWithSearch', GridWithSearch)
-        .component('waltzDatePickerFormInput', DatePickerFormInput);
+        .component("waltzBooleanRenderer", BooleanRenderer)
+        .component("waltzBucketChart", BucketChart)
+        .component("waltzLastUpdated", LastUpdated)
+        .component("waltzMultiSelectTreeControl", MultiSelectTreeControl)
+        .component("waltzSearchControl", SearchControl)
+        .component("waltzEntityIconLabel", EntityIconLabel)
+        .component("waltzEntityLink", EntityLink)
+        .component("waltzGrid", Grid)
+        .component("waltzGridSref", GridSref)
+        .component("waltzGridWithSearch", GridWithSearch)
+        .component("waltzDatePickerFormInput", DatePickerFormInput);
 
 
 };

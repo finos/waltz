@@ -30,7 +30,10 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker, notification) {
+function controller($q,
+                    serviceBroker,
+                    notification)
+{
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -101,10 +104,10 @@ function controller($q, serviceBroker, notification) {
                 "Scenario name updated");
     };
 
-    vm.onSaveScenarioTargetDate = (ctx, data) => {
+    vm.onSaveScenarioEffectiveDate = (ctx, data) => {
         return updateField(
                 ctx.id,
-                CORE_API.ScenarioStore.updateTargetDate,
+                CORE_API.ScenarioStore.updateEffectiveDate,
                 data,
                 true,
                 "Scenario target date updated");
@@ -128,6 +131,45 @@ function controller($q, serviceBroker, notification) {
         vm.visibility.mode = modes.LIST;
         vm.selectedScenario = null;
         reloadAllData();
+    };
+
+    vm.onAddAxisItem = (axisItem) => {
+        const args = [
+            vm.selectedScenario.id,
+            axisItem.orientation,
+            axisItem.domainItem,
+            axisItem.position
+        ];
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.addAxisItem,
+                args);
+
+    };
+
+    vm.onRemoveAxisItem = (axisItem) => {
+        const args = [
+            vm.selectedScenario.id,
+            axisItem.orientation,
+            axisItem.domainItem
+        ];
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.removeAxisItem,
+                args);
+    };
+
+    vm.onRepositionAxisItems = (scenarioId, orientation, ids) => {
+        const args = [
+            scenarioId,
+            orientation,
+            ids
+        ];
+
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.reorderAxis,
+                args);
     };
 
 

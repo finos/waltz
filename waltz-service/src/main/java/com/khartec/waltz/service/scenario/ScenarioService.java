@@ -4,9 +4,12 @@ import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
+import com.khartec.waltz.model.AxisOrientation;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -76,7 +80,46 @@ public class ScenarioService {
     }
 
 
-    public Boolean updateTargetDate(long scenarioId, LocalDate newValue, String userId) {
-        return scenarioDao.updateTargetDate(scenarioId, newValue, userId);
+    public Boolean updateEffectiveDate(long scenarioId, LocalDate newValue, String userId) {
+        return scenarioDao.updateEffectiveDate(scenarioId, newValue, userId);
+    }
+
+
+    public Boolean addAxisItem(long scenarioId,
+                              AxisOrientation orientation,
+                              EntityReference domainItem,
+                              Integer position,
+                              String userId) {
+        return scenarioAxisItemDao.add(
+                scenarioId,
+                orientation,
+                domainItem,
+                position);
+    }
+
+
+    public Boolean removeAxisItem(long scenarioId,
+                              AxisOrientation orientation,
+                              EntityReference domainItem,
+                              String userId) {
+        return scenarioAxisItemDao.remove(
+                scenarioId,
+                orientation,
+                domainItem);
+    }
+
+
+    public Collection<ScenarioAxisItem> loadAxis(long scenarioId, AxisOrientation orientation) {
+        return scenarioAxisItemDao.findForScenarioAndOrientation(
+                scenarioId,
+                orientation);
+    }
+
+
+    public int[] reorderAxis(long scenarioId, AxisOrientation orientation, List<Long> orderedIds) {
+        return scenarioAxisItemDao.reorder(
+                scenarioId,
+                orientation,
+                orderedIds);
     }
 }

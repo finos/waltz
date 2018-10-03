@@ -11,10 +11,7 @@ export const ROW_STYLES = {
 
 
 export function drawRow(selection, options, colWidths = []) {
-    const dataProvider = d => {
-        console.log('row', { d })
-        return d.data;
-    };
+    const dataProvider = d => d.data;
 
     const rows = selection
         .selectAll(`g.${ROW_STYLES.rowCell}`)

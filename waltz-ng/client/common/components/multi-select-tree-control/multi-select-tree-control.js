@@ -47,12 +47,6 @@ const initialState = {
 };
 
 
-function prepareTree(dataTypes = []) {
-    const hierarchy = buildHierarchies(dataTypes);
-    return hierarchy;
-}
-
-
 function expandSearchNotes(hierarchy = []) {
     return hierarchy.length < 6  // pre-expand small trees
         ? _.clone(hierarchy)
@@ -126,7 +120,7 @@ function controller() {
 
     vm.$onChanges = changes => {
         if(changes.items) {
-            vm.hierarchy = prepareTree(vm.items);
+            vm.hierarchy = buildHierarchies(vm.items);
             vm.searchNodes = prepareSearchNodes(vm.items);
         }
 
@@ -141,9 +135,9 @@ function controller() {
 
     vm.searchTermsChanged = (termStr = "") => {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
-        vm.hierarchy = prepareTree(matchingNodes);
+        vm.hierarchy = buildHierarchies(matchingNodes);
 
-        vm.expandedNodes = termStr.length == 0
+        vm.expandedNodes = termStr.length === 0
             ? expandSelectedNodes(vm.items, vm.expandedItemIds)
             : expandSearchNotes(vm.hierarchy);
     };

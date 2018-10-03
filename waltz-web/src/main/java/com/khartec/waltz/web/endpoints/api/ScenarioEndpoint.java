@@ -1,5 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.AxisOrientation;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.service.roadmap.RoadmapService;
@@ -56,8 +58,52 @@ public class ScenarioEndpoint implements Endpoint {
         registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
-        registerUpdateTargetDate(mkPath(BASE_URL, "id", ":id", "target-date"));
+        registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
+
+        registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
+        registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
+        registerAddAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
+        registerRemoveAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
     }
+
+
+    private void registerReorderAxis(String path) {
+        postForDatum(path, (request, response) ->
+                scenarioService.reorderAxis(
+                        getId(request),
+                        getOrientation(request),
+                        readIdsFromBody(request)));
+    }
+
+
+    private void registerLoadAxis(String path) {
+        getForList(path, (request, response) ->
+                scenarioService.loadAxis(
+                        getId(request),
+                        getOrientation(request)));
+    }
+
+
+    private void registerAddAxisItem(String path) {
+        postForDatum(path, (request, response) ->
+                scenarioService.addAxisItem(
+                        getId(request),
+                        getOrientation(request),
+                        getDomainItem(request),
+                        readBody(request, Integer.class),
+                        getUsername(request)));
+    }
+
+
+    private void registerRemoveAxisItem(String path) {
+        deleteForDatum(path, (request, response) ->
+                scenarioService.removeAxisItem(
+                        getId(request),
+                        getOrientation(request),
+                        getDomainItem(request),
+                        getUsername(request)));
+    }
+
 
     private void registerUpdateRating(String path) {
         postForDatum(path, (request, response) ->
@@ -72,9 +118,10 @@ public class ScenarioEndpoint implements Endpoint {
                     ));
     }
 
-    private void registerUpdateTargetDate(String path) {
+
+    private void registerUpdateEffectiveDate(String path) {
         postForDatum(path, (req, resp) ->
-                scenarioService.updateTargetDate(
+                scenarioService.updateEffectiveDate(
                         getId(req),
                         readBody(req, LocalDate.class),
                         getUsername(req)));
@@ -111,9 +158,6 @@ public class ScenarioEndpoint implements Endpoint {
                     ));
     }
 
-    private char getRating(Request request) {
-        return request.params("rating").charAt(0);
-    }
 
     private void registerRemoveRating(String path) {
         deleteForDatum(path, (request, response) ->
@@ -142,7 +186,6 @@ public class ScenarioEndpoint implements Endpoint {
     }
 
 
-
     private void registerGetScenarioById(String path) {
         getForDatum(path, (req, resp) -> {
             long scenarioId = getId(req);
@@ -162,6 +205,30 @@ public class ScenarioEndpoint implements Endpoint {
     private void registerFindScenariosForRoadmapId(String path) {
         getForList(path, (req, resp) ->
                 scenarioService.findForRoadmapId(getLong(req, "roadmapId")));
+    }
+
+
+    // -- helpers --
+
+    private char getRating(Request request) {
+        return request.params("rating").charAt(0);
+    }
+
+
+    private AxisOrientation getOrientation(Request request) {
+        return readEnum(
+                request,
+                "orientation",
+                AxisOrientation.class,
+                s -> AxisOrientation.ROW);
+    }
+
+
+    private EntityReference getDomainItem(Request request) {
+        return getEntityReference(
+                request,
+                "domainItemKind",
+                "domainItemId");
     }
 
 }

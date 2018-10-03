@@ -1,6 +1,6 @@
 package com.khartec.waltz.model;
 
-public enum AxisKind {
+public enum AxisOrientation {
     ROW,
     COLUMN
 }

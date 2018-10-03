@@ -74,9 +74,34 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const updateTargetDate = (scenarioId, newDate) => {
+    const updateEffectiveDate = (scenarioId, newDate) => {
         return $http
-            .post(`${BASE}/id/${scenarioId}/target-date`, newDate)
+            .post(`${BASE}/id/${scenarioId}/effective-date`, newDate)
+            .then(result => result.data);
+    };
+
+    const addAxisItem = (scenarioId, orientation, domainItem, position) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/axis/${orientation}/${domainItem.kind}/${domainItem.id}`, position)
+            .then(result => result.data);
+    };
+
+    const removeAxisItem = (scenarioId, orientation, domainItem) => {
+        return $http
+            .delete(`${BASE}/id/${scenarioId}/axis/${orientation}/${domainItem.kind}/${domainItem.id}`)
+            .then(result => result.data);
+    };
+
+    const loadAxis = (scenarioId, orientation) => {
+        return $http
+            .get(`${BASE}/id/${scenarioId}/axis/${orientation}`)
+            .then(result => result.data);
+    };
+
+
+    const reorderAxis = (scenarioId, orientation, ids = []) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/axis/${orientation}/reorder`, ids)
             .then(result => result.data);
     };
 
@@ -91,7 +116,11 @@ function store($http, baseUrl) {
         updateDescription,
         updateName,
         updateRating,
-        updateTargetDate
+        updateEffectiveDate,
+        addAxisItem,
+        removeAxisItem,
+        loadAxis,
+        reorderAxis
     };
 }
 
@@ -151,12 +180,31 @@ export const ScenarioStore_API = {
         serviceFnName: "updateName",
         description: "executes updateName [scenarioId, newName]"
     },
-    updateTargetDate: {
+    updateEffectiveDate: {
         serviceName,
-        serviceFnName: "updateTargetDate",
-        description: "executes updateTargetDate [scenarioId, newDate]"
-    }
-
+        serviceFnName: "updateEffectiveDate",
+        description: "executes updateEffectiveDate [scenarioId, newDate]"
+    },
+    addAxisItem: {
+        serviceName,
+        serviceFnName: "addAxisItem",
+        description: "executes addAxisItem [scenarioId, newName]"
+    },
+    removeAxisItem: {
+        serviceName,
+        serviceFnName: "removeAxisItem",
+        description: "executes removeAxisItem [scenarioId, newName]"
+    },
+    loadAxis: {
+        serviceName,
+        serviceFnName: "loadAxis",
+        description: "executes loadAxis [scenarioId, orientation]"
+    },
+    reorderAxis: {
+        serviceName,
+        serviceFnName: "reorderAxis",
+        description: "executes reorderAxis [scenarioId, orientation, [ids...]]"
+    },
 };
 
 
