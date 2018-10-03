@@ -16,11 +16,12 @@
 
     <br>
 
-    <table class="table table-condensed table-hover small">
+    <table class="table table-condensed small">
         <colgroup>
             <col width="30%">
             <col width="70%">
         </colgroup>
+        <!-- name -->
         <tr>
             <td>Name:</td>
             <td>
@@ -32,8 +33,10 @@
                 </waltz-editable-field>
             </td>
         </tr>
+
+        <!-- effective date -->
         <tr>
-            <td>Target Date:</td>
+            <td>Effective Date:</td>
             <td>
                 <waltz-editable-field field-type="date"
                                       on-save="$ctrl.onSaveTargetDate"
@@ -43,6 +46,41 @@
                 </waltz-editable-field>
             </td>
         </tr>
+
+        <!-- cols -->
+        <tr>
+            <td>
+                Columns:
+                <p class="help-block">
+                    ( <span ng-bind="$ctrl.roadmap.columnType.id | toDisplayName:'measurableCategory'"></span> )
+                </p>
+            </td>
+            <td>
+                <waltz-roadmap-scenario-axis-config axis="{ type: $ctrl.roadmap.columnType }"
+                                                    axis-orientation="COLUMN"
+                                                    axis-items="$ctrl.scenarioAxisItems">
+                </waltz-roadmap-scenario-axis-config>
+
+            </td>
+        </tr>
+
+        <!-- rows -->
+        <tr>
+            <td>
+                Rows:
+                <p class="help-block">
+                    ( <span ng-bind="$ctrl.roadmap.rowType.id | toDisplayName:'measurableCategory'"></span> )
+                </p>
+            </td>
+            <td>
+                <waltz-roadmap-scenario-axis-config axis-type="$ctrl.roadmap.rowType"
+                                                    axis-orientation="ROW"
+                                                    axis-definitions="$ctrl.axisDefinitions">
+                </waltz-roadmap-scenario-axis-config>
+            </td>
+        </tr>
+
+        <!-- desc -->
         <tr>
             <td>Description:</td>
             <td>
@@ -57,6 +95,8 @@
             </td>
         </tr>
     </table>
+
+    <hr>
 
     <a ng-click="$ctrl.onCancel()"
        class="clickable">

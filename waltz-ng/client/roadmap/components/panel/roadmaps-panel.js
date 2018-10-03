@@ -30,7 +30,10 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker, notification) {
+function controller($q,
+                    serviceBroker,
+                    notification)
+{
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {

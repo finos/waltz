@@ -22,6 +22,7 @@ import angular from "angular";
 import RoadmapsPanel from "./components/panel/roadmaps-panel";
 import RoadmapsList from "./components/list/roadmaps-list";
 import RoadmapScenarioConfig from "./components/roadmap-scenario-config/roadmap-scenario-config";
+import RoadmapScenarioAxisConfig from "./components/roadmap-scenario-axis-config/roadmap-scenario-axis-config";
 import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
 import {registerComponents, registerStores} from "../common/module-utils";
 import RoadmapStore from "./services/roadmap-store";
@@ -31,6 +32,7 @@ export default () => {
     const module = angular.module("waltz.roadmap", []);
 
     registerComponents(module, [
+        RoadmapScenarioAxisConfig,
         RoadmapScenarioConfig,
         RoadmapScenarioDiagram,
         RoadmapsList,

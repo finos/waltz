@@ -19,7 +19,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function reload() {
@@ -32,16 +32,19 @@ function controller(serviceBroker) {
     }
 
 
+    // -- boot ---
+
     vm.$onInit = () => {
         reload();
     };
 
 
+    // -- interact ---
+
     vm.onSaveName = (ctx, data) => {
         vm.onSaveScenarioName(ctx, data)
             .then(() => reload());
     };
-
 
     vm.onSaveDescription = (ctx, data) => {
         vm.onSaveScenarioDescription(ctx, data)
@@ -52,12 +55,13 @@ function controller(serviceBroker) {
         vm.onSaveScenarioTargetDate(ctx, data)
             .then(() => reload());
     };
-
-
 }
 
 
-controller.$inject = [ "ServiceBroker" ];
+controller.$inject = [
+    "$q",
+    "ServiceBroker"
+];
 
 
 const component = {

@@ -1,0 +1,65 @@
+<div>
+    <div ng-switch="$ctrl.visibility.mode">
+        <div class="waltz-tabs">
+            <!-- TABS: tab headers -->
+            <input type="radio"
+                   ng-repeat-start="tab in $ctrl.tabs"
+                   ng-model="$ctrl.activeTabId"
+                   ng-value="tab.id"
+                   name="{{tab.name + $id}}"
+                   id="{{tab.id + $id}}">
+            <label for="{{tab.id + $id}}"
+                   ng-bind="tab.name"
+                   ng-repeat-end>
+            </label>
+            <!-- TABS: tab content -->
+            <div ng-switch="$ctrl.activeTabId"
+                 class="wt-tab wt-active">
+
+                <!-- TAB: view -->
+                <div ng-switch-when="VIEW">
+                    <p class="help-block">
+                        The list below describes the axis items that will be used when drawing this scenario.
+                        <br>
+                        Use the 'pick' and 'sort' tabs to alter this list.
+                    </p>
+                    <ul ng-if="$ctrl.axisDefinitions.length > 0">
+                        <li ng-repeat="item in $ctrl.axisItems">
+                            <span ng-bind="item.name"></span>
+                        </li>
+                    </ul>
+                    <waltz-no-data ng-if="$ctrl.axisDefinitions.length === 0">
+                        <message>
+                            <strong>No axis items defined</strong>.
+                            Use the <a ng-click="$ctrl.activeTabId = 'PICK'" class="clickable">Pick</a>
+                            tab to select some.
+                        </message>
+                    </waltz-no-data>
+                </div>
+
+                <!-- TAB: pick -->
+                <div ng-switch-when="PICK">
+                    <p class="help-block">
+                        Select the items to use in the axis.
+                    </p>
+                    <waltz-multi-select-tree-control items="$ctrl.items"
+
+                                                     on-click="$ctrl.onItemClick"
+                                                     on-check="$ctrl.onItemCheck"
+                                                     on-uncheck="$ctrl.onItemUncheck"
+                                                     checked-item-ids="$ctrl.checkedItemIds"
+                                                     expanded-item-ids="$ctrl.expandedItemIds" >
+                        <span ng-bind="node.name"></span>
+                    </waltz-multi-select-tree-control>
+                </div>
+
+                <!-- TAB: sort -->
+                <div ng-switch-when="SORT">
+                    SORT
+                </div>
+
+            </div> <!-- /tabcontent -->
+        </div> <!-- /tabs -->
+    </div>
+
+</div>

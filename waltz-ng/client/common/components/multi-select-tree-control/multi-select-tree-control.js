@@ -47,8 +47,9 @@ const initialState = {
 };
 
 
-function prepareTree(dataTypes = []) {
-    const hierarchy = buildHierarchies(dataTypes);
+function prepareTree(nodes = []) {
+    const hierarchy = buildHierarchies(nodes);
+    console.log({ nodes, hierarchy })
     return hierarchy;
 }
 
