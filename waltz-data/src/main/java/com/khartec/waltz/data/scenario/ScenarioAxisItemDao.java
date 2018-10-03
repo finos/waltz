@@ -13,7 +13,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -127,6 +129,24 @@ public class ScenarioAxisItemDao {
                 .and(SCENARIO_AXIS_ITEM.AXIS_KIND.eq(orientation.name()))
                 .orderBy(SCENARIO_AXIS_ITEM.POSITION, DOMAIN_ITEM_NAME_FIELD)
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int[] reorder(long scenarioId,
+                         AxisOrientation orientation,
+                         List<Long> orderedIds) {
+        Collection<ScenarioAxisItemRecord> records = new ArrayList<>();
+
+        for (int i = 0; i < orderedIds.size(); i++) {
+            ScenarioAxisItemRecord record = dsl.newRecord(SCENARIO_AXIS_ITEM);
+            record.setPosition(i * 10);
+            record.setId((Long) orderedIds.get(i));
+            records.add(record);
+        }
+
+        return dsl
+                .batchUpdate(records)
+                .execute();
     }
 
 }

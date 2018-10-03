@@ -1,6 +1,7 @@
 import template from "./roadmap-scenario-axis-config.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {move} from "../../../common/list-utils";
 
 
 const bindings = {
@@ -38,7 +39,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker) {
+function controller($q, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     function prepareData() {
@@ -129,13 +130,46 @@ function controller($q, serviceBroker) {
             .then(() => reloadData());
     };
 
+    vm.onMoveUp = (id) => {
+        const position = _.findIndex(vm.usedItems, d => d.id === id);
+        vm.usedItems = move(vm.usedItems, position, -1);
+    };
+
+    vm.onMoveDown = (id) => {
+        const position = _.findIndex(vm.usedItems, d => d.id === id);
+        vm.usedItems = move(vm.usedItems, position, 1);
+    };
+
+    vm.onMoveTop = (id) => {
+        const pred = d => d.id === id;
+        const item = _.find(vm.usedItems, pred);
+        vm.usedItems = [item].concat(_.reject(vm.usedItems, pred));
+    };
+
+    vm.onMoveBottom = (id) => {
+        const pred = d => d.id === id;
+        const item = _.find(vm.usedItems, pred);
+        vm.usedItems = _.reject(vm.usedItems, pred).concat([item]);
+    };
+
+    vm.onSortAlphabetically = () => {
+        vm.usedItems = _.sortBy(vm.usedItems, d => d.domainItem.name.toLowerCase());
+    };
+
+    vm.onSaveSort = () => {
+        const orderedIds = _.map(vm.usedItems, d => d.id);
+        vm.onRepositionAxisItems(vm.scenarioId, vm.axisOrientation, orderedIds)
+            .then(() => reloadData())
+            .then(() => notification.success("Axis reordered"));
+    };
 
 }
 
 
 controller.$inject = [
     "$q",
-    "ServiceBroker"
+    "ServiceBroker",
+    "Notification"
 ];
 
 

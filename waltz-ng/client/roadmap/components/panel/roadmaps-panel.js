@@ -159,8 +159,17 @@ function controller($q,
                 args);
     };
 
-    vm.onRepositionAxisItems = (axisItems) => {
-        console.log("wrp: onRepositionAxisItems", axisItems);
+    vm.onRepositionAxisItems = (scenarioId, orientation, ids) => {
+        const args = [
+            scenarioId,
+            orientation,
+            ids
+        ];
+
+        return serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.reorderAxis,
+                args);
     };
 
 

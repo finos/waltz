@@ -99,6 +99,13 @@ function store($http, baseUrl) {
     };
 
 
+    const reorderAxis = (scenarioId, orientation, ids = []) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/axis/${orientation}/reorder`, ids)
+            .then(result => result.data);
+    };
+
+
     return {
         findForRoadmap,
         findByRoadmapSelector,
@@ -112,7 +119,8 @@ function store($http, baseUrl) {
         updateEffectiveDate,
         addAxisItem,
         removeAxisItem,
-        loadAxis
+        loadAxis,
+        reorderAxis
     };
 }
 
@@ -191,6 +199,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "loadAxis",
         description: "executes loadAxis [scenarioId, orientation]"
+    },
+    reorderAxis: {
+        serviceName,
+        serviceFnName: "reorderAxis",
+        description: "executes reorderAxis [scenarioId, orientation, [ids...]]"
     },
 };
 

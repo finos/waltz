@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -107,9 +108,18 @@ public class ScenarioService {
                 domainItem);
     }
 
+
     public Collection<ScenarioAxisItem> loadAxis(long scenarioId, AxisOrientation orientation) {
         return scenarioAxisItemDao.findForScenarioAndOrientation(
                 scenarioId,
                 orientation);
+    }
+
+
+    public int[] reorderAxis(long scenarioId, AxisOrientation orientation, List<Long> orderedIds) {
+        return scenarioAxisItemDao.reorder(
+                scenarioId,
+                orientation,
+                orderedIds);
     }
 }

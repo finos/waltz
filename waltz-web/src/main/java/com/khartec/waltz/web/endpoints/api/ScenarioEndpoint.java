@@ -59,9 +59,20 @@ public class ScenarioEndpoint implements Endpoint {
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
+
+        registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
+        registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
         registerAddAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
         registerRemoveAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
-        registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
+    }
+
+
+    private void registerReorderAxis(String path) {
+        postForDatum(path, (request, response) ->
+                scenarioService.reorderAxis(
+                        getId(request),
+                        getOrientation(request),
+                        readIdsFromBody(request)));
     }
 
 

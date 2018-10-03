@@ -65,3 +65,22 @@ export function toOffsetMap(arr = [], keyFn = d => d.id) {
         return acc;
     }, {});
 }
+
+/**
+ * Adapted from:
+ * https://gist.github.com/albertein/4496103
+ *
+ * @param array
+ * @param idx
+ * @param delta
+ * @returns {*}
+ */
+export function move(array, idx, delta) {
+    const arrayClone = array.slice();
+    const newIndex = idx + delta;
+    if (newIndex < 0  || newIndex == arrayClone.length) return; //Already at the top or bottom.
+    const indexes = [idx, newIndex].sort((a, b) => a - b); //Sort the indexes
+    arrayClone.splice(indexes[0], 2, arrayClone[indexes[1]], arrayClone[indexes[0]]); //Replace from lowest index, two elements, reverting the order
+    return arrayClone;
+}
+
