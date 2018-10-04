@@ -681,12 +681,51 @@
             </column>
         </addColumn>
     </changeSet>
+    
+    <!-- 3424: update column names to reflect problem domain -->
+    <changeSet id="20181004-3424-1"
+               author="davidwatkins73">
+        <comment> 3424: update column names to reflect problem domain</comment>
+        <renameColumn tableName="scenario"
+                      columnDataType="DATE"
+                      oldColumnName="target_date"
+                      newColumnName="effective_date"/>
+
+        <renameColumn tableName="scenario_axis_item"
+                      columnDataType="${enum.type}"
+                      oldColumnName="item_kind"
+                      newColumnName="domain_item_kind"/>
+        <renameColumn tableName="scenario_axis_item"
+                      columnDataType="${id.type}"
+                      oldColumnName="item_id"
+                      newColumnName="domain_item_id"/>
+        <renameColumn tableName="scenario_axis_item"
+                      columnDataType="${enum.type}"
+                      oldColumnName="axis_kind"
+                      newColumnName="orientation"/>
+
+        <renameColumn tableName="scenario_rating_item"
+                      columnDataType="${enum.type}"
+                      oldColumnName="item_kind"
+                      newColumnName="domain_item_kind"/>
+        <renameColumn tableName="scenario_rating_item"
+                      columnDataType="${id.type}"
+                      oldColumnName="item_id"
+                      newColumnName="domain_item_id"/>
+
+        <addColumn tableName="scenario">
+            <column name="scenario_status"
+                    type="${enum.type}"
+                    defaultValue="TARGET">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 
     <!-- 3404: Unique axis items -->
-    <!-- TODO: re-enable after column rename of item => domainItem, axis_kind => orientation
     <changeSet id="20181003-3404-1"
                author="davidwatkins73">
-        <comment>3387: make data_type_id non nullable</comment>
+        <comment>3404: unique index on scenario axis, domain items cannot appear twice on an axis</comment>
         <createIndex indexName="idx_scenario_axis_uniq"
                      tableName="scenario_axis_item"
                      unique="true">
@@ -705,5 +744,5 @@
         </createIndex>
 
     </changeSet>
-    -->
+
 </databaseChangeLog>

@@ -45,6 +45,7 @@ function controller($q, serviceBroker, notification) {
     function prepareData() {
         if (! vm.usedItems) return;
         if (! vm.axisDomain) return;
+        if (! vm.measurablesByCategory) return;
 
         if (! vm.allItems) vm.allItems = vm.measurablesByCategory[vm.axisDomain.id];
 
