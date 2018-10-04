@@ -11,6 +11,7 @@ const bindings = {
     onSaveScenarioName: "<",
     onSaveScenarioDescription: "<",
     onSaveScenarioEffectiveDate: "<",
+    onSaveScenarioStatus: "<",
     onAddAxisItem: "<",
     onRemoveAxisItem: "<",
     onRepositionAxisItems: "<"

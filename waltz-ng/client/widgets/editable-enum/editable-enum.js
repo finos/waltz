@@ -28,7 +28,7 @@ const bindings = {
     enumKind: "@",
     onSave: "<",
     editRole: "@",
-    ctx: '<?'
+    ctx: "<?"
 };
 
 
@@ -76,14 +76,14 @@ function controller(displayNameService, enumValueService) {
     };
 
     vm.isDirty = () => {
-        return vm.currentVal != null && vm.currentVal != vm.initialVal;
+        return vm.currentVal !== null && vm.currentVal !== vm.initialVal;
     };
 
 }
 
 controller.$inject = [
-    'DisplayNameService',
-    'EnumValueService'
+    "DisplayNameService",
+    "EnumValueService"
 ];
 
 
@@ -94,7 +94,7 @@ const component = {
 };
 
 
-const id = 'waltzEditableEnum';
+const id = "waltzEditableEnum";
 
 
 export default {

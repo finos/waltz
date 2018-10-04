@@ -745,4 +745,38 @@
 
     </changeSet>
 
+
+    <!-- 3417: Adding scenario type (current|interim|target etc) -->
+    <changeSet id="20181003-3417-1"
+               author="davidwatkins73">
+        <comment>3417: Adding scenario type (current|interim|target etc) - defaulting enum values</comment>
+        <insert tableName="enum_value">
+            <column name="type" value="scenarioStatus"/>
+            <column name="key" value="CURRENT"/>
+            <column name="display_name" value="Current"/>
+            <column name="description" value="Current state"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="scenarioStatus"/>
+            <column name="key" value="INTERIM"/>
+            <column name="display_name" value="Interim"/>
+            <column name="description" value="Interim state"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="1"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="scenarioStatus"/>
+            <column name="key" value="TARGET"/>
+            <column name="display_name" value="Target"/>
+            <column name="description" value="Target state"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="2"/>
+        </insert>
+
+    </changeSet>
+
 </databaseChangeLog>

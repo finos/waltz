@@ -17,7 +17,8 @@ public abstract class Scenario implements
         LastUpdatedProvider {
 
     public abstract long roadmapId();
-    public abstract ReleaseLifecycleStatus status();
+    public abstract ReleaseLifecycleStatus lifecycleStatus();
     public abstract LocalDate effectiveDate();
+    public abstract ScenarioStatus scenarioStatus();
 
 }
