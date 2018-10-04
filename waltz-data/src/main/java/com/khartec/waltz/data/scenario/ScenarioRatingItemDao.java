@@ -24,7 +24,7 @@ public class ScenarioRatingItemDao {
     private static final RecordMapper<? super Record, ScenarioRatingItem> TO_DOMAIN_MAPPER = r -> {
         ScenarioRatingItemRecord record = r.into(ScenarioRatingItemRecord.class);
         return ImmutableScenarioRatingItem.builder()
-                .item(readRef(record, SCENARIO_RATING_ITEM.ITEM_KIND, SCENARIO_RATING_ITEM.ITEM_ID))
+                .item(readRef(record, SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND, SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID))
                 .row(readRef(record, SCENARIO_RATING_ITEM.ROW_KIND, SCENARIO_RATING_ITEM.ROW_ID))
                 .column(readRef(record, SCENARIO_RATING_ITEM.COLUMN_KIND, SCENARIO_RATING_ITEM.COLUMN_ID))
                 .rating(record.getRating().charAt(0))
@@ -59,8 +59,8 @@ public class ScenarioRatingItemDao {
         SelectConditionStep<Record11<Long, Long, String, String, Long, String, Long, String, String, Timestamp, String>> originalData = DSL
                 .select(
                         DSL.value(clonedScenarioId),
-                        SCENARIO_RATING_ITEM.ITEM_ID,
-                        SCENARIO_RATING_ITEM.ITEM_KIND,
+                        SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID,
+                        SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND,
                         SCENARIO_RATING_ITEM.RATING,
                         SCENARIO_RATING_ITEM.ROW_ID,
                         SCENARIO_RATING_ITEM.ROW_KIND,
@@ -76,8 +76,8 @@ public class ScenarioRatingItemDao {
                 .insertInto(
                         SCENARIO_RATING_ITEM,
                         SCENARIO_RATING_ITEM.SCENARIO_ID,
-                        SCENARIO_RATING_ITEM.ITEM_ID,
-                        SCENARIO_RATING_ITEM.ITEM_KIND,
+                        SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID,
+                        SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND,
                         SCENARIO_RATING_ITEM.RATING,
                         SCENARIO_RATING_ITEM.ROW_ID,
                         SCENARIO_RATING_ITEM.ROW_KIND,
@@ -103,8 +103,8 @@ public class ScenarioRatingItemDao {
         return dsl
                 .insertInto(SCENARIO_RATING_ITEM)
                 .set(SCENARIO_RATING_ITEM.SCENARIO_ID, scenarioId)
-                .set(SCENARIO_RATING_ITEM.ITEM_ID, appId)
-                .set(SCENARIO_RATING_ITEM.ITEM_KIND, EntityKind.APPLICATION.name())
+                .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID, appId)
+                .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND, EntityKind.APPLICATION.name())
                 .set(SCENARIO_RATING_ITEM.COLUMN_ID, columnId)
                 .set(SCENARIO_RATING_ITEM.COLUMN_KIND, EntityKind.MEASURABLE.name())
                 .set(SCENARIO_RATING_ITEM.ROW_ID, rowId)
@@ -130,7 +130,7 @@ public class ScenarioRatingItemDao {
 
 
     private Condition mkCoordinatesCondition(long scenarioId, long appId, long columnId, long rowId) {
-        return SCENARIO_RATING_ITEM.ITEM_ID.eq(appId)
+        return SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(appId)
                 .and(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(scenarioId))
                 .and(SCENARIO_RATING_ITEM.ROW_ID.eq(rowId))
                 .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(columnId));

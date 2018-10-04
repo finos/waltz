@@ -27,8 +27,8 @@ import static com.khartec.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITE
 public class ScenarioAxisItemDao {
 
     private static final Field<String> DOMAIN_ITEM_NAME_FIELD = mkNameField(
-            SCENARIO_AXIS_ITEM.ITEM_ID,
-            SCENARIO_AXIS_ITEM.ITEM_KIND,
+            SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID,
+            SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND,
             newArrayList(EntityKind.MEASURABLE));
 
 
@@ -37,10 +37,10 @@ public class ScenarioAxisItemDao {
 
         return ImmutableScenarioAxisItem.builder()
                 .id(record.getId())
-                .axisOrientation(AxisOrientation.valueOf(record.getAxisKind()))
+                .axisOrientation(AxisOrientation.valueOf(record.getOrientation() ))
                 .position(record.getPosition())
                 .scenarioId(record.getScenarioId())
-                .domainItem(readRef(r, SCENARIO_AXIS_ITEM.ITEM_KIND, SCENARIO_AXIS_ITEM.ITEM_ID, DOMAIN_ITEM_NAME_FIELD))
+                .domainItem(readRef(r, SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND, SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID, DOMAIN_ITEM_NAME_FIELD))
                 .build();
     };
 
@@ -70,9 +70,9 @@ public class ScenarioAxisItemDao {
         SelectConditionStep<Record5<Long, Long, String, String, Integer>> originalData = DSL
                 .select(
                     DSL.value(clonedScenarioId),
-                    SCENARIO_AXIS_ITEM.ITEM_ID,
-                    SCENARIO_AXIS_ITEM.ITEM_KIND,
-                    SCENARIO_AXIS_ITEM.AXIS_KIND,
+                    SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID,
+                    SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND,
+                    SCENARIO_AXIS_ITEM.ORIENTATION,
                     SCENARIO_AXIS_ITEM.POSITION)
                 .from(SCENARIO_AXIS_ITEM)
                 .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(command.scenarioId()));
@@ -81,9 +81,9 @@ public class ScenarioAxisItemDao {
                 .insertInto(
                     SCENARIO_AXIS_ITEM,
                     SCENARIO_AXIS_ITEM.SCENARIO_ID,
-                    SCENARIO_AXIS_ITEM.ITEM_ID,
-                    SCENARIO_AXIS_ITEM.ITEM_KIND,
-                    SCENARIO_AXIS_ITEM.AXIS_KIND,
+                    SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID,
+                    SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND,
+                    SCENARIO_AXIS_ITEM.ORIENTATION,
                     SCENARIO_AXIS_ITEM.POSITION)
                 .select(originalData)
                 .execute();
@@ -97,9 +97,9 @@ public class ScenarioAxisItemDao {
         ScenarioAxisItemRecord record = dsl.newRecord(SCENARIO_AXIS_ITEM);
 
         record.setScenarioId(scenarioId);
-        record.setItemId(domainItem.id());
-        record.setItemKind(domainItem.kind().name());
-        record.setAxisKind(orientation.name());
+        record.setDomainItemId(domainItem.id());
+        record.setDomainItemKind(domainItem.kind().name());
+        record.setOrientation(orientation.name());
         record.setPosition(position);
 
         return record.store() == 1;
@@ -112,9 +112,9 @@ public class ScenarioAxisItemDao {
         return dsl
                 .deleteFrom(SCENARIO_AXIS_ITEM)
                 .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
-                .and(SCENARIO_AXIS_ITEM.AXIS_KIND.eq(orientation.name()))
-                .and(SCENARIO_AXIS_ITEM.ITEM_KIND.eq(domainItem.kind().name()))
-                .and(SCENARIO_AXIS_ITEM.ITEM_ID.eq(domainItem.id()))
+                .and(SCENARIO_AXIS_ITEM.ORIENTATION.eq(orientation.name()))
+                .and(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND.eq(domainItem.kind().name()))
+                .and(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID.eq(domainItem.id()))
                 .execute() == 1;
     }
 
@@ -126,7 +126,7 @@ public class ScenarioAxisItemDao {
                 .select(DOMAIN_ITEM_NAME_FIELD)
                 .from(SCENARIO_AXIS_ITEM)
                 .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(scenarioId))
-                .and(SCENARIO_AXIS_ITEM.AXIS_KIND.eq(orientation.name()))
+                .and(SCENARIO_AXIS_ITEM.ORIENTATION.eq(orientation.name()))
                 .orderBy(SCENARIO_AXIS_ITEM.POSITION, DOMAIN_ITEM_NAME_FIELD)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -140,7 +140,7 @@ public class ScenarioAxisItemDao {
         for (int i = 0; i < orderedIds.size(); i++) {
             ScenarioAxisItemRecord record = dsl.newRecord(SCENARIO_AXIS_ITEM);
             record.setPosition(i * 10);
-            record.setId((Long) orderedIds.get(i));
+            record.setId(orderedIds.get(i));
             records.add(record);
         }
 

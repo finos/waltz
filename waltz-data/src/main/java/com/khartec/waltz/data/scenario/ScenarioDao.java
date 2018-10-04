@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
@@ -31,9 +33,9 @@ public class ScenarioDao {
                 .roadmapId(record.getRoadmapId())
                 .description(record.getDescription())
                 .status(ReleaseLifecycleStatus.valueOf(record.getLifecycleStatus()))
-                .effectiveDate(DateTimeUtilities.toLocalDate(record.getTargetDate()))
+                .effectiveDate(toLocalDate(record.getEffectiveDate()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
-                .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
+                .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .build();
     };
 
@@ -45,7 +47,7 @@ public class ScenarioDao {
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
         record.setLifecycleStatus(domainObj.status().name());
-        record.setTargetDate(Date.valueOf(domainObj.effectiveDate()));
+        record.setEffectiveDate(Date.valueOf(domainObj.effectiveDate()));
         record.setLastUpdatedBy(domainObj.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(domainObj.lastUpdatedAt()));
 
@@ -132,7 +134,7 @@ public class ScenarioDao {
     public Boolean updateEffectiveDate(long scenarioId, LocalDate newValue, String userId) {
         return updateField(
                 scenarioId,
-                SCENARIO.TARGET_DATE,
+                SCENARIO.EFFECTIVE_DATE,
                 toSqlDate(newValue),
                 userId) == 1;
     }
