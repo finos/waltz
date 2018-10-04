@@ -4,6 +4,7 @@ import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.model.scenario.ScenarioStatus;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
 import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
@@ -59,6 +60,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
+        registerUpdateScenarioStatus(mkPath(BASE_URL, "id", ":id", "scenario-status", ":scenarioStatus"));
 
         registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
         registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
@@ -124,6 +126,15 @@ public class ScenarioEndpoint implements Endpoint {
                 scenarioService.updateEffectiveDate(
                         getId(req),
                         readBody(req, LocalDate.class),
+                        getUsername(req)));
+    }
+
+
+    private void registerUpdateScenarioStatus(String path) {
+        postForDatum(path, (req, resp) ->
+                scenarioService.updateScenarioStatus(
+                        getId(req),
+                        readEnum(req, "scenarioStatus", ScenarioStatus.class, (s) -> ScenarioStatus.CURRENT),
                         getUsername(req)));
     }
 

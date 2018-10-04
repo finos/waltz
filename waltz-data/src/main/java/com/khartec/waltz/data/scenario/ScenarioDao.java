@@ -1,10 +1,12 @@
 package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.ImmutableScenario;
 import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.model.scenario.ScenarioStatus;
 import com.khartec.waltz.schema.tables.records.ScenarioRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,8 @@ public class ScenarioDao {
                 .name(record.getName())
                 .roadmapId(record.getRoadmapId())
                 .description(record.getDescription())
-                .status(ReleaseLifecycleStatus.valueOf(record.getLifecycleStatus()))
+                .lifecycleStatus(ReleaseLifecycleStatus.valueOf(record.getLifecycleStatus()))
+                .scenarioStatus(ScenarioStatus.valueOf(record.getScenarioStatus()))
                 .effectiveDate(toLocalDate(record.getEffectiveDate()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -46,7 +49,8 @@ public class ScenarioDao {
         record.setRoadmapId(domainObj.roadmapId());
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
-        record.setLifecycleStatus(domainObj.status().name());
+        record.setLifecycleStatus(domainObj.lifecycleStatus().name());
+        record.setScenarioStatus(domainObj.scenarioStatus().name());
         record.setEffectiveDate(Date.valueOf(domainObj.effectiveDate()));
         record.setLastUpdatedBy(domainObj.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(domainObj.lastUpdatedAt()));
@@ -93,15 +97,12 @@ public class ScenarioDao {
 
     public Scenario cloneScenario(CloneScenarioCommand command) {
         Scenario orig = getById(command.scenarioId());
-        Scenario clone = ImmutableScenario.builder()
-                .name(command.newName())
-                .description(orig.description())
-                .roadmapId(orig.roadmapId())
-                .status(ReleaseLifecycleStatus.DRAFT)
-                .effectiveDate(orig.effectiveDate())
-                .lastUpdatedAt(DateTimeUtilities.nowUtc())
-                .lastUpdatedBy(command.userId())
-                .build();
+
+        Scenario clone = ImmutableScenario.copyOf(orig)
+                .withName(command.newName())
+                .withLifecycleStatus(ReleaseLifecycleStatus.DRAFT)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withLastUpdatedBy(command.userId());
 
         ScenarioRecord clonedRecord = TO_RECORD_MAPPER.apply(clone, dsl);
         clonedRecord.store();
@@ -109,7 +110,6 @@ public class ScenarioDao {
         return ImmutableScenario
                 .copyOf(clone)
                 .withId(clonedRecord.getId());
-
     }
 
 
@@ -136,6 +136,24 @@ public class ScenarioDao {
                 scenarioId,
                 SCENARIO.EFFECTIVE_DATE,
                 toSqlDate(newValue),
+                userId) == 1;
+    }
+
+
+    public Boolean updateLifecycleStatus(long scenarioId, LifecycleStatus newValue, String userId) {
+        return updateField(
+                scenarioId,
+                SCENARIO.LIFECYCLE_STATUS,
+                newValue.name(),
+                userId) == 1;
+    }
+
+
+    public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newValue, String userId) {
+        return updateField(
+                scenarioId,
+                SCENARIO.SCENARIO_STATUS,
+                newValue.name(),
                 userId) == 1;
     }
 

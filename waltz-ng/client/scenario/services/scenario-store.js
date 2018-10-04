@@ -80,6 +80,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateScenarioStatus = (scenarioId, newStatus) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/scenario-status/${newStatus}`)
+            .then(result => result.data);
+    };
+
     const addAxisItem = (scenarioId, orientation, domainItem, position) => {
         return $http
             .post(`${BASE}/id/${scenarioId}/axis/${orientation}/${domainItem.kind}/${domainItem.id}`, position)
@@ -117,6 +123,7 @@ function store($http, baseUrl) {
         updateName,
         updateRating,
         updateEffectiveDate,
+        updateScenarioStatus,
         addAxisItem,
         removeAxisItem,
         loadAxis,
@@ -184,6 +191,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "updateEffectiveDate",
         description: "executes updateEffectiveDate [scenarioId, newDate]"
+    },
+    updateScenarioStatus: {
+        serviceName,
+        serviceFnName: "updateScenarioStatus",
+        description: "executes updateScenarioStatus [scenarioId, newStatus]"
     },
     addAxisItem: {
         serviceName,

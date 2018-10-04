@@ -113,6 +113,15 @@ function controller($q,
                 "Scenario target date updated");
     };
 
+    vm.onSaveScenarioStatus = (data, ctx) => {
+        return updateField(
+                ctx.id,
+                CORE_API.ScenarioStore.updateScenarioStatus,
+                { newVal: data },   // as this is coming from enum field, we need to fake out change object
+                true,
+                "Scenario status updated");
+    };
+
     vm.onSaveScenarioDescription = (ctx, data) => {
         return updateField(
                 ctx.id,
@@ -181,7 +190,7 @@ function controller($q,
                          preventNull = true,
                          message = "Updated") {
         if (preventNull && (_.isEmpty(data.newVal) && !_.isDate(data.newVal))) {
-            return Promise.reject("Cannot set an empty value");
+            return Promise.reject("Waltz:updateField - Cannot set an empty value");
         }
         if (data.newVal !== data.oldVal) {
             return serviceBroker

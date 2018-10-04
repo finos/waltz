@@ -47,6 +47,20 @@
             </td>
         </tr>
 
+
+        <!-- scenario status -->
+        <tr>
+            <td>Scenario Status:</td>
+            <td>
+                <waltz-editable-enum enum-kind="scenarioStatus"
+                                     on-save="$ctrl.onSaveScenarioStatus"
+                                     ctx="$ctrl.scenario"
+                                     save-label="Save"
+                                     initial-val="$ctrl.scenario.scenarioStatus">
+                </waltz-editable-enum>
+            </td>
+        </tr>
+
         <!-- cols -->
         <tr>
             <td>

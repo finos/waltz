@@ -10,6 +10,7 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioAxisItem;
+import com.khartec.waltz.model.scenario.ScenarioStatus;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,14 @@ public class ScenarioService {
     }
 
 
+    public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newStatus, String userId) {
+        return scenarioDao.updateScenarioStatus(
+                scenarioId,
+                newStatus,
+                userId);
+    }
+
+
     public Boolean addAxisItem(long scenarioId,
                               AxisOrientation orientation,
                               EntityReference domainItem,
@@ -122,4 +131,5 @@ public class ScenarioService {
                 orientation,
                 orderedIds);
     }
+
 }
