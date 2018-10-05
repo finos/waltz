@@ -16,6 +16,6 @@ export const ROW_CELL_DIMENSIONS = {
 
 
 export const ROW_DIMENSIONS = {
-    padding: CELL_PADDING * 3
+    padding: CELL_PADDING * 2
 };
 

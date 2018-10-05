@@ -1,11 +1,12 @@
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {NODE_DIMENSIONS} from "./scenario-diagram-static-node-utils";
+import {truncate} from "../../../common/string-utils";
 
 export const rowAxisWidth = 150;
 export const columnAxisHeight = 50;
 
 
-const AXIS_STLYES = {
+const AXIS_STYLES = {
     header: "wrd-axis-header"
 };
 
@@ -13,14 +14,14 @@ const AXIS_STLYES = {
 function drawRowHeaders(holder, headerData, layout) {
 
     const headers = holder
-        .selectAll(`.${AXIS_STLYES.header}`)
+        .selectAll(`.${AXIS_STYLES.header}`)
         .data(headerData, d => d.id);
 
     const newHeaders = headers
         .enter()
         .append("text")
         .text(d => d.name)
-        .classed(AXIS_STLYES.header, true);
+        .classed(AXIS_STYLES.header, true);
 
     headers
         .exit()
@@ -40,14 +41,21 @@ function drawRowHeaders(holder, headerData, layout) {
 function drawColumnHeaders(holder, headerData, layout) {
 
     const headers = holder
-        .selectAll(`.${AXIS_STLYES.header}`)
+        .selectAll(`.${AXIS_STYLES.header}`)
         .data(headerData, d => d.id);
 
     const newHeaders = headers
         .enter()
         .append("text")
-        .text(d => d.name)
-        .classed(AXIS_STLYES.header, true);
+        .attr("foo", (d,i) => console.log({d, headerData, layout, w: layout.colWidths[i]}))
+        .text((d, i) => layout.colWidths[i] < 1 ? truncate(d.name, 14, "...") : d.name)
+        .classed(AXIS_STYLES.header, true);
+
+    // tooltip
+    newHeaders
+        .filter(d => d.name.length > 14)
+        .append("title")
+        .text(d => d.name);
 
     headers
         .exit()
@@ -64,8 +72,6 @@ function drawColumnHeaders(holder, headerData, layout) {
             return columnOffset + padding - actualColumnWidth / 2;
         });
 }
-
-
 
 
 export function drawAxis(columnAxisContent, rowAxisContent, dataWithLayout) {
