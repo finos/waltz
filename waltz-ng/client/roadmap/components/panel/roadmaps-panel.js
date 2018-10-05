@@ -47,6 +47,33 @@ function controller($q,
 
     vm.onAddScenario = (roadmap) => {
         vm.visibility.mode = modes.ADD_SCENARIO;
+        const usedNames = _
+            .chain(vm.scenarios)
+            .filter(s => s.roadmapId = roadmap.id)
+            .map(s => s.name.toLowerCase())
+            .value();
+
+        const defaultName = "New Scenario for " + roadmap.name;
+        const newName = prompt("Enter a name for the new scenario", defaultName);
+        if (! newName) {
+            return Promise.reject("Create cancelled by user");
+        } else {
+            const isNameAlreadyTaken = _.includes(usedNames, newName.toLowerCase());
+            if (isNameAlreadyTaken) {
+                const msg = "Cannot create a scenario with the same name as an existing scenario";
+                notification.error(msg);
+                return Promise.reject(msg);
+            } else {
+                return serviceBroker
+                    .execute(
+                        CORE_API.RoadmapStore.addScenario,
+                        [ roadmap.id, newName ])
+                    .then(r => {
+                        notification.success("New scenario created");
+                        vm.onConfigureScenario(r.data);
+                    });
+            }
+        }
     };
 
     vm.onAddRoadmap = () => {
@@ -134,6 +161,7 @@ function controller($q,
     vm.onConfigureScenario = (scenario) => {
         vm.visibility.mode = modes.CONFIGURE_SCENARIO;
         vm.selectedScenario = scenario;
+        console.log('cs', {scenario})
     };
 
     vm.onCancel = () => {

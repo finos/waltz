@@ -2,9 +2,11 @@ package com.khartec.waltz.service.roadmap;
 
 import com.khartec.waltz.data.roadmap.RoadmapDao;
 import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
+import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.roadmap.Roadmap;
+import com.khartec.waltz.model.scenario.Scenario;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +20,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class RoadmapService {
 
     private final RoadmapDao roadmapDao;
+    private final ScenarioDao scenarioDao;
     private RoadmapIdSelectorFactory roadmapIdSelectorFactory;
 
 
     @Autowired
-    public RoadmapService(RoadmapDao roadmapDao, RoadmapIdSelectorFactory roadmapIdSelectorFactory) {
+    public RoadmapService(RoadmapDao roadmapDao, ScenarioDao scenarioDao, RoadmapIdSelectorFactory roadmapIdSelectorFactory) {
         checkNotNull(roadmapDao, "roadmapDao cannot be null");
+        checkNotNull(scenarioDao, "scenarioDao cannot be null");
         checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
         this.roadmapDao = roadmapDao;
+        this.scenarioDao = scenarioDao;
         this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
     }
 
@@ -58,5 +63,9 @@ public class RoadmapService {
 
     public Boolean updateName(long id, String newName, String userId) {
         return roadmapDao.updateName(id, newName, userId);
+    }
+
+    public Scenario addScenario(long roadmapId, String name, String userId) {
+        return scenarioDao.add(roadmapId, name, userId);
     }
 }

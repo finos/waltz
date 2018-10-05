@@ -68,7 +68,6 @@ function controller($element, $q, serviceBroker) {
             .then(() => vm.realData = prepareData(vm.scenarioDefn, vm.applications, vm.measurables));
 
         vm.demoData = mkDemoData(3, 4);
-        global.vm = vm;
     }
 }
 

@@ -81,4 +81,8 @@ public class DateTimeUtilities {
         return Instant.ofEpochMilli(date.getTime()).atZone(UTC).toLocalDateTime();
     }
 
+    public static LocalDate today() {
+        return LocalDate.now();
+
+    }
 }

@@ -32,6 +32,16 @@ public class RoadmapEndpoint implements Endpoint {
         registerGetRoadmapById(mkPath(BASE_URL, "id", ":id"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
+        registerAddScenario(mkPath(BASE_URL, "id", ":id", "add-scenario"));
+    }
+
+
+    private void registerAddScenario(String path) {
+        postForDatum(path, (req, resp) ->
+                roadmapService.addScenario(
+                        getId(req),
+                        req.body(),
+                        getUsername(req)));
     }
 
 
