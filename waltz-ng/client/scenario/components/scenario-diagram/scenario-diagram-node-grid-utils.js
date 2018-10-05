@@ -4,6 +4,9 @@ import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {defaultOptions} from "./scenario-diagram-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";
 
+const EMPTY_CELL_WIDTH = 0.5;
+const EMPTY_CELL_HEIGHT = 0.5;
+
 
 export function drawNodeGrid(selection, options) {
     const dataProvider = d => d.data;
@@ -75,8 +78,8 @@ export function nodeGridLayout(data = [], coords, options = defaultOptions) {
         .value();
 
     const layout = {
-        colCount: Math.min(options.cols, data.length),
-        rowCount: Math.ceil(data.length / options.cols)
+        colCount: Math.min(options.cols, data.length) || EMPTY_CELL_WIDTH,
+        rowCount: Math.ceil(data.length / options.cols) || EMPTY_CELL_HEIGHT
     };
 
     return {
