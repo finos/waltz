@@ -47,12 +47,19 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const addScenario = (roadmapId, name) => {
+        return $http
+            .post(`${BASE}/id/${roadmapId}/add-scenario`, name)
+            .then(result => result.data);
+    };
+
 
     return {
         getRoadmapById,
         findRoadmapsBySelector,
         updateDescription,
-        updateName
+        updateName,
+        addScenario
     };
 }
 
@@ -86,7 +93,12 @@ export const RoadmapStore_API = {
         serviceName,
         serviceFnName: "updateName",
         description: "executes updateName [roadmapId, newName]"
-    }
+    },
+    addScenario: {
+        serviceName,
+        serviceFnName: "addScenario",
+        description: "executes addScenario [roadmapId, name]"
+    },
 };
 
 

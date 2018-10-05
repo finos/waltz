@@ -19,9 +19,7 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
 @Repository
@@ -101,7 +99,7 @@ public class ScenarioDao {
         Scenario clone = ImmutableScenario.copyOf(orig)
                 .withName(command.newName())
                 .withLifecycleStatus(ReleaseLifecycleStatus.DRAFT)
-                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withLastUpdatedAt(nowUtc())
                 .withLastUpdatedBy(command.userId());
 
         ScenarioRecord clonedRecord = TO_RECORD_MAPPER.apply(clone, dsl);
@@ -158,6 +156,29 @@ public class ScenarioDao {
     }
 
 
+    public Scenario add(long roadmapId, String name, String userId) {
+        Scenario scenario = ImmutableScenario.builder()
+                .roadmapId(roadmapId)
+                .name(name)
+                .description("")
+                .lifecycleStatus(ReleaseLifecycleStatus.DRAFT)
+                .scenarioStatus(ScenarioStatus.INTERIM)
+                .effectiveDate(today())
+                .lastUpdatedAt(nowUtc())
+                .lastUpdatedBy(userId)
+                .build();
+
+        ScenarioRecord record = TO_RECORD_MAPPER
+                .apply(scenario, dsl);
+
+        record.store();
+
+        return ImmutableScenario
+                .copyOf(scenario)
+                .withId(record.getId());
+    }
+
+
     // -- helpers --
 
     private <T> int updateField(long id, Field<T> field, T value, String userId) {
@@ -169,6 +190,5 @@ public class ScenarioDao {
                 .where(SCENARIO.ID.eq(id))
                 .execute();
     }
-
 
 }

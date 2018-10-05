@@ -53,12 +53,9 @@
 
         <!-- SCENARIO: add -->
         <div ng-switch-when="ADD_SCENARIO">
-            <h1>Add scenario</h1>
-
-            <a ng-click="$ctrl.onCancel()"
-               class="clickable">
-                Cancel
-            </a>
+            <waltz-roadmap-add-scenario roadmap="$ctrl.selectedRoadmap"
+                                        on-cancel="$ctrl.onCancel">
+            </waltz-roadmap-add-scenario>
         </div>
 
 
