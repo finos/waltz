@@ -7,7 +7,7 @@
 import _ from "lodash";
 
 
-export const f = "F"
+export const f = "F";
 
 
 // -- ENTITY_REFS ---

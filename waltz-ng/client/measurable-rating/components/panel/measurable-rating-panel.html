@@ -12,20 +12,16 @@
         <div ng-if="$ctrl.selected == null"
              class="waltz-fade-if text-muted">
             Please select an item on the tree to see more detail.
-            <br>
-            <br>
-            Items flagged with an asterisk indicate that the rating is subject to additional
-            refinement when combined with other viewpoints.
         </div>
 
         <div ng-if="$ctrl.selected != null"
              class="waltz-fade-if">
             <div>
                 <h4>
-                    <span ng-bind="$ctrl.selected.measurable.name"></span>
-                    <a class='small clickable'
+                    <a class='clickable'
+                       style="font-weight: lighter;"
                        ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
-                        (more &raquo;)
+                        <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
                 </h4>
 

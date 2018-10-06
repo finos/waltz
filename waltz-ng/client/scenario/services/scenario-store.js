@@ -104,10 +104,15 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-
     const reorderAxis = (scenarioId, orientation, ids = []) => {
         return $http
             .post(`${BASE}/id/${scenarioId}/axis/${orientation}/reorder`, ids)
+            .then(result => result.data);
+    };
+
+    const findScenarioAndRoadmapsByRatedEntity = (ratedEntity) => {
+        return $http
+            .get(`${BASE}/by-rated-entity/${ratedEntity.kind}/${ratedEntity.id}`)
             .then(result => result.data);
     };
 
@@ -127,7 +132,8 @@ function store($http, baseUrl) {
         addAxisItem,
         removeAxisItem,
         loadAxis,
-        reorderAxis
+        reorderAxis,
+        findScenarioAndRoadmapsByRatedEntity
     };
 }
 
@@ -216,6 +222,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "reorderAxis",
         description: "executes reorderAxis [scenarioId, orientation, [ids...]]"
+    },
+    findScenarioAndRoadmapsByRatedEntity: {
+        serviceName,
+        serviceFnName: "findScenarioAndRoadmapsByRatedEntity",
+        description: "executes findScenarioAndRoadmapsByRatedEntity [ratedEntityRef]"
     },
 };
 

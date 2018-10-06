@@ -102,7 +102,7 @@
                         </td>
                         <td>
                             <span class="small"
-                                  ng-bind="scenario.lifecycleStatus | toDisplayName:'releaseLifecycleStatus'">
+                                  ng-bind="scenario.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
                             </span>
                         </td>
                         <td>
@@ -125,7 +125,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="3"></td>
+                        <td colspan="4"></td>
                         <td colspan="2">
                             <a ng-click="$ctrl.onAddScenario(roadmap)"
                                class="clickable">
