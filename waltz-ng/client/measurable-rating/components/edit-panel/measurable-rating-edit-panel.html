@@ -157,26 +157,6 @@
             </div>
         </div>
 
-        <div class="row"
-             ng-if="$ctrl.perspectiveDefinitions.length > 0">
-            <hr>
-            <div class="col-md-12">
-                <h4>Associated Perspectives</h4>
-                <p class="text-muted small">
-                    Perspectives provide a rated association between entities and two other
-                    architectural elements.  This provides a more detailed view of how an entity supports
-                    the business.
-                </p>
-
-                <waltz-associated-perspectives measurables="$ctrl.measurables"
-                                               entity-ref="$ctrl.parentEntityRef"
-                                               perspective-definitions="$ctrl.perspectiveDefinitions"
-                                               ratings="$ctrl.ratings"
-                                               category-id="$ctrl.visibility.tab">
-                </waltz-associated-perspectives>
-
-            </div>
-        </div>
     </div>
 
     <!-- TABS & TREES -->

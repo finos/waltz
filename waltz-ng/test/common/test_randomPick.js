@@ -10,21 +10,21 @@
  *
  */
 
-import assert from 'assert';
-import { randomPick } from '../../client/common';
+import assert from "assert";
+import { randomPick } from "../../client/common";
 
 
-describe('randomPick', () => {
+describe("randomPick", () => {
 
-    it('returns the only element of a one element array', () => {
+    it("returns the only element of a one element array", () => {
         assert.equal(3, randomPick([3]));
     });
 
-    it('returns null from a zero element array', () => {
+    it("returns null from a zero element array", () => {
         assert.equal(null, randomPick([]));
     });
 
-    it('throws with a null array', () => {
+    it("throws with a null array", () => {
         assert.throws(() => randomPick());
     });
 

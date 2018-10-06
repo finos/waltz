@@ -29,8 +29,8 @@ import template from "./measurable-rating-edit-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    startingCategoryId: '<'
+    parentEntityRef: "<",
+    startingCategoryId: "<"
 };
 
 
@@ -80,7 +80,7 @@ function controller($q,
             vm.ratings,
             vm.visibility.showAllCategories);
 
-        vm.hasHiddenTabs = vm.categories.length != vm.tabs.length;
+        vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
     };
 
     const loadData = (force) => {
@@ -89,7 +89,7 @@ function controller($q,
         const ratingSchemePromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
             .then(r => {
-                vm.ratingSchemesById = _.keyBy(r.data, 'id');
+                vm.ratingSchemesById = _.keyBy(r.data, "id");
                 vm.ratingItemsBySchemeIdByCode = indexRatingSchemes(r.data || []);
             });
 
@@ -97,7 +97,7 @@ function controller($q,
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => {
                 vm.categories = r.data;
-                vm.categoriesById = _.keyBy(r.data, 'id');
+                vm.categoriesById = _.keyBy(r.data, "id");
             });
 
         const measurablesPromise = serviceBroker
@@ -108,16 +108,11 @@ function controller($q,
             .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
             .then(r => vm.ratings = r.data);
 
-
         $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
             .then(() => {
                 recalcTabs();
                 vm.onTabChange(vm.startingCategoryId);
             });
-
-        serviceBroker
-            .loadViewData(CORE_API.PerspectiveDefinitionStore.findAll, [], { force })
-            .then(r => vm.perspectiveDefinitions = r.data);
 
     };
 
@@ -209,16 +204,16 @@ function controller($q,
         if (r === getRating()) return; // rating not changed
 
         const plannedDate = resetPlannedDate(vm.selected.ratingScheme.id, vm.selected.measurable.id, getRating(), r);
-        return r === 'X'
+        return r === "X"
             ? doRemove()
-                .then(() => notification.success('Removed'))
+                .then(() => notification.success("Removed"))
             : doSave(r, getDescription(), plannedDate)
-                .then(() => notification.success('Saved'));
+                .then(() => notification.success("Saved"));
     };
 
     vm.onSaveComment = (comment) => {
         return doSave(getRating(), comment, getPlannedDate())
-            .then(() => notification.success('Saved Comment'))
+            .then(() => notification.success("Saved Comment"))
     };
 
     vm.doCancel = reset;
@@ -253,19 +248,19 @@ function controller($q,
     };
 
     vm.onUpdatePlannedDate = (itemId, data) => {
-        const newPlannedDate = timeFormat('%Y-%m-%d')(data.newVal);
+        const newPlannedDate = timeFormat("%Y-%m-%d")(data.newVal);
         return doSave(getRating(), getDescription(), newPlannedDate)
-            .then(() => notification.success('Saved Planned Date'))
+            .then(() => notification.success("Saved Planned Date"))
     };
 }
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    'MeasurableRatingStore',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "$state",
+    "MeasurableRatingStore",
+    "Notification",
+    "ServiceBroker"
 ];
 
 
@@ -278,5 +273,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzMeasurableRatingEditPanel'
+    id: "waltzMeasurableRatingEditPanel"
 };

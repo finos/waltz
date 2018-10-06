@@ -2,7 +2,6 @@
     <div class="col-sm-6">
         <waltz-measurable-rating-tree ratings="$ctrl.ratings"
                                       rating-scheme="$ctrl.ratingScheme"
-                                      overrides="$ctrl.overriddenMeasurableIds"
                                       on-select="$ctrl.onSelect"
                                       measurables="$ctrl.measurables">
         </waltz-measurable-rating-tree>
@@ -78,18 +77,5 @@
                 </div>
             </div>
         </div>
-        <div ng-if="$ctrl.selected.overrides"
-             class="waltz-fade-if">
-            <hr>
-            <h5>Overrides</h5>
-
-            <waltz-perspective-overrides overrides="$ctrl.selected.overrides"
-                                         entity-reference="$ctrl.entityReference"
-                                         base-measurable="$ctrl.selected.measurable"
-                                         base-rating="$ctrl.selected.rating.rating"
-                                         rag-names="$ctrl.category.ragNames">
-            </waltz-perspective-overrides>
-        </div>
-
     </div>
 </div>

@@ -30,15 +30,6 @@ const entityRefShape = {
 };
 
 
-const perspectiveDefinitionShape = {
-    id: apiCheck.number,
-    name: apiCheck.string,
-    description: apiCheck.string,
-    categoryX: apiCheck.number,
-    categoryY: apiCheck.number
-};
-
-
 const measurableRatingShape = {
     entityReference: myApiCheck.shape(entityRefShape),
     measurableId: apiCheck.number,
@@ -63,7 +54,7 @@ const measurableShape = {
 
 const idSelectorShape = {
     entityReference: myApiCheck.shape(entityRefShape),
-    scope: myApiCheck.oneOf(['EXACT', 'PARENTS', 'CHILDREN'])
+    scope: myApiCheck.oneOf(["EXACT", "PARENTS", "CHILDREN"])
 };
 
 
@@ -184,7 +175,7 @@ export function checkTrue(b, msg) {
     assert(b, msg);
 }
 
-export function checkNotEmpty(x, msg = 'is empty') {
+export function checkNotEmpty(x, msg = "is empty") {
     assert(notEmpty(x), msg);
 }
 
@@ -194,10 +185,6 @@ export const checkIsEntityRef = ref =>
 
 export const checkIsLogicalFlow = flow =>
     check(myApiCheck.shape(logicalFlowShape), flow);
-
-
-export const checkIsPerspectiveDefinition = ref =>
-    check(myApiCheck.shape(perspectiveDefinitionShape), ref);
 
 
 export const checkIsMeasurableRating = ref =>
@@ -275,14 +262,14 @@ export const checkIsApplicationIdSelector = opt =>
 export const checkIsIdSelector = checkIsApplicationIdSelector;
 
 
-export function checkAll(xs, pred = x => true, msg = 'failed test') {
+export function checkAll(xs, pred = x => true, msg = "failed test") {
     return assert(_.every(xs, pred), msg);
 }
 
 
 export function checkIsArray(xs, message) {
     if (!_.isArray(xs)) {
-        throw new Error(message ? message : 'not an array', xs);
+        throw new Error(message ? message : "not an array", xs);
     } else {
         return xs;
     }
@@ -291,7 +278,7 @@ export function checkIsArray(xs, message) {
 
 export function ensureNotNull(x, message) {
     if (_.isNull(x) || _.isUndefined(x)) {
-        throw new Error(message ? message : 'is null', x);
+        throw new Error(message ? message : "is null", x);
     } else {
         return x;
     }

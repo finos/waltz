@@ -47,10 +47,6 @@
                 <span ng-bind="node.displayName"
                       ng-class="{ 'italics' : ! node.concrete }">
                 </span>
-                <span ng-if="$ctrl.overrides.indexOf(node.id) > -1"
-                      class="waltz-visibility-child-50">
-                    *
-                </span>
                 <span class="small"
                        ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
                      <waltz-icon name="sticky-note-o"></waltz-icon>

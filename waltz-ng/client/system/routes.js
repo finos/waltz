@@ -20,98 +20,91 @@
  */
 
 const baseState = {
-    url: 'system'
+    url: "system"
 };
 
 
-import SystemAdminList from './system-admin-list';
-import SettingsView from './settings-view';
-import HierarchiesView from './hierarchies-view';
-import OrphansView from './orphans-view';
-import RecalculateView from './recalculate-view';
-import ActorsView from './actors-view';
-import EntityNamedNoteTypesView from './entity-named-node-types-view';
-import InvolvementKindsView from './involvement-kinds-view';
-import PerspectivesView from './perspectives-view';
-import StaticPanelsView from './static-panels-view';
+import SystemAdminList from "./system-admin-list";
+import SettingsView from "./settings-view";
+import HierarchiesView from "./hierarchies-view";
+import OrphansView from "./orphans-view";
+import RecalculateView from "./recalculate-view";
+import ActorsView from "./actors-view";
+import EntityNamedNoteTypesView from "./entity-named-node-types-view";
+import InvolvementKindsView from "./involvement-kinds-view";
+import StaticPanelsView from "./static-panels-view";
 
 const listViewState = {
-    url: '/list',
-    views: { 'content@': SystemAdminList }
+    url: "/list",
+    views: { "content@": SystemAdminList }
 };
 
 
 const settingsState = {
-    url: '/settings',
-    views: { 'content@': SettingsView }
+    url: "/settings",
+    views: { "content@": SettingsView }
 };
 
 
 const hierarchiesState = {
-    url: '/hierarchies',
-    views: { 'content@': HierarchiesView }
+    url: "/hierarchies",
+    views: { "content@": HierarchiesView }
 };
 
 
 const orphansState = {
-    url: '/orphans',
-    views: { 'content@': OrphansView }
+    url: "/orphans",
+    views: { "content@": OrphansView }
 };
 
 
 const recalculateState = {
-    url: '/recalculate',
-    views: { 'content@': RecalculateView }
+    url: "/recalculate",
+    views: { "content@": RecalculateView }
 };
 
 
 const actorsState = {
-    url: '/actors',
-    views: { 'content@': ActorsView }
+    url: "/actors",
+    views: { "content@": ActorsView }
 };
 
 
 const entityNamedNodeTypesState = {
-    url: '/entity-named-note-types',
-    views: { 'content@': EntityNamedNoteTypesView }
+    url: "/entity-named-note-types",
+    views: { "content@": EntityNamedNoteTypesView }
 };
 
 
 const involvementKindsState = {
-    url: '/involvement-kinds',
-    views: { 'content@': InvolvementKindsView }
+    url: "/involvement-kinds",
+    views: { "content@": InvolvementKindsView }
 };
 
-
-const perspectivesState = {
-    url: '/perspectives',
-    views: { 'content@': PerspectivesView }
-};
 
 
 const staticPanelsState = {
-    url: '/static-panels',
-    views: { 'content@': StaticPanelsView }
+    url: "/static-panels",
+    views: { "content@": StaticPanelsView }
 };
 
 
 function setupRoutes($stateProvider) {
     $stateProvider
-        .state('main.system', baseState)
-        .state('main.system.list', listViewState)
-        .state('main.system.settings', settingsState)
-        .state('main.system.hierarchies', hierarchiesState)
-        .state('main.system.orphans', orphansState)
-        .state('main.system.actors', actorsState)
-        .state('main.system.entity-named-note-types', entityNamedNodeTypesState)
-        .state('main.system.involvement-kinds', involvementKindsState)
-        .state('main.system.perspectives', perspectivesState)
-        .state('main.system.static-panels', staticPanelsState)
-        .state('main.system.recalculate', recalculateState);
+        .state("main.system", baseState)
+        .state("main.system.list", listViewState)
+        .state("main.system.settings", settingsState)
+        .state("main.system.hierarchies", hierarchiesState)
+        .state("main.system.orphans", orphansState)
+        .state("main.system.actors", actorsState)
+        .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
+        .state("main.system.involvement-kinds", involvementKindsState)
+        .state("main.system.static-panels", staticPanelsState)
+        .state("main.system.recalculate", recalculateState);
 }
 
 
-setupRoutes.$inject = ['$stateProvider'];
+setupRoutes.$inject = ["$stateProvider"];
 
 
 export default setupRoutes;

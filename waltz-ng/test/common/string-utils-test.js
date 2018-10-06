@@ -1,8 +1,8 @@
-import assert from 'assert';
-import * as su from '../../client/common/string-utils';
+import assert from "assert";
+import * as su from "../../client/common/string-utils";
 
 
-describe('toDomainAll', () => {
+describe("toDomainAll", () => {
     it ("returns just the domain part of a url",
         () => assert.equal("www.reddit.com", su.toDomain("https://www.reddit.com/r/programming")));
     it ("happy with any protocol",
@@ -17,7 +17,7 @@ describe('toDomainAll', () => {
 });
 
 
-describe('truncateMiddle', () => {
+describe("truncateMiddle", () => {
     it("chops the middle out of strings", () =>
         assert.equal("12 ... 12", su.truncateMiddle("123456789101112", 9)));
     it("returns the original string if it's below the max length", () =>
@@ -25,7 +25,7 @@ describe('truncateMiddle', () => {
 });
 
 
-describe('numberFormatter', () => {
+describe("numberFormatter", () => {
     const simplify = true;
     const doNotSimplify = false;
 
@@ -45,10 +45,10 @@ describe('numberFormatter', () => {
 
 
 describe("escapeRegexCharacters", () => {
-    it('escapes', () => {
-        assert.equal('\\+\\.\\?\\\\', su.escapeRegexCharacters("+.?\\"));
-        assert.equal('\\$\\^\\{\\}\\(\\)', su.escapeRegexCharacters("$^{}()"));
-        assert.equal('\\[\\]', su.escapeRegexCharacters("[]"));
+    it("escapes", () => {
+        assert.equal("\\+\\.\\?\\\\", su.escapeRegexCharacters("+.?\\"));
+        assert.equal("\\$\\^\\{\\}\\(\\)", su.escapeRegexCharacters("$^{}()"));
+        assert.equal("\\[\\]", su.escapeRegexCharacters("[]"));
     })
 });
 

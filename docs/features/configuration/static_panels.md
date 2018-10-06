@@ -28,7 +28,6 @@ Currently assigned groups are:
 - ```HOME.PERSON```: For the People overview page
 - ```HOME.PROCESS```: For the Process list page
 - ```HOME.PERFORMANCE```: For the Performance Metric overview page
-- ```PERSPECTIVE.RATING.EDIT```: For providing explanatory text about this editor
 - ```SECTION.ASSET_COSTS.ABOUT```: For an explanation of the asset costs section
 - ```SECTION.COMPLEXITY.ABOUT```: For an explanation of the complexity calculation
 - ```SECTION.AUTH_SOURCES.ABOUT```: For explanations about authoritative sources
