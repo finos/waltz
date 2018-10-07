@@ -32,6 +32,14 @@ public class RoadmapEndpoint implements Endpoint {
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerAddScenario(mkPath(BASE_URL, "id", ":id", "add-scenario"));
         registerFindRoadmapsAndScenariosByRatedEntity(mkPath(BASE_URL, "by-rated-entity", ":kind", ":id"));
+        registerFindRoadmapsAndScenariosByFormalRelationship(mkPath(BASE_URL, "by-formal-relationship", ":kind", ":id"));
+    }
+
+
+    private void registerFindRoadmapsAndScenariosByFormalRelationship(String path) {
+        getForList(path, (request, response) ->
+                roadmapService.findRoadmapsAndScenariosByFormalRelationship(
+                        getEntityReference(request)));
     }
 
 
@@ -40,7 +48,6 @@ public class RoadmapEndpoint implements Endpoint {
                 roadmapService.findRoadmapsAndScenariosByRatedEntity(
                         getEntityReference(request)));
     }
-
 
 
     private void registerAddScenario(String path) {

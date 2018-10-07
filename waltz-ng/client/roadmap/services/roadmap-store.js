@@ -59,6 +59,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const findRoadmapsAndScenariosByFormalRelationship = (relatedEntity) => {
+        return $http
+            .get(`${BASE}/by-formal-relationship/${relatedEntity.kind}/${relatedEntity.id}`)
+            .then(result => result.data);
+    };
+
 
     return {
         getRoadmapById,
@@ -66,7 +72,8 @@ function store($http, baseUrl) {
         updateDescription,
         updateName,
         addScenario,
-        findRoadmapsAndScenariosByRatedEntity
+        findRoadmapsAndScenariosByRatedEntity,
+        findRoadmapsAndScenariosByFormalRelationship
     };
 }
 
@@ -111,6 +118,11 @@ export const RoadmapStore_API = {
         serviceFnName: "findRoadmapsAndScenariosByRatedEntity",
         description: "executes findRoadmapsAndScenariosByRatedEntity [ratedEntityRef]"
     },
+    findRoadmapsAndScenariosByFormalRelationship: {
+        serviceName,
+        serviceFnName: "findRoadmapsAndScenariosByFormalRelationship",
+        description: "executes findRoadmapsAndScenariosByFormalRelationship [relatedEntityRef]"
+    }
 };
 
 

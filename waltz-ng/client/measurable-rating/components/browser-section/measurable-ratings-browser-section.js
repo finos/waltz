@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../../common';
-import template from './measurable-ratings-browser-section.html';
+import {initialiseData} from "../../../common";
+import template from "./measurable-ratings-browser-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 /**
@@ -30,7 +30,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -51,6 +51,12 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
             .then(r => vm.visibility.gridAvailable = r.data.length > 0);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.RoadmapStore.findRoadmapsAndScenariosByFormalRelationship,
+                [ vm.parentEntityRef ])
+            .then(r => vm.roadmapReferences = r.data);
     };
 
     vm.showGridView = () => {
@@ -66,7 +72,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -79,5 +85,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzMeasurableRatingsBrowserSection'
+    id: "waltzMeasurableRatingsBrowserSection"
 };

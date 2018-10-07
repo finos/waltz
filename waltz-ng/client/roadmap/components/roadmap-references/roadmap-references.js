@@ -1,4 +1,4 @@
-import template from "./roadmap-app-references.html";
+import template from "./roadmap-references.html";
 import {initialiseData} from "../../../common";
 
 
@@ -16,8 +16,6 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    global.vm = vm;
-
 }
 
 
@@ -32,6 +30,6 @@ const component = {
 
 
 export default {
-    id: "waltzRoadmapAppReferences",
+    id: "waltzRoadmapReferences",
     component
 };

@@ -54,8 +54,10 @@
 <!-- DESCRIPTION POPUP -->
 <script type="text/ng-template"
         id="wmrb/measurable-popover.html">
-    <h4 ng-bind="node.name"></h4>
-    <waltz-markdown text="node.description"></waltz-markdown>
+    <label ng-bind="node.name"></label>
+    <br>
+    <waltz-markdown class="small"
+                    text="node.description"></waltz-markdown>
     <hr>
     <div class="small">
         <table class="table table-condensed small">

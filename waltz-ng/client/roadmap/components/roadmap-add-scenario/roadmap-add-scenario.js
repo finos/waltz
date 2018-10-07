@@ -10,10 +10,8 @@ const bindings = {
 const initialState = {};
 
 
-function controller(serviceBroker) {
-
+function controller() {
     const vm = initialiseData(this, initialState);
-    global.vm = vm;
 }
 
 
