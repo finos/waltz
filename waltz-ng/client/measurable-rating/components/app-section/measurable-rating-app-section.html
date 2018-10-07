@@ -37,6 +37,11 @@
                            name="measurable_rating"
                            id="{{ tab.category.id + '_' +$id}}">
                     <label for="{{ tab.category.id + '_' +$id}}"
+                           uib-popover-template="'wmras-tab-popover.html'"
+                           popover-trigger="mouseenter"
+                           popover-append-to-body="true"
+                           popover-placement="top"
+                           popover-popup-delay="200"
                            ng-repeat-end
                            ng-bind="tab.category.name">
                     </label>
@@ -49,28 +54,20 @@
                                                        entity-reference="$ctrl.parentEntityRef"
                                                        measurables="tab.measurables"
                                                        ratings="tab.ratings"
-                                                       rating-scheme="tab.ratingScheme"
-                                                       overrides="$ctrl.overridesByMeasurableId">
+                                                       rating-scheme="tab.ratingScheme">
                         </waltz-measurable-rating-panel>
-
-                        <br>
-                        <waltz-markdown class="text-muted small"
-                                        text="tab.category.description">
-                        </waltz-markdown>
-
-                        <br>
-                        <hr>
-
-                        <!--PERSPECTIVE RATINGS-->
-                        <waltz-perspective-rating-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                        measurable-category="tab.category">
-                        </waltz-perspective-rating-panel>
                     </div>
-
                 </div>
             </div>
         </div>
 
+        <div ng-if="$ctrl.roadmapReferences.length > 0">
+            <hr>
+            <h4>Roadmaps</h4>
+            <p>This application appears in the following roadmap/scenarios</p>
+            <waltz-roadmap-app-references references="$ctrl.roadmapReferences">
+            </waltz-roadmap-app-references>
+        </div>
 
         <!-- NO DATA -->
         <div class="row"
@@ -95,3 +92,17 @@
     </div>
 
 </div>
+
+
+<script type="text/ng-template"
+        id="wmras-tab-popover.html">
+    <div class="small">
+        <strong ng-bind="tab.category.name">
+        </strong>
+        <div>
+            <hr>
+            <waltz-markdown text="tab.category.description">
+            </waltz-markdown>
+        </div>
+    </div>
+</script>

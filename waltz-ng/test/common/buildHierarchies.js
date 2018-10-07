@@ -11,8 +11,8 @@
  */
 
 
-import assert from 'assert';
-import { buildHierarchies } from '../../client/common/hierarchy-utils';
+import assert from "assert";
+import { buildHierarchies } from "../../client/common/hierarchy-utils";
 
 
 const ouA = {
@@ -48,28 +48,28 @@ const ouCycleB = {
     parentId: 4
 };
 
-describe('buildHierarchies', () => {
-    it('should give empty array when given no data', () => {
+describe("buildHierarchies", () => {
+    it("should give empty array when given no data", () => {
         assert.equal(0, buildHierarchies().length);
     });
 
-    it('should one back if only given one thing', () => {
+    it("should one back if only given one thing", () => {
         assert.equal(1, buildHierarchies([ouA]).length);
     });
 
-    it('gives back an element for each root', () => {
+    it("gives back an element for each root", () => {
         assert.equal(2, buildHierarchies([ouA, ouB]).length);
     });
 
-    it('builds hierarchies and only returns the roots', () => {
+    it("builds hierarchies and only returns the roots", () => {
         assert.equal(2, buildHierarchies([ouA, ouA1, ouA2, ouB]).length);
     });
 
-    it('handles bogus parents', () => {
+    it("handles bogus parents", () => {
         assert.equal(3, buildHierarchies([ouA, ouB, ouBogusParent]).length);
     });
 
-    it('ignores cycles', () => {
+    it("ignores cycles", () => {
         assert.equal(0, buildHierarchies([ouCycleA, ouCycleB]).length);
     });
 

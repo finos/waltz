@@ -1,0 +1,84 @@
+<div>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Roadmap</th>
+            <th>Scenario</th>
+            <th>State</th>
+            <th>Effective Date</th>
+        </tr>
+        </thead>
+        <tbody ng-repeat="ref in $ctrl.references">
+            <tr ng-repeat="scenario in ref.scenarios">
+                <td>
+                    <span ng-if="$first"
+                          uib-popover-template="'wrar-roadmap-popover.html'"
+                          popover-trigger="mouseenter"
+                          popover-append-to-body="true"
+                          popover-placement="top"
+                          ng-bind="ref.roadmap.name">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="scenario.name"
+                          uib-popover-template="'wrar-scenario-popover.html'"
+                          popover-trigger="mouseenter"
+                          popover-append-to-body="true"
+                          popover-placement="top">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="scenario.scenarioStatus | toDisplayName:'scenarioStatus'">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="scenario.effectiveDate">
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<script type="text/ng-template"
+        id="wrar-roadmap-popover.html">
+    <div class="small">
+        <h5>
+            <span ng-bind="ref.roadmap.name"></span>
+            <small>Roadmap</small>
+        </h5>
+
+        <waltz-markdown text="ref.roadmap.description">
+        </waltz-markdown>
+
+        <hr>
+
+        <label>Dimensions:</label>
+        <br>
+        <span ng-bind="ref.roadmap.columnType.name"></span>
+        /
+        <span ng-bind="ref.roadmap.rowType.name"></span>
+    </div>
+</script>
+
+
+<script type="text/ng-template"
+        id="wrar-scenario-popover.html">
+    <div class="small">
+        <h5>
+            <span ng-bind="scenario.name"></span>
+            <small>Scenario</small>
+        </h5>
+
+        <waltz-markdown text="scenario.description">
+        </waltz-markdown>
+
+        <hr>
+
+        <waltz-last-updated entity="scenario">
+        </waltz-last-updated>
+    </div>
+</script>

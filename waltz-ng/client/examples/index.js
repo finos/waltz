@@ -36,8 +36,6 @@ import DemoEndpointServerInformation from './demo-endpoint-server-information.ht
 import DemoEndpointCapability from './demo-endpoint-capability.html';
 import DemoEndpointAppCapability from './demo-endpoint-app-capability.html';
 import DemoEndpointOrgUnit from './demo-endpoint-organisational-unit.html';
-import DemoEndpointPerspective from './demo-endpoint-perspective.html';
-import DemoEndpointPerspectiveMeasurable from './demo-endpoint-perspective-measurable.html';
 import DemoEndpointInvolvement from './demo-endpoint-involvement.html';
 import DemoEndpointRoadmap from './waltz-roadmap.html';
 import DemoEndpointEngagement from './waltz-engagement.html';
@@ -167,14 +165,6 @@ export default () => {
                 .state('main.examples.endpoint-organisational-unit', {
                     url: '/organisational-unit',
                     views: { 'content@': {template: DemoEndpointOrgUnit } }
-                })
-                .state('main.examples.endpoint-perspective', {
-                    url: '/perspective',
-                    views: { 'content@': {template: DemoEndpointPerspective } }
-                })
-                .state('main.examples.endpoint-perspective-measurable', {
-                    url: '/perspective-measurable',
-                    views: { 'content@': {template: DemoEndpointPerspectiveMeasurable } }
                 })
                 .state('main.examples.endpoint-involvement', {
                     url: '/involvement',

@@ -66,6 +66,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
         registerAddAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
         registerRemoveAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
+
     }
 
 

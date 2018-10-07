@@ -6,6 +6,7 @@ import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.roadmap.Roadmap;
+import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.model.scenario.Scenario;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -65,7 +66,14 @@ public class RoadmapService {
         return roadmapDao.updateName(id, newName, userId);
     }
 
+
     public Scenario addScenario(long roadmapId, String name, String userId) {
         return scenarioDao.add(roadmapId, name, userId);
     }
+
+
+    public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
+        return roadmapDao.findRoadmapsAndScenariosByRatedEntity(ratedEntity);
+    }
+
 }

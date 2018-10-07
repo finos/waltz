@@ -779,4 +779,19 @@
 
     </changeSet>
 
+
+    <!-- 3429: x-refing apps to roadmap/scenarios -->
+    <changeSet id="20181006-3429-1"
+               author="davidwatkins73">
+        <comment> 3429: Index for x-refing apps to roadmap/scenarios </comment>
+        <createIndex indexName="idx_scenario_rating_domain"
+                     tableName="scenario_rating_item"
+                     unique="false">
+            <column name="domain_item_kind"
+                    type="${enum.type}"/>
+            <column name="domain_item_id"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

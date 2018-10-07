@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { initialiseData } from '../../../common';
-import { mkOverridesMap } from '../../../measurable-rating/measurable-rating-utils';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
 
-import template from './inline-measurable-rating-panel.html';
+import template from "./inline-measurable-rating-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    measurableCategoryRef: '<',
+    parentEntityRef: "<",
+    measurableCategoryRef: "<",
 };
 
 
@@ -35,9 +34,7 @@ const initialState = {
     measurableCategory: {},
     ratings: [],
     ratingSchemesById: {},
-    perspectiveRatings: [],
-    measurables: [],
-    overridesByMeasurableId: {}
+    measurables: []
 };
 
 
@@ -52,7 +49,7 @@ function controller($q, serviceBroker) {
 
         const ratingSchemesPromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
+            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
 
         const categoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.getById, [vm.measurableCategoryRef.id])
@@ -62,17 +59,10 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
             .then(r => vm.measurables = r.data);
 
-        const perspectiveRatingsPromise = serviceBroker
-            .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef], { force })
-            .then(r => vm.perspectiveRatings = r.data);
-
-        $q.all([perspectiveRatingsPromise, measurablesPromise])
-            .then(() => vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables));
-
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
                 vm.ratingScheme = vm.ratingSchemesById[vm.measurableCategory.ratingSchemeId];
-                console.log('got data: ', {parentRef: vm.parentEntityRef, cat: vm.measurableCategory, vm} );
+                console.log("got data: ", {parentRef: vm.parentEntityRef, cat: vm.measurableCategory, vm} );
             });
     };
 
@@ -84,8 +74,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -98,5 +88,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzInlineMeasurableRatingPanel'
+    id: "waltzInlineMeasurableRatingPanel"
 };

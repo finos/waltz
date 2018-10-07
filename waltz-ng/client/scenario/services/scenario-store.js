@@ -104,12 +104,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-
     const reorderAxis = (scenarioId, orientation, ids = []) => {
         return $http
             .post(`${BASE}/id/${scenarioId}/axis/${orientation}/reorder`, ids)
             .then(result => result.data);
     };
+
 
 
     return {
@@ -216,7 +216,7 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "reorderAxis",
         description: "executes reorderAxis [scenarioId, orientation, [ids...]]"
-    },
+    }
 };
 
 

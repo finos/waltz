@@ -33,19 +33,17 @@ import template from "./measurable-rating-panel.html";
 
 
 const bindings = {
-    category: '<',
-    entityReference: '<',
-    ratings: '<',
-    ratingScheme: '<',
-    measurables: '<',
-    overrides: '<'
+    category: "<",
+    entityReference: "<",
+    ratings: "<",
+    ratingScheme: "<",
+    measurables: "<",
 };
 
 
 const initialState = {
     measurables: [],
     ratings: [],
-    overrides: [],
     selected: null
 };
 
@@ -56,18 +54,13 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = () => {
-        vm.overriddenMeasurableIds = _.map(
-            _.keys(vm.overrides || {}),
-            Number);
-
-        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), 'rating');
+        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
     };
 
     vm.onSelect = (measurable, rating) =>
         vm.selected = {
             measurable,
             rating,
-            overrides: vm.overrides[measurable.id]
         };
 }
 

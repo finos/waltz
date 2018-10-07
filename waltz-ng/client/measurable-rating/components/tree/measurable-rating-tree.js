@@ -34,7 +34,6 @@ const bindings = {
     ratings: "<",
     ratingScheme: "<",
     measurables: "<",
-    overrides: "<",
     onKeypress: "<",
     onSelect: "<",
     scrollHeight: "@" // should correspond to numeric values in `waltz-scroll-region` classes

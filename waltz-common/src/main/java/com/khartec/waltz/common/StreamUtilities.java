@@ -65,6 +65,13 @@ public class StreamUtilities {
     }
 
 
+    public static <T> Stream<T> concat(Stream<T>... streams) {
+        return Stream.of(streams)
+                .reduce(Stream.empty(),
+                        (acc, s) -> Stream.concat(acc, s));
+    }
+
+
     public static class Siphon<T> implements Predicate<T> {
         private final Predicate<T> pred;
         private final List<T> results = new ArrayList();

@@ -21,7 +21,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import { determineStartingTab, mkOverridesMap, mkTabs } from "../../measurable-rating-utils";
+import { determineStartingTab, mkTabs } from "../../measurable-rating-utils";
 
 
 /**
@@ -35,14 +35,13 @@ import { determineStartingTab, mkOverridesMap, mkTabs } from "../../measurable-r
  */
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
 const initialState = {
     categories: [],
     ratings: [],
-    perspectiveRatings: [],
     measurables: [],
     visibility: {
         editor: false,
@@ -63,13 +62,19 @@ function controller($q, serviceBroker) {
 
     const loadData = (force = false) => {
 
+        const f = serviceBroker
+            .loadViewData(
+                CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
+                [ vm.parentEntityRef ])
+            .then(r => vm.roadmapReferences = r.data);
+
         const ratingsPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
             .then(r => vm.ratings = r.data);
 
         const ratingSchemesPromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, 'id'));
+            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
 
         const categoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
@@ -78,13 +83,6 @@ function controller($q, serviceBroker) {
         const measurablesPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
             .then(r => vm.measurables = r.data);
-
-        const perspectiveRatingsPromise = serviceBroker
-            .loadViewData(CORE_API.PerspectiveRatingStore.findForEntity, [vm.parentEntityRef], { force })
-            .then(r => vm.perspectiveRatings = r.data);
-
-        $q.all([perspectiveRatingsPromise, measurablesPromise])
-            .then(() => vm.overridesByMeasurableId = mkOverridesMap(vm.perspectiveRatings, vm.measurables));
 
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
@@ -105,8 +103,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 

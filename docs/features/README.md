@@ -8,7 +8,6 @@
 - [Entity Relationship](entity_relationship/README.md)
 - [Entity Notes](entity_notes/README.md)
 - [Organisational Units](org_units/README.md)
-- [Perspectives](perspectives/README.md)
 - [Physical Flows](physical_flows/README.md)
 - [Server / Database Information](servers_and_databases/README.md)
 - [Surveys](surveys/README.md)

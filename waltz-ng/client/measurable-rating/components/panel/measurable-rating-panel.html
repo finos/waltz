@@ -2,7 +2,6 @@
     <div class="col-sm-6">
         <waltz-measurable-rating-tree ratings="$ctrl.ratings"
                                       rating-scheme="$ctrl.ratingScheme"
-                                      overrides="$ctrl.overriddenMeasurableIds"
                                       on-select="$ctrl.onSelect"
                                       measurables="$ctrl.measurables">
         </waltz-measurable-rating-tree>
@@ -13,20 +12,16 @@
         <div ng-if="$ctrl.selected == null"
              class="waltz-fade-if text-muted">
             Please select an item on the tree to see more detail.
-            <br>
-            <br>
-            Items flagged with an asterisk indicate that the rating is subject to additional
-            refinement when combined with other viewpoints.
         </div>
 
         <div ng-if="$ctrl.selected != null"
              class="waltz-fade-if">
             <div>
                 <h4>
-                    <span ng-bind="$ctrl.selected.measurable.name"></span>
-                    <a class='small clickable'
+                    <a class='clickable'
+                       style="font-weight: lighter;"
                        ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
-                        (more &raquo;)
+                        <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
                 </h4>
 
@@ -78,18 +73,5 @@
                 </div>
             </div>
         </div>
-        <div ng-if="$ctrl.selected.overrides"
-             class="waltz-fade-if">
-            <hr>
-            <h5>Overrides</h5>
-
-            <waltz-perspective-overrides overrides="$ctrl.selected.overrides"
-                                         entity-reference="$ctrl.entityReference"
-                                         base-measurable="$ctrl.selected.measurable"
-                                         base-rating="$ctrl.selected.rating.rating"
-                                         rag-names="$ctrl.category.ragNames">
-            </waltz-perspective-overrides>
-        </div>
-
     </div>
 </div>

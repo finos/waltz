@@ -14,10 +14,10 @@ public abstract class Scenario implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        EntityLifecycleStatusProvider {
 
     public abstract long roadmapId();
-    public abstract ReleaseLifecycleStatus lifecycleStatus();
     public abstract LocalDate effectiveDate();
     public abstract ScenarioStatus scenarioStatus();
 
