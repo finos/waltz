@@ -61,35 +61,12 @@
             </div>
         </div>
 
-        <div>
+        <div ng-if="$ctrl.roadmapReferences.length > 0">
             <hr>
             <h4>Roadmaps</h4>
             <p>This application appears in the following roadmap/scenarios</p>
-            <table class="table table-condensed">
-                <thead>
-                <tr>
-                    <th>Roadmap</th>
-                    <th>Current State Scenarios</th>
-                    <th>Interim State Scenarios</th>
-                    <th>Target State Scenarios</th>
-                </tr>
-                </thead>
-                <tr>
-                    <td>
-                        Finance
-                    </td>
-                    <td>
-                        Current State
-                    </td>
-                    <td>
-                        Hard Brexit
-                        Soft Brexit
-                    </td>
-                    <td>
-                        Future State
-                    </td>
-
-            </table>
+            <waltz-roadmap-app-references references="$ctrl.roadmapReferences">
+            </waltz-roadmap-app-references>
         </div>
 
         <!-- NO DATA -->

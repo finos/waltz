@@ -5,6 +5,7 @@ import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.roadmap.ImmutableRoadmap;
 import com.khartec.waltz.model.roadmap.ImmutableRoadmapAndScenarioOverview;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -151,12 +153,13 @@ public class RoadmapDao {
                 .stream()
                 .map(t -> t.v2)
                 .distinct()
-                .collect(groupingBy(s -> s.roadmapId()));
+                .collect(groupingBy(Scenario::roadmapId));
 
         return roadmapScenarioTuples
                 .stream()
                 .map(t -> t.v1)
                 .distinct()
+                .sorted(Comparator.comparing(NameProvider::name))
                 .map(r -> ImmutableRoadmapAndScenarioOverview
                         .builder()
                         .roadmap(r)

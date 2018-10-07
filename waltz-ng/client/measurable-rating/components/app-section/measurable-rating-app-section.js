@@ -66,7 +66,7 @@ function controller($q, serviceBroker) {
             .loadViewData(
                 CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
                 [ vm.parentEntityRef ])
-            .then(r => console.log("Scenarios and stuff = ", r.data))
+            .then(r => vm.roadmapReferences = r.data);
 
         const ratingsPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
