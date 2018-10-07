@@ -20,7 +20,7 @@
 
 import angular from "angular";
 import RoadmapsPanel from "./components/panel/roadmaps-panel";
-import RoadmapAppReferences from "./components/roadmap-app-references/roadmap-app-references";
+import RoadmapReferences from "./components/roadmap-references/roadmap-references";
 import RoadmapsList from "./components/list/roadmaps-list";
 import RoadmapAddScenario from "./components/roadmap-add-scenario/roadmap-add-scenario";
 import RoadmapScenarioConfig from "./components/roadmap-scenario-config/roadmap-scenario-config";
@@ -35,7 +35,7 @@ export default () => {
 
     registerComponents(module, [
         RoadmapAddScenario,
-        RoadmapAppReferences,
+        RoadmapReferences,
         RoadmapScenarioAxisConfig,
         RoadmapScenarioConfig,
         RoadmapScenarioDiagram,

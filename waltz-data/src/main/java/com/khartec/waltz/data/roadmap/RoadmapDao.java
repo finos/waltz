@@ -6,7 +6,6 @@ import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.roadmap.ImmutableRoadmap;
 import com.khartec.waltz.model.roadmap.ImmutableRoadmapAndScenarioOverview;
 import com.khartec.waltz.model.roadmap.Roadmap;
@@ -14,6 +13,7 @@ import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.schema.tables.records.RoadmapRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
+import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
@@ -109,44 +110,48 @@ public class RoadmapDao {
     }
 
 
+    public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
+        SelectConditionStep<Record1<Long>> scenarioSelector = DSL
+                .select(SCENARIO_RATING_ITEM.SCENARIO_ID)
+                .from(SCENARIO_RATING_ITEM)
+                .where(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(ratedEntity.kind().name()))
+                .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(ratedEntity.id()));
+
+        return findRoadmapsAndScenariosViaScenarioSelector(
+                scenarioSelector);
+    }
+
+
+    public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByFormalRelationship(EntityReference relatedEntity) {
+
+        SelectConditionStep<Record1<Long>> scenarioSelector = DSL
+                .select(SCENARIO.ID)
+                .from(SCENARIO)
+                .innerJoin(ENTITY_RELATIONSHIP)
+                .on(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ROADMAP.name()).and(ENTITY_RELATIONSHIP.ID_B.eq(SCENARIO.ROADMAP_ID)))
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(relatedEntity.kind().name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()));
+
+        return findRoadmapsAndScenariosViaScenarioSelector(scenarioSelector);
+
+    }
+
+
     // -- helpers
 
-    private SelectJoinStep<Record> baseSelect() {
-        return dsl
-                .select(ROW_TYPE_NAME, COLUMN_KIND_NAME)
-                .select(ROADMAP.fields())
-                .from(ROADMAP);
-    }
-
-
-    private <T> int updateField(long id, Field<T> field, T value, String userId) {
-        return dsl
-                .update(ROADMAP)
-                .set(field, value)
-                .set(ROADMAP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .set(ROADMAP.LAST_UPDATED_BY, userId)
-                .where(ROADMAP.ID.eq(id))
-                .execute();
-    }
-
-
-    public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
-
-        Stream<Field<?>> fields = StreamUtilities.concat(
+    private List<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaScenarioSelector(Select<Record1<Long>> scenarioSelector) {
+        List<Field<?>> fields = StreamUtilities.concat(
                 ROADMAP.fieldStream(),
                 SCENARIO.fieldStream(),
-                Stream.of(ROW_TYPE_NAME, COLUMN_KIND_NAME));
+                Stream.of(ROW_TYPE_NAME, COLUMN_KIND_NAME))
+                .collect(Collectors.toList());
 
         List<Tuple2<Roadmap, Scenario>> roadmapScenarioTuples = dsl
-                .selectDistinct(fields.collect(Collectors.toList()))
+                .selectDistinct(fields)
                 .from(ROADMAP)
                 .innerJoin(SCENARIO)
                 .on(SCENARIO.ROADMAP_ID.eq(ROADMAP.ID))
-                .innerJoin(SCENARIO_RATING_ITEM)
-                .on(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(SCENARIO.ID))
-                .where(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(ratedEntity.kind().name()))
-                .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(ratedEntity.id()))
-                .and(SCENARIO.LIFECYCLE_STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                .where(SCENARIO.ID.in(scenarioSelector))
                 .fetch(r -> Tuple.tuple(TO_DOMAIN_MAPPER.map(r), ScenarioDao.TO_DOMAIN_MAPPER.map(r)));
 
         Map<Long, List<Scenario>> scenariosByRoadmapId = roadmapScenarioTuples
@@ -167,4 +172,24 @@ public class RoadmapDao {
                         .build())
                 .collect(toList());
     }
+
+
+    private SelectJoinStep<Record> baseSelect() {
+        return dsl
+                .select(ROW_TYPE_NAME, COLUMN_KIND_NAME)
+                .select(ROADMAP.fields())
+                .from(ROADMAP);
+    }
+
+
+    private <T> int updateField(long id, Field<T> field, T value, String userId) {
+        return dsl
+                .update(ROADMAP)
+                .set(field, value)
+                .set(ROADMAP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ROADMAP.LAST_UPDATED_BY, userId)
+                .where(ROADMAP.ID.eq(id))
+                .execute();
+    }
+
 }

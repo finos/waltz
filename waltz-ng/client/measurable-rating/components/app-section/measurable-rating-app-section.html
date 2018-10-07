@@ -61,12 +61,19 @@
             </div>
         </div>
 
-        <div ng-if="$ctrl.roadmapReferences.length > 0">
-            <hr>
-            <h4>Roadmaps</h4>
-            <p>This application appears in the following roadmap/scenarios</p>
-            <waltz-roadmap-app-references references="$ctrl.roadmapReferences">
-            </waltz-roadmap-app-references>
+        <div ng-if="$ctrl.roadmapReferences.length > 0"
+             style="margin-top: 12px">
+            <waltz-sub-section name="Roadmaps">
+                <content>
+                    <div style="margin: 8px">
+                        <p class="help-block">
+                            This application appears in the following roadmap/scenarios
+                        </p>
+                        <waltz-roadmap-references references="$ctrl.roadmapReferences">
+                        </waltz-roadmap-references>
+                    </div>
+                </content>
+            </waltz-sub-section>
         </div>
 
         <!-- NO DATA -->

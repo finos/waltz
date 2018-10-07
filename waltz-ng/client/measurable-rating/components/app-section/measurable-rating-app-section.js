@@ -62,7 +62,7 @@ function controller($q, serviceBroker) {
 
     const loadData = (force = false) => {
 
-        const f = serviceBroker
+        serviceBroker
             .loadViewData(
                 CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
                 [ vm.parentEntityRef ])
