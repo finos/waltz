@@ -1,14 +1,13 @@
 package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.ImmutableScenario;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioStatus;
 import com.khartec.waltz.schema.tables.records.ScenarioRecord;
 import org.jooq.*;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -20,16 +19,12 @@ import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.*;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
-import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class ScenarioDao {
 
-    private static final RecordMapper<? super Record, Scenario> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<? super Record, Scenario> TO_DOMAIN_MAPPER = r -> {
         ScenarioRecord record = r.into(ScenarioRecord.class);
         return ImmutableScenario.builder()
                 .id(record.getId())
@@ -195,20 +190,4 @@ public class ScenarioDao {
                 .execute();
     }
 
-
-    public Collection<Tuple2<EntityReference, EntityReference>> findScenarioAndRoadmapsByRatedEntity(EntityReference ratedEntity) {
-        return dsl
-                .selectDistinct(ROADMAP.ID, ROADMAP.NAME, SCENARIO.ID, SCENARIO.NAME)
-                .from(ROADMAP)
-                .innerJoin(SCENARIO)
-                    .on(SCENARIO.ROADMAP_ID.eq(ROADMAP.ID))
-                .innerJoin(SCENARIO_RATING_ITEM)
-                    .on(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(SCENARIO.ID))
-                .where(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(ratedEntity.kind().name()))
-                .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(ratedEntity.id()))
-                .and(SCENARIO.LIFECYCLE_STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
-                .fetch(r -> tuple(
-                        mkRef(EntityKind.ROADMAP, r.get(ROADMAP.ID), r.get(ROADMAP.NAME)),
-                        mkRef(EntityKind.SCENARIO, r.get(SCENARIO.ID), r.get(SCENARIO.NAME))));
-    }
 }

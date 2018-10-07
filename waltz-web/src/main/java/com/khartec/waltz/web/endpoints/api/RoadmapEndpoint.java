@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class RoadmapEndpoint implements Endpoint {
@@ -33,7 +31,16 @@ public class RoadmapEndpoint implements Endpoint {
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerAddScenario(mkPath(BASE_URL, "id", ":id", "add-scenario"));
+        registerFindRoadmapsAndScenariosByRatedEntity(mkPath(BASE_URL, "by-rated-entity", ":kind", ":id"));
     }
+
+
+    private void registerFindRoadmapsAndScenariosByRatedEntity(String path) {
+        getForList(path, (request, response) ->
+                roadmapService.findRoadmapsAndScenariosByRatedEntity(
+                        getEntityReference(request)));
+    }
+
 
 
     private void registerAddScenario(String path) {

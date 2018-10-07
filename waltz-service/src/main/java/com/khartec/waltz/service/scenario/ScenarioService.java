@@ -13,7 +13,6 @@ import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.model.scenario.ScenarioStatus;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,9 +130,5 @@ public class ScenarioService {
                 scenarioId,
                 orientation,
                 orderedIds);
-    }
-
-    public Collection<Tuple2<EntityReference, EntityReference>> findScenarioAndRoadmapsByRatedEntity(EntityReference ratedEntity) {
-        return scenarioDao.findScenarioAndRoadmapsByRatedEntity(ratedEntity);
     }
 }

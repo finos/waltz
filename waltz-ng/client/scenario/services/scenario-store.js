@@ -110,11 +110,6 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const findScenarioAndRoadmapsByRatedEntity = (ratedEntity) => {
-        return $http
-            .get(`${BASE}/by-rated-entity/${ratedEntity.kind}/${ratedEntity.id}`)
-            .then(result => result.data);
-    };
 
 
     return {
@@ -132,8 +127,7 @@ function store($http, baseUrl) {
         addAxisItem,
         removeAxisItem,
         loadAxis,
-        reorderAxis,
-        findScenarioAndRoadmapsByRatedEntity
+        reorderAxis
     };
 }
 
@@ -222,12 +216,7 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "reorderAxis",
         description: "executes reorderAxis [scenarioId, orientation, [ids...]]"
-    },
-    findScenarioAndRoadmapsByRatedEntity: {
-        serviceName,
-        serviceFnName: "findScenarioAndRoadmapsByRatedEntity",
-        description: "executes findScenarioAndRoadmapsByRatedEntity [ratedEntityRef]"
-    },
+    }
 };
 
 

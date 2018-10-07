@@ -64,7 +64,7 @@ function controller($q, serviceBroker) {
 
         const f = serviceBroker
             .loadViewData(
-                CORE_API.ScenarioStore.findScenarioAndRoadmapsByRatedEntity,
+                CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
                 [ vm.parentEntityRef ])
             .then(r => console.log("Scenarios and stuff = ", r.data))
 

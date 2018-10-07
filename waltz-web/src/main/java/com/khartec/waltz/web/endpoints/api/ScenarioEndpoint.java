@@ -67,14 +67,6 @@ public class ScenarioEndpoint implements Endpoint {
         registerAddAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
         registerRemoveAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
 
-        registerFindScenarioAndRoadmapsByRatedEntity(mkPath(BASE_URL, "by-rated-entity", ":kind", ":id"));
-    }
-
-
-    private void registerFindScenarioAndRoadmapsByRatedEntity(String path) {
-        getForList(path, (request, response) ->
-                scenarioService.findScenarioAndRoadmapsByRatedEntity(
-                        getEntityReference(request)));
     }
 
 
