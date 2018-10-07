@@ -37,6 +37,11 @@
                            name="measurable_rating"
                            id="{{ tab.category.id + '_' +$id}}">
                     <label for="{{ tab.category.id + '_' +$id}}"
+                           uib-popover-template="'wmras-tab-popover.html'"
+                           popover-trigger="mouseenter"
+                           popover-append-to-body="true"
+                           popover-placement="top"
+                           popover-popup-delay="200"
                            ng-repeat-end
                            ng-bind="tab.category.name">
                     </label>
@@ -51,11 +56,6 @@
                                                        ratings="tab.ratings"
                                                        rating-scheme="tab.ratingScheme">
                         </waltz-measurable-rating-panel>
-
-                        <br>
-                        <waltz-markdown class="text-muted small"
-                                        text="tab.category.description">
-                        </waltz-markdown>
                     </div>
                 </div>
             </div>
@@ -92,3 +92,17 @@
     </div>
 
 </div>
+
+
+<script type="text/ng-template"
+        id="wmras-tab-popover.html">
+    <div class="small">
+        <strong ng-bind="tab.category.name">
+        </strong>
+        <div>
+            <hr>
+            <waltz-markdown text="tab.category.description">
+            </waltz-markdown>
+        </div>
+    </div>
+</script>
