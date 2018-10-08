@@ -1,6 +1,26 @@
 
 
 <div>
+    <p class="help-block">
+        <span ng-if="$ctrl.mode === 'VIEW'">
+            You are currently viewing this scenario.
+            <br>
+            <a ng-click="$ctrl.mode = 'EDIT'"
+               class="clickable">
+                Switch to edit mode
+            </a>
+            (also available via context menu).
+        </span>
+
+        <span ng-if="$ctrl.mode === 'EDIT'"
+              class="clickable">
+            You are currently editing this scenario. Use the context menu to add applications, change ratings and update descriptions.
+            <br>
+            <a ng-click="$ctrl.mode = 'VIEW'">
+                Switch back to view mode.
+            </a>
+        </span>
+    </p>
 
     <!-- VIZ -->
     <waltz-scenario-diagram row-data="$ctrl.vizData.rowData"
@@ -8,7 +28,6 @@
                             row-headings="$ctrl.vizData.rowHeadings"
                             handlers="$ctrl.handlers">
     </waltz-scenario-diagram>
-
 </div>
 
 

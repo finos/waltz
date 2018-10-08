@@ -26,8 +26,8 @@ public class ScenarioRatingItemService {
         return scenarioRatingItemDao.findForScenarioId(scenarioId);
     }
 
-    public boolean remove(long scenarioId, long appId, long columnId, long rowId) {
-        return scenarioRatingItemDao.remove(scenarioId, appId, columnId, rowId);
+    public boolean remove(long scenarioId, long appId, long columnId, long rowId, String userId) {
+        return scenarioRatingItemDao.remove(scenarioId, appId, columnId, rowId, userId);
     }
 
     public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {

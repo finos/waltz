@@ -147,6 +147,7 @@ public class LogicalFlowDecoratorService {
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
+            case SCENARIO:
                 return findByAppIdSelector(options);
             case DATA_TYPE:
                 return findByDataTypeIdSelector(options);

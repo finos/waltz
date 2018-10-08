@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
+import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 
 @Repository
@@ -91,16 +92,24 @@ public class ScenarioRatingItemDao {
     }
 
 
-    public boolean remove(long scenarioId, long appId, long columnId, long rowId) {
-        return dsl
+    public boolean remove(long scenarioId, long appId, long columnId, long rowId, String userId) {
+
+        boolean rc = dsl
                 .deleteFrom(SCENARIO_RATING_ITEM)
                 .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
                 .execute() == 1;
+
+        if (rc) {
+            updateScenarioTimestamp(scenarioId, userId);
+        }
+
+        return rc;
     }
 
 
     public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {
-        return dsl
+
+        boolean rc = dsl
                 .insertInto(SCENARIO_RATING_ITEM)
                 .set(SCENARIO_RATING_ITEM.SCENARIO_ID, scenarioId)
                 .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID, appId)
@@ -114,11 +123,17 @@ public class ScenarioRatingItemDao {
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .execute() == 1;
+
+        if (rc) {
+            updateScenarioTimestamp(scenarioId, userId);
+        }
+
+        return rc;
     }
 
 
     public boolean updateRating(long scenarioId, long appId, long columnId, long rowId, char rating, String comment, String userId) {
-        return dsl
+        boolean rc = dsl
                 .update(SCENARIO_RATING_ITEM)
                 .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(rating))
                 .set(SCENARIO_RATING_ITEM.DESCRIPTION, comment)
@@ -126,8 +141,16 @@ public class ScenarioRatingItemDao {
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
                 .execute() == 1;
+
+        if (rc) {
+            updateScenarioTimestamp(scenarioId, userId);
+        }
+
+        return rc;
     }
 
+
+    // -- helpers
 
     private Condition mkCoordinatesCondition(long scenarioId, long appId, long columnId, long rowId) {
         return SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(appId)
@@ -135,4 +158,14 @@ public class ScenarioRatingItemDao {
                 .and(SCENARIO_RATING_ITEM.ROW_ID.eq(rowId))
                 .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(columnId));
     }
+
+
+    private void updateScenarioTimestamp(long scenarioId, String userId) {
+        dsl.update(SCENARIO)
+                .set(SCENARIO.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(SCENARIO.LAST_UPDATED_BY, userId)
+                .where(SCENARIO.ID.eq(scenarioId))
+                .execute();
+    }
+
 }
