@@ -66,6 +66,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
             case APP_GROUP:
             case APPLICATION:
             case MEASURABLE:
+            case SCENARIO:
                 return mkForRef(options);
             case PERSON:
                 return mkForPerson(options);

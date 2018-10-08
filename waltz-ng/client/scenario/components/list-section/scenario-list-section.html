@@ -1,0 +1,59 @@
+
+<waltz-section name="Scenarios">
+    <!-- NO DATA -->
+
+    <div ng-switch="$ctrl.visibility.mode">
+
+        <div ng-switch-when="LOADING">
+            <waltz-loading-notification name="Loading scenarios">
+            </waltz-loading-notification>
+        </div>
+
+
+        <div ng-switch-when="LIST">
+            <waltz-no-data ng-if="! $ctrl.scenarios">
+                <message>
+                    <strong>No Scenarios</strong> associated with this roadmap
+                </message>
+            </waltz-no-data>
+
+            <waltz-scenario-list scenarios="$ctrl.scenarios"
+                                 on-add-scenario="$ctrl.onAddScenario"
+                                 on-select-scenario="$ctrl.onSelectScenario"
+                                 on-clone-scenario="$ctrl.onCloneScenario"
+                                 on-configure-scenario="$ctrl.onConfigureScenario">
+            </waltz-scenario-list>
+
+
+            <p class="help-block">
+                Scenarios are used to show possible future states
+            </p>
+        </div>
+
+
+        <!-- SCENARIO: configure -->
+        <div ng-switch-when="CONFIGURE_SCENARIO">
+            <waltz-roadmap-scenario-config scenario-id="$ctrl.selectedScenario.id"
+                                           on-save-scenario-description="$ctrl.onSaveScenarioDescription"
+                                           on-save-scenario-name="$ctrl.onSaveScenarioName"
+                                           on-save-scenario-effective-date="$ctrl.onSaveScenarioEffectiveDate"
+                                           on-save-scenario-status="$ctrl.onSaveScenarioStatus"
+                                           on-add-axis-item="$ctrl.onAddAxisItem"
+                                           on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                           on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                           on-reposition-axis-items="$ctrl.onRepositionAxisItems"
+                                           on-cancel="$ctrl.onCancel">
+            </waltz-roadmap-scenario-config>
+        </div>
+
+
+        <!-- SCENARIO: add -->
+        <div ng-switch-when="ADD_SCENARIO">
+            <waltz-roadmap-add-scenario roadmap="$ctrl.selectedRoadmap"
+                                        on-cancel="$ctrl.onCancel">
+            </waltz-roadmap-add-scenario>
+        </div>
+
+    </div>
+
+</waltz-section>

@@ -21,13 +21,26 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import ScenarioStore from "./services/scenario-store";
+import ScenarioView from "./pages/view/scenario-view";
+import ScenarioHeader from "./components/header/scenario-header";
 import ScenarioDiagram from "./components/scenario-diagram/scenario-diagram";
+import ScenarioList from "./components/list/scenario-list";
+import ScenarioListSection from "./components/list-section/scenario-list-section";
+import Routes from "./routes";
 
 
 export default () => {
     const module = angular.module("waltz.scenario", []);
 
-    registerComponents(module, [ ScenarioDiagram ]);
+    module
+        .config(Routes);
+
+    registerComponents(module, [
+        ScenarioDiagram,
+        ScenarioHeader,
+        ScenarioList,
+        ScenarioListSection,
+        ScenarioView ]);
 
     registerStores(module, [ ScenarioStore ]);
 

@@ -31,6 +31,7 @@ export function getDefaultScopeForEntityKind(kind) {
         case "LOGICAL_FLOW":
         case "PHYSICAL_FLOW":
         case "PHYSICAL_SPECIFICATION":
+        case "SCENARIO":
             return "EXACT";
         default:
             return "CHILDREN";

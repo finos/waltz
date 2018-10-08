@@ -47,7 +47,6 @@ function drawColumnHeaders(holder, headerData, layout) {
     const newHeaders = headers
         .enter()
         .append("text")
-        .attr("foo", (d,i) => console.log({d, headerData, layout, w: layout.colWidths[i]}))
         .text((d, i) => layout.colWidths[i] < 1 ? truncate(d.name, 14, "...") : d.name)
         .classed(AXIS_STYLES.header, true);
 

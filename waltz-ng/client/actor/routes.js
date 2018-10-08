@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actorView from './pages/actor-view/actor-view';
+import actorView from "./pages/actor-view/actor-view";
 
 
 const baseState = {
@@ -25,19 +25,19 @@ const baseState = {
 
 
 const viewState = {
-    url: 'actor/{id:int}',
-    views: { 'content@': actorView }
+    url: "actor/{id:int}",
+    views: { "content@": actorView }
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.actor', baseState)
-        .state('main.actor.view', viewState);
+        .state("main.actor", baseState)
+        .state("main.actor.view", viewState);
 }
 
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

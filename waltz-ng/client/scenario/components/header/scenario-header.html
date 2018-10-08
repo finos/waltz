@@ -1,0 +1,166 @@
+<waltz-page-header name="{{ $ctrl.scenario.name }}"
+                   xx-icon="sitemap"
+                   small="Scenario">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li>Roadmaps</li>
+        <li>
+            <a ui-sref="main.roadmap.view ({ id: $ctrl.roadmap.id })">
+                <span ng-bind="$ctrl.roadmap.name">
+                </span>
+            </a>
+        </li>
+        <li><span ng-bind="$ctrl.scenario.name"></span></li>
+    </ol>
+</waltz-page-header>
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- NO DATA -->
+
+    <div ng-switch="$ctrl.visibility.mode">
+
+        <div ng-switch-when="LOADING">
+            <waltz-loading-notification name="Loading scenario">
+            </waltz-loading-notification>
+        </div>
+
+        <div ng-switch-when="CONFIGURE_SCENARIO">
+            <waltz-sub-section name="Configure">
+                <content>
+                    <div style="padding:8px">
+                        <waltz-roadmap-scenario-config scenario-id="$ctrl.scenario.id"
+                                                       on-save-scenario-description="$ctrl.onSaveScenarioDescription"
+                                                       on-save-scenario-name="$ctrl.onSaveScenarioName"
+                                                       on-save-scenario-effective-date="$ctrl.onSaveScenarioEffectiveDate"
+                                                       on-save-scenario-status="$ctrl.onSaveScenarioStatus"
+                                                       on-add-axis-item="$ctrl.onAddAxisItem"
+                                                       on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                                       on-remove-axis-item="$ctrl.onRemoveAxisItem"
+                                                       on-reposition-axis-items="$ctrl.onRepositionAxisItems"
+                                                       on-cancel="$ctrl.onCancel">
+                        </waltz-roadmap-scenario-config>
+                    </div>
+                    <div class="waltz-sub-section-controls">
+                        <span>
+                            <a ng-click="$ctrl.onCancel()"
+                               class="clickable">
+                                Close
+                            </a>
+                        </span>
+                    </div>
+                </content>
+            </waltz-sub-section>
+
+        </div>
+
+        <div ng-switch-when="VIEW">
+
+            <div class="row">
+                <div class="col-sm-8">
+                    <waltz-sub-section name="Overview">
+                        <content>
+                            <div style="padding: 8px">
+                                <!-- name -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Name:</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span ng-bind="$ctrl.scenario.name"></span>
+                                    </div>
+                                </div>  <!-- /name -->
+
+
+                                <!-- target date -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Effective Date:</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span ng-bind="$ctrl.scenario.effectiveDate"></span>
+                                    </div>
+                                </div>
+
+                                <!-- status -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Status:</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <span ng-bind="$ctrl.scenario.scenarioStatus | toDisplayName:'scenarioStatus'"></span>
+                                    </div>
+                                </div>
+
+                                <!-- description -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Description:</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <waltz-markdown text="$ctrl.scenario.description">
+                                        </waltz-markdown>
+                                    </div>
+                                </div>
+                            </div>
+                             <!-- /desc -->
+
+                            <div class="waltz-sub-section-controls">
+                                <span>
+                                    <a ng-click="$ctrl.onConfigureScenario()"
+                                       class="clickable">
+                                        Configure
+                                    </a>
+                                </span>
+                            </div>
+                        </content>
+                    </waltz-sub-section>
+                </div>
+                <div class="col-sm-4">
+                    <waltz-sub-section name="Owning Roadmap">
+                        <content>
+                            <div style="padding:8px">
+                                <table class="waltz-mini-table">
+                                    <tr>
+                                        <td><label>Name:</label></td>
+                                        <td>
+                                            <a ui-sref="main.roadmap.view ({id: $ctrl.roadmap.id })">
+                                                <span ng-bind="$ctrl.roadmap.name"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Description:</label></td>
+                                        <td><waltz-markdown text="$ctrl.roadmap.description"></waltz-markdown></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </content>
+                    </waltz-sub-section>
+                </div>
+            </div>
+
+            <br>
+
+            <waltz-sub-section name="Diagram">
+                <content>
+                    <div style="padding: 8px">
+                        <waltz-roadmap-scenario-diagram scenario-id="$ctrl.scenarioId">
+                        </waltz-roadmap-scenario-diagram>
+                    </div>
+                </content>
+            </waltz-sub-section>
+
+        </div> <!--  mode: VIEW -->
+
+
+    </div>
+
+    <br>
+
+    <waltz-dynamic-section-navigation available-sections="$ctrl.availableSections"
+                                      open-sections="$ctrl.sections"
+                                      on-select="$ctrl.onAddSection"
+                                      offset="650">
+    </waltz-dynamic-section-navigation>
+</div>
