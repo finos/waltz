@@ -321,5 +321,17 @@ export const dynamicSectionsByKind = {
         dynamicSections.relatedDataTypesSection,
         dynamicSections.relatedMeasurablesSection,
         dynamicSections.changeLogSection
+    ],
+    "SCENARIO": [
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.appsSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.complexitySection,
+        dynamicSections.technologySummarySection,
+        dynamicSections.assetCostsSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.changeLogSection
     ]
 };

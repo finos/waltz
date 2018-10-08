@@ -26,11 +26,11 @@ import {rgb} from "d3-color";
 export const dyamicSectionNavigationDefaultOffset = 250;
 
 const bindings = {
-    availableSections: '<',
-    openSections: '<',
-    parentEntityRef: '<',
-    onSelect: '<',
-    offset: '@?'
+    availableSections: "<",
+    openSections: "<",
+    parentEntityRef: "<",
+    onSelect: "<",
+    offset: "@?"
 };
 
 
@@ -38,7 +38,7 @@ const initialState = {
     sections: [],
     offset: dyamicSectionNavigationDefaultOffset,
     stickyVisible: false,
-    onSelect: (w) => console.log('default on-select handler for dynamic-section-navigation: ', w),
+    onSelect: (w) => console.log("default on-select handler for dynamic-section-navigation: ", w),
 };
 
 
@@ -47,7 +47,7 @@ function controller($scope,
     const vm = initialiseData(this, initialState);
 
     const colorScale = scaleLinear()
-        .range([rgb('#ffc46e'), rgb('#ffffff')]);
+        .range([rgb("#ffc46e"), rgb("#ffffff")]);
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
@@ -70,7 +70,7 @@ function controller($scope,
     vm.$onChanges = () => {
         const fadeFactor = 2.5;
         colorScale
-            .domain([0, vm.availableSections.length / fadeFactor]);
+            .domain([0, _.get(vm, ["availableSections", "length"],  1) / fadeFactor]);
 
         vm.sections = _.map(vm.availableSections, s => {
             const openOffset = _.findIndex(vm.openSections, os => os.id === s.id);
@@ -80,7 +80,7 @@ function controller($scope,
                 : rgb(255,255,255);
 
             const style = {
-                'border-bottom': `2px solid ${color.toString()}`
+                "border-bottom": `2px solid ${color.toString()}`
             };
 
             return Object.assign({}, s, { style })
@@ -98,8 +98,8 @@ function controller($scope,
 
 
 controller.$inject = [
-    '$scope',
-    '$window'
+    "$scope",
+    "$window"
 ];
 
 
@@ -112,5 +112,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzDynamicSectionNavigation'
+    id: "waltzDynamicSectionNavigation"
 };

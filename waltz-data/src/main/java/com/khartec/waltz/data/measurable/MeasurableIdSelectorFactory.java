@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
+import static com.khartec.waltz.schema.Tables.SCENARIO_AXIS_ITEM;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
@@ -68,6 +69,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 return mkForAppGroup(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
+            case SCENARIO:
+                return mkForScenario(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
             default:
@@ -75,6 +78,15 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+    private Select<Record1<Long>> mkForScenario(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .selectDistinct(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID)
+                .from(SCENARIO_AXIS_ITEM)
+                .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(options.entityReference().id()))
+                .and(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND.eq(EntityKind.MEASURABLE.name()));
     }
 
 

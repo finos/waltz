@@ -1,0 +1,83 @@
+<!-- SCENARIOS -->
+<table class="small table table-condensed">
+    <colgroup>
+        <col width="30%">
+        <col width="10%">
+        <col width="10%">
+        <col width="10%">
+        <col width="20%">
+        <col width="20%">
+    </colgroup>
+    <thead>
+    <tr>
+        <th>Scenario Name</th>
+        <th>Target Date</th>
+        <th>Status</th>
+        <th>Lifecycle Status</th>
+        <th>Operations</th>
+        <th>Last modified</th>
+    </tr>
+    </thead>
+    <tr ng-repeat="scenario in $ctrl.scenarios track by scenario.id"
+        class="waltz-visibility-parent">
+        <td>
+            <span uib-popover-template="'wsl-popover.html'"
+                  popover-trigger="mouseenter"
+                  popover-enable="scenario.description"
+                  popover-popup-delay="300"
+                  popover-append-to-body="true">
+                <a ui-sref="main.scenario.view ({ id: scenario.id })"
+                   class="clickable">
+                    <span ng-bind="scenario.name"></span>
+                </a>
+            </span>
+        </td>
+        <td>
+            <span ng-bind="scenario.effectiveDate">
+            </span>
+        </td>
+        <td>
+            <span class="small"
+                  ng-bind="scenario.scenarioStatus | toDisplayName:'scenarioStatus'">
+            </span>
+        </td>
+        <td>
+            <span class="small"
+                  ng-bind="scenario.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
+            </span>
+        </td>
+        <td>
+            <span class="waltz-visibility-child-30">
+                <a ng-click="$ctrl.onCloneScenario(scenario)"
+                   class="clickable">
+                    Clone
+                </a>
+            </span>
+        </td>
+        <td>
+            <waltz-last-updated entity="scenario"
+                                show-label="false">
+            </waltz-last-updated>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"></td>
+        <td colspan="2">
+            <a ng-click="$ctrl.onAddScenario(roadmap)"
+               class="clickable">
+                <waltz-icon name="plus">
+                </waltz-icon>
+                Add new scenario
+            </a>
+        </td>
+    </tr>
+</table>
+
+<script type="text/ng-template"
+        id="wsl-popover.html">
+    <div class="small">
+        <strong ng-bind="scenario.name"></strong>
+        <hr>
+        <waltz-markdown text="scenario.description"></waltz-markdown>
+    </div>
+</script>

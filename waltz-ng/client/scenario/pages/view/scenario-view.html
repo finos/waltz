@@ -1,0 +1,15 @@
+<waltz-scenario-header scenario-id="$ctrl.scenarioId"
+                       available-sections="$ctrl.availableSections"
+                       open-sections="$ctrl.sections"
+                       on-add-section="$ctrl.addSection"
+                       offset="650">
+</waltz-scenario-header>
+
+
+<br>
+
+<waltz-dynamic-sections-view sections="$ctrl.sections"
+                             parent-entity-ref="$ctrl.parentEntityRef"
+                             on-remove="$ctrl.removeSection">
+</waltz-dynamic-sections-view>
+

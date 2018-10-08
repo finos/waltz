@@ -40,6 +40,7 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.schema.Tables.SCENARIO_RATING_ITEM;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -110,6 +111,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
                 return mkForFlowDiagram(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
+            case SCENARIO:
+                return mkForScenario(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
             case PERSON:
@@ -117,6 +120,13 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForScenario(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL.selectDistinct(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID)
+                .from(SCENARIO_RATING_ITEM)
+                .where(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(options.entityReference().id()));
     }
 
 

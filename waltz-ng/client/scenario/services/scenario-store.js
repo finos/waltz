@@ -34,7 +34,7 @@ function store($http, baseUrl) {
 
     const findForRoadmap = (roadmapId) =>
         $http
-            .get(`${BASE}/id/${roadmapId}/scenario`)
+            .get(`${BASE}/by-roadmap-id/${roadmapId}`)
             .then(result => result.data);
 
     const getById = (scenarioId) =>

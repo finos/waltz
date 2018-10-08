@@ -25,10 +25,10 @@ import template from "./page-header.html";
 export const pageHeaderDefaultOffset = 60;
 
 const bindings = {
-    name: '@',
-    icon: '@',
-    small: '@',
-    tour: '<'
+    name: "@",
+    icon: "@",
+    small: "@",
+    tour: "<"
 };
 
 
@@ -81,9 +81,9 @@ function controller($document,
 
 
 controller.$inject=[
-    '$document',
-    '$scope',
-    '$window'
+    "$document",
+    "$scope",
+    "$window"
 ];
 
 

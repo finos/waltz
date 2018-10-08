@@ -161,7 +161,6 @@ function controller($q,
     vm.onConfigureScenario = (scenario) => {
         vm.visibility.mode = modes.CONFIGURE_SCENARIO;
         vm.selectedScenario = scenario;
-        console.log('cs', {scenario})
     };
 
     vm.onCancel = () => {

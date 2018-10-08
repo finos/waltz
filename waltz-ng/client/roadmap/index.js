@@ -19,19 +19,21 @@
  */
 
 import angular from "angular";
-import RoadmapsPanel from "./components/panel/roadmaps-panel";
+import RoadmapHeader from "./components/header/roadmap-header";
 import RoadmapReferences from "./components/roadmap-references/roadmap-references";
-import RoadmapsList from "./components/list/roadmaps-list";
 import RoadmapAddScenario from "./components/roadmap-add-scenario/roadmap-add-scenario";
 import RoadmapScenarioConfig from "./components/roadmap-scenario-config/roadmap-scenario-config";
 import RoadmapScenarioAxisConfig from "./components/roadmap-scenario-axis-config/roadmap-scenario-axis-config";
 import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
 import {registerComponents, registerStores} from "../common/module-utils";
 import RoadmapStore from "./services/roadmap-store";
+import Routes from "./routes";
 
 
 export default () => {
     const module = angular.module("waltz.roadmap", []);
+
+    module.config(Routes);
 
     registerComponents(module, [
         RoadmapAddScenario,
@@ -39,8 +41,7 @@ export default () => {
         RoadmapScenarioAxisConfig,
         RoadmapScenarioConfig,
         RoadmapScenarioDiagram,
-        RoadmapsList,
-        RoadmapsPanel
+        RoadmapHeader
     ]);
 
     registerStores(module, [
