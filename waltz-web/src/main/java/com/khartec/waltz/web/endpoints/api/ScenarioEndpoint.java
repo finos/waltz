@@ -177,7 +177,8 @@ public class ScenarioEndpoint implements Endpoint {
                     getId(request),
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
-                    getLong(request, "rowId")));
+                    getLong(request, "rowId"),
+                    getUsername(request)));
     }
 
 

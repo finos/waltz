@@ -69,6 +69,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
+            case SCENARIO:
                 return wrapAppIdSelector(options);
             case DATA_TYPE:
                 return mkForDataType(options);

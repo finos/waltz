@@ -136,7 +136,6 @@ function controller($element, serviceBroker) {
     };
 
     vm.$onChanges = (c) => {
-        console.log("roadmap-diagram changes: ", c);
         redraw();
     };
 }

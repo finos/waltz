@@ -69,7 +69,7 @@
                                     <div class="col-sm-8">
                                         <span ng-bind="$ctrl.scenario.name"></span>
                                     </div>
-                                </div>  <!-- /name -->
+                                </div>
 
 
                                 <!-- target date -->
@@ -102,8 +102,19 @@
                                         </waltz-markdown>
                                     </div>
                                 </div>
+
+                                <!-- last update -->
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label>Last updated:</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <waltz-last-updated entity="$ctrl.scenario" show-label="false">
+                                        </waltz-last-updated>
+                                    </div>
+                                </div>
                             </div>
-                             <!-- /desc -->
+
 
                             <div class="waltz-sub-section-controls">
                                 <span>

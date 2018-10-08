@@ -10,6 +10,10 @@ const bindings = {
     onCancel: "<"
 };
 
+const modes = {
+    EDIT: "EDIT",
+    VIEW: "VIEW"
+};
 
 const dialogs = {
     ADD_APPLICATION: "ADD_APPLICATION",
@@ -28,6 +32,7 @@ const initialState = {
     handlers: {
         onNodeClick: (n) => console.log("WRSD: NodeClick", n)
     },
+    mode: modes.VIEW,
     dialog: null
 };
 
@@ -89,59 +94,74 @@ function controller($q, $timeout, serviceBroker, notification) {
         });
     };
 
+    const switchToEditModeAction =  {
+        title: "Switch to edit mode",
+        action:  (elm, d) => $timeout(() => vm.mode = modes.EDIT)
+    };
+
+
     function mkNodeMenu() {
         return () => {
-            return [
-                {
-                    title: "Add another application",
-                    action:  (elm, d) => addApplicationAction(d.domainCoordinates)
-                }, {
-                    title: "Edit",
-                    action: (elm, d) => {
-                        const style = mkDialogStyle();
-                        $timeout(() => {
-                            const row = d.domainCoordinates.row;
-                            const column = d.domainCoordinates.column;
+            if (vm.mode === modes.VIEW) {
+                return [ switchToEditModeAction ];
+            } else {
+                return [
+                    {
+                        title: "Add another application",
+                        action:  (elm, d) => addApplicationAction(d.domainCoordinates)
+                    }, {
+                        title: "Edit",
+                        action: (elm, d) => {
+                            const style = mkDialogStyle();
+                            $timeout(() => {
+                                const row = d.domainCoordinates.row;
+                                const column = d.domainCoordinates.column;
 
-                            vm.dialog = {
-                                type: dialogs.EDIT_CELL,
-                                data: d,
-                                workingState: Object.assign({ rating: "G", comment: "" }, d.state),
-                                style
-                            };
-                        });
+                                vm.dialog = {
+                                    type: dialogs.EDIT_CELL,
+                                    data: d,
+                                    workingState: Object.assign({ rating: "G", comment: "" }, d.state),
+                                    style
+                                };
+                            });
+                        }
+                    },  {
+                        divider: true
+                    }, {
+                        title: "Remove",
+                        action: (elm, d) => {
+                            const args = [
+                                vm.scenarioDefn.scenario.id,
+                                d.node.id,
+                                d.domainCoordinates.column.id,
+                                d.domainCoordinates.row.id
+                            ];
+                            serviceBroker
+                                .execute(
+                                    CORE_API.ScenarioStore.removeRating,
+                                    args)
+                                .then(() => notification.success("Item removed"))
+                                .then(() => reload());
+                        }
                     }
-                },  {
-                    divider: true
-                }, {
-                    title: "Remove",
-                    action: (elm, d) => {
-                        const args = [
-                            vm.scenarioDefn.scenario.id,
-                            d.node.id,
-                            d.domainCoordinates.column.id,
-                            d.domainCoordinates.row.id
-                        ];
-                        serviceBroker
-                            .execute(
-                                CORE_API.ScenarioStore.removeRating,
-                                args)
-                            .then(() => notification.success("Item removed"))
-                            .then(() => reload());
-                    }
-                }
-            ];
+                ];
+
+            }
         };
     }
 
     function mkNodeGridMenu() {
         return () => {
-            return [
-                {
-                    title: "Add application",
-                    action:  (elm, d) => addApplicationAction({ row: d.row, column: d.column })
-                }
-            ];
+            if (vm.mode === modes.VIEW) {
+                return [ switchToEditModeAction ];
+            } else {
+                return [
+                    {
+                        title: "Add application",
+                        action: (elm, d) => addApplicationAction({row: d.row, column: d.column})
+                    }
+                ];
+            }
         };
     }
 
@@ -204,6 +224,12 @@ function controller($q, $timeout, serviceBroker, notification) {
 
 
     // -- INTERACT --
+
+    vm.toggleMode = () => {
+        vm.mode = vm.mode === modes.VIEW
+            ? modes.EDIT
+            : modes.VIEW;
+    };
 
     vm.onRatingSelect = (rating) => {
         vm.dialog.workingState.rating = rating;

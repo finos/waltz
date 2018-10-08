@@ -20,16 +20,16 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import template from './logical-flows-boingy-graph.html';
+import template from "./logical-flows-boingy-graph.html";
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
 const defaultFilterOptions = {
-    type: 'ALL',
-    scope: 'INTRA'
+    type: "ALL",
+    scope: "INTRA"
 };
 
 
@@ -39,7 +39,7 @@ const defaultOptions = {
             enter: (selection) => console.log("default graphTweaker.node.entry, selection: ", selection),
         },
         link : {
-            enter: (selection) => selection.attr('stroke', 'red')
+            enter: (selection) => selection.attr("stroke", "red")
         }
     }
 };
@@ -73,7 +73,7 @@ function calculateEntities(flows = []) {
 }
 
 
-function mkScopeFilterFn(appIds = [], scope = 'INTRA') {
+function mkScopeFilterFn(appIds = [], scope = "INTRA") {
     return (f) => {
         switch (scope) {
             case "INTRA":
@@ -91,7 +91,7 @@ function mkScopeFilterFn(appIds = [], scope = 'INTRA') {
 
 function mkTypeFilterFn(decorators = []) {
     const flowIds = _.chain(decorators)
-        .map('dataFlowId')
+        .map("dataFlowId")
         .uniq()
         .value();
     return f => _.includes(flowIds, f.id);
@@ -101,7 +101,7 @@ function mkTypeFilterFn(decorators = []) {
 function mkIsolatedNodeFilterFn(isolatedNode) {
     return isolatedNode
         ? f => f.source.id === isolatedNode.id || f.target.id === isolatedNode.id
-        : f => true;
+        : () => true;
 }
 
 
@@ -118,8 +118,8 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
 
 function buildDecoratorFilter(options = defaultFilterOptions) {
     return d => {
-        const isDataType = d.decoratorEntity.kind === 'DATA_TYPE';
-        const matchesDataType = options.type === 'ALL' || d.decoratorEntity.id === Number(options.type);
+        const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
+        const matchesDataType = options.type === "ALL" || d.decoratorEntity.id === Number(options.type);
         return isDataType && matchesDataType;
     };
 }
@@ -140,21 +140,18 @@ function calculateFlowData(allFlows = [],
 
     const entities = calculateEntities(flows);
 
-    const result = {flows, entities, decorators};
-
-    console.log('cfd', result);
-    return result;
+    return {flows, entities, decorators};
 }
 
 
 function getDataTypeIds(allDataTypes = [], decorators = []) {
-    const dataTypesById = _.keyBy(allDataTypes, 'id');
+    const dataTypesById = _.keyBy(allDataTypes, "id");
     return _.chain(decorators)
-        .filter(dc => dc.decoratorEntity.kind === 'DATA_TYPE')
-        .map('decoratorEntity.id')
+        .filter(dc => dc.decoratorEntity.kind === "DATA_TYPE")
+        .map("decoratorEntity.id")
         .uniq()
         .map(dtId => dataTypesById[dtId])
-        .orderBy('name')
+        .orderBy("name")
         .value();
 }
 
@@ -164,12 +161,12 @@ function prepareGraphTweakers(logicalFlowUtilityService,
                               decorators = [],
                               nodeSelectFn = (d) => console.log("dftg: no nodeSelectFn given", d))
 {
-    const appIds = _.map(applications, 'id');
+    const appIds = _.map(applications, "id");
     const tweakers = logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
 
     const dfltNodeEnter = tweakers.node.enter;
     const nodeEnter = selection => selection
-        .on('click.node-select', nodeSelectFn)
+        .on("click.node-select", nodeSelectFn)
         .call(dfltNodeEnter);
 
     tweakers.node.enter = nodeEnter;
@@ -276,10 +273,10 @@ function controller($scope,
 
 
 controller.$inject = [
-    '$scope',
-    '$q',
-    'ServiceBroker',
-    'LogicalFlowUtilityService'
+    "$scope",
+    "$q",
+    "ServiceBroker",
+    "LogicalFlowUtilityService"
 ];
 
 
@@ -292,5 +289,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzLogicalFlowsBoingyGraph'
+    id: "waltzLogicalFlowsBoingyGraph"
 };

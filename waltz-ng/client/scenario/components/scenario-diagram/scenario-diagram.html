@@ -19,19 +19,9 @@
 
 <div class="waltz-scenario-diagram">
 
-    <label>Search:</label>
-    <input class="form-control small small"
-           type="search"
-           ng-change="$ctrl.doSearch()"
-           ng-model-options="{ debounce: 200 }"
-           ng-model="$ctrl.qry">
-
-    <br>
-    <br>
 
     <svg width="1600"
          height="800"
-         style="xxborder: 1px solid red;"
          viewBox="0 0 1600 800">
 
         <clipPath id="grid-clip">
@@ -56,5 +46,20 @@
         </clipPath>
 
     </svg>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label>Search:</label>
+            <input class="form-control col-sm-3 input-sm"
+                   type="search"
+                   placeholder="Search for application by name or code"
+                   ng-change="$ctrl.doSearch()"
+                   ng-model-options="{ debounce: 200 }"
+                   ng-model="$ctrl.qry">
+        </div>
+        <div class="col-sm-6">
+
+        </div>
+    </div>
 
 </div>
