@@ -25,17 +25,21 @@
  */
 export function getEditRoleForEntityKind(kind) {
     switch (kind) {
-        case 'APPLICATION':
-            return 'APP_EDITOR';
-        case 'CHANGE_INITIATIVE':
-            return 'CHANGE_INITIATIVE_EDITOR';
-        case 'MEASURABLE':
-            return 'CAPABILITY_EDITOR';
-        case 'ORG_UNIT':
-            return 'ORG_UNIT_EDITOR';
-        case 'DATA_TYPE':
-            return 'AUTHORITATIVE_SOURCE_EDITOR';
+        case "APPLICATION":
+            return "APP_EDITOR";
+        case "CHANGE_INITIATIVE":
+            return "CHANGE_INITIATIVE_EDITOR";
+        case "MEASURABLE":
+            return "CAPABILITY_EDITOR";
+        case "ORG_UNIT":
+            return "ORG_UNIT_EDITOR";
+        case "DATA_TYPE":
+            return "AUTHORITATIVE_SOURCE_EDITOR";
+        case "SCENARIO":
+            return "SCENARIO_EDITOR";
+        case "ROADMAP":
+            return "SCENARIO_ADMIN";
         default:
-            return 'ADMIN';
+            return "ADMIN";
     }
 }

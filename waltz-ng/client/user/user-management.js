@@ -22,12 +22,37 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 // ---
-import template from './user-management.html';
+import template from "./user-management.html";
+
+
+
+const allRoles = [
+    "ADMIN",
+    "APP_EDITOR",
+    "ATTESTATION_ADMIN",
+    "AUTHORITATIVE_SOURCE_EDITOR",
+    "BETA_TESTER",
+    "BOOKMARK_EDITOR",
+    "CAPABILITY_EDITOR",
+    "CHANGE_INITIATIVE_EDITOR",
+    "LINEAGE_EDITOR",
+    "LOGICAL_DATA_FLOW_EDITOR",
+    "ORG_UNIT_EDITOR",
+    "RATING_EDITOR",
+    "SCENARIO_ADMIN",
+    "SCENARIO_EDITOR",
+    "SURVEY_ADMIN",
+    "SURVEY_TEMPLATE_ADMIN",
+    "USER_ADMIN"
+];
 
 
 const initialState = {
-    numAllowedWithoutFilter: 100
+    numAllowedWithoutFilter: 100,
+    allRoles
 };
+
+
 
 
 function controller(serviceBroker) {
@@ -55,7 +80,7 @@ function controller(serviceBroker) {
 
     vm.addUserSelected = () => {
         vm.dismiss();
-        vm.newUser = { userName: '', password: ''};
+        vm.newUser = { userName: "", password: ""};
     };
 
     vm.isValidNewUser = (user) => {
@@ -71,7 +96,7 @@ function controller(serviceBroker) {
                     vm.users = [...vm.users, user];
                 },
                 err => {
-                    console.error('Error registering user: ', err);
+                    console.error("Error registering user: ", err);
                     vm.lastError = err.data;
                 }
             );
@@ -80,7 +105,7 @@ function controller(serviceBroker) {
     vm.updateUser = (user, roleSelections, password1, password2) => {
 
         if (password1 !== password2) {
-            vm.lastError = { id: 'MISMATCH', message: 'Passwords do not match'};
+            vm.lastError = { id: "MISMATCH", message: "Passwords do not match"};
             return;
         }
 
@@ -126,17 +151,34 @@ function controller(serviceBroker) {
 
         return false; // prevent form submission
     };
+
+    function setAllSelectionsTo(b) {
+        vm.roleSelections = _.reduce(
+            allRoles,
+            (acc, k) => {
+                acc[k] = b;
+                return acc;
+            },
+            {});
+    }
+
+    vm.selectAll = () => {
+        setAllSelectionsTo(true);
+    };
+
+    vm.deselectAll = () => {
+        setAllSelectionsTo(false);
+    };
 }
 
 
-
-controller.$inject = [ 'ServiceBroker' ];
+controller.$inject = [ "ServiceBroker" ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };
