@@ -17,9 +17,10 @@ public class SlowQueryListener extends DefaultExecuteListener {
 
     private static final String PERFORMANCE_APPENDER = "WALTZ.PERFORMANCE";
     private static final Logger LOG = LoggerFactory.getLogger(PERFORMANCE_APPENDER);
-    private final int slowQueryThresholdSeconds;
 
+    private final int slowQueryThresholdSeconds;
     private StopWatch stopWatch;
+    private long slowQueryThresholdInNanos;
 
     public class SQLPerformanceWarning
             extends Exception {
@@ -33,6 +34,7 @@ public class SlowQueryListener extends DefaultExecuteListener {
     public SlowQueryListener(int slowQueryThresholdSeconds) {
         LOG.info(String.format("Initialising with %s second threshold", slowQueryThresholdSeconds));
         this.slowQueryThresholdSeconds = slowQueryThresholdSeconds;
+        this.slowQueryThresholdInNanos = TimeUnit.SECONDS.toNanos(slowQueryThresholdSeconds);
     }
 
 
@@ -47,7 +49,7 @@ public class SlowQueryListener extends DefaultExecuteListener {
     public void executeEnd(ExecuteContext ctx) {
         super.executeEnd(ctx);
         long split = stopWatch.split();
-        if (split > TimeUnit.SECONDS.toNanos(slowQueryThresholdSeconds)) {
+        if (split > slowQueryThresholdInNanos) {
             DSLContext context = DSL.using(ctx.dialect(),
                     // ... and the flag for pretty-printing
                     new Settings().withRenderFormatted(true));
