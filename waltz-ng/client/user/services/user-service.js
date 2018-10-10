@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 let userPromise = null;
@@ -35,7 +35,7 @@ function service(http, baseUrl, $auth) {
             userPromise = http.get(`${BASE}/whoami`)
                 .then(result => result.data)
                 .then(u => {
-                    userName = u.userName === 'anonymous'
+                    userName = u.userName === "anonymous"
                         ? null
                         : u.userName;
                     return u;
@@ -63,12 +63,13 @@ function service(http, baseUrl, $auth) {
 
     /**
      * @param user object with roles array property
-     * @param role
+     * @param role - either obj w/ key or string
      * @returns {boolean}
      */
     const hasRole = ( { roles = [] }, role) => {
         if (_.isEmpty(role)) return true;
-        return _.includes(roles, role);
+        const roleToCheck = _.isObject(role) ? role.key : role;
+        return _.includes(roles, roleToCheck);
     };
 
 
@@ -83,9 +84,9 @@ function service(http, baseUrl, $auth) {
 }
 
 service.$inject = [
-    '$http',
-    'BaseApiUrl',
-    '$auth'
+    "$http",
+    "BaseApiUrl",
+    "$auth"
 ];
 
 

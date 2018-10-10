@@ -21,6 +21,7 @@ import {initialiseData} from "../common/index";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
 
 import template from "./survey-instance-list-user-view.html";
+import roles from "../user/roles";
 
 
 const initialState = {
@@ -32,23 +33,23 @@ const initialState = {
 
 
 function mkSurveyData(surveyRuns = [], surveyInstances = []) {
-    const runsById = _.keyBy(surveyRuns, 'id');
+    const runsById = _.keyBy(surveyRuns, "id");
 
     const mappedData = _.map(surveyInstances, instance => {
-            return {
-                'surveyInstance': instance,
-                'surveyRun': runsById[instance.surveyRunId]
-            }
-        });
+        return {
+            "surveyInstance": instance,
+            "surveyRun": runsById[instance.surveyRunId]
+        }
+    });
 
     const [incomplete = [], complete = []] = _.partition(mappedData,
-        data => data.surveyInstance.status == 'NOT_STARTED'
-        || data.surveyInstance.status == 'IN_PROGRESS'
-        || data.surveyInstance.status == 'REJECTED');
+        data => data.surveyInstance.status === "NOT_STARTED"
+        || data.surveyInstance.status === "IN_PROGRESS"
+        || data.surveyInstance.status === "REJECTED");
 
     return {
-        'incomplete': incomplete,
-        'complete': complete
+        "incomplete": incomplete,
+        "complete": complete
     };
 }
 
@@ -56,33 +57,33 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
 function mkCommonColumnDefs() {
     return [
         {
-            field: 'surveyInstance.id',
-            name: 'ID',
-            width: '5%'
+            field: "surveyInstance.id",
+            name: "ID",
+            width: "5%"
         },
-        mkEntityLinkGridCell('Subject', 'surveyInstance.surveyEntity'),
+        mkEntityLinkGridCell("Subject", "surveyInstance.surveyEntity"),
         {
-            field: 'surveyInstance.surveyEntityExternalId',
-            name: 'Subject External Id',
-            width: '10%'
+            field: "surveyInstance.surveyEntityExternalId",
+            name: "Subject External Id",
+            width: "10%"
         },
         {
-            field: 'surveyInstance.status',
-            name: 'Status',
+            field: "surveyInstance.status",
+            name: "Status",
             cellFilter: "toDisplayName:'surveyInstanceStatus'",
-            width: '10%'
+            width: "10%"
         },
         {
-            field: 'surveyRun.issuedOn',
-            name: 'Issued',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
-            width: '10%'
+            field: "surveyRun.issuedOn",
+            name: "Issued",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
+            width: "10%"
         },
         {
-            field: 'surveyInstance.dueDate',
-            name: 'Due',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD" days-only="true"></waltz-from-now></div>',
-            width: '10%'
+            field: "surveyInstance.dueDate",
+            name: "Due",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
+            width: "10%"
         },
     ];
 }
@@ -91,8 +92,8 @@ function mkCommonColumnDefs() {
 function mkIncompleteColumnDefs() {
     const columnDefs = mkCommonColumnDefs();
     columnDefs.splice(0, 0, Object.assign({},
-        mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.edit'),
-        { width: '25%'}
+        mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
+        { width: "25%"}
     ));
     return columnDefs;
 }
@@ -101,14 +102,14 @@ function mkIncompleteColumnDefs() {
 function mkCompleteColumnDefs() {
     const columnDefs = mkCommonColumnDefs();
     columnDefs.splice(0, 0, Object.assign({},
-        mkLinkGridCell('Survey', 'surveyRun.name', 'surveyInstance.id', 'main.survey.instance.response.view'),
-        { width: '25%'}
+        mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.view"),
+        { width: "25%"}
     ));
 
     const approved = {
-            field: 'surveyInstance.approvedBy',
-            name: 'Approved By',
-            cellTemplate: `<div class="ui-grid-cell-contents">
+        field: "surveyInstance.approvedBy",
+        name: "Approved By",
+        cellTemplate: `<div class="ui-grid-cell-contents">
                                <span ng-if="row.entity.surveyInstance.approvedBy">
                                     <span ng-bind="row.entity.surveyInstance.approvedBy">
                                     </span>,
@@ -121,8 +122,8 @@ function mkCompleteColumnDefs() {
                                     -
                                 </span>
                            </div>`,
-            width: '15%'
-        };
+        width: "15%"
+    };
 
     columnDefs.push(approved);
 
@@ -142,8 +143,8 @@ function controller($q,
 
     userService.whoami()
         .then(user => vm.user = user)
-        .then(() => vm.showSurveyTemplateButton = userService.hasRole(vm.user, 'SURVEY_ADMIN')
-            || userService.hasRole(vm.user, 'SURVEY_TEMPLATE_ADMIN'));
+        .then(() => vm.showSurveyTemplateButton = userService.hasRole(vm.user, roles.SURVEY_ADMIN)
+            || userService.hasRole(vm.user, roles.SURVEY_TEMPLATE_ADMIN));
 
     const surveyRunsPromise = surveyRunStore.findForUser();
     const surveyInstancesPromise = surveyInstanceStore.findForUser();
@@ -156,16 +157,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'SurveyInstanceStore',
-    'SurveyRunStore',
-    'UserService'
+    "$q",
+    "SurveyInstanceStore",
+    "SurveyRunStore",
+    "UserService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 

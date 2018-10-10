@@ -1,6 +1,7 @@
 import template from "./scenario-header.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import roles from "../../../user/roles";
 
 
 const bindings = {
@@ -18,45 +19,46 @@ const modes = {
 };
 
 
-const initialState = {
-    modes,
-    roadmap: null,
-    visibility: {
-        mode: modes.LOADING
-    }
-};
-
-
 function controller($q,
+                    notification,
                     serviceBroker,
-                    notification)
+                    userService)
 {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
         vm.visibility.mode = modes.LOADING;
+
         reloadAllData()
             .then(() => vm.visibility.mode = modes.VIEW);
+
+        userService
+            .whoami()
+            .then(u => vm.permissions = {
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
+            });
+
     };
 
 
     vm.onSaveScenarioName = (ctx, data) => {
         return updateField(
-                ctx.id,
-                CORE_API.ScenarioStore.updateName,
-                data,
-                true,
-                "Scenario name updated")
+            ctx.id,
+            CORE_API.ScenarioStore.updateName,
+            data,
+            true,
+            "Scenario name updated")
             .then(() => reloadAllData());
     };
 
     vm.onSaveScenarioDescription = (ctx, data) => {
         return updateField(
-                ctx.id,
-                CORE_API.RoadmapStore.updateDescription,
-                data,
-                false,
-                "Scenario description updated")
+            ctx.id,
+            CORE_API.RoadmapStore.updateDescription,
+            data,
+            false,
+            "Scenario description updated")
             .then(() => reloadAllData());
     };
 
@@ -165,10 +167,24 @@ function controller($q,
 }
 
 
+const initialState = {
+    modes,
+    roadmap: null,
+    permissions: {
+        admin: false,
+        edit: false
+    },
+    visibility: {
+        mode: modes.LOADING
+    }
+};
+
+
 controller.$inject = [
     "$q",
+    "Notification",
     "ServiceBroker",
-    "Notification"
+    "UserService"
 ];
 
 

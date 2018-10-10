@@ -22,12 +22,16 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 // ---
-import template from './user-management.html';
+import template from "./user-management.html";
+import roles from "./roles";
 
 
 const initialState = {
-    numAllowedWithoutFilter: 100
+    numAllowedWithoutFilter: 100,
+    roles
 };
+
+
 
 
 function controller(serviceBroker) {
@@ -55,7 +59,7 @@ function controller(serviceBroker) {
 
     vm.addUserSelected = () => {
         vm.dismiss();
-        vm.newUser = { userName: '', password: ''};
+        vm.newUser = { userName: "", password: ""};
     };
 
     vm.isValidNewUser = (user) => {
@@ -71,7 +75,7 @@ function controller(serviceBroker) {
                     vm.users = [...vm.users, user];
                 },
                 err => {
-                    console.error('Error registering user: ', err);
+                    console.error("Error registering user: ", err);
                     vm.lastError = err.data;
                 }
             );
@@ -80,7 +84,7 @@ function controller(serviceBroker) {
     vm.updateUser = (user, roleSelections, password1, password2) => {
 
         if (password1 !== password2) {
-            vm.lastError = { id: 'MISMATCH', message: 'Passwords do not match'};
+            vm.lastError = { id: "MISMATCH", message: "Passwords do not match"};
             return;
         }
 
@@ -126,17 +130,34 @@ function controller(serviceBroker) {
 
         return false; // prevent form submission
     };
+
+    function setAllSelectionsTo(b) {
+        vm.roleSelections = _.reduce(
+            _.map(roles, "key"),
+            (acc, k) => {
+                acc[k] = b;
+                return acc;
+            },
+            {});
+    }
+
+    vm.selectAll = () => {
+        setAllSelectionsTo(true);
+    };
+
+    vm.deselectAll = () => {
+        setAllSelectionsTo(false);
+    };
 }
 
 
-
-controller.$inject = [ 'ServiceBroker' ];
+controller.$inject = [ "ServiceBroker" ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

@@ -1,6 +1,6 @@
 import template from "./scenario-list.html";
 import {initialiseData} from "../../../common";
-import _ from "lodash";
+import roles from "../../../user/roles";
 
 
 const bindings = {
@@ -13,20 +13,32 @@ const bindings = {
 
 
 const initialState = {
+    permissions: {
+        admin: false,
+        edit: false
+    },
     scenarios: []
 };
 
 
-function controller() {
+function controller(userService) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
+    vm.$onInit = () => {
+        userService
+            .whoami()
+            .then(u => vm.permissions = {
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
+            });
     };
 
 }
 
 
-controller.$inject = [ ];
+controller.$inject = [
+    "UserService"
+];
 
 
 const component = {

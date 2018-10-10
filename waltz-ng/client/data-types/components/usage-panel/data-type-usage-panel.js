@@ -21,11 +21,12 @@ import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-panel.html";
+import roles from "../../../user/roles";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    helpText: '@'
+    parentEntityRef: "<",
+    helpText: "@"
 };
 
 
@@ -43,7 +44,7 @@ function controller(notification, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-        const promise = vm.parentEntityRef.kind == 'PHYSICAL_SPECIFICATION'
+        const promise = vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION"
             ? serviceBroker
                 .loadViewData(
                     CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
@@ -73,10 +74,10 @@ function controller(notification, serviceBroker, userService) {
     vm.$onInit = () => {
         userService
             .whoami()
-            .then(u => vm.visibility.controls = userService.hasRole(u, 'LOGICAL_DATA_FLOW_EDITOR'));
+            .then(u => vm.visibility.controls = userService.hasRole(u, roles.LOGICAL_DATA_FLOW_EDITOR));
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
         reload();
     };
@@ -93,12 +94,12 @@ function controller(notification, serviceBroker, userService) {
         if (vm.save) {
             vm.save()
                 .then(() => {
-                    notification.success('Data types updated successfully');
+                    notification.success("Data types updated successfully");
                     reload(true);
                     vm.onHideEdit();
                 });
         } else {
-            console.log('onSave - no impl');
+            console.log("onSave - no impl");
         }
     };
 
@@ -113,9 +114,9 @@ function controller(notification, serviceBroker, userService) {
 
 
 controller.$inject = [
-    'Notification',
-    'ServiceBroker',
-    'UserService'
+    "Notification",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
@@ -127,6 +128,6 @@ const component = {
 
 
 export default {
-    id: 'waltzDataTypeUsagePanel',
+    id: "waltzDataTypeUsagePanel",
     component
 }

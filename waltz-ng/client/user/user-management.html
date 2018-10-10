@@ -43,25 +43,14 @@
         </form>
         <hr>
         <div class="waltz-user-admin-scroll">
-            <table class="table table-condensed table-striped table-hover">
+            <table class="table table-condensed table-striped table-hover small">
                 <thead>
                 <tr>
                     <th>User Name</th>
-                    <th>Admin</th>
-                    <th>Attesation Admin</th>
-                    <th>User Admin</th>
-                    <th>Application</th>
-                    <th>Rating</th>
-                    <th>Org Unit</th>
-                    <th>Capability</th>
-                    <th>Bookmark</th>
-                    <th>Flow</th>
-                    <th>Auth Source</th>
-                    <th>Beta Tester</th>
-                    <th>Lineage</th>
-                    <th>Survey</th>
-                    <th>Survey Template</th>
-                    <th>Change Initiative</th>
+                    <th ng-repeat="role in ctrl.roles">
+                        <span ng-bind="role.name">
+                        </span>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,78 +62,8 @@
                         <a class="clickable" ng-bind="user.userName">
                         </a>
                     </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "ADMIN")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "ATTESTATION_ADMIN")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "USER_ADMIN")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "APP_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "RATING_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "ORG_UNIT_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "CAPABILITY_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "BOOKMARK_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "LOGICAL_DATA_FLOW_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "AUTHORITATIVE_SOURCE_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "BETA_TESTER")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "LINEAGE_EDITOR")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "SURVEY_ADMIN")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "SURVEY_TEMPLATE_ADMIN")'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                    <td align="left">
-                        <span ng-if='ctrl.hasRole(user, "CHANGE_INITIATIVE_EDITOR")'>
+                    <td align="left" ng-repeat="role in ctrl.roles">
+                        <span ng-if='ctrl.hasRole(user, role.key)'>
                             <waltz-icon name='check'></waltz-icon>
                         </span>
                     </td>
@@ -160,103 +79,51 @@
 
         <div ng-if="ctrl.selectedUser">
             <hr>
-            <h3>{{ ctrl.selectedUser.userName }} <small>User</small></h3>
+            <h3>
+                <span ng-bind="ctrl.selectedUser.userName"></span>
+                <small>User</small>
+            </h3>
 
             <form class="form-horizontal"
                   ng-submit="ctrl.updateUser(ctrl.selectedUser, ctrl.roleSelections, ctrl.newPassword1, ctrl.newPassword2)">
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Permissions</label>
                     <div class="col-sm-10">
-                        <table class="table table-condensed table-striped">
+                        <table class="table table-condensed table-hover">
+                            <colgroup>
+                                <col width="5%">
+                                <col width="40%">
+                                <col width="55%">
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>
+                                    <a ng-click="ctrl.selectAll()" class="clickable">
+                                        <waltz-icon name="plus" fixed-width="true"></waltz-icon>
+                                    </a>
+                                    /
+                                    <a ng-click="ctrl.deselectAll()" class="clickable">
+                                        <waltz-icon name="minus" fixed-width="true"></waltz-icon>
+                                    </a>
+
+                                </th>
+                                <th>Role</th>
+                                <th>Desc</th>
+                            </tr>
+                            </thead>
                             <tbody>
-                            <tr>
-                                <td>ADMIN</td>
+                            <tr ng-repeat="role in ctrl.roles">
                                 <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.ADMIN">
+                                    <input type="checkbox"
+                                           ng-model="ctrl.roleSelections[role.key]">
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>ATTESTATION_ADMIN</td>
                                 <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.ATTESTATION_ADMIN">
+                                    <div ng-bind="role.name"></div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>USER_ADMIN</td>
                                 <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.USER_ADMIN">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>APP_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.APP_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>RATING_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.RATING_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>ORG_UNIT_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.ORG_UNIT_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CAPABILITY_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.CAPABILITY_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>BOOKMARK_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.BOOKMARK_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>LOGICAL_DATA_FLOW_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.LOGICAL_DATA_FLOW_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>AUTHORITATIVE_SOURCE_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.AUTHORITATIVE_SOURCE_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>BETA_TESTER</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.BETA_TESTER">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>LINEAGE_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.LINEAGE_EDITOR">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>SURVEY_ADMIN</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.SURVEY_ADMIN">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>SURVEY_TEMPLATE_ADMIN</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.SURVEY_TEMPLATE_ADMIN">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CHANGE_INITIATIVE_EDITOR</td>
-                                <td>
-                                    <input type="checkbox" ng-model="ctrl.roleSelections.CHANGE_INITIATIVE_EDITOR">
+                                    <p class="help-block"
+                                       ng-bind="role.description">
+                                    </p>
                                 </td>
                             </tr>
                             </tbody>
@@ -346,10 +213,10 @@
 
         <div class="alert alert-danger"
              ng-if="ctrl.lastError">
-            <strong>
-                {{ ctrl.lastError.id }}:
+            <strong ng-bind="ctrl.lastError.id">
             </strong>
-            {{ ctrl.lastError.message }}
+            <span ng-bind="ctrl.lastError.message">
+            </span>
             <br>
             <a class="clickable" ng-click="ctrl.lastError = null">
                 Clear

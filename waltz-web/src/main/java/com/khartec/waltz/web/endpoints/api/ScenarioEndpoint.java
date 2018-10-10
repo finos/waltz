@@ -5,10 +5,12 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioStatus;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
 import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
 import com.khartec.waltz.service.scenario.ScenarioService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.ImmutableFullScenario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,22 +31,26 @@ public class ScenarioEndpoint implements Endpoint {
     private final ScenarioService scenarioService;
     private final ScenarioAxisItemService scenarioAxisItemService;
     private final ScenarioRatingItemService scenarioRatingItemService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public ScenarioEndpoint(RoadmapService roadmapService, 
+    public ScenarioEndpoint(RoadmapService roadmapService,
                             ScenarioService scenarioService,
                             ScenarioAxisItemService scenarioAxisItemService,
-                            ScenarioRatingItemService scenarioRatingItemService) {
+                            ScenarioRatingItemService scenarioRatingItemService,
+                            UserRoleService userRoleService) {
         checkNotNull(roadmapService, "roadmapService cannot be null");
         checkNotNull(scenarioService, "scenarioService cannot be null");
         checkNotNull(scenarioAxisItemService, "scenarioAxisItemService cannot be null");
         checkNotNull(scenarioRatingItemService, "scenarioRatingItemService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.roadmapService = roadmapService;
         this.scenarioService = scenarioService;
         this.scenarioAxisItemService = scenarioAxisItemService;
         this.scenarioRatingItemService = scenarioRatingItemService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -71,11 +77,14 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void registerReorderAxis(String path) {
-        postForDatum(path, (request, response) ->
-                scenarioService.reorderAxis(
+        postForDatum(path, (request, response) -> {
+                ensureUserHasEditRights(request);
+                return scenarioService
+                        .reorderAxis(
                         getId(request),
                         getOrientation(request),
-                        readIdsFromBody(request)));
+                        readIdsFromBody(request));
+        });
     }
 
 
@@ -88,97 +97,114 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void registerAddAxisItem(String path) {
-        postForDatum(path, (request, response) ->
-                scenarioService.addAxisItem(
-                        getId(request),
-                        getOrientation(request),
-                        getDomainItem(request),
-                        readBody(request, Integer.class),
-                        getUsername(request)));
+        postForDatum(path, (request, response) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.addAxisItem(
+                    getId(request),
+                    getOrientation(request),
+                    getDomainItem(request),
+                    readBody(request, Integer.class),
+                    getUsername(request));
+        });
     }
 
 
     private void registerRemoveAxisItem(String path) {
-        deleteForDatum(path, (request, response) ->
-                scenarioService.removeAxisItem(
-                        getId(request),
-                        getOrientation(request),
-                        getDomainItem(request),
-                        getUsername(request)));
+        deleteForDatum(path, (request, response) -> {
+            ensureUserHasAdminRights(request);
+            return scenarioService.removeAxisItem(
+                    getId(request),
+                    getOrientation(request),
+                    getDomainItem(request),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateRating(String path) {
         postForDatum(path, (request, response) ->
-            scenarioRatingItemService.updateRating(
+        {
+            ensureUserHasEditRights(request);
+            return scenarioRatingItemService.updateRating(
                     getId(request),
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
                     getLong(request, "rowId"),
                     getRating(request),
                     request.body(),
-                    getUsername(request)
-                    ));
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateEffectiveDate(String path) {
-        postForDatum(path, (req, resp) ->
-                scenarioService.updateEffectiveDate(
-                        getId(req),
-                        readBody(req, LocalDate.class),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.updateEffectiveDate(
+                    getId(request),
+                    readBody(request, LocalDate.class),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateScenarioStatus(String path) {
-        postForDatum(path, (req, resp) ->
-                scenarioService.updateScenarioStatus(
-                        getId(req),
-                        readEnum(req, "scenarioStatus", ScenarioStatus.class, (s) -> ScenarioStatus.CURRENT),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.updateScenarioStatus(
+                    getId(request),
+                    readEnum(request, "scenarioStatus", ScenarioStatus.class, (s) -> ScenarioStatus.CURRENT),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateName(String path) {
-        postForDatum(path, (req, resp) ->
-                scenarioService.updateName(
-                        getId(req),
-                        req.body(),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.updateName(
+                    getId(request),
+                    request.body(),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateDescription(String path) {
-        postForDatum(path, (req, resp) ->
-                scenarioService.updateDescription(
-                        getId(req),
-                        req.body(),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.updateDescription(
+                    getId(request),
+                    request.body(),
+                    getUsername(request));
+        });
     }
 
 
     private void registerAddRating(String path) {
-        postForDatum(path, (request, response) ->
-            scenarioRatingItemService.add(
+        postForDatum(path, (request, response) -> {
+            ensureUserHasEditRights(request);
+            return scenarioRatingItemService.add(
                     getId(request),
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
                     getLong(request, "rowId"),
                     getRating(request),
-                    getUsername(request)
-                    ));
+                    getUsername(request));
+        });
     }
 
 
     private void registerRemoveRating(String path) {
-        deleteForDatum(path, (request, response) ->
-            scenarioRatingItemService.remove(
+        deleteForDatum(path, (request, response) -> {
+            ensureUserHasEditRights(request);
+            return scenarioRatingItemService.remove(
                     getId(request),
                     getLong(request, "appId"),
                     getLong(request, "columnId"),
                     getLong(request, "rowId"),
-                    getUsername(request)));
+                    getUsername(request));
+        });
     }
 
 
@@ -189,19 +215,21 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void registerCloneScenario(String path) {
-        postForDatum(path, (request, response) ->
-                scenarioService.cloneScenario(ImmutableCloneScenarioCommand
-                        .builder()
-                        .newName(request.body())
-                        .scenarioId(getId(request))
-                        .userId(getUsername(request))
-                        .build()));
+        postForDatum(path, (request, response) -> {
+            ensureUserHasAdminRights(request);
+            return scenarioService.cloneScenario(ImmutableCloneScenarioCommand
+                    .builder()
+                    .newName(request.body())
+                    .scenarioId(getId(request))
+                    .userId(getUsername(request))
+                    .build());
+        });
     }
 
 
     private void registerGetScenarioById(String path) {
-        getForDatum(path, (req, resp) -> {
-            long scenarioId = getId(req);
+        getForDatum(path, (request, resp) -> {
+            long scenarioId = getId(request);
 
             Scenario scenario = scenarioService.getById(scenarioId);
             return ImmutableFullScenario
@@ -216,8 +244,8 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void registerFindScenariosForRoadmapId(String path) {
-        getForList(path, (req, resp) ->
-                scenarioService.findForRoadmapId(getLong(req, "roadmapId")));
+        getForList(path, (request, resp) ->
+                scenarioService.findForRoadmapId(getLong(request, "roadmapId")));
     }
 
 
@@ -244,4 +272,13 @@ public class ScenarioEndpoint implements Endpoint {
                 "domainItemId");
     }
 
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.SCENARIO_ADMIN);
+    }
+
+
+    private void ensureUserHasEditRights(Request request) {
+        requireRole(userRoleService, request, Role.SCENARIO_EDITOR);
+    }
 }

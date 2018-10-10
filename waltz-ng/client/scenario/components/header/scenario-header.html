@@ -116,7 +116,8 @@
                             </div>
 
 
-                            <div class="waltz-sub-section-controls">
+                            <div class="waltz-sub-section-controls"
+                                 ng-if="$ctrl.permissions.edit">
                                 <span>
                                     <a ng-click="$ctrl.onConfigureScenario()"
                                        class="clickable">

@@ -1,9 +1,12 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.roadmap.RoadmapService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -14,13 +17,16 @@ public class RoadmapEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "roadmap");
     private final RoadmapService roadmapService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public RoadmapEndpoint(RoadmapService roadmapService) {
+    public RoadmapEndpoint(RoadmapService roadmapService, UserRoleService userRoleService) {
         checkNotNull(roadmapService, "roadmapService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.roadmapService = roadmapService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -51,29 +57,35 @@ public class RoadmapEndpoint implements Endpoint {
 
 
     private void registerAddScenario(String path) {
-        postForDatum(path, (req, resp) ->
-                roadmapService.addScenario(
-                        getId(req),
-                        req.body(),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasAdminRights(request);
+            return roadmapService.addScenario(
+                    getId(request),
+                    request.body(),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateName(String path) {
-        postForDatum(path, (req, resp) ->
-                roadmapService.updateName(
-                        getId(req),
-                        req.body(),
-                        getUsername(req)));
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasAdminRights(request);
+            return roadmapService.updateName(
+                    getId(request),
+                    request.body(),
+                    getUsername(request));
+        });
     }
 
 
     private void registerUpdateDescription(String path) {
-        postForDatum(path, (req, resp) ->
-                roadmapService.updateDescription(
-                        getId(req),
-                        req.body(),
-                        getUsername(req)));
+        postForDatum(path, (req, resp) -> {
+            ensureUserHasAdminRights(req);
+            return roadmapService.updateDescription(
+                    getId(req),
+                    req.body(),
+                    getUsername(req));
+        });
     }
 
 
@@ -87,4 +99,12 @@ public class RoadmapEndpoint implements Endpoint {
         getForDatum(path, (req, resp) ->
                 roadmapService.getById(getId(req)));
     }
+
+
+    // -- helpers --
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireRole(userRoleService, request, Role.SCENARIO_ADMIN);
+    }
+
 }

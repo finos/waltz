@@ -4,6 +4,7 @@ import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event} from "d3-selection";
+import roles from "../../../user/roles";
 
 const bindings = {
     scenarioId: "<",
@@ -32,6 +33,10 @@ const initialState = {
     handlers: {
         onNodeClick: (n) => console.log("WRSD: NodeClick", n)
     },
+    permissions: {
+        admin: false,
+        edit: false
+    },
     mode: modes.VIEW,
     dialog: null
 };
@@ -53,7 +58,11 @@ function determineApplicationPickList(applications = [], ratings = [], column, r
 }
 
 
-function controller($q, $timeout, serviceBroker, notification) {
+function controller($q,
+                    $timeout,
+                    notification,
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -96,12 +105,16 @@ function controller($q, $timeout, serviceBroker, notification) {
 
     const switchToEditModeAction =  {
         title: "Switch to edit mode",
-        action:  (elm, d) => $timeout(() => vm.mode = modes.EDIT)
+        action:  () => $timeout(() => vm.mode = modes.EDIT)
     };
 
 
     function mkNodeMenu() {
         return () => {
+            if (!vm.permissions.edit) {
+                return null;
+            }
+
             if (vm.mode === modes.VIEW) {
                 return [ switchToEditModeAction ];
             } else {
@@ -114,9 +127,6 @@ function controller($q, $timeout, serviceBroker, notification) {
                         action: (elm, d) => {
                             const style = mkDialogStyle();
                             $timeout(() => {
-                                const row = d.domainCoordinates.row;
-                                const column = d.domainCoordinates.column;
-
                                 vm.dialog = {
                                     type: dialogs.EDIT_CELL,
                                     data: d,
@@ -151,14 +161,19 @@ function controller($q, $timeout, serviceBroker, notification) {
     }
 
     function mkNodeGridMenu() {
+
         return () => {
+            if (!vm.permissions.edit) {
+                return null;
+            }
+
             if (vm.mode === modes.VIEW) {
                 return [ switchToEditModeAction ];
             } else {
                 return [
                     {
                         title: "Add application",
-                        action: (elm, d) => addApplicationAction({row: d.row, column: d.column})
+                        action: (elm, d) => addApplicationAction({ row: d.row, column: d.column })
                     }
                 ];
             }
@@ -220,6 +235,13 @@ function controller($q, $timeout, serviceBroker, notification) {
             columnAxisItem: mkNodeMenu(),
             rowAxisItem: mkNodeMenu(),
         };
+
+        userService
+            .whoami()
+            .then(u => vm.permissions = {
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
+            });
     };
 
 
@@ -283,8 +305,9 @@ function controller($q, $timeout, serviceBroker, notification) {
 controller.$inject = [
     "$q",
     "$timeout",
+    "Notification",
     "ServiceBroker",
-    "Notification"
+    "UserService"
 ];
 
 
