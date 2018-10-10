@@ -111,7 +111,7 @@ public class ScenarioEndpoint implements Endpoint {
 
     private void registerRemoveAxisItem(String path) {
         deleteForDatum(path, (request, response) -> {
-            ensureUserHasAdminRights(request);
+            ensureUserHasEditRights(request);
             return scenarioService.removeAxisItem(
                     getId(request),
                     getOrientation(request),
@@ -279,6 +279,6 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, Role.SCENARIO_EDITOR);
+        requireAnyRole(userRoleService, request, Role.SCENARIO_EDITOR, Role.SCENARIO_ADMIN);
     }
 }

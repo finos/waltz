@@ -43,7 +43,7 @@ const initialState = {
     hierarchy: [],
     onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
     onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
-    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
+    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node)
 };
 
 
@@ -83,6 +83,7 @@ function expandSelectedNodes(nodes = [], expandedIds = []) {
 
 function controller() {
     const vm = initialiseData(this, initialState);
+    let expandedItemsLatch = false;
 
     vm.treeOptions = {
         nodeChildren: "children",
@@ -98,8 +99,10 @@ function controller() {
         if (node.children && node.children.length > 0) {
             const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
             if (idx === -1) {
+                // add
                 vm.expandedNodes.push(node);
             } else {
+                // remove
                 vm.expandedNodes.splice(idx, 1);
             }
         }
@@ -124,9 +127,10 @@ function controller() {
             vm.searchNodes = prepareSearchNodes(vm.items);
         }
 
-        if(changes.items || changes.expandedItemIds) {
+        if(!expandedItemsLatch && (changes.items || changes.expandedItemIds)) {
             if (vm.expandedItemIds && vm.items) {
                 vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
+                expandedItemsLatch = true;
             }
         }
 
