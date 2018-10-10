@@ -13,20 +13,32 @@ const bindings = {
 
 
 const initialState = {
+    permissions: {
+        admin: false,
+        edit: false
+    },
     scenarios: []
 };
 
 
-function controller() {
+function controller(userService) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
+    vm.$onInit = () => {
+        userService
+            .whoami()
+            .then(u => vm.permissions = {
+                admin: userService.hasRole(u, "SCENARIO_ADMIN"),
+                edit: userService.hasRole(u, "SCENARIO_EDIT")
+            });
     };
 
 }
 
 
-controller.$inject = [ ];
+controller.$inject = [
+    "UserService"
+];
 
 
 const component = {

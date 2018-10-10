@@ -2,24 +2,27 @@
 
 <div>
     <p class="help-block">
-        <span ng-if="$ctrl.mode === 'VIEW'">
-            You are currently viewing this scenario.
-            <br>
-            <a ng-click="$ctrl.mode = 'EDIT'"
-               class="clickable">
-                Switch to edit mode
-            </a>
-            (also available via context menu).
-        </span>
+        <div ng-if="$ctrl.permissions.edit">
+            <span ng-if="$ctrl.mode === 'VIEW'">
+                You are currently viewing this scenario.
+                <br>
+                <a ng-click="$ctrl.mode = 'EDIT'"
+                   class="clickable">
+                    Switch to edit mode
+                </a>
+                (also available via context menu).
+            </span>
 
-        <span ng-if="$ctrl.mode === 'EDIT'"
-              class="clickable">
-            You are currently editing this scenario. Use the context menu to add applications, change ratings and update descriptions.
-            <br>
-            <a ng-click="$ctrl.mode = 'VIEW'">
-                Switch back to view mode.
-            </a>
-        </span>
+            <span ng-if="$ctrl.mode === 'EDIT'"
+                  class="clickable">
+                You are currently editing this scenario. Use the context menu to add applications, change ratings and update descriptions.
+                <br>
+                <a ng-click="$ctrl.mode = 'VIEW'">
+                    Switch back to view mode.
+                </a>
+            </span>
+        </div>
+
     </p>
 
     <!-- VIZ -->

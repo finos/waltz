@@ -49,6 +49,7 @@
         <td>
             <span class="waltz-visibility-child-30">
                 <a ng-click="$ctrl.onCloneScenario(scenario)"
+                   ng-if="$ctrl.permissions.admin"
                    class="clickable">
                     Clone
                 </a>
@@ -60,7 +61,7 @@
             </waltz-last-updated>
         </td>
     </tr>
-    <tr>
+    <tr ng-if="$ctrl.permissions.admin">
         <td colspan="4"></td>
         <td colspan="2">
             <a ng-click="$ctrl.onAddScenario(roadmap)"

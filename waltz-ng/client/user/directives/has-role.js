@@ -18,7 +18,7 @@
  */
 
 const bindings = {
-    role: '@waltzHasRole'
+    role: "@waltzHasRole"
 };
 
 function controller(UserService) {
@@ -30,16 +30,16 @@ function controller(UserService) {
     vm.show = false;
 }
 
-controller.$inject = ['UserService'];
+controller.$inject = ["UserService"];
 
 
 export default () => ({
     replace: true,
-    restrict: 'A',
+    restrict: "A",
     transclude: true,
     scope: {},
     bindToController: bindings,
-    controllerAs: 'ctrl',
-    template: '<span ng-show="ctrl.show"><ng-transclude></ng-transclude></span>',
+    controllerAs: "ctrl",
+    template: "<span ng-show=\"ctrl.show\"><ng-transclude></ng-transclude></span>",
     controller
 });

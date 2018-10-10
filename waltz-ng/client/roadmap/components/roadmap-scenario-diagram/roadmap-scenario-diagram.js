@@ -32,6 +32,10 @@ const initialState = {
     handlers: {
         onNodeClick: (n) => console.log("WRSD: NodeClick", n)
     },
+    permissions: {
+        admin: false,
+        edit: false
+    },
     mode: modes.VIEW,
     dialog: null
 };
@@ -53,7 +57,11 @@ function determineApplicationPickList(applications = [], ratings = [], column, r
 }
 
 
-function controller($q, $timeout, serviceBroker, notification) {
+function controller($q,
+                    $timeout,
+                    notification,
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -220,6 +228,13 @@ function controller($q, $timeout, serviceBroker, notification) {
             columnAxisItem: mkNodeMenu(),
             rowAxisItem: mkNodeMenu(),
         };
+
+        userService
+            .whoami()
+            .then(u => vm.permissions = {
+                admin: userService.hasRole(u, "SCENARIO_ADMIN"),
+                edit: userService.hasRole(u, "SCENARIO_EDIT")
+            });
     };
 
 
@@ -283,8 +298,9 @@ function controller($q, $timeout, serviceBroker, notification) {
 controller.$inject = [
     "$q",
     "$timeout",
+    "Notification",
     "ServiceBroker",
-    "Notification"
+    "UserService"
 ];
 
 
