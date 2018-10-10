@@ -48,13 +48,20 @@ function controller($q, serviceBroker, notification) {
         if (! vm.measurablesByCategory) return;
 
         if (! vm.allItems) vm.allItems = vm.measurablesByCategory[vm.axisDomain.id];
+        const allItemsById = _.keyBy(vm.allItems, "id");
 
         vm.checkedItemIds = _.map(vm.usedItems, d => d.domainItem.id);
-        vm.expandedItemIds = vm.checkedItemIds;
+        vm.expandedItemIds = _
+            .chain(vm.checkedItemIds)
+            .map(d => allItemsById[d])
+            .compact()
+            .map("parentId")
+            .uniq()
+            .value();
     }
 
     function reloadData() {
-        const axisPromise = serviceBroker
+        serviceBroker
             .loadViewData(
                 CORE_API.ScenarioStore.loadAxis,
                 [ vm.scenarioId, vm.axisOrientation ],
@@ -74,7 +81,7 @@ function controller($q, serviceBroker, notification) {
             .then(() => prepareData());
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.axisDomain) {
             reloadData();
         }
