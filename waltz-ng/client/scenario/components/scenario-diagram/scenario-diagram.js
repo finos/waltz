@@ -24,7 +24,7 @@ import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
 import {filterData} from "./scenario-diagram-data-utils";
-import {setupZoom} from "./scenario-diagram-utils";
+import {removeZoom, resetZoom, setupZoom} from "./scenario-diagram-utils";
 import _ from "lodash";
 import {drawGrid, gridLayout} from "./scenario-diagram-grid-utils";
 import {columnAxisHeight, drawAxis, rowAxisWidth} from "./scenario-diagram-axis-utils";
@@ -45,6 +45,7 @@ const defaultHandlers = {
 
 
 const initialState = {
+    panAndZoomEnabled: false
 };
 
 
@@ -117,7 +118,7 @@ function controller($element, serviceBroker) {
     vm.$onInit = () => {
         vm.handlers = Object.assign({}, defaultHandlers, vm.handlers);
         svgGroups = setupGroupElements($element);
-        setupZoom(svgGroups);
+
         destructorFn = responsivefy(svgGroups.svg);
         serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
@@ -131,12 +132,29 @@ function controller($element, serviceBroker) {
         }
     };
 
+
+    // -- interact --
+
     vm.doSearch = () => {
         redraw();
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         redraw();
+    };
+
+    vm.enablePanAndZoom = () => {
+        vm.panAndZoomEnabled = true;
+        setupZoom(svgGroups);
+    };
+
+    vm.disablePanAndZoom = () => {
+        vm.panAndZoomEnabled = false;
+        removeZoom(svgGroups);
+    };
+
+    vm.resetPanAndZoom = () => {
+        resetZoom(svgGroups);
     };
 }
 

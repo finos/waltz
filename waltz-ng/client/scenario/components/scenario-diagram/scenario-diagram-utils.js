@@ -16,37 +16,54 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {zoom} from "d3-zoom";
+import {zoom, zoomIdentity} from "d3-zoom";
 import {event} from "d3-selection";
 
 
 export const defaultOptions = { cols: 3, sortFn: d => d.node.name };
 
 
+const myZoom = zoom()
+    .scaleExtent([0.1, 2]);
+
+
 export function setupZoom(svgGroups) {
+    const zoomer = myZoom.on("zoom.myZoom", () => {
+        const tx = event.transform.x;
+        const ty = event.transform.y;
+        const k = event.transform.k;
 
-    const myZoom = zoom()
-        .scaleExtent([0.1, 2])
-        .on("zoom", () => {
-            const tx = event.transform.x;
-            const ty = event.transform.y;
-            const k = event.transform.k;
+        svgGroups
+            .rowAxisContent
+            .attr("transform", `translate(0 ${ty}) scale(${k})`);
 
-            svgGroups
-                .rowAxisContent
-                .attr("transform", `translate(0 ${ty}) scale(${k})`);
+        svgGroups
+            .columnAxisContent
+            .attr("transform", `translate(${tx} 0) scale(${k})`);
 
-            svgGroups
-                .columnAxisContent
-                .attr("transform", `translate(${tx} 0) scale(${k})`);
-
-            svgGroups
-                .gridContent
-                .attr("transform", event.transform);
-        });
+        svgGroups
+            .gridContent
+            .attr("transform", event.transform);
+    });
 
     return svgGroups
         .svg
-        .call(myZoom);
+        .call(zoomer);
+}
+
+
+export function removeZoom(svgGroups) {
+    return svgGroups
+        .svg
+        .on(".zoom", null);
+}
+
+
+export function resetZoom(svgGroups) {
+    svgGroups
+        .svg
+        .transition()
+        .duration(800)
+        .call(myZoom.transform, zoomIdentity.scale(1));
 }
 

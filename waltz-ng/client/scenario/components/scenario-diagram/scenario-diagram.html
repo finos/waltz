@@ -21,6 +21,7 @@
 
 
     <svg width="1600"
+         style="border-bottom: 1px solid #eee"
          height="800"
          viewBox="0 0 1600 800">
 
@@ -57,8 +58,24 @@
                    ng-model-options="{ debounce: 200 }"
                    ng-model="$ctrl.qry">
         </div>
-        <div class="col-sm-6">
 
+        <div class="col-sm-6">
+            <label>Diagram controls:</label>
+            <br>
+            <button class="btn btn-primary btn-sm"
+                    ng-if="! $ctrl.panAndZoomEnabled"
+                    ng-click="$ctrl.enablePanAndZoom()">
+                Enable pan & zoom
+            </button>
+            <button class="btn btn-primary btn-sm"
+                    ng-if="$ctrl.panAndZoomEnabled"
+                    ng-click="$ctrl.disablePanAndZoom()">
+                Disable pan & zoom
+            </button>
+            <button class="btn btn-primary btn-sm"
+                    ng-click="$ctrl.resetPanAndZoom()">
+                Reset
+            </button>
         </div>
     </div>
 
