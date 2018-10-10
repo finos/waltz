@@ -106,8 +106,7 @@ function controller($q,
                 CORE_API.ScenarioStore.findForRoadmap,
                 [ vm.roadmapId ],
                 { force: true })
-            .then(r => vm.scenarios = r.data)
-            .then(() => console.log('sc', vm.scenarios))
+            .then(r => vm.scenarios = r.data);
 
         return $q
             .all([scenarioPromise]);
