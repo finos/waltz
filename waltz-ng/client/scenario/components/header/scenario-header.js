@@ -55,7 +55,7 @@ function controller($q,
     vm.onSaveScenarioDescription = (ctx, data) => {
         return updateField(
             ctx.id,
-            CORE_API.RoadmapStore.updateDescription,
+            CORE_API.ScenarioStore.updateDescription,
             data,
             false,
             "Scenario description updated")
