@@ -81,18 +81,18 @@ public class ScenarioEndpoint implements Endpoint {
     private void registerReorderAxis(String path) {
         postForDatum(path, (request, response) -> {
                 ensureUserHasEditRights(request);
-                return scenarioService
-                        .reorderAxis(
+                return scenarioAxisItemService.reorderAxis(
                         getId(request),
                         getOrientation(request),
-                        readIdsFromBody(request));
+                        readIdsFromBody(request),
+                        getUsername(request));
         });
     }
 
 
     private void registerLoadAxis(String path) {
         getForList(path, (request, response) ->
-                scenarioService.loadAxis(
+                scenarioAxisItemService.loadAxis(
                         getId(request),
                         getOrientation(request)));
     }
@@ -101,7 +101,7 @@ public class ScenarioEndpoint implements Endpoint {
     private void registerAddAxisItem(String path) {
         postForDatum(path, (request, response) -> {
             ensureUserHasEditRights(request);
-            return scenarioService.addAxisItem(
+            return scenarioAxisItemService.addAxisItem(
                     getId(request),
                     getOrientation(request),
                     getDomainItem(request),
@@ -114,7 +114,7 @@ public class ScenarioEndpoint implements Endpoint {
     private void registerRemoveAxisItem(String path) {
         deleteForDatum(path, (request, response) -> {
             ensureUserHasEditRights(request);
-            return scenarioService.removeAxisItem(
+            return scenarioAxisItemService.removeAxisItem(
                     getId(request),
                     getOrientation(request),
                     getDomainItem(request),

@@ -4,14 +4,13 @@ import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.model.scenario.ScenarioStatus;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.service.scenario.ScenarioUtilities.mkBasicLogEntry;
 
 @Service
 public class ScenarioService {
@@ -30,21 +29,24 @@ public class ScenarioService {
     private final ScenarioAxisItemDao scenarioAxisItemDao;
     private final ScenarioRatingItemDao scenarioRatingItemDao;
     private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
     public ScenarioService(ScenarioDao scenarioDao,
                            ScenarioAxisItemDao scenarioAxisItemDao,
                            ScenarioRatingItemDao scenarioRatingItemDao,
-                           RoadmapIdSelectorFactory roadmapIdSelectorFactory) {
+                           RoadmapIdSelectorFactory roadmapIdSelectorFactory, ChangeLogService changeLogService) {
         checkNotNull(scenarioDao, "scenarioDao cannot be null");
         checkNotNull(scenarioAxisItemDao, "scenarioAxisItemDao cannot be null");
         checkNotNull(scenarioRatingItemDao, "scenarioRatingItemDao cannot be null");
         checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         this.scenarioDao = scenarioDao;
         this.scenarioAxisItemDao = scenarioAxisItemDao;
         this.scenarioRatingItemDao = scenarioRatingItemDao;
         this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -68,26 +70,31 @@ public class ScenarioService {
         Scenario clonedScenario = scenarioDao.cloneScenario(command);
         scenarioRatingItemDao.cloneItems(command, clonedScenario.id().get());
         scenarioAxisItemDao.cloneItems(command, clonedScenario.id().get());
+
+        writeLogEntriesForCloningOperation(command, clonedScenario);
+
         return clonedScenario;
     }
 
-
     public Boolean updateName(long scenarioId, String newValue, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Name", newValue, userId);
         return scenarioDao.updateName(scenarioId, newValue, userId);
     }
 
-
     public Boolean updateDescription(long scenarioId, String newValue, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Description", newValue, userId);
         return scenarioDao.updateDescription(scenarioId, newValue, userId);
     }
 
 
     public Boolean updateEffectiveDate(long scenarioId, LocalDate newValue, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Effective Date", newValue.toString(), userId);
         return scenarioDao.updateEffectiveDate(scenarioId, newValue, userId);
     }
 
 
     public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newStatus, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Scenario Status", newStatus.name(), userId);
         return scenarioDao.updateScenarioStatus(
                 scenarioId,
                 newStatus,
@@ -97,6 +104,7 @@ public class ScenarioService {
 
 
     public Boolean updateEntityLifecycleStatus(long scenarioId, EntityLifecycleStatus newStatus, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Lifecycle Status", newStatus.name(), userId);
         return scenarioDao.updateEntityLifecycleStatus(
                 scenarioId,
                 newStatus,
@@ -104,41 +112,23 @@ public class ScenarioService {
     }
 
 
-    public Boolean addAxisItem(long scenarioId,
-                              AxisOrientation orientation,
-                              EntityReference domainItem,
-                              Integer position,
-                              String userId) {
-        return scenarioAxisItemDao.add(
-                scenarioId,
-                orientation,
-                domainItem,
-                position);
+    // -- helpers --
+
+    private void writeLogEntriesForUpdate(long scenarioId, String desc, String newValue, String userId) {
+        String message = String.format("%s: '%s'", desc, newValue);
+        changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
     }
 
 
-    public Boolean removeAxisItem(long scenarioId,
-                              AxisOrientation orientation,
-                              EntityReference domainItem,
-                              String userId) {
-        return scenarioAxisItemDao.remove(
-                scenarioId,
-                orientation,
-                domainItem);
+    private void writeLogEntriesForCloningOperation(CloneScenarioCommand command, Scenario clonedScenario) {
+        String message = String.format("Created cloned scenario: '%s'", command.newName());
+        ChangeLog logEntry = mkBasicLogEntry(command.scenarioId(), message, command.userId());
+
+        changeLogService.write(logEntry);
+        changeLogService.write(ImmutableChangeLog
+                .copyOf(logEntry)
+                .withParentReference(EntityReference.mkRef(EntityKind.ROADMAP, clonedScenario.roadmapId())));
     }
 
 
-    public Collection<ScenarioAxisItem> loadAxis(long scenarioId, AxisOrientation orientation) {
-        return scenarioAxisItemDao.findForScenarioAndOrientation(
-                scenarioId,
-                orientation);
-    }
-
-
-    public int[] reorderAxis(long scenarioId, AxisOrientation orientation, List<Long> orderedIds) {
-        return scenarioAxisItemDao.reorder(
-                scenarioId,
-                orientation,
-                orderedIds);
-    }
 }
