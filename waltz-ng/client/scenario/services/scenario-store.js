@@ -86,6 +86,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateEntityLifecycleStatus = (scenarioId, newStatus) => {
+        return $http
+            .post(`${BASE}/id/${scenarioId}/entity-lifecycle-status/${newStatus}`)
+            .then(result => result.data);
+    };
+
     const addAxisItem = (scenarioId, orientation, domainItem, position) => {
         return $http
             .post(`${BASE}/id/${scenarioId}/axis/${orientation}/${domainItem.kind}/${domainItem.id}`, position)
@@ -124,6 +130,7 @@ function store($http, baseUrl) {
         updateRating,
         updateEffectiveDate,
         updateScenarioStatus,
+        updateEntityLifecycleStatus,
         addAxisItem,
         removeAxisItem,
         loadAxis,
@@ -196,6 +203,11 @@ export const ScenarioStore_API = {
         serviceName,
         serviceFnName: "updateScenarioStatus",
         description: "executes updateScenarioStatus [scenarioId, newStatus]"
+    },
+    updateEntityLifecycleStatus: {
+        serviceName,
+        serviceFnName: "updateEntityLifecycleStatus",
+        description: "executes updateEntityLifecycleStatus [scenarioId, newStatus]"
     },
     addAxisItem: {
         serviceName,

@@ -8,7 +8,10 @@ const bindings = {
     onAddScenario: "<",
     onCloneScenario: "<",
     onSelectScenario: "<",
-    onConfigureScenario: "<"
+    onConfigureScenario: "<",
+    onPublishScenario: "<",
+    onRetireScenario: "<",
+    onRevertToDraftScenario: "<"
 };
 
 
@@ -34,8 +37,9 @@ function controller(userService) {
             })
             .then(() => {
                 vm.actions = [
-                    cloneAction,
                     publishAction,
+                    revertToDraftAction,
+                    cloneAction,
                     retireAction
                 ];
             });
@@ -54,18 +58,27 @@ function controller(userService) {
         type: "action",
         predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "PENDING",
         name: "Publish",
-        icon: "caret-square-o-up",
+        icon: "arrow-up",
         description: "Makes this scenario viewable by all users",
-        execute: (scenario) => console.log("publish", { scenario })
+        execute: (scenario) => vm.onPublishScenario(scenario)
     };
 
     const retireAction = {
         type: "action",
         predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "ACTIVE",
         name: "Retire",
-        icon: "caret-square-o-down",
+        icon: "arrow-down",
         description: "Marks this scenario as retired",
-        execute: (scenario) => console.log("retire", { scenario })
+        execute: (scenario) => vm.onRetireScenario(scenario)
+    };
+
+    const revertToDraftAction = {
+        type: "action",
+        predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "ACTIVE",
+        name: "Draft",
+        icon: "arrow-left",
+        description: "Marks this scenario as in draft",
+        execute: (scenario) => vm.onRevertToDraftScenario(scenario)
     };
 
 }

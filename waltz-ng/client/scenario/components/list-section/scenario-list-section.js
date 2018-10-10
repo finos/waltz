@@ -1,7 +1,7 @@
 import template from "./scenario-list-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 
 const bindings = {
@@ -84,9 +84,39 @@ function controller($q,
                     [ scenario.id, newName ])
                 .then(() => reloadAllData())
                 .then(() => notification.success("Scenario cloned"));
-        } else {
-            notification.warning("Aborting clone")
         }
+    };
+
+    vm.onPublishScenario = (scenario) => {
+        confirmWithUser(
+            `PUBLISH: Please confirm that you want scenario: "${scenario.name}" to be published`,
+            () => updateLifecycleStatus(
+                scenario.id,
+                entityLifecycleStatus.ACTIVE,
+                "Scenario published",
+                "Failed to publish scenario"));
+
+    };
+
+    vm.onRevertToDraftScenario = (scenario) => {
+        confirmWithUser(
+            `REVERT: Please confirm that you want to revert scenario: "${scenario.name}" back to draft`,
+            () => updateLifecycleStatus(
+                scenario.id,
+                entityLifecycleStatus.PENDING,
+                "Scenario reverted to draft",
+                "Failed to revert scenario to draft"));
+    };
+
+    vm.onRetireScenario = (scenario) => {
+        confirmWithUser(
+            `RETIRE: Please confirm that you want scenario: "${scenario.name}" to be retired`,
+            () => updateLifecycleStatus(
+                scenario.id,
+                entityLifecycleStatus.REMOVED,
+                "Scenario retired",
+                "Failed to retire scenario"));
+
     };
 
     vm.onCancel = () => {
@@ -94,7 +124,21 @@ function controller($q,
         reloadAllData();
     };
 
+
     // -- helpers --
+
+    function updateLifecycleStatus(scenarioId, status, successMessage = "Success", failureMessage = "Failed") {
+        serviceBroker
+            .execute(
+                CORE_API.ScenarioStore.updateEntityLifecycleStatus,
+                [ scenarioId, status.key ])
+            .then(() => reloadAllData())
+            .then(() => notification.success(successMessage))
+            .catch((e) => {
+                console.log(`WSLS: ${failureMessage}`, { error: e });
+                return notification.warning(`${failureMessage}: ${e.message}`);
+            });
+    }
 
     function reloadAllData() {
         const roadmapPromise = serviceBroker

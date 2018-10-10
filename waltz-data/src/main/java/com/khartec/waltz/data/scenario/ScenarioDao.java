@@ -137,7 +137,7 @@ public class ScenarioDao {
     }
 
 
-    public Boolean updateLifecycleStatus(long scenarioId, EntityLifecycleStatus newValue, String userId) {
+    public Boolean updateEntityLifecycleStatus(long scenarioId, EntityLifecycleStatus newValue, String userId) {
         return updateField(
                 scenarioId,
                 SCENARIO.LIFECYCLE_STATUS,
