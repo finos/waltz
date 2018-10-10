@@ -48,11 +48,9 @@
         </td>
         <td>
             <span class="waltz-visibility-child-30">
-                <a ng-click="$ctrl.onCloneScenario(scenario)"
-                   ng-if="$ctrl.permissions.admin"
-                   class="clickable">
-                    Clone
-                </a>
+                <waltz-mini-actions ctx="scenario"
+                                    actions="$ctrl.actions">
+                </waltz-mini-actions>
             </span>
         </td>
         <td>

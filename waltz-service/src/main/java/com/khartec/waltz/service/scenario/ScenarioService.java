@@ -5,6 +5,7 @@ import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
 import com.khartec.waltz.model.AxisOrientation;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
@@ -88,6 +89,15 @@ public class ScenarioService {
 
     public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newStatus, String userId) {
         return scenarioDao.updateScenarioStatus(
+                scenarioId,
+                newStatus,
+                userId);
+    }
+
+
+
+    public Boolean updateEntityLifecycleStatus(long scenarioId, EntityLifecycleStatus newStatus, String userId) {
+        return scenarioDao.updateEntityLifecycleStatus(
                 scenarioId,
                 newStatus,
                 userId);

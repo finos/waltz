@@ -1,6 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.AxisOrientation;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
@@ -67,6 +68,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
         registerUpdateScenarioStatus(mkPath(BASE_URL, "id", ":id", "scenario-status", ":scenarioStatus"));
+        registerUpdateEntityLifecycleStatus(mkPath(BASE_URL, "id", ":id", "entity-lifecycle-status", ":lifecycleStatus"));
 
         registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
         registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
@@ -154,6 +156,17 @@ public class ScenarioEndpoint implements Endpoint {
             return scenarioService.updateScenarioStatus(
                     getId(request),
                     readEnum(request, "scenarioStatus", ScenarioStatus.class, (s) -> ScenarioStatus.CURRENT),
+                    getUsername(request));
+        });
+    }
+
+
+    private void registerUpdateEntityLifecycleStatus(String path) {
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasAdminRights(request);
+            return scenarioService.updateEntityLifecycleStatus(
+                    getId(request),
+                    readEnum(request, "lifecycleStatus", EntityLifecycleStatus.class, (s) -> EntityLifecycleStatus.PENDING),
                     getUsername(request));
         });
     }

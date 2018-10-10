@@ -27,6 +27,8 @@ import Grid from "./grid/grid";
 import GridSref from "./grid-sref/grid-sref";
 import GridWithSearch from "./grid/grid-with-search";
 import DatePickerFormInput from "./date-picker/date-picker-form-input";
+import MiniActions from "./mini-actions/mini-actions";
+import {registerComponents} from "../module-utils";
 
 
 export default (module) => {
@@ -44,5 +46,8 @@ export default (module) => {
         .component("waltzGridWithSearch", GridWithSearch)
         .component("waltzDatePickerFormInput", DatePickerFormInput);
 
+    registerComponents(module, [
+        MiniActions
+    ]);
 
 };
