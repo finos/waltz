@@ -1,6 +1,6 @@
 import template from "./scenario-list.html";
 import {initialiseData} from "../../../common";
-import _ from "lodash";
+import roles from "../../../user/roles";
 
 
 const bindings = {
@@ -28,8 +28,8 @@ function controller(userService) {
         userService
             .whoami()
             .then(u => vm.permissions = {
-                admin: userService.hasRole(u, "SCENARIO_ADMIN"),
-                edit: userService.hasRole(u, "SCENARIO_EDIT")
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
             });
     };
 

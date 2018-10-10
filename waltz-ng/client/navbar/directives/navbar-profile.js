@@ -19,15 +19,16 @@
 
 import _ from "lodash";
 import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
-import template from './navbar-profile.html';
+import template from "./navbar-profile.html";
+import roles from "../../user/roles";
 
 const bindings = {
-    logoOverlayText: '<'
+    logoOverlayText: "<"
 };
 
 
 const initialState = {
-    logoOverlayText: '',
+    logoOverlayText: "",
     user: null,
     showSysAdminMenuItem: false,
     notificationCountTotal: null,
@@ -44,18 +45,18 @@ function loginController($scope, $uibModalInstance, logoOverlayText) {
         $uibModalInstance.close(credentials);
     };
 
-    $scope.username = '';
-    $scope.password = '';
-    $scope.logoOverlayText = logoOverlayText || '';
+    $scope.username = "";
+    $scope.password = "";
+    $scope.logoOverlayText = logoOverlayText || "";
 
-    $scope.cancel = () => $uibModalInstance.dismiss('cancel');
+    $scope.cancel = () => $uibModalInstance.dismiss("cancel");
 }
 
 
 loginController.$inject = [
-    '$scope',
-    '$uibModalInstance',
-    'logoOverlayText'
+    "$scope",
+    "$uibModalInstance",
+    "logoOverlayText"
 ];
 
 
@@ -68,19 +69,19 @@ function controller($interval,
     const vm = _.defaultsDeep(this, initialState);
 
     settingsService
-        .findOrDefault('web.authentication', "")
+        .findOrDefault("web.authentication", "")
         .then(webAuthentication => {
-            vm.allowDirectLogin = webAuthentication === 'waltz';
+            vm.allowDirectLogin = webAuthentication === "waltz";
         });
 
     userService
         .whoami(true) // force
         .then(user => vm.user = user)
-        .then(() => vm.showSysAdminMenuItem = userService.hasRole(vm.user, 'ADMIN')
-                                                || userService.hasRole(vm.user, 'USER_ADMIN'));
+        .then(() => vm.showSysAdminMenuItem = userService.hasRole(vm.user, roles.ADMIN)
+                                                || userService.hasRole(vm.user, roles.USER_ADMIN));
 
     const notificationCacheRefreshListener = (e) => {
-        if (e.eventType === 'REFRESH'
+        if (e.eventType === "REFRESH"
             && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.NotificationStore.findAll) {
             loadNotifications();
         }
@@ -90,14 +91,14 @@ function controller($interval,
         return serviceBroker
             .loadAppData(CORE_API.NotificationStore.findAll, [], {
                 cacheRefreshListener: {
-                    componentId: 'waltzNavbarProfile',
+                    componentId: "waltzNavbarProfile",
                     fn: notificationCacheRefreshListener
                 }
             })
             .then(r => {
                 const notificationSummaries = r.data;
-                vm.notificationCountTotal = _.sumBy(notificationSummaries, 'count');
-                vm.notificationsCountsByKind = _.keyBy(notificationSummaries, 'kind');
+                vm.notificationCountTotal = _.sumBy(notificationSummaries, "count");
+                vm.notificationsCountsByKind = _.keyBy(notificationSummaries, "kind");
             });
     };
 
@@ -111,7 +112,7 @@ function controller($interval,
 
     const reloadPage = () => $state.reload();
 
-    const rejected = () => alert('Invalid username/password');
+    const rejected = () => alert("Invalid username/password");
 
     const logout = () => userService
         .logout()
@@ -123,12 +124,12 @@ function controller($interval,
 
         var loginModalInstance = $uibModal.open({
             animation: true,
-            templateUrl: 'navbar/modal-login.html',
+            templateUrl: "navbar/modal-login.html",
             controller: loginController,
             resolve: {
                 logoOverlayText: () => vm.logoOverlayText
             },
-            size: 'sm'
+            size: "sm"
         });
 
         loginModalInstance.result
@@ -136,7 +137,7 @@ function controller($interval,
                 (credentials) => userService
                     .login(credentials)
                     .then(reloadPage, rejected),
-                () => console.log('Login dismissed at: ' + new Date()));
+                () => console.log("Login dismissed at: " + new Date()));
 
     };
 
@@ -144,21 +145,21 @@ function controller($interval,
 
 
 controller.$inject = [
-    '$interval',
-    '$state',
-    '$uibModal',
-    'ServiceBroker',
-    'SettingsService',
-    'UserService'
+    "$interval",
+    "$state",
+    "$uibModal",
+    "ServiceBroker",
+    "SettingsService",
+    "UserService"
 ];
 
 
 const directive = {
-    restrict: 'E',
+    restrict: "E",
     replace: true,
     scope: {},
     bindToController: bindings,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     controller,
     template
 };

@@ -4,6 +4,7 @@ import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event} from "d3-selection";
+import roles from "../../../user/roles";
 
 const bindings = {
     scenarioId: "<",
@@ -104,12 +105,16 @@ function controller($q,
 
     const switchToEditModeAction =  {
         title: "Switch to edit mode",
-        action:  (elm, d) => $timeout(() => vm.mode = modes.EDIT)
+        action:  () => $timeout(() => vm.mode = modes.EDIT)
     };
 
 
     function mkNodeMenu() {
         return () => {
+            if (!vm.permissions.edit) {
+                return null;
+            }
+
             if (vm.mode === modes.VIEW) {
                 return [ switchToEditModeAction ];
             } else {
@@ -122,9 +127,6 @@ function controller($q,
                         action: (elm, d) => {
                             const style = mkDialogStyle();
                             $timeout(() => {
-                                const row = d.domainCoordinates.row;
-                                const column = d.domainCoordinates.column;
-
                                 vm.dialog = {
                                     type: dialogs.EDIT_CELL,
                                     data: d,
@@ -159,14 +161,19 @@ function controller($q,
     }
 
     function mkNodeGridMenu() {
+
         return () => {
+            if (!vm.permissions.edit) {
+                return null;
+            }
+
             if (vm.mode === modes.VIEW) {
                 return [ switchToEditModeAction ];
             } else {
                 return [
                     {
                         title: "Add application",
-                        action: (elm, d) => addApplicationAction({row: d.row, column: d.column})
+                        action: (elm, d) => addApplicationAction({ row: d.row, column: d.column })
                     }
                 ];
             }
@@ -232,8 +239,8 @@ function controller($q,
         userService
             .whoami()
             .then(u => vm.permissions = {
-                admin: userService.hasRole(u, "SCENARIO_ADMIN"),
-                edit: userService.hasRole(u, "SCENARIO_EDIT")
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
             });
     };
 

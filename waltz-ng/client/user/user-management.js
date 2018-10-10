@@ -23,33 +23,12 @@ import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 // ---
 import template from "./user-management.html";
-
-
-
-const allRoles = [
-    "ADMIN",
-    "APP_EDITOR",
-    "ATTESTATION_ADMIN",
-    "AUTHORITATIVE_SOURCE_EDITOR",
-    "BETA_TESTER",
-    "BOOKMARK_EDITOR",
-    "CAPABILITY_EDITOR",
-    "CHANGE_INITIATIVE_EDITOR",
-    "LINEAGE_EDITOR",
-    "LOGICAL_DATA_FLOW_EDITOR",
-    "ORG_UNIT_EDITOR",
-    "RATING_EDITOR",
-    "SCENARIO_ADMIN",
-    "SCENARIO_EDITOR",
-    "SURVEY_ADMIN",
-    "SURVEY_TEMPLATE_ADMIN",
-    "USER_ADMIN"
-];
+import roles from "./roles";
 
 
 const initialState = {
     numAllowedWithoutFilter: 100,
-    allRoles
+    roles
 };
 
 
@@ -154,7 +133,7 @@ function controller(serviceBroker) {
 
     function setAllSelectionsTo(b) {
         vm.roleSelections = _.reduce(
-            allRoles,
+            _.map(roles, "key"),
             (acc, k) => {
                 acc[k] = b;
                 return acc;

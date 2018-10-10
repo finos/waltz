@@ -1,6 +1,7 @@
 import template from "./scenario-header.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import roles from "../../../user/roles";
 
 
 const bindings = {
@@ -34,8 +35,8 @@ function controller($q,
         userService
             .whoami()
             .then(u => vm.permissions = {
-                admin: userService.hasRole(u, "SCENARIO_ADMIN"),
-                edit: userService.hasRole(u, "SCENARIO_EDIT")
+                admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
+                edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
             });
 
     };

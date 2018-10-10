@@ -18,7 +18,8 @@
  */
 import {initialiseData} from "../common";
 
-import template from './system-admin-list.html';
+import template from "./system-admin-list.html";
+import roles from "../user/roles";
 
 const initialState = {
     showUserAdminItems: false
@@ -31,19 +32,19 @@ function controller(userService) {
         userService
             .whoami(true) // force
             .then(user => vm.user = user)
-            .then(() => vm.showUserAdminItems = userService.hasRole(vm.user, 'ADMIN')
-                || userService.hasRole(vm.user, 'USER_ADMIN'));
+            .then(() => vm.showUserAdminItems = userService.hasRole(vm.user, roles.ADMIN)
+                || userService.hasRole(vm.user, roles.USER_ADMIN));
     };
 
 }
 
-controller.$inject = [ 'UserService' ];
+controller.$inject = [ "UserService" ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };
