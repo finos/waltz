@@ -1,6 +1,6 @@
 import template from "./roadmap-view.html";
 import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 
 const bindings = {
@@ -8,7 +8,7 @@ const bindings = {
 
 
 const initialState = {
-    foo: "baa"
+    changeLogSection: dynamicSections.changeLogSection,
 };
 
 
@@ -19,7 +19,7 @@ function controller($stateParams, serviceBroker) {
     vm.$onInit = () => {
         vm.roadmapId = $stateParams.id;
         vm.parentEntityRef = {
-            kind: "SCENARIO",
+            kind: "ROADMAP",
             id: vm.roadmapId
         };
 
