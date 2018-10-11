@@ -33,6 +33,7 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
+import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
@@ -95,6 +96,9 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Value("${smtpPort:25}")
     private int smtpPort;
 
+    @Value("${database.performance.query.slow.threshold:10}")
+    private int databasePerformanceQuerySlowThreshold;
+
     // -- BUILD ---
 
     @Value("${build.pom}")
@@ -155,10 +159,13 @@ public class DIConfiguration implements SchedulingConfigurer {
                     .withExecuteLogging(true);
         }
 
-        return DSL.using(
-                dataSource,
-                SQLDialect.valueOf(dialect),
-                dslSettings);
+        org.jooq.Configuration configuration = new DefaultConfiguration()
+                .set(dataSource)
+                .set(SQLDialect.valueOf(dialect))
+                .set(dslSettings)
+                .set(new SlowQueryListener(databasePerformanceQuerySlowThreshold));
+
+        return DSL.using(configuration);
     }
 
     @Bean
