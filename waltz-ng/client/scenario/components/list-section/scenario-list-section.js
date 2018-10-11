@@ -2,6 +2,7 @@ import template from "./scenario-list-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import {confirmWithUser} from "../../../common/dialog-utils";
 
 
 const bindings = {
