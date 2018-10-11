@@ -40,12 +40,6 @@ If using header based authentication provide an additional setting which gives t
 * `server.authentication.filter.headerbased.param`  e.g. `ct_user`
 
 
-## Database (```database``` )
-Database options can be used to influence Waltz interaction with the database
-* ```database.performance.query.slow.threshold``` - to monitor query performance, the number of seconds a query can run
-before being logged as a slow query in the performance monitoring log file.  Helpful in finding slow running queries
-
-
 ## Development (```web.devext``` )
 
 Development options can be used by developers to aid in writing code for Waltz
