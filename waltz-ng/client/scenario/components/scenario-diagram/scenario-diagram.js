@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common/index";
+import {initialiseData, isEmpty} from "../../../common/index";
 import template from "./scenario-diagram.html";
 import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";
@@ -39,8 +39,8 @@ const bindings = {
 
 
 const defaultHandlers = {
-    onNodeClick: (d) => console.log("WRD: NodeClick", d),
-    onNodeGridClick: (d) => console.log("WRD: NodeGridClick", d)
+    onNodeClick: (d) => console.log("WSD: NodeClick", d),
+    onNodeGridClick: (d) => console.log("WSD: NodeGridClick", d)
 };
 
 
@@ -91,10 +91,38 @@ function draw(dataWithLayout, svgGroups, options) {
 }
 
 
-function controller($element, serviceBroker) {
+function controller($element, $timeout, serviceBroker) {
     const vm = initialiseData(this, initialState);
     let svgGroups = null;
     let destructorFn = null;
+
+    const enablePanAndZoomAction = { title: "Disable pan and zoom", action: (elm, d) => $timeout(() => vm.disablePanAndZoom()) };
+    const disablePanAndZoomAction = { title: "Enable pan and zoom", action: (elm, d) => $timeout(() => vm.enablePanAndZoom()) };
+    const resetViewAction = { title: "Reset view", action: (elm, d) => $timeout(() => vm.resetPanAndZoom()) };
+    const menuDivider = { divider: "pan"};
+
+    function enrichHandlers(handlers) {
+        const newContextMenus =  _.reduce(
+            handlers.contextMenus,
+            (acc, fn, k) => {
+                acc[k] = () => {
+                    const panAction = vm.panAndZoomEnabled
+                        ? (enablePanAndZoomAction)
+                        : (disablePanAndZoomAction);
+                    const newItems = [ panAction, resetViewAction ];
+
+                    const existingItems = fn();
+
+                    return isEmpty(existingItems)
+                        ? newItems
+                        : _.uniq(_.concat(existingItems, [ menuDivider ] , newItems) );
+                };
+                return acc;
+            },
+            {});
+
+        return Object.assign(handlers, { contextMenus: newContextMenus });
+    }
 
     function redraw() {
         const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
@@ -109,7 +137,7 @@ function controller($element, serviceBroker) {
 
             const drawingOptions = {
                 colorScale,
-                handlers: vm.handlers
+                handlers: enrichHandlers(vm.handlers)
             };
             draw(dataWithLayout, svgGroups, drawingOptions);
         }
@@ -159,7 +187,11 @@ function controller($element, serviceBroker) {
 }
 
 
-controller.$inject = ["$element", "ServiceBroker"];
+controller.$inject = [
+    "$element",
+    "$timeout",
+    "ServiceBroker"
+];
 
 
 const component = {
