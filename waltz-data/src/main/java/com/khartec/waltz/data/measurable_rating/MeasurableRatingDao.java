@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.measurable_rating;
 
 import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
@@ -47,6 +48,8 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -59,6 +62,17 @@ public class MeasurableRatingDao {
     private static final Condition APP_JOIN_CONDITION = APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID)
             .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            MEASURABLE_RATING.ENTITY_ID,
+            MEASURABLE_RATING.ENTITY_KIND,
+            newArrayList(EntityKind.values()))
+        .as("entity_name");
+
+    private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
+            MEASURABLE_RATING.ENTITY_ID,
+            MEASURABLE_RATING.ENTITY_KIND)
+            .as("entity_lifecycle_status");
+
 
     private static final RecordMapper<? super Record, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
         MeasurableRatingRecord r = record.into(MEASURABLE_RATING);
@@ -66,8 +80,8 @@ public class MeasurableRatingDao {
         EntityReference ref = ImmutableEntityReference.builder()
                 .kind(EntityKind.valueOf(r.getEntityKind()))
                 .id(r.getEntityId())
-                .name(record.get(APPLICATION.NAME))
-                .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.get(APPLICATION.ENTITY_LIFECYCLE_STATUS)))
+                .name(Optional.ofNullable(record.get(ENTITY_NAME_FIELD)))
+                .entityLifecycleStatus(readEnum(record.get(ENTITY_LIFECYCLE_FIELD), EntityLifecycleStatus.class, (s) -> EntityLifecycleStatus.REMOVED))
                 .build();
 
         return ImmutableMeasurableRating.builder()
@@ -148,7 +162,6 @@ public class MeasurableRatingDao {
     public List<MeasurableRating> findForEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return mkBaseQuery()
-                .innerJoin(APPLICATION).on(APP_JOIN_CONDITION)
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -175,7 +188,6 @@ public class MeasurableRatingDao {
         Condition condition = MEASURABLE_RATING.ENTITY_ID.in(selector)
                 .and(MEASURABLE_RATING.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
         return mkBaseQuery()
-                .leftJoin(APPLICATION).on(APP_JOIN_CONDITION)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -184,7 +196,6 @@ public class MeasurableRatingDao {
     public Collection<MeasurableRating> findByCategory(long id) {
         return mkBaseQuery()
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
-                .leftJoin(APPLICATION).on(APP_JOIN_CONDITION)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(id))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -259,8 +270,8 @@ public class MeasurableRatingDao {
     private SelectJoinStep<Record> mkBaseQuery() {
         return dsl
                 .select(MEASURABLE_RATING.fields())
-                .select(APPLICATION.NAME)
-                .select(APPLICATION.ENTITY_LIFECYCLE_STATUS)
+                .select(ENTITY_NAME_FIELD)
+                .select(ENTITY_LIFECYCLE_FIELD)
                 .from(MEASURABLE_RATING);
     }
 
