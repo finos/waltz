@@ -29,6 +29,7 @@ const bindings = {
 
 
 const initialState = {
+    thisYear: null,
     currentYear: null,
     currentCosts : [],
     currentTotal : null
@@ -64,6 +65,7 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findByAppId,
                 [vm.parentEntityRef.id])
             .then(r => {
+                vm.thisYear = (new Date()).getFullYear();
                 vm.costs = r.data;
                 vm.currentYear = getCurrentYear(vm.costs);
                 vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);

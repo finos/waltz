@@ -11,6 +11,8 @@
         </message>
     </waltz-no-data>
 
+
+
     <div ng-if="$ctrl.costs.length > 0"
          class="row">
         <div class="col-sm-8">
@@ -29,7 +31,8 @@
                                 </waltz-currency-amount>
                             </h3>
                             <h4>
-                                <span ng-bind="$ctrl.currentYear"></span> YTD
+                                <span ng-bind="$ctrl.currentYear"></span>
+                                <span ng-if="$ctrl.currentYear == $ctrl.thisYear">YTD</span>
                             </h4>
                         </div>
                         <div class="col-md-7">
