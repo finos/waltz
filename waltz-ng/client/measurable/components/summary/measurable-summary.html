@@ -1,5 +1,5 @@
 <div class="waltz-page-summary waltz-page-summary-attach">
-    <div class="row">
+    <div class="row" ng-if="$ctrl.measurable">
         <div class="col-sm-2 waltz-display-field-label">
             Description
         </div>
@@ -15,7 +15,7 @@
 
 
     <!-- APP SUMMARY STATS -->
-    <div ng-if="$ctrl.applications.length > 0 || $ctrl.relationshipStats.length > 0">
+    <div ng-if="$ctrl.applications.length > 0 || $ctrl.relationshipStats.length > 0 && $ctrl.measurable">
         <hr>
         <div class="row">
             <div class="col-sm-4"
@@ -65,16 +65,21 @@
         </div>
     </div>
 
-    <hr>
+    <hr ng-if="$ctrl.measurable">
 
     <!-- NAV -->
     <div class="row"
-         style="padding: 1em">
+         style="padding: 1em"
+         ng-if="$ctrl.measurable">
         <div class="col-md-8">
             <waltz-immediate-hierarchy-navigator parents="$ctrl.parentRefs"
                                                  children="$ctrl.childRefs">
             </waltz-immediate-hierarchy-navigator>
         </div>
     </div>
+
+    <waltz-no-data ng-if="!$ctrl.measurable">
+        <message>No information for this measurable</message>
+    </waltz-no-data>
 
 </div>

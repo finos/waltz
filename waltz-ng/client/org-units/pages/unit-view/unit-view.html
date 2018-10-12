@@ -37,7 +37,8 @@
 
 
     <!-- NAVIGATION -->
-    <div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="waltz-page-summary waltz-page-summary-attach"
+         ng-if="ctrl.orgUnit">
         <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
                                           open-sections="ctrl.sections"
                                           on-select="ctrl.addSection"
@@ -47,7 +48,8 @@
 
     <br>
 
-    <waltz-dynamic-sections-view sections="ctrl.sections"
+    <waltz-dynamic-sections-view ng-if="ctrl.orgUnit"
+                                 sections="ctrl.sections"
                                  parent-entity-ref="ctrl.parentEntityRef"
                                  on-remove="ctrl.removeSection">
     </waltz-dynamic-sections-view>

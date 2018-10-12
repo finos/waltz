@@ -3,7 +3,7 @@
     <div class="row">
 
         <div class="col-sm-12 ">
-            <div class="row">
+            <div class="row" ng-if="$ctrl.dataType">
                 <div class="col-sm-2 waltz-display-field-label">
                     Description
                 </div>
@@ -16,9 +16,9 @@
                     </span>
                 </div>
             </div>
-            <hr/>
+            <hr ng-if="$ctrl.dataType">
 
-            <div class="container-fluid">
+            <div class="container-fluid" ng-if="$ctrl.dataType">
 
                 <div class="row">
                     <div class="col-sm-4">
@@ -47,7 +47,7 @@
             </div>
 
             <div class="row no-overflow"
-                 ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
+                 ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0 && $ctrl.dataType"
                  style="padding: 1em">
                 <div class="col-sm-4"
                      ng-if="$ctrl.parents.length > 0">
@@ -81,8 +81,11 @@
                 </div>
             </div>
 
-        </div>
+            <waltz-no-data ng-if="!ctrl.dataType">
+                <message>No information for this Data Type</message>
+            </waltz-no-data>
 
+        </div>
     </div>
 
 </div>

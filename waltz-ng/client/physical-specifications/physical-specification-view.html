@@ -19,8 +19,8 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-7">
+        <div class="row" ng-if="ctrl.specification">
+            <div class="col-md-7" >
                 <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
                                                        specification="ctrl.specification"
                                                        organisational-unit="ctrl.organisationalUnit">
@@ -31,18 +31,23 @@
                 </waltz-data-type-usage-panel>
             </div>
         </div>
+        <waltz-no-data ng-if="!ctrl.specification">
+            <message>No information for this physical specification</message>
+        </waltz-no-data>
     </div>
 
     <br>
 
 
     <!-- SPEC DEFINITIONS -->
-    <waltz-physical-spec-definition-section parent-entity-ref="ctrl.entityReference">
+    <waltz-physical-spec-definition-section ng-if="ctrl.specification"
+                                            parent-entity-ref="ctrl.entityReference">
     </waltz-physical-spec-definition-section>
 
 
     <!-- FLOW DIAGRAMS -->
-    <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.specification"
+                                   section="ctrl.entityDiagramsSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
@@ -91,12 +96,14 @@
     </waltz-section>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.specification"
+                                   section="ctrl.bookmarksSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.specification"
+                                   section="ctrl.changeLogSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 

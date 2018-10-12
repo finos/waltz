@@ -17,16 +17,17 @@
     </waltz-data-type-overview>
 
     <!-- NAVIGATION -->
-    <div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="waltz-page-summary waltz-page-summary-attach" ng-if="ctrl.dataType">
         <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
                                           open-sections="ctrl.sections"
                                           on-select="ctrl.addSection">
         </waltz-dynamic-section-navigation>
     </div>
 
-    <br>
+    <br ng-if="ctrl.dataType">
 
-    <waltz-dynamic-sections-view sections="ctrl.sections"
+    <waltz-dynamic-sections-view ng-if="ctrl.dataType"
+                                 sections="ctrl.sections"
                                  parent-entity-ref="ctrl.entityRef"
                                  on-remove="ctrl.removeSection">
     </waltz-dynamic-sections-view>

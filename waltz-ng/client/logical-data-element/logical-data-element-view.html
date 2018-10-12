@@ -7,13 +7,14 @@
                        icon="asterisk">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li ng-bind="ctrl.logicalDataElement.name | truncateMiddle:50"></li>
+            <li ng-if="ctrl.logicalDataElement" ng-bind="ctrl.logicalDataElement.name | truncateMiddle:50"></li>
+            <li ng-if="!ctrl.logicalDataElement">Logical Data Element</li>
         </ol>
     </waltz-page-header>
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
+        <div class="row" ng-if="ctrl.logicalDataElement">
             <div class="col-md-12">
                 <waltz-sub-section name="Overview">
                     <content>
@@ -25,26 +26,31 @@
                 </waltz-sub-section>
             </div>
         </div>
-
+        <waltz-no-data ng-if="!ctrl.logicalDataElement">
+            <message>No information for this logical data element</message>
+        </waltz-no-data>
     </div>
 
     <br>
 
 
     <!-- Entity Named Notes -->
-    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
+                                   section="ctrl.entityNamedNotesSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
 
     <!-- Physical Fields -->
-    <waltz-dynamic-section-wrapper section="ctrl.relatedPhysicalFieldSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
+                                   section="ctrl.relatedPhysicalFieldSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
 
     <!-- Bookmarks -->
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
+                                   section="ctrl.bookmarksSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 </div>

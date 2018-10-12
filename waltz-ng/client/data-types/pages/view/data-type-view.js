@@ -45,11 +45,13 @@ function controller(dataType,
     vm.$onInit = () => {
         vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('DATA_TYPE');
         vm.sections = dynamicSectionManager.findUserSectionsForKind('DATA_TYPE');
-        historyStore.put(
-            dataType.name,
-            'DATA_TYPE',
-            'main.data-type.view',
-            { id: dataType.id });
+        if(dataType) {
+            historyStore.put(
+                dataType.name,
+                'DATA_TYPE',
+                'main.data-type.view',
+                {id: dataType.id});
+        }
     };
 
     // -- INTERACT --

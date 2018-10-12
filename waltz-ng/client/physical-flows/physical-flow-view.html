@@ -7,16 +7,17 @@
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>
+            <li ng-if="ctrl.logicalFlow">
                 <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
             </li>
+            <li ng-if="!ctrl.logicalFlow">physical Flow</li>
             <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
         </ol>
     </waltz-page-header>
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-section-actions>
+        <waltz-section-actions ng-if="ctrl.logicalFlow">
             <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 <button class="btn btn-xs btn-danger"
                         ng-disabled="! (ctrl.mentions | isEmpty)"
@@ -34,7 +35,7 @@
         </waltz-section-actions>
 
 
-        <div class="row">
+        <div class="row" ng-if="ctrl.logicalFlow">
             <div class="col-md-7">
                 <waltz-sub-section name="Overview">
                     <content>
@@ -81,11 +82,15 @@
 
 
         <div class="small text-muted"
-             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
+             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt && ctrl.physicalFlow">
             Last updated by
             <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
             (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
         </div>
+
+        <waltz-no-data ng-if="!ctrl.physicalFlow">
+            <message>No information for this physical flow</message>
+        </waltz-no-data>
 
     </div>
 
@@ -93,7 +98,8 @@
 
 
     <!--Entity Named Notes-->
-    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.entityNamedNotesSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
@@ -101,7 +107,8 @@
     <!-- SPEC DEFINITION -->
     <waltz-section name="Specification Definition"
                    icon="file-code-o"
-                   id="specification-definition-section">
+                   id="specification-definition-section"
+                   ng-if="ctrl.logicalFlow">
         <waltz-section-actions>
             <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 <a ui-sref="main.physical-specification.view ({id: ctrl.specification.id})"
@@ -130,16 +137,19 @@
     </waltz-section>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.entityDiagramsSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.bookmarksSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
-    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.changeLogSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 </div>

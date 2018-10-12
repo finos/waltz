@@ -45,16 +45,21 @@ export function stringToRef(s) {
 
 
 export function toEntityRef(obj, kind = obj.kind) {
-    const ref = {
-        id: obj.id,
-        kind,
-        name: obj.name,
-        description: obj.description
-    };
 
-    checkIsEntityRef(ref);
+    if(obj) {
+        const ref = {
+            id: obj.id,
+            kind,
+            name: obj.name,
+            description: obj.description
+        };
 
-    return ref;
+        checkIsEntityRef(ref);
+
+        return ref;
+    }
+    console.error('No object found');
+    return null;
 }
 
 
