@@ -232,8 +232,6 @@ function controller($q,
         vm.handlers.contextMenus = {
             node: mkNodeMenu(),
             nodeGrid: mkNodeGridMenu(),
-            columnAxisItem: mkNodeMenu(),
-            rowAxisItem: mkNodeMenu(),
         };
 
         userService
