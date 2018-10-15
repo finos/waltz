@@ -19,6 +19,7 @@ public abstract class Scenario implements
 
     public abstract long roadmapId();
     public abstract LocalDate effectiveDate();
-    public abstract ScenarioStatus scenarioStatus();
+    public abstract ScenarioType scenarioType();
+    public abstract ReleaseLifecycleStatus releaseStatus();
 
 }

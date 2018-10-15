@@ -793,5 +793,44 @@
                     type="${id.type}"/>
         </createIndex>
     </changeSet>
+    
+    
+    <!-- 3461: splitting entity lifecycle from scenario lifecycle -->
+    <changeSet id="20181014-3461-1" 
+               author="davidwatkins73">
+        <comment>3461: splitting entity lifecycle from scenario lifecycle</comment>
+        <addColumn tableName="scenario">
+            <column name="release_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20181014-3461-2" 
+               author="davidwatkins73">
+        <comment>3461: splitting entity lifecycle from scenario lifecycle</comment>
+        <renameColumn tableName="scenario" 
+                      oldColumnName="scenario_status" 
+                      newColumnName="scenario_type" 
+                      columnDataType="${enum.type}"/>
+    </changeSet>
+
+    <changeSet id="20181014-3461-3a"
+               author="davidwatkins73"
+               dbms="mysql">
+        <sql>
+            UPDATE enum_value SET type = 'scenarioType' WHERE type = 'scenarioStatus';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20181014-3461-3b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <sql>
+            UPDATE enum_value SET [type] = 'scenarioType' WHERE [type] = 'scenarioStatus';
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

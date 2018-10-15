@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './sub-section.html';
+import template from "./sub-section.html";
 import {initialiseData} from "../common/index";
 
 
 const bindings = {
-    name: '@',
-    showBorder: '<',
+    name: "@",
+    showBorder: "<",
 };
 
 
@@ -47,12 +47,12 @@ const component = {
     bindings,
     controller,
     transclude: {
-        content: 'content',
+        content: "content",
     }
 };
 
 
 export default {
-    id: 'waltzSubSection',
+    id: "waltzSubSection",
     component
 };

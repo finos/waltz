@@ -11,10 +11,10 @@ import com.khartec.waltz.model.roadmap.ImmutableRoadmapAndScenarioOverview;
 import com.khartec.waltz.model.roadmap.Roadmap;
 import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.model.scenario.Scenario;
+import com.khartec.waltz.schema.tables.EntityRelationship;
 import com.khartec.waltz.schema.tables.records.RoadmapRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,6 +36,7 @@ import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class RoadmapDao {
@@ -133,10 +134,30 @@ public class RoadmapDao {
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()));
 
         return findRoadmapsAndScenariosViaScenarioSelector(scenarioSelector);
-
     }
 
 
+    public long createRoadmap(String name,
+                              long ratingSchemeId,
+                              EntityReference columnType,
+                              EntityReference rowType,
+                              String userId)
+    {
+        RoadmapRecord newRecord = dsl.newRecord(ROADMAP);
+
+        newRecord.setName(name);
+        newRecord.setRatingSchemeId(ratingSchemeId);
+        newRecord.setColumnTypeKind(columnType.kind().name());
+        newRecord.setColumnTypeId(columnType.id());
+        newRecord.setRowTypeKind(rowType.kind().name());
+        newRecord.setRowTypeId(rowType.id());
+        newRecord.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        newRecord.setLastUpdatedBy(userId);
+
+        newRecord.store();
+
+        return newRecord.getId();
+    }
     // -- helpers
 
     private List<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaScenarioSelector(Select<Record1<Long>> scenarioSelector) {
@@ -152,7 +173,10 @@ public class RoadmapDao {
                 .innerJoin(SCENARIO)
                 .on(SCENARIO.ROADMAP_ID.eq(ROADMAP.ID))
                 .where(SCENARIO.ID.in(scenarioSelector))
-                .fetch(r -> Tuple.tuple(TO_DOMAIN_MAPPER.map(r), ScenarioDao.TO_DOMAIN_MAPPER.map(r)));
+                .and(ScenarioDao.NOT_REMOVED)
+                .fetch(r -> tuple(
+                        TO_DOMAIN_MAPPER.map(r),  // roadmap
+                        ScenarioDao.TO_DOMAIN_MAPPER.map(r))); // scenario
 
         Map<Long, List<Scenario>> scenariosByRoadmapId = roadmapScenarioTuples
                 .stream()

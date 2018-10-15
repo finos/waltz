@@ -33,7 +33,7 @@
                                                        on-save-scenario-description="$ctrl.onSaveScenarioDescription"
                                                        on-save-scenario-name="$ctrl.onSaveScenarioName"
                                                        on-save-scenario-effective-date="$ctrl.onSaveScenarioEffectiveDate"
-                                                       on-save-scenario-status="$ctrl.onSaveScenarioStatus"
+                                                       on-save-scenario-type="$ctrl.onSaveScenarioType"
                                                        on-add-axis-item="$ctrl.onAddAxisItem"
                                                        on-remove-axis-item="$ctrl.onRemoveAxisItem"
                                                        on-remove-axis-item="$ctrl.onRemoveAxisItem"
@@ -88,7 +88,7 @@
                                         <label>Status:</label>
                                     </div>
                                     <div class="col-sm-8">
-                                        <span ng-bind="$ctrl.scenario.scenarioStatus | toDisplayName:'scenarioStatus'"></span>
+                                        <span ng-bind="$ctrl.scenario.scenarioType | toDisplayName:'scenarioType'"></span>
                                     </div>
                                 </div>
 

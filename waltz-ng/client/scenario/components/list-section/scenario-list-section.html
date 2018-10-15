@@ -24,6 +24,8 @@
                                  on-publish-scenario="$ctrl.onPublishScenario"
                                  on-revert-to-draft-scenario="$ctrl.onRevertToDraftScenario"
                                  on-retire-scenario="$ctrl.onRetireScenario"
+                                 on-republish-scenario="$ctrl.onRepublishScenario"
+                                 on-delete-scenario="$ctrl.onDeleteScenario"
                                  on-configure-scenario="$ctrl.onConfigureScenario">
             </waltz-scenario-list>
 
@@ -40,7 +42,7 @@
                                            on-save-scenario-description="$ctrl.onSaveScenarioDescription"
                                            on-save-scenario-name="$ctrl.onSaveScenarioName"
                                            on-save-scenario-effective-date="$ctrl.onSaveScenarioEffectiveDate"
-                                           on-save-scenario-status="$ctrl.onSaveScenarioStatus"
+                                           on-save-scenario-type="$ctrl.onSaveScenarioType"
                                            on-add-axis-item="$ctrl.onAddAxisItem"
                                            on-remove-axis-item="$ctrl.onRemoveAxisItem"
                                            on-remove-axis-item="$ctrl.onRemoveAxisItem"
@@ -49,13 +51,6 @@
             </waltz-roadmap-scenario-config>
         </div>
 
-
-        <!-- SCENARIO: add -->
-        <div ng-switch-when="ADD_SCENARIO">
-            <waltz-roadmap-add-scenario roadmap="$ctrl.selectedRoadmap"
-                                        on-cancel="$ctrl.onCancel">
-            </waltz-roadmap-add-scenario>
-        </div>
 
     </div>
 

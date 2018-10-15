@@ -33,13 +33,13 @@
 
         <!-- scenario status -->
         <tr>
-            <td>Scenario Status:</td>
+            <td>Scenario Type:</td>
             <td>
-                <waltz-editable-enum enum-kind="scenarioStatus"
-                                     on-save="$ctrl.onSaveScenarioStatus"
+                <waltz-editable-enum enum-kind="scenarioType"
+                                     on-save="$ctrl.onSaveScenarioType"
                                      ctx="$ctrl.scenario"
                                      save-label="Save"
-                                     initial-val="$ctrl.scenario.scenarioStatus">
+                                     initial-val="$ctrl.scenario.scenarioType">
                 </waltz-editable-enum>
             </td>
         </tr>
