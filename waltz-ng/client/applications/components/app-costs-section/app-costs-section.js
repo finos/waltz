@@ -29,10 +29,10 @@ const bindings = {
 
 
 const initialState = {
-    now: null,
     currentYear: null,
-    currentCosts : [],
-    currentTotal : null
+    costsMostRecentYear: null,
+    mostRecentCosts : [],
+    mostRecentTotal : null
 };
 
 
@@ -65,11 +65,11 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findByAppId,
                 [vm.parentEntityRef.id])
             .then(r => {
-                vm.now = (new Date()).getFullYear();
+                vm.currentYear = (new Date()).getFullYear();
                 vm.costs = r.data;
-                vm.currentYear = getCurrentYear(vm.costs);
-                vm.currentCosts = filterCostsForYear(vm.currentYear, vm.costs);
-                vm.currentTotal = calcTotalCost(vm.currentCosts);
+                vm.costsMostRecentYear = getCurrentYear(vm.costs);
+                vm.mostRecentCosts = filterCostsForYear(vm.costsMostRecentYear, vm.costs);
+                vm.mostRecentTotal = calcTotalCost(vm.mostRecentCosts);
             });
     };
 

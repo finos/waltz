@@ -27,12 +27,12 @@
                             <br>
                             <h3>
                                 Application TCO:
-                                <waltz-currency-amount amount="$ctrl.currentTotal">
+                                <waltz-currency-amount amount="$ctrl.mostRecentTotal">
                                 </waltz-currency-amount>
                             </h3>
                             <h4>
-                                <span ng-bind="$ctrl.currentYear"></span>
-                                <span ng-if="$ctrl.currentYear == $ctrl.now">YTD</span>
+                                <span ng-bind="$ctrl.costsMostRecentYear"></span>
+                                <span ng-if="$ctrl.costsMostRecentYear == $ctrl.currentYear">YTD</span>
                             </h4>
                         </div>
                         <div class="col-md-7">
@@ -45,7 +45,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="item in $ctrl.currentCosts">
+                                <tr ng-repeat="item in $ctrl.mostRecentCosts">
                                     <td>
                                         <waltz-enum-value type="'CostKind'"
                                                           show-icon="false"
