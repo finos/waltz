@@ -19,15 +19,17 @@
  */
 
 import angular from "angular";
+
+import AddRoadmap from "./components/add-roadmap/add-roadmap";
 import RoadmapHeader from "./components/header/roadmap-header";
 import RoadmapReferences from "./components/roadmap-references/roadmap-references";
-import RoadmapAddScenario from "./components/roadmap-add-scenario/roadmap-add-scenario";
 import RoadmapScenarioConfig from "./components/roadmap-scenario-config/roadmap-scenario-config";
 import RoadmapScenarioAxisConfig from "./components/roadmap-scenario-axis-config/roadmap-scenario-axis-config";
 import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
-import {registerComponents, registerStores} from "../common/module-utils";
 import RoadmapStore from "./services/roadmap-store";
 import Routes from "./routes";
+
+import {registerComponents, registerStores} from "../common/module-utils";
 
 
 export default () => {
@@ -36,7 +38,7 @@ export default () => {
     module.config(Routes);
 
     registerComponents(module, [
-        RoadmapAddScenario,
+        AddRoadmap,
         RoadmapReferences,
         RoadmapScenarioAxisConfig,
         RoadmapScenarioConfig,

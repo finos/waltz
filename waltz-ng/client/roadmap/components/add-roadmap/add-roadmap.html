@@ -1,0 +1,90 @@
+<div>
+    <h4>Add New Roadmap</h4>
+    <table class="table table-condensed small">
+        <colgroup>
+            <col width="30%">
+            <col width="30%">
+            <col width="40%">
+        </colgroup>
+        <!-- name -->
+        <tr>
+            <td>
+                Name:
+            </td>
+            <td>
+                <input class='form-control input-sm'
+                       ng-model="$ctrl.model.name"
+                       ng-change="$ctrl.onFormChange()"
+                       placeholder="name">
+                <p class="help-block">
+                    A descriptive name, should not include temporal aspects.
+                    e.g. `Finance 2020` is <strong>not</strong> a good name,
+                    `Finance Product Roadmap` is a better name.
+                </p>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Rating Scheme:</td>
+            <td>
+                <select ng-model="$ctrl.model.ratingScheme"
+                        ng-change="$ctrl.onFormChange()"
+                        ng-options="option.name for option in $ctrl.ratingSchemes track by option.id">
+                </select>
+                <p class="help-block">
+                    The rating scheme defines the which set of ratings can be assigned
+                    to applications appearing in the roadmap scenarios.  This is set at
+                    the roadmap level to ensure a common scheme between scenarios belonging
+                    to the same roadmap.
+                </p>
+            </td>
+            <td>
+
+                <ul class="list-unstyled small">
+                    <li ng-repeat="rating in $ctrl.model.ratingScheme.ratings">
+                        <div style="padding: 4px; margin: 2px;"
+                             ng-style="{ 'background-color': rating.color, color: rating.foregroundColor }"
+                             ng-bind="rating.name">
+                        </div>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Column Domain:</td>
+            <td>
+                <select ng-model="$ctrl.model.columnType"
+                        ng-change="$ctrl.onFormChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Row Domain:</td>
+            <td>
+                <select ng-model="$ctrl.model.rowType"
+                        ng-change="$ctrl.onFormChange()"
+                        ng-options="option.name for option in $ctrl.axisOptions track by option.id">
+                </select>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td>
+                <button ng-click="$ctrl.onAdd()"
+                        class="btn btn-success btn-sm"
+                        ng-disabled="$ctrl.preventSubmit">
+                    Add Roadmap
+                </button>
+                <a ng-click="$ctrl.onCancel()" class="clickable">
+                    Cancel
+                </a>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+</div>
