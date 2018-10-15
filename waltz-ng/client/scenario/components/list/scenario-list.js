@@ -1,6 +1,7 @@
 import template from "./scenario-list.html";
 import {initialiseData} from "../../../common";
 import roles from "../../../user/roles";
+import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
 
 
 const bindings = {
@@ -11,7 +12,9 @@ const bindings = {
     onConfigureScenario: "<",
     onPublishScenario: "<",
     onRetireScenario: "<",
-    onRevertToDraftScenario: "<"
+    onRevertToDraftScenario: "<",
+    onRepublishScenario: "<",
+    onDeleteScenario: "<"
 };
 
 
@@ -39,8 +42,10 @@ function controller(userService) {
                 vm.actions = [
                     publishAction,
                     revertToDraftAction,
+                    republishAction,
                     cloneAction,
-                    retireAction
+                    retireAction,
+                    deleteAction
                 ];
             });
     };
@@ -56,7 +61,7 @@ function controller(userService) {
 
     const publishAction = {
         type: "action",
-        predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "PENDING",
+        predicate: (scenario) => vm.permissions.admin &&  scenario.releaseStatus === releaseLifecycleStatus.DRAFT.key,
         name: "Publish",
         icon: "arrow-up",
         description: "Makes this scenario viewable by all users",
@@ -65,7 +70,7 @@ function controller(userService) {
 
     const retireAction = {
         type: "action",
-        predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "ACTIVE",
+        predicate: (scenario) => vm.permissions.admin &&  scenario.releaseStatus === releaseLifecycleStatus.ACTIVE.key,
         name: "Retire",
         icon: "arrow-down",
         description: "Marks this scenario as retired",
@@ -74,11 +79,29 @@ function controller(userService) {
 
     const revertToDraftAction = {
         type: "action",
-        predicate: (scenario) => vm.permissions.admin && scenario.entityLifecycleStatus === "ACTIVE",
+        predicate: (scenario) => vm.permissions.admin && scenario.releaseStatus === releaseLifecycleStatus.ACTIVE.key,
         name: "Draft",
         icon: "arrow-left",
         description: "Marks this scenario as in draft",
         execute: (scenario) => vm.onRevertToDraftScenario(scenario)
+    };
+
+    const republishAction = {
+        type: "action",
+        predicate: (scenario) => vm.permissions.admin &&  scenario.releaseStatus === releaseLifecycleStatus.DEPRECATED.key,
+        name: "Republish",
+        icon: "arrow-left",
+        description: "Marks this scenario as published",
+        execute: (scenario) => vm.onRepublishScenario(scenario)
+    };
+
+    const deleteAction = {
+        type: "action",
+        predicate: (scenario) => vm.permissions.admin &&  scenario.releaseStatus === releaseLifecycleStatus.DRAFT.key,
+        name: "Delete",
+        icon: "trash",
+        description: "Delete this scenario (cannot be recovered)",
+        execute: (scenario) => vm.onDeleteScenario(scenario)
     };
 
 }

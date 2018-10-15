@@ -2,6 +2,7 @@ import template from "./scenario-list-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
 import {confirmWithUser} from "../../../common/dialog-utils";
 
 
@@ -13,7 +14,6 @@ const bindings = {
 const modes = {
     LOADING: "LOADING",
     LIST: "LIST",
-    ADD_SCENARIO: "ADD_SCENARIO",
     CONFIGURE_SCENARIO: "CONFIGURE_SCENARIO",
 };
 
@@ -43,7 +43,7 @@ function controller($q,
 
     // -- INTERACT --
 
-    vm.onAddScenario = (roadmap) => {
+    vm.onAddScenario = () => {
         const usedNames = _
             .chain(vm.scenarios)
             .filter(s => s.roadmapId = vm.roadmap.id)
@@ -65,7 +65,7 @@ function controller($q,
                     .execute(
                         CORE_API.RoadmapStore.addScenario,
                         [ vm.roadmap.id, newName ])
-                    .then(r => {
+                    .then(() => {
                         notification.success("New scenario created");
                         reloadAllData();
                     });
@@ -91,9 +91,9 @@ function controller($q,
     vm.onPublishScenario = (scenario) => {
         confirmWithUser(
             `PUBLISH: Please confirm that you want scenario: "${scenario.name}" to be published`,
-            () => updateLifecycleStatus(
+            () => updateReleaseStatus(
                 scenario.id,
-                entityLifecycleStatus.ACTIVE,
+                releaseLifecycleStatus.ACTIVE,
                 "Scenario published",
                 "Failed to publish scenario"));
 
@@ -102,9 +102,9 @@ function controller($q,
     vm.onRevertToDraftScenario = (scenario) => {
         confirmWithUser(
             `REVERT: Please confirm that you want to revert scenario: "${scenario.name}" back to draft`,
-            () => updateLifecycleStatus(
+            () => updateReleaseStatus(
                 scenario.id,
-                entityLifecycleStatus.PENDING,
+                releaseLifecycleStatus.DRAFT,
                 "Scenario reverted to draft",
                 "Failed to revert scenario to draft"));
     };
@@ -112,11 +112,38 @@ function controller($q,
     vm.onRetireScenario = (scenario) => {
         confirmWithUser(
             `RETIRE: Please confirm that you want scenario: "${scenario.name}" to be retired`,
-            () => updateLifecycleStatus(
+            () => updateReleaseStatus(
                 scenario.id,
-                entityLifecycleStatus.REMOVED,
+                releaseLifecycleStatus.DEPRECATED,
                 "Scenario retired",
                 "Failed to retire scenario"));
+
+    };
+
+    vm.onRepublishScenario = (scenario) => {
+        confirmWithUser(
+            `REPUBLISH: Please confirm that you want scenario: "${scenario.name}" to be republished`,
+            () => updateReleaseStatus(
+                scenario.id,
+                releaseLifecycleStatus.ACTIVE,
+                "Scenario republished",
+                "Failed to republish scenario"));
+
+    };
+
+    vm.onDeleteScenario = (scenario) => {
+        confirmWithUser(
+            `DELETE: Please confirm that you want scenario: "${scenario.name}" to be deleted, it cannot be recovered`,
+            () => serviceBroker
+                .execute(
+                    CORE_API.ScenarioStore.removeScenario,
+                    [ scenario.id ])
+                .then(() => reloadAllData())
+                .then(() => notification.success("Scenario deleted"))
+                .catch((e) => {
+                    console.log("WSLS: Failed to delete scenario", { error: e });
+                    return notification.warning(`Failed to delete scenario: ${e.message}`);
+                }));
 
     };
 
@@ -128,10 +155,10 @@ function controller($q,
 
     // -- helpers --
 
-    function updateLifecycleStatus(scenarioId, status, successMessage = "Success", failureMessage = "Failed") {
+    function updateReleaseStatus(scenarioId, status, successMessage = "Success", failureMessage = "Failed") {
         serviceBroker
             .execute(
-                CORE_API.ScenarioStore.updateEntityLifecycleStatus,
+                CORE_API.ScenarioStore.updateReleaseStatus,
                 [ scenarioId, status.key ])
             .then(() => reloadAllData())
             .then(() => notification.success(successMessage))

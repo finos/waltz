@@ -22,18 +22,10 @@
         <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-measurable-ratings-browser-tree-panel>
 
-        <div ng-if="$ctrl.roadmapReferences.length > 0"
-             style="margin-top: 12px">
-            <waltz-sub-section name="Roadmaps">
-                <content>
-                    <div style="margin: 8px">
-                        <p>This entity appears in the following roadmap/scenarios</p>
-                        <waltz-roadmap-references references="$ctrl.roadmapReferences">
-                        </waltz-roadmap-references>
-                    </div>
-                </content>
-            </waltz-sub-section>
-        </div>
+        <br>
+
+        <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-roadmap-references>
     </div>
 
 

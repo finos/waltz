@@ -1,5 +1,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -39,6 +40,16 @@ public class RoadmapEndpoint implements Endpoint {
         registerAddScenario(mkPath(BASE_URL, "id", ":id", "add-scenario"));
         registerFindRoadmapsAndScenariosByRatedEntity(mkPath(BASE_URL, "by-rated-entity", ":kind", ":id"));
         registerFindRoadmapsAndScenariosByFormalRelationship(mkPath(BASE_URL, "by-formal-relationship", ":kind", ":id"));
+        registerCreateRoadmap(mkPath(BASE_URL));
+    }
+
+
+    private void registerCreateRoadmap(String path) {
+        postForDatum(path, ((request, response) -> {
+            ensureUserHasAdminRights(request);
+            RoadmapCreateCommand createCommand = readBody(request, RoadmapCreateCommand.class);
+            return roadmapService.createRoadmap(createCommand, getUsername(request));
+        }));
     }
 
 

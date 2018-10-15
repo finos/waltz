@@ -3,9 +3,10 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioStatus;
+import com.khartec.waltz.model.scenario.ScenarioType;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
@@ -67,14 +68,25 @@ public class ScenarioEndpoint implements Endpoint {
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
-        registerUpdateScenarioStatus(mkPath(BASE_URL, "id", ":id", "scenario-status", ":scenarioStatus"));
+        registerUpdateScenarioType(mkPath(BASE_URL, "id", ":id", "scenario-type", ":scenarioType"));
+        registerUpdateReleaseStatus(mkPath(BASE_URL, "id", ":id", "release-status", ":releaseStatus"));
         registerUpdateEntityLifecycleStatus(mkPath(BASE_URL, "id", ":id", "entity-lifecycle-status", ":lifecycleStatus"));
 
         registerLoadAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation"));
         registerReorderAxis(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", "reorder"));
         registerAddAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
         registerRemoveAxisItem(mkPath(BASE_URL, "id", ":id", "axis", ":orientation", ":domainItemKind", ":domainItemId"));
+        registerRemoveScenario(mkPath(BASE_URL, "id", ":id"));
+    }
 
+
+    private void registerRemoveScenario(String path) {
+        deleteForDatum(path, (request, response) -> {
+            ensureUserHasAdminRights(request);
+            return scenarioService.removeScenario(
+                    getId(request),
+                    getUsername(request));
+        });
     }
 
 
@@ -150,12 +162,23 @@ public class ScenarioEndpoint implements Endpoint {
     }
 
 
-    private void registerUpdateScenarioStatus(String path) {
+    private void registerUpdateScenarioType(String path) {
         postForDatum(path, (request, resp) -> {
             ensureUserHasEditRights(request);
-            return scenarioService.updateScenarioStatus(
+            return scenarioService.updateScenarioType(
                     getId(request),
-                    readEnum(request, "scenarioStatus", ScenarioStatus.class, (s) -> ScenarioStatus.CURRENT),
+                    readEnum(request, "scenarioType", ScenarioType.class, (s) -> ScenarioType.CURRENT),
+                    getUsername(request));
+        });
+    }
+
+
+    private void registerUpdateReleaseStatus(String path) {
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasEditRights(request);
+            return scenarioService.updateReleaseStatus(
+                    getId(request),
+                    readEnum(request, "releaseStatus", ReleaseLifecycleStatus.class, (s) -> ReleaseLifecycleStatus.ACTIVE),
                     getUsername(request));
         });
     }

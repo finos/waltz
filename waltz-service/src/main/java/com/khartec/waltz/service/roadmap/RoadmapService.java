@@ -1,14 +1,20 @@
 package com.khartec.waltz.service.roadmap;
 
+import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.data.roadmap.RoadmapDao;
 import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import com.khartec.waltz.data.scenario.ScenarioDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.roadmap.Roadmap;
 import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
+import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
@@ -19,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.roadmap.RoadmapUtilities.mkBasicLogEntry;
 
 @Service
@@ -28,21 +35,25 @@ public class RoadmapService {
     private final ScenarioDao scenarioDao;
     private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
     private final ChangeLogService changeLogService;
+    private final EntityRelationshipDao entityRelationshipDao;
 
 
     @Autowired
     public RoadmapService(RoadmapDao roadmapDao,
                           ScenarioDao scenarioDao,
                           RoadmapIdSelectorFactory roadmapIdSelectorFactory,
-                          ChangeLogService changeLogService) {
+                          ChangeLogService changeLogService,
+                          EntityRelationshipDao entityRelationshipDao) {
         checkNotNull(roadmapDao, "roadmapDao cannot be null");
         checkNotNull(scenarioDao, "scenarioDao cannot be null");
         checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
         this.roadmapDao = roadmapDao;
         this.scenarioDao = scenarioDao;
         this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
         this.changeLogService = changeLogService;
+        this.entityRelationshipDao = entityRelationshipDao;
     }
 
 
@@ -50,6 +61,33 @@ public class RoadmapService {
         return roadmapDao.getById(id);
     }
 
+
+    public Long createRoadmap(RoadmapCreateCommand command, String userId) {
+        long roadmapId = roadmapDao.createRoadmap(
+                command.name(),
+                command.ratingSchemeId(),
+                command.columnType(),
+                command.rowType(),
+                userId);
+
+        if (roadmapId > 0) {
+            changeLogService.write(ImmutableChangeLog
+                    .copyOf(mkBasicLogEntry(roadmapId, String.format("Created roadmap: %s", command.name()), userId))
+                    .withOperation(Operation.ADD));
+        }
+
+        EntityRelationship reln = ImmutableEntityRelationship.builder()
+                .a(command.linkedEntity())
+                .b(mkRef(EntityKind.ROADMAP, roadmapId))
+                .relationship(RelationshipKind.RELATES_TO)
+                .lastUpdatedBy(userId)
+                .build();
+
+        entityRelationshipDao.create(reln);
+
+        return roadmapId;
+
+    }
 
     public Collection<Roadmap> findRoadmapsBySelector(IdSelectionOptions selectionOptions) {
         Select<Record1<Long>> selector = roadmapIdSelectorFactory.apply(selectionOptions);
@@ -78,6 +116,7 @@ public class RoadmapService {
     public Scenario addScenario(long roadmapId, String name, String userId) {
         changeLogService.write(ImmutableChangeLog
                 .copyOf(mkBasicLogEntry(roadmapId, String.format("Added scenario %s", name), userId))
+                .withChildKind(EntityKind.SCENARIO)
                 .withOperation(Operation.ADD));
         return scenarioDao.add(roadmapId, name, userId);
     }

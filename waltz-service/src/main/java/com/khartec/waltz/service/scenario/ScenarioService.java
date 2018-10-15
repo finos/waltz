@@ -9,8 +9,9 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioStatus;
+import com.khartec.waltz.model.scenario.ScenarioType;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.roadmap.RoadmapUtilities;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +77,12 @@ public class ScenarioService {
         return clonedScenario;
     }
 
+
     public Boolean updateName(long scenarioId, String newValue, String userId) {
         writeLogEntriesForUpdate(scenarioId, "Updated Name", newValue, userId);
         return scenarioDao.updateName(scenarioId, newValue, userId);
     }
+
 
     public Boolean updateDescription(long scenarioId, String newValue, String userId) {
         writeLogEntriesForUpdate(scenarioId, "Updated Description", newValue, userId);
@@ -93,14 +96,22 @@ public class ScenarioService {
     }
 
 
-    public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newStatus, String userId) {
-        writeLogEntriesForUpdate(scenarioId, "Updated Scenario Status", newStatus.name(), userId);
-        return scenarioDao.updateScenarioStatus(
+    public Boolean updateScenarioType(long scenarioId, ScenarioType newType, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Scenario Type", newType.name(), userId);
+        return scenarioDao.updateScenarioType(
+                scenarioId,
+                newType,
+                userId);
+    }
+
+
+    public Boolean updateReleaseStatus(long scenarioId, ReleaseLifecycleStatus newStatus, String userId) {
+        writeLogEntriesForUpdate(scenarioId, "Updated Release  Status", newStatus.name(), userId);
+        return scenarioDao.updateReleaseStatus(
                 scenarioId,
                 newStatus,
                 userId);
     }
-
 
 
     public Boolean updateEntityLifecycleStatus(long scenarioId, EntityLifecycleStatus newStatus, String userId) {
@@ -109,6 +120,18 @@ public class ScenarioService {
                 scenarioId,
                 newStatus,
                 userId);
+    }
+
+
+    public Boolean removeScenario(long scenarioId, String userId) {
+        Scenario scenario = scenarioDao.getById(scenarioId);
+        changeLogService.write(ImmutableChangeLog
+                .copyOf(RoadmapUtilities.mkBasicLogEntry(
+                        scenario.roadmapId(),
+                        String.format("Removed scenario: %s", scenario.name()),
+                        userId))
+                .withOperation(Operation.REMOVE));
+        return scenarioDao.removeScenario(scenarioId, userId);
     }
 
 
@@ -129,6 +152,5 @@ public class ScenarioService {
                 .copyOf(logEntry)
                 .withParentReference(EntityReference.mkRef(EntityKind.ROADMAP, clonedScenario.roadmapId())));
     }
-
 
 }

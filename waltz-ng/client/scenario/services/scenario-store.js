@@ -80,15 +80,15 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const updateScenarioStatus = (scenarioId, newStatus) => {
+    const updateScenarioType = (scenarioId, newType) => {
         return $http
-            .post(`${BASE}/id/${scenarioId}/scenario-status/${newStatus}`)
+            .post(`${BASE}/id/${scenarioId}/scenario-type/${newType}`)
             .then(result => result.data);
     };
 
-    const updateEntityLifecycleStatus = (scenarioId, newStatus) => {
+    const updateReleaseStatus = (scenarioId, newStatus) => {
         return $http
-            .post(`${BASE}/id/${scenarioId}/entity-lifecycle-status/${newStatus}`)
+            .post(`${BASE}/id/${scenarioId}/release-status/${newStatus}`)
             .then(result => result.data);
     };
 
@@ -116,7 +116,11 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-
+    const removeScenario = (scenarioId) => {
+        return $http
+            .delete(`${BASE}/id/${scenarioId}`)
+            .then(result => result.data);
+    };
 
     return {
         findForRoadmap,
@@ -124,13 +128,14 @@ function store($http, baseUrl) {
         getById,
         cloneById,
         removeRating,
+        removeScenario,
         addRating,
         updateDescription,
         updateName,
         updateRating,
         updateEffectiveDate,
-        updateScenarioStatus,
-        updateEntityLifecycleStatus,
+        updateScenarioType,
+        updateReleaseStatus,
         addAxisItem,
         removeAxisItem,
         loadAxis,
@@ -169,6 +174,11 @@ export const ScenarioStore_API = {
         serviceFnName: "cloneById",
         description: "executes cloneById [scenarioId, newName]"
     },
+    removeScenario: {
+        serviceName,
+        serviceFnName: "removeScenario",
+        description: "executes removeScenario [scenarioId]"
+    },
     removeRating: {
         serviceName,
         serviceFnName: "removeRating",
@@ -199,15 +209,15 @@ export const ScenarioStore_API = {
         serviceFnName: "updateEffectiveDate",
         description: "executes updateEffectiveDate [scenarioId, newDate]"
     },
-    updateScenarioStatus: {
+    updateScenarioType: {
         serviceName,
-        serviceFnName: "updateScenarioStatus",
-        description: "executes updateScenarioStatus [scenarioId, newStatus]"
+        serviceFnName: "updateScenarioType",
+        description: "executes updateScenarioType [scenarioId, newStatus]"
     },
-    updateEntityLifecycleStatus: {
+    updateReleaseStatus: {
         serviceName,
-        serviceFnName: "updateEntityLifecycleStatus",
-        description: "executes updateEntityLifecycleStatus [scenarioId, newStatus]"
+        serviceFnName: "updateReleaseStatus",
+        description: "executes updateReleaseStatus [scenarioId, newStatus]"
     },
     addAxisItem: {
         serviceName,

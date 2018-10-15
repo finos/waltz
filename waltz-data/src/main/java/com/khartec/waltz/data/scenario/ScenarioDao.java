@@ -2,10 +2,11 @@ package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.ImmutableScenario;
 import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioStatus;
+import com.khartec.waltz.model.scenario.ScenarioType;
 import com.khartec.waltz.schema.tables.records.ScenarioRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,10 @@ import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 @Repository
 public class ScenarioDao {
 
+    public static final Condition NOT_REMOVED = SCENARIO.LIFECYCLE_STATUS
+            .notEqual(EntityLifecycleStatus.REMOVED.name());
+
+
     public static final RecordMapper<? super Record, Scenario> TO_DOMAIN_MAPPER = r -> {
         ScenarioRecord record = r.into(ScenarioRecord.class);
         return ImmutableScenario.builder()
@@ -32,7 +37,8 @@ public class ScenarioDao {
                 .roadmapId(record.getRoadmapId())
                 .description(record.getDescription())
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getLifecycleStatus()))
-                .scenarioStatus(ScenarioStatus.valueOf(record.getScenarioStatus()))
+                .scenarioType(ScenarioType.valueOf(record.getScenarioType()))
+                .releaseStatus(ReleaseLifecycleStatus.valueOf(record.getReleaseStatus()))
                 .effectiveDate(toLocalDate(record.getEffectiveDate()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -47,7 +53,8 @@ public class ScenarioDao {
         record.setName(domainObj.name());
         record.setDescription(domainObj.description());
         record.setLifecycleStatus(domainObj.entityLifecycleStatus().name());
-        record.setScenarioStatus(domainObj.scenarioStatus().name());
+        record.setScenarioType(domainObj.scenarioType().name());
+        record.setReleaseStatus(domainObj.releaseStatus().name());
         record.setEffectiveDate(Date.valueOf(domainObj.effectiveDate()));
         record.setLastUpdatedBy(domainObj.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(domainObj.lastUpdatedAt()));
@@ -80,14 +87,17 @@ public class ScenarioDao {
                 .select(SCENARIO.fields())
                 .from(SCENARIO)
                 .where(SCENARIO.ROADMAP_ID.eq(roadmapId))
+                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 
     public Collection<Scenario> findByRoadmapSelector(Select<Record1<Long>> selector) {
         return dsl
                 .select(SCENARIO.fields())
                 .from(SCENARIO)
                 .where(SCENARIO.ROADMAP_ID.in(selector))
+                .and(NOT_REMOVED)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -98,6 +108,7 @@ public class ScenarioDao {
         Scenario clone = ImmutableScenario.copyOf(orig)
                 .withName(command.newName())
                 .withEntityLifecycleStatus(EntityLifecycleStatus.PENDING)
+                .withReleaseStatus(ReleaseLifecycleStatus.DRAFT)
                 .withLastUpdatedAt(nowUtc())
                 .withLastUpdatedBy(command.userId());
 
@@ -146,10 +157,29 @@ public class ScenarioDao {
     }
 
 
-    public Boolean updateScenarioStatus(long scenarioId, ScenarioStatus newValue, String userId) {
+    public Boolean updateReleaseStatus(long scenarioId, ReleaseLifecycleStatus newValue, String userId) {
+        ScenarioRecord record = dsl.fetchOne(
+                SCENARIO,
+                SCENARIO.ID.eq(scenarioId));
+
+        if (record.getReleaseStatus().equals(newValue.name())) {
+            return false;
+        } else {
+            record.setReleaseStatus(newValue.name());
+            record.setLifecycleStatus(newValue == ReleaseLifecycleStatus.DRAFT
+                ? EntityLifecycleStatus.PENDING.name()
+                : EntityLifecycleStatus.ACTIVE.name());
+            record.setLastUpdatedAt(nowUtcTimestamp());
+            record.setLastUpdatedBy(userId);
+            return record.store() == 1;
+        }
+    }
+
+
+    public Boolean updateScenarioType(long scenarioId, ScenarioType newValue, String userId) {
         return updateField(
                 scenarioId,
-                SCENARIO.SCENARIO_STATUS,
+                SCENARIO.SCENARIO_TYPE,
                 newValue.name(),
                 userId) == 1;
     }
@@ -161,7 +191,8 @@ public class ScenarioDao {
                 .name(name)
                 .description("")
                 .entityLifecycleStatus(EntityLifecycleStatus.PENDING)
-                .scenarioStatus(ScenarioStatus.INTERIM)
+                .scenarioType(ScenarioType.INTERIM)
+                .releaseStatus(ReleaseLifecycleStatus.DRAFT)
                 .effectiveDate(today())
                 .lastUpdatedAt(nowUtc())
                 .lastUpdatedBy(userId)
@@ -178,13 +209,25 @@ public class ScenarioDao {
     }
 
 
+    public Boolean removeScenario(long scenarioId, String userId) {
+        return dsl
+                .update(SCENARIO)
+                .set(SCENARIO.LIFECYCLE_STATUS, EntityLifecycleStatus.REMOVED.name())
+                .set(SCENARIO.RELEASE_STATUS, ReleaseLifecycleStatus.OBSOLETE.name())
+                .set(SCENARIO.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(SCENARIO.LAST_UPDATED_BY, userId)
+                .where(SCENARIO.ID.eq(scenarioId))
+                .execute() == 1;
+    }
+
+
     // -- helpers --
 
     private <T> int updateField(long id, Field<T> field, T value, String userId) {
         return dsl
                 .update(SCENARIO)
                 .set(field, value)
-                .set(SCENARIO.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(SCENARIO.LAST_UPDATED_AT, nowUtcTimestamp())
                 .set(SCENARIO.LAST_UPDATED_BY, userId)
                 .where(SCENARIO.ID.eq(id))
                 .execute();

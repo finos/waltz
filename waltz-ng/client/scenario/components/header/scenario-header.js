@@ -71,13 +71,13 @@ function controller($q,
             "Scenario target date updated");
     };
 
-    vm.onSaveScenarioStatus = (data, ctx) => {
+    vm.onSaveScenarioType = (data, ctx) => {
         return updateField(
             ctx.id,
-            CORE_API.ScenarioStore.updateScenarioStatus,
+            CORE_API.ScenarioStore.updateScenarioType,
             { newVal: data },   // as this is coming from enum field, we need to fake out change object
             true,
-            "Scenario status updated");
+            "Scenario type updated");
     };
 
     vm.onConfigureScenario = () => {

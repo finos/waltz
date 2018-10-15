@@ -47,13 +47,15 @@ public enum RelationshipKind {
             tuple(APP_GROUP, APP_GROUP),
             tuple(APP_GROUP, CHANGE_INITIATIVE),
             tuple(APP_GROUP, MEASURABLE),
+            tuple(APP_GROUP, ROADMAP),
+            tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE),
+            tuple(CHANGE_INITIATIVE, MEASURABLE),
+            tuple(CHANGE_INITIATIVE, DATA_TYPE),
+            tuple(CHANGE_INITIATIVE, APP_GROUP),
             tuple(MEASURABLE, APP_GROUP),
             tuple(MEASURABLE, MEASURABLE),
             tuple(MEASURABLE, CHANGE_INITIATIVE),
-            tuple(CHANGE_INITIATIVE, APP_GROUP),
-            tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE),
-            tuple(CHANGE_INITIATIVE, MEASURABLE),
-            tuple(CHANGE_INITIATIVE, DATA_TYPE)
+            tuple(ORG_UNIT, ROADMAP)
     )),
 
     SUPPORTS(fromArray(

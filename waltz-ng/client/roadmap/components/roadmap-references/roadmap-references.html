@@ -1,52 +1,122 @@
-<div>
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th>Roadmap</th>
-            <th>Scenario</th>
-            <th>State</th>
-            <th>Effective Date</th>
-        </tr>
-        </thead>
-        <tbody ng-repeat="ref in $ctrl.references">
-            <tr ng-repeat="scenario in ref.scenarios">
-                <td>
-                    <a ui-sref="main.roadmap.view ({id: ref.roadmap.id })">
-                        <span ng-if="$first"
-                              uib-popover-template="'wrar-roadmap-popover.html'"
-                              popover-trigger="mouseenter"
-                              popover-append-to-body="true"
-                              popover-placement="top"
-                              ng-bind="ref.roadmap.name">
+<!-- VIEW -->
+<waltz-sub-section name="Roadmaps"
+                   ng-if="$ctrl.visibility.subSection">
+    <content>
+        <div style="margin: 8px">
+            <div ng-switch="$ctrl.mode">
+
+                <!-- LOADING -->
+                <div ng-switch-when="LOADING">
+                    <waltz-loading-notification show="true"
+                                                name="Looking for associated roadmaps">
+                    </waltz-loading-notification>
+                </div>
+
+
+                <!-- ADD -->
+                <div ng-switch-when="ADD">
+                    <waltz-roadmap-add on-roadmap-create="$ctrl.onRoadmapCreate"
+                                       on-cancel="$ctrl.onCancel">
+                    </waltz-roadmap-add>
+                </div>
+
+
+                <div ng-switch-when="VIEW">
+
+                    <!-- PREAMBLE -->
+                    <p>
+                        This entity appears in the following roadmap/scenarios
+                    </p>
+
+
+                    <!-- NO DATA -->
+                    <div ng-if="$ctrl.references.length === 0">
+                        <waltz-no-data>
+                            <message>
+                                <strong>Not linked</strong>to any roadmap scenarios.
+                                <br>
+                                <a ng-if="$ctrl.permissions.admin"
+                                   class="clickable"
+                                   ng-click="$ctrl.onShowAddRoadmap()">
+                                    <waltz-icon name="plus"></waltz-icon>
+                                    Add Roadmap?
+                                </a>
+                            </message>
+                        </waltz-no-data>
+                        <br>
+                    </div>
+
+
+                    <!-- TABLE -->
+                    <table class="table table-condensed"
+                           ng-if="$ctrl.references.length > 0">
+                        <thead>
+                        <tr>
+                            <th>Roadmap</th>
+                            <th>Scenario</th>
+                            <th>State</th>
+                            <th>Effective Date</th>
+                        </tr>
+                        </thead>
+                        <tbody ng-repeat="ref in $ctrl.references">
+                        <tr ng-repeat="scenario in ref.scenarios">
+                            <td>
+                                <a ui-sref="main.roadmap.view ({id: ref.roadmap.id })">
+                            <span ng-if="$first"
+                                  uib-popover-template="'wrar-roadmap-popover.html'"
+                                  popover-trigger="mouseenter"
+                                  popover-append-to-body="true"
+                                  popover-placement="top"
+                                  ng-bind="ref.roadmap.name">
                         </span>
-                    </a>
-                </td>
-                <td>
-                    <a ui-sref="main.scenario.view ({ id: scenario.id })">
-                        <span ng-bind="scenario.name"
-                              uib-popover-template="'wrar-scenario-popover.html'"
-                              popover-trigger="mouseenter"
-                              popover-append-to-body="true"
-                              popover-placement="top">
+                                </a>
+                            </td>
+                            <td>
+                                <a ui-sref="main.scenario.view ({ id: scenario.id })">
+                            <span ng-bind="scenario.name"
+                                  uib-popover-template="'wrar-scenario-popover.html'"
+                                  popover-trigger="mouseenter"
+                                  popover-append-to-body="true"
+                                  popover-placement="top">
+                            </span>
+                                </a>
+                            </td>
+                            <td>
+                        <span ng-bind="scenario.scenarioType | toDisplayName:'scenarioType'">
                         </span>
-                    </a>
-                </td>
-                <td>
-                    <span ng-bind="scenario.scenarioStatus | toDisplayName:'scenarioStatus'">
+                            </td>
+                            <td>
+                        <span ng-bind="scenario.effectiveDate">
+                        </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div> <!-- /(mode==view)-->
+
+
+                <!-- CONTROLS -->
+                <div class="waltz-sub-section-controls"
+                     ng-if="$ctrl.references.length > 0">
+                    <span ng-if="$ctrl.permissions.admin">
+
+                        <a class="clickable"
+                           ng-click="$ctrl.onShowAddRoadmap()">
+                            <waltz-icon name="plus"></waltz-icon>
+                            Add Roadmap
+                        </a>
+
                     </span>
-                </td>
-                <td>
-                    <span ng-bind="scenario.effectiveDate">
-                    </span>
-                </td>
-            </tr>
-        </tbody>
-
-    </table>
-
-</div>
+                </div>
+            </div> <!-- /switch -->
+        </div>
+    </content>
+</waltz-sub-section>
 
 
+
+
+<!-- ROADMAP POPOVER -->
 <script type="text/ng-template"
         id="wrar-roadmap-popover.html">
     <div class="small">
@@ -62,13 +132,14 @@
 
         <label>Dimensions:</label>
         <br>
-        <span ng-bind="ref.roadmap.columnType.name"></span>
+        <span ng-bind="::ref.roadmap.columnType.name"></span>
         /
-        <span ng-bind="ref.roadmap.rowType.name"></span>
+        <span ng-bind="::ref.roadmap.rowType.name"></span>
     </div>
 </script>
 
 
+<!-- SCENARIO POPOVER -->
 <script type="text/ng-template"
         id="wrar-scenario-popover.html">
     <div class="small">

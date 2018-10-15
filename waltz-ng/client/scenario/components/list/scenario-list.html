@@ -12,8 +12,8 @@
     <tr>
         <th>Scenario Name</th>
         <th>Target Date</th>
-        <th>Status</th>
-        <th>Lifecycle Status</th>
+        <th>Type</th>
+        <th>Release Status</th>
         <th>Operations</th>
         <th>Last modified</th>
     </tr>
@@ -38,12 +38,12 @@
         </td>
         <td>
             <span class="small"
-                  ng-bind="scenario.scenarioStatus | toDisplayName:'scenarioStatus'">
+                  ng-bind="scenario.scenarioType | toDisplayName:'scenarioType'">
             </span>
         </td>
         <td>
             <span class="small"
-                  ng-bind="scenario.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
+                  ng-bind="scenario.releaseStatus | toDisplayName:'releaseLifecycleStatus'">
             </span>
         </td>
         <td>
