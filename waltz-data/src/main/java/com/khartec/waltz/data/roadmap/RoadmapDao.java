@@ -11,7 +11,6 @@ import com.khartec.waltz.model.roadmap.ImmutableRoadmapAndScenarioOverview;
 import com.khartec.waltz.model.roadmap.Roadmap;
 import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.schema.tables.EntityRelationship;
 import com.khartec.waltz.schema.tables.records.RoadmapRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -19,10 +18,8 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -125,15 +122,34 @@ public class RoadmapDao {
 
     public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByFormalRelationship(EntityReference relatedEntity) {
 
-        SelectConditionStep<Record1<Long>> scenarioSelector = DSL
-                .select(SCENARIO.ID)
-                .from(SCENARIO)
-                .innerJoin(ENTITY_RELATIONSHIP)
-                .on(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ROADMAP.name()).and(ENTITY_RELATIONSHIP.ID_B.eq(SCENARIO.ROADMAP_ID)))
+        SelectConditionStep<Record1<Long>> roadmapIdSelector = DSL
+                .select(ENTITY_RELATIONSHIP.ID_B)
+                .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(relatedEntity.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()));
+                .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()))
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ROADMAP.name()));
 
-        return findRoadmapsAndScenariosViaScenarioSelector(scenarioSelector);
+        Collection<Roadmap> roadmaps = findRoadmapsBySelector(roadmapIdSelector);
+
+        Map<Long, List<Scenario>> scenariosByRoadmapId = dsl
+                .select(SCENARIO.fields())
+                .from(SCENARIO)
+                .where(SCENARIO.ROADMAP_ID.in(roadmapIdSelector))
+                .and(ScenarioDao.NOT_REMOVED)
+                .fetch(ScenarioDao.TO_DOMAIN_MAPPER)
+                .stream()
+                .collect(Collectors.groupingBy(s -> s.roadmapId()));
+
+        return roadmaps
+                .stream()
+                .map(r -> ImmutableRoadmapAndScenarioOverview.builder()
+                        .roadmap(r)
+                        .scenarios(scenariosByRoadmapId.getOrDefault(
+                                r.id().get(),
+                                Collections.emptyList()))
+                        .build())
+                .collect(Collectors.toList());
+
     }
 
 

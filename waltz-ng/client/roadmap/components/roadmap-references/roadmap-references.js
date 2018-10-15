@@ -38,24 +38,26 @@ function determineLoadMethod(kind) {
 }
 
 
-function controller(serviceBroker, userService) {
+function controller(notification, serviceBroker, userService) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-
+    function reloadData() {
         const loadMethod = determineLoadMethod(vm.parentEntityRef.kind);
 
-        serviceBroker
+        return serviceBroker
             .loadViewData(
                 loadMethod,
-                [ vm.parentEntityRef ])
+                [ vm.parentEntityRef ],
+                { force: true })
             .then(r => {
                 vm.references = r.data;
                 vm.mode = modes.VIEW;
                 vm.visibility.subSection = vm.visibility.subSection || vm.references.length > 0;
             });
+    }
 
+    function loadPermissions() {
         userService
             .whoami()
             .then(u => {
@@ -65,25 +67,46 @@ function controller(serviceBroker, userService) {
                 };
                 vm.visibility.subSection = vm.permissions.admin || vm.references.length > 0;
             });
+    }
+
+    vm.$onInit = () => {
+        reloadData();
+        loadPermissions();
     };
 
+
+    // -- interact --
+
     vm.onShowAddRoadmap = () => {
+        if (! vm.permissions.admin) return;
         vm.mode = modes.ADD;
     };
 
-    vm.onAddRoadmap = (r) => {
-        console.log("add roadmap", {r})
+    vm.onAddRoadmap = (command) => {
+        const commandWithLinkedEntity = Object.assign(
+            {},
+            command,
+            { linkedEntity: vm.parentEntityRef });
+
+        return serviceBroker
+            .execute(
+                CORE_API.RoadmapStore.addRoadmap,
+                [ commandWithLinkedEntity ])
+            .then(() => {
+                notification.success(`Roadmap "${command.name}" created`);
+                vm.mode = modes.LOADING;
+                reloadData();
+            })
     };
 
     vm.onCancel = () => {
         vm.mode = modes.VIEW;
     };
-
-
 }
 
 
 controller.$inject = [
+    "Notification",
     "ServiceBroker",
     "UserService"
 ];

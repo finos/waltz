@@ -65,8 +65,15 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const addRoadmap = (command) => {
+        return $http
+            .post(BASE, command)
+            .then(result => result.data);
+    };
+
 
     return {
+        addRoadmap,
         getRoadmapById,
         findRoadmapsBySelector,
         updateDescription,
@@ -88,6 +95,11 @@ const serviceName = "RoadmapStore";
 
 
 export const RoadmapStore_API = {
+    addRoadmap: {
+        serviceName,
+        serviceFnName: "addRoadmap",
+        description: "executes addRoadmap [ command ]"
+    },
     getRoadmapById: {
         serviceName,
         serviceFnName: "getRoadmapById",
