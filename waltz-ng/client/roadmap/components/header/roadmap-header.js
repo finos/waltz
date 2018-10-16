@@ -23,7 +23,19 @@ const initialState = {
 };
 
 
+const addToHistory = (historyStore, roadmap) => {
+    if (! roadmap) { return; }
+    historyStore.put(
+        roadmap.name,
+        "ROADMAP",
+        "main.roadmap.view",
+        { id: roadmap.id });
+};
+
+
+
 function controller($q,
+                    historyStore,
                     serviceBroker,
                     notification)
 {
@@ -32,7 +44,10 @@ function controller($q,
     vm.$onInit = () => {
         vm.visibility.mode = modes.LOADING;
         reloadAllData()
-            .then(() => vm.visibility.mode = modes.VIEW);
+            .then(() => {
+                vm.visibility.mode = modes.VIEW;
+                addToHistory(historyStore, vm.roadmap);
+            });
     };
 
 
@@ -102,6 +117,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
+    "HistoryStore",
     "ServiceBroker",
     "Notification"
 ];

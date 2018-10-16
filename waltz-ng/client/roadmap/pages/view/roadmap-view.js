@@ -12,7 +12,7 @@ const initialState = {
 };
 
 
-function controller($stateParams, serviceBroker) {
+function controller($stateParams) {
     const vm = initialiseData(this, initialState);
 
 
@@ -22,14 +22,12 @@ function controller($stateParams, serviceBroker) {
             kind: "ROADMAP",
             id: vm.roadmapId
         };
-
     };
 }
 
 
 controller.$inject = [
-    "$stateParams",
-    "ServiceBroker"
+    "$stateParams"
 ];
 
 
