@@ -62,12 +62,27 @@ export function drawUnit(selection, options) {
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
         .call(drawRatingIndicator)
-        .call(drawCommentIndicator);
+        .call(drawCommentIndicator)
+        .call(drawRemovedIndicator);
 
     selection
         .on("click", options.handlers.onNodeClick);
 }
 
+function drawRemovedIndicator(selection) {
+    selection
+        .filter(d => d.node.entityLifecycleStatus === "REMOVED")
+        .attr("opacity", 0.6)
+        .append("line")
+        .attr("x1", 0)
+        .attr("x2", NODE_DIMENSIONS.width)
+        .attr("y1", NODE_DIMENSIONS.height)
+        .attr("y2", 0)
+        .attr("stroke", "#c2462c")
+        .attr("opacity", 0.4)
+        .attr("stroke-width", 3);
+
+}
 
 function drawCommentIndicator(selection) {
 
@@ -79,8 +94,8 @@ function drawCommentIndicator(selection) {
         M${NODE_DIMENSIONS.width - w} ${NODE_DIMENSIONS.height} 
         h ${w}
         v ${h * -1}
-        Z
-    `;
+        Z `;
+
     selection
         .append("path")
         .attr("transform", "translate(-1 -1)")

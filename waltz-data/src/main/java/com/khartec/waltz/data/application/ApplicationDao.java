@@ -107,7 +107,6 @@ public class ApplicationDao {
         return dsl.select()
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(ids))
-                .and(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
 
     }

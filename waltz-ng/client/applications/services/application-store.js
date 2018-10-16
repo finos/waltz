@@ -92,69 +92,69 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl',
+    "$http",
+    "BaseApiUrl",
 ];
 
 
-export const serviceName = 'ApplicationStore';
+export const serviceName = "ApplicationStore";
 
 
 export const ApplicationStore_API = {
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'retrieve a single app (or null) given an id'
+        serviceFnName: "getById",
+        description: "retrieve a single app (or null) given an id"
     },
     getAppTagsById: {
         serviceName,
-        serviceFnName: 'getAppTagsById',
-        description: 'find tags for the given app'
+        serviceFnName: "getAppTagsById",
+        description: "find tags for the given app"
     },
     findRelatedById: {
         serviceName,
-        serviceFnName: 'findRelatedById',
-        description: 'find related apps for the given app id'
+        serviceFnName: "findRelatedById",
+        description: "find related apps for the given app id"
     },
     findByIds: {
         serviceName,
-        serviceFnName: 'findByIds',
-        description: 'find apps for the given list of app ids'
+        serviceFnName: "findByIds",
+        description: "find apps for the given list of app ids"
     },
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'find all apps'
+        serviceFnName: "findAll",
+        description: "find all apps"
     },
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'find apps for the given selector options'
+        serviceFnName: "findBySelector",
+        description: "find apps for the given selector options"
     },
     findByAssetCode: {
         serviceName,
-        serviceFnName: 'findByAssetCode',
-        description: 'executes findByAssetCode'
+        serviceFnName: "findByAssetCode",
+        description: "executes findByAssetCode"
     },
     countByOrganisationalUnit: {
         serviceName,
-        serviceFnName: 'countByOrganisationalUnit',
-        description: 'returns number of apps in the given ou'
+        serviceFnName: "countByOrganisationalUnit",
+        description: "returns number of apps in the given ou"
     },
     registerNewApp: {
         serviceName,
-        serviceFnName: 'registerNewApp',
-        description: 'registers a new application'
+        serviceFnName: "registerNewApp",
+        description: "registers a new application"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'find apps for the given search terms'
+        serviceFnName: "search",
+        description: "find apps for the given search terms"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'updates an application'
+        serviceFnName: "update",
+        description: "updates an application"
     }
 };
 
