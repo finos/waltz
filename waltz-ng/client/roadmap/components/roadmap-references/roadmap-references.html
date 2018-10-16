@@ -54,8 +54,9 @@
                         <tr>
                             <th>Roadmap</th>
                             <th>Scenario</th>
-                            <th>State</th>
                             <th>Effective Date</th>
+                            <th>Type</th>
+                            <th>State</th>
                         </tr>
                         </thead>
                         <tbody ng-repeat="ref in $ctrl.references">
@@ -69,6 +70,9 @@
                                           ng-bind="ref.roadmap.name">
                                     </span>
                                 </a>
+                            </td>
+                            <td>
+                                -
                             </td>
                             <td>
                                 -
@@ -104,11 +108,15 @@
                                 </a>
                             </td>
                             <td>
+                                <span ng-bind="scenario.effectiveDate">
+                                </span>
+                            </td>
+                            <td>
                                 <span ng-bind="scenario.scenarioType | toDisplayName:'scenarioType'">
                                 </span>
                             </td>
                             <td>
-                                <span ng-bind="scenario.effectiveDate">
+                                <span ng-bind="scenario.releaseStatus | toDisplayName:'releaseLifecycleStatus'">
                                 </span>
                             </td>
                         </tr>
