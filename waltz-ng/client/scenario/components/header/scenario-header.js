@@ -18,8 +18,18 @@ const modes = {
     CONFIGURE_SCENARIO: "CONFIGURE_SCENARIO"
 };
 
+const addToHistory = (historyStore, scenario) => {
+    if (! scenario) { return; }
+    historyStore.put(
+        scenario.name,
+        "SCENARIO",
+        "main.scenario.view",
+        { id: scenario.id });
+};
+
 
 function controller($q,
+                    historyStore,
                     notification,
                     serviceBroker,
                     userService)
@@ -30,7 +40,10 @@ function controller($q,
         vm.visibility.mode = modes.LOADING;
 
         reloadAllData()
-            .then(() => vm.visibility.mode = modes.VIEW);
+            .then(() => {
+                vm.visibility.mode = modes.VIEW;
+                addToHistory(historyStore, vm.scenario);
+            });
 
         userService
             .whoami()
@@ -163,7 +176,6 @@ function controller($q,
         return $q
             .all([roadmapPromise]);
     }
-
 }
 
 
@@ -182,6 +194,7 @@ const initialState = {
 
 controller.$inject = [
     "$q",
+    "HistoryStore",
     "Notification",
     "ServiceBroker",
     "UserService"
