@@ -39,7 +39,7 @@ public class ScenarioDao {
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getLifecycleStatus()))
                 .scenarioType(ScenarioType.valueOf(record.getScenarioType()))
                 .releaseStatus(ReleaseLifecycleStatus.valueOf(record.getReleaseStatus()))
-                .effectiveDate(toLocalDate(record.getEffectiveDate()))
+                .effectiveDate(record.getEffectiveDate().toLocalDate())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .build();
