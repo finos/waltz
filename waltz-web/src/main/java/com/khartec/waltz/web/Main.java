@@ -203,10 +203,9 @@ public class Main {
     private void enableCORS() {
 
         options("/*", (req, res) -> {
-
             handleCORSHeader(req, res, "Access-Control-Request-Headers", "Access-Control-Allow-Headers");
             handleCORSHeader(req, res, "Access-Control-Request-Method", "Access-Control-Allow-Methods");
-
+            res.header("Access-Control-Max-Age", "600");
             return "OK";
         });
 
