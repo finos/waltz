@@ -33,24 +33,22 @@
 
     <br>
 
-
-    <!-- Entity Named Notes -->
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
-                                   section="ctrl.entityNamedNotesSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
-
-
-    <!-- Physical Fields -->
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
-                                   section="ctrl.relatedPhysicalFieldSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+    <div ng-if="ctrl.logicalDataElement">
+        <!-- Entity Named Notes -->
+        <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
 
 
-    <!-- Bookmarks -->
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalDataElement"
-                                   section="ctrl.bookmarksSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <!-- Physical Fields -->
+        <waltz-dynamic-section-wrapper section="ctrl.relatedPhysicalFieldSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
+
+
+        <!-- Bookmarks -->
+        <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
+    </div>
 </div>

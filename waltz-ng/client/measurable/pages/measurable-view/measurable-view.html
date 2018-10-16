@@ -30,22 +30,22 @@
                               server-stats="ctrl.techStats.serverStats">
     </waltz-measurable-summary>
 
+    <div ng-if="ctrl.measurable">
+        <!-- NAVIGATION -->
+        <div class="waltz-page-summary waltz-page-summary-attach">
+            <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
+                                              open-sections="ctrl.sections"
+                                              on-select="ctrl.addSection"
+                                              offset="650">
+            </waltz-dynamic-section-navigation>
+        </div>
 
-    <!-- NAVIGATION -->
-    <div class="waltz-page-summary waltz-page-summary-attach" ng-if="ctrl.measurable">
-        <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
-                                          open-sections="ctrl.sections"
-                                          on-select="ctrl.addSection"
-                                          offset="650">
-        </waltz-dynamic-section-navigation>
+        <br>
+
+        <waltz-dynamic-sections-view sections="ctrl.sections"
+                                     parent-entity-ref="ctrl.entityReference"
+                                     on-remove="ctrl.removeSection">
+        </waltz-dynamic-sections-view>
     </div>
-
-    <br>
-
-    <waltz-dynamic-sections-view ng-if="ctrl.measurable"
-                                 sections="ctrl.sections"
-                                 parent-entity-ref="ctrl.entityReference"
-                                 on-remove="ctrl.removeSection">
-    </waltz-dynamic-sections-view>
 
 </div>

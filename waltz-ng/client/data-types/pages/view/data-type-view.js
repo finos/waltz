@@ -19,7 +19,7 @@
 
 import {initialiseData} from "../../../common";
 
-import template from './data-type-view.html';
+import template from "./data-type-view.html";
 import {toEntityRef} from "../../../common/entity-utils";
 
 
@@ -37,38 +37,36 @@ function controller(dataType,
 
     const vm = initialiseData(this, initialState);
 
-    vm.entityRef = toEntityRef(dataType, 'DATA_TYPE');
-    vm.dataType = dataType;
+    if(dataType) {
+        vm.entityRef = toEntityRef(dataType, "DATA_TYPE");
+        vm.dataType = dataType;
 
-
-    // -- BOOT ---
-    vm.$onInit = () => {
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('DATA_TYPE');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('DATA_TYPE');
-        if(dataType) {
+        // -- BOOT ---
+        vm.$onInit = () => {
+            vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("DATA_TYPE");
+            vm.sections = dynamicSectionManager.findUserSectionsForKind("DATA_TYPE");
             historyStore.put(
                 dataType.name,
-                'DATA_TYPE',
-                'main.data-type.view',
+                "DATA_TYPE",
+                "main.data-type.view",
                 {id: dataType.id});
-        }
-    };
-
+        };
+    }
     // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'DATA_TYPE');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'DATA_TYPE');
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "DATA_TYPE");
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "DATA_TYPE");
 }
 
 
 controller.$inject = [
-    'dataType',
-    'DynamicSectionManager',
-    'HistoryStore'
+    "dataType",
+    "DynamicSectionManager",
+    "HistoryStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

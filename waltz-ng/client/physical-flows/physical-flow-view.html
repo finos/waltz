@@ -17,77 +17,78 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-section-actions ng-if="ctrl.logicalFlow">
-            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <button class="btn btn-xs btn-danger"
-                        ng-disabled="! (ctrl.mentions | isEmpty)"
-                        ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
-                    Delete
-                </button>
-                <waltz-icon name="exclamation-circle"
-                            ng-if="! (ctrl.mentions | isEmpty)"
-                            class="small"
-                            uib-popover="This flow cannot be deleted as it is being used in a lineage"
-                            popover-trigger="mouseenter"
-                            style="color: #777; vertical-align: text-top;">
-                </waltz-icon>
-            </div>
-        </waltz-section-actions>
+        <div ng-if="ctrl.logicalFlow">
+            <waltz-section-actions>
+                <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                    <button class="btn btn-xs btn-danger"
+                            ng-disabled="! (ctrl.mentions | isEmpty)"
+                            ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
+                        Delete
+                    </button>
+                    <waltz-icon name="exclamation-circle"
+                                ng-if="! (ctrl.mentions | isEmpty)"
+                                class="small"
+                                uib-popover="This flow cannot be deleted as it is being used in a lineage"
+                                popover-trigger="mouseenter"
+                                style="color: #777; vertical-align: text-top;">
+                    </waltz-icon>
+                </div>
+            </waltz-section-actions>
 
 
-        <div class="row" ng-if="ctrl.logicalFlow">
-            <div class="col-md-7">
-                <waltz-sub-section name="Overview">
-                    <content>
-                        <div class="waltz-sub-section-content">
-                            <div ng-if="! ctrl.visibility.overviewEditor">
-                                <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
-                                </waltz-physical-flow-overview>
+            <div class="row">
+                <div class="col-md-7">
+                    <waltz-sub-section name="Overview">
+                        <content>
+                            <div class="waltz-sub-section-content">
+                                <div ng-if="! ctrl.visibility.overviewEditor">
+                                    <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
+                                    </waltz-physical-flow-overview>
+                                </div>
+                                <div ng-if="ctrl.visibility.overviewEditor"
+                                     class="waltz-highlight-if">
+                                    <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
+                                    </waltz-physical-flow-editor>
+                                </div>
+
                             </div>
-                            <div ng-if="ctrl.visibility.overviewEditor"
-                                 class="waltz-highlight-if">
-                                <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
-                                </waltz-physical-flow-editor>
+                            <div class="waltz-sub-section-controls"
+                                 waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                                <span>
+                                    <a ng-click="ctrl.visibility.overviewEditor = true"
+                                       ng-if="! ctrl.visibility.overviewEditor"
+                                       class="clickable">
+                                        Edit
+                                    </a>
+
+                                    <a ng-click="ctrl.visibility.overviewEditor = false"
+                                       ng-if="ctrl.visibility.overviewEditor"
+                                       class="clickable">
+                                        Done
+                                    </a>
+                                </span>
                             </div>
 
-                        </div>
-                        <div class="waltz-sub-section-controls"
-                             waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
-                            <span>
-                                <a ng-click="ctrl.visibility.overviewEditor = true"
-                                   ng-if="! ctrl.visibility.overviewEditor"
-                                   class="clickable">
-                                    Edit
-                                </a>
+                        </content>
+                    </waltz-sub-section>
 
-                                <a ng-click="ctrl.visibility.overviewEditor = false"
-                                   ng-if="ctrl.visibility.overviewEditor"
-                                   class="clickable">
-                                    Done
-                                </a>
-                            </span>
-                        </div>
-
-                    </content>
-                </waltz-sub-section>
-
+                </div>
+                <div class="col-md-5">
+                    <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                                                 help-text="Data types referenced by the specification">
+                    </waltz-data-type-usage-panel>
+                </div>
             </div>
-            <div class="col-md-5">
-                <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
-                                             help-text="Data types referenced by the specification">
-                </waltz-data-type-usage-panel>
+
+
+
+            <div class="small text-muted"
+                 ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
+                Last updated by
+                <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
+                (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
             </div>
         </div>
-
-
-
-        <div class="small text-muted"
-             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt && ctrl.physicalFlow">
-            Last updated by
-            <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
-            (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
-        </div>
-
         <waltz-no-data ng-if="!ctrl.physicalFlow">
             <message>No information for this physical flow</message>
         </waltz-no-data>
