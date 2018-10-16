@@ -61,7 +61,12 @@ function setupGroupElements($element) {
                         "clip-path": "url(#grid-clip)",
                         "transform": `translate(${rowAxisWidth} ${columnAxisHeight})`
                     },
-                    children: [ { name: "gridContent" } ]
+                    children: [
+                        {
+                            name: "gridContent",
+                            attrs: { "transform": "translate(1, 1)" }
+                        }
+                    ]
                 }, {
                     name: "columnAxisHolder",
                     attrs: {

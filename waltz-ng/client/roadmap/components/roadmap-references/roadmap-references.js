@@ -2,6 +2,7 @@ import template from "./roadmap-references.html";
 import {initialiseData} from "../../../common";
 import roles from "../../../user/roles";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import _ from "lodash";
 
 
 const bindings = {
@@ -53,7 +54,7 @@ function controller(notification, serviceBroker, userService) {
             .then(r => {
                 vm.references = r.data;
                 vm.mode = modes.VIEW;
-                vm.visibility.subSection = vm.visibility.subSection || vm.references.length > 0;
+                vm.visibility.subSection = vm.visibility.subSection || !_.isEmpty(vm.references);
             });
     }
 
@@ -65,7 +66,7 @@ function controller(notification, serviceBroker, userService) {
                     admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
                     edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
                 };
-                vm.visibility.subSection = vm.permissions.admin || vm.references.length > 0;
+                vm.visibility.subSection = vm.permissions.admin || !_.isEmpty(vm.references);
             });
     }
 
