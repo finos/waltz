@@ -139,8 +139,9 @@ public class ScenarioAxisItemDao {
 
         for (int i = 0; i < orderedIds.size(); i++) {
             ScenarioAxisItemRecord record = dsl.newRecord(SCENARIO_AXIS_ITEM);
-            record.setPosition(i * 10);
             record.setId(orderedIds.get(i));
+            record.changed(SCENARIO_AXIS_ITEM.ID, false);
+            record.setPosition(i * 10);
             records.add(record);
         }
 

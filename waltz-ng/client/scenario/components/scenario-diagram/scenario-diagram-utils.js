@@ -64,6 +64,6 @@ export function resetZoom(svgGroups) {
         .svg
         .transition()
         .duration(800)
-        .call(myZoom.transform, zoomIdentity.scale(1));
+        .call(myZoom.transform, zoomIdentity.scale(1).translate(1, 1));
 }
 
