@@ -74,5 +74,8 @@ export function kindToViewState(kind) {
     if (kind === "PHYSICAL_FLOW") {
         return "main.physical-flow.view";
     }
+    if (kind === "ROADMAP") {
+        return "main.roadmap.view";
+    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }

@@ -12,11 +12,20 @@ public abstract class Roadmap implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
-        LastUpdatedProvider {
+        LastUpdatedProvider,
+        WaltzEntity {
 
 
     public abstract long ratingSchemeId();
     public abstract EntityReference rowType();
     public abstract EntityReference columnType();
 
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.ROADMAP)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

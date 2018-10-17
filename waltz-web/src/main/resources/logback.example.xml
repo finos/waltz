@@ -40,8 +40,27 @@
         </encoder>
     </appender>
 
+    <appender name="PERFORMANCE_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../logs/waltz-performance.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/waltz-performance.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <logger name="com.khartec" level="DEBUG" />
     <!--<logger name="org.jooq" level="DEBUG" />-->
+
+    <logger name="WALTZ.PERFORMANCE" level="DEBUG">
+        <appender-ref ref="PERFORMANCE_FILE" />
+        <appender-ref ref="STDOUT" />
+    </logger>
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />
