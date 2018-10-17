@@ -198,6 +198,12 @@ export const dynamicSections = {
         icon: "file-code-o",
         id: 40,
     },
+    relatedOrgUnitSection: {
+        componentId: "related-org-unit-section",
+        name: "Organisation Units",
+        icon: "sitemap",
+        id: 50,
+    },
     entityDiagramsSection: {
         componentId: "entity-diagrams-section",
         name: "Diagrams",

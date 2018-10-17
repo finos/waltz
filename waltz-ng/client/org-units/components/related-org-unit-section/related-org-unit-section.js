@@ -20,12 +20,11 @@
 
 import _ from "lodash";
 
-import template from "./related-app-groups-section.html";
+import template from "./related-org-unit-section.html";
 
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {sameRef} from "../../../common/entity-utils";
-import {isGroupOwner} from "../../app-group-utils";
 import {getEditRoleForEntityKind} from "../../../common/role-utils";
 
 
@@ -35,19 +34,15 @@ const bindings = {
 
 
 const initialState = {
-    currentlySelectedGroup: null,
+    currentlySelected: null,
     relationships: [],
     editable: false,
     mode: 'view', // edit | view
 };
 
 
-function canEdit(serviceBroker, UserService, entityRef) {
+function canEdit(UserService, entityRef) {
     switch(entityRef.kind){
-        case 'APP_GROUP':
-            return isGroupOwner(serviceBroker, entityRef);
-        case 'CHANGE_INITIATIVE':
-            return Promise.resolve(true);
         case 'ROADMAP':
             const role = getEditRoleForEntityKind('ROADMAP');
             return UserService
@@ -67,9 +62,9 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
             { force: true })
         .then(r => r.data);
 
-    const groupPromise = serviceBroker
+    const orgUnitsPromise = serviceBroker
         .loadViewData(
-            CORE_API.AppGroupStore.findRelatedByEntityRef,
+            CORE_API.OrgUnitStore.findRelatedByEntityRef,
             [ entityRef ],
             { force: true })
         .then(r => _
@@ -78,9 +73,9 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
             .value());
 
     return $q
-        .all([relationshipPromise, groupPromise])
-        .then(([relationships, groups]) => {
-            const groupsById = _.keyBy(groups, 'id');
+        .all([relationshipPromise, orgUnitsPromise])
+        .then(([relationships, orgUnits]) => {
+            const groupsById = _.keyBy(orgUnits, 'id');
             return _
                 .chain(relationships)
                 .map(rel => {
@@ -88,7 +83,7 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
                         ? {counterpartRef: rel.b, side: 'TARGET', relationship: rel}
                         : {counterpartRef: rel.a, side: 'SOURCE', relationship: rel};
                 })
-                .filter(rel => rel.counterpartRef.kind === 'APP_GROUP')
+                .filter(rel => rel.counterpartRef.kind === 'ORG_UNIT')
                 .map(rel => Object.assign({}, rel, { counterpart: groupsById[rel.counterpartRef.id] }))
                 .filter(rel => rel.counterpart != null)
                 .uniqBy(rel => rel.counterpart.id)
@@ -98,15 +93,15 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
 }
 
 
-function canGroupBeProposed(relationships = [], proposedGroup, selfRef) {
-    const proposalId = proposedGroup.id;
+function canOrgUnitBeProposed(relationships = [], proposedOrgUnit, selfRef) {
+    const proposalId = proposedOrgUnit.id;
     const alreadyLinked = _
         .chain(relationships)
         .map('counterpart.id')
         .includes(proposalId)
         .value();
 
-    return ! alreadyLinked && ! sameRef(proposedGroup, selfRef);
+    return ! alreadyLinked && ! sameRef(proposedOrgUnit, selfRef);
 }
 
 
@@ -118,15 +113,15 @@ function controller($q, notification, serviceBroker, UserService) {
 
     vm.$onInit = () => {
         reload();
-        canEdit(serviceBroker, UserService, vm.parentEntityRef)
+        canEdit(UserService, vm.parentEntityRef)
             .then(r => vm.editable = r);
 
     };
 
 
-    vm.groupSelectionFilter = (proposedGroup) => canGroupBeProposed(
+    vm.selectionFilter = (proposed) => canOrgUnitBeProposed(
         vm.relationships,
-        proposedGroup,
+        proposed,
         vm.parentEntityRef);
 
 
@@ -142,13 +137,13 @@ function controller($q, notification, serviceBroker, UserService) {
 
 
     vm.onAdd = () => {
-        if (vm.currentlySelectedGroup === null) {
+        if (vm.currentlySelected === null) {
             return;
         }
 
         const newRel = {
             a: vm.parentEntityRef,
-            b: vm.currentlySelectedGroup,
+            b: vm.currentlySelected,
             relationship: 'RELATES_TO'
         };
 
@@ -156,14 +151,14 @@ function controller($q, notification, serviceBroker, UserService) {
             .execute(CORE_API.EntityRelationshipStore.create, [ newRel ])
             .then(() => {
                 notification.info("Relationship created");
-                vm.currentlySelectedGroup = null;
+                vm.currentlySelected = null;
                 reload();
             })
             .catch(e => notification.error("Failed to add! " + e.message))
     };
 
 
-    vm.onGroupSelected = (g) => vm.currentlySelectedGroup = g;
+    vm.onSelected = (g) => vm.currentlySelected = g;
     vm.onEdit = () => vm.mode = 'edit';
     vm.onCancel = () => vm.mode = 'view';
 }
@@ -184,7 +179,7 @@ const component = {
 };
 
 
-const id = 'waltzRelatedAppGroupsSection';
+const id = 'waltzRelatedOrgUnitSection';
 
 
 export default {

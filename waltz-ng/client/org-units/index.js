@@ -22,7 +22,8 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import * as OrgUnitStore from "./services/org-unit-store";
 import OrgUnitOverview from "./components/overview/org-unit-overview";
 import OrgUnitTree from "./components/tree/org-unit-tree";
-import Routes from './routes';
+import RelatedOrgUnitSection from "./components/related-org-unit-section/related-org-unit-section";
+import Routes from "./routes";
 
 export default () => {
 
@@ -32,7 +33,11 @@ export default () => {
         .config(Routes);
 
     registerStores(module, [OrgUnitStore]);
-    registerComponents(module, [ OrgUnitOverview, OrgUnitTree ]);
+    registerComponents(module, [
+        OrgUnitOverview,
+        OrgUnitTree,
+        RelatedOrgUnitSection
+    ]);
 
     return module.name;
 };

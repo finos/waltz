@@ -68,6 +68,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL);
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String findByIdsPath = mkPath(BASE_URL, "by-ids");
+        String findRelatedByEntityRefPath = mkPath(BASE_URL, "related", ":kind", ":id");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String findDescendantsPath = mkPath(BASE_URL, ":id", "descendants");
         String findImmediateHierarchyPath = mkPath(BASE_URL, ":id", "immediate-hierarchy");
@@ -75,6 +76,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
         ListRoute<OrganisationalUnit> findAllRoute = (request, response) -> service.findAll();
         ListRoute<OrganisationalUnit> searchRoute = (request, response) -> service.search(request.params("query"));
         ListRoute<OrganisationalUnit> findByIdsRoute = (req, res) -> service.findByIds(readBody(req, Long[].class));
+        ListRoute<OrganisationalUnit> findRelatedByEntityRefRoute = (req, res) -> service.findRelatedByEntityRef(getEntityReference(req));
         ListRoute<LeveledEntityReference> findImmediateHierarchyRoute = (req, res) -> service.findImmediateHierarchy(getId(req));
         ListRoute<OrganisationalUnit> findDescendantsRoute = (req, res) -> service.findDescendants(getId(req));
 
@@ -86,6 +88,7 @@ public class OrganisationUnitEndpoint implements Endpoint {
         getForList(findImmediateHierarchyPath, findImmediateHierarchyRoute);
         getForList(findDescendantsPath, findDescendantsRoute);
         postForList(findByIdsPath, findByIdsRoute);
+        getForList(findRelatedByEntityRefPath, findRelatedByEntityRefRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }
 
