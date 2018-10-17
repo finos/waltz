@@ -1,0 +1,15 @@
+@import "../../../../style/util";
+
+
+.wrsd-infopop {
+    background-color: white;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    opacity: 0.9;
+    max-width: 40%;
+    @include waltz-box-shadow();
+}

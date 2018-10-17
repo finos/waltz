@@ -3,7 +3,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
-import {event} from "d3-selection";
+import {event, select, selectAll} from "d3-selection";
 import roles from "../../../user/roles";
 
 const bindings = {
@@ -30,9 +30,7 @@ const component = {
 
 
 const initialState = {
-    handlers: {
-        onNodeClick: (n) => console.log("WRSD: NodeClick", n)
-    },
+    handlers: {},
     permissions: {
         admin: false,
         edit: false
@@ -111,6 +109,7 @@ function controller($q,
 
     function mkNodeMenu() {
         return () => {
+            hideInfoPopup();
             if (!vm.permissions.edit) {
                 return null;
             }
@@ -163,6 +162,7 @@ function controller($q,
     function mkNodeGridMenu() {
 
         return () => {
+            hideInfoPopup();
             if (!vm.permissions.edit) {
                 return null;
             }
@@ -218,10 +218,95 @@ function controller($q,
             });
     }
 
+
+    function hideInfoPopup() {
+        select(".wrsd-infopop")
+            .style("display", "none");
+    }
+
+
+    function showInfoPopup(html) {
+        return select(".wrsd-infopop")
+            .style("left", (event.pageX - 2) + "px")
+            .style("top", (event.pageY - 2) + "px")
+            .style("display", "block")
+            .html(html)
+            .select(".infopop-close")
+            .on("click", () => hideInfoPopup());
+    }
+
+
+    function setupHandlers() {
+        // create the div element that will hold the context menu
+        selectAll(".wrsd-infopop")
+            .data([1])
+            .enter()
+            .append("div")
+            .attr("class", "wrsd-infopop");
+
+        return {
+            onNodeClick: (d) => {
+                const name = d.node.name;
+                const column = d.domainCoordinates.column.name;
+                const row = d.domainCoordinates.row.name;
+                const ratingName = _.get(vm, ["ratingsByCode", d.state.rating, "name"], "?");
+                const comment = _.get(d, ["state", "comment"], "- No comment -");
+
+                const html = `
+                    <table class="table table-condensed small">
+                        <thead>
+                        <tr>
+                            <th colspan="2">${ name }</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Column:</td>
+                            <td>${ column }</td>
+                        </tr>
+                        <tr>
+                            <td>Row:</td>
+                            <td>${ row }</td>
+                        </tr>
+                        <tr>
+                            <td>Comment:</td>
+                            <td>${ comment }</td>
+                        </tr>
+                        <tr>
+                            <td>Rating:</td> 
+                            <td>${ ratingName }</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <a class="clickable infopop-close">
+                        Close
+                    </a>
+                `;
+
+                showInfoPopup(html);
+            },
+            onNodeGridClick: () => {
+                hideInfoPopup();
+            },
+            contextMenus: {
+                node: mkNodeMenu(),
+                nodeGrid: mkNodeGridMenu(),
+            }
+        };
+    }
+
+
     vm.$onInit = () => {
         const scenarioPromise = loadScenario();
         const applicationPromise = loadApplications(scenarioPromise);
         const measurablePromise = loadMeasurables(scenarioPromise);
+
+        scenarioPromise
+            .then( () => serviceBroker.loadAppData(
+                CORE_API.RatingSchemeStore.getById,
+                [ vm.scenarioDefn.roadmap.ratingSchemeId ]))
+            .then(r => vm.ratingsByCode = _.keyBy(r.data.ratings, "rating"));
+
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
             .then(() => vm.vizData = prepareData(
@@ -229,10 +314,7 @@ function controller($q,
                 vm.applications,
                 vm.measurables));
 
-        vm.handlers.contextMenus = {
-            node: mkNodeMenu(),
-            nodeGrid: mkNodeGridMenu(),
-        };
+        vm.handlers = setupHandlers();
 
         userService
             .whoami()
