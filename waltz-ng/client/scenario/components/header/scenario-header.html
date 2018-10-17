@@ -160,11 +160,22 @@
                         <waltz-roadmap-scenario-diagram scenario-id="$ctrl.scenarioId">
                         </waltz-roadmap-scenario-diagram>
                     </div>
+
+                    <div class="waltz-sub-section-controls">
+                        <div uib-popover="Exports this scenario"
+                             popover-append-to-body="true"
+                             popover-trigger="mouseenter">
+                            <waltz-data-extract-link name="Export"
+                                                     extract="scenario/{{$ctrl.scenarioId}}"
+                                                     styling="link"
+                                                     filename="{{tab.category.name}}.csv">
+                            </waltz-data-extract-link>
+                        </div>
+                    </div>
                 </content>
             </waltz-sub-section>
 
         </div> <!--  mode: VIEW -->
-
 
     </div>
 
