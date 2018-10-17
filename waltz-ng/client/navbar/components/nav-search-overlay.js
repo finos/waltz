@@ -42,7 +42,8 @@ const initialState = {
         'ORG_UNIT',
         'MEASURABLE',
         'PHYSICAL_SPECIFICATION',
-        'LOGICAL_DATA_ELEMENT'
+        'LOGICAL_DATA_ELEMENT',
+        'ROADMAP'
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -153,6 +154,7 @@ function controller($element,
         handleSearch(query, 'PHYSICAL_SPECIFICATION');
         handleSearch(query, 'APP_GROUP');
         handleSearch(query, 'LOGICAL_DATA_ELEMENT');
+        handleSearch(query, 'ROADMAP');
     };
 
     vm.doSearch = () => doSearch(vm.query);

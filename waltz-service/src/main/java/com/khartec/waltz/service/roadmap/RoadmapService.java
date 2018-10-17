@@ -3,6 +3,7 @@ package com.khartec.waltz.service.roadmap;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.data.roadmap.RoadmapDao;
 import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
+import com.khartec.waltz.data.roadmap.RoadmapSearchDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -12,6 +13,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.roadmap.Roadmap;
 import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
@@ -23,15 +25,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.roadmap.RoadmapUtilities.mkBasicLogEntry;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class RoadmapService {
 
     private final RoadmapDao roadmapDao;
+    private final RoadmapSearchDao roadmapSearchDao;
     private final ScenarioDao scenarioDao;
     private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
     private final ChangeLogService changeLogService;
@@ -40,16 +45,19 @@ public class RoadmapService {
 
     @Autowired
     public RoadmapService(RoadmapDao roadmapDao,
+                          RoadmapSearchDao roadmapSearchDao,
                           ScenarioDao scenarioDao,
                           RoadmapIdSelectorFactory roadmapIdSelectorFactory,
                           ChangeLogService changeLogService,
                           EntityRelationshipDao entityRelationshipDao) {
         checkNotNull(roadmapDao, "roadmapDao cannot be null");
+        checkNotNull(roadmapSearchDao, "roadmapSearchDao cannot be null");
         checkNotNull(scenarioDao, "scenarioDao cannot be null");
         checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
         this.roadmapDao = roadmapDao;
+        this.roadmapSearchDao = roadmapSearchDao;
         this.scenarioDao = scenarioDao;
         this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
         this.changeLogService = changeLogService;
@@ -129,6 +137,19 @@ public class RoadmapService {
 
     public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByFormalRelationship(EntityReference relatedEntity) {
         return roadmapDao.findRoadmapsAndScenariosByFormalRelationship(relatedEntity);
+    }
+
+
+    public List<EntityReference> search(String query) {
+        List<Roadmap> roadmaps = search(query, EntitySearchOptions.mkForEntity(EntityKind.ROADMAP));
+        return roadmaps.stream()
+                .map(a -> a.entityReference())
+                .collect(toList());
+    }
+
+
+    public List<Roadmap> search(String query, EntitySearchOptions options) {
+        return roadmapSearchDao.search(query, options);
     }
 
 
