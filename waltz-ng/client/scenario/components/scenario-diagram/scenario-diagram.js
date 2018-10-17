@@ -90,7 +90,7 @@ function setupGroupElements($element) {
 
 
 function draw(dataWithLayout, svgGroups, options) {
-    console.log("WRD: draw", { dataWithLayout, options });
+    // console.log("WSD: draw", { dataWithLayout, options });
     drawGrid(svgGroups.gridContent, dataWithLayout, options);
     drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
 }
