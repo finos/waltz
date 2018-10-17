@@ -104,7 +104,7 @@ public class ScenarioExtractor extends BaseDataExtractor {
                 .innerJoin(ROADMAP)
                 .on(ROADMAP.ID.eq(SCENARIO.ROADMAP_ID))
                 .innerJoin(RATING_SCHEME_ITEM)
-                .on(RATING_SCHEME_ITEM.SCHEME_ID.eq(ROADMAP.RATING_SCHEME_ID))
+                .on(RATING_SCHEME_ITEM.SCHEME_ID.eq(ROADMAP.RATING_SCHEME_ID).and(RATING_SCHEME_ITEM.CODE.eq(SCENARIO_RATING_ITEM.RATING)))
                 .where(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(scenarioId));
 
         System.out.println(qry);
