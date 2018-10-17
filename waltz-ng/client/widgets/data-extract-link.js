@@ -24,25 +24,25 @@ import template from "./data-extract-link.html";
 
 
 const bindings = {
-    name: '@',
-    extract: '@',
-    method: '@',
-    filename: '@',
-    requestBody: '<',
-    styling: '@?'
+    name: "@",
+    extract: "@",
+    method: "@",
+    filename: "@",
+    requestBody: "<",
+    styling: "@?"
 };
 
 
 const initialState = {
-    name: 'Export',
-    filename: 'extract.csv',
-    method: 'GET',
+    name: "Export",
+    filename: "extract.csv",
+    method: "GET",
     requestBody: null,
-    styling: 'button'
+    styling: "button"
 };
 
 
-function calcClasses(styling = 'button') {
+function calcClasses(styling = "button") {
     switch(styling) {
         case "link":
             return ["clickable"];
@@ -53,12 +53,12 @@ function calcClasses(styling = 'button') {
 
 
 function getFileNameFromHttpResponse(httpResponse) {
-    var contentDispositionHeader = httpResponse.headers('Content-Disposition');
+    var contentDispositionHeader = httpResponse.headers("Content-Disposition");
     if(!contentDispositionHeader) {
         return null;
     }
-    var result = contentDispositionHeader.split(';')[1].trim().split('=')[1];
-    return result.replace(/"/g, '');
+    var result = contentDispositionHeader.split(";")[1].trim().split("=")[1];
+    return result.replace(/"/g, "");
 }
 
 
@@ -72,16 +72,16 @@ function controller($http, BaseExtractUrl) {
 
     vm.export = () => {
         switch (vm.method) {
-            case 'GET':
+            case "GET":
                 return $http
                     .get(vm.url)
                     .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
-            case 'POST':
+            case "POST":
                 return $http
                     .post(vm.url, vm.requestBody)
                     .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
             default:
-                throw 'Unrecognised method: ' + vm.method;
+                throw "Unrecognised method: " + vm.method;
         }
     };
 
@@ -89,8 +89,8 @@ function controller($http, BaseExtractUrl) {
 
 
 controller.$inject = [
-    '$http',
-    'BaseExtractUrl'
+    "$http",
+    "BaseExtractUrl"
 ];
 
 
