@@ -21,6 +21,11 @@ const dialogs = {
     EDIT_CELL: "EDIT_CELL"
 };
 
+const styles = {
+    INFOPOP: "wrsd-infopop",
+    INFOPOP_CLOSE: "infopop-close",
+};
+
 
 const component = {
     bindings,
@@ -220,29 +225,29 @@ function controller($q,
 
 
     function hideInfoPopup() {
-        select(".wrsd-infopop")
+        select(`.${styles.INFOPOP}`)
             .style("display", "none");
     }
 
 
     function showInfoPopup(html) {
-        return select(".wrsd-infopop")
+        return select(`.${styles.INFOPOP}`)
             .style("left", (event.pageX - 2) + "px")
             .style("top", (event.pageY - 2) + "px")
             .style("display", "block")
             .html(html)
-            .select(".infopop-close")
+            .select(`.${styles.INFOPOP_CLOSE}`)
             .on("click", () => hideInfoPopup());
     }
 
 
     function setupHandlers() {
         // create the div element that will hold the context menu
-        selectAll(".wrsd-infopop")
+        selectAll(`.${styles.INFOPOP}`)
             .data([1])
             .enter()
             .append("div")
-            .attr("class", "wrsd-infopop");
+            .attr("class", styles.INFOPOP);
 
         return {
             onNodeClick: (d) => {
