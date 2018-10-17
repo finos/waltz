@@ -28,12 +28,13 @@ import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
-import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
+import com.khartec.waltz.service.roadmap.RoadmapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,7 @@ public class EntitySearchService {
     private final OrganisationalUnitService organisationalUnitService;
     private final PersonService personService;
     private final PhysicalSpecificationService physicalSpecificationService;
+    private final RoadmapService roadmapService;
 
 
     @Autowired
@@ -73,7 +75,8 @@ public class EntitySearchService {
                                MeasurableService measurableService,
                                OrganisationalUnitService organisationalUnitService,
                                PersonService personService,
-                               PhysicalSpecificationService physicalSpecificationService) {
+                               PhysicalSpecificationService physicalSpecificationService,
+                               RoadmapService roadmapService) {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
@@ -85,6 +88,7 @@ public class EntitySearchService {
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
         checkNotNull(personService, "personService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
+        checkNotNull(roadmapService, "roadmapService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -97,6 +101,7 @@ public class EntitySearchService {
         this.organisationalUnitService = organisationalUnitService;
         this.personService = personService;
         this.physicalSpecificationService = physicalSpecificationService;
+        this.roadmapService = roadmapService;
     }
 
 
@@ -139,6 +144,8 @@ public class EntitySearchService {
                 return () -> personService.search(terms, options);
             case PHYSICAL_SPECIFICATION:
                 return () -> physicalSpecificationService.search(terms, options);
+            case ROADMAP:
+                return () -> roadmapService.search(terms, options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }

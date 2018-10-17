@@ -90,6 +90,13 @@ public class RoadmapDao {
     }
 
 
+    public Collection<Roadmap> findAll() {
+        return baseSelect()
+                .orderBy(ROADMAP.NAME)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public Boolean updateDescription(long id, String newValue, String userId) {
         return updateField(
                 id,
