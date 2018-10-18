@@ -2,90 +2,96 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
-                       small="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
+                       small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
                        tour="ctrl.tour"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>
+            <li ng-if="ctrl.logicalFlow">
                 <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
             </li>
+            <li ng-if="!ctrl.logicalFlow">physical Flow</li>
             <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
         </ol>
     </waltz-page-header>
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-section-actions>
-            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <button class="btn btn-xs btn-danger"
-                        ng-disabled="! (ctrl.mentions | isEmpty)"
-                        ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
-                    Delete
-                </button>
-                <waltz-icon name="exclamation-circle"
-                            ng-if="! (ctrl.mentions | isEmpty)"
-                            class="small"
-                            uib-popover="This flow cannot be deleted as it is being used in a lineage"
-                            popover-trigger="mouseenter"
-                            style="color: #777; vertical-align: text-top;">
-                </waltz-icon>
-            </div>
-        </waltz-section-actions>
+        <div ng-if="ctrl.logicalFlow">
+            <waltz-section-actions>
+                <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                    <button class="btn btn-xs btn-danger"
+                            ng-disabled="! (ctrl.mentions | isEmpty)"
+                            ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
+                        Delete
+                    </button>
+                    <waltz-icon name="exclamation-circle"
+                                ng-if="! (ctrl.mentions | isEmpty)"
+                                class="small"
+                                uib-popover="This flow cannot be deleted as it is being used in a lineage"
+                                popover-trigger="mouseenter"
+                                style="color: #777; vertical-align: text-top;">
+                    </waltz-icon>
+                </div>
+            </waltz-section-actions>
 
 
-        <div class="row">
-            <div class="col-md-7">
-                <waltz-sub-section name="Overview">
-                    <content>
-                        <div class="waltz-sub-section-content">
-                            <div ng-if="! ctrl.visibility.overviewEditor">
-                                <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
-                                </waltz-physical-flow-overview>
+            <div class="row">
+                <div class="col-md-7">
+                    <waltz-sub-section name="Overview">
+                        <content>
+                            <div class="waltz-sub-section-content">
+                                <div ng-if="! ctrl.visibility.overviewEditor">
+                                    <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
+                                    </waltz-physical-flow-overview>
+                                </div>
+                                <div ng-if="ctrl.visibility.overviewEditor"
+                                     class="waltz-highlight-if">
+                                    <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
+                                    </waltz-physical-flow-editor>
+                                </div>
+
                             </div>
-                            <div ng-if="ctrl.visibility.overviewEditor"
-                                 class="waltz-highlight-if">
-                                <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
-                                </waltz-physical-flow-editor>
+                            <div class="waltz-sub-section-controls"
+                                 waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                                <span>
+                                    <a ng-click="ctrl.visibility.overviewEditor = true"
+                                       ng-if="! ctrl.visibility.overviewEditor"
+                                       class="clickable">
+                                        Edit
+                                    </a>
+
+                                    <a ng-click="ctrl.visibility.overviewEditor = false"
+                                       ng-if="ctrl.visibility.overviewEditor"
+                                       class="clickable">
+                                        Done
+                                    </a>
+                                </span>
                             </div>
 
-                        </div>
-                        <div class="waltz-sub-section-controls"
-                             waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
-                            <span>
-                                <a ng-click="ctrl.visibility.overviewEditor = true"
-                                   ng-if="! ctrl.visibility.overviewEditor"
-                                   class="clickable">
-                                    Edit
-                                </a>
+                        </content>
+                    </waltz-sub-section>
 
-                                <a ng-click="ctrl.visibility.overviewEditor = false"
-                                   ng-if="ctrl.visibility.overviewEditor"
-                                   class="clickable">
-                                    Done
-                                </a>
-                            </span>
-                        </div>
-
-                    </content>
-                </waltz-sub-section>
-
+                </div>
+                <div class="col-md-5">
+                    <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                                                 help-text="Data types referenced by the specification">
+                    </waltz-data-type-usage-panel>
+                </div>
             </div>
-            <div class="col-md-5">
-                <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
-                                             help-text="Data types referenced by the specification">
-                </waltz-data-type-usage-panel>
+
+
+
+            <div class="small text-muted"
+                 ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
+                Last updated by
+                <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
+                (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
             </div>
         </div>
-
-
-
-        <div class="small text-muted"
-             ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
-            Last updated by
-            <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
-            (<waltz-from-now timestamp="ctrl.physicalFlow.lastUpdatedAt"></waltz-from-now>)
-        </div>
+        <waltz-no-data ng-if="!ctrl.physicalFlow">
+            <message>No information for this physical flow</message>
+        </waltz-no-data>
 
     </div>
 
@@ -93,7 +99,8 @@
 
 
     <!--Entity Named Notes-->
-    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.entityNamedNotesSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
@@ -101,7 +108,8 @@
     <!-- SPEC DEFINITION -->
     <waltz-section name="Specification Definition"
                    icon="file-code-o"
-                   id="specification-definition-section">
+                   id="specification-definition-section"
+                   ng-if="ctrl.logicalFlow">
         <waltz-section-actions>
             <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 <a ui-sref="main.physical-specification.view ({id: ctrl.specification.id})"
@@ -130,16 +138,19 @@
     </waltz-section>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.entityDiagramsSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.bookmarksSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 
-    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
+                                   section="ctrl.changeLogSection"
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 </div>

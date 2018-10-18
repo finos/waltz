@@ -19,8 +19,8 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-7">
+        <div class="row" ng-if="ctrl.specification">
+            <div class="col-md-7" >
                 <waltz-physical-specification-overview owning-entity="ctrl.owningEntity"
                                                        specification="ctrl.specification"
                                                        organisational-unit="ctrl.organisationalUnit">
@@ -31,74 +31,78 @@
                 </waltz-data-type-usage-panel>
             </div>
         </div>
+        <waltz-no-data ng-if="!ctrl.specification">
+            <message>No information for this physical specification</message>
+        </waltz-no-data>
     </div>
 
     <br>
 
-
-    <!-- SPEC DEFINITIONS -->
-    <waltz-physical-spec-definition-section parent-entity-ref="ctrl.entityReference">
-    </waltz-physical-spec-definition-section>
-
-
-    <!-- FLOW DIAGRAMS -->
-    <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+    <div ng-if="ctrl.specification">
+        <!-- SPEC DEFINITIONS -->
+        <waltz-physical-spec-definition-section parent-entity-ref="ctrl.entityReference">
+        </waltz-physical-spec-definition-section>
 
 
-    <!-- ASSOCIATED FLOWS -->
-    <waltz-section icon='link'
-                   ng-if="ctrl.physicalFlows.length > 0"
-                   id="specification-usage-section"
-                   name="Usage"
-                   small="Associated Flows">
-        <p>This specification is associated with the following physical flows:</p>
-
-        <table class="table table-condensed small">
-            <thead>
-            <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Frequency</th>
-                <th>Transport</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="flow in ctrl.physicalFlows">
-                <td>
-                    <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
-                       class="clickable"
-                       ui-sref="main.physical-flow.view ({id: flow.id })">
-
-                    </a>
-                </td>
-                <td>
-                    <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].target.name"
-                       class="clickable"
-                       ui-sref="main.physical-flow.view ({id: flow.id })">
-                    </a>
-                </td>
-                <td>
-                    <span ng-bind="flow.frequency | toDisplayName:'frequencyKind'"></span>
-                </td>
-                <td>
-                    <span ng-bind="flow.transport | toDisplayName:'transportKind'"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </waltz-section>
+        <!-- FLOW DIAGRAMS -->
+        <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <!-- ASSOCIATED FLOWS -->
+        <waltz-section icon='link'
+                       ng-if="ctrl.physicalFlows.length > 0"
+                       id="specification-usage-section"
+                       name="Usage"
+                       small="Associated Flows">
+            <p>This specification is associated with the following physical flows:</p>
+
+            <table class="table table-condensed small">
+                <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Frequency</th>
+                    <th>Transport</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="flow in ctrl.physicalFlows">
+                    <td>
+                        <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
+                           class="clickable"
+                           ui-sref="main.physical-flow.view ({id: flow.id })">
+
+                        </a>
+                    </td>
+                    <td>
+                        <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].target.name"
+                           class="clickable"
+                           ui-sref="main.physical-flow.view ({id: flow.id })">
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="flow.frequency | toDisplayName:'frequencyKind'"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="flow.transport | toDisplayName:'transportKind'"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </waltz-section>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
 
+
+        <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
+
+    </div>
 
 </div>

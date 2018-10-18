@@ -42,7 +42,8 @@ export function dataTypeByIdResolver($stateParams, serviceBroker) {
             if (dataType) {
                 return dataType;
             } else {
-                throw `data type with id: ${$stateParams.id} not found`;
+                console.error(`data type with id: ${$stateParams.id} not found`);
+                return null;
             }
         });
 }
@@ -64,7 +65,8 @@ export function dataTypeByCodeResolver($stateParams, serviceBroker) {
             if (dataType) {
                 return dataType;
             } else {
-                throw `data type with code: ${$stateParams.code} not found`;
+                console.error(`data type with code: ${$stateParams.code} not found`);
+                return null;
             }
         });
 }
