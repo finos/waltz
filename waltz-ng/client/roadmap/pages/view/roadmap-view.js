@@ -9,12 +9,13 @@ const bindings = {
 
 const initialState = {
     changeLogSection: dynamicSections.changeLogSection,
+    relatedAppGroupsSection: dynamicSections.relatedAppGroupsSection,
+    relatedOrgUnitSection: dynamicSections.relatedOrgUnitSection,
 };
 
 
 function controller($stateParams) {
     const vm = initialiseData(this, initialState);
-
 
     vm.$onInit = () => {
         vm.roadmapId = $stateParams.id;

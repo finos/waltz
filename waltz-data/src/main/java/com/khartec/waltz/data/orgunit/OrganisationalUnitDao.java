@@ -41,6 +41,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
@@ -88,6 +89,30 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
     public List<OrganisationalUnit> findAll() {
         return dsl.select(ou.fields())
                 .from(ou)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<OrganisationalUnit> findRelatedByEntityRef(EntityReference ref) {
+        Condition joinOnA = ou.ID.eq(ENTITY_RELATIONSHIP.ID_A)
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.ORG_UNIT.name()));
+        Condition joinOnB = ou.ID.eq(ENTITY_RELATIONSHIP.ID_B)
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ORG_UNIT.name()));
+
+        Condition aMatchesEntity = ENTITY_RELATIONSHIP.ID_A.eq(ref.id())
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()));
+        Condition bMatchesEntity = ENTITY_RELATIONSHIP.ID_B.eq(ref.id())
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
+
+        SelectConditionStep<Record1<Long>> qry = dsl
+                .selectDistinct(ou.ID)
+                .from(ou)
+                .join(ENTITY_RELATIONSHIP)
+                .on(joinOnA.or(joinOnB))
+                .where((aMatchesEntity.or(bMatchesEntity)));
+
+        return dsl.selectFrom(ou)
+                .where(ou.ID.in(qry))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

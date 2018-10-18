@@ -37,6 +37,11 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findRelatedByEntityRef = (ref) => $http
+        .get(`${BASE}/related/${ref.kind}/${ref.id}`, ref)
+        .then(result => result.data);
+
+
     const findDescendants = (id) => $http
         .get(`${BASE}/${id}/descendants`)
         .then(result => result.data);
@@ -60,6 +65,7 @@ export function store($http, BaseApiUrl) {
         getById,
         findAll,
         findByIds,
+        findRelatedByEntityRef,
         findDescendants,
         findImmediateHierarchy,
         search
@@ -91,6 +97,11 @@ export const OrgUnitStore_API = {
         serviceName,
         serviceFnName: 'findByIds',
         description: 'executes findByIds'
+    },
+    findRelatedByEntityRef: {
+        serviceName,
+        serviceFnName: 'findRelatedByEntityRef',
+        description: 'executes findRelatedByEntityRef'
     },
     findDescendants: {
         serviceName,
