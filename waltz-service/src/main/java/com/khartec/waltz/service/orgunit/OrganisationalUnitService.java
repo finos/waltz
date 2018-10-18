@@ -75,6 +75,11 @@ public class OrganisationalUnitService {
     }
 
 
+    public List<OrganisationalUnit> findRelatedByEntityRef(EntityReference ref) {
+        return dao.findRelatedByEntityRef(ref);
+    }
+
+
     public OrganisationalUnit getById(long id) {
         return dao.getById(id);
     }

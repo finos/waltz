@@ -21,14 +21,12 @@
                 <table class="table table-condensed small table-hover">
                     <colgroup>
                         <col width="35%">
-                        <col width="15%">
-                        <col width="35%">
+                        <col width="50%">
                         <col width="15%">
                     </colgroup>
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Type</th>
                         <th>Description</th>
                         <th>
                             <span ng-if="$ctrl.mode === 'edit'">
@@ -45,14 +43,11 @@
                                 <span ng-bind="rel.counterpart.name"></span>
                             </span>
                             <span ng-if="$ctrl.mode === 'view'">
-                                <a ui-sref="main.app-group.view ({id: rel.counterpart.id})"
+                                <a ui-sref="main.org-unit.view ({id: rel.counterpart.id})"
                                    class="clickable">
                                     <span ng-bind="rel.counterpart.name"></span>
                                 </a>
                             </span>
-                        </td>
-                        <td>
-                            <span ng-bind="rel.counterpart.appGroupKind | toDisplayName:'appGroupKind'"></span>
                         </td>
                         <td>
                             <span ng-bind="rel.counterpart.description | limitTo: 50"></span>
@@ -76,12 +71,12 @@
             <!-- ADD -->
             <div ng-if="$ctrl.mode === 'edit'">
                 <div class="help-block">
-                    Add related app groups by searching for them here.
+                    Add related Organisation Units by searching for them here.
                 </div>
-                <waltz-entity-selector on-select="$ctrl.onGroupSelected"
-                                       current-selection="$ctrl.currentlySelectedGroup"
-                                       entity-kinds="['APP_GROUP']"
-                                       selection-filter="$ctrl.groupSelectionFilter">
+                <waltz-entity-selector on-select="$ctrl.onSelected"
+                                       current-selection="$ctrl.currentlySelected"
+                                       entity-kinds="['ORG_UNIT']"
+                                       selection-filter="$ctrl.selectionFilter">
                 </waltz-entity-selector>
 
                 <a class="btn btn-primary"
@@ -94,7 +89,7 @@
             <!-- NO DATA -->
             <waltz-no-data ng-if="$ctrl.relationships.length == 0 && $ctrl.mode == 'view'">
                 <message>
-                    <strong>No Groups have been associated with this
+                    <strong>No Organisational Units have been associated with this
                         <span ng-bind="::$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>
                     </strong>
                 </message>
