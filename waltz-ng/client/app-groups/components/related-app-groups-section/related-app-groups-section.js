@@ -146,11 +146,20 @@ function controller($q, notification, serviceBroker, UserService) {
             return;
         }
 
-        const newRel = {
+        let newRel = {
             a: vm.parentEntityRef,
             b: vm.currentlySelectedGroup,
             relationship: 'RELATES_TO'
         };
+
+        if(vm.parentEntityRef.kind === 'ROADMAP') {
+            // ROADMAPs are always side b
+            newRel = {
+                a: vm.currentlySelectedGroup,
+                b: vm.parentEntityRef,
+                relationship: 'RELATES_TO'
+            };
+        }
 
         return serviceBroker
             .execute(CORE_API.EntityRelationshipStore.create, [ newRel ])
