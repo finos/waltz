@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 
 import template from "./inline-measurable-rating-panel.html";
 
@@ -57,7 +58,7 @@ function controller($q, serviceBroker) {
 
         const measurablesPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
-            .then(r => vm.measurables = r.data);
+            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === vm.measurableCategoryRef.id));
 
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
