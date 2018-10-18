@@ -45,6 +45,7 @@ export function stringToRef(s) {
 
 
 export function toEntityRef(obj, kind = obj.kind) {
+
     const ref = {
         id: obj.id,
         kind,

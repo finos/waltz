@@ -8,13 +8,18 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.measurable-category.list ({id: ctrl.measurableCategory.id })"
-                   ng-bind="ctrl.measurableCategory.name">
+                   ng-bind="ctrl.measurableCategory.name"
+                   ng-if="ctrl.measurable">
+                </a>
+                <a ng-if="!ctrl.measurable">
+                    Measurable
                 </a>
             </li>
-            <li><span ng-bind="ctrl.measurable.name"></span></li>
+            <li><span ng-bind="ctrl.measurable.name"
+                      ng-if="ctrl.measurable"
+            ></span></li>
         </ol>
     </waltz-page-header>
-
 
     <waltz-measurable-summary parent-entity-ref='ctrl.entityReference'
                               scope="CHILDREN"
@@ -25,21 +30,22 @@
                               server-stats="ctrl.techStats.serverStats">
     </waltz-measurable-summary>
 
+    <div ng-if="ctrl.measurable">
+        <!-- NAVIGATION -->
+        <div class="waltz-page-summary waltz-page-summary-attach">
+            <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
+                                              open-sections="ctrl.sections"
+                                              on-select="ctrl.addSection"
+                                              offset="650">
+            </waltz-dynamic-section-navigation>
+        </div>
 
-    <!-- NAVIGATION -->
-    <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-dynamic-section-navigation available-sections="ctrl.availableSections"
-                                          open-sections="ctrl.sections"
-                                          on-select="ctrl.addSection"
-                                          offset="650">
-        </waltz-dynamic-section-navigation>
+        <br>
+
+        <waltz-dynamic-sections-view sections="ctrl.sections"
+                                     parent-entity-ref="ctrl.entityReference"
+                                     on-remove="ctrl.removeSection">
+        </waltz-dynamic-sections-view>
     </div>
-
-    <br>
-
-    <waltz-dynamic-sections-view sections="ctrl.sections"
-                                 parent-entity-ref="ctrl.entityReference"
-                                 on-remove="ctrl.removeSection">
-    </waltz-dynamic-sections-view>
 
 </div>

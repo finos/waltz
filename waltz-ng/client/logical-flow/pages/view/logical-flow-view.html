@@ -1,12 +1,15 @@
 <div class="container-fluid">
 
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
+    <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
                        icon="random">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
-            <li>
+            <li ng-if="ctrl.logicalFlow">
                 <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
+            </li>
+            <li ng-if="!ctrl.logicalFlow">
+                Logical Flow
             </li>
             <li>
                 <waltz-entity-link entity-ref="ctrl.logicalFlow.target"></waltz-entity-link>
@@ -16,45 +19,51 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-data-type-usage-panel parent-entity-ref="ctrl.entityReference"
-                                             help-text="Data types referenced by this logical flow">
-                </waltz-data-type-usage-panel>
+        <div ng-if="ctrl.logicalFlow">
+            <div class="row">
+                <div class="col-md-12">
+                    <waltz-data-type-usage-panel parent-entity-ref="ctrl.entityReference"
+                                                 help-text="Data types referenced by this logical flow">
+                    </waltz-data-type-usage-panel>
+                </div>
+            </div>
+
+            <div class="small text-muted"
+                 ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt && ctrl.logicalFLow">
+                Last updated by
+                <span ng-bind="ctrl.logicalFlow.lastUpdatedBy"></span>
+                (<waltz-from-now timestamp="ctrl.logicalFlow.lastUpdatedAt"></waltz-from-now>)
             </div>
         </div>
+        <waltz-no-data ng-if="!ctrl.logicalFlow">
+            <message>No information for this logical flow</message>
+        </waltz-no-data>
 
-        <div class="small text-muted"
-             ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt">
-            Last updated by
-            <span ng-bind="ctrl.logicalFlow.lastUpdatedBy"></span>
-            (<waltz-from-now timestamp="ctrl.logicalFlow.lastUpdatedAt"></waltz-from-now>)
-        </div>
     </div>
-
-    <br>
-
-    <!--Entity Named Notes-->
-    <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
-
-
-    <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
-    </waltz-physical-flow-section>
+    <div ng-if="ctrl.logicalFlow">
+        <br>
+        <!--Entity Named Notes-->
+        <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
+        </waltz-physical-flow-section>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
 
 
-    <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+        <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
+
+
+        <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
+    </div>
 </div>
