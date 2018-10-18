@@ -2,7 +2,7 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
-                       small="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
+                       small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
                        tour="ctrl.tour"
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">

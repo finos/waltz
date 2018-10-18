@@ -1,7 +1,7 @@
 <div class="container-fluid">
 
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} &rarr; {{ ctrl.logicalFlow.target.name }}"
+    <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
                        icon="random">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
