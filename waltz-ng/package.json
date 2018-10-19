@@ -10,8 +10,8 @@
     "dev-server": "webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
     "test-server": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
     "build-orig": "BUILD_ENV=prod webpack --config webpack.config.js -p --progress --profile --colors",
-    "build": "webpack --config webpack.config.js -p --progress --profile --colors",
-    "build-debug": "webpack --config webpack.config.js --progress --profile --colors",
+    "build": "webpack --config webpack.prod.js -p --progress --profile --colors",
+    "build-debug": "webpack --config webpack.dev.js --progress --profile --colors",
     "watch": "webpack --progress --watch --colors",
     "start-dev": "node lib/server-development",
     "start": "node lib/server-production"
@@ -86,6 +86,7 @@
     "webpack": "^4.16.1",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4",
+    "webpack-merge": "^4.1.4",
     "webpack-visualizer-plugin": "^0.1.11"
   },
   "author": "",
