@@ -17,12 +17,6 @@ module.exports = {
         filename: "[name].js"
         //pathinfo: false  // https://webpack.js.org/guides/build-performance/#output-without-path-info
     },
-    mode: "development",
-    devtool: "cheap-module-eval-source-map",
-    devServer: {
-        contentBase: "./dist",
-        disableHostCheck: true
-    },
     resolve: {
         symlinks: false
     },
