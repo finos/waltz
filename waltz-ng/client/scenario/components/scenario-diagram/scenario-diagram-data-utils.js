@@ -64,8 +64,8 @@ export function prepareData(scenarioDefinition, applications = [], measurables =
     const measurablesById = _.keyBy(measurables, "id");
     const axisHeadings = prepareAxisHeadings(scenarioDefinition, measurablesById);
 
-    const columnHeadings = axisHeadings["COLUMN"];
-    const rowHeadings = axisHeadings["ROW"];
+    const columnHeadings = axisHeadings["COLUMN"] || [];
+    const rowHeadings = axisHeadings["ROW"] || [];
 
     const colOffsets = toOffsetMap(columnHeadings);
     const rowOffsets = toOffsetMap(rowHeadings);
