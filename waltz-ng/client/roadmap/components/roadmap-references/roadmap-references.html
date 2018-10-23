@@ -128,7 +128,8 @@
 
 
         <!-- CONTROLS -->
-        <div class="waltz-sub-section-controls">
+        <div class="waltz-sub-section-controls"
+             ng-if="$ctrl.visibility.controls">
             <div ng-switch="$ctrl.mode">
                 <div ng-switch-when="VIEW">
                     <span ng-if="$ctrl.permissions.admin">
