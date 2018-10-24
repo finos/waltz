@@ -48,7 +48,7 @@ public class MeasurableComplexityService {
 
 
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
-        Double baseline = measurableComplexityDao.findBaseline();
+        Double baseline = measurableComplexityDao.calculateBaseline();
         return findByAppIdSelector(idSelector, baseline);
     }
 

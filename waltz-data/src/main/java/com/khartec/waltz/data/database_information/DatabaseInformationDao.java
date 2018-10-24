@@ -105,7 +105,7 @@ public class DatabaseInformationDao {
     }
 
 
-    public DatabaseSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
+    public DatabaseSummaryStatistics calculateStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
         Field<String> dbmsVendorInner = DSL.field("dbms_vendor_inner", String.class);
         Field<String> environmentInner = DSL.field("environment_inner", String.class);

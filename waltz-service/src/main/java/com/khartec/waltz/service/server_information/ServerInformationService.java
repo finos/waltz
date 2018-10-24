@@ -60,9 +60,9 @@ public class ServerInformationService {
     }
 
 
-    public ServerSummaryStatistics findStatsForAppSelector(IdSelectionOptions options) {
+    public ServerSummaryStatistics calculateStatsForAppSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
-        return serverInformationDao.findStatsForAppSelector(selector);
+        return serverInformationDao.calculateStatsForAppSelector(selector);
     }
 
 }

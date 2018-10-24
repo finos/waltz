@@ -50,6 +50,11 @@ public class CollectionUtilities {
     }
 
 
+    public static <T> boolean any(Collection<T> ts, Predicate<T> pred) {
+        return find(pred, ts).isPresent();
+    }
+
+
     /**
      * Returns the first item in a collections (as given by an iterator) or null if the
      * collection is empty.  A null collection

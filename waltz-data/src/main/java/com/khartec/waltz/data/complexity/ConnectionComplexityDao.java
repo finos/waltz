@@ -84,16 +84,16 @@ public class ConnectionComplexityDao {
 
     // ---- convenience functions
 
-    public int findBaseline() {
-        return findBaseline(DSL.trueCondition());
+    public int calculateBaseline() {
+        return calculateBaseline(DSL.trueCondition());
     }
 
-    public int findBaseline(Select<Record1<Long>> appIdProvider) {
-        return findBaseline(APP_ID_ALIAS.in(appIdProvider));
+    public int calculateBaseline(Select<Record1<Long>> appIdProvider) {
+        return calculateBaseline(APP_ID_ALIAS.in(appIdProvider));
     }
 
-    public int findBaseline(Long appIds) {
-        return findBaseline(APP_ID_ALIAS.in(appIds));
+    public int calculateBaseline(Long appIds) {
+        return calculateBaseline(APP_ID_ALIAS.in(appIds));
     }
 
     public List<Tally<Long>> findCounts() {
@@ -111,7 +111,7 @@ public class ConnectionComplexityDao {
 
     // ---- base queries
 
-    private int findBaseline(Condition condition) {
+    private int calculateBaseline(Condition condition) {
 
         return dsl.select(DSL.max(TOTAL_CONNECTIONS_FIELD))
                 .from(TOTAL_FLOW_COUNTS)

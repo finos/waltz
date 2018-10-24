@@ -53,7 +53,7 @@ public class ConnectionComplexityService {
      * @return
      */
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
-        int baseline = connectionComplexityDao.findBaseline();
+        int baseline = connectionComplexityDao.calculateBaseline();
         return findByAppIdSelector(idSelector, baseline);
     }
 

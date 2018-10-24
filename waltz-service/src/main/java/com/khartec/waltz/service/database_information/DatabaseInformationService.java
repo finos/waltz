@@ -58,9 +58,9 @@ public class DatabaseInformationService {
         return databaseInformationDao.findByAppSelector(factory.apply(options));
     }
 
-    public DatabaseSummaryStatistics findStatsForAppIdSelector(IdSelectionOptions options) {
+    public DatabaseSummaryStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
         Checks.checkNotNull(options, "options cannot be null");
-        return databaseInformationDao.findStatsForAppSelector(factory.apply(options));
+        return databaseInformationDao.calculateStatsForAppSelector(factory.apply(options));
     }
         
 }

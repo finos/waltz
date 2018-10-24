@@ -45,7 +45,7 @@ public class ServerComplexityService {
 
 
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector) {
-        int baseline = serverComplexityDao.findBaseline();
+        int baseline = serverComplexityDao.calculateBaseline();
         return findByAppIdSelector(idSelector, baseline);
 
     }

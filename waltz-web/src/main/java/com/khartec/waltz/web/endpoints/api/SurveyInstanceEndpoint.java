@@ -54,7 +54,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
                                   UserRoleService userRoleService) {
         checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
-
         this.surveyInstanceService = surveyInstanceService;
         this.userRoleService = userRoleService;
     }

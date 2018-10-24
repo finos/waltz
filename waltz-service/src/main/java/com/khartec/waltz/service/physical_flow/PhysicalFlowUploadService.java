@@ -342,7 +342,7 @@ public class PhysicalFlowUploadService {
                                                EntityReference dataType,
                                                String username) {
 
-        LogicalFlow flow = logicalFlowDao.findBySourceAndTarget(source, target);
+        LogicalFlow flow = logicalFlowDao.getBySourceAndTarget(source, target);
 
         if (flow == null) {
             LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()

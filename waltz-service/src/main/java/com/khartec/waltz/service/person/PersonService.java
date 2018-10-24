@@ -99,8 +99,8 @@ public class PersonService {
     }
 
 
-    public Person findPersonByUserId(String userId) {
-        return personDao.findPersonByUserId(userId);
+    public Person getPersonByUserId(String userId) {
+        return personDao.getPersonByUserId(userId);
     }
 
 

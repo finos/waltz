@@ -101,7 +101,7 @@ public class UserRoleService {
     public boolean updateRoles(String userName, String targetUserName, List<Role> newRoles) {
         LOG.info("Updating roles for userName: " + targetUserName + ", new roles: " + newRoles);
 
-        Person person = personService.findPersonByUserId(targetUserName);
+        Person person = personService.getPersonByUserId(targetUserName);
         if(person == null) {
             LOG.warn(targetUserName + " does not exist, cannot update roles");
             return false;

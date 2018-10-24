@@ -44,7 +44,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String COUNT_CUMULATIVE_REPORTS_BY_KIND_PATH = mkPath(BASE_URL, "employee-id", ":empId", "count-cumulative-reports");
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
-    private static final String FIND_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
+    private static final String GET_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
     private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
 
@@ -88,8 +88,8 @@ public class PersonEndpoint implements Endpoint {
         getForDatum(GET_BY_ID, (request, response) ->
                 personService.getById(getId(request)));
 
-        getForDatum(FIND_BY_USERID_PATH, ((request, response) ->
-                personService.findPersonByUserId(request.params("userId"))));
+        getForDatum(GET_BY_USERID_PATH, ((request, response) ->
+                personService.getPersonByUserId(request.params("userId"))));
 
         getForDatum(REBUILD_HIERARCHY_PATH, this::rebuildHierarchyRoute);
 

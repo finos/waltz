@@ -109,7 +109,7 @@ public class LogicalFlowService {
 
 
     public LogicalFlow getById(long flowId) {
-        return logicalFlowDao.findByFlowId(flowId);
+        return logicalFlowDao.getByFlowId(flowId);
     }
 
 
@@ -212,7 +212,7 @@ public class LogicalFlowService {
      * @return
      */
     public int removeFlow(Long flowId, String username) {
-        LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(flowId);
+        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(flowId);
 
         int deleted = logicalFlowDao.removeFlow(flowId, username);
 

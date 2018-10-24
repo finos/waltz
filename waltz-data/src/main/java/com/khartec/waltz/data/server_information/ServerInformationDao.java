@@ -38,7 +38,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
-import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static java.util.stream.Collectors.counting;
@@ -139,7 +138,7 @@ public class ServerInformationDao {
     }
 
 
-    public ServerSummaryStatistics findStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
+    public ServerSummaryStatistics calculateStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
         Field<String> environmentInner = DSL.field("environment_inner", String.class);
         Field<String> operatingSystemInner = DSL.field("operating_system_inner", String.class);

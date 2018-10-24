@@ -50,7 +50,7 @@ public class ServerHarness {
                 .build();
 
         for (int i = 0; i < 5; i++) {
-            HarnessUtilities.time("stats", () -> serverInfoService.findStatsForAppSelector(options));
+            HarnessUtilities.time("stats", () -> serverInfoService.calculateStatsForAppSelector(options));
         }
 
 
