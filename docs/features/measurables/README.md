@@ -8,7 +8,7 @@ Applications can be associated to many measurables and given individual _RAG_
 __ratings__ with optional comments.
   
 - [Viewpoints](using_viewpoints_to_manage_taxonomies.md)
-- [Perspectives / Drill Grids](using_perspectives_and_drill_grids.md)
+- [Perspectives / Drill Grids](using_perspectives_and_drill_grids.md)  (Deprecated)
 
 ## Model
 
