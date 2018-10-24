@@ -1,4 +1,6 @@
-# Using Perspectives and Drill Grids
+# (Deprecated) Using Perspectives and Drill Grids
+
+**Note** these features have been deprecated from Waltz 1.14 as user uptake was low and complexity was high.
 
 This document addresses how two features in Waltz may be used to facilitate a better understanding of the 
 data within Waltz.
