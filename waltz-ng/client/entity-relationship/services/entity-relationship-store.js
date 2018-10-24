@@ -55,7 +55,7 @@ export function store($http, BaseApiUrl) {
 
 
     const findForEntity = (ref,
-                           directionality = 'ANY',  // ANY | SOURCE | TARGET
+                           directionality = "ANY",  // ANY | SOURCE | TARGET
                            relationshipKinds = []) => {
 
         const url = `${BASE}/entity/${ref.kind}/${ref.id}`;
@@ -81,8 +81,8 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
@@ -92,22 +92,22 @@ export const serviceName = "EntityRelationshipStore";
 export const EntityRelationshipStore_API = {
     findBetweenEntities: {
         serviceName,
-        serviceFnName: 'findBetweenEntities',
-        description: 'executes findBetweenEntities [ref, directed? (T|f), List?<RelationshipKinds>]'
+        serviceFnName: "findBetweenEntities",
+        description: "executes findBetweenEntities [ref, directed? (T|f), List?<RelationshipKinds>]"
     },
     findForEntity: {
         serviceName,
-        serviceFnName: 'findForEntity',
-        description: 'executes findForEntity [ref, directionality? (_ANY_|SOURCE|TARGET), List?<RelationshipKinds>]'
+        serviceFnName: "findForEntity",
+        description: "executes findForEntity [ref, directionality? (_ANY_|SOURCE|TARGET), List?<RelationshipKinds>]"
     },
     remove: {
         serviceName,
-        serviceFnName: 'remove',
-        description: 'executes remove [rel]'
+        serviceFnName: "remove",
+        description: "executes remove [rel]"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'executes create [rel]'
+        serviceFnName: "create",
+        description: "executes create [rel]"
     },
 };
