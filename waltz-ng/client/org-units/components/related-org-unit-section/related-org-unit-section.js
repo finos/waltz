@@ -26,10 +26,17 @@ import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {getEditRoleForEntityKind} from "../../../common/role-utils";
+import {mkRel} from "../../../common/relationship-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
+};
+
+
+const modes = {
+    view: "view",
+    edit: "edit"
 };
 
 
@@ -37,14 +44,15 @@ const initialState = {
     currentlySelected: null,
     relationships: [],
     editable: false,
-    mode: 'view', // edit | view
+    mode: modes.view
 };
 
 
 function canEdit(UserService, entityRef) {
-    switch(entityRef.kind){
-        case 'ROADMAP':
-            const role = getEditRoleForEntityKind('ROADMAP');
+    const kind = entityRef.kind;
+    switch(kind){
+        case "ROADMAP":
+            const role = getEditRoleForEntityKind(kind);
             return UserService
                 .whoami()
                 .then(user => UserService.hasRole(user, role));
@@ -58,7 +66,7 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
     const relationshipPromise = serviceBroker
         .loadViewData(
             CORE_API.EntityRelationshipStore.findForEntity,
-            [entityRef, 'ANY'],
+            [entityRef, "ANY"],
             { force: true })
         .then(r => r.data);
 
@@ -67,25 +75,22 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
             CORE_API.OrgUnitStore.findRelatedByEntityRef,
             [ entityRef ],
             { force: true })
-        .then(r => _
-            .chain(r.data)
-            .reject(relatedGroup => sameRef(relatedGroup, entityRef))
-            .value());
+        .then(r => _.reject(r.data, ou => sameRef(ou, entityRef, { skipChecks: true })));
 
     return $q
         .all([relationshipPromise, orgUnitsPromise])
         .then(([relationships, orgUnits]) => {
-            const groupsById = _.keyBy(orgUnits, 'id');
+            const groupsById = _.keyBy(orgUnits, "id");
             return _
                 .chain(relationships)
                 .map(rel => {
                     return sameRef(entityRef, rel.a, { skipChecks: true })
-                        ? {counterpartRef: rel.b, side: 'TARGET', relationship: rel}
-                        : {counterpartRef: rel.a, side: 'SOURCE', relationship: rel};
+                        ? {counterpartRef: rel.b, side: "TARGET", relationship: rel}
+                        : {counterpartRef: rel.a, side: "SOURCE", relationship: rel};
                 })
-                .filter(rel => rel.counterpartRef.kind === 'ORG_UNIT')
+                .filter(rel => rel.counterpartRef.kind === "ORG_UNIT")
                 .map(rel => Object.assign({}, rel, { counterpart: groupsById[rel.counterpartRef.id] }))
-                .filter(rel => rel.counterpart != null)
+                .filter(rel => rel.counterpart !== null)
                 .uniqBy(rel => rel.counterpart.id)
                 .orderBy("counterpart.name")
                 .value();
@@ -95,11 +100,7 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
 
 function canOrgUnitBeProposed(relationships = [], proposedOrgUnit, selfRef) {
     const proposalId = proposedOrgUnit.id;
-    const alreadyLinked = _
-        .chain(relationships)
-        .map('counterpart.id')
-        .includes(proposalId)
-        .value();
+    const alreadyLinked = _.some(relationships, r => r.counterpart.id === proposalId);
 
     return ! alreadyLinked && ! sameRef(proposedOrgUnit, selfRef);
 }
@@ -115,15 +116,12 @@ function controller($q, notification, serviceBroker, UserService) {
         reload();
         canEdit(UserService, vm.parentEntityRef)
             .then(r => vm.editable = r);
-
     };
-
 
     vm.selectionFilter = (proposed) => canOrgUnitBeProposed(
         vm.relationships,
         proposed,
         vm.parentEntityRef);
-
 
     vm.onRemove = (rel) => {
         return serviceBroker
@@ -135,17 +133,12 @@ function controller($q, notification, serviceBroker, UserService) {
             .catch(e => notification.error("Failed to remove! " + e.message))
     };
 
-
     vm.onAdd = () => {
         if (vm.currentlySelected === null) {
             return;
         }
 
-        const newRel = {
-            a: vm.parentEntityRef,
-            b: vm.currentlySelected,
-            relationship: 'RELATES_TO'
-        };
+        const newRel = mkRel(vm.parentEntityRef, "RELATES_TO", vm.currentlySelected);
 
         return serviceBroker
             .execute(CORE_API.EntityRelationshipStore.create, [ newRel ])
@@ -159,16 +152,16 @@ function controller($q, notification, serviceBroker, UserService) {
 
 
     vm.onSelected = (g) => vm.currentlySelected = g;
-    vm.onEdit = () => vm.mode = 'edit';
-    vm.onCancel = () => vm.mode = 'view';
+    vm.onEdit = () => vm.mode = modes.edit;
+    vm.onCancel = () => vm.mode = modes.view;
 }
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker',
-    'UserService'
+    "$q",
+    "Notification",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
@@ -179,7 +172,7 @@ const component = {
 };
 
 
-const id = 'waltzRelatedOrgUnitSection';
+const id = "waltzRelatedOrgUnitSection";
 
 
 export default {

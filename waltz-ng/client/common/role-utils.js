@@ -18,6 +18,8 @@
  */
 
 
+import roles from "../user/roles";
+
 /**
  * Given an entity kind, returns the user roles required for editing
  * @param kind
@@ -26,20 +28,20 @@
 export function getEditRoleForEntityKind(kind) {
     switch (kind) {
         case "APPLICATION":
-            return "APP_EDITOR";
+            return roles.APP_EDITOR.key;
         case "CHANGE_INITIATIVE":
-            return "CHANGE_INITIATIVE_EDITOR";
+            return roles.CHANGE_INITIATIVE_EDITOR.key;
         case "MEASURABLE":
-            return "CAPABILITY_EDITOR";
+            return roles.CAPABILITY_EDITOR.key;
         case "ORG_UNIT":
-            return "ORG_UNIT_EDITOR";
+            return roles.ORG_UNIT_EDITOR.key;
         case "DATA_TYPE":
-            return "AUTHORITATIVE_SOURCE_EDITOR";
+            return roles.AUTHORITATIVE_SOURCE_EDITOR.key;
         case "SCENARIO":
-            return "SCENARIO_EDITOR";
+            return roles.SCENARIO_EDITOR.key;
         case "ROADMAP":
-            return "SCENARIO_ADMIN";
+            return roles.SCENARIO_ADMIN.key;
         default:
-            return "ADMIN";
+            return roles.ADMIN.key;
     }
 }
