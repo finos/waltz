@@ -82,7 +82,7 @@ public class EntityStatisticService {
     }
 
 
-    public ImmediateHierarchy<EntityStatisticDefinition> findRelatedStatDefinitions(long id, boolean rollupOnly) {
+    public ImmediateHierarchy<EntityStatisticDefinition> getRelatedStatDefinitions(long id, boolean rollupOnly) {
         List<EntityStatisticDefinition> defs = definitionDao.findRelated(id, rollupOnly);
         ImmediateHierarchy<EntityStatisticDefinition> relations = ImmediateHierarchyUtilities.build(id, defs);
         return relations;

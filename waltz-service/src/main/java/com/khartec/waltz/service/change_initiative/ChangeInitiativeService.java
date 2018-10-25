@@ -173,7 +173,7 @@ public class ChangeInitiativeService {
             entityReference,
             relationship,
             validate)
-            .orElseThrow(() -> new RuntimeException(String.format(
+            .orElseThrow(() -> new IllegalArgumentException(String.format(
                     "Could not build a valid relationship for kind: %s between %s and %s",
                     relationship,
                     CHANGE_INITIATIVE,

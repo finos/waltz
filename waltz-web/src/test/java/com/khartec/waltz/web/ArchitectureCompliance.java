@@ -8,25 +8,21 @@ import org.junit.Test;
 
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
-public class ArchitectureCompliance {
-
-    private static JavaClasses importedClasses = new ClassFileImporter()
-            .importPackages("com.khartec");
+public class ArchitectureCompliance extends BaseArchitectureComplianceCheck {
 
     @Test
     public void noJavaUtilLogging() {
         GeneralCodingRules.NO_CLASSES_SHOULD_USE_JAVA_UTIL_LOGGING
                 .because("slf4j/logback should be used instead of java.util logger")
-                .check(importedClasses);
+                .check(waltzOnlyClasses);
 
     }
 
 
     @Test
-    @Ignore
     public void noGenericExceptions() {
         GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS
-                .check(importedClasses);
+                .check(waltzOnlyClasses);
     }
 
 
@@ -41,7 +37,7 @@ public class ArchitectureCompliance {
                 .whereLayer("Endpoints").mayOnlyBeAccessedByLayers("Web")
                 .whereLayer("Data").mayOnlyBeAccessedByLayers("Services", "Extractors")
                 .whereLayer("Services").mayOnlyBeAccessedByLayers("Web")
-                .check(importedClasses);
+                .check(waltzOnlyClasses);
     }
 
 

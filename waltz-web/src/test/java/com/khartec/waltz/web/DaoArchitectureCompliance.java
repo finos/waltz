@@ -20,10 +20,7 @@ import java.util.Set;
 import static com.khartec.waltz.common.CollectionUtilities.any;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class DaoArchitectureCompliance {
-
-    private static JavaClasses importedClasses = new ClassFileImporter()
-            .importPackages("com.khartec", "java.util");
+public class DaoArchitectureCompliance extends BaseArchitectureComplianceCheck {
 
 
     @Test
@@ -31,45 +28,24 @@ public class DaoArchitectureCompliance {
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
+                .resideInAPackage("..khartec..")
+                .and()
                 .haveNameMatching(".*Dao")
                 .should()
                 .beAnnotatedWith(Repository.class);
-        rule.check(importedClasses);
+        rule.check(waltzAndJavaUtilClasses);
     }
 
 
     @Test
     public void methodsPrefixedFindShouldReturnCollections() {
-        Set<Class<?>> validReturnTypes = SetUtilities.asSet(Collection.class, Optional.class, Map.class);
-
-        ArchCondition<JavaClass> haveFindMethodsThatReturnCollections = new ArchCondition<JavaClass>("have 'find*' methods that return Collections, Maps or Optionals") {
-            @Override
-            public void check(JavaClass item, ConditionEvents events) {
-                item.getMethods()
-                        .stream()
-                        .filter(m -> m.getName().startsWith("find"))
-                        .filter(m -> m.getModifiers().contains(JavaModifier.PUBLIC))
-                        .forEach(m -> {
-                            JavaClass returnType = m.getReturnType();
-                            if (! any(validReturnTypes, vrt -> returnType.isAssignableTo(vrt))) {
-                                String message = String.format(
-                                        "Method %s.%s does not return a collection, map or optional. It returns: %s",
-                                        item.getName(),
-                                        m.getName(),
-                                        returnType.getName());
-                                events.add(SimpleConditionEvent.violated(item, message));
-                            }
-                        });
-            }
-        };
-
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
                 .haveNameMatching(".*Dao")
-                .should(haveFindMethodsThatReturnCollections);
+                .should(haveFindMethodsThatReturnCollectionsOrMapsOrOptionals);
 
-        rule.check(importedClasses);
+        rule.check(waltzAndJavaUtilClasses);
     }
 
 }

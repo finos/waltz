@@ -46,7 +46,7 @@ public class SoftwareCatalogHarness {
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();
 
-        SoftwareSummaryStatistics stats = softwareCatalogService.findStatisticsForAppIdSelector(options);
+        SoftwareSummaryStatistics stats = softwareCatalogService.calculateStatisticsForAppIdSelector(options);
         System.out.println("stats:"+stats);
     }
 
