@@ -29,7 +29,7 @@ import {
     allowedRelationshipsByKind,
     changeRelationshipFunctionsByKind,
     fetchRelationshipFunctionsByKind
-} from "../../../common/relationship-definitions";
+} from "../../../common/relationship-utils";
 
 
 import template from "./related-apps-section.html";

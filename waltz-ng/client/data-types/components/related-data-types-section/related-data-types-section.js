@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './related-data-types-section.html';
+import template from "./related-data-types-section.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {toEntityRef} from "../../../common/entity-utils";
+import {mkRel} from "../../../common/relationship-utils";
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -36,7 +37,7 @@ const initialState = {
 
 
 function alreadyContains(relatedDataTypes = [], dt) {
-    const existingIds = _.map(relatedDataTypes, 'id');
+    const existingIds = _.map(relatedDataTypes, "id");
     return _.includes(existingIds, dt.id);
 }
 
@@ -50,7 +51,7 @@ function controller(serviceBroker, notification) {
             return;
         }
 
-        const dataTypesById = _.keyBy(vm.dataTypes, 'id');
+        const dataTypesById = _.keyBy(vm.dataTypes, "id");
         serviceBroker
             .loadViewData(
                 CORE_API.EntityRelationshipStore.findForEntity,
@@ -59,9 +60,9 @@ function controller(serviceBroker, notification) {
             .then(r => {
                 vm.relatedDataTypes = _
                     .chain(r.data)
-                    .filter(rel => rel.b.kind === 'DATA_TYPE')
+                    .filter(rel => rel.b.kind === "DATA_TYPE")
                     .map(rel => Object.assign({}, dataTypesById[rel.b.id]))
-                    .sortBy('name')
+                    .sortBy("name")
                     .value()
             });
     }
@@ -78,8 +79,8 @@ function controller(serviceBroker, notification) {
     vm.onSelectDataType = (dt) => {
         vm.selectedDataType = dt;
         vm.editMode = alreadyContains(vm.relatedDataTypes, vm.selectedDataType)
-            ? 'REMOVE'
-            : 'ADD';
+            ? "REMOVE"
+            : "ADD";
     };
 
     vm.onAction = () => {
@@ -89,18 +90,14 @@ function controller(serviceBroker, notification) {
             ? CORE_API.EntityRelationshipStore.remove
             : CORE_API.EntityRelationshipStore.create;
 
-        const rel = {
-            a: vm.parentEntityRef,
-            b: toEntityRef(vm.selectedDataType),
-            relationship: 'RELATES_TO'
-        };
+        const rel = mkRel(vm.parentEntityRef, "RELATES_TO", toEntityRef(vm.selectedDataType));
 
         serviceBroker
             .execute(operation, [ rel ])
             .then(() => {
                 const verb = isRemove
-                    ? 'removed'
-                    : 'added';
+                    ? "removed"
+                    : "added";
                 const msg = `Relationship to ${vm.selectedDataType.name} ${verb}`;
                 notification.success(msg);
                 vm.selectedDataType = null;
@@ -113,7 +110,7 @@ function controller(serviceBroker, notification) {
 }
 
 
-controller.$inject= [ 'ServiceBroker', 'Notification'];
+controller.$inject= [ "ServiceBroker", "Notification"];
 
 
 const component = {
@@ -125,5 +122,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzRelatedDataTypeSection'
+    id: "waltzRelatedDataTypeSection"
 };

@@ -51,3 +51,12 @@ export const changeRelationshipFunctionsByKind = {
     "CHANGE_INITIATIVE": CORE_API.ChangeInitiativeStore.changeRelationship
 };
 
+
+export function mkRel(a, relationship, b) {
+    if (a.kind === "ROADMAP") {
+        const tmp = a;
+        a = b;
+        b = tmp;
+    }
+    return {a, b, relationship};
+}
