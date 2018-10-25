@@ -24,7 +24,8 @@ const initialState = {
     },
     mode: modes.LOADING,
     visibility: {
-        subSection: false
+        subSection: false,
+        controls: false
     }
 };
 
@@ -67,6 +68,7 @@ function controller(notification, serviceBroker, userService) {
                     edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
                 };
                 vm.visibility.subSection = vm.permissions.admin || !_.isEmpty(vm.references);
+                vm.visibility.controls = vm.permissions.admin && vm.parentEntityRef.kind !== "APPLICATION";
             });
     }
 

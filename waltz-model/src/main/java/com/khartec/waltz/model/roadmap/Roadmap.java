@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableRoadmap.class)
 @JsonDeserialize(as = ImmutableRoadmap.class)
@@ -25,7 +27,7 @@ public abstract class Roadmap implements
                 .kind(EntityKind.ROADMAP)
                 .id(id().get())
                 .name(name())
-                .description(description())
+                .description(Optional.ofNullable(description()))
                 .build();
     }
 }
