@@ -27,10 +27,7 @@ import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -133,7 +130,7 @@ public class PhysicalFlowUploadService {
         List<PhysicalFlowUploadCommandResponse> validated = validate(cmds);
 
         if(validated.stream().anyMatch(v -> v.outcome() == CommandOutcome.FAILURE)) {
-            throw new Exception("Cannot upload flows which contain parse errors, please validate");
+            throw new IllegalArgumentException("Cannot upload flows which contain parse errors, please validate");
         }
 
         List<PhysicalFlowUploadCommandResponse> newFlowCmds = validated.stream()

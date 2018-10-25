@@ -10,11 +10,7 @@ import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class EndpointArchitectureCompliance {
-
-    private static JavaClasses importedClasses = new ClassFileImporter()
-            .importPackages("com.khartec");
-
+public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCheck {
 
     @Test
     public void endpointsNeedMarkerInterface() {
@@ -24,7 +20,7 @@ public class EndpointArchitectureCompliance {
                 .haveNameMatching(".*Endpoint")
                 .should()
                 .implement(Endpoint.class);
-        rule.check(importedClasses);
+        rule.check(waltzOnlyClasses);
     }
 
 
@@ -38,7 +34,7 @@ public class EndpointArchitectureCompliance {
                 .haveNameMatching(".*Endpoint")
                 .should()
                 .beAnnotatedWith(Service.class);
-        rule.check(importedClasses);
+        rule.check(waltzOnlyClasses);
     }
 
 
@@ -52,7 +48,7 @@ public class EndpointArchitectureCompliance {
                 .haveNameMatching(".*Extractor")
                 .andShould()
                 .beAnnotatedWith(Service.class);
-        rule.check(importedClasses);
+        rule.check(waltzOnlyClasses);
     }
 
 
@@ -64,7 +60,7 @@ public class EndpointArchitectureCompliance {
                 .dontHaveSimpleName("BaseDataExtractor")
                 .should()
                 .beAssignableTo(BaseDataExtractor.class);
-        rule.check(importedClasses);
+        rule.check(waltzOnlyClasses);
     }
 
 }

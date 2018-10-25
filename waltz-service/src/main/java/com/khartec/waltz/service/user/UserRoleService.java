@@ -90,7 +90,7 @@ public class UserRoleService {
     }
 
 
-    public User findForUserId(String userId) {
+    public User getByUserId(String userId) {
         return ImmutableUser.builder()
                 .userName(userId)
                 .addAllRoles(userRoleDao.getUserRoles(userId))

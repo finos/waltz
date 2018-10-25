@@ -65,7 +65,7 @@ public class SoftwareCatalogService {
     }
 
 
-    public SoftwareCatalog findForAppIds(List<Long> appIds) {
+    public SoftwareCatalog makeCatalogForAppIds(List<Long> appIds) {
         List<SoftwareUsage> usages = softwareUsageDao.findByAppIds(appIds);
         Set<Long> packageIds = usages.stream()
                 .map(u -> u.softwarePackageId())
@@ -91,7 +91,7 @@ public class SoftwareCatalogService {
     }
 
 
-    public SoftwareSummaryStatistics findStatisticsForAppIdSelector(IdSelectionOptions options) {
+    public SoftwareSummaryStatistics calculateStatisticsForAppIdSelector(IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 

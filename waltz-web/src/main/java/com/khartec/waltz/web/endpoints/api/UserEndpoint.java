@@ -66,7 +66,7 @@ public class UserEndpoint implements Endpoint {
 
         String whoAmIPath = mkPath(BASE_URL, "whoami");
         String findAllPath = mkPath(BASE_URL);
-        String findUserPath = mkPath(BASE_URL, "user-id", ":userId");
+        String getByUserIdPath = mkPath(BASE_URL, "user-id", ":userId");
 
 
         // -- routes
@@ -84,7 +84,7 @@ public class UserEndpoint implements Endpoint {
             String userName = getUsername(request);
             String targetUserName = request.params("userName");
             List<String> roles = (List<String>) readBody(request, List.class);
-            return userRoleService.updateRoles(userName, targetUserName, map(roles, r -> Role.valueOf(r)));
+            return userRoleService.updateRoles(userName, targetUserName, map(roles, Role::valueOf));
         };
 
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
@@ -115,7 +115,7 @@ public class UserEndpoint implements Endpoint {
         };
 
         ListRoute<User> findAllRoute = (request, response) -> userRoleService.findAllUsers();
-        DatumRoute<User> findUserRoute = (request, response) -> userRoleService.findForUserId(request.params("userId"));
+        DatumRoute<User> getByUserIdRoute = (request, response) -> userRoleService.getByUserId(request.params("userId"));
 
 
         // --- register
@@ -127,7 +127,7 @@ public class UserEndpoint implements Endpoint {
         deleteForDatum(deleteUserPath, deleteUserRoute);
 
         getForDatum(whoAmIPath, whoAmIRoute);
-        getForDatum(findUserPath, findUserRoute);
+        getForDatum(getByUserIdPath, getByUserIdRoute);
         getForList(findAllPath, findAllRoute);
     }
 

@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class ServicesArchitectureCompliance {
-
-    private static JavaClasses importedClasses = new ClassFileImporter()
-            .importPackages("com.khartec");
-
+public class ServicesArchitectureCompliance extends BaseArchitectureComplianceCheck {
 
     @Test
     public void servicesNeedServiceAnnotation() {
@@ -22,7 +18,19 @@ public class ServicesArchitectureCompliance {
                 .haveNameMatching(".*Service")
                 .should()
                 .beAnnotatedWith(Service.class);
-        rule.check(importedClasses);
+        rule.check(waltzOnlyClasses);
+    }
+
+
+    @Test
+    public void methodsPrefixedFindShouldReturnCollections() {
+        ArchRule rule = classes().that()
+                .areNotInterfaces()
+                .and()
+                .haveNameMatching(".*Service")
+                .should(haveFindMethodsThatReturnCollectionsOrMapsOrOptionals);
+
+        rule.check(waltzAndJavaUtilClasses);
     }
 
 }

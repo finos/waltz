@@ -33,14 +33,14 @@ public class EntityWorkflowEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllDefinitionsPath = mkPath(BASE_URL, "definition");
-        String findStateForEntityAndWorkflowPath = mkPath("entity-ref", ":kind", ":id", ":workflowId", "state");
+        String getStateForEntityAndWorkflowPath = mkPath("entity-ref", ":kind", ":id", ":workflowId", "state");
         String findTransitionsForEntityAndWorkflowPath = mkPath("entity-ref", ":kind", ":id", ":workflowId", "transition");
 
         ListRoute<EntityWorkflowDefinition> findAllDefinitionsRoute = (request, response)
                 -> entityWorkflowService.findAllDefinitions();
 
-        DatumRoute<EntityWorkflowState> findStateForEntityAndWorkflowRoute = (request, response)
-                -> entityWorkflowService.findStateForEntityReferenceAndWorkflowId(
+        DatumRoute<EntityWorkflowState> getStateForEntityAndWorkflowRoute = (request, response)
+                -> entityWorkflowService.getStateForEntityReferenceAndWorkflowId(
                         getLong(request, "workflowId"),
                         getEntityReference(request));
 
@@ -52,7 +52,7 @@ public class EntityWorkflowEndpoint implements Endpoint {
 
 
         getForList(findAllDefinitionsPath, findAllDefinitionsRoute);
-        getForDatum(findStateForEntityAndWorkflowPath, findStateForEntityAndWorkflowRoute);
+        getForDatum(getStateForEntityAndWorkflowPath, getStateForEntityAndWorkflowRoute);
         getForList(findTransitionsForEntityAndWorkflowPath, findTransitionsForEntityAndWorkflowRoute);
     }
 }

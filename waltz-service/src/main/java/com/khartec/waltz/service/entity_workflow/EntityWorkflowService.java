@@ -37,8 +37,8 @@ public class EntityWorkflowService {
     }
 
 
-    public EntityWorkflowState findStateForEntityReferenceAndWorkflowId(long workflowId,
-                                                                        EntityReference ref) {
+    public EntityWorkflowState getStateForEntityReferenceAndWorkflowId(long workflowId,
+                                                                       EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
         return entityWorkflowStateDao.getByEntityReferenceAndWorkflowId(workflowId, ref);

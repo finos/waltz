@@ -111,7 +111,7 @@ public class EntityStatisticEndpoint implements Endpoint {
 
         String findAllActiveDefinitionsPath = mkPath(BASE_URL, "definition");
         String findDefinitionPath = mkPath(BASE_URL, "definition", ":id");
-        String findRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
+        String getRelatedStatDefinitionsPath = mkPath(BASE_URL, "definition" , ":statId", "related");
         String findStatsForEntityPath = mkPath(BASE_URL, ":kind", ":id");
         String findStatValuesBySelectorPath = mkPath(BASE_URL, "value", ":statId");
         String findStatAppsBySelectorPath = mkPath(BASE_URL, "app", ":statId");
@@ -134,8 +134,8 @@ public class EntityStatisticEndpoint implements Endpoint {
         ListRoute<Application> findStatAppsForAppSelectorRoute = (request, response)
                 -> entityStatisticService.getStatisticAppsForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
-        DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> findRelatedStatDefinitionsRoute = (request, response)
-                -> entityStatisticService.findRelatedStatDefinitions(getLong(request, "statId"), true);
+        DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> getRelatedStatDefinitionsRoute = (request, response)
+                -> entityStatisticService.getRelatedStatDefinitions(getLong(request, "statId"), true);
 
         getForList(findAllActiveDefinitionsPath, findAllActiveDefinitionsRoute);
         getForList(findStatsForEntityPath, findStatsForEntityRoute);
@@ -144,7 +144,7 @@ public class EntityStatisticEndpoint implements Endpoint {
         postForList(findStatTalliesPath, this::findStatTalliesRoute);
         postForDatum(calculateStatTallyPath, this::calculateStatTallyRoute);
         postForDatum(calculateHistoricStatTallyPath, this::calculateHistoricStatTallyRoute);
-        getForDatum(findRelatedStatDefinitionsPath, findRelatedStatDefinitionsRoute);
+        getForDatum(getRelatedStatDefinitionsPath, getRelatedStatDefinitionsRoute);
         getForDatum(findDefinitionPath, findDefinitionRoute);
     }
 

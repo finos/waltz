@@ -46,19 +46,19 @@ public class SoftwareCatalogEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findByAppIdsPath = mkPath(BASE_URL, "apps");
-        String findStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
+        String makeCatalogForAppIdsPath = mkPath(BASE_URL, "apps");
+        String calculateStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
-        DatumRoute<SoftwareCatalog> findByAppIdsRoute = (request, response) ->
-                service.findForAppIds(readIdsFromBody(request));
+        DatumRoute<SoftwareCatalog> makeCatalogForAppIdsRoute = (request, response) ->
+                service.makeCatalogForAppIds(readIdsFromBody(request));
 
-        DatumRoute<SoftwareSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
-                -> service.findStatisticsForAppIdSelector(readIdSelectionOptionsFromBody(request));
+        DatumRoute<SoftwareSummaryStatistics> calculateStatsForAppIdSelectorRoute = (request, response)
+                -> service.calculateStatisticsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
-        postForDatum(findByAppIdsPath, findByAppIdsRoute);
-        postForDatum(findStatsForAppIdSelectorPath, findStatsForAppIdSelectorRoute);
+        postForDatum(makeCatalogForAppIdsPath, makeCatalogForAppIdsRoute);
+        postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
 
     }
 
