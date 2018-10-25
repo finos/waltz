@@ -30,9 +30,8 @@ public class BaseArchitectureComplianceCheck {
     @BeforeClass
     public static void beforeClass() {
         configureLogging();
-       waltzAndJavaUtilClasses = new ClassFileImporter().importPackages("com.khartec", "java.util");
-       waltzOnlyClasses = new ClassFileImporter().importPackages("com.khartec");
-
+        waltzAndJavaUtilClasses = new ClassFileImporter().importPackages("com.khartec", "java.util");
+        waltzOnlyClasses = new ClassFileImporter().importPackages("com.khartec");
     }
 
     static ArchCondition<JavaClass> haveFindMethodsThatReturnCollectionsOrMapsOrOptionals =
