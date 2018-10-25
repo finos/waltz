@@ -69,7 +69,7 @@ public class MeasurableComplexityDao {
     }
 
 
-    public Double findBaseline() {
+    public Double calculateBaseline() {
         return dsl.select(DSL.max(SCORE_ALIAS))
                 .from(mkSelectQueryWhere(DSL.trueCondition()))
                 .fetchOne()

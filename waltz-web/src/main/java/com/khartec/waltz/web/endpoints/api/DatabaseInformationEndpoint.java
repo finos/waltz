@@ -52,7 +52,7 @@ public class DatabaseInformationEndpoint implements Endpoint {
 
         String findForAppPath = mkPath(BASE_URL, "app", ":id");
         String findForAppSelectorPath = mkPath(BASE_URL);
-        String findStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
+        String calculateStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
         ListRoute<DatabaseInformation> findForAppRoute = (request, response)
@@ -68,13 +68,13 @@ public class DatabaseInformationEndpoint implements Endpoint {
                             .build())
                     .collect(Collectors.toList());
 
-        DatumRoute<DatabaseSummaryStatistics> findStatsForAppIdSelectorRoute = (request, response)
-                -> databaseInformationService.findStatsForAppIdSelector(readIdSelectionOptionsFromBody(request));
+        DatumRoute<DatabaseSummaryStatistics> calculateStatsForAppIdSelectorRoute = (request, response)
+                -> databaseInformationService.calculateStatsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findForAppPath, findForAppRoute);
         postForList(findForAppSelectorPath, findForAppSelectorRoute);
-        postForDatum(findStatsForAppIdSelectorPath, findStatsForAppIdSelectorRoute);
+        postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
 
     }
 }

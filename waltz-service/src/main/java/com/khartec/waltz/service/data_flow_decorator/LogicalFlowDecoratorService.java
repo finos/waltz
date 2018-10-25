@@ -169,7 +169,7 @@ public class LogicalFlowDecoratorService {
                                   Collection<EntityReference> decoratorReferences,
                                   String username) {
         checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
-        LogicalFlow flow = logicalFlowDao.findByFlowId(flowId);
+        LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
         int[] deleted = logicalFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
         dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
         audit("Removed", decoratorReferences, flow, username);
@@ -183,7 +183,7 @@ public class LogicalFlowDecoratorService {
         checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
         if (decoratorReferences.isEmpty()) return new int[0];
 
-        LogicalFlow flow = logicalFlowDao.findByFlowId(flowId);
+        LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
 
         boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
 

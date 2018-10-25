@@ -135,7 +135,7 @@ public class LogicalFlowDao {
     }
 
 
-    public LogicalFlow findBySourceAndTarget(EntityReference source, EntityReference target) {
+    public LogicalFlow getBySourceAndTarget(EntityReference source, EntityReference target) {
         return baseQuery()
                 .where(isSourceCondition(source))
                 .and(isTargetCondition(target))
@@ -196,7 +196,7 @@ public class LogicalFlowDao {
 
     public LogicalFlow addFlow(LogicalFlow flow) {
         if (restoreFlow(flow, flow.lastUpdatedBy())) {
-            return findBySourceAndTarget(flow.source(), flow.target());
+            return getBySourceAndTarget(flow.source(), flow.target());
         } else {
             LogicalFlowRecord record = TO_RECORD_MAPPER.apply(flow, dsl);
             record.store();
@@ -300,7 +300,7 @@ public class LogicalFlowDao {
     }
 
 
-    public LogicalFlow findByFlowId(long dataFlowId) {
+    public LogicalFlow getByFlowId(long dataFlowId) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.eq(dataFlowId))
                 .fetchOne(TO_DOMAIN_MAPPER);

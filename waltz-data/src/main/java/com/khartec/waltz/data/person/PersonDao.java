@@ -163,7 +163,7 @@ public class PersonDao {
     }
 
 
-    public Person findPersonByUserId(String userId) {
+    public Person getPersonByUserId(String userId) {
         return dsl.select(PERSON.fields())
                 .from(PERSON)
                 .where(PERSON.EMAIL.eq(userId)) // TODO: change as part of 247

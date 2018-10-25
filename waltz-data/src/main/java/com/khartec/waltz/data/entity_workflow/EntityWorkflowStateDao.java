@@ -43,7 +43,7 @@ public class EntityWorkflowStateDao {
     }
 
 
-    public EntityWorkflowState findForEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
+    public EntityWorkflowState getByEntityReferenceAndWorkflowId(long workflowId, EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
 
         return dsl.selectFrom(ENTITY_WORKFLOW_STATE)

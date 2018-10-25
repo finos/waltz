@@ -374,7 +374,7 @@ public class FlowDiagramService {
 
     private Long makeForPhysicalFlow(EntityReference ref, String userId, String providedTitle) {
         PhysicalFlow physFlow = physicalFlowDao.getById(ref.id());
-        LogicalFlow logicalFlow = logicalFlowDao.findByFlowId(physFlow.logicalFlowId());
+        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(physFlow.logicalFlowId());
         PhysicalSpecification spec = physicalSpecificationDao.getById(physFlow.specificationId());
 
         String title = isEmpty(providedTitle)

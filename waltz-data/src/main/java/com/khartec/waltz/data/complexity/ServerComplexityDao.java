@@ -52,8 +52,8 @@ public class ServerComplexityDao {
     }
 
 
-    public int findBaseline() {
-        return findBaseline(DSL.trueCondition());
+    public int calculateBaseline() {
+        return calculateBaseline(DSL.trueCondition());
     }
 
 
@@ -94,7 +94,7 @@ public class ServerComplexityDao {
     }
 
 
-    private int findBaseline(Condition condition) {
+    private int calculateBaseline(Condition condition) {
         return dsl.select(DSL.max(SERVER_COUNT_FIELD))
                 .from(DSL.select(SERVER_INFORMATION.ASSET_CODE, SERVER_COUNT_FIELD)
                         .from(SERVER_INFORMATION)

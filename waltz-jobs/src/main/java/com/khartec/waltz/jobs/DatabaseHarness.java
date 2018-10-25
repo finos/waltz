@@ -62,7 +62,7 @@ public class DatabaseHarness {
                 .build();
 
         for (int i = 0; i < 5; i++) {
-            HarnessUtilities.time("stats", () -> databaseInfoService.findStatsForAppIdSelector(options));
+            HarnessUtilities.time("stats", () -> databaseInfoService.calculateStatsForAppIdSelector(options));
         }
 
 
