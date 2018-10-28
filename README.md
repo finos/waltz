@@ -60,3 +60,7 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 All contributions should contain the standard license and copyright notice (see [Notice file](NOTICE.md)).  
 
 Individual and organisational contributors are listed in [the contributors file](CONTRIBUTORS.md)
+
+## External Resources
+
+[Using ArchUnit to formalize architecture rules in the Waltz codebase](https://medium.com/@davidwatkins73/using-archunit-to-formalize-architecture-rules-in-the-waltz-code-base-5fd3e092fc22)
