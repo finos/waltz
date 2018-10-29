@@ -60,6 +60,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case MEASURABLE_CATEGORY:
+                return mkForMeasurableCategory(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case ACTOR:
@@ -79,6 +81,16 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         options.entityReference().kind()));
         }
     }
+
+
+    private Select<Record1<Long>> mkForMeasurableCategory(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()));
+    }
+
 
     private Select<Record1<Long>> mkForScenario(IdSelectionOptions options) {
         ensureScopeIsExact(options);
