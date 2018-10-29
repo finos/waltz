@@ -57,7 +57,7 @@ public class Main {
     }
 
 
-    public void go() {
+    private void go() {
         startHttpServer();
     }
 
@@ -67,9 +67,6 @@ public class Main {
         boolean sslEnabled = Boolean.valueOf(System.getProperty("waltz.ssl.enabled", "false"));
 
         String home = System.getProperty("user.home");
-        boolean devMode = Boolean.valueOf(System.getProperty("waltz.dev.mode", "false"));
-
-        final ServerMode mode = devMode ? ServerMode.DEV : ServerMode.DEPLOY;
 
         System.out.println("\n" +
                 "__/\\\\\\______________/\\\\\\_________________/\\\\\\\\\\\\________________________________        \n" +
@@ -84,7 +81,6 @@ public class Main {
 
         System.out.println("--WALTZ---------------------------------------------");
         System.out.println("Home is: " + home);
-        System.out.println("Mode is: " + mode);
         System.out.println("Listening on port: " + listenPortStr);
         System.out.println("SSL Enabled: " + sslEnabled);
         System.out.println("----------------------------------------------------");
@@ -97,10 +93,10 @@ public class Main {
         port(listenPort);
 
 
-        start(mode);
+        start();
     }
 
-    public void start(ServerMode mode) {
+    void start() {
         // configure logging
         LoggingUtilities.configureLogging();
 

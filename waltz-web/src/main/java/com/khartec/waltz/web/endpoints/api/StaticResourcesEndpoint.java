@@ -39,6 +39,8 @@ import static java.lang.String.format;
 public class StaticResourcesEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(StaticResourcesEndpoint.class);
+    private static final String CACHE_MAX_AGE_VALUE = "max-age=" + TimeUnit.DAYS.toSeconds(30);
+
 
     private final ClassLoader classLoader = StaticResourcesEndpoint.class
             .getClassLoader();
@@ -57,17 +59,20 @@ public class StaticResourcesEndpoint implements Endpoint {
             }
 
             try (
-                InputStream resourceAsStream = classLoader.getResourceAsStream(resolvedPath);
+                InputStream resourceAsStream = classLoader.getResourceAsStream(resolvedPath)
             ) {
                 if (resourceAsStream == null) {
                     return null;
                 } else {
-                    String message = format("Serving %s in response to request for %s", resolvedPath, request.pathInfo());
+                    String message = format(
+                            "Serving %s in response to request for %s",
+                            resolvedPath,
+                            request.pathInfo());
                     LOG.info(message);
 
                     response.type(getMimeType(resolvedPath));
 
-                    setupHeaders(response, resolvedPath);
+                    addCacheHeadersIfNeeded(response, resolvedPath);
                     OutputStream out = response
                             .raw()
                             .getOutputStream();
@@ -83,18 +88,25 @@ public class StaticResourcesEndpoint implements Endpoint {
         });
     }
 
-    private void setupHeaders(Response response, String resolvedPath) {
-        if (resolvedPath.endsWith(".html")) {
-            // no cache
-        } else {
-            long seconds = TimeUnit.DAYS.toSeconds(30);
-            response.header(HttpHeader.CACHE_CONTROL.toString(), "max-age="+seconds);
+
+    /**
+     * We want to add a cache-control: max-age value to all resources except html.
+     * This is because the html resources have references to 'cache-busted' js files
+     * and other resources.  If the html was also cached then it would be difficult
+     * to detect client code updates.
+     *
+     * @param response - the http response we are servicing
+     * @param resolvedPath - the resolved path to the resource we are serving
+     */
+    private void addCacheHeadersIfNeeded(Response response, String resolvedPath) {
+        if (! resolvedPath.endsWith(".html")) {
+            response.header(HttpHeader.CACHE_CONTROL.toString(), CACHE_MAX_AGE_VALUE);
         }
     }
 
 
     private String resolvePath(Request request) {
-        String path = request.pathInfo().replaceFirst("\\/", "");
+        String path = request.pathInfo().replaceFirst("/", "");
         String resourcePath = path.length() > 0 ? ("static/" + path) : "static/index.html";
 
         URL resource = classLoader.getResource(resourcePath);
@@ -107,11 +119,9 @@ public class StaticResourcesEndpoint implements Endpoint {
                 .getPath()
                 .endsWith("/");
 
-        String resolvedPath = isDirectory
+        return isDirectory
                 ? resourcePath + "/index.html"
                 : resourcePath;
-
-        return resolvedPath;
     }
 
 }
