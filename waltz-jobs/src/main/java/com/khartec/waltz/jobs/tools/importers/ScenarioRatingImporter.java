@@ -77,7 +77,7 @@ public class ScenarioRatingImporter {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         ScenarioRatingImporter importer = ctx.getBean(ScenarioRatingImporter.class);
 
-        String filename = "Upload test cases-Org Unit.csv";
+        String filename = "scenario-rating-import-template.csv";
         importer.importScenarioRatings(filename);
     }
 
