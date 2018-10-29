@@ -14,20 +14,21 @@ module.exports = {
     },
     output: {
         path: path.join(basePath, "/dist"),
-        filename: "[name].js"
+        filename: "[name].[contenthash].js"
         //pathinfo: false  // https://webpack.js.org/guides/build-performance/#output-without-path-info
     },
     resolve: {
         symlinks: false
     },
     optimization: {
+        runtimeChunk: "single",
         splitChunks: {
             chunks: "all",
             minSize: 30000,
-            maxSize: 0,
+            maxSize: 600000,
             minChunks: 1,
-            maxAsyncRequests: 5,
-            maxInitialRequests: 3,
+            maxAsyncRequests: 8,
+            maxInitialRequests: 4,
             automaticNameDelimiter: "~",
             name: true,
             cacheGroups: {
