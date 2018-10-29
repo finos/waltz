@@ -31,6 +31,7 @@ import {columnAxisHeight, drawAxis, rowAxisWidth} from "./scenario-diagram-axis-
 
 
 const bindings = {
+    ratingSchemeId: '<',
     rowData: "<",
     rowHeadings: "<",
     columnHeadings: "<",
@@ -130,7 +131,7 @@ function controller($element, $timeout, serviceBroker) {
     }
 
     function redraw() {
-        const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: 1 }));
+        const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: vm.ratingSchemeId }));
         if (svgGroups && colorScale) {
             const filteredData = filterData(vm.rowData, vm.qry);
             const layoutOptions = { cols: 2 };

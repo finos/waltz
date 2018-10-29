@@ -26,7 +26,8 @@
     </p>
 
     <!-- VIZ -->
-    <waltz-scenario-diagram row-data="$ctrl.vizData.rowData"
+    <waltz-scenario-diagram rating-scheme-id="$ctrl.scenarioDefn.roadmap.ratingSchemeId"
+                            row-data="$ctrl.vizData.rowData"
                             column-headings="$ctrl.vizData.columnHeadings"
                             row-headings="$ctrl.vizData.rowHeadings"
                             handlers="$ctrl.handlers">
@@ -76,7 +77,7 @@
                     </p>
                     <div class="small">
                         <waltz-rating-picker selected="$ctrl.dialog.workingState.rating"
-                                             scheme-id="1"
+                                             scheme-id="$ctrl.scenarioDefn.roadmap.ratingSchemeId"
                                              on-select="$ctrl.onRatingSelect">
                         </waltz-rating-picker>
                     </div>
