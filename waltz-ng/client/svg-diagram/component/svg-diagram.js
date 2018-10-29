@@ -22,6 +22,12 @@ import angular from "angular";
 import {select} from "d3-selection";
 
 
+const bindings = {
+    blockProcessor: "<",
+    diagram: "<"
+};
+
+
 function resize(elem, win) {
 
     const width = win.innerWidth * 0.7 || 1024;
@@ -47,32 +53,39 @@ function controller($element, $window) {
 
     vm.$onChanges = () => {
         if (!vm.diagram) return;
+
         if (latch === true) return;
+        else console.log("latch fail")
+        latch = vm.diagram !== null && vm.blockProcessor !== null;
+        console.log("diagram", { latch, d: vm.diagram, bp: vm.blockProcessor});
+
         const svg = $element.append(vm.diagram.svg);
-        latch = true;
 
         resize($element, $window);
 
-        const dataProp = "data-" + vm.diagram.keyProperty;
-        const dataBlocks = svg.querySelectorAll("[" + dataProp + "]");
+        const dataProp = `data-${vm.diagram.keyProperty}`;
+        const dataBlocks = svg.querySelectorAll(`[${dataProp}]`);
 
-        const blocks = _.map(dataBlocks, b => ({
-            block: b,
-            value: b.attributes[dataProp].value
-        }));
+        const blocks = _.map(
+            dataBlocks,
+            b => ({
+                block: b,
+                value: b.attributes[dataProp].value
+            }));
 
         _.each(blocks, vm.blockProcessor);
     };
 
 }
 
-controller.$inject = ["$element", "$window"];
+
+controller.$inject = [
+    "$element",
+    "$window"
+];
 
 
 export default {
-    bindings: {
-        blockProcessor: "<",
-        diagram: "<"
-    },
+    bindings,
     controller
 };
