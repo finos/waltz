@@ -20,14 +20,17 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.eclipse.jetty.http.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
+import spark.Response;
 import spark.Spark;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static com.khartec.waltz.common.IOUtilities.copyStream;
 import static com.khartec.waltz.web.WebUtilities.getMimeType;
@@ -63,6 +66,8 @@ public class StaticResourcesEndpoint implements Endpoint {
                     LOG.info(message);
 
                     response.type(getMimeType(resolvedPath));
+
+                    setupHeaders(response, resolvedPath);
                     OutputStream out = response
                             .raw()
                             .getOutputStream();
@@ -76,6 +81,15 @@ public class StaticResourcesEndpoint implements Endpoint {
                 return null;
             }
         });
+    }
+
+    private void setupHeaders(Response response, String resolvedPath) {
+        if (resolvedPath.endsWith(".html")) {
+            // no cache
+        } else {
+            long seconds = TimeUnit.DAYS.toSeconds(30);
+            response.header(HttpHeader.CACHE_CONTROL.toString(), "max-age="+seconds);
+        }
     }
 
 
