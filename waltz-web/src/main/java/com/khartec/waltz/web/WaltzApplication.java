@@ -27,7 +27,7 @@ public class WaltzApplication implements SparkApplication {
 
     @Override
     public void init() {
-        new Main().start(ServerMode.DEPLOY);
+        new Main().start();
     }
 
 
