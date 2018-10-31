@@ -21,7 +21,6 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <label>Search within diagram:</label>
             <input class="form-control col-sm-3 input-sm"
                    type="search"
                    placeholder="Search for application by name or code"
@@ -29,24 +28,73 @@
                    ng-model-options="{ debounce: 200 }"
                    ng-model="$ctrl.qry">
         </div>
+    </div>
 
-        <div class="col-sm-6">
-            <label>Diagram controls:</label>
-            <br>
-            <button class="btn btn-primary btn-sm"
-                    ng-if="! $ctrl.panAndZoomEnabled"
-                    ng-click="$ctrl.enablePanAndZoom()">
-                Enable pan & zoom
-            </button>
-            <button class="btn btn-primary btn-sm"
-                    ng-if="$ctrl.panAndZoomEnabled"
-                    ng-click="$ctrl.disablePanAndZoom()">
-                Disable pan & zoom
-            </button>
-            <button class="btn btn-primary btn-sm"
-                    ng-click="$ctrl.resetPanAndZoom()">
-                Reset
-            </button>
+    <br>
+
+    <!-- Diagram controls -->
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div>
+                <a ng-click="$ctrl.visibility.diagramControls = true"
+                   ng-if="$ctrl.visibility.diagramControls === false"
+                   class="clickable">
+                    Show Diagram Controls
+                </a>
+
+                <a ng-click="$ctrl.visibility.diagramControls = false"
+                   ng-if="$ctrl.visibility.diagramControls === true"
+                   class="clickable">
+                    Hide Diagram Controls
+                </a>
+            </div>
+
+
+            <div ng-if="$ctrl.visibility.diagramControls">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>Pan & Zoom:</label>
+                        <br>
+                        <button class="btn btn-primary btn-sm"
+                                ng-if="! $ctrl.panAndZoomEnabled"
+                                ng-click="$ctrl.enablePanAndZoom()">
+                            Enable pan & zoom
+                        </button>
+                        <button class="btn btn-primary btn-sm"
+                                ng-if="$ctrl.panAndZoomEnabled"
+                                ng-click="$ctrl.disablePanAndZoom()">
+                            Disable pan & zoom
+                        </button>
+                        <button class="btn btn-primary btn-sm"
+                                ng-click="$ctrl.resetPanAndZoom()">
+                            Reset
+                        </button>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label>Sort by:</label>
+                        <br>
+                        <label>
+                            <input name="name"
+                                   type="radio"
+                                   ng-model="$ctrl.sortBy"
+                                   ng-change="$ctrl.changeSort('name')"
+                                   value="name"/>
+                            Name
+                        </label>
+                        &nbsp;
+                        <label>
+                            <input name="rating"
+                                   type="radio"
+                                   ng-model="$ctrl.sortBy"
+                                   ng-change="$ctrl.changeSort('rating')"
+                                   value="rating"/>
+                            Rating
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

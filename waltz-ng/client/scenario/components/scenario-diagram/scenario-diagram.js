@@ -45,8 +45,18 @@ const defaultHandlers = {
 };
 
 
+const SORT_COLUMN = {
+    NAME: 'name',
+    RATING: 'rating'
+};
+
+
 const initialState = {
-    panAndZoomEnabled: false
+    panAndZoomEnabled: false,
+    sortBy: SORT_COLUMN.NAME,
+    visibility: {
+        diagramControls: false
+    }
 };
 
 
@@ -131,10 +141,19 @@ function controller($element, $timeout, serviceBroker) {
     }
 
     function redraw() {
-        const colorScale = mkRatingSchemeColorScale(_.find(vm.ratingSchemes, { id: vm.ratingSchemeId }));
-        if (svgGroups && colorScale) {
+        const ratingScheme = _.find(vm.ratingSchemes, { id: vm.ratingSchemeId });
+        const colorScale = mkRatingSchemeColorScale(ratingScheme);
+
+        if (svgGroups && colorScale && vm.rowData) {
             const filteredData = filterData(vm.rowData, vm.qry);
-            const layoutOptions = { cols: 2 };
+            const ratingsByCode = _.keyBy(ratingScheme.ratings, 'rating');
+
+            let sortFn = d => d.node.name;
+            if(vm.sortBy === SORT_COLUMN.RATING) {
+                sortFn = d => ratingsByCode[d.state.rating] ? ratingsByCode[d.state.rating].position : d.node.name;
+            }
+
+            const layoutOptions = { cols: 2, sortFn };
             const dataWithLayout = gridLayout(
                 filteredData,
                 vm.columnHeadings,
@@ -190,7 +209,12 @@ function controller($element, $timeout, serviceBroker) {
     vm.resetPanAndZoom = () => {
         resetZoom(svgGroups);
     };
-}
+
+    vm.changeSort = (column) => {
+        vm.sortBy = column;
+        redraw();
+    };
+}9
 
 
 controller.$inject = [
