@@ -16,6 +16,7 @@ const modes = {
 
 const initialState = {
     modes,
+    ratingScheme: null,
     roadmap: null,
     visibility: {
         mode: modes.LOADING
@@ -109,7 +110,13 @@ function controller($q,
             .then(r => vm.roadmap = r.data);
 
         return $q
-            .all([roadmapPromise]);
+            .all([roadmapPromise])
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.RatingSchemeStore.getById,
+                    [vm.roadmap.ratingSchemeId]
+                )
+                .then(r => vm.ratingScheme = r.data));
     }
 
 }

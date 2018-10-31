@@ -71,6 +71,23 @@
                 </div>
             </div> <!-- /desc -->
 
+            <!-- rating scheme -->
+            <div class="row">
+                <div class="col-sm-3">
+                    <label>Rating Scheme:</label>
+                </div>
+                <div class="col-sm-9">
+                    <span ng-bind="$ctrl.ratingScheme.name"></span>
+                    <span ng-bind="$ctrl.ratingScheme.description"
+                          class="text-muted small">
+                    </span>
+
+                    <waltz-rating-picker class="small"
+                                         scheme-id="$ctrl.roadmap.ratingSchemeId">
+                    </waltz-rating-picker>
+                </div>
+            </div> <!-- /rating scheme -->
+
         </div>
     </div>
 
