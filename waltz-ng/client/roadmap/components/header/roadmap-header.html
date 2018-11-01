@@ -77,14 +77,8 @@
                     <label>Rating Scheme:</label>
                 </div>
                 <div class="col-sm-9">
-                    <span ng-bind="$ctrl.ratingScheme.name"></span>
-                    <span ng-bind="$ctrl.ratingScheme.description"
-                          class="text-muted small">
-                    </span>
-
-                    <waltz-rating-picker class="small"
-                                         scheme-id="$ctrl.roadmap.ratingSchemeId">
-                    </waltz-rating-picker>
+                    <waltz-rating-scheme-legend rating-scheme="$ctrl.ratingScheme">
+                    </waltz-rating-scheme-legend>
                 </div>
             </div> <!-- /rating scheme -->
 

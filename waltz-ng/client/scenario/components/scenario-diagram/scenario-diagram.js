@@ -56,7 +56,8 @@ const initialState = {
     sortBy: SORT_COLUMN.NAME,
     visibility: {
         diagramControls: false
-    }
+    },
+    ratingScheme: null
 };
 
 
@@ -141,12 +142,12 @@ function controller($element, $timeout, serviceBroker) {
     }
 
     function redraw() {
-        const ratingScheme = _.find(vm.ratingSchemes, { id: vm.ratingSchemeId });
-        const colorScale = mkRatingSchemeColorScale(ratingScheme);
+        vm.ratingScheme = _.find(vm.ratingSchemes, { id: vm.ratingSchemeId });
+        const colorScale = mkRatingSchemeColorScale(vm.ratingScheme);
 
         if (svgGroups && colorScale && vm.rowData) {
             const filteredData = filterData(vm.rowData, vm.qry);
-            const ratingsByCode = _.keyBy(ratingScheme.ratings, 'rating');
+            const ratingsByCode = _.keyBy(vm.ratingScheme.ratings, 'rating');
 
             let sortFn = d => d.node.name;
             if(vm.sortBy === SORT_COLUMN.RATING) {
