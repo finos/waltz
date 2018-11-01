@@ -37,6 +37,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.StringUtilities.lower;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.stream.Collectors.*;
 
@@ -69,7 +70,10 @@ public class ScenarioRatingImporter {
         this.scenarioDao = scenarioDao;
 
 
-        assetCodeToApplicationMap = indexBy(a -> a.assetCode().get(), applicationDao.getAll());
+        List<Application> allApps = dsl.select()
+                .from(APPLICATION)
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+        assetCodeToApplicationMap = indexBy(a -> a.assetCode().get(), allApps);
     }
 
 
@@ -236,7 +240,7 @@ public class ScenarioRatingImporter {
                     checkTrue(rowAxis.axisOrientation().equals(AxisOrientation.ROW), "row does not match a row axis");
 
                     Application app = assetCodeToApplicationMap.get(r.assetCode());
-                    checkNotNull(app, "app cannot be null");
+                    checkNotNull(app, String.format("Application with asset code[%s] cannot be null", r.assetCode()));
 
                     RagName rating = ratingsByName.get(lower(r.rating()));
                     checkNotNull(rating, String.format("rating [%s] cannot be null", r.rating()));
