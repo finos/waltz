@@ -39,15 +39,8 @@
                 </p>
             </td>
             <td>
-
-                <ul class="list-unstyled small">
-                    <li ng-repeat="rating in $ctrl.model.ratingScheme.ratings">
-                        <div style="padding: 4px; margin: 2px;"
-                             ng-style="{ 'background-color': rating.color, color: rating.foregroundColor }"
-                             ng-bind="rating.name">
-                        </div>
-                    </li>
-                </ul>
+                <waltz-rating-scheme-legend rating-scheme="$ctrl.model.ratingScheme">
+                </waltz-rating-scheme-legend>
             </td>
         </tr>
         <tr>
