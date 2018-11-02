@@ -53,7 +53,7 @@
 
             <div ng-if="$ctrl.visibility.diagramControls">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <label>Pan & Zoom:</label>
                         <br>
                         <button class="btn btn-primary btn-sm"
@@ -72,7 +72,7 @@
                         </button>
                     </div>
 
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <label>Sort by:</label>
                         <br>
                         <label>
@@ -92,6 +92,13 @@
                                    value="rating"/>
                             Rating
                         </label>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <label>Legend:</label>
+                        <br>
+                        <waltz-rating-scheme-legend rating-scheme="$ctrl.ratingScheme">
+                        </waltz-rating-scheme-legend>
                     </div>
                 </div>
             </div>

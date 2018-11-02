@@ -22,6 +22,7 @@ import * as RatingSchemeStore from "./services/rating-scheme-store";
 import {registerComponents, registerStores} from "../common/module-utils";
 import RatingPicker from "./components/rating-picker/rating-picker";
 import RatingIndicatorCell from "./components/rating-indicator-cell/rating-indicator-cell";
+import RatingSchemeLegend from "./components/rating-scheme-legend/rating-scheme-legend";
 import RagLine from "./components/rag-line/rag-line";
 
 export default () => {
@@ -30,7 +31,9 @@ export default () => {
     registerComponents(module, [
         RatingIndicatorCell,
         RagLine,
-        RatingPicker ]);
+        RatingPicker,
+        RatingSchemeLegend
+    ]);
 
     registerStores(module, [ RatingSchemeStore ]);
 
