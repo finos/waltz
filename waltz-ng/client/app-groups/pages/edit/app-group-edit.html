@@ -176,41 +176,50 @@
                 </p>
 
 
-                <!-- Single Selector -->
-                <div ng-if="ctrl.editor === 'SINGLE'">
-                    <div style="padding-top: 5px">
-                        <a class="clickable"
-                           ng-click="ctrl.showBulkEditor()">
-                            bulk editor
-                            <waltz-icon name="folder-o"></waltz-icon>
-                        </a>
-                    </div>
+                <!-- Selectors -->
+                <uib-tabset>
+                    <uib-tab heading="Bulk Editor">
+                        <!-- Single Selector -->
+                        <div style="padding: 1em 0">
+                            <span>
+                                Once a selection is made related applications
+                                will also be shown.
+                            </span>
 
-                    <span>
-                        Once a selection is made related applications
-                        will also be shown.
-                    </span>
+                            <waltz-app-selector model="ctrl.searchedApp">
+                            </waltz-app-selector>
+                        </div>
+                    </uib-tab>
 
-                    <waltz-app-selector model="ctrl.searchedApp">
-                    </waltz-app-selector>
-                </div>
+                    <uib-tab heading="Single Editor">
+                        <!-- Bulk selector -->
+                        <div style="padding: 1em 0">
+                            <waltz-bulk-application-selector existing-refs="ctrl.applications"
+                                                             on-save="ctrl.saveApplications">
+                            </waltz-bulk-application-selector>
+                        </div>
+                    </uib-tab>
 
-
-                <!-- Bulk selector -->
-                <div ng-if="ctrl.editor === 'BULK'">
-                    <div>
-                        <a class="clickable"
-                           ng-click="ctrl.showSingleEditor()">
-                            single editor
-                            <waltz-icon name="crosshairs"></waltz-icon>
-                        </a>
-                    </div>
-
-                    <waltz-bulk-application-selector existing-refs="ctrl.applications"
-                                                     on-save="ctrl.saveApplications">
-                    </waltz-bulk-application-selector>
-                </div>
-
+                    <uib-tab heading="Recently Viewed">
+                        <div style="padding: 1em 0">
+                            <ul class="list-unstyled">
+                                <li ng-repeat="item in ctrl.history"
+                                    class="clickable"
+                                    ng-click="ctrl.addRecentViewed(item)">
+                                    <a>
+                                        <waltz-icon class='text-muted'
+                                                    fixed-width="true"
+                                                    name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
+                                        <span ng-bind="::item.name"></span>
+                                    </a>
+                                </li>
+                                <waltz-no-data ng-if="ctrl.history.length == 0">
+                                    <message>No information for this person</message>
+                                </waltz-no-data>
+                            </ul>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
 
                 <!-- Focus App -->
                 <div ng-if="ctrl.focusApp">
