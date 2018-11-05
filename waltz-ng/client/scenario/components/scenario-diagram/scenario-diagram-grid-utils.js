@@ -17,6 +17,7 @@ export function gridLayout(rowData = [],
                            columnHeaders = [],
                            rowHeaders = [],
                            options = defaultOptions) {
+
     const activeOptions = Object.assign({}, defaultOptions, options);
 
     const gridDataWithLayout = _.map(rowData, (row, i) => rowLayout(row, i, activeOptions));
@@ -113,4 +114,7 @@ function drawBackgroundCells(selection, options, dataWithLayout) {
         .attr("x", (d,i) => (d.colOffset * CELL_DIMENSIONS.width) + (i * ROW_CELL_DIMENSIONS.padding))
         .attr("width", (d, i) => d.colWidth * CELL_DIMENSIONS.width + CELL_DIMENSIONS.padding)
         .attr("height", (d, i) => d.rowHeight * CELL_DIMENSIONS.height + CELL_DIMENSIONS.padding);
+
+    backgroundCells.exit()
+        .remove();
 }

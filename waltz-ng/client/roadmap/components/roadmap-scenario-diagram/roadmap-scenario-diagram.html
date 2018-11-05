@@ -30,7 +30,10 @@
                             row-data="$ctrl.vizData.rowData"
                             column-headings="$ctrl.vizData.columnHeadings"
                             row-headings="$ctrl.vizData.rowHeadings"
-                            handlers="$ctrl.handlers">
+                            handlers="$ctrl.handlers"
+                            hidden-axes="$ctrl.hiddenAxes"
+                            on-unhide-axis="$ctrl.unhideAxis"
+                            on-unhide-all-axes="$ctrl.unhideAllAxes">
     </waltz-scenario-diagram>
 </div>
 

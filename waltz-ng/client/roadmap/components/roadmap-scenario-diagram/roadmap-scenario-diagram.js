@@ -41,7 +41,8 @@ const initialState = {
         edit: false
     },
     mode: modes.VIEW,
-    dialog: null
+    dialog: null,
+    hiddenAxes: []
 };
 
 
@@ -165,7 +166,6 @@ function controller($q,
     }
 
     function mkNodeGridMenu() {
-
         return () => {
             hideInfoPopup();
             if (!vm.permissions.edit) {
@@ -185,13 +185,37 @@ function controller($q,
         };
     }
 
+
+    function mkAxisItemMenu() {
+        return () => {
+            return [
+                {
+                    title: "Hide",
+                    action: (elm, d) => $timeout(() => {
+                        if(vm.hiddenAxes.length === 0) {
+                            notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
+                        }
+                        vm.hiddenAxes.push(d);
+                        vm.vizData = prepareData(
+                            vm.scenarioDefn,
+                            vm.applications,
+                            vm.measurables,
+                            vm.hiddenAxes);
+                    })
+                }
+            ];
+        };
+    }
+
+
     function reload() {
         loadApplications(loadScenario())
             .then(() => vm.vizData =
                 prepareData(
                     vm.scenarioDefn,
                     vm.applications,
-                    vm.measurables));
+                    vm.measurables,
+                    vm.hiddenAxes));
     }
 
     function loadScenario() {
@@ -296,6 +320,7 @@ function controller($q,
             contextMenus: {
                 node: mkNodeMenu(),
                 nodeGrid: mkNodeGridMenu(),
+                axisItem: mkAxisItemMenu()
             }
         };
     }
@@ -317,7 +342,8 @@ function controller($q,
             .then(() => vm.vizData = prepareData(
                 vm.scenarioDefn,
                 vm.applications,
-                vm.measurables));
+                vm.measurables,
+                vm.hiddenAxes));
 
         vm.handlers = setupHandlers();
 
@@ -383,6 +409,24 @@ function controller($q,
 
     vm.onCloseDialog = () => {
         vm.dialog = null;
+    };
+
+    vm.unhideAxis = (axis) => {
+        _.remove(vm.hiddenAxes, (d => d.id === axis.id));
+        vm.vizData = prepareData(
+            vm.scenarioDefn,
+            vm.applications,
+            vm.measurables,
+            vm.hiddenAxes);
+    };
+
+    vm.unhideAllAxes = () => {
+        vm.hiddenAxes = [];
+        vm.vizData = prepareData(
+            vm.scenarioDefn,
+            vm.applications,
+            vm.measurables,
+            vm.hiddenAxes);
     };
 }
 

@@ -101,6 +101,29 @@
                         </waltz-rating-scheme-legend>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <label>Hidden Axes:</label>
+                        <a ng-click="$ctrl.showAllAxes()"
+                           ng-if="$ctrl.hiddenAxes.length > 0"
+                           class="clickable small">
+                            show all
+                            <waltz-icon name="eye"></waltz-icon>
+                        </a>
+                        <div class="small text-muted">Axes can be hidden from the right click context menu</div>
+
+                        <div ng-repeat="axis in $ctrl.hiddenAxes">
+                            <span ng-bind="axis.name"></span>
+                            <a ng-click="$ctrl.showAxis(axis)"
+                               class="clickable"
+                               title="show">
+                                <waltz-icon name="eye"></waltz-icon>
+                            </a>
+                        <div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

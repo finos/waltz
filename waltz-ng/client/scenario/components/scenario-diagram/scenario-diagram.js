@@ -18,7 +18,6 @@
  */
 
 import {initialiseData, isEmpty} from "../../../common/index";
-import template from "./scenario-diagram.html";
 import {select} from "d3-selection";
 import {createGroupElements, responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -28,36 +27,48 @@ import {removeZoom, resetZoom, setupZoom} from "./scenario-diagram-utils";
 import _ from "lodash";
 import {drawGrid, gridLayout} from "./scenario-diagram-grid-utils";
 import {columnAxisHeight, drawAxis, rowAxisWidth} from "./scenario-diagram-axis-utils";
+import {invokeFunction} from "../../../common";
+
+
+import template from "./scenario-diagram.html";
 
 
 const bindings = {
-    ratingSchemeId: '<',
+    ratingSchemeId: "<",
     rowData: "<",
     rowHeadings: "<",
     columnHeadings: "<",
-    handlers: "<?"
+    handlers: "<?",
+    hiddenAxes: "<?",
+
+    onUnhideAxis: "<?",
+    onUnhideAllAxes: "<?",
 };
 
 
 const defaultHandlers = {
     onNodeClick: (d) => console.log("WSD: NodeClick", d),
-    onNodeGridClick: (d) => console.log("WSD: NodeGridClick", d)
+    onNodeGridClick: (d) => console.log("WSD: NodeGridClick", d),
 };
 
 
 const SORT_COLUMN = {
-    NAME: 'name',
-    RATING: 'rating'
+    NAME: "name",
+    RATING: "rating"
 };
 
 
 const initialState = {
+    hiddenAxes: [],
     panAndZoomEnabled: false,
     sortBy: SORT_COLUMN.NAME,
     visibility: {
         diagramControls: false
     },
-    ratingScheme: null
+    ratingScheme: null,
+
+    onUnhideAxis: (axis) => console.log("WSD: UnhideAxis", axis),
+    onUnhideAllAxes: (axis) => console.log("WSD: UnhideAllAxes", axis)
 };
 
 
@@ -68,18 +79,6 @@ function setupGroupElements($element) {
             name: "holder",
             children: [
                 {
-                    name: "gridHolder",
-                    attrs: {
-                        "clip-path": "url(#grid-clip)",
-                        "transform": `translate(${rowAxisWidth} ${columnAxisHeight})`
-                    },
-                    children: [
-                        {
-                            name: "gridContent",
-                            attrs: { "transform": "translate(1, 1)" }
-                        }
-                    ]
-                }, {
                     name: "columnAxisHolder",
                     attrs: {
                         "clip-path": "url(#column-clip)",
@@ -93,7 +92,19 @@ function setupGroupElements($element) {
                         "transform": `translate(0 ${columnAxisHeight})`
                     },
                     children: [ { name: "rowAxisContent" } ]
-                }
+                }, {
+                    name: "gridHolder",
+                    attrs: {
+                        "clip-path": "url(#grid-clip)",
+                        "transform": `translate(${rowAxisWidth} ${columnAxisHeight})`
+                    },
+                    children: [
+                        {
+                            name: "gridContent",
+                            attrs: { "transform": "translate(1, 1)" }
+                        }
+                    ]
+                },
             ]
         }
     ];
@@ -103,8 +114,8 @@ function setupGroupElements($element) {
 
 function draw(dataWithLayout, svgGroups, options) {
     // console.log("WSD: draw", { dataWithLayout, options });
+    drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout, options);
     drawGrid(svgGroups.gridContent, dataWithLayout, options);
-    drawAxis(svgGroups.columnAxisContent, svgGroups.rowAxisContent, dataWithLayout);
 }
 
 
@@ -137,7 +148,6 @@ function controller($element, $timeout, serviceBroker) {
                 return acc;
             },
             {});
-
         return Object.assign(handlers, { contextMenus: newContextMenus });
     }
 
@@ -147,7 +157,7 @@ function controller($element, $timeout, serviceBroker) {
 
         if (svgGroups && colorScale && vm.rowData) {
             const filteredData = filterData(vm.rowData, vm.qry);
-            const ratingsByCode = _.keyBy(vm.ratingScheme.ratings, 'rating');
+            const ratingsByCode = _.keyBy(vm.ratingScheme.ratings, "rating");
 
             let sortFn = d => d.node.name;
             if(vm.sortBy === SORT_COLUMN.RATING) {
@@ -215,7 +225,15 @@ function controller($element, $timeout, serviceBroker) {
         vm.sortBy = column;
         redraw();
     };
-}9
+
+    vm.showAxis = (axis) => {
+        invokeFunction(vm.onUnhideAxis, axis);
+    };
+
+    vm.showAllAxes = () => {
+        invokeFunction(vm.onUnhideAllAxes);
+    };
+}
 
 
 controller.$inject = [
