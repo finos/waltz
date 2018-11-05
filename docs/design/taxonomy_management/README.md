@@ -82,7 +82,7 @@ Commands that alter taxonomies will be captured in a new table `taxonomy_changel
 | `kind_b` | enum | _n_ | optional secondary entity kind this command is operating on |
 | `id_b` | enum | _n_ | optional secondary entity id this command is operating on |
 | `new_value` | string | _n_ | string value to use in cases of rename etc, may be parsed for boolean value (e.g. concrete flag) |
-| `change_status` | enum | _n_ | tbc | 
+| `change_status` | enum | **y** | tbc | 
 | `created_by` | string | **y** | who created this change user id |
 | `created_on` | timestamp | **y** | when this change was created |   
 | `executed_date` | string | _n_ | who executed this change |   
