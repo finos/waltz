@@ -201,24 +201,25 @@
                     </uib-tab>
 
                     <uib-tab heading="Recently Viewed">
+                        <!-- Recent selector -->
                         <div style="padding: 1em 0">
                             <ul class="list-unstyled">
                                 <li ng-repeat="app in ctrl.history">
-                                    <a ng-if="!ctrl.isAppInGroup(app.stateParams)"
+                                    <span ng-if="!ctrl.isAppInGroup(app.stateParams)"
                                        class='clickable'
                                        ng-click="ctrl.addRecentViewed(app)">
                                         <waltz-icon fixed-width="true"
                                                     class="text-muted"
                                                     name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
                                         <span ng-bind="::app.name"></span>
-                                    </a>
-                                    <a ng-if="ctrl.isAppInGroup(app.stateParams)"
+                                    </span>
+                                    <span ng-if="ctrl.isAppInGroup(app.stateParams)"
                                        class='text-muted'>
                                         <waltz-icon fixed-width="true"
                                                     name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
                                         <span ng-bind="::app.name"
                                               style="text-decoration: line-through"></span>
-                                    </a>
+                                    </span>
                                 </li>
                                 <waltz-no-data ng-if="ctrl.history.length == 0">
                                     <message>No information for this person</message>
