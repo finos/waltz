@@ -51,24 +51,8 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 
 Similar to Measurable Operations  ?
 
-
-### Security considerations
-
-**Note this section requires more thought**
-
-Currently the Waltz security model is extremely coarse grained.  Simple roles are associated to users 
-via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`,
-in particular the following role is relevant to taxonomy management:
-
-- `CAPABILITY_EDITOR` synonym for measurable editor.
-
-We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type taxonomies.
-This alone _may_ not be enough to administer a taxonomy.  Instance level _involvement_ associations could be used to indicate
-who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.  This involvement would
-only be assignable by those with the role: `USER_ADMIN` and would need to be differentiated in the `involvement_kind` table.
-
-   
-## Command representation:
+  
+### Command representation:
 
 Commands that alter taxonomies will be captured in a new table `taxonomy_changelog`:
 
@@ -93,7 +77,7 @@ Commands that alter taxonomies will be captured in a new table `taxonomy_changel
 work.  
 
 
-## Command processing:
+### Command processing:
 
 #### Tables potentially impacted by measurable commands 
 
@@ -114,6 +98,22 @@ work.
 | `involvement` | _Delete_, _Migrate_ | - | 
 
 
+### Security considerations
+
+**Note this section requires more thought**
+
+Currently the Waltz security model is extremely coarse grained.  Simple roles are associated to users 
+via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`,
+in particular the following role is relevant to taxonomy management:
+
+- `CAPABILITY_EDITOR` synonym for measurable editor.
+
+We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type taxonomies.
+This alone _may_ not be enough to administer a taxonomy.  Instance level _involvement_ associations could be used to indicate
+who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.  This involvement would
+only be assignable by those with the role: `USER_ADMIN` and would need to be differentiated in the `involvement_kind` table.
+
+ 
 
 ## Notes
 
