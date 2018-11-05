@@ -40,7 +40,7 @@ const initialState = {
     dialog: null,
     handlers: {},
     hiddenAxes: [],
-    lastRating: null,
+    lastRatings: {},
     mode: modes.VIEW,
     permissions: {
         admin: false,
@@ -351,19 +351,13 @@ function controller($q,
     };
 
 
-    const getLastOrDefaultRating = () => {
-
-        if (vm.lastRating) {
-            return vm.lastRating;
-        }
-
-        const defaultRating = _.chain(vm.ratingsByCode)
+    const getLastOrDefaultRating = (app) => {
+        const getDefaultRating = () => _.chain(vm.ratingsByCode)
             .values()
             .sortBy(["position"])
             .head()
             .value();
-
-        return defaultRating.rating;
+        return _.get(vm.lastRatings, [app.id], getDefaultRating())
     };
 
 
@@ -380,7 +374,8 @@ function controller($q,
     };
 
     vm.onAddApplication = (app) => {
-        const lastOrDefaultRating = getLastOrDefaultRating();
+        const lastOrDefaultRating = getLastOrDefaultRating(app);
+
         const args = [
             vm.scenarioDefn.scenario.id,
             app.id,
@@ -417,7 +412,7 @@ function controller($q,
                 reload();
                 notification.success("Edited rating");
                 vm.onCloseDialog();
-                vm.lastRating = workingState.rating;
+                vm.lastRatings[item.id] = workingState.rating;
             });
     };
 
