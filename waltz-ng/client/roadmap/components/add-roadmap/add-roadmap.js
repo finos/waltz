@@ -1,9 +1,8 @@
-import template from "./add-roadmap.html";
 import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import _ from "lodash";
-import {checkNotEmpty} from "../../../common/checks";
 import {toEntityRef} from "../../../common/entity-utils";
+
+import template from "./add-roadmap.html";
 
 
 const bindings = {
