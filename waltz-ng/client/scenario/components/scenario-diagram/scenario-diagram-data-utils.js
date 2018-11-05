@@ -37,8 +37,10 @@ export function enrichDatumWithSearchTargetString(datum) {
 }
 
 
-function prepareAxisHeadings(scenarioDefinition, measurablesById) {
+function prepareAxisHeadings(scenarioDefinition, measurablesById, hiddenAxes = []) {
+    const hiddenAxisIds = _.map(hiddenAxes, 'id');
     return _.chain(scenarioDefinition.axisDefinitions)
+        .filter(d => !_.includes(hiddenAxisIds, d.domainItem.id))
         .map(d => {
             const measurable = measurablesById[d.domainItem.id];
             return {
@@ -59,10 +61,10 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById) {
 
 
 
-export function prepareData(scenarioDefinition, applications = [], measurables = []) {
+export function prepareData(scenarioDefinition, applications = [], measurables = [], hiddenAxes = []) {
     const applicationsById = _.keyBy(applications, "id");
     const measurablesById = _.keyBy(measurables, "id");
-    const axisHeadings = prepareAxisHeadings(scenarioDefinition, measurablesById);
+    const axisHeadings = prepareAxisHeadings(scenarioDefinition, measurablesById, hiddenAxes);
 
     const columnHeadings = axisHeadings["COLUMN"] || [];
     const rowHeadings = axisHeadings["ROW"] || [];
