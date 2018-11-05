@@ -37,14 +37,15 @@ const component = {
 
 
 const initialState = {
+    dialog: null,
     handlers: {},
+    hiddenAxes: [],
+    lastRatings: {},
+    mode: modes.VIEW,
     permissions: {
         admin: false,
         edit: false
-    },
-    mode: modes.VIEW,
-    dialog: null,
-    hiddenAxes: []
+    }
 };
 
 
@@ -350,6 +351,16 @@ function controller($q,
     };
 
 
+    const getLastOrDefaultRating = (app) => {
+        const getDefaultRating = () => _.chain(vm.ratingsByCode)
+            .values()
+            .sortBy(["position"])
+            .head()
+            .value();
+        return _.get(vm.lastRatings, [app.id], getDefaultRating())
+    };
+
+
     // -- INTERACT --
 
     vm.toggleMode = () => {
@@ -363,12 +374,14 @@ function controller($q,
     };
 
     vm.onAddApplication = (app) => {
+        const lastOrDefaultRating = getLastOrDefaultRating(app);
+
         const args = [
             vm.scenarioDefn.scenario.id,
             app.id,
             vm.selectedColumn.id,
             vm.selectedRow.id,
-            "G"
+            lastOrDefaultRating
         ];
         serviceBroker
             .execute(
@@ -390,6 +403,7 @@ function controller($q,
             workingState.rating,
             workingState.comment
         ];
+
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.updateRating,
@@ -398,6 +412,7 @@ function controller($q,
                 reload();
                 notification.success("Edited rating");
                 vm.onCloseDialog();
+                vm.lastRatings[item.id] = workingState.rating;
             });
     };
 
