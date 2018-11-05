@@ -1,10 +1,12 @@
-import template from "./roadmap-scenario-diagram.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event, select, selectAll} from "d3-selection";
 import roles from "../../../user/roles";
+
+import template from "./roadmap-scenario-diagram.html";
+
 
 const bindings = {
     scenarioId: "<",
@@ -113,6 +115,11 @@ function controller($q,
     };
 
 
+    function prepData() {
+        return prepareData(vm.scenarioDefn, vm.applications, vm.measurables, vm.hiddenAxes);
+    }
+
+
     function mkNodeMenu() {
         return () => {
             hideInfoPopup();
@@ -196,11 +203,7 @@ function controller($q,
                             notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
                         }
                         vm.hiddenAxes.push(d);
-                        vm.vizData = prepareData(
-                            vm.scenarioDefn,
-                            vm.applications,
-                            vm.measurables,
-                            vm.hiddenAxes);
+                        vm.vizData = prepData();
                     })
                 }
             ];
@@ -210,12 +213,7 @@ function controller($q,
 
     function reload() {
         loadApplications(loadScenario())
-            .then(() => vm.vizData =
-                prepareData(
-                    vm.scenarioDefn,
-                    vm.applications,
-                    vm.measurables,
-                    vm.hiddenAxes));
+            .then(() => vm.vizData = prepData());
     }
 
     function loadScenario() {
@@ -339,11 +337,7 @@ function controller($q,
 
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
-            .then(() => vm.vizData = prepareData(
-                vm.scenarioDefn,
-                vm.applications,
-                vm.measurables,
-                vm.hiddenAxes));
+            .then(() => vm.vizData = prepData());
 
         vm.handlers = setupHandlers();
 
@@ -413,20 +407,12 @@ function controller($q,
 
     vm.unhideAxis = (axis) => {
         _.remove(vm.hiddenAxes, (d => d.id === axis.id));
-        vm.vizData = prepareData(
-            vm.scenarioDefn,
-            vm.applications,
-            vm.measurables,
-            vm.hiddenAxes);
+        vm.vizData = prepData();
     };
 
     vm.unhideAllAxes = () => {
         vm.hiddenAxes = [];
-        vm.vizData = prepareData(
-            vm.scenarioDefn,
-            vm.applications,
-            vm.measurables,
-            vm.hiddenAxes);
+        vm.vizData = prepData();
     };
 }
 
