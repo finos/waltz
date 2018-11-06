@@ -1,6 +1,7 @@
 # Waltz Documentation
 
 - [Features](features/README.md)
+- [Design](design)
 - Integration
   - [Neo4J](integration/neo4j)
 
