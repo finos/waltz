@@ -388,9 +388,9 @@ function controller($q,
                 CORE_API.ScenarioStore.addRating,
                 args)
             .then(() => {
+                _.remove(vm.dialog.applicationPickList, a => a.id === app.id);
                 reload();
                 notification.success("Added rating");
-                vm.onCloseDialog();
             });
     };
 
