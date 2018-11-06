@@ -70,7 +70,7 @@ Commands that alter taxonomies will be captured in a new table `taxonomy_changel
 | `created_by` | string | **y** | who created this change user id |
 | `created_on` | timestamp | **y** | when this change was created |   
 | `executed_date` | string | _n_ | who executed this change |   
-| `executed_by` | timestamp | _n_ | when this change was applied |   
+| `executed_by` | timestamp | _n_ | when this change was app    lied |   
 
 
 *Possible extensions* : batching via _changesets_ to indicate a transactional unit of 
@@ -98,20 +98,37 @@ work.
 | `involvement` | _Delete_, _Migrate_ | - | 
 
 
+#### Problems
+
+
+
 ### Security considerations
 
-**Note this section requires more thought**
+Security is a broad topic and a comprehensive solution is out of scope of the initial delivery of this
+feature.  
 
 Currently the Waltz security model is extremely coarse grained.  Simple roles are associated to users 
-via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`,
-in particular the following role is relevant to taxonomy management:
+via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`.
 
-- `CAPABILITY_EDITOR` synonym for measurable editor.
+#### Phase 1 - interim design
 
-We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type taxonomies.
-This alone _may_ not be enough to administer a taxonomy.  Instance level _involvement_ associations could be used to indicate
-who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.  This involvement would
-only be assignable by those with the role: `USER_ADMIN` and would need to be differentiated in the `involvement_kind` table.
+
+We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type 
+taxonomies. An additional column/field will be added to `measurable_category` to determine whether a 
+category is editable.  This will help prevent accidental damage to other taxonomies.  
+
+The main drawback to this proposal is the lack of fine-grained control.  Any category that is flagged
+as editable may potentially be modified by any person with the `TAXONOMY_EDITOR` role.
+
+#### Phase 2 - target state design
+
+Building upon _phase 1_,  instance level _involvement_ associations could be used to indicate
+who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.
+  
+This involvement should only be assignable by those with the role: `USER_ADMIN` and would need 
+to be referenced by the target nodes.  For example the `measurable_category` table could include 
+a column `maintainer_involvement_kind`  which, if present, indicates a required involvement that 
+a potential editor _must_ have.
 
  
 
