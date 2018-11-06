@@ -1,5 +1,28 @@
 # Design for Taxonomy Management within Waltz
 
+<!-- toc -->
+
+- [Terminology](#terminology)
+- [Motivation](#motivation)
+- [Commands](#commands)
+  * [Commands: Measurable](#commands-measurable)
+  * [Commands: Measurable Category](#commands-measurable-category)
+  * [Commands: Data Type](#commands-data-type)
+- [Persistence](#persistence)
+  * [Taxonomy Changelog table](#taxonomy-changelog-table)
+- [Command Processing](#command-processing)
+  * [Tables potentially impacted by measurable commands](#tables-potentially-impacted-by-measurable-commands)
+- [Problems](#problems)
+  * [Change ordering](#change-ordering)
+    + [Problem](#problem)
+    + [Potential mitigation](#potential-mitigation)
+- [Security considerations](#security-considerations)
+  * [Phase 1 - interim design](#phase-1---interim-design)
+  * [Phase 2 - target state design](#phase-2---target-state-design)
+- [Notes](#notes)
+
+<!-- tocstop -->
+
 ## Terminology 
 
 In the following section we will use the following terminology:
@@ -17,12 +40,9 @@ loaded into Waltz via custom loaders.  However when a taxonomy is wholly owned b
 it is desirable that Waltz provide the facility to adequately manage it within the tool.
 
 
-## Design
+## Commands
  
-### Measurable Operations
-
-#### Operations
-
+### Commands: Measurable 
 | Change | Description | Concerns | Priority | Impl. Complexity |
 | --- | --- | --- | --- | --- |
 | **Rename** | Alter the displayed name of the measurable | Care must be taken to not alter the meaning of the measurable item as all existing references will not reflect the new name | HIGH | LOW |
@@ -36,8 +56,7 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 | **Deprecate** | Marks an item as deprecated and should be no longer considered a valid option.  Used to communicate an intent to remove from a future version of the taxonomy. | Will need ddl update to support. Full gui support may take a while | MEDIUM | MEDIUM / HIGH |
 
 
-
-### Measurable Category Operations 
+### Commands: Measurable Category 
 
 | Change | Description | Concerns | Priority | Impl. Complexity |
 | --- | --- | --- | --- | --- |
@@ -47,15 +66,16 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 | **Delete category** | Remove the category and all items within it [1] | Very destructive. | LOW | MEDIUM |
 
 
-### Data Type Operations 
+### Commands: Data Type 
 
-Similar to Measurable Operations  ?
+TBD: Similar to Measurable Operations  ?
 
   
-### Command representation:
+## Persistence
+  
+### Taxonomy Changelog table
 
 Commands that alter taxonomies will be captured in a new table `taxonomy_changelog`:
-
 
 | Column | Type | Mandatory | Description | 
 | --- | --- | --- | --- |
@@ -77,9 +97,9 @@ Commands that alter taxonomies will be captured in a new table `taxonomy_changel
 work.  
 
 
-### Command processing:
+## Command Processing
 
-#### Tables potentially impacted by measurable commands 
+### Tables potentially impacted by measurable commands 
 
 | Table | Impacting Commands | Comment |
 | --- | --- | --- |
@@ -98,11 +118,35 @@ work.
 | `involvement` | _Delete_, _Migrate_ | - | 
 
 
-#### Problems
+## Problems
+
+### Change ordering
+
+#### Problem
+If we disconnect command creation from command execution we may inadvertently remove data.
+Consider a taxonomy that looks like:
+
+```
+    |- r
+      |- c1    (mappings: [])
+      |- c2    (mappings: [1, 2, 3])
+```
+
+If we merge `c2` into `c1` the result will be the removal of `c2` removed and the mappings `[1, 2, 3]` 
+now linked to `c1`.
+
+If we subsequently remove `c1` it will be removed and the mappings will also be deleted.
+
+However if the commands are entered in advance of the processing then the feedback would not show the 
+'pending' mappings. This may lead a user to erroneously believing that removing `c1` has no other side-effects.
 
 
+#### Potential mitigation
+If any pending change mentions an entity warn the user.  E.g. 'c1 has a pending merge from c2', the 
+user would still be responsible for investigating the potential impact further.
 
-### Security considerations
+
+## Security considerations
 
 Security is a broad topic and a comprehensive solution is out of scope of the initial delivery of this
 feature.  
@@ -110,7 +154,7 @@ feature.
 Currently the Waltz security model is extremely coarse grained.  Simple roles are associated to users 
 via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`.
 
-#### Phase 1 - interim design
+### Phase 1 - interim design
 
 
 We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type 
@@ -120,7 +164,7 @@ category is editable.  This will help prevent accidental damage to other taxonom
 The main drawback to this proposal is the lack of fine-grained control.  Any category that is flagged
 as editable may potentially be modified by any person with the `TAXONOMY_EDITOR` role.
 
-#### Phase 2 - target state design
+### Phase 2 - target state design
 
 Building upon _phase 1_,  instance level _involvement_ associations could be used to indicate
 who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.
@@ -130,9 +174,13 @@ to be referenced by the target nodes.  For example the `measurable_category` tab
 a column `maintainer_involvement_kind`  which, if present, indicates a required involvement that 
 a potential editor _must_ have.
 
+
+## Example Screens
+
+See [removal example walkthrough](taxonomy_management.pdf).
  
 
 ## Notes
 
 [1] - an example of deleting an entire category already exists in
-`com.khartec.waltz.jobs.tools.RemoveTaxonomy` 
+`com.khartec.waltz.jobs.tools.RemoveTaxonomy`
