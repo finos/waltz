@@ -25,12 +25,13 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyTemplateChangeCommand.class)
 @JsonDeserialize(as = ImmutableSurveyTemplateChangeCommand.class)
-public abstract class SurveyTemplateChangeCommand implements IdProvider, NameProvider, DescriptionProvider {
+public abstract class SurveyTemplateChangeCommand implements Command, IdProvider, NameProvider, DescriptionProvider {
 
     public abstract EntityKind targetEntityKind();
 }

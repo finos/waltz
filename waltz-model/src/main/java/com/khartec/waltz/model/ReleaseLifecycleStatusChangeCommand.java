@@ -21,12 +21,13 @@ package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableReleaseLifecycleStatusChangeCommand.class)
 @JsonDeserialize(as = ImmutableReleaseLifecycleStatusChangeCommand.class)
-public abstract class ReleaseLifecycleStatusChangeCommand {
+public abstract class ReleaseLifecycleStatusChangeCommand implements Command {
 
     public abstract ReleaseLifecycleStatus newStatus();
 }

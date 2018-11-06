@@ -25,6 +25,7 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -33,6 +34,7 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutablePhysicalSpecDefinitionFieldChangeCommand.class)
 @JsonDeserialize(as = ImmutablePhysicalSpecDefinitionFieldChangeCommand.class)
 public abstract class PhysicalSpecDefinitionFieldChangeCommand implements
+        Command,
         IdProvider,
         NameProvider,
         DescriptionProvider {
