@@ -22,6 +22,7 @@ package com.khartec.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstanceStatusChangeCommand.class)
 @JsonDeserialize(as = ImmutableSurveyInstanceStatusChangeCommand.class)
-public abstract class SurveyInstanceStatusChangeCommand {
+public abstract class SurveyInstanceStatusChangeCommand implements Command {
 
     public abstract SurveyInstanceStatus newStatus();
 

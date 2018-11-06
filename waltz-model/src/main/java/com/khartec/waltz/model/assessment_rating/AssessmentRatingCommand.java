@@ -21,8 +21,9 @@ package com.khartec.waltz.model.assessment_rating;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdatedProvider;
+import com.khartec.waltz.model.command.Command;
 
-public abstract class AssessmentRatingCommand implements LastUpdatedProvider {
+public abstract class AssessmentRatingCommand implements Command, LastUpdatedProvider {
 
     public abstract EntityReference entityReference();
 

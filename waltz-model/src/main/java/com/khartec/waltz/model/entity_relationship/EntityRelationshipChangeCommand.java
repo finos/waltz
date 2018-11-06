@@ -23,13 +23,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityRelationshipChangeCommand.class)
 @JsonDeserialize(as = ImmutableEntityRelationshipChangeCommand.class)
-public abstract class EntityRelationshipChangeCommand {
+public abstract class EntityRelationshipChangeCommand implements Command {
 
     public abstract Operation operation();
     public abstract EntityReference entityReference();
