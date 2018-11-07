@@ -2,6 +2,7 @@
 
 <!-- toc -->
 
+- [Status: DEVELOPMENT](#status-development)
 - [Terminology](#terminology)
 - [Motivation](#motivation)
 - [Commands](#commands)
@@ -24,12 +25,18 @@
 
 <!-- tocstop -->
 
+## Status: DEVELOPMENT
+
+This feature is currently being build.  Therefore this document is liable to be modified as new information comes to light.
+
+
 ## Terminology 
 
 In the following section we will use the following terminology:
 
-- _Measurable Category_:  a category applied to a group of measurable items.  Synonymous with an item in a taxonomy
-- _Measurable_: a specific item within a measurable category.  Synonymous with a _taxonomy_
+- _Measurable Category_:  a category applied to a group of measurable items.  Is an instance of a _taxonomy_
+- _Measurable_: a specific item within a measurable category.  Is an instance of a _taxonomy item_
+- _Data Type_: a specific item in the data type taxonomy
 
 
 ## Motivation
@@ -58,7 +65,6 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 
 
 ### Commands: Measurable Category 
-
 | Change | Description | Concerns | Priority | Impl. Complexity |
 | --- | --- | --- | --- | --- |
 | **Rename** | Alter the displayed name of the measurable category | Care must be taken to ensure meaning is not altered. For example if a measurable category consisting of countries was renamed from 'Trading Locations' to 'Processing Locations' then the underlying meaning has been changed and all mappings are potentially invalid | MEDIUM | LOW |
@@ -68,24 +74,24 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 
 
 ### Commands: Data Type 
-
 TBD: Similar to Measurable Operations  ?
 
   
 ## Persistence
   
 ### Taxonomy Changelog table
-
 Commands that alter taxonomies will be captured in a new table `taxonomy_changelog`:
 
 | Column | Type | Mandatory | Description | 
 | --- | --- | --- | --- |
 | `id` | seq | **y** | PK |  - |
 | `change_type` | enum | **y** | one of: 'ADD | 
+| `change_domain_kind` | enum | **y** | typically either `MEASURABLE_CATEGORY` or `DATA_TYPE` |
+| `change_domain_id` | long | **y** | `-1` for data types |
 | `kind_a` | enum | **y** | main entity kind this command is operating on |
-| `id_a` | enum | **y** | main entity id this command is operating on |
+| `id_a` | long | **y** | main entity id this command is operating on |
 | `kind_b` | enum | _n_ | optional secondary entity kind this command is operating on |
-| `id_b` | enum | _n_ | optional secondary entity id this command is operating on |
+| `id_b` | long | _n_ | optional secondary entity id this command is operating on |
 | `new_value` | string | _n_ | string value to use in cases of rename etc, may be parsed for boolean value (e.g. concrete flag) |
 | `change_status` | enum | **y** | tbc | 
 | `created_by` | string | **y** | who created this change user id |
@@ -141,7 +147,6 @@ If we subsequently remove `c1` it will be removed and the mappings will also be 
 However if the commands are entered in advance of the processing then the feedback would not show the 
 'pending' mappings. This may lead a user to erroneously believing that removing `c1` has no other side-effects.
 
-
 #### Potential mitigation
 If any pending change mentions an entity warn the user.  E.g. 'c1 has a pending merge from c2', the 
 user would still be responsible for investigating the potential impact further.
@@ -156,8 +161,6 @@ Currently the Waltz security model is extremely coarse grained.  Simple roles ar
 via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`.
 
 ### Phase 1 - interim design
-
-
 We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type 
 taxonomies. An additional column/field will be added to `measurable_category` to determine whether a 
 category is editable.  This will help prevent accidental damage to other taxonomies.  
@@ -166,7 +169,6 @@ The main drawback to this proposal is the lack of fine-grained control.  Any cat
 as editable may potentially be modified by any person with the `TAXONOMY_EDITOR` role.
 
 ### Phase 2 - target state design
-
 Building upon _phase 1_,  instance level _involvement_ associations could be used to indicate
 who may manage specific _measurable categories_, _measurable_ subtrees or _data type_ subtrees.
   
