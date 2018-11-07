@@ -61,12 +61,13 @@ public class Checks {
     /**
      * Verifies that the boolean <code>b</code> is true
      * @param b Boolean to check
-     * @param msg Text to use in any exception method
+     * @param msg Text to use in any exception method (can use standard string formatting)
+     * @param args Arguments to use in format
      * @throws IllegalArgumentException if <code>b != true</code>
      */
-    public static void checkTrue(boolean b, String msg) {
+    public static void checkTrue(boolean b, String msg, Object... args) {
         if (! b) {
-            throw new IllegalArgumentException(msg);
+            fail(msg, args);
         }
     }
 
@@ -78,7 +79,7 @@ public class Checks {
 
     public static <T> T checkOptionalIsPresent(Optional<T> optional, String message) {
         return optional
-                .orElseThrow(() -> new IllegalArgumentException(message));
+                .orElseThrow(() -> mkFail(message));
     }
 
 
@@ -99,4 +100,15 @@ public class Checks {
         checkFalse(str.trim().equals(""), message);
         return str;
     }
+
+
+    public static void fail(String msg, Object... args) {
+        throw mkFail(msg, args);
+    }
+
+    public static IllegalArgumentException mkFail(String msg, Object... args) {
+        throw new IllegalArgumentException(String.format(msg, args));
+    }
+
+
 }
