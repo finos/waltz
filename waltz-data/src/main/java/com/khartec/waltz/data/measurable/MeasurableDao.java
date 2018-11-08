@@ -130,4 +130,13 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.EXTERNAL_ID.eq(extId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public int updateConcreteFlag(Long id, boolean newValue) {
+        return dsl
+                .update(MEASURABLE)
+                .set(MEASURABLE.CONCRETE, newValue)
+                .where(MEASURABLE.ID.eq(id))
+                .execute();
+    }
 }

@@ -62,7 +62,7 @@ import static com.khartec.waltz.common.StringUtilities.mkSafe;
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
-@PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = false)
+@PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = true)
 public class DIConfiguration implements SchedulingConfigurer {
 
     // -- DATABASE ---
@@ -101,13 +101,13 @@ public class DIConfiguration implements SchedulingConfigurer {
 
     // -- BUILD ---
 
-    @Value("${build.pom}")
+    @Value("${build.pom:dev}")
     private String buildPom;
 
-    @Value("${build.date}")
+    @Value("${build.date:dev}")
     private String buildDate;
 
-    @Value("${build.revision}")
+    @Value("${build.revision:dev}")
     private String buildRevision;
 
     @Value("${settings.override:#{null}}")

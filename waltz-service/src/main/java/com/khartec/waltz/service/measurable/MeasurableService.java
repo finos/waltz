@@ -67,8 +67,8 @@ public class MeasurableService {
 
     /**
      * Includes parents, this should probably be deprecated and rolled into findByMeasureableIdSelector
-     * @param ref
-     * @return
+     * @param ref Entity reference of item to search against
+     * @return List of measurable related to the given entity `ref`
      */
     public List<Measurable> findMeasurablesRelatedToEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
@@ -95,5 +95,15 @@ public class MeasurableService {
 
     public Collection<Measurable> findByExternalId(String extId) {
         return measurableDao.findByExternalId(extId);
+    }
+
+
+    public Measurable getById(long id) {
+        return measurableDao.getById(id);
+    }
+
+
+    public int updateConcreteFlag(Long id, boolean newValue) {
+        return measurableDao.updateConcreteFlag(id, newValue);
     }
 }
