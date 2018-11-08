@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.StringChangeCommand;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
 import com.khartec.waltz.service.entity_named_note.EntityNamedNoteService;
@@ -68,7 +69,7 @@ public class EntityNamedNoteEndpoint implements Endpoint {
 
         DatumRoute<Boolean> removeRoute = (req, res) -> {
             EntityReference ref = getEntityReference(req);
-            ensureHasPermission(ref.kind(), req);
+            ensureHasPermission(ref.kind(), req, Operation.REMOVE);
             return entityNamedNoteService.remove(
                     ref,
                     getLong(req,"noteTypeId"),
@@ -77,7 +78,7 @@ public class EntityNamedNoteEndpoint implements Endpoint {
 
         DatumRoute<Boolean> saveRoute = (req, res) -> {
             EntityReference ref = getEntityReference(req);
-            ensureHasPermission(ref.kind(), req);
+            ensureHasPermission(ref.kind(), req, Operation.ADD);
             StringChangeCommand command = readBody(req, StringChangeCommand.class);
             return entityNamedNoteService.save(
                     ref,
@@ -92,8 +93,8 @@ public class EntityNamedNoteEndpoint implements Endpoint {
     }
 
 
-    private void ensureHasPermission(EntityKind kind, Request req) {
-        requireEditRoleForEntity(userRoleService, req, kind);
+    private void ensureHasPermission(EntityKind kind, Request req, Operation op) {
+        requireEditRoleForEntity(userRoleService, req, kind, op, EntityKind.ENTITY_NAMED_NOTE);
     }
 
 }

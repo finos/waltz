@@ -25,6 +25,7 @@ import com.khartec.waltz.model.user.Role;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.FunctionUtilities.alwaysBi;
@@ -44,11 +45,23 @@ public class RoleUtilities {
     }
 
 
+    /**
+     * Shorthand for `getRequiredRoleForEntityKind(kind, null, null)`
+     *
+     * @param kind Primary entity kind
+     * @return required role
+     */
     public static Role getRequiredRoleForEntityKind(EntityKind kind) {
         return getRequiredRoleForEntityKind(kind, null, null);
     }
 
 
+    /**
+     * @param kind Primary entity kind involved in this request
+     * @param op Operation to perform (ignored)
+     * @param additionalKind Secondary entity kind involved in request
+     * @return Role - required role for this
+     */
     public static Role getRequiredRoleForEntityKind(EntityKind kind, Operation op, EntityKind additionalKind) {
         return REQUIRED_ROLES
                 .getOrDefault(kind, REQUIRE_ADMIN)
@@ -68,8 +81,16 @@ public class RoleUtilities {
     }
 
 
+    /*
+     * If the additional kind is set we are more relaxed as the request is probably for something like
+     * a relationship or a bookmark.  If it is not given it is a direct edit on the measurable and
+     * is restricted to those with the `TAXONOMY_EDITOR` role.
+     */
     private static Role getRequiredRoleForMeasurable(Operation op, EntityKind additionalKind) {
-        return Role.CAPABILITY_EDITOR;
+        return Optional
+                .ofNullable(additionalKind)
+                .map(k -> Role.CAPABILITY_EDITOR)
+                .orElse(Role.TAXONOMY_EDITOR);
     }
 
 

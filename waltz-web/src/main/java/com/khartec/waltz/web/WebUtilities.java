@@ -134,11 +134,13 @@ public class WebUtilities {
 
     public static void requireEditRoleForEntity(UserRoleService userRoleService,
                                                 Request req,
-                                                EntityKind kind) {
+                                                EntityKind kind,
+                                                Operation op,
+                                                EntityKind additionalKind) {
         requireRole(
                 userRoleService,
                 req,
-                getRequiredRoleForEntityKind(kind));
+                getRequiredRoleForEntityKind(kind, op, additionalKind));
     }
 
 
@@ -179,8 +181,8 @@ public class WebUtilities {
 
     /**
      * Expect parameter to be called: <code>kind</code>
-     * @param request
-     * @return
+     * @param request Http request
+     * @return Entity Kind parsed from the param named 'kind'
      */
     public static EntityKind getKind(Request request) {
        return getKind(request, "kind");
@@ -189,9 +191,9 @@ public class WebUtilities {
 
     /**
      * Expect parameter to be called: <code>kind</code>
-     * @param request
-     * @param paramName
-     * @return
+     * @param request Http request
+     * @param paramName Name of the paramter which contains the entity kind value
+     * @return The parsed entity kind
      */
     public static EntityKind getKind(Request request, String paramName) {
         checkNotNull(request, "request must not be null");
@@ -201,8 +203,8 @@ public class WebUtilities {
 
     /**
      * Expects parameters :kind and :id
-     * @param request
-     * @return
+     * @param request Http request
+     * @return EntityReferenced parsed from parameters 'kind' and 'id'
      */
     public static EntityReference getEntityReference(Request request) {
         return getEntityReference(request, "kind", "id");
@@ -211,8 +213,10 @@ public class WebUtilities {
 
     /**
      * Expects parameters :kind and :id
-     * @param request
-     * @return
+     * @param request Http request
+     * @param kindParamName Name of the parameter containing the entity kind
+     * @param idParamName Name of the parameter containing the (Long) id
+     * @return Entity Reference parsed from the kind and id params
      */
     public static EntityReference getEntityReference(Request request, String kindParamName, String idParamName) {
         checkNotNull(request, "request must not be null");
@@ -227,11 +231,11 @@ public class WebUtilities {
      * Reads the body of the request and attempts to convert it into an instance of
      * the given class.
      *
-     * @param request
-     * @param objClass
-     * @param <T>
-     * @return
-     * @throws IOException
+     * @param request Http request
+     * @param objClass Class of the object we are parsing
+     * @param <T> Object type
+     * @return Instance of the object parsed from the request body
+     * @throws IOException If the object representation could not be parsed
      */
     public static <T> T readBody(Request request,
                                  Class<T> objClass) throws IOException {
@@ -255,9 +259,11 @@ public class WebUtilities {
         return readBody(req, List.class);
     }
 
+
     public static IdSelectionOptions readIdSelectionOptionsFromBody(Request request) throws java.io.IOException {
         return readBody(request, IdSelectionOptions.class);
     }
+
 
     public static EntityIdSelectionOptions readEntityIdOptionsFromBody(Request request) throws java.io.IOException {
         return readBody(request, EntityIdSelectionOptions.class);
@@ -270,11 +276,11 @@ public class WebUtilities {
      * the given class. If the attempt fails then return the given default object
      * instead of throwing an exception.
      *
-     * @param request
-     * @param objClass
-     * @param dflt
-     * @param <T>
-     * @return
+     * @param request http request
+     * @param objClass Class of the object we are parsing
+     * @param <T> Object type
+     * @param dflt An instance of T to return if parsing fails
+     * @return Instance of the object parsed from the request body
      */
     public static <T> T readBody(Request request,
                                  Class<T> objClass,
