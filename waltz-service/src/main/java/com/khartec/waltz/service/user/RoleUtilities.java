@@ -20,24 +20,61 @@
 package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.user.Role;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+import static com.khartec.waltz.common.FunctionUtilities.alwaysBi;
 import static com.khartec.waltz.model.user.Role.*;
 
 public class RoleUtilities {
 
-    public static Role getRequiredRoleForEntityKind(EntityKind kind) {
-        switch (kind) {
-            case APPLICATION:
-                return APP_EDITOR;
-            case CHANGE_INITIATIVE:
-                return CHANGE_INITIATIVE_EDITOR;
-            case MEASURABLE:
-                return CAPABILITY_EDITOR;
-            case ORG_UNIT:
-                return ORG_UNIT_EDITOR;
-            default:
-                return ADMIN;
-        }
+    private static final BiFunction<Operation, EntityKind, Role> REQUIRE_ADMIN = alwaysBi(ADMIN);
+    private static final Map<EntityKind, BiFunction<Operation, EntityKind, Role>> REQUIRED_ROLES = new HashMap<>();
+
+
+    static {
+        REQUIRED_ROLES.put(EntityKind.APPLICATION, RoleUtilities::getRequiredRoleForApplication);
+        REQUIRED_ROLES.put(EntityKind.CHANGE_INITIATIVE, RoleUtilities::getRequiredRoleForChangeInitiative);
+        REQUIRED_ROLES.put(EntityKind.MEASURABLE, RoleUtilities::getRequiredRoleForMeasurable);
+        REQUIRED_ROLES.put(EntityKind.ORG_UNIT, RoleUtilities::getRequiredRoleForOrgUnit);
     }
+
+
+    public static Role getRequiredRoleForEntityKind(EntityKind kind) {
+        return getRequiredRoleForEntityKind(kind, null, null);
+    }
+
+
+    public static Role getRequiredRoleForEntityKind(EntityKind kind, Operation op, EntityKind additionalKind) {
+        return REQUIRED_ROLES
+                .getOrDefault(kind, REQUIRE_ADMIN)
+                .apply(op, additionalKind);
+    }
+
+
+    // -- helpers
+
+    private static Role getRequiredRoleForApplication(Operation op, EntityKind additionalKind) {
+        return APP_EDITOR;
+    }
+
+
+    private static Role getRequiredRoleForChangeInitiative(Operation op, EntityKind additionalKind) {
+        return CHANGE_INITIATIVE_EDITOR;
+    }
+
+
+    private static Role getRequiredRoleForMeasurable(Operation op, EntityKind additionalKind) {
+        return Role.CAPABILITY_EDITOR;
+    }
+
+
+    private static Role getRequiredRoleForOrgUnit(Operation op, EntityKind additionalKind) {
+        return Role.ORG_UNIT_EDITOR;
+    }
+
 }
