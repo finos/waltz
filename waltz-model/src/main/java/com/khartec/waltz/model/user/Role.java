@@ -42,6 +42,7 @@ public enum Role {
     SCENARIO_EDITOR,
     SURVEY_ADMIN,
     SURVEY_TEMPLATE_ADMIN,
+    TAXONOMY_EDITOR,
     USER_ADMIN
     ;
 
