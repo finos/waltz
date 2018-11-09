@@ -28,6 +28,17 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
+/**
+ * A measurable category represents a classifier for a hierarchy of
+ * {@link com.khartec.waltz.model.measurable.Measurable} items.
+ * Together they can be thought of as a taxonomy.  Common categories include:
+ *
+ * <ul>
+ *     <li>Service</li>
+ *     <li>Function</li>
+ *     <li>Product</li>
+ * </ul>
+ */
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableCategory.class)
 @JsonDeserialize(as = ImmutableMeasurableCategory.class)
@@ -44,11 +55,25 @@ public abstract class MeasurableCategory implements
     @Value.Default
     public EntityKind kind() { return EntityKind.MEASURABLE_CATEGORY; }
 
+    /**
+     * Indicates if the measurables in the category may be edited from within the tool.
+     * This should only be enabled for taxonomies which are entirely managed from within
+     * Waltz.
+     *
+     * @return true if this measurables in this category can be edited
+     */
     @Value.Default
-    public List<RagName> ragNames() {
-        return RatingScheme.toList();
+    public boolean editable() {
+        return false;
     }
 
+    /**
+     * A category is linked to a Rating Scheme which provides a mechanism to describe
+     * application alignments to this category.  These schemes are typically variants
+     * of RAG ratings, or investment ratings.
+     *
+     * @return id which links to a {@link RatingScheme}
+     */
     public abstract long ratingSchemeId();
 
 }
