@@ -17,23 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import * as measurableStore from './services/measurable-store';
-import MeasurableSummary from './components/summary/measurable-summary';
-import MeasurableTree from './components/tree/measurable-tree';
-import Routes from './routes';
+import angular from "angular";
+import MeasurableStore from "./services/measurable-store";
+import MeasurableSummary from "./components/summary/measurable-summary";
+import MeasurableTree from "./components/tree/measurable-tree";
+import MeasurableInfo from "./components/info/measurable-info";
+import Routes from "./routes";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 
 export default () => {
+    const module = angular.module("waltz.measurable", []);
 
-    const module = angular.module('waltz.measurable', []);
+    registerStores(module, [
+        MeasurableStore ]);
 
-    module
-        .component('waltzMeasurableSummary', MeasurableSummary)
-        .component('waltzMeasurableTree', MeasurableTree);
-
-    module
-        .service(measurableStore.serviceName, measurableStore.store);
+    registerComponents(module, [
+        MeasurableInfo,
+        MeasurableTree,
+        MeasurableSummary ]);
 
     module
         .config(Routes);

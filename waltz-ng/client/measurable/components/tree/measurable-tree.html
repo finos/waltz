@@ -34,17 +34,22 @@
           popover-popup-delay="200"
           ng-class="{ 'text-muted': node.rating == null }"
           class="no-overflow">
-        <a ui-sref='main.measurable.view ({id: node.id })'
+        <span ng-if="$ctrl.onSelect"
+              class="clickable"
+              ng-click="$ctrl.onSelect(node)">
+            <span ng-include="'wmt/measurable-node.html'"></span>
+        </span>
+        <a ng-if="!$ctrl.onSelect"
+           ui-state="$ctrl.linkToState"
+           ui-state-params="{id: node.id }"
            ng-class="{ 'italics' : ! node.concrete }">
-            <span ng-bind="node.name"></span>
-            <span class="wml-bar-chart"
-                  ng-if="node.totalCount > 0"
-                  ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}">
-            </span>
+            <span ng-include="'wmt/measurable-node.html'"></span>
         </a>
     </span>
 </treecontrol>
 
+
+<!-- SUB-COMPONENTS -->
 
 <!-- DESCRIPTION POPUP -->
 <script type="text/ng-template"
@@ -56,4 +61,14 @@
             <span ng-bind="node.totalCount"></span> applications
         </div>
     </div>
+</script>
+
+<!-- NODE CONTENT -->
+<script type="text/ng-template"
+        id="wmt/measurable-node.html">
+    <span ng-bind="node.name"></span>
+    <span class="wml-bar-chart"
+          ng-if="node.totalCount > 0"
+          ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}">
+    </span>
 </script>
