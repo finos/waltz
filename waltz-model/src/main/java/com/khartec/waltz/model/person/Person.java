@@ -37,6 +37,7 @@ public abstract class Person implements
     public abstract String employeeId();
     public abstract String displayName();
     public abstract String email();
+    public abstract boolean isRemoved();
     public abstract PersonKind personKind();
     public abstract Optional<String> title();
     public abstract Optional<String> mobilePhone();
@@ -59,6 +60,7 @@ public abstract class Person implements
                 .kind(EntityKind.PERSON)
                 .id(id().get())
                 .name(displayName())
+                .entityLifecycleStatus(this.isRemoved() ? EntityLifecycleStatus.REMOVED : EntityLifecycleStatus.ACTIVE)
                 .build();
     }
 }
