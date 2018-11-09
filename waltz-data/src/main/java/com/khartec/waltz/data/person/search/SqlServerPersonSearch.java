@@ -28,6 +28,7 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,17 +45,19 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
             return Collections.emptyList();
         }
 
-        Condition is_removed = PERSON.IS_REMOVED.isFalse();
+        boolean showRemoved = options
+                .entityLifecycleStatuses()
+                .contains(EntityLifecycleStatus.REMOVED);
 
-        boolean showRemoved = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED);
-        if (showRemoved) {
-            is_removed = PERSON.IS_REMOVED.isNotNull();
-        }
+        Condition maybeFilterRemoved = showRemoved
+            ? DSL.trueCondition()  // match anything
+            : PERSON.IS_REMOVED.isFalse();
 
-        return dsl.select(PERSON.fields())
+        return dsl
+                .select(PERSON.fields())
                 .from(PERSON)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
-                .and(is_removed)
+                .and(maybeFilterRemoved)
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);
     }

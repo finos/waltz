@@ -9,9 +9,9 @@
         </ol>
     </waltz-page-header>
 
-    <div class="row waltz-sealed">
+    <div class="row">
         <div class="col-sm-12">
-            <div ng-class="ctrl.person.isRemoved ? 'ws-inactive' : ''">
+            <div ng-class="{ 'ws-inactive' : ctrl.person.isRemoved }">
                 <div class="waltz-page-summary-attach waltz-page-summary"
                                name="Summary">
 

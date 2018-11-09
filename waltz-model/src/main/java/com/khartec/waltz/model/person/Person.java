@@ -60,7 +60,7 @@ public abstract class Person implements
                 .kind(EntityKind.PERSON)
                 .id(id().get())
                 .name(displayName())
-                .entityLifecycleStatus(this.isRemoved() ? EntityLifecycleStatus.REMOVED : EntityLifecycleStatus.ACTIVE)
+                .entityLifecycleStatus(EntityLifecycleStatus.fromIsRemovedFlag(this.isRemoved()))
                 .build();
     }
 }

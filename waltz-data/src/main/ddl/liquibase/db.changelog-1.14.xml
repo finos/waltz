@@ -30,6 +30,7 @@
             <column name="is_removed"
                     type="boolean"
                     defaultValueBoolean="false">
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>

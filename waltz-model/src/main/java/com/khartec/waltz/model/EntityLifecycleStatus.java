@@ -23,5 +23,10 @@ public enum EntityLifecycleStatus {
 
     ACTIVE,
     PENDING,
-    REMOVED
+    REMOVED;
+
+
+    public static EntityLifecycleStatus fromIsRemovedFlag(boolean isRemoved) {
+        return isRemoved ? REMOVED : ACTIVE;
+    }
 }
