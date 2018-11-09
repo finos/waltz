@@ -214,7 +214,8 @@ function controller($q,
             const contract =  {
                 title: "Decrease width",
                 action: (elm, d) => $timeout(() => {
-                    vm.layoutOptions.maxColWidths[d.id] = Math.max(--vm.layoutOptions.maxColWidths[d.id] || 0, vm.layoutOptions.defaultColMaxWidth);
+                    const newMaxColWidth = (vm.layoutOptions.maxColWidths[d.id] || 0) - 1;
+                    vm.layoutOptions.maxColWidths[d.id] = Math.max(newMaxColWidth, vm.layoutOptions.defaultColMaxWidth);
                     vm.vizData = prepData();
                 })
             };
@@ -222,9 +223,7 @@ function controller($q,
             const expand = {
                 title: "Increase width",
                 action: (elm, d) => $timeout(() => {
-                    vm.layoutOptions.maxColWidths[d.id] = Math.max(
-                        ++vm.layoutOptions.maxColWidths[d.id] || vm.layoutOptions.defaultColMaxWidth + 1,
-                        vm.layoutOptions.defaultColMaxWidth);
+                    vm.layoutOptions.maxColWidths[d.id] = (vm.layoutOptions.maxColWidths[d.id] || vm.layoutOptions.defaultColMaxWidth) + 1;
                     vm.vizData = prepData();
                 })
             };
