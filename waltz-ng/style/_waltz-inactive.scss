@@ -4,7 +4,6 @@
     position:absolute;
     top: 2em;
     left: 40%;
-    -ms-transform: rotate(-45deg); /* IE */
     transform: rotate(-45deg);
 
     font-family:Arial,sans-serif;
@@ -15,10 +14,8 @@
     border:solid 4px #c00;
     border-radius:5px;
 
-    filter:alpha(opacity=20);
     opacity:0.1;
 
-    -webkit-text-shadow: 0 0 2px #c00;
     text-shadow: 0 0 2px #c00;
     box-shadow: 0 0 2px #c00;
 }
