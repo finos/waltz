@@ -46,7 +46,7 @@ public class MeasurableCategoryDao {
                 .description(r.getDescription())
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
-                .ragNames(RatingScheme.toList())
+                .editable(r.getEditable())
                 .build();
     };
 

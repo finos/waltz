@@ -162,8 +162,8 @@ via the `user_role` table.  The set of roles is determined by the enum `com.khar
 
 ### Phase 1 - interim design
 We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type 
-taxonomies. An additional column/field will be added to `measurable_category` to determine whether a 
-category is editable.  This will help prevent accidental damage to other taxonomies.  
+taxonomies. An additional column, `editable`, will be added to `measurable_category` to determine whether a 
+category may be modified.  This will help prevent accidental damage to other taxonomies.  
 
 The main drawback to this proposal is the lack of fine-grained control.  Any category that is flagged
 as editable may potentially be modified by any person with the `TAXONOMY_EDITOR` role.
