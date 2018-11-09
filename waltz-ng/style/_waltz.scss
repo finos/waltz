@@ -301,6 +301,36 @@ textarea {
     border-top-right-radius: 0;
 }
 
+.waltz-sealed {
+    vertical-align:top;
+    box-sizing:border-box;
+
+    .ws-inactive:after {
+        content:"INACTIVE";
+        position:absolute;
+        top: 2em;
+        left: 40%;
+        z-index:1;
+        font-family:Arial,sans-serif;
+        -webkit-transform: rotate(-45deg); /* Safari */
+        -moz-transform: rotate(-45deg); /* Firefox */
+        -ms-transform: rotate(-45deg); /* IE */
+        -o-transform: rotate(-45deg); /* Opera */
+        transform: rotate(-45deg);
+        font-size:60px;
+        color:#c00;
+        background:#fff;
+        border:solid 4px #c00;
+        border-radius:5px;
+        zoom:1;
+        filter:alpha(opacity=20);
+        opacity:0.1;
+        -webkit-text-shadow: 0 0 2px #c00;
+        text-shadow: 0 0 2px #c00;
+        box-shadow: 0 0 2px #c00;
+    }
+}
+
 
 .waltz-side-nav-help {
   @extend small;

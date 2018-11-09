@@ -14,7 +14,8 @@
 
     <!-- SUMMARY -->
     <waltz-person-summary parent-entity-ref="ctrl.entityRef"
-                          ng-if="ctrl.entityRef">
+                          ng-if="ctrl.entityRef"
+                          ng-class="ctrl.person.isRemoved ? 'waltz-sealed' : ''">
     </waltz-person-summary>
 
 
