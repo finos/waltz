@@ -1,10 +1,12 @@
-import template from "./roadmap-scenario-diagram.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event, select, selectAll} from "d3-selection";
 import roles from "../../../user/roles";
+
+import template from "./roadmap-scenario-diagram.html";
+
 
 const bindings = {
     scenarioId: "<",
@@ -35,13 +37,15 @@ const component = {
 
 
 const initialState = {
+    dialog: null,
     handlers: {},
+    hiddenAxes: [],
+    lastRatings: {},
+    mode: modes.VIEW,
     permissions: {
         admin: false,
         edit: false
-    },
-    mode: modes.VIEW,
-    dialog: null
+    }
 };
 
 
@@ -112,6 +116,11 @@ function controller($q,
     };
 
 
+    function prepData() {
+        return prepareData(vm.scenarioDefn, vm.applications, vm.measurables, vm.hiddenAxes);
+    }
+
+
     function mkNodeMenu() {
         return () => {
             hideInfoPopup();
@@ -165,7 +174,6 @@ function controller($q,
     }
 
     function mkNodeGridMenu() {
-
         return () => {
             hideInfoPopup();
             if (!vm.permissions.edit) {
@@ -185,13 +193,28 @@ function controller($q,
         };
     }
 
+
+    function mkAxisItemMenu() {
+        return () => {
+            return [
+                {
+                    title: "Hide",
+                    action: (elm, d) => $timeout(() => {
+                        if(vm.hiddenAxes.length === 0) {
+                            notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
+                        }
+                        vm.hiddenAxes.push(d);
+                        vm.vizData = prepData();
+                    })
+                }
+            ];
+        };
+    }
+
+
     function reload() {
         loadApplications(loadScenario())
-            .then(() => vm.vizData =
-                prepareData(
-                    vm.scenarioDefn,
-                    vm.applications,
-                    vm.measurables));
+            .then(() => vm.vizData = prepData());
     }
 
     function loadScenario() {
@@ -296,6 +319,7 @@ function controller($q,
             contextMenus: {
                 node: mkNodeMenu(),
                 nodeGrid: mkNodeGridMenu(),
+                axisItem: mkAxisItemMenu()
             }
         };
     }
@@ -314,10 +338,7 @@ function controller($q,
 
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
-            .then(() => vm.vizData = prepareData(
-                vm.scenarioDefn,
-                vm.applications,
-                vm.measurables));
+            .then(() => vm.vizData = prepData());
 
         vm.handlers = setupHandlers();
 
@@ -327,6 +348,16 @@ function controller($q,
                 admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
                 edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
             });
+    };
+
+
+    const getLastOrDefaultRating = (app) => {
+        const getDefaultRating = () => _.chain(vm.ratingsByCode)
+            .values()
+            .sortBy(["position"])
+            .head()
+            .value();
+        return _.get(vm.lastRatings, [app.id], getDefaultRating())
     };
 
 
@@ -343,21 +374,23 @@ function controller($q,
     };
 
     vm.onAddApplication = (app) => {
+        const lastOrDefaultRating = getLastOrDefaultRating(app);
+
         const args = [
             vm.scenarioDefn.scenario.id,
             app.id,
             vm.selectedColumn.id,
             vm.selectedRow.id,
-            "G"
+            lastOrDefaultRating
         ];
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.addRating,
                 args)
             .then(() => {
+                _.remove(vm.dialog.applicationPickList, a => a.id === app.id);
                 reload();
                 notification.success("Added rating");
-                vm.onCloseDialog();
             });
     };
 
@@ -370,6 +403,7 @@ function controller($q,
             workingState.rating,
             workingState.comment
         ];
+
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.updateRating,
@@ -378,11 +412,22 @@ function controller($q,
                 reload();
                 notification.success("Edited rating");
                 vm.onCloseDialog();
+                vm.lastRatings[item.id] = workingState.rating;
             });
     };
 
     vm.onCloseDialog = () => {
         vm.dialog = null;
+    };
+
+    vm.unhideAxis = (axis) => {
+        _.remove(vm.hiddenAxes, (d => d.id === axis.id));
+        vm.vizData = prepData();
+    };
+
+    vm.unhideAllAxes = () => {
+        vm.hiddenAxes = [];
+        vm.vizData = prepData();
     };
 }
 

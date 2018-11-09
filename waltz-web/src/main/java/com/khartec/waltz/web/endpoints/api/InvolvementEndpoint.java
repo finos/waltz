@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
@@ -109,8 +110,13 @@ public class InvolvementEndpoint implements Endpoint {
 
     private Boolean updateEntityInvolvement(Request request) throws java.io.IOException {
         EntityReference entityReference = getEntityReference(request);
-        requireEditRoleForEntity(userRoleService, request, entityReference.kind());
         EntityInvolvementChangeCommand command = readBody(request, EntityInvolvementChangeCommand.class);
+        requireEditRoleForEntity(
+                userRoleService,
+                request,
+                entityReference.kind(),
+                command.operation(),
+                EntityKind.ENTITY_NAMED_NOTE);
         String username = getUsername(request);
 
         switch (command.operation()) {

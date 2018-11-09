@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -30,7 +31,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePhysicalSpecDefinitionChangeCommand.class)
 @JsonDeserialize(as = ImmutablePhysicalSpecDefinitionChangeCommand.class)
-public abstract class PhysicalSpecDefinitionChangeCommand implements IdProvider {
+public abstract class PhysicalSpecDefinitionChangeCommand implements Command, IdProvider {
 
     public abstract String version();
     public abstract ReleaseLifecycleStatus status();

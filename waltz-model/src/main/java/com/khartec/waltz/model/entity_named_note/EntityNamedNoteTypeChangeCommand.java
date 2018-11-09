@@ -22,6 +22,7 @@ package com.khartec.waltz.model.entity_named_note;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -31,7 +32,7 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityNamedNoteTypeChangeCommand.class)
 @JsonDeserialize(as = ImmutableEntityNamedNoteTypeChangeCommand.class)
-public abstract class EntityNamedNoteTypeChangeCommand {
+public abstract class EntityNamedNoteTypeChangeCommand implements Command {
     public abstract Optional<Set<EntityKind>> applicableEntityKinds();
     public abstract Optional<String> name();
     public abstract Optional<String> description();

@@ -23,13 +23,14 @@ package com.khartec.waltz.model.authoritativesource;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.command.Command;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAuthoritativeSourceCreateCommand.class)
 @JsonDeserialize(as = ImmutableAuthoritativeSourceCreateCommand.class)
-public abstract class AuthoritativeSourceCreateCommand implements DescriptionProvider {
+public abstract class AuthoritativeSourceCreateCommand implements Command, DescriptionProvider {
     public abstract AuthoritativenessRating rating();
     public abstract long dataTypeId();
     public abstract long applicationId();

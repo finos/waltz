@@ -25,6 +25,7 @@ import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ import java.util.Set;
 @JsonSerialize(as = ImmutableAttestationRunCreateCommand.class)
 @JsonDeserialize(as = ImmutableAttestationRunCreateCommand.class)
 public abstract class AttestationRunCreateCommand implements
+        Command,
         NameProvider,
         DescriptionProvider {
 

@@ -1,0 +1,20 @@
+<div>
+    <span ng-bind="$ctrl.ratingScheme.name"></span>
+    <span ng-bind="$ctrl.ratingScheme.description"
+          class="text-muted small">
+    </span>
+
+    <ul class="list-unstyled small">
+        <li ng-repeat="rating in $ctrl.ratingScheme.ratings">
+
+            <waltz-rating-indicator-cell rating="rating"
+                                         show-name="true">
+            </waltz-rating-indicator-cell>
+
+            <div class="small text-muted"
+                 ng-if="rating.description"
+                 ng-bind="rating.description">
+            </div>
+        </li>
+    </ul>
+</div>

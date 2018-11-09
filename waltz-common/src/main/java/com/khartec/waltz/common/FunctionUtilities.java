@@ -22,10 +22,12 @@ package com.khartec.waltz.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Created by dwatkins on 26/12/2015.
+ * Collection of utility methods to make working with functions simpler and more expressive
  */
 public class FunctionUtilities {
 
@@ -41,13 +43,33 @@ public class FunctionUtilities {
     public static void discardResult(Object x) {
     }
 
-    public static <T> T time(String name, Supplier<T> s) {
+
+    /**
+     * Intended to be used to do ad-hoc informal timings of functions.
+     * The time taken by the function is logged out (info level) and the
+     * natural result of the timed function is returned, allowing this
+     * utility method to be easily introduced.
+     *
+     * <pre>
+     * String r = possiblySlowCalc(x, y);
+     *
+     * // => becomes
+     *
+     * String r = FunctionUtilities.time("timing possiblySlowCalc", () -> possibleSlowCalc(x, y));
+     * </pre>
+     *
+     * @param name The name to use when logging timing information
+     * @param supplier The function that performs the calculation to be timed
+     * @param <T> Return type of the supplier
+     * @return
+     */
+    public static <T> T time(String name, Supplier<T> supplier) {
         // LOG.info("-- begin [" + name + "]");
 
         long st = System.currentTimeMillis();
 
         try {
-            T r = s.get();
+            T r = supplier.get();
             long end = System.currentTimeMillis();
 
             // LOG.info("-- end [" + name + "]");
@@ -55,9 +77,37 @@ public class FunctionUtilities {
             //LOG.info("-- result [" + name + "]: " + r);
             return r;
         } catch (Exception e) {
-            LOG.error("Unexpected error when timing: "+name, e);
+            String msg = String.format("Unexpected error when timing [%s]: %s", name, e.getMessage());
+            LOG.error(msg, e);
             return null;
         }
 
+    }
+
+
+    /**
+     * Returns a `BiFunction` which always ignores its arguments and returns
+     * a constant
+     * @param result The constant value to return
+     * @param <X> Type of argument 1
+     * @param <Y> Type of argument 2
+     * @param <Z> Type of return value
+     * @return Always returns the `result` object
+     */
+    public static <X, Y, Z> BiFunction<X, Y, Z> alwaysBi(Z result) {
+        return (x, y) -> result;
+    }
+
+
+    /**
+     * Returns a `Function` which always ignores its arguments and returns
+     * a constant
+     * @param result The constant value to return
+     * @param <X> Type of argument 1
+     * @param <Y> Type of return value
+     * @return Always returns the `result` object
+     */
+    public static <X, Y> Function<X, Y> always(Y result) {
+        return (x) -> result;
     }
 }
