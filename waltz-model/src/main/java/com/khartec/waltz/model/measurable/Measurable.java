@@ -25,6 +25,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+/**
+ * A Measurable represents a specific instance of an item in a hierarchical taxonomy.
+ * Measurables may be classified as concrete, in which case applications should
+ * be allowed to map directly to this Measurable.  Non concrete measurables should
+ * not allow mappings to be linked to them.
+ */
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurable.class)
 @JsonDeserialize(as = ImmutableMeasurable.class)
@@ -40,7 +46,16 @@ public abstract class Measurable implements
         ProvenanceProvider,
         WaltzEntity {
 
+    /**
+     * The category to which this measurable belongs
+     * @return id which references a {@link com.khartec.waltz.model.measurable_category.MeasurableCategory}
+     */
     public abstract long categoryId();
+
+    /**
+     * A flag which indicates if this measurable may be used in application ratings.
+     * @return true if allowed
+     */
     public abstract boolean concrete();
 
     @Value.Default
