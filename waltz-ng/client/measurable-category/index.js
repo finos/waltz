@@ -19,19 +19,18 @@
 
 
 import angular from "angular";
-import * as categoryStore from "./services/measurable-category-store";
+import CategoryStore from "./services/measurable-category-store";
 import Routes from "./routes";
+import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-texonomy-changes-list"
+import {registerComponents, registerStores} from "../common/module-utils";
 
 export default () => {
-
     const module = angular.module("waltz.measurable-category", []);
 
-    module
-        .service(categoryStore.serviceName, categoryStore.store);
+    registerStores(module, [ CategoryStore ]);
+    registerComponents(module, [ PendingTaxonomyChangesList ]);
 
-    module
-        .config(Routes);
-
+    module.config(Routes);
 
     return module.name;
 };

@@ -1,6 +1,20 @@
-<a class="clickable no-text-select"
+<!-- EDITABLE -->
+<a ng-if="!$ctrl.readOnly"
+   class="clickable no-text-select"
    style="text-decoration: none"
    ng-click="$ctrl.onToggle()">
+    <span ng-include="'wt/toggle-content.html'"></span>
+</a>
+
+<!-- READ-ONLY -->
+<span ng-if="$ctrl.readOnly">
+    <span ng-include="'wt/toggle-content.html'"></span>
+</span>
+
+
+<!-- NODE CONTENT -->
+<script type="text/ng-template"
+        id="wt/toggle-content.html">
     <span ng-show="$ctrl.state">
         <span style="font-size: larger">
             <waltz-icon name="{{ $ctrl.iconOn }}"></waltz-icon>
@@ -14,4 +28,4 @@
         </span>
         <span ng-bind="$ctrl.labelOff"></span>
     </span>
-</a>
+</script>

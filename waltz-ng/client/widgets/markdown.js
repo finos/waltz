@@ -18,7 +18,7 @@
  */
 
 const bindings = {
-    text: '<'
+    text: "<"
 };
 
 
@@ -29,14 +29,9 @@ const template = `
     </span>`;
 
 
-function controller() {
-}
-
-
 const component = {
     bindings,
-    template,
-    controller
+    template
 };
 
 

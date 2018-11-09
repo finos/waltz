@@ -19,26 +19,28 @@
  */
 
 import {initialiseData} from "../common/index";
-import template from './toggle.html';
+import template from "./toggle.html";
 
 
 const bindings = {
-    labelOn: '@',
-    labelOff: '@',
-    iconOn: '@',
-    iconOff: '@',
-    onToggle: '&',
-    state: '<'
+    labelOn: "@",
+    labelOff: "@",
+    iconOn: "@",
+    iconOff: "@",
+    onToggle: "&",
+    state: "<",
+    readOnly: "<"
 };
 
 
 const initialState = {
-    labelOn: '',
-    labelOff: '',
-    iconOn: 'toggle-on',
-    iconOff: 'toggle-off',
-    onToggle: () => console.log('no on-toggle handler supplied to waltz-toggle component'),
-    state: false
+    labelOn: "",
+    labelOff: "",
+    iconOn: "toggle-on",
+    iconOff: "toggle-off",
+    onToggle: () => console.log("no on-toggle handler supplied to waltz-toggle component"),
+    state: false,
+    readOnly: false
 };
 
 

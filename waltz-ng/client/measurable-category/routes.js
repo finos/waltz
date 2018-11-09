@@ -1,5 +1,6 @@
 import _ from "lodash";
 import ListView from "./pages/list/measurable-category-list.js";
+import EditView from "./pages/edit/measurable-category-edit.js";
 import {lastViewedMeasurableCategoryKey} from "../user/services/user-preference-service";
 
 
@@ -50,12 +51,20 @@ const listState = {
     }
 };
 
+const editState = {
+    url: "measurable-category/{id:int}/edit",
+    views: {
+        "content@": EditView
+    }
+};
+
 
 function setup($stateProvider) {
     $stateProvider
         .state("main.measurable-category", baseState)
         .state("main.measurable-category.index", bouncerState)
-        .state("main.measurable-category.list", listState);
+        .state("main.measurable-category.list", listState)
+        .state("main.measurable-category.edit", editState);
 }
 
 

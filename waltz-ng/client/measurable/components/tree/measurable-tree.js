@@ -29,16 +29,23 @@ import template from "./measurable-tree.html";
  * @name waltz-measurable-tree
  *
  * @description
- * This component ...
+ * This component displays a measurable hierarchy in a tree control.
+ * By default each node in the tree will link to the corresponding
+ * measurable view page.  This behaviour can be overriden by
+ * passing in either an `on-select` callback function or by
+ * passing in a `link-to-state` name
  */
 
 
 const bindings = {
     measurables: "<",
+    onSelect: "<?",
+    linkToState: "@?"
 };
 
 
 const initialState = {
+    linkToState: "main.measurable.view",
     expandedNodes: [],
     hierarchy: [],
     searchNodes: [],
@@ -119,4 +126,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: "waltzMeasurableTree"
+};

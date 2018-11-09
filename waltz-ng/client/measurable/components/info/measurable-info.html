@@ -1,0 +1,37 @@
+<div class="row">
+    <div class="col-sm-4 waltz-display-field-label">
+        Name
+    </div>
+    <div class="col-sm-8">
+        <span ng-bind="$ctrl.measurable.name"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 waltz-display-field-label">
+        External Id
+    </div>
+    <div class="col-sm-8">
+        <span ng-bind="$ctrl.measurable.externalId"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 waltz-display-field-label">
+        Concrete
+    </div>
+    <div class="col-sm-8">
+        <waltz-toggle state="$ctrl.measurable.concrete"
+                      read-only="true"
+                      label-on="Concrete"
+                      label-off="Not concrete">
+        </waltz-toggle>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-4 waltz-display-field-label">
+        Description
+    </div>
+    <div class="col-sm-8">
+        <waltz-markdown text="$ctrl.measurable.description">
+        </waltz-markdown>
+    </div>
+</div>
