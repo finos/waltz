@@ -1,7 +1,8 @@
+import _ from "lodash";
 import {CELL_DIMENSIONS, ROW_CELL_DIMENSIONS, ROW_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {NODE_DIMENSIONS} from "./scenario-diagram-static-node-utils";
 import {truncate} from "../../../common/string-utils";
-import { d3ContextMenu } from '../../../common/d3-context-menu';
+import {d3ContextMenu} from "../../../common/d3-context-menu";
 
 export const rowAxisWidth = 150;
 export const columnAxisHeight = 50;
