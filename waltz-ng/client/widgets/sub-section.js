@@ -23,6 +23,7 @@ import {initialiseData} from "../common/index";
 
 const bindings = {
     name: "@",
+    small: "@",
     showBorder: "<",
 };
 

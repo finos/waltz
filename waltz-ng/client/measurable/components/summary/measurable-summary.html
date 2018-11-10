@@ -1,85 +1,92 @@
 <div class="waltz-page-summary waltz-page-summary-attach">
+
+    <waltz-no-data ng-if="!$ctrl.measurable">
+        <message>No information for this measurable</message>
+    </waltz-no-data>
+
     <div ng-if="$ctrl.measurable">
+
+        <!-- OVERVIEW -->
         <div class="row">
-            <div class="col-sm-2 waltz-display-field-label">
-                Description
+            <div class="col-sm-5">
+                <waltz-sub-section name="Overview">
+                    <content>
+                        <div style="padding:8px">
+                            <waltz-measurable-info measurable="$ctrl.measurable">
+                            </waltz-measurable-info>
+                        </div>
+                    </content>
+
+                </waltz-sub-section>
             </div>
-            <div class="col-sm-10 text-muted">
-                <waltz-markdown text="$ctrl.measurable.description"
-                                ng-if="$ctrl.measurable.description">
-                </waltz-markdown>
-                <span ng-if="!$ctrl.measurable.description">
-                    Description not provided
-                </span>
+
+            <!-- STATS -->
+            <div class="col-sm-7">
+                <div ng-if="$ctrl.applications.length > 0 || $ctrl.relationshipStats.length > 0">
+                    <waltz-sub-section name="Stats">
+                        <content>
+                            <div class="row" style="padding: 8px">
+                                <div class="col-sm-4"
+                                     ng-if="$ctrl.applications.length > 0">
+                                    <waltz-basic-info-tile name="App Stats"
+                                                           icon="rocket">
+                                        <div style="font-size: large;"
+                                             waltz-jump-to="costs-section">
+                                            Cost:
+                                            <waltz-currency-amount amount="$ctrl.totalCost.amount"
+                                                                   simplify="true">
+                                            </waltz-currency-amount>
+                                        </div>
+                                        <div style="font-size: large;"
+                                             waltz-jump-to="complexity-section">
+                                            Complexity:
+                                            <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1"></span>
+                                        </div>
+                                        <div style="font-size: large;"
+                                             ng-if="$ctrl.enrichedServerStats.total > 0"
+                                             waltz-jump-to="technologies-section">
+                                            Servers #:
+                                            <span ng-bind="$ctrl.enrichedServerStats.total"></span>
+                                        </div>
+                                    </waltz-basic-info-tile>
+                                </div>
+
+                                <div class="col-sm-4"
+                                     ng-if="$ctrl.applications.length > 0">
+                                    <waltz-apps-by-investment-pie applications="$ctrl.applications"
+                                                                  size="70">
+                                    </waltz-apps-by-investment-pie>
+                                </div>
+
+                                <div class="col-sm-4"
+                                     ng-if="$ctrl.relationshipStats.length > 0">
+                                    <waltz-basic-info-tile name="Relationships"
+                                                           waltz-jump-to="related-measurables"
+                                                           icon="link">
+                                        <div ng-repeat="category in $ctrl.relationshipStats"
+                                             style="font-size: large;">
+                                            <span ng-bind="category.name"></span>:
+                                            <span ng-bind="category.count"></span>
+                                        </div>
+                                    </waltz-basic-info-tile>
+                                </div>
+                            </div>
+                        </content>
+                    </waltz-sub-section>
+                </div>
             </div>
         </div>
-
-
-        <!-- APP SUMMARY STATS -->
-        <div ng-if="$ctrl.applications.length > 0 || $ctrl.relationshipStats.length > 0">
-            <hr>
-            <div class="row">
-                <div class="col-sm-4"
-                     ng-if="$ctrl.applications.length > 0">
-                    <waltz-basic-info-tile name="App Stats"
-                                           icon="rocket">
-                        <div style="font-size: large;"
-                             waltz-jump-to="costs-section">
-                            Cost:
-                            <waltz-currency-amount amount="$ctrl.totalCost.amount"
-                                                   simplify="true">
-                            </waltz-currency-amount>
-                        </div>
-                        <div style="font-size: large;"
-                             waltz-jump-to="complexity-section">
-                            Complexity:
-                            <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1"></span>
-                        </div>
-                        <div style="font-size: large;"
-                             ng-if="$ctrl.enrichedServerStats.total > 0"
-                             waltz-jump-to="technologies-section">
-                            Servers #:
-                            <span ng-bind="$ctrl.enrichedServerStats.total"></span>
-                        </div>
-                    </waltz-basic-info-tile>
-                </div>
-
-                <div class="col-sm-4"
-                     ng-if="$ctrl.applications.length > 0">
-                    <waltz-apps-by-investment-pie applications="$ctrl.applications"
-                                                  size="70">
-                    </waltz-apps-by-investment-pie>
-                </div>
-
-                <div class="col-sm-4"
-                     ng-if="$ctrl.relationshipStats.length > 0">
-                    <waltz-basic-info-tile name="Relationships"
-                                           waltz-jump-to="related-measurables"
-                                           icon="link">
-                        <div ng-repeat="category in $ctrl.relationshipStats"
-                             style="font-size: large;">
-                            <span ng-bind="category.name"></span>:
-                            <span ng-bind="category.count"></span>
-                        </div>
-                    </waltz-basic-info-tile>
-                </div>
-            </div>
-        </div>
-
-        <hr>
 
         <!-- NAV -->
         <div class="row"
              style="padding: 1em">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <waltz-immediate-hierarchy-navigator parents="$ctrl.parentRefs"
                                                      children="$ctrl.childRefs">
                 </waltz-immediate-hierarchy-navigator>
             </div>
         </div>
     </div>
-    <waltz-no-data ng-if="!$ctrl.measurable">
-        <message>No information for this measurable</message>
-    </waltz-no-data>
+
 
 </div>

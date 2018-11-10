@@ -64,7 +64,7 @@
              ng-show="$ctrl.mode === 'NODE_VIEW'">
             <div class="col-sm-6">
 
-                <waltz-sub-section name="{{$ctrl.selectedMeasurable.name}}">
+                <waltz-sub-section name="Overview">
                     <content>
                         <div style="padding: 8px">
                             <waltz-measurable-info measurable="$ctrl.selectedMeasurable">
@@ -78,11 +78,21 @@
                             </a>
                         </div>
                     </content>
+                </waltz-sub-section>
+            </div>
 
+            <div class="col-sm-6">
+                <waltz-sub-section name="Operations">
+                    <content>
+                        <div style="padding:8px">
+                            <waltz-measurable-change-control measurable="$ctrl.selectedMeasurable">
+
+                            </waltz-measurable-change-control>
+                        </div>
+                    </content>
                 </waltz-sub-section>
 
             </div>
-        </div>
 
 
     </div>
