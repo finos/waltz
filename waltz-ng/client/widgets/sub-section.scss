@@ -17,6 +17,11 @@
         letter-spacing: 1px;
         background-color: #f6f6f6;
     }
+
+    .wss-small-name {
+        @extend .wss-name;
+        font-size: 9px;
+    }
 }
 
 

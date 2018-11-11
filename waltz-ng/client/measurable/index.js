@@ -19,9 +19,10 @@
 
 import angular from "angular";
 import MeasurableStore from "./services/measurable-store";
-import MeasurableSummary from "./components/summary/measurable-summary";
-import MeasurableTree from "./components/tree/measurable-tree";
+import MeasurableChangeControl from "./components/change-control/measurable-change-control";
 import MeasurableInfo from "./components/info/measurable-info";
+import MeasurableTree from "./components/tree/measurable-tree";
+import MeasurableSummary from "./components/summary/measurable-summary";
 import Routes from "./routes";
 import {registerComponents, registerStores} from "../common/module-utils";
 
@@ -33,6 +34,7 @@ export default () => {
         MeasurableStore ]);
 
     registerComponents(module, [
+        MeasurableChangeControl,
         MeasurableInfo,
         MeasurableTree,
         MeasurableSummary ]);

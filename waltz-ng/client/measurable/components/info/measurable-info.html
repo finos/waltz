@@ -31,7 +31,11 @@
         Description
     </div>
     <div class="col-sm-8">
-        <waltz-markdown text="$ctrl.measurable.description">
+        <waltz-markdown ng-if="$ctrl.measurable.description"
+                        text="$ctrl.measurable.description">
         </waltz-markdown>
+        <span ng-if="!$ctrl.measurable.description">
+            Description not provided
+        </span>
     </div>
 </div>
