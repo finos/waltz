@@ -27,7 +27,7 @@
  *   - allowed actions to return a `result` object which is passed to the `onClose` callback handler
  */
 
-import {selectAll, select, event} from "d3-selection";
+import {event, select, selectAll} from "d3-selection";
 
 
 export function d3ContextMenu(menu, opts) {
@@ -74,7 +74,7 @@ export function d3ContextMenu(menu, opts) {
             .append("ul");
 
         list.selectAll("li")
-            .data(typeof menu === "function" ? menu(data) : menu)
+            .data(typeof menu === "function" ? menu(data, elem, index) : menu)
             .enter()
             .append("li")
             .classed("is-divider", d => d.divider)

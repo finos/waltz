@@ -41,6 +41,10 @@ const initialState = {
     handlers: {},
     hiddenAxes: [],
     lastRatings: {},
+    layoutOptions: {
+        defaultColMaxWidth: 2,
+        maxColWidths: {}, // { domainItemId: width }
+    },
     mode: modes.VIEW,
     permissions: {
         admin: false,
@@ -195,19 +199,40 @@ function controller($q,
 
 
     function mkAxisItemMenu() {
-        return () => {
-            return [
-                {
-                    title: "Hide",
-                    action: (elm, d) => $timeout(() => {
-                        if(vm.hiddenAxes.length === 0) {
-                            notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
-                        }
-                        vm.hiddenAxes.push(d);
-                        vm.vizData = prepData();
-                    })
-                }
-            ];
+        return (data, elem, index) => {
+            const hide = {
+                title: "Hide",
+                action: (elm, d) => $timeout(() => {
+                    if(vm.hiddenAxes.length === 0) {
+                        notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
+                    }
+                    vm.hiddenAxes.push(d);
+                    vm.vizData = prepData();
+                })
+            };
+
+            const contract =  {
+                title: "Decrease width",
+                action: (elm, d) => $timeout(() => {
+                    const newMaxColWidth = (vm.layoutOptions.maxColWidths[d.id] || 0) - 1;
+                    vm.layoutOptions.maxColWidths[d.id] = Math.max(newMaxColWidth, vm.layoutOptions.defaultColMaxWidth);
+                    vm.vizData = prepData();
+                })
+            };
+
+            const expand = {
+                title: "Increase width",
+                action: (elm, d) => $timeout(() => {
+                    vm.layoutOptions.maxColWidths[d.id] = (vm.layoutOptions.maxColWidths[d.id] || vm.layoutOptions.defaultColMaxWidth) + 1;
+                    vm.vizData = prepData();
+                })
+            };
+
+            return _.compact([
+                hide,
+                data.axisOrientation === 'COLUMN' ? contract : null,
+                data.axisOrientation === 'COLUMN' ? expand : null
+            ]);
         };
     }
 

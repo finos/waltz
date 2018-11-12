@@ -53,28 +53,7 @@
 
             <div ng-if="$ctrl.visibility.diagramControls">
                 <div class="row">
-                    <div class="col-sm-8">
-                        <div>
-                            <label>Pan & Zoom:</label>
-                            <br>
-                            <button class="btn btn-primary btn-sm"
-                                    ng-if="! $ctrl.panAndZoomEnabled"
-                                    ng-click="$ctrl.enablePanAndZoom()">
-                                Enable pan & zoom
-                            </button>
-                            <button class="btn btn-primary btn-sm"
-                                    ng-if="$ctrl.panAndZoomEnabled"
-                                    ng-click="$ctrl.disablePanAndZoom()">
-                                Disable pan & zoom
-                            </button>
-                            <button class="btn btn-primary btn-sm"
-                                    ng-click="$ctrl.resetPanAndZoom()">
-                                Reset
-                            </button>
-                        </div>
-
-                        <br>
-
+                    <div class="col-sm-6">
                         <div>
                             <label>Sort by:</label>
                             <br>
@@ -118,9 +97,30 @@
                                 </a>
                             </div>
                         </div>
+
+                        <br>
+
+                        <div>
+                            <label>Pan & Zoom:</label>
+                            <br>
+                            <button class="btn btn-primary btn-sm"
+                                    ng-if="! $ctrl.panAndZoomEnabled"
+                                    ng-click="$ctrl.enablePanAndZoom()">
+                                Enable pan & zoom
+                            </button>
+                            <button class="btn btn-primary btn-sm"
+                                    ng-if="$ctrl.panAndZoomEnabled"
+                                    ng-click="$ctrl.disablePanAndZoom()">
+                                Disable pan & zoom
+                            </button>
+                            <button class="btn btn-primary btn-sm"
+                                    ng-click="$ctrl.resetPanAndZoom()">
+                                Reset
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <label>Legend:</label>
                         <br>
                         <waltz-rating-scheme-legend rating-scheme="$ctrl.ratingScheme">
