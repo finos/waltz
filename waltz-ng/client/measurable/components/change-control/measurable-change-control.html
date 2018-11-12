@@ -31,12 +31,31 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
+                <hr>
+                <div ng-switch="$ctrl.selectedOperation.code">
+                    <div ng-switch-when="CONCRETE">
+
+                    </div>
+                    <div ng-switch-default>
+                        Operation
+                        <code ng-bind="$ctrl.selectedOperation.code"></code>
+                        ( <span ng-bind="$ctrl.selectedOperation.name"></span> )
+                        not yet implemented.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
                 <a ng-click="$ctrl.onDismiss()"
                    class="clickable">
                     Close
                 </a>
             </div>
         </div>
+
     </div>
 
 </div>
@@ -49,6 +68,12 @@
     <ul class="list-unstyled">
         <li ng-repeat="opt in menu.options">
             <a class="clickable"
+               uib-popover-template="'wmcc/operation-popup.html'"
+               popover-append-to-body="true"
+               popover-placement="top"
+               popover-trigger="mouseenter click"
+               popover-enable="opt.description"
+               popover-popup-delay="200"
                ng-click="$ctrl.onSelectOperation(opt)"
                ng-style="{color: menu.color}">
                 <waltz-icon name="{{opt.icon}}"></waltz-icon>
@@ -58,5 +83,12 @@
     </ul>
     <div class="help-block"
          ng-bind-html="menu.description">
+    </div>
+</script>
+
+<script type="text/ng-template"
+        id="wmcc/operation-popup.html">
+    <div class="small">
+        <div ng-bind-html="opt.description"></div>
     </div>
 </script>
