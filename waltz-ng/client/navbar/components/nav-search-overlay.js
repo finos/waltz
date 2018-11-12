@@ -25,25 +25,25 @@ import template from "./nav-search-overlay.html";
 const ESCAPE_KEYCODE = 27;
 
 const bindings = {
-    query: '@',
-    onDismiss: '<',
-    visible: '<'
+    query: "@",
+    onDismiss: "<",
+    visible: "<"
 };
 
 
 const initialState = {
     categories: [
-        'APPLICATION',
-        'PERSON',
-        'ACTOR',
-        'CHANGE_INITIATIVE',
-        'DATA_TYPE',
-        'APP_GROUP',
-        'ORG_UNIT',
-        'MEASURABLE',
-        'PHYSICAL_SPECIFICATION',
-        'LOGICAL_DATA_ELEMENT',
-        'ROADMAP'
+        "APPLICATION",
+        "PERSON",
+        "ACTOR",
+        "CHANGE_INITIATIVE",
+        "DATA_TYPE",
+        "APP_GROUP",
+        "ORG_UNIT",
+        "MEASURABLE",
+        "PHYSICAL_SPECIFICATION",
+        "LOGICAL_DATA_ELEMENT",
+        "ROADMAP"
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -84,25 +84,25 @@ function controller($element,
         }
 
         if(vm.visible) {
-            const input = $element.find('input')[0];
+            const input = $element.find("input")[0];
             input.focus();
-            $timeout(() => $document.on('click', documentClick), 200);
-            $timeout(() => $element.on('keydown', vm.onOverlayKeypress), 200);
+            $timeout(() => $document.on("click", documentClick), 200);
+            $timeout(() => $element.on("keydown", vm.onOverlayKeypress), 200);
         }  else {
-            $document.off('click', documentClick);
-            $element.off('keydown', vm.onOverlayKeypress);
+            $document.off("click", documentClick);
+            $element.off("keydown", vm.onOverlayKeypress);
         }
     };
 
     vm.$onDestroy = () => {
-        $document.off('click', documentClick);
+        $document.off("click", documentClick);
     };
 
     vm.dismiss = () => {
         if (vm.onDismiss) {
             vm.onDismiss();
         } else {
-            console.log('No dismiss handler registered');
+            console.log("No dismiss handler registered");
         }
     };
 
@@ -121,9 +121,6 @@ function controller($element,
     // helper fn, to reduce boilerplate
     const handleSearch = (query, entityKind) => {
         const statuses = vm.showActiveOnly
-
-
-
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
 
@@ -144,24 +141,24 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, 'APPLICATION');
-        handleSearch(query, 'CHANGE_INITIATIVE');
-        handleSearch(query, 'DATA_TYPE');
-        handleSearch(query, 'PERSON');
-        handleSearch(query, 'MEASURABLE');
-        handleSearch(query, 'ORG_UNIT');
-        handleSearch(query, 'ACTOR');
-        handleSearch(query, 'PHYSICAL_SPECIFICATION');
-        handleSearch(query, 'APP_GROUP');
-        handleSearch(query, 'LOGICAL_DATA_ELEMENT');
-        handleSearch(query, 'ROADMAP');
+        handleSearch(query, "APPLICATION");
+        handleSearch(query, "CHANGE_INITIATIVE");
+        handleSearch(query, "DATA_TYPE");
+        handleSearch(query, "PERSON");
+        handleSearch(query, "MEASURABLE");
+        handleSearch(query, "ORG_UNIT");
+        handleSearch(query, "ACTOR");
+        handleSearch(query, "PHYSICAL_SPECIFICATION");
+        handleSearch(query, "APP_GROUP");
+        handleSearch(query, "LOGICAL_DATA_ELEMENT");
+        handleSearch(query, "ROADMAP");
     };
 
     vm.doSearch = () => doSearch(vm.query);
 
     vm.clearSearch = () => {
         vm.results = {};
-        vm.query = '';
+        vm.query = "";
         vm.selectedCategory = null;
     };
 
@@ -183,17 +180,17 @@ function controller($element,
     };
 
     vm.toggleActiveOnly = () => {
-       vm.showActiveOnly = ! vm.showActiveOnly;
-       vm.doSearch();
+        vm.showActiveOnly = ! vm.showActiveOnly;
+        vm.doSearch();
     };
 }
 
 
 controller.$inject = [
-    '$element',
-    '$document',
-    '$timeout',
-    'ServiceBroker'
+    "$element",
+    "$document",
+    "$timeout",
+    "ServiceBroker"
 ];
 
 
@@ -206,5 +203,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzNavSearchOverlay'
+    id: "waltzNavSearchOverlay"
 };

@@ -1,0 +1,21 @@
+.ws-inactive:after {
+    content:"INACTIVE";
+
+    position:absolute;
+    top: 2em;
+    left: 40%;
+    transform: rotate(-45deg);
+
+    font-family:Arial,sans-serif;
+    font-size:60px;
+
+    color:#c00;
+
+    border:solid 4px #c00;
+    border-radius:5px;
+
+    opacity:0.1;
+
+    text-shadow: 0 0 2px #c00;
+    box-shadow: 0 0 2px #c00;
+}
