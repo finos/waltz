@@ -18,20 +18,35 @@
  */
 
 
-import angular from "angular";
-import CategoryStore from "./services/measurable-category-store";
-import TaxonomyManagementStore from "./services/taxonomy-management-store";
-import Routes from "./routes";
-import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-texonomy-changes-list"
-import {registerComponents, registerStores} from "../common/module-utils";
+function store($http, baseApiUrl) {
+    const baseUrl = `${baseApiUrl}/taxonomy-management`;
 
-export default () => {
-    const module = angular.module("waltz.measurable-category", []);
+    const preview = (cmd) => $http
+        .post(`${baseUrl}/preview`, [ cmd ])
+        .then(d => d.data);
 
-    registerStores(module, [ CategoryStore, TaxonomyManagementStore ]);
-    registerComponents(module, [ PendingTaxonomyChangesList ]);
+    return {
+        preview
+    };
 
-    module.config(Routes);
+}
 
-    return module.name;
+store.$inject = ["$http", "BaseApiUrl"];
+
+
+const serviceName = "TaxonomyManagementStore";
+
+
+export default {
+    serviceName,
+    store
+};
+
+
+export const TaxonomyManagementStore_API = {
+    preview: {
+        serviceName,
+        serviceFnName: "preview",
+        description: "preview the effect of a command [ cmd ]"
+    }
 };

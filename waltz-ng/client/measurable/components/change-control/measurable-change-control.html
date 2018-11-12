@@ -33,8 +33,15 @@
             <div class="col-sm-12">
                 <hr>
                 <div ng-switch="$ctrl.selectedOperation.code">
-                    <div ng-switch-when="CONCRETE">
-
+                    <div ng-switch-when="UPDATE_CONCRETENESS">
+                        <p>
+                            The concrete flag for this taxonomy item is currently set
+                            to <kbd ng-bind="$ctrl.measurable.concrete"></kbd>.
+                        </p>
+                        <p>
+                            Setting it to <kbd ng-bind="! $ctrl.measurable.concrete"></kbd>
+                            will have the following impact:
+                        </p>
                     </div>
                     <div ng-switch-default>
                         Operation
