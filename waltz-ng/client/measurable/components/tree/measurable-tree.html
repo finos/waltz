@@ -41,8 +41,7 @@
         </span>
         <a ng-if="!$ctrl.onSelect"
            ui-state="$ctrl.linkToState"
-           ui-state-params="{id: node.id }"
-           ng-class="{ 'italics' : ! node.concrete }">
+           ui-state-params="{id: node.id }">
             <span ng-include="'wmt/measurable-node.html'"></span>
         </a>
     </span>
@@ -66,8 +65,10 @@
 <!-- NODE CONTENT -->
 <script type="text/ng-template"
         id="wmt/measurable-node.html">
-    <span ng-bind="node.name"></span>
-    <span class="wml-bar-chart"
+    <span ng-class="{ 'italics' : ! node.concrete }"
+          ng-bind="node.name">
+    </span>
+    <span class="wmt-bar-chart"
           ng-if="node.totalCount > 0"
           ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}">
     </span>
