@@ -4,6 +4,7 @@ public enum TaxonomyChangeType {
 
     ADD,
     REMOVE,
+    DEPRECATE,
     UPDATE_NAME,
     UPDATE_DESCRIPTION,
     UPDATE_CONCRETENESS,

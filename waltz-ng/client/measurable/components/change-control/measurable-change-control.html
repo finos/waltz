@@ -1,0 +1,101 @@
+<div ng-switch="$ctrl.mode">
+
+    <div ng-switch-when="MENU">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4>Available Options</h4>
+                <div class="help-block">
+                    Select an operation from the menu below.
+                    Hover over each item to see a more detailed description.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4"
+                 ng-repeat="menu in $ctrl.menus">
+                <!-- incl: MENU -->
+                <div ng-include="'wmcc/menu.html'"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-switch-when="OPERATION">
+        <div class="row">
+            <div class="col-sm-12">
+                <h4 ng-bind="$ctrl.selectedOperation.title || $ctrl.selectedOperation.name"></h4>
+                <div class="help-block"
+                     ng-bind-html="$ctrl.selectedOperation.description">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
+                <div ng-switch="$ctrl.selectedOperation.code">
+                    <div ng-switch-when="UPDATE_CONCRETENESS">
+                        <p>
+                            The concrete flag for this taxonomy item is currently set
+                            to <kbd ng-bind="$ctrl.measurable.concrete"></kbd>.
+                        </p>
+                        <p>
+                            Setting it to <kbd ng-bind="! $ctrl.measurable.concrete"></kbd>
+                            will have the following impact:
+                        </p>
+                    </div>
+                    <div ng-switch-default>
+                        Operation
+                        <code ng-bind="$ctrl.selectedOperation.code"></code>
+                        ( <span ng-bind="$ctrl.selectedOperation.name"></span> )
+                        not yet implemented.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <hr>
+                <a ng-click="$ctrl.onDismiss()"
+                   class="clickable">
+                    Close
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- template: MENU -->
+<script type="text/ng-template"
+        id="wmcc/menu.html">
+    <h5 ng-bind="menu.name"></h5>
+    <ul class="list-unstyled">
+        <li ng-repeat="opt in menu.options">
+            <a class="clickable"
+               uib-popover-template="'wmcc/operation-popup.html'"
+               popover-append-to-body="true"
+               popover-placement="top"
+               popover-trigger="mouseenter click"
+               popover-enable="opt.description"
+               popover-popup-delay="200"
+               ng-click="$ctrl.onSelectOperation(opt)"
+               ng-style="{color: menu.color}">
+                <waltz-icon name="{{opt.icon}}"></waltz-icon>
+                <span ng-bind="opt.name"></span>
+            </a>
+        </li>
+    </ul>
+    <div class="help-block"
+         ng-bind-html="menu.description">
+    </div>
+</script>
+
+<script type="text/ng-template"
+        id="wmcc/operation-popup.html">
+    <div class="small">
+        <div ng-bind-html="opt.description"></div>
+    </div>
+</script>

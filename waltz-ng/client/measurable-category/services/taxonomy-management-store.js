@@ -17,24 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const bindings = {
-    text: "<"
+
+function store($http, baseApiUrl) {
+    const baseUrl = `${baseApiUrl}/taxonomy-management`;
+
+    const preview = (cmd) => $http
+        .post(`${baseUrl}/preview`, [ cmd ])
+        .then(d => d.data);
+
+    return {
+        preview
+    };
+
+}
+
+store.$inject = ["$http", "BaseApiUrl"];
+
+
+const serviceName = "TaxonomyManagementStore";
+
+
+export default {
+    serviceName,
+    store
 };
 
 
-const template = `
-    <span ng-if="$ctrl.text" 
-          class="waltz-markdown" 
-          markdown-to-html="$ctrl.text">
-    </span>`;
-
-
-const component = {
-    bindings,
-    template
+export const TaxonomyManagementStore_API = {
+    preview: {
+        serviceName,
+        serviceFnName: "preview",
+        description: "preview the effect of a command [ cmd ]"
+    }
 };
-
-
-export default component;
-
-

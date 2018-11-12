@@ -16,3 +16,14 @@
         margin-left: 4px;
     }
 }
+
+.wmt-bar-chart {
+    display: inline-block;
+    background-color: #d5dfff;
+    height: 6px;
+    border: 1px solid #9eacde;
+    &:hover {
+        height: 8px;
+        background-color: #bec7e3;
+    }
+}

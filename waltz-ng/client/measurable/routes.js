@@ -19,7 +19,6 @@
 
 import _ from "lodash";
 import UnitView from "./pages/measurable-view/measurable-view";
-import ListView from "./pages/list-view/measurable-list";
 
 import {CORE_API} from "../common/services/core-api-utils";
 
@@ -31,15 +30,6 @@ const viewState = {
     url: "measurable/{id:int}",
     views: {
         "content@": UnitView
-    }
-};
-
-
-const listState = {
-    url: "measurable?{category:int}",
-    reloadOnSearch: false,
-    views: {
-        "content@": ListView
     }
 };
 
@@ -90,7 +80,6 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.measurableBouncer", bouncerState)
         .state("main.measurable", baseState)
-        .state("main.measurable.list", listState)
         .state("main.measurable.view", viewState);
 }
 

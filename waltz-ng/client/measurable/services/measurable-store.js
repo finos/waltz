@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks"
 
 
-export function store($http, baseApiUrl) {
+function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/measurable`;
 
     const findAll = () => $http
@@ -58,36 +58,43 @@ export function store($http, baseApiUrl) {
 
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+
+store.$inject = ["$http", "BaseApiUrl"];
 
 
-export const serviceName = 'MeasurableStore';
+const serviceName = "MeasurableStore";
+
+
+export default {
+    store,
+    serviceName
+};
 
 
 export const MeasurableStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'findAll'
+        serviceFnName: "findAll",
+        description: "findAll"
     },
     findByExternalId: {
         serviceName,
-        serviceFnName: 'findByExternalId',
-        description: 'saves an entity named note'
+        serviceFnName: "findByExternalId",
+        description: "saves an entity named note"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'executes search'
+        serviceFnName: "search",
+        description: "executes search"
     },
     findMeasurablesRelatedToPath: {
         serviceName,
-        serviceFnName: 'findMeasurablesRelatedToPath',
-        description: 'executes findMeasurablesRelatedToPath'
+        serviceFnName: "findMeasurablesRelatedToPath",
+        description: "executes findMeasurablesRelatedToPath"
     },
     findMeasurablesBySelector: {
         serviceName,
-        serviceFnName: 'findMeasurablesBySelector',
-        description: 'executes findMeasurablesBySelector'
+        serviceFnName: "findMeasurablesBySelector",
+        description: "executes findMeasurablesBySelector"
     }
 };
