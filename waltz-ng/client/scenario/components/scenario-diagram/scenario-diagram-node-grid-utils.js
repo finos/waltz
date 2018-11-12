@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-static-node-utils";
 import {checkTrue} from "../../../common/checks";
 import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
@@ -63,23 +64,26 @@ export function drawNodeGrid(selection, options) {
  * @returns {{data: Array, layout: {colCount: number, rowCount: number}}}
  **/
 export function nodeGridLayout(data = [], coords, options = defaultOptions) {
-    checkTrue(options.cols > 0, "gridLayout: Num cols must be greater than zero");
+    checkTrue(options.defaultColMaxWidth > 0, "gridLayout: Num cols must be greater than zero");
+    // head is safe because the whole data array deals with the same domain coordinates
+    const columnDomainId = _.get(_.head(data), ["domainCoordinates", "column", "id"]);
+    const maxColWidth = options.maxColWidths[columnDomainId] || options.defaultColMaxWidth;
 
     const dataWithLayout = _
         .chain(data)
         .orderBy(options.sortFn)
         .map((d, idx) => {
             const layout = {
-                col: idx % options.cols,
-                row: Math.floor(idx / options.cols)
+                col: idx % maxColWidth,
+                row: Math.floor(idx / maxColWidth)
             };
             return Object.assign({}, d, { layout });
         })
         .value();
 
     const layout = {
-        colCount: Math.min(options.cols, data.length) || EMPTY_CELL_WIDTH,
-        rowCount: Math.ceil(data.length / options.cols) || EMPTY_CELL_HEIGHT
+        colCount: Math.min(maxColWidth, data.length) || EMPTY_CELL_WIDTH,
+        rowCount: Math.ceil(data.length / maxColWidth) || EMPTY_CELL_HEIGHT
     };
 
     return {

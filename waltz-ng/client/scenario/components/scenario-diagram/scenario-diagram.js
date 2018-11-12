@@ -40,6 +40,7 @@ const bindings = {
     columnHeadings: "<",
     handlers: "<?",
     hiddenAxes: "<?",
+    layoutOptions: "<?",
 
     onUnhideAxis: "<?",
     onUnhideAllAxes: "<?",
@@ -66,6 +67,10 @@ const initialState = {
         diagramControls: false
     },
     ratingScheme: null,
+    layoutOptions: {
+        defaultColMaxWidth: 2,
+        sortFn: d => d.node.name
+    },
 
     onUnhideAxis: (axis) => console.log("WSD: UnhideAxis", axis),
     onUnhideAllAxes: (axis) => console.log("WSD: UnhideAllAxes", axis)
@@ -133,13 +138,13 @@ function controller($element, $timeout, serviceBroker) {
         const newContextMenus =  _.reduce(
             handlers.contextMenus,
             (acc, fn, k) => {
-                acc[k] = () => {
+                acc[k] = (data, elm, idx) => {
                     const panAction = vm.panAndZoomEnabled
                         ? (enablePanAndZoomAction)
                         : (disablePanAndZoomAction);
                     const newItems = [ panAction, resetViewAction ];
 
-                    const existingItems = fn();
+                    const existingItems = fn(data, elm, idx);
 
                     return isEmpty(existingItems)
                         ? newItems
@@ -159,17 +164,20 @@ function controller($element, $timeout, serviceBroker) {
             const filteredData = filterData(vm.rowData, vm.qry);
             const ratingsByCode = _.keyBy(vm.ratingScheme.ratings, "rating");
 
-            let sortFn = d => d.node.name;
-            if(vm.sortBy === SORT_COLUMN.RATING) {
-                sortFn = d => ratingsByCode[d.state.rating] ? ratingsByCode[d.state.rating].position : d.node.name;
+            switch (vm.sortBy) {
+                case SORT_COLUMN.RATING:
+                    vm.layoutOptions.sortFn = d => ratingsByCode[d.state.rating] ? ratingsByCode[d.state.rating].position : d.node.name;
+                    break;
+                case SORT_COLUMN.NAME:
+                    vm.layoutOptions.sortFn = d => d.node.name;
+                    break;
             }
 
-            const layoutOptions = { cols: 2, sortFn };
             const dataWithLayout = gridLayout(
                 filteredData,
                 vm.columnHeadings,
                 vm.rowHeadings,
-                layoutOptions);
+                vm.layoutOptions);
 
             const drawingOptions = {
                 colorScale,

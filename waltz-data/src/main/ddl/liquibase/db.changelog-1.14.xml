@@ -22,6 +22,19 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.14.xml">
 
+    <!-- 3565 - add is_removed to person -->
+    <changeSet id="20181109-3565-1"
+               author="xuanyiliu">
+        <comment>3565: add new column is_removed to Person</comment>
+        <addColumn tableName="person">
+            <column name="is_removed"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <!-- 3561: add 'editable' column to the measurable category table -->
     <changeSet id="20181109-3561-1"
                author="davidwatkins73">
