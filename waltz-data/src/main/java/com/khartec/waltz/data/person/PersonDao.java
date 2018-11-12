@@ -64,6 +64,7 @@ public class PersonDao {
                 .mobilePhone(Optional.ofNullable(record.getMobilePhone()))
                 .officePhone(Optional.ofNullable(record.getOfficePhone()))
                 .organisationalUnitId(Optional.ofNullable(record.getOrganisationalUnitId()))
+                .isRemoved(record.getIsRemoved())
                 .build();
     };
     private final DSLContext dsl;
@@ -99,6 +100,7 @@ public class PersonDao {
         return dsl.select()
                 .from(PERSON)
                 .where(PERSON.EMAIL.eq(userName))
+                .andNot(PERSON.IS_REMOVED)
                 .fetchOne(personMapper);
     }
 
@@ -108,6 +110,7 @@ public class PersonDao {
         return dsl.select()
                 .from(PERSON)
                 .where(dsl.renderInlined(PERSON.MANAGER_EMPLOYEE_ID.eq(employeeId)))
+                .andNot(PERSON.IS_REMOVED)
                 .orderBy(PERSON.DISPLAY_NAME)
                 .fetch(personMapper);
     }
@@ -123,6 +126,7 @@ public class PersonDao {
                 .join(PERSON_HIERARCHY)
                 .on(PERSON.EMPLOYEE_ID.eq(PERSON_HIERARCHY.MANAGER_ID))
                 .where(PERSON_HIERARCHY.EMPLOYEE_ID.eq(employeeId))
+                .andNot(PERSON.IS_REMOVED)
                 .orderBy(PERSON_HIERARCHY.LEVEL.desc())
                 .fetch(personMapper);
     }
@@ -131,6 +135,7 @@ public class PersonDao {
     public List<Person> all() {
         return dsl.select()
                 .from(PERSON)
+                .where(PERSON.IS_REMOVED.eq(false))
                 .fetch(personMapper);
     }
 
@@ -147,6 +152,7 @@ public class PersonDao {
                     r.setDisplayName(p.displayName());
                     r.setEmployeeId(p.employeeId());
                     r.setEmail(p.email());
+                    r.setIsRemoved(p.isRemoved());
                     r.setKind(p.personKind().name());
                     r.setDepartmentName(p.departmentName().orElse(""));
                     r.setManagerEmployeeId(p.managerEmployeeId().orElse(""));
@@ -177,6 +183,7 @@ public class PersonDao {
                 .innerJoin(PERSON)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(PERSON.EMAIL))
                 .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(instanceId))
+                .andNot(PERSON.IS_REMOVED)
                 .fetch(personMapper);
     }
 
@@ -191,6 +198,7 @@ public class PersonDao {
                 .innerJoin(PERSON)
                 .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
+                .andNot(PERSON.IS_REMOVED)
                 .groupBy(PERSON.KIND)
                 .fetchMap(r -> PersonKind.valueOf(r.get(PERSON.KIND)), r -> r.get(countField));
     }
