@@ -27,16 +27,17 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 const initialState = {
     changeInitiatives: [],
     selectedChangeInitiative: null,
-    editor: 'SINGLE',
-    canDelete: false
+    editor: "SINGLE",
+    canDelete: false,
+    history: []
 };
 
 
 function setup(groupDetail) {
     const { applications, members, appGroup } = groupDetail;
 
-    const owners = _.filter(members, m => m.role === 'OWNER' );
-    const viewers = _.filter(members, m => m.role === 'VIEWER' );
+    const owners = _.filter(members, m => m.role === "OWNER" );
+    const viewers = _.filter(members, m => m.role === "VIEWER" );
 
     return {
         owners,
@@ -57,7 +58,7 @@ function navigateToLastView($state, historyStore) {
     if (lastHistoryItem) {
         $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
     } else {
-        $state.go('main.home');
+        $state.go("main.home");
     }
 }
 
@@ -78,15 +79,15 @@ function removeFromHistory(historyStore, appGroup) {
 function mkHistoryObj(appGroup) {
     return {
         name: appGroup.name,
-        kind: 'APP_GROUP',
-        state: 'main.app-group.view',
+        kind: "APP_GROUP",
+        state: "main.app-group.view",
         stateParams: { id: appGroup.id }
     };
 }
 
 function recalcMembers(data) {
-    const owners = _.filter(data, m => m.role === 'OWNER');
-    const viewers = _.filter(data, m => m.role === 'VIEWER');
+    const owners = _.filter(data, m => m.role === "OWNER");
+    const viewers = _.filter(data, m => m.role === "VIEWER");
 
     return {
         owners,
@@ -102,6 +103,7 @@ function controller($q,
                     appStore,
                     historyStore,
                     logicalFlowStore,
+                    localStorageService,
                     notification,
                     serviceBroker,
                     userService) {
@@ -121,7 +123,7 @@ function controller($q,
             return userService
                 .whoami()
                 .then(me => {
-                    const owner = _.find(vm.owners, o => o.userId == me.userName && o.role === 'OWNER');
+                    const owner = _.find(vm.owners, o => o.userId == me.userName && o.role === "OWNER");
                     vm.canDelete = owner != null;
                 });
         });
@@ -132,7 +134,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.addApplication, [id, app.id])
             .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => notification.success('Added: ' + app.name));
+            .then(() => notification.success("Added: " + app.name));
     };
 
 
@@ -141,7 +143,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.removeApplication, [id, app.id])
             .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => notification.warning('Removed: ' + app.name));
+            .then(() => notification.warning("Removed: " + app.name));
     };
 
 
@@ -169,7 +171,7 @@ function controller($q,
     vm.updateGroupOverview = () => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.updateGroupOverview, [id, vm.appGroup])
-            .then(() => notification.success('Group details updated'));
+            .then(() => notification.success("Group details updated"));
     };
 
 
@@ -181,8 +183,8 @@ function controller($q,
                 focusApp.app = fullApp;
                 const promises = [
                     appStore.findRelatedById(fullApp.id),
-                    logicalFlowStore.findByEntityReference('APPLICATION', fullApp.id),
-                    appStore.findBySelector({ entityReference: { id: fullApp.organisationalUnitId, kind: 'ORG_UNIT'}, scope: 'EXACT'})
+                    logicalFlowStore.findByEntityReference("APPLICATION", fullApp.id),
+                    appStore.findBySelector({ entityReference: { id: fullApp.organisationalUnitId, kind: "ORG_UNIT"}, scope: "EXACT"})
                 ];
                 return $q.all(promises);
             })
@@ -204,21 +206,21 @@ function controller($q,
     };
 
     vm.showSingleEditor = () => {
-        vm.editor = 'SINGLE'
+        vm.editor = "SINGLE"
     };
 
     vm.showBulkEditor = () => {
-        vm.editor = 'BULK';
+        vm.editor = "BULK";
     };
 
     vm.saveApplications = (results) => {
         const appIdsToAdd = _.chain(results)
-            .filter(r => r.action === 'ADD')
+            .filter(r => r.action === "ADD")
             .map(r => r.entityRef.id)
             .value();
 
         const appIdsToRemove = _.chain(results)
-            .filter(r => r.action === 'REMOVE')
+            .filter(r => r.action === "REMOVE")
             .map(r => r.entityRef.id)
             .value();
 
@@ -246,7 +248,7 @@ function controller($q,
 
         serviceBroker
             .execute(CORE_API.AppGroupStore.deleteGroup, [id])
-            .then(() => notification.warning('Deleted group: ' + vm.appGroup.name))
+            .then(() => notification.warning("Deleted group: " + vm.appGroup.name))
             .then(() => {
                 removeFromHistory(historyStore, vm.appGroup);
                 navigateToLastView($state, historyStore);
@@ -258,15 +260,25 @@ function controller($q,
     // add app via search
     vm.searchedApp = {};
 
-    $scope.$watch('ctrl.searchedApp.app', (app) => {
+    $scope.$watch("ctrl.searchedApp.app", (app) => {
         if (! _.isObject(app)) return;
         vm.addToGroup(app);
         vm.focusOnApp(app);
     }, true);
 
 
+    //add app via recently viewed
+    vm.history = localStorageService
+        .get("history_2").filter(r => r.kind == "APPLICATION" ) || [];
+
+    vm.addRecentViewed = (app) => {
+        app.id = app.stateParams.id;
+        vm.addToGroup(app);
+        vm.focusOnApp(app);
+    };
+
     $scope.$watch(
-        'ctrl.selectedChangeInitiative',
+        "ctrl.selectedChangeInitiative",
         (changeInitiative) => {
             if (!changeInitiative) return;
 
@@ -274,7 +286,7 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, changeInitiative.id])
                 .then(r => r.data)
                 .then(cis => vm.changeInitiatives = cis)
-                .then(() => notification.success('Associated Change Initiative: ' + changeInitiative.name));
+                .then(() => notification.success("Associated Change Initiative: " + changeInitiative.name));
 
         });
 
@@ -282,32 +294,33 @@ function controller($q,
         .execute(CORE_API.AppGroupStore.removeChangeInitiative, [id, changeInitiative.id])
         .then(r => r.data)
         .then(cis => vm.changeInitiatives = cis)
-        .then(() => notification.warning('Removed Change Initiative: ' + changeInitiative.name));
+        .then(() => notification.warning("Removed Change Initiative: " + changeInitiative.name));
 
     serviceBroker
         .loadViewData(
             CORE_API.ChangeInitiativeStore.findBySelector,
-            [ mkSelectionOptions({ kind: 'APP_GROUP', id }, 'EXACT') ])
+            [ mkSelectionOptions({ kind: "APP_GROUP", id }, "EXACT") ])
         .then(result => vm.changeInitiatives = result.data);
 
 }
 
 controller.$inject = [
-    '$q',
-    '$state',
-    '$scope',
-    '$stateParams',
-    'ApplicationStore',
-    'HistoryStore',
-    'LogicalFlowStore',
-    'Notification',
-    'ServiceBroker',
-    'UserService'
+    "$q",
+    "$state",
+    "$scope",
+    "$stateParams",
+    "ApplicationStore",
+    "HistoryStore",
+    "LogicalFlowStore",
+    "localStorageService",
+    "Notification",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
