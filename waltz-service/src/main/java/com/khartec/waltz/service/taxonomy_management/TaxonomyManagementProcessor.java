@@ -3,6 +3,7 @@ package com.khartec.waltz.service.taxonomy_management;
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import com.khartec.waltz.model.taxonomy_management.TaxonomyChangePreview;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
 
 public interface TaxonomyManagementProcessor {
@@ -22,4 +23,7 @@ public interface TaxonomyManagementProcessor {
                 expectedDomain,
                 cmd.changeDomain().kind());
     }
+
+
+    TaxonomyChangePreview preview(TaxonomyChangeCommand cmd);
 }

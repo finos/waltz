@@ -78,6 +78,7 @@ import {SurveyInstanceStore_API as SurveyInstanceStore} from "../../survey/servi
 import {SurveyRunStore_API as SurveyRunStore} from "../../survey/services/survey-run-store";
 import {SurveyTemplateStore_API as SurveyTemplateStore} from "../../survey/services/survey-template-store";
 import {SvgDiagramStore_API as SvgDiagramStore} from "../../svg-diagram/services/svg-diagram-store";
+import {TaxonomyManagementStore_API as TaxonomyManagementStore} from "../../measurable-category/services/taxonomy-management-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
 import {UserStore_API as UserStore} from "../../user/services/user-store";
 
@@ -144,6 +145,7 @@ export const CORE_API = {
     SurveyRunStore,
     SurveyTemplateStore,
     SvgDiagramStore,
+    TaxonomyManagementStore,
     TechnologyStatisticsService,
     UserStore
 };

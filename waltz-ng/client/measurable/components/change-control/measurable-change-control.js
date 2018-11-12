@@ -1,5 +1,7 @@
 import template from "./measurable-change-control.html";
 import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 const modes = {
     MENU: "MENU",
@@ -8,6 +10,8 @@ const modes = {
 
 
 const bindings = {
+    measurable: "<",
+    changeDomain: "<",
 
 };
 
@@ -19,8 +23,19 @@ const initialState = {
 };
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+
+    function mkUpdCmd(newValue) {
+        return {
+            changeType: vm.selectedOperation.code,
+            changeDomain: toEntityRef(vm.changeDomain),
+            a: toEntityRef(vm.measurable),
+            newValue
+        };
+    }
+
 
     const updateMenu = {
         name: "Update",
@@ -41,13 +56,19 @@ function controller() {
                 icon: "edit"
             }, {
                 name: "Concrete",
-                code: "UPDATE_CONCRETE",
+                code: "UPDATE_CONCRETENESS",
                 title: "Update Concrete Flag",
                 description: `The concrete flag is used to determine whether applications may
                     use this taxonomy item to describe themselves via ratings.  Typically
                     higher level <em>grouping</em> items are non-concrete as they are not
                     specific enough to accurately describe the portfolio.`,
-                icon: "edit"
+                icon: "edit",
+                onShow: () => {
+                    const cmd = mkUpdCmd(!vm.measurable.concrete);
+                    return serviceBroker
+                        .execute(CORE_API.TaxonomyManagementStore.preview, [ cmd ])
+                        .then(r => vm.preview = r.data)
+                }
             }, {
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
@@ -68,7 +89,7 @@ function controller() {
         options: [
             {
                 name: "Add Child",
-                code: "ADD_CHILD",
+                code: "ADD",
                 icon: "plus-circle"
             }, {
                 name: "Clone",
@@ -93,7 +114,7 @@ function controller() {
                 icon: "exclamation-triangle"
             }, {
                 name: "Destroy",
-                code: "DESTROY",
+                code: "REMOVE",
                 icon: "trash"
             }
         ]
@@ -105,17 +126,31 @@ function controller() {
         destructiveMenu
     ];
 
-
     // --- interact
 
+    vm.$onChanges = (c) => {
+        if (c.measurable) {
+            vm.onDismiss();
+        }
+    };
+
+
     vm.onDismiss = () => vm.mode = modes.MENU;
+
 
     vm.onSelectOperation = (op) => {
         vm.mode = modes.OPERATION;
         vm.selectedOperation = op;
-        console.log('oso', op)
+        return _.isFunction(op.onShow)
+            ? op.onShow()
+            : Promise.resolve();
     };
 }
+
+
+controller.$inject = [
+    "ServiceBroker"
+];
 
 
 const component = {
