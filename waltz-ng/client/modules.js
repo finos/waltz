@@ -102,6 +102,7 @@ import Survey from "./survey";
 import SvgDiagram from "./svg-diagram";
 import System from "./system";
 import Technology from "./technology";
+import TaxonomyManagement from "./taxonomy-management";
 import Tour from "./tour";
 import User from "./user";
 import UserContribution from "./user-contribution";
@@ -200,6 +201,7 @@ const dependencies = [
     Tour(),
     User(),
     UserContribution(),
+    TaxonomyManagement(),
     Welcome(),
     Widgets()
 ];

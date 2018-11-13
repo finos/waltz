@@ -1,0 +1,40 @@
+<div>
+    <h4>Pending Changes</h4>
+
+    <!-- BLURB -->
+    <div class="help-block">
+        Pending changes to this taxonomy are shown here:
+    </div>
+
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="$ctrl.pendingChanges.length === 0">
+        <message>
+            <strong>No pending changes</strong>
+        </message>
+    </waltz-no-data>
+
+
+    <!-- CHANGES -->
+    <div ng-if="$ctrl.pendingChanges.length > 0">
+        <table class="table table-condensed small">
+            <thead>
+            <th>Primary Ref</th>
+            <th>Secondary Ref</th>
+            <th>Change Type</th>
+            <th>New Value</th>
+            <th>Author</th>
+            </thead>
+            <tbody>
+            <tr ng-repeat="change in $ctrl.pendingChanges">
+                <td><span ng-bind="change.a.name"></span></td>
+                <td><span ng-bind="change.b.name"></span></td>
+                <td><span ng-bind="change.changeType"></span></td>
+                <td><span ng-bind="change.newValue"></span></td>
+                <td><span ng-bind="change.createdBy"></span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

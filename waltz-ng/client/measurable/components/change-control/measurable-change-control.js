@@ -173,7 +173,7 @@ function controller(notification,
     vm.onSubmitChange = () => {
         serviceBroker
             .execute(
-                CORE_API.TaxonomyManagementStore.submitChange,
+                CORE_API.TaxonomyManagementStore.submitPendingChange,
                 [ vm.command ])
             .then(r => notification.info("Change submitted"))
     };

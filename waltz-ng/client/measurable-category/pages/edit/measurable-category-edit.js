@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const modes = {
@@ -53,7 +54,11 @@ function controller($q,
 
         serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.category = _.find(r.data, { id: $stateParams.id }));
+            .then(r => vm.category = _.find(r.data, { id: $stateParams.id }))
+            .then(() => serviceBroker.loadViewData(
+                    CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
+                    [ toEntityRef(vm.category) ]))
+            .then(r => vm.pendingChanges = console.log(r.data) || r.data);
     };
 
     vm.onSelect = (d) => {

@@ -49,7 +49,7 @@ public class TaxonomyManagementEndpoint implements Endpoint {
     public void register() {
         registerPreview(mkPath(BASE_URL, "preview"));
         registerSubmitPendingChange(mkPath(BASE_URL, "pending-changes"));
-        registerListPendingChanges(mkPath(BASE_URL, "pending-changes"));
+        registerFindPendingChangesByDomain(mkPath(BASE_URL, "pending-changes", "by-domain", ":kind", ":id"));
         registerApplyChange(mkPath(BASE_URL, "pending-changes", ":id"));
     }
 
@@ -74,9 +74,9 @@ public class TaxonomyManagementEndpoint implements Endpoint {
     }
 
 
-    private void registerListPendingChanges(String path) {
+    private void registerFindPendingChangesByDomain(String path) {
         getForList(path, (req, resp) -> {
-            return taxonomyChangeService.getPendingChanges();
+            return taxonomyChangeService.findPendingChangesByDomain(getEntityReference(req));
         });
     }
 
