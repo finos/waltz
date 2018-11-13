@@ -25,13 +25,25 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/preview`, cmd)
         .then(d => d.data);
 
-    const submitChange = (cmd) => $http
-        .post(`${baseUrl}/submit-change`, cmd)
+    /*
+    const previewById = (id) => $http
+        .get(`${baseUrl}/pending-change/${id}`)
+        .then(d => d.data);
+    */
+
+    const submitPendingChange = (cmd) => $http
+        .post(`${baseUrl}/pending-changes`, cmd)
+        .then(d => d.data);
+
+
+    const findPendingChangesByDomain = (domainRef) => $http
+        .get(`${baseUrl}/pending-changes/by-domain/${domainRef.kind}/${domainRef.id}`)
         .then(d => d.data);
 
     return {
+        findPendingChangesByDomain,
         preview,
-        submitChange
+        submitPendingChange
     };
 
 }
@@ -49,14 +61,19 @@ export default {
 
 
 export const TaxonomyManagementStore_API = {
+    findPendingChangesByDomain: {
+        serviceName,
+        serviceFnName: "findPendingChangesByDomain",
+        description: "findPendingChangesByDomain [ domainRef ]"
+    },
     preview: {
         serviceName,
         serviceFnName: "preview",
         description: "preview the effect of a command [ cmd ]"
     },
-    submitChange: {
+    submitPendingChange: {
         serviceName,
-        serviceFnName: "submitChange",
+        serviceFnName: "submitPendingChange",
         description: "submit the command for later execution [ cmd ]"
     }
 };
