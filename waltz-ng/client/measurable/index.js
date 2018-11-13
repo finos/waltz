@@ -20,6 +20,7 @@
 import angular from "angular";
 import MeasurableStore from "./services/measurable-store";
 import MeasurableChangeControl from "./components/change-control/measurable-change-control";
+import TaxonomyChangeCommandPreview from "./components/taxonomy-change-command-preview/taxonomy-change-command-preview";
 import MeasurableInfo from "./components/info/measurable-info";
 import MeasurableTree from "./components/tree/measurable-tree";
 import MeasurableSummary from "./components/summary/measurable-summary";
@@ -34,6 +35,7 @@ export default () => {
         MeasurableStore ]);
 
     registerComponents(module, [
+        TaxonomyChangeCommandPreview,
         MeasurableChangeControl,
         MeasurableInfo,
         MeasurableTree,

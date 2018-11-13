@@ -103,7 +103,7 @@ public class MeasurableService {
     }
 
 
-    public int updateConcreteFlag(Long id, boolean newValue) {
+    public boolean updateConcreteFlag(Long id, boolean newValue) {
         return measurableDao.updateConcreteFlag(id, newValue);
     }
 }

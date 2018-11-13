@@ -132,11 +132,12 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public int updateConcreteFlag(Long id, boolean newValue) {
+    public boolean updateConcreteFlag(Long id, boolean newValue) {
         return dsl
                 .update(MEASURABLE)
                 .set(MEASURABLE.CONCRETE, newValue)
                 .where(MEASURABLE.ID.eq(id))
-                .execute();
+                .and(MEASURABLE.CONCRETE.eq(!newValue))
+                .execute() == 1;
     }
 }

@@ -2,6 +2,7 @@ import template from "./measurable-change-control.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
+import {findHighestSeverity, severityToBootstrapBtnClass} from "../../../common/severity-utils";
 
 const modes = {
     MENU: "MENU",
@@ -12,27 +13,31 @@ const modes = {
 const bindings = {
     measurable: "<",
     changeDomain: "<",
-
 };
 
 
 const initialState = {
     modes: modes,
     mode: modes.MENU,
-    selectedOperation: null
+    selectedOperation: null,
+    preview: null,
+    command: null
 };
 
 
-function controller(serviceBroker) {
-    const vm = initialiseData(this, initialState);
+function controller(notification,
+                    serviceBroker,
+                    userService) {
 
+    const vm = initialiseData(this, initialState);
 
     function mkUpdCmd(newValue) {
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
             a: toEntityRef(vm.measurable),
-            newValue
+            newValue: newValue+"",
+            createdBy: vm.userName
         };
     }
 
@@ -64,10 +69,15 @@ function controller(serviceBroker) {
                     specific enough to accurately describe the portfolio.`,
                 icon: "edit",
                 onShow: () => {
-                    const cmd = mkUpdCmd(!vm.measurable.concrete);
+                    vm.command = mkUpdCmd(!vm.measurable.concrete);
                     return serviceBroker
-                        .execute(CORE_API.TaxonomyManagementStore.preview, [ cmd ])
-                        .then(r => vm.preview = r.data)
+                        .execute(CORE_API.TaxonomyManagementStore.preview, [ vm.command ])
+                        .then(r => {
+                            vm.preview = r.data;
+                            vm.submitButtonClass = severityToBootstrapBtnClass(
+                                findHighestSeverity(
+                                    _.map(vm.preview.impacts, "severity")));
+                        })
                 }
             }, {
                 name: "External Id",
@@ -98,6 +108,7 @@ function controller(serviceBroker) {
             }
         ]
     };
+
     const destructiveMenu = {
         name: "Destructive",
         description: `These operations <strong>will</strong> potentially result in data loss and 
@@ -126,7 +137,13 @@ function controller(serviceBroker) {
         destructiveMenu
     ];
 
-    // --- interact
+    // --- boot
+
+    vm.$onInit = () => {
+        userService
+            .whoami()
+            .then(u => vm.userName = u.userName);
+    };
 
     vm.$onChanges = (c) => {
         if (c.measurable) {
@@ -135,8 +152,15 @@ function controller(serviceBroker) {
     };
 
 
-    vm.onDismiss = () => vm.mode = modes.MENU;
+    // --- interact
 
+    vm.toTemplateName = (op) => `wmcc/${op.code}.html`;
+
+    vm.onDismiss = () => {
+        vm.mode = modes.MENU;
+        vm.command = null;
+        vm.preview = null;
+    };
 
     vm.onSelectOperation = (op) => {
         vm.mode = modes.OPERATION;
@@ -145,11 +169,22 @@ function controller(serviceBroker) {
             ? op.onShow()
             : Promise.resolve();
     };
+
+    vm.onSubmitChange = () => {
+        serviceBroker
+            .execute(
+                CORE_API.TaxonomyManagementStore.submitChange,
+                [ vm.command ])
+            .then(r => notification.info("Change submitted"))
+    };
+
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "Notification",
+    "ServiceBroker",
+    "UserService"
 ];
 
 

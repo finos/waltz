@@ -1,0 +1,30 @@
+<waltz-no-data ng-if="$ctrl.preview.impacts.length === 0">
+    <message>
+        No impacts
+    </message>
+</waltz-no-data>
+
+<table class="table table-condensed"
+       ng-if="$ctrl.preview.impacts.length > 0">
+    <thead>
+    <th>Severity</th>
+    <th>Information</th>
+    <th>Impacted references</th>
+    </thead>
+    <tbody>
+    <tr ng-repeat="impact in $ctrl.preview.impacts"
+        ng-class="$ctrl.severityToBootstrapAlertClass(impact.severity)">
+        <td>
+            <strong ng-bind="impact.severity | toDisplayName:'severity'"></strong>
+        </td>
+        <td>
+            <span ng-bind="impact.description"></span>
+        </td>
+        <td>
+            <span class="badge clickable"
+                  ng-bind="impact.impactedReferences.length"></span>
+            </span>
+        </td>
+    </tr>
+    </tbody>
+</table>

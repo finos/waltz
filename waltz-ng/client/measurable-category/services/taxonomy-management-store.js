@@ -22,11 +22,16 @@ function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/taxonomy-management`;
 
     const preview = (cmd) => $http
-        .post(`${baseUrl}/preview`, [ cmd ])
+        .post(`${baseUrl}/preview`, cmd)
+        .then(d => d.data);
+
+    const submitChange = (cmd) => $http
+        .post(`${baseUrl}/submit-change`, cmd)
         .then(d => d.data);
 
     return {
-        preview
+        preview,
+        submitChange
     };
 
 }
@@ -48,5 +53,10 @@ export const TaxonomyManagementStore_API = {
         serviceName,
         serviceFnName: "preview",
         description: "preview the effect of a command [ cmd ]"
+    },
+    submitChange: {
+        serviceName,
+        serviceFnName: "submitChange",
+        description: "submit the command for later execution [ cmd ]"
     }
 };
