@@ -18,35 +18,21 @@
  */
 
 
-function store($http, baseApiUrl) {
-    const baseUrl = `${baseApiUrl}/taxonomy-management`;
+import angular from "angular";
+import TaxonomyManagementStore from "./services/taxonomy-management-store";
+import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-texonomy-changes-list";
+import TaxonomyChangePreview from "./components/taxonomy-change-command-preview/taxonomy-change-command-preview";
+import {registerStores, registerComponents} from "../common/module-utils";
 
-    const preview = (cmd) => $http
-        .post(`${baseUrl}/preview`, [ cmd ])
-        .then(d => d.data);
+export default () => {
+    const module = angular.module("waltz.taxonomy-management", []);
 
-    return {
-        preview
-    };
+    registerStores(module, [
+        TaxonomyManagementStore ]);
 
-}
+    registerComponents(module, [
+        PendingTaxonomyChangesList,
+        TaxonomyChangePreview ]);
 
-store.$inject = ["$http", "BaseApiUrl"];
-
-
-const serviceName = "TaxonomyManagementStore";
-
-
-export default {
-    serviceName,
-    store
-};
-
-
-export const TaxonomyManagementStore_API = {
-    preview: {
-        serviceName,
-        serviceFnName: "preview",
-        description: "preview the effect of a command [ cmd ]"
-    }
+    return module.name;
 };

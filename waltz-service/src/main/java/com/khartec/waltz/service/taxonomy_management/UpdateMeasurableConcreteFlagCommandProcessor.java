@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.taxonomy_management;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -28,17 +29,17 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
-public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagementProcessor {
+public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCommandProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableConcreteFlagProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableConcreteFlagCommandProcessor.class);
 
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
 
 
     @Autowired
-    public UpdateMeasurableConcreteFlagProcessor(MeasurableService measurableService,
-                                                 MeasurableRatingService measurableRatingService) {
+    public UpdateMeasurableConcreteFlagCommandProcessor(MeasurableService measurableService,
+                                                        MeasurableRatingService measurableRatingService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
         this.measurableService = measurableService;
@@ -48,7 +49,7 @@ public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagement
 
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
-        Measurable m = loadMeasurable(cmd);
+        Measurable m = validateMeasurable(cmd);
 
         ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
                 .builder()
@@ -64,19 +65,31 @@ public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagement
 
         if (newValue == false) {
             calcCurrentMappings(cmd)
-                .map(impact -> preview.addImpacts(impact));
+                .map(preview::addImpacts);
         }
         return preview.build();
     }
 
 
-    public void execute(TaxonomyChangeCommand cmd) {
+    @Override
+    public TaxonomyChangeType type() {
+        return TaxonomyChangeType.UPDATE_CONCRETENESS;
+    }
+
+
+    public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        Measurable m = loadMeasurable(cmd);
+        validateMeasurable(cmd);
 
-        if (hasNoChange(m, cmd.valueAsBoolean())) return;
+        measurableService.updateConcreteFlag(
+                cmd.a().id(),
+                cmd.valueAsBoolean());
 
-        measurableService.updateConcreteFlag(m.id().get(), cmd.valueAsBoolean());
+        return ImmutableTaxonomyChangeCommand
+                .copyOf(cmd)
+                .withExecutedAt(DateTimeUtilities.nowUtc())
+                .withExecutedBy(userId)
+                .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED);
     }
 
 
@@ -106,18 +119,24 @@ public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagement
     }
 
 
-    private Measurable loadMeasurable(TaxonomyChangeCommand cmd) {
-        Measurable m = measurableService.getById(cmd.a().id());
+    private Measurable validateMeasurable(TaxonomyChangeCommand cmd) {
+        long measurableId = cmd.a().id();
+        Measurable measurable = measurableService.getById(measurableId);
+
+        checkNotNull(
+                measurable,
+                "Cannot find measurable [%d]",
+                measurableId);
 
         checkTrue(
-                cmd.changeDomain().id() == m.categoryId(),
+                cmd.changeDomain().id() == measurable.categoryId(),
                 "Measurable [%s / %d] is not in category [%d], instead it is in category [%d]",
-                m.name(),
-                m.id(),
+                measurable.name(),
+                measurable.id(),
                 cmd.changeDomain().id(),
-                m.categoryId());
+                measurable.categoryId());
 
-        return m;
+        return measurable;
     }
 
 
@@ -133,7 +152,7 @@ public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagement
     public static void main(String[] args) throws IOException {
         LoggingUtilities.configureLogging();
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        UpdateMeasurableConcreteFlagProcessor proc = ctx.getBean(UpdateMeasurableConcreteFlagProcessor.class);
+        UpdateMeasurableConcreteFlagCommandProcessor proc = ctx.getBean(UpdateMeasurableConcreteFlagCommandProcessor.class);
 
         TaxonomyChangeCommand cmd = ImmutableTaxonomyChangeCommand.builder()
                 .changeType(TaxonomyChangeType.UPDATE_CONCRETENESS)
@@ -145,7 +164,7 @@ public class UpdateMeasurableConcreteFlagProcessor implements TaxonomyManagement
 
         TaxonomyChangePreview preview = proc.preview(cmd);
         System.out.printf("Preview: %s\n", preview);
-        proc.execute(cmd);
+        proc.apply(cmd, "admin");
     }
 
 }

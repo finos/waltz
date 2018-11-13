@@ -6,7 +6,7 @@ import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangePreview;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
 
-public interface TaxonomyManagementProcessor {
+public interface TaxonomyCommandProcessor {
 
     default void checkType(TaxonomyChangeCommand cmd, TaxonomyChangeType expectedType) {
         Checks.checkTrue(
@@ -24,6 +24,9 @@ public interface TaxonomyManagementProcessor {
                 cmd.changeDomain().kind());
     }
 
-
     TaxonomyChangePreview preview(TaxonomyChangeCommand cmd);
+    TaxonomyChangeCommand apply(TaxonomyChangeCommand command, String userId);
+
+    TaxonomyChangeType type();
+
 }
