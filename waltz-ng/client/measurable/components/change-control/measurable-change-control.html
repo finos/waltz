@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4"
+            <div class="col-md-4"
                  ng-repeat="menu in $ctrl.menus">
                 <!-- incl: MENU -->
                 <div ng-include="'wmcc/menu.html'"></div>
@@ -32,23 +32,8 @@
         <div class="row">
             <div class="col-sm-12">
                 <hr>
-                <div ng-switch="$ctrl.selectedOperation.code">
-                    <div ng-switch-when="UPDATE_CONCRETENESS">
-                        <p>
-                            The concrete flag for this taxonomy item is currently set
-                            to <kbd ng-bind="$ctrl.measurable.concrete"></kbd>.
-                        </p>
-                        <p>
-                            Setting it to <kbd ng-bind="! $ctrl.measurable.concrete"></kbd>
-                            will have the following impact:
-                        </p>
-                    </div>
-                    <div ng-switch-default>
-                        Operation
-                        <code ng-bind="$ctrl.selectedOperation.code"></code>
-                        ( <span ng-bind="$ctrl.selectedOperation.name"></span> )
-                        not yet implemented.
-                    </div>
+                <!-- operation ui is dynamically brought in based on op.code -->
+                <div ng-include="$ctrl.toTemplateName($ctrl.selectedOperation)">
                 </div>
             </div>
         </div>
@@ -56,16 +41,39 @@
         <div class="row">
             <div class="col-sm-12">
                 <hr>
+
+                <a ng-click="$ctrl.onSubmitChange()"
+                   class="btn btn-sm"
+                    ng-class="$ctrl.submitButtonClass">
+                    Submit change
+                </a>
+                |
                 <a ng-click="$ctrl.onDismiss()"
                    class="clickable">
                     Close
                 </a>
+
+
             </div>
         </div>
-
     </div>
-
 </div>
+
+
+<script type="text/ng-template"
+        id="wmcc/UPDATE_CONCRETENESS.html">
+    <p>
+        The concrete flag for this taxonomy item is currently set
+        to <kbd ng-bind="$ctrl.measurable.concrete"></kbd>
+    </p>
+    <p>
+        Setting it to <kbd ng-bind="! $ctrl.measurable.concrete"></kbd>
+        will have the following impact:
+    </p>
+
+    <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+    </waltz-taxonomy-change-command-preview>
+</script>
 
 
 <!-- template: MENU -->
@@ -93,6 +101,8 @@
     </div>
 </script>
 
+
+<!-- template: OPTION popup -->
 <script type="text/ng-template"
         id="wmcc/operation-popup.html">
     <div class="small">

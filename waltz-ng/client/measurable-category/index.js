@@ -20,16 +20,13 @@
 
 import angular from "angular";
 import CategoryStore from "./services/measurable-category-store";
-import TaxonomyManagementStore from "./services/taxonomy-management-store";
 import Routes from "./routes";
-import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-texonomy-changes-list"
-import {registerComponents, registerStores} from "../common/module-utils";
+import {registerStores} from "../common/module-utils";
 
 export default () => {
     const module = angular.module("waltz.measurable-category", []);
 
-    registerStores(module, [ CategoryStore, TaxonomyManagementStore ]);
-    registerComponents(module, [ PendingTaxonomyChangesList ]);
+    registerStores(module, [ CategoryStore ]);
 
     module.config(Routes);
 

@@ -29,13 +29,14 @@ public class Checks {
 
     /**
      * @param t Value to check
-     * @param message Text to use in the exception message
+     * @param message Text  to use in the exception message (can use standard string formatting)
+     * @param args Arguments to use in format
      * @param <T> Type of the value
      * @return The given value, facilitates method chaining
-     * @throw IllegalArgumentException If the value <code>t</code> is null
+     * @throws IllegalArgumentException If the value <code>t</code> is null
      */
-    public static <T> T checkNotNull(T t, String message) {
-        checkTrue(t != null, message);
+    public static <T> T checkNotNull(T t, String message, Object... args) {
+        checkTrue(t != null, message, args);
         return t;
     }
 
@@ -61,7 +62,7 @@ public class Checks {
     /**
      * Verifies that the boolean <code>b</code> is true
      * @param b Boolean to check
-     * @param msg Text to use in any exception method (can use standard string formatting)
+     * @param msg Text to use in any exception message (can use standard string formatting)
      * @param args Arguments to use in format
      * @throws IllegalArgumentException if <code>b != true</code>
      */

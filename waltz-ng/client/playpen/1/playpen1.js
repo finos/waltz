@@ -48,27 +48,25 @@ function controller($element, $q, serviceBroker) {
 
 
     vm.$onInit = () => {
-        const scenarioPromise = serviceBroker
-            .loadViewData(CORE_API.ScenarioStore.getById, [1])
-            .then(r => vm.scenarioDefn = r.data);
-
-        const applicationPromise = scenarioPromise
-            .then(() => _.map(vm.scenarioDefn.ratings, r => r.item.id))
-            .then(appIds => serviceBroker.loadViewData(CORE_API.ApplicationStore.findByIds, [ appIds ]))
-            .then(r => vm.applications = r.data);
-
-        const measurablePromise = scenarioPromise
-            .then(() => serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll))
-            .then(r => {
-                const requiredMeasurableIds = _.map(vm.scenarioDefn.axisDefinitions, d => d.item.id);
-                vm.measurables = _.filter(r.data, m => _.includes(requiredMeasurableIds, m.id));
-            });
-
-        $q.all([scenarioPromise, applicationPromise, measurablePromise])
-            .then(() => vm.realData = prepareData(vm.scenarioDefn, vm.applications, vm.measurables));
-
-        vm.demoData = mkDemoData(3, 4);
-    }
+        const cmd = {
+            "changeType": "UPDATE_CONCRETENESS",
+            "changeDomain": {
+                "kind": "MEASURABLE_CATEGORY",
+                "id": 4,
+            },
+            "a": {
+                "kind": "MEASURABLE",
+                "id": 587,
+            },
+            "newValue": "false",
+            "createdBy": "admin"
+        };
+        serviceBroker
+            .execute(
+                CORE_API.TaxonomyManagementStore.preview,
+                [ cmd ])
+            .then(r => vm.preview = r.data);
+    };
 }
 
 controller.$inject = ["$element", "$q", "ServiceBroker"];
@@ -76,7 +74,7 @@ controller.$inject = ["$element", "$q", "ServiceBroker"];
 const view = {
     template,
     controller,
-    controllerAs: "ctrl",
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };

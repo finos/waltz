@@ -6,7 +6,7 @@ const bindings = {
 
 
 function controller() {
-
+    console.log('here')
 }
 
 
