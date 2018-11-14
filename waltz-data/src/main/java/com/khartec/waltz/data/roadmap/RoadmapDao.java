@@ -4,6 +4,7 @@ import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.roadmap.ImmutableRoadmap;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
@@ -61,8 +63,11 @@ public class RoadmapDao {
                 .description(record.getDescription())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
+                .entityLifecycleStatus(readEnum(record.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .build();
     };
+
+    public static final Condition IS_ACTIVE = ROADMAP.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name());
 
 
     private final DSLContext dsl;
@@ -85,6 +90,7 @@ public class RoadmapDao {
     public Collection<Roadmap> findRoadmapsBySelector(Select<Record1<Long>> selector) {
         return baseSelect()
                 .where(ROADMAP.ID.in(selector))
+                .and(IS_ACTIVE)
                 .orderBy(ROADMAP.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -92,6 +98,13 @@ public class RoadmapDao {
 
     public Collection<Roadmap> findAll() {
         return baseSelect()
+                .orderBy(ROADMAP.NAME)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public Collection<Roadmap> findAllActive() {
+        return baseSelect()
+                .where(IS_ACTIVE)
                 .orderBy(ROADMAP.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -111,6 +124,15 @@ public class RoadmapDao {
                 id,
                 ROADMAP.NAME,
                 newValue,
+                userId) == 1;
+    }
+
+
+    public Boolean updateLifecycleStatus(long id, EntityLifecycleStatus newValue, String userId) {
+        return updateField(
+                id,
+                ROADMAP.ENTITY_LIFECYCLE_STATUS,
+                newValue.name(),
                 userId) == 1;
     }
 
@@ -196,6 +218,7 @@ public class RoadmapDao {
                 .innerJoin(SCENARIO)
                 .on(SCENARIO.ROADMAP_ID.eq(ROADMAP.ID))
                 .where(SCENARIO.ID.in(scenarioSelector))
+                .and(IS_ACTIVE)
                 .and(ScenarioDao.NOT_REMOVED)
                 .fetch(r -> tuple(
                         TO_DOMAIN_MAPPER.map(r),  // roadmap

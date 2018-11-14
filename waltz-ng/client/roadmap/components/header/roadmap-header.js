@@ -78,6 +78,31 @@ function controller($q,
         reloadAllData();
     };
 
+    vm.markActive = () => {
+        return updateField(
+            vm.roadmap.id,
+            CORE_API.RoadmapStore.updateLifecycleStatus,
+            {
+                newVal: 'ACTIVE',
+                oldVal: vm.roadmap.entityLifecycleStatus
+            },
+            true,
+            "Roadmap restored")
+            .then(() => reloadAllData());
+    };
+
+    vm.markRemoved = () => {
+        return updateField(
+            vm.roadmap.id,
+            CORE_API.RoadmapStore.updateLifecycleStatus,
+            {
+                newVal: 'REMOVED',
+                oldVal: vm.roadmap.entityLifecycleStatus
+            },
+            true,
+            "Roadmap deleted")
+            .then(() => reloadAllData());
+    };
 
     // -- helpers --
 
