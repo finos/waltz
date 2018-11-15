@@ -48,4 +48,18 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 3482: add entity_lifecycle_status to roadmap -->
+    <changeSet id="20181112-3482-1"
+               author="kamransaleem">
+        <comment>3482: add entity_lifecycle_status to roadmap</comment>
+        <addColumn tableName="roadmap">
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

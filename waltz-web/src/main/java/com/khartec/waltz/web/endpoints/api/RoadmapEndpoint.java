@@ -1,5 +1,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.roadmap.RoadmapService;
@@ -37,6 +39,7 @@ public class RoadmapEndpoint implements Endpoint {
         registerGetRoadmapById(mkPath(BASE_URL, "id", ":id"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
+        registerUpdateLifecycleStatus(mkPath(BASE_URL, "id", ":id", "lifecycleStatus"));
         registerAddScenario(mkPath(BASE_URL, "id", ":id", "add-scenario"));
         registerFindRoadmapsAndScenariosByRatedEntity(mkPath(BASE_URL, "by-rated-entity", ":kind", ":id"));
         registerFindRoadmapsAndScenariosByFormalRelationship(mkPath(BASE_URL, "by-formal-relationship", ":kind", ":id"));
@@ -96,6 +99,18 @@ public class RoadmapEndpoint implements Endpoint {
                     getId(req),
                     req.body(),
                     getUsername(req));
+        });
+    }
+
+
+    private void registerUpdateLifecycleStatus(String path) {
+        postForDatum(path, (request, resp) -> {
+            ensureUserHasAdminRights(request);
+            EntityLifecycleStatus entityLifecycleStatus = EnumUtilities.readEnum(request.body(), EntityLifecycleStatus.class, s -> null);
+            return roadmapService.updateLifecycleStatus(
+                    getId(request),
+                    entityLifecycleStatus,
+                    getUsername(request));
         });
     }
 

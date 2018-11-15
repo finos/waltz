@@ -264,7 +264,7 @@ public class ScenarioRatingImporter {
 
 
     private Map<String, Roadmap> getNameToRoadmapMap(RoadmapDao roadmapDao) {
-        return roadmapDao.findAll()
+        return roadmapDao.findAllActive()
                 .stream()
                 .collect(toMap(r -> lower(r.name()), r -> r));
     }

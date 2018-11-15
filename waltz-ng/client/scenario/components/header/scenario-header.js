@@ -11,12 +11,24 @@ const bindings = {
     onAddSection: "<"
 };
 
-
 const modes = {
     LOADING: "LOADING",
     VIEW: "VIEW",
     CONFIGURE_SCENARIO: "CONFIGURE_SCENARIO"
 };
+
+const initialState = {
+    modes,
+    roadmap: null,
+    permissions: {
+        admin: false,
+        edit: false
+    },
+    visibility: {
+        mode: modes.LOADING
+    }
+};
+
 
 const addToHistory = (historyStore, scenario) => {
     if (! scenario) { return; }
@@ -32,8 +44,7 @@ function controller($q,
                     historyStore,
                     notification,
                     serviceBroker,
-                    userService)
-{
+                    userService) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -171,25 +182,15 @@ function controller($q,
                 CORE_API.ScenarioStore.getById,
                 [ vm.scenarioId ],
                 { force: true })
-            .then(r => Object.assign(vm, r.data));
+            .then(r => {
+                Object.assign(vm, r.data);
+                Object.assign(vm.roadmap, {kind: 'ROADMAP'});
+            });
 
         return $q
             .all([roadmapPromise]);
     }
 }
-
-
-const initialState = {
-    modes,
-    roadmap: null,
-    permissions: {
-        admin: false,
-        edit: false
-    },
-    visibility: {
-        mode: modes.LOADING
-    }
-};
 
 
 controller.$inject = [

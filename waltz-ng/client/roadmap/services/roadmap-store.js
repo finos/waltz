@@ -41,6 +41,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const updateLifecycleStatus = (roadmapId, newStatus) => {
+        return $http
+            .post(`${BASE}/id/${roadmapId}/lifecycleStatus`, newStatus)
+            .then(result => result.data);
+    };
+
     const updateName = (roadmapId, newName) => {
         return $http
             .post(`${BASE}/id/${roadmapId}/name`, newName)
@@ -77,6 +83,7 @@ function store($http, baseUrl) {
         getRoadmapById,
         findRoadmapsBySelector,
         updateDescription,
+        updateLifecycleStatus,
         updateName,
         addScenario,
         findRoadmapsAndScenariosByRatedEntity,
@@ -114,6 +121,11 @@ export const RoadmapStore_API = {
         serviceName,
         serviceFnName: "updateDescription",
         description: "executes updateDescription [roadmapId, newDescription]"
+    },
+    updateLifecycleStatus: {
+        serviceName,
+        serviceFnName: "updateLifecycleStatus",
+        description: "executes updateLifecycleStatus [roadmapId, newStatus]"
     },
     updateName: {
         serviceName,
