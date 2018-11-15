@@ -93,13 +93,16 @@ function prepareTree(nodes = []) {
 function controller() {
     const vm = this;
 
+
+
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
         const toDisplayName = m => truncateMiddle(m.name, 96);
         const measurables = _.map(vm.measurables, m => Object.assign({}, m, { displayName: toDisplayName(m)}));
-        vm.searchNodes = prepareSearchNodes(vm.measurables);
+        vm.searchNodes = prepareSearchNodes(measurables);
         vm.hierarchy = prepareTree(measurables);
+
         vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
         vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
 
