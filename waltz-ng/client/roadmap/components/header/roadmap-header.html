@@ -8,7 +8,23 @@
     </ol>
 </waltz-page-header>
 
-<div class="waltz-page-summary waltz-page-summary-attach">
+<div class="waltz-page-summary waltz-page-summary-attach"
+     ng-class="{'ws-inactive': $ctrl.roadmap.entityLifecycleStatus === 'REMOVED'}">
+
+    <waltz-section-actions>
+        <a class="btn btn-success btn-xs"
+           waltz-has-role="SCENARIO_ADMIN"
+           ng-if="$ctrl.roadmap.entityLifecycleStatus === 'REMOVED'"
+           ng-click="$ctrl.markActive()">
+            Restore
+        </a>
+        <a class="btn btn-danger btn-xs"
+           waltz-has-role="SCENARIO_ADMIN"
+           ng-if="$ctrl.roadmap.entityLifecycleStatus === 'ACTIVE'"
+           ng-click="$ctrl.markRemoved()">
+            Delete
+        </a>
+    </waltz-section-actions>
 
     <!-- NO DATA -->
 
