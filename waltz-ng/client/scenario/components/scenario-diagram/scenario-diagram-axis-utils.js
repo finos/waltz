@@ -58,7 +58,6 @@ function drawRowHeaders(holder, headerData, layout, options) {
             return padding + actualRowHeight;
         });
 
-
     allHeaderGroups
         .select("text")
         .attr("y", (d, i) => {
@@ -89,8 +88,7 @@ function drawColumnHeaders(holder, headerData, layout, options) {
         .style("pointer-events", "visible");
 
     const newHeaders = newHeaderGroups
-        .append("text")
-        .text((d, i) => layout.colWidths[i] < 1 ? truncate(d.name, 14, "...") : d.name);
+        .append("text");
 
     // tooltip
     newHeaders
@@ -127,7 +125,8 @@ function drawColumnHeaders(holder, headerData, layout, options) {
         .attr("x", (d, i) => {
             const actualColWidth = layout.colWidths[i] * CELL_DIMENSIONS.width;
             return actualColWidth / 2;
-        });
+        })
+        .text((d, i) => truncate(d.name, 25 * layout.colWidths[i], "..."));
 
 }
 

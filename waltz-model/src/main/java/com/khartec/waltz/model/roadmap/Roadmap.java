@@ -15,6 +15,7 @@ public abstract class Roadmap implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider,
+        EntityLifecycleStatusProvider,
         WaltzEntity {
 
 
@@ -28,6 +29,7 @@ public abstract class Roadmap implements
                 .id(id().get())
                 .name(name())
                 .description(Optional.ofNullable(description()))
+                .entityLifecycleStatus(entityLifecycleStatus())
                 .build();
     }
 }
