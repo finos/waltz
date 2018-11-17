@@ -34,8 +34,20 @@
                 </waltz-measurable-tree>
             </div>
             <div class="col-sm-6">
-                <waltz-pending-taxonomy-changes-list pending-changes="$ctrl.pendingChanges">
-                </waltz-pending-taxonomy-changes-list>
+                <waltz-sub-section name="Pending Changes">
+                    <content>
+                        <div style="padding:8px">
+                            <!-- BLURB -->
+                            <div class="help-block">
+                                Pending changes to this taxonomy are shown here:
+                            </div>
+
+                            <waltz-pending-taxonomy-changes-sub-section change-domain="$ctrl.category">
+                            </waltz-pending-taxonomy-changes-sub-section>
+                        </div>
+                    </content>
+                </waltz-sub-section>
+
 
                 <div ng-if="$ctrl.recentlySelected.length > 0">
                     <hr>
@@ -91,8 +103,8 @@
                         </div>
                     </content>
                 </waltz-sub-section>
-
             </div>
+        </div>
 
 
     </div>

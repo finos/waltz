@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import angular from "angular";
 import TaxonomyManagementStore from "./services/taxonomy-management-store";
-import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-texonomy-changes-list";
+import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-taxonomy-changes-list";
+import PendingTaxonomyChangesSubSection from "./components/pending-taxonomy-changes-sub-section/pending-taxonomy-changes-sub-section";
 import TaxonomyChangePreview from "./components/taxonomy-change-command-preview/taxonomy-change-command-preview";
 import {registerStores, registerComponents} from "../common/module-utils";
+
 
 export default () => {
     const module = angular.module("waltz.taxonomy-management", []);
@@ -32,6 +33,7 @@ export default () => {
 
     registerComponents(module, [
         PendingTaxonomyChangesList,
+        PendingTaxonomyChangesSubSection,
         TaxonomyChangePreview ]);
 
     return module.name;

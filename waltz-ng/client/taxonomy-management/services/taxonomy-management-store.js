@@ -25,6 +25,10 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/preview`, cmd)
         .then(d => d.data);
 
+    const previewByChangeId = (changeId) => $http
+        .get(`${baseUrl}/pending-changes/${changeId}/preview`)
+        .then(d => d.data);
+
     /*
     const previewById = (id) => $http
         .get(`${baseUrl}/pending-change/${id}`)
@@ -40,10 +44,16 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/pending-changes/by-domain/${domainRef.kind}/${domainRef.id}`)
         .then(d => d.data);
 
+    const applyPendingChange = (cmdId) => $http
+        .post(`${baseUrl}/pending-changes/id/${cmdId}/apply`)
+        .then(d => d.data);
+
     return {
         findPendingChangesByDomain,
         preview,
-        submitPendingChange
+        previewByChangeId,
+        submitPendingChange,
+        applyPendingChange
     };
 
 }
@@ -61,6 +71,11 @@ export default {
 
 
 export const TaxonomyManagementStore_API = {
+    applyPendingChange: {
+        serviceName,
+        serviceFnName: "applyPendingChange",
+        description: "applyPendingChange [ cmdId ]"
+    },
     findPendingChangesByDomain: {
         serviceName,
         serviceFnName: "findPendingChangesByDomain",
@@ -70,6 +85,11 @@ export const TaxonomyManagementStore_API = {
         serviceName,
         serviceFnName: "preview",
         description: "preview the effect of a command [ cmd ]"
+    },
+    previewByChangeId: {
+        serviceName,
+        serviceFnName: "previewByChangeId",
+        description: "preview the effect of a pending command [ cmdId ]"
     },
     submitPendingChange: {
         serviceName,

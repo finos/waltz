@@ -23,8 +23,11 @@ public class TaxonomyChangeService {
 
     private final Map<TaxonomyChangeType, TaxonomyCommandProcessor> processorsByType;
 
+    // BEGIN: hack
     private final Map<Long, TaxonomyChangeCommand> pendingCommandsHack = new HashMap<>();
     private AtomicLong commandCtrHack = new AtomicLong();
+    // END: hack
+
 
     @Autowired
     public TaxonomyChangeService(
@@ -36,6 +39,12 @@ public class TaxonomyChangeService {
     public TaxonomyChangePreview preview(TaxonomyChangeCommand command) {
         TaxonomyCommandProcessor processor = getCommandProcessor(command);
         return processor.preview(command);
+    }
+
+
+    public TaxonomyChangePreview previewByChangeId(long id) {
+        TaxonomyChangeCommand command = pendingCommandsHack.get(id);
+        return preview(command);
     }
 
 
@@ -71,11 +80,11 @@ public class TaxonomyChangeService {
         return updatedCommand;
     }
 
+
     private TaxonomyCommandProcessor getCommandProcessor(TaxonomyChangeCommand command) {
         TaxonomyCommandProcessor processor = processorsByType.get(command.changeType());
         checkNotNull(processor, "Cannot find processor for type: %s", command.changeType());
         return processor;
     }
-
 
 }
