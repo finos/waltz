@@ -54,8 +54,10 @@ function controller($element, $window) {
     vm.$onChanges = () => {
         if (!vm.diagram) return;
 
-        if (latch === true) return;
-        else console.log("latch fail")
+        if (latch === true) {
+            return;
+        }
+
         latch = vm.diagram !== null && vm.blockProcessor !== null;
         console.log("diagram", { latch, d: vm.diagram, bp: vm.blockProcessor});
 

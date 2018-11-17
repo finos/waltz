@@ -50,13 +50,13 @@ function controller($q,
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
-        const measurablePromise = serviceBroker
+        serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === $stateParams.id));
+            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === categoryId));
 
         serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.category = _.find(r.data, { id: $stateParams.id }))
+            .then(r => vm.category = _.find(r.data, { id: categoryId }))
             .then(() => serviceBroker.loadViewData(
                     CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
                     [ toEntityRef(vm.category) ]))

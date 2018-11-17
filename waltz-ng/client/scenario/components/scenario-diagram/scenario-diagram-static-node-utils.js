@@ -1,4 +1,4 @@
-import {toPath, truncateText} from "../../../common/d3-utils";
+import {truncateText} from "../../../common/d3-utils";
 
 
 const nodeWidth = 160;
