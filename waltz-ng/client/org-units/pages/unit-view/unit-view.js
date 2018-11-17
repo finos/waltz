@@ -40,17 +40,10 @@ const addToHistory = (historyStore, orgUnit) => {
 };
 
 
-function initTour(tourService, holder = {}) {
-    return tourService.initialiseForKey('main.org-unit.view', true)
-        .then(tour => holder.tour = tour);
-}
-
-
 function controller($stateParams,
                     dynamicSectionManager,
                     historyStore,
-                    serviceBroker,
-                    tourService) {
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -64,8 +57,8 @@ function controller($stateParams,
         serviceBroker
             .loadViewData(CORE_API.OrgUnitStore.getById, [ id ])
             .then(r => vm.orgUnit = r.data)
-            .then(() => addToHistory(historyStore, vm.orgUnit))
-            .then(() => initTour(tourService, vm))
+            .then(() => addToHistory(historyStore, vm.orgUnit));
+
     };
 
 
@@ -80,8 +73,7 @@ controller.$inject = [
     '$stateParams',
     'DynamicSectionManager',
     'HistoryStore',
-    'ServiceBroker',
-    'TourService'
+    'ServiceBroker'
 ];
 
 

@@ -29,16 +29,13 @@ const initialState = {
 
 function controller($document,
                     appGroupStore,
-                    localStorageService,
-                    tourService) {
+                    localStorageService) {
 
     const vm = Object.assign(this, initialState);
 
     appGroupStore
         .findMyGroupSubscriptions()
-        .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions)
-        .then(() => tourService.initialiseForKey('main.home', true))
-        .then(tour => vm.tour = tour);
+        .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
 
     vm.history = localStorageService
             .get('history_2') || [];
@@ -50,8 +47,7 @@ function controller($document,
 controller.$inject = [
     '$document',
     'AppGroupStore',
-    'localStorageService',
-    'TourService'
+    'localStorageService'
 ];
 
 
