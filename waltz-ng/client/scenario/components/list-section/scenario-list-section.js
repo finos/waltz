@@ -203,7 +203,7 @@ function controller($q,
             .then(r => vm.scenarios = r.data);
 
         return $q
-            .all([scenarioPromise]);
+            .all([scenarioPromise, roadmapPromise]);
     }
 
 }
