@@ -25,7 +25,8 @@ import {toEntityRef} from "../../../common/entity-utils";
 
 const modes = {
     TREE_VIEW : "TREE_VIEW",
-    NODE_VIEW: "NODE_VIEW"
+    NODE_VIEW: "NODE_VIEW",
+    CHANGE_VIEW: "CHANGE_VIEW"
 };
 
 
@@ -33,6 +34,7 @@ const initialState = {
     category: null,
     measurables: [],
     selectedMeasurable: null,
+    selectedChange: null,
     recentlySelected: [],
     pendingChanges: [],
     mode: modes.TREE_VIEW
@@ -61,16 +63,25 @@ function controller($q,
             .then(r => vm.pendingChanges = console.log(r.data) || r.data);
     };
 
+    const clearSelections = () => {
+        vm.selectedMeasurable = null;
+        vm.selectedChange = null;
+    };
+
     vm.onSelect = (d) => {
+        clearSelections();
         vm.mode = modes.NODE_VIEW;
         vm.recentlySelected = _.unionBy(vm.recentlySelected, [d], d => d.id);
         vm.selectedMeasurable = d;
     };
 
     vm.onDismissSelection = () => {
+        clearSelections();
         vm.mode = modes.TREE_VIEW;
-        vm.selectedMeasurable = null;
     };
+
+
+
 }
 
 
