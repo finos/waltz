@@ -60,7 +60,7 @@ function controller($q,
             .then(() => serviceBroker.loadViewData(
                     CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
                     [ toEntityRef(vm.category) ]))
-            .then(r => vm.pendingChanges = console.log(r.data) || r.data);
+            .then(r => vm.pendingChanges = r.data);
     };
 
     const clearSelections = () => {

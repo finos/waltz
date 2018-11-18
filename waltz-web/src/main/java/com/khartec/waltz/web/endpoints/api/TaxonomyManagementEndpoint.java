@@ -48,10 +48,10 @@ public class TaxonomyManagementEndpoint implements Endpoint {
     @Override
     public void register() {
         registerPreview(mkPath(BASE_URL, "preview"));
-        registerPreviewByChangeId(mkPath(BASE_URL, "preview", ":id", "preview"));
         registerSubmitPendingChange(mkPath(BASE_URL, "pending-changes"));
-        registerFindPendingChangesByDomain(mkPath(BASE_URL, "pending-changes", "by-domain", ":kind", ":id"));
+        registerPreviewByChangeId(mkPath(BASE_URL, "pending-changes", "id", ":id", "preview"));
         registerApplyPendingChange(mkPath(BASE_URL, "pending-changes", "id", ":id", "apply"));
+        registerFindPendingChangesByDomain(mkPath(BASE_URL, "pending-changes", "by-domain", ":kind", ":id"));
     }
 
 

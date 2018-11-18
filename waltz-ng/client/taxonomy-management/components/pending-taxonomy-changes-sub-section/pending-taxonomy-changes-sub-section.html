@@ -6,5 +6,20 @@
     </waltz-pending-taxonomy-changes-list>
 
 
+    <div ng-if="$ctrl.selectedPendingChange">
+        <waltz-taxonomy-change-command-info change="$ctrl.selectedPendingChange">
+        </waltz-taxonomy-change-command-info>
+    </div>
+
+
+    <div ng-if="$ctrl.preview">
+        <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+        </waltz-taxonomy-change-command-preview>
+
+        <button class="btn btn-sm"
+                ng-class="$ctrl.submitButtonClass">
+            Execute now
+        </button>
+    </div>
 
 </div>

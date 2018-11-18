@@ -25,16 +25,6 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/preview`, cmd)
         .then(d => d.data);
 
-    const previewByChangeId = (changeId) => $http
-        .get(`${baseUrl}/pending-changes/${changeId}/preview`)
-        .then(d => d.data);
-
-    /*
-    const previewById = (id) => $http
-        .get(`${baseUrl}/pending-change/${id}`)
-        .then(d => d.data);
-    */
-
     const submitPendingChange = (cmd) => $http
         .post(`${baseUrl}/pending-changes`, cmd)
         .then(d => d.data);
@@ -42,6 +32,10 @@ function store($http, baseApiUrl) {
 
     const findPendingChangesByDomain = (domainRef) => $http
         .get(`${baseUrl}/pending-changes/by-domain/${domainRef.kind}/${domainRef.id}`)
+        .then(d => d.data);
+
+    const previewByChangeId = (changeId) => $http
+        .get(`${baseUrl}/pending-changes/id/${changeId}/preview`)
         .then(d => d.data);
 
     const applyPendingChange = (cmdId) => $http

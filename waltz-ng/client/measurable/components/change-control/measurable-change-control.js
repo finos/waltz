@@ -2,7 +2,7 @@ import template from "./measurable-change-control.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
-import {findHighestSeverity, severityToBootstrapBtnClass} from "../../../common/severity-utils";
+import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 
 const modes = {
     MENU: "MENU",
@@ -42,6 +42,16 @@ function controller(notification,
     }
 
 
+    /**
+     * uses the highest severity item in `vm.preview.impacts` to determine the
+     * overall class name (danger, warn etc) of the submit button.
+     */
+    function setupSubmitButtonClassname() {
+        const severities = _.map(vm.preview.impacts, "severity");
+        vm.submitButtonClass = determineColorOfSubmitButton(severities);
+    }
+
+
     const updateMenu = {
         name: "Update",
         description: `These are operations modify an existing taxonomy element.  Care must be taken 
@@ -74,9 +84,7 @@ function controller(notification,
                         .execute(CORE_API.TaxonomyManagementStore.preview, [ vm.command ])
                         .then(r => {
                             vm.preview = r.data;
-                            vm.submitButtonClass = severityToBootstrapBtnClass(
-                                findHighestSeverity(
-                                    _.map(vm.preview.impacts, "severity")));
+                            setupSubmitButtonClassname();
                         })
                 }
             }, {

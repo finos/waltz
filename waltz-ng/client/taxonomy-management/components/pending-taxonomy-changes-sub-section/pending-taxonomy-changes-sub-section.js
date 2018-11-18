@@ -1,6 +1,7 @@
 import template from "./pending-taxonomy-changes-sub-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 
 
 const bindings = {
@@ -10,6 +11,8 @@ const bindings = {
 
 const initialState = {
     pendingChanges: [],
+    selectedPendingChange: null,
+    preview: null
 };
 
 
@@ -34,15 +37,21 @@ function controller(serviceBroker) {
     };
 
     vm.onSelectPendingChange = (pendingChange) => {
-        console.log('s', c);
-
+        vm.selectedPendingChange = pendingChange;
         serviceBroker
             .execute(
                 CORE_API.TaxonomyManagementStore.previewByChangeId,
-                [ c.id ],
+                [ pendingChange.id ],
                 { force: true })
-            .then(r => vm.preview = r.data);
+            .then(r => {
+                vm.preview = r.data;
+                vm.submitButtonClass = determineColorOfSubmitButton(_.map(vm.preview.impacts, "severity"));
+            });
+    };
 
+    vm.onDismiss = () => {
+        vm.preview = null;
+        vm.selectedPendingChange = null;
     };
 }
 
