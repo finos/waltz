@@ -37,9 +37,13 @@ public class RoadmapSearchDao {
         }
 
         List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
-        return roadmapDao.findAll()
+        List<Roadmap> collect = roadmapDao.findAll()
                 .stream()
                 .filter(roadmap -> {
+                    if (!options.entityLifecycleStatuses().contains(roadmap.entityLifecycleStatus())) {
+                        return false;
+                    }
+
                     String s = (roadmap.name() + " " + roadmap.description()).toLowerCase();
                     return all(
                             terms,
@@ -47,6 +51,8 @@ public class RoadmapSearchDao {
                 })
                 .limit(options.limit())
                 .collect(toList());
+
+        return collect;
     }
 
 }

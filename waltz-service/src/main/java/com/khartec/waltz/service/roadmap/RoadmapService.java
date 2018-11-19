@@ -5,10 +5,7 @@ import com.khartec.waltz.data.roadmap.RoadmapDao;
 import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import com.khartec.waltz.data.roadmap.RoadmapSearchDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
@@ -116,6 +113,15 @@ public class RoadmapService {
         Boolean result = roadmapDao.updateName(id, newName, userId);
         if (result) {
             writeLogEntriesForUpdate(id, "Updated Name", newName, userId);
+        }
+        return result;
+    }
+
+
+    public Boolean updateLifecycleStatus(long id, EntityLifecycleStatus newStatus, String userId) {
+        Boolean result = roadmapDao.updateLifecycleStatus(id, newStatus, userId);
+        if (result) {
+            writeLogEntriesForUpdate(id, "Updated Entity Lifecycle Status", newStatus.name(), userId);
         }
         return result;
     }

@@ -67,14 +67,14 @@ public abstract class TaxonomyChangeCommand implements
             case MEASURABLE_CATEGORY:
                 checkTrue(
                         kind == EntityKind.MEASURABLE,
-                        "If domain is [MEASURABLE_CATEGORY] then '%s' must also be a [MEASURABLE], instead it is a [$s]",
+                        "If domain is [MEASURABLE_CATEGORY] then '%s' must also be a [MEASURABLE], instead it is a [%s]",
                         label,
                         kind);
                 break;
             case DATA_TYPE:
                 checkTrue(
                         a().kind() == EntityKind.DATA_TYPE,
-                        "If domain is [DATA_TYPE] then 'a' must also be a [DATA_TYPE], instead it is a [$s]",
+                        "If domain is [DATA_TYPE] then 'a' must also be a [DATA_TYPE], instead it is a [%s]",
                         a().kind());
                 break;
         }

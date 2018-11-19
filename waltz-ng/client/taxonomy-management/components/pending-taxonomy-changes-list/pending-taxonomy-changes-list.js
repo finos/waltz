@@ -1,12 +1,20 @@
 import template from "./pending-taxonomy-changes-list.html";
+import {initialiseData} from "../../../common";
+
 
 const bindings = {
-    pendingChanges: "<"
+    pendingChanges: "<",
+    onSelect: "<"
+};
+
+
+const initialState = {
+    onSelect: (c) => console.log("WPTCL:onSelect default handler", c)
 };
 
 
 function controller() {
-    console.log('here')
+    const vm = initialiseData(this, initialState);
 }
 
 
@@ -24,4 +32,3 @@ export default {
     component,
     id: "waltzPendingTaxonomyChangesList"
 }
-

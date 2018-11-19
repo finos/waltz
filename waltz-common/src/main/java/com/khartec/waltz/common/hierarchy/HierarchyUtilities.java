@@ -39,8 +39,9 @@ public class HierarchyUtilities {
      * return a tuple of a map of all nodes, and the collection
      * of root nodes.
      *
-     * @param flatNodes
-     * @param <T, K>
+     * @param flatNodes collection of flat nodes which will be used to construct the forest
+     * @param <T> type of the node data
+     * @param <K> type of the node key
      * @return
      */
     public static <T, K> Forest<T, K> toForest(Collection<FlatNode<T, K>> flatNodes) {
@@ -119,10 +120,10 @@ public class HierarchyUtilities {
 
     /**
      * Returns a list of parent nodes, immediate parents first
-     * @param startNode
-     * @param <T>
-     * @param <K>
-     * @return
+     * @param startNode node to start from, not included in output
+     * @param <T> type of the node data
+     * @param <K> type of the node key
+     * @return list of parents to this node (or empty list)
      */
     public static <T, K> List<Node<T, K>> parents(Node<T, K> startNode) {
         List<Node<T, K>> parents = ListUtilities.newArrayList();

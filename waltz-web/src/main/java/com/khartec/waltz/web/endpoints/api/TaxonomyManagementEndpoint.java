@@ -48,13 +48,14 @@ public class TaxonomyManagementEndpoint implements Endpoint {
     @Override
     public void register() {
         registerPreview(mkPath(BASE_URL, "preview"));
+        registerPreviewByChangeId(mkPath(BASE_URL, "preview", ":id", "preview"));
         registerSubmitPendingChange(mkPath(BASE_URL, "pending-changes"));
         registerFindPendingChangesByDomain(mkPath(BASE_URL, "pending-changes", "by-domain", ":kind", ":id"));
-        registerApplyChange(mkPath(BASE_URL, "pending-changes", ":id"));
+        registerApplyPendingChange(mkPath(BASE_URL, "pending-changes", "id", ":id", "apply"));
     }
 
 
-    private void registerApplyChange(String path) {
+    private void registerApplyPendingChange(String path) {
         postForDatum(path, (req, resp) -> {
             return taxonomyChangeService.applyById(
                     getId(req),
@@ -84,6 +85,13 @@ public class TaxonomyManagementEndpoint implements Endpoint {
     private void registerPreview(String path) {
         postForDatum(path, (req, resp) -> {
             return taxonomyChangeService.preview(readBody(req, TaxonomyChangeCommand.class));
+        });
+    }
+
+
+    private void registerPreviewByChangeId(String path) {
+        getForDatum(path, (req, resp) -> {
+            return taxonomyChangeService.previewByChangeId(getId(req));
         });
     }
 
