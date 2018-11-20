@@ -42,7 +42,7 @@
             <div class="col-sm-12">
                 <hr>
 
-                <a ng-click="$ctrl.onSubmitChange()"
+                <a ng-click="$ctrl.onSubmit()"
                    class="btn btn-sm"
                     ng-class="$ctrl.submitButtonClass">
                     Submit change
@@ -69,6 +69,21 @@
     <p>
         Setting it to <kbd ng-bind="! $ctrl.measurable.concrete"></kbd>
         will have the following impact:
+    </p>
+
+    <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+    </waltz-taxonomy-change-command-preview>
+</script>
+
+
+<script type="text/ng-template"
+        id="wmcc/UPDATE_NAME.html">
+    <p>
+        The name for this taxonomy item is currently set
+        to <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+    <p>
+        Changing the name will impact the following relationships:
     </p>
 
     <waltz-taxonomy-change-command-preview preview="$ctrl.preview">

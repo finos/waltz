@@ -5,42 +5,42 @@ import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 
 
 const bindings = {
-    changeDomain: "<",
+    pendingChanges: "<",
+    onApplyChange: "<",
+    onDiscardChange: "<",
+    onDismiss: "<"
+};
+
+
+const modes = {
+    LIST: "LIST",
+    VIEW: "VIEW"
 };
 
 
 const initialState = {
-    pendingChanges: [],
     selectedPendingChange: null,
-    preview: null
+    preview: null,
+    mode: modes.LIST
 };
 
 
-function controller(serviceBroker) {
+function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function loadChanges() {
-        if (!vm.changeDomain) return Promise.resolve([]);
-        return serviceBroker
-            .loadViewData(
-                CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
-                [ vm.changeDomain ],
-                { force: true })
-            .then(r => r.data);
+    function reload() {
+        console.log("reload ?!")
     }
 
     vm.$onChanges = (c) => {
-        if (c.changeDomain) {
-            loadChanges()
-                .then(cs => vm.pendingChanges = cs);
-        }
     };
 
     vm.onSelectPendingChange = (pendingChange) => {
         vm.selectedPendingChange = pendingChange;
+        vm.mode = modes.VIEW;
         serviceBroker
             .execute(
-                CORE_API.TaxonomyManagementStore.previewByChangeId,
+                CORE_API.TaxonomyManagementStore.previewById,
                 [ pendingChange.id ],
                 { force: true })
             .then(r => {
@@ -50,13 +50,26 @@ function controller(serviceBroker) {
     };
 
     vm.onDismiss = () => {
+        vm.mode = modes.LIST;
         vm.preview = null;
         vm.selectedPendingChange = null;
     };
+
+    vm.onDiscardPendingChange = (c) => {
+        vm.onDiscardChange(c)
+            .then(vm.onDismiss);
+    };
+
+    vm.onApplyPendingChange = (c) => {
+        vm.onApplyChange(c)
+            .then(vm.onDismiss);
+    };
+
 }
 
 
 controller.$inject = [
+    "Notification",
     "ServiceBroker"
 ];
 

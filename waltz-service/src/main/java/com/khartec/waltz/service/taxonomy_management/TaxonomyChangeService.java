@@ -1,10 +1,7 @@
 package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangePreview;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
+import com.khartec.waltz.model.taxonomy_management.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +39,7 @@ public class TaxonomyChangeService {
     }
 
 
-    public TaxonomyChangePreview previewByChangeId(long id) {
+    public TaxonomyChangePreview previewById(long id) {
         TaxonomyChangeCommand command = pendingCommandsHack.get(id);
         return preview(command);
     }
@@ -69,6 +66,7 @@ public class TaxonomyChangeService {
                 .values()
                 .stream()
                 .filter(c -> c.changeDomain().equals(domain))
+                .filter(c -> c.status() == TaxonomyChangeLifecycleStatus.DRAFT)
                 .collect(Collectors.toList());
     }
 
@@ -87,4 +85,8 @@ public class TaxonomyChangeService {
         return processor;
     }
 
+
+    public boolean removeById(long id) {
+        return pendingCommandsHack.remove(id) != null;
+    }
 }

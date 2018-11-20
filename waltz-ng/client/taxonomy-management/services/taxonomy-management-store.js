@@ -29,23 +29,27 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/pending-changes`, cmd)
         .then(d => d.data);
 
-
     const findPendingChangesByDomain = (domainRef) => $http
         .get(`${baseUrl}/pending-changes/by-domain/${domainRef.kind}/${domainRef.id}`)
         .then(d => d.data);
 
-    const previewByChangeId = (changeId) => $http
+    const previewById = (changeId) => $http
         .get(`${baseUrl}/pending-changes/id/${changeId}/preview`)
         .then(d => d.data);
 
-    const applyPendingChange = (cmdId) => $http
-        .post(`${baseUrl}/pending-changes/id/${cmdId}/apply`)
+    const removeById = (changeId) => $http
+        .delete(`${baseUrl}/pending-changes/id/${changeId}`)
+        .then(d => d.data);
+
+    const applyPendingChange = (changeId) => $http
+        .post(`${baseUrl}/pending-changes/id/${changeId}/apply`)
         .then(d => d.data);
 
     return {
         findPendingChangesByDomain,
         preview,
-        previewByChangeId,
+        previewById,
+        removeById,
         submitPendingChange,
         applyPendingChange
     };
@@ -68,7 +72,7 @@ export const TaxonomyManagementStore_API = {
     applyPendingChange: {
         serviceName,
         serviceFnName: "applyPendingChange",
-        description: "applyPendingChange [ cmdId ]"
+        description: "applyPendingChange [ changeId ]"
     },
     findPendingChangesByDomain: {
         serviceName,
@@ -78,16 +82,21 @@ export const TaxonomyManagementStore_API = {
     preview: {
         serviceName,
         serviceFnName: "preview",
-        description: "preview the effect of a command [ cmd ]"
+        description: "preview the effect of a change [ changeId ]"
     },
-    previewByChangeId: {
+    previewById: {
         serviceName,
-        serviceFnName: "previewByChangeId",
-        description: "preview the effect of a pending command [ cmdId ]"
+        serviceFnName: "previewById",
+        description: "preview the effect of a pending change [ changeId ]"
+    },
+    removeById: {
+        serviceName,
+        serviceFnName: "removeById",
+        description: "remove [ changeId ]"
     },
     submitPendingChange: {
         serviceName,
         serviceFnName: "submitPendingChange",
-        description: "submit the command for later execution [ cmd ]"
+        description: "submit the command for later execution [ change ]"
     }
 };

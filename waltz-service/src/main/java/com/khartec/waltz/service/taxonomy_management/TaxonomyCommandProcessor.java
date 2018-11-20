@@ -28,5 +28,13 @@ public interface TaxonomyCommandProcessor {
     TaxonomyChangeCommand apply(TaxonomyChangeCommand command, String userId);
 
     TaxonomyChangeType type();
+    EntityKind domain();
+
+
+    default void doBasicValidation(TaxonomyChangeCommand cmd) {
+        cmd.validate();
+        checkDomain(cmd, domain());
+        checkType(cmd, type());
+    }
 
 }

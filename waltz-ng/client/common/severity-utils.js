@@ -7,7 +7,7 @@
 
 const severityMap = {
     "INFORMATION": {
-        bootstrapClass: "info",
+        bootstrapClass: "success",
         score: 0
     },
     "WARNING": {

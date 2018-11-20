@@ -12,6 +12,9 @@ const initialState = {};
 
 function controller() {
     const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+    }
 }
 
 
@@ -24,5 +27,5 @@ const component = {
 
 export default {
     component,
-    id: "taxonomyChangeCommandInfo"
-}
+    id: "waltzTaxonomyChangeCommandInfo"
+};

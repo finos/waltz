@@ -13,6 +13,7 @@ const modes = {
 const bindings = {
     measurable: "<",
     changeDomain: "<",
+    onSubmitChange: "<"
 };
 
 
@@ -42,13 +43,15 @@ function controller(notification,
     }
 
 
-    /**
-     * uses the highest severity item in `vm.preview.impacts` to determine the
-     * overall class name (danger, warn etc) of the submit button.
-     */
-    function setupSubmitButtonClassname() {
-        const severities = _.map(vm.preview.impacts, "severity");
-        vm.submitButtonClass = determineColorOfSubmitButton(severities);
+    function calcPreview(command) {
+        return serviceBroker
+            .execute(CORE_API.TaxonomyManagementStore.preview, [ command ])
+            .then(r => {
+                const preview = r.data;
+                vm.preview = preview;
+                const severities = _.map(preview.impacts, "severity");
+                vm.submitButtonClass = determineColorOfSubmitButton(severities);
+            });
     }
 
 
@@ -80,12 +83,7 @@ function controller(notification,
                 icon: "edit",
                 onShow: () => {
                     vm.command = mkUpdCmd(!vm.measurable.concrete);
-                    return serviceBroker
-                        .execute(CORE_API.TaxonomyManagementStore.preview, [ vm.command ])
-                        .then(r => {
-                            vm.preview = r.data;
-                            setupSubmitButtonClassname();
-                        })
+                    calcPreview(vm.command);
                 }
             }, {
                 name: "External Id",
@@ -107,7 +105,11 @@ function controller(notification,
         options: [
             {
                 name: "Add Child",
-                code: "ADD",
+                code: "ADD_CHILD",
+                icon: "plus-circle"
+            }, {
+                name: "Add Peer",
+                code: "ADD_PEER",
                 icon: "plus-circle"
             }, {
                 name: "Clone",
@@ -178,12 +180,9 @@ function controller(notification,
             : Promise.resolve();
     };
 
-    vm.onSubmitChange = () => {
-        serviceBroker
-            .execute(
-                CORE_API.TaxonomyManagementStore.submitPendingChange,
-                [ vm.command ])
-            .then(r => notification.info("Change submitted"))
+    vm.onSubmit = () => {
+        vm.onSubmitChange(vm.command)
+            .then(vm.onDismiss);
     };
 
 }
