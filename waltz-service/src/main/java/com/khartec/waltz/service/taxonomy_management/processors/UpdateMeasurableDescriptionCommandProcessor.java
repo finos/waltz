@@ -1,11 +1,13 @@
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +17,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
-public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFieldUpdateCommandProcessor {
+public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyCommandProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableConcreteFlagCommandProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableDescriptionCommandProcessor.class);
 
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
 
 
     @Autowired
-    public UpdateMeasurableConcreteFlagCommandProcessor(MeasurableService measurableService,
-                                                        MeasurableRatingService measurableRatingService) {
+    public UpdateMeasurableDescriptionCommandProcessor(MeasurableService measurableService,
+                                                       MeasurableRatingService measurableRatingService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
         this.measurableService = measurableService;
@@ -35,7 +37,12 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
 
     @Override
     public TaxonomyChangeType type() {
-        return TaxonomyChangeType.UPDATE_CONCRETENESS;
+        return TaxonomyChangeType.UPDATE_NAME;
+    }
+
+    @Override
+    public EntityKind domain() {
+        return EntityKind.MEASURABLE_CATEGORY;
     }
 
 
@@ -49,19 +56,18 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
                         .copyOf(cmd)
                         .withA(m.entityReference()));
 
-        boolean newValue = cmd.valueAsBoolean();
+        String newName = cmd.newValue();
 
-        if (hasNoChange(m, newValue)) {
+        if (hasNoChange(m, newName)) {
             return preview.build();
         }
 
-        if (newValue == false) {
-            addToPreview(
+        addToPreview(
                     preview,
                     findCurrentRatingMappings(measurableRatingService, cmd),
-                    Severity.WARNING,
-                    "Current app mappings exist to item, these will be invalid when the item becomes non-concrete");
-        }
+                    Severity.INFORMATION,
+                    "Current app mappings exist to item, these may be misleading if the description change alters the meaning of this item");
+
 
         return preview.build();
     }
@@ -71,9 +77,9 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
         doBasicValidation(cmd);
         validateMeasurable(measurableService, cmd);
 
-        measurableService.updateConcreteFlag(
+        measurableService.updateDescription(
                 cmd.a().id(),
-                cmd.valueAsBoolean());
+                cmd.newValue());
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
@@ -85,10 +91,10 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
 
     // --- helpers
 
-    private boolean hasNoChange(Measurable m, boolean newValue) {
-        boolean currentState = m.concrete();
-        if (currentState == newValue) {
-            LOG.info("Aborting command as nothing to do, concrete flag is already {}", newValue);
+    private boolean hasNoChange(Measurable m, String newValue) {
+        String currentName = m.name();
+        if (currentName.equals(newValue)) {
+            LOG.info("Aborting command as nothing to do, name already {}", newValue);
             return true;
         } else {
             return false;

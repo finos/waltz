@@ -20,6 +20,8 @@ const bindings = {
 const initialState = {
     modes: modes,
     mode: modes.MENU,
+    submitDisabled: true,
+    newValue: "",
     selectedOperation: null,
     preview: null,
     command: null
@@ -42,7 +44,6 @@ function controller(notification,
         };
     }
 
-
     function calcPreview(command) {
         return serviceBroker
             .execute(CORE_API.TaxonomyManagementStore.preview, [ command ])
@@ -52,6 +53,13 @@ function controller(notification,
                 const severities = _.map(preview.impacts, "severity");
                 vm.submitButtonClass = determineColorOfSubmitButton(severities);
             });
+    }
+
+
+    function resetForm(currentValue) {
+        vm.newValue = currentValue;
+        vm.originalValue = currentValue;
+        vm.submitDisabled = true;
     }
 
 
@@ -68,10 +76,30 @@ function controller(notification,
                 description: `The name of the taxonomy item may be changed, however care should be 
                     taken to prevent inadvertently altering the <em>meaning</em> of the item`,
                 icon: "edit",
+                onShow: () => {
+                    resetForm(vm.measurable.name);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Description",
                 code: "UPDATE_DESCRIPTION",
-                icon: "edit"
+                icon: "edit",
+                description: `The description of the taxonomy item may be changed, however care should be 
+                    taken to prevent inadvertently altering the <em>meaning</em> of the item.`,
+                onShow: () => {
+                    resetForm(vm.measurable.description);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Concrete",
                 code: "UPDATE_CONCRETENESS",
@@ -83,6 +111,7 @@ function controller(notification,
                 icon: "edit",
                 onShow: () => {
                     vm.command = mkUpdCmd(!vm.measurable.concrete);
+                    vm.submitDisabled = false;
                     calcPreview(vm.command);
                 }
             }, {
@@ -181,6 +210,7 @@ function controller(notification,
     };
 
     vm.onSubmit = () => {
+        if (vm.submitDisabled) return;
         vm.onSubmitChange(vm.command)
             .then(vm.onDismiss);
     };

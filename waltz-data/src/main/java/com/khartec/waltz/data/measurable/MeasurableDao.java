@@ -150,4 +150,12 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .execute() == 1;
     }
 
+
+    public boolean updateDescription(long id, String newValue) {
+        return dsl
+                .update(MEASURABLE)
+                .set(MEASURABLE.DESCRIPTION, newValue)
+                .where(MEASURABLE.ID.eq(id))
+                .execute() == 1;
+    }
 }

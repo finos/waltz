@@ -54,11 +54,23 @@ public class TaxonomyManagementUtilities {
     }
 
 
+    /**
+     * Optionally add an impact to the given preview and return it.
+     * Whether to add the impact is determined by the presence of references.
+     *
+     * @param preview The preview builder to update
+     * @param refs Set of references, if empty no impact will be added to the preview
+     * @param severity Severity of the impact
+     * @param msg Description of the impact
+     * @return The preview builder for convenience
+     */
     public static ImmutableTaxonomyChangePreview.Builder addToPreview(ImmutableTaxonomyChangePreview.Builder preview,
                                                                       Set<EntityReference> refs,
                                                                       Severity severity,
                                                                       String msg) {
-        return preview
+        return refs.isEmpty()
+            ? preview
+            : preview
                 .addImpacts(ImmutableTaxonomyChangeImpact.builder()
                 .impactedReferences(refs)
                 .description(msg)
