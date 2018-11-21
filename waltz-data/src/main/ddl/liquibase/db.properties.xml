@@ -56,6 +56,10 @@
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
     <property name="longvarchar.type" value="varchar(4000)" dbms="postgresql"></property>
 
+    <property name="true.value" value="1" dbms="mssql"/>
+    <property name="true.value" value="1" dbms="mysql"/>
+    <property name="true.value" value="true" dbms="postgresql"/>
+
 
     <!-- DICTIONARY -->
     <property name="assetcode.type" value="VARCHAR(255)"></property>

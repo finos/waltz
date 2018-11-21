@@ -51,6 +51,19 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>waltz-postgres</id>
+            <properties>
+                <jdbc.group>org.postgresql</jdbc.group>
+                <jdbc.artifact>postgresql</jdbc.artifact>
+                <jdbc.version>42.2.5</jdbc.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jooq.dialect>POSTGRES</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.util.postgres.PostgresDatabase</jooq.database>
+                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+            </properties>
+        </profile>
 
         <profile>
             <id>travis-mariadb</id>

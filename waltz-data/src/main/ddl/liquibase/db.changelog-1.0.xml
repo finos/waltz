@@ -732,8 +732,20 @@
     </changeSet>
 
     <!-- 146 -->
-    <changeSet author="dwatkins" id="20160106-idx-3">
+    <changeSet author="dwatkins"
+               id="20160106-idx-3"
+               dbms="mssql,mysql">
         <createIndex indexName="idx_asset_code"
+                     tableName="server_information"
+                     unique="false">
+            <column name="asset_code" type="VARCHAR(128)"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="dwatkins"
+               id="20160106-idx-3"
+               dbms="postgresql">
+        <createIndex indexName="idx_si_asset_code"
                      tableName="server_information"
                      unique="false">
             <column name="asset_code" type="VARCHAR(128)"/>
@@ -2007,7 +2019,7 @@
     <!-- 244 entity statistics - rename -->
     <changeSet author="kamransaleem"
                id="20160624-244-1"
-               dbms="mssql">
+               dbms="mssql,postgresql">
         <renameTable newTableName="entity_statistic_definition"
                      oldTableName="entity_statistic"/>
 
@@ -2096,7 +2108,8 @@
 
 
     <changeSet author="dwatkins"
-               id="20160629-253-3">
+               id="20160629-253-3"
+               dbms="mssql,maria">
         <sql>
             INSERT INTO data_type_usage (entity_id, entity_kind, data_type_code, usage_kind)
                 SELECT DISTINCT df.source_entity_id as entity_id, df.source_entity_kind as entity_kind, df.data_type as data_type_code, 'DISTRIBUTOR' as usage_kind
@@ -2130,7 +2143,7 @@
     <changeSet author="dwatkins"
                id="20160629-253-5">
         <sql>
-            UPDATE data_type_usage SET is_selected = 1
+            UPDATE data_type_usage SET is_selected = ${true.value}
         </sql>
     </changeSet>
 
@@ -2583,6 +2596,7 @@
     </changeSet>
 
     <changeSet id="20160830-447-4"
+               dbms="mssql,mysql"
                author="rovats">
         <sql>
             insert data_flow_decorator (data_flow_id, decorator_entity_kind, decorator_entity_id, provenance)
@@ -2599,6 +2613,24 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20160830-447-4"
+               dbms="postgresql"
+               author="rovats">
+        <sql>
+            insert into data_flow_decorator (data_flow_id, decorator_entity_kind, decorator_entity_id, provenance)
+                (select df_u.id, 'DATA_TYPE', dt.id, provenance
+                from data_flow df
+                inner join (select min(id) as id, source_entity_id, target_entity_id
+                            from data_flow
+                            group by source_entity_id, target_entity_id) df_u
+                    on df_u.source_entity_id = df.source_entity_id
+                        and df_u.target_entity_id = df.target_entity_id
+                inner join data_type dt
+                    on dt.code = df.data_type
+                order by df_u.id desc);
+        </sql>
+    </changeSet>
+
     <changeSet id="20160830-447-5"
                author="rovats">
         <dropColumn tableName="data_flow"
@@ -2606,6 +2638,7 @@
     </changeSet>
 
     <changeSet id="20160830-447-6"
+               dbms="mysql,mssql"
                author="rovats">
         <sql>
             delete df
@@ -3228,7 +3261,7 @@
     <!-- 747 actor rename to actor-->
     <changeSet author="kamransaleem"
                id="20161021-747-1"
-               dbms="mssql">
+               dbms="mssql,postgresql">
         <renameTable oldTableName="involvement_kind"
                      newTableName="actor" />
 
@@ -3274,7 +3307,7 @@
     <!-- 750 - Rename DataFlow / DataFlowDecorator to LogicalFlow LogicalFlowDecorator -->
     <changeSet author="dwatkins"
                id="20161107-750-1"
-               dbms="mssql">
+               dbms="mssql,postgresql">
         <dropPrimaryKey tableName="data_flow"/>
 
         <renameTable oldTableName="data_flow"
@@ -3464,7 +3497,7 @@
 
     <changeSet id="20161111-942-1"
                author="kamransaleem"
-               dbms="mssql">
+               dbms="mssql,postgresql">
 
         <dropDefaultValue columnName="last_updated_at"
                           tableName="actor" />
