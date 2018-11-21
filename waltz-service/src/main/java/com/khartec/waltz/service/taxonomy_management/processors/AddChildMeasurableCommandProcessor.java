@@ -2,6 +2,7 @@ package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.measurable.ImmutableMeasurable;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
@@ -10,17 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.getExternalIdParam;
-import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validateMeasurable;
+import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
-public class UpdateMeasurableExternalIdCommandProcessor implements TaxonomyCommandProcessor {
+public class AddChildMeasurableCommandProcessor implements TaxonomyCommandProcessor {
 
     private final MeasurableService measurableService;
 
 
     @Autowired
-    public UpdateMeasurableExternalIdCommandProcessor(MeasurableService measurableService) {
+    public AddChildMeasurableCommandProcessor(MeasurableService measurableService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         this.measurableService = measurableService;
     }
@@ -28,7 +28,7 @@ public class UpdateMeasurableExternalIdCommandProcessor implements TaxonomyComma
 
     @Override
     public TaxonomyChangeType type() {
-        return TaxonomyChangeType.UPDATE_EXTERNAL_ID;
+        return TaxonomyChangeType.UPDATE_NAME;
     }
 
 
@@ -41,12 +41,14 @@ public class UpdateMeasurableExternalIdCommandProcessor implements TaxonomyComma
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
         Measurable m = validateMeasurable(measurableService, cmd);
-        return ImmutableTaxonomyChangePreview
+
+        ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
                 .builder()
                 .command(ImmutableTaxonomyChangeCommand
                         .copyOf(cmd)
-                        .withPrimaryReference(m.entityReference()))
-                .build();
+                        .withPrimaryReference(m.entityReference()));
+
+        return preview.build();
     }
 
 
@@ -54,10 +56,19 @@ public class UpdateMeasurableExternalIdCommandProcessor implements TaxonomyComma
         doBasicValidation(cmd);
         validateMeasurable(measurableService, cmd);
 
-        measurableService.updateExternalId(
-                cmd.primaryReference().id(),
-                getExternalIdParam(cmd),
-                userId);
+        Measurable measurable = ImmutableMeasurable
+                .builder()
+                .categoryId(cmd.changeDomain().id())
+                .parentId(cmd.primaryReference().id())
+                .name(getNameParam(cmd))
+                .description(getDescriptionParam(cmd))
+                .externalId(getExternalIdParam(cmd))
+                .concrete(getConcreteParam(cmd))
+                .lastUpdatedBy(userId)
+                .lastUpdatedAt(DateTimeUtilities.nowUtc())
+                .build();
+
+        measurableService.create(measurable, userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)

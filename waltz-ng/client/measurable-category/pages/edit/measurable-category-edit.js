@@ -132,6 +132,7 @@ function controller($q,
     };
 
     vm.onSubmitChange = (change) => {
+        console.log('osc', { change })
         return serviceBroker
             .execute(
                 CORE_API.TaxonomyManagementStore.submitPendingChange,

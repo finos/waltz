@@ -6,7 +6,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkTrue;
 
@@ -16,7 +16,8 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 public abstract class TaxonomyChangeCommand implements
         Command,
         IdProvider,
-        CreatedProvider {
+        CreatedProvider,
+        LastUpdatedProvider {
 
     public abstract TaxonomyChangeType changeType();
 
@@ -27,19 +28,10 @@ public abstract class TaxonomyChangeCommand implements
 
     public abstract EntityReference changeDomain();
 
-    public abstract EntityReference a();
+    public abstract EntityReference primaryReference();
 
     @Nullable
-    public abstract EntityReference b();
-
-    @Nullable
-    public abstract String newValue();
-
-    @Nullable
-    public abstract LocalDateTime executedAt();
-
-    @Nullable
-    public abstract String executedBy();
+    public abstract Map<String, String> params();
 
 
     /**
@@ -47,10 +39,7 @@ public abstract class TaxonomyChangeCommand implements
      */
     public void validate() {
         checkDomain(changeDomain().kind());
-        checkRefKind(a().kind(), "a");
-        if (b() != null) {
-            checkRefKind(b().kind(), "b");
-        }
+        checkRefKind(primaryReference().kind(), "a");
     }
 
 
@@ -73,16 +62,21 @@ public abstract class TaxonomyChangeCommand implements
                 break;
             case DATA_TYPE:
                 checkTrue(
-                        a().kind() == EntityKind.DATA_TYPE,
+                        primaryReference().kind() == EntityKind.DATA_TYPE,
                         "If domain is [DATA_TYPE] then 'a' must also be a [DATA_TYPE], instead it is a [%s]",
-                        a().kind());
+                        primaryReference().kind());
                 break;
         }
     }
 
 
-    public boolean valueAsBoolean() {
-        return Boolean.valueOf(newValue());
+    public boolean paramAsBoolean(String key) {
+        return Boolean.valueOf(params().get(key));
+    }
+
+
+    public String param(String key) {
+        return params().get(key);
     }
 }
 

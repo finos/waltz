@@ -23,7 +23,7 @@ public class TaxonomyManagementUtilities {
 
     public static Measurable validateMeasurable(MeasurableService measurableService,
                                                 TaxonomyChangeCommand cmd) {
-        long measurableId = cmd.a().id();
+        long measurableId = cmd.primaryReference().id();
         Measurable measurable = measurableService.getById(measurableId);
 
         checkNotNull(
@@ -45,7 +45,7 @@ public class TaxonomyManagementUtilities {
 
     public static Set<EntityReference> findCurrentRatingMappings(MeasurableRatingService measurableRatingService,
                                                                  TaxonomyChangeCommand cmd) {
-        IdSelectionOptions selectionOptions = mkOpts(cmd.a(), HierarchyQueryScope.EXACT);
+        IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.EXACT);
         return measurableRatingService
                 .findByMeasurableIdSelector(selectionOptions)
                 .stream()
@@ -78,4 +78,23 @@ public class TaxonomyManagementUtilities {
                 .build());
     }
 
+
+    public static String getNameParam(TaxonomyChangeCommand cmd) {
+        return cmd.param("name");
+    }
+
+
+    public static String getDescriptionParam(TaxonomyChangeCommand cmd) {
+        return cmd.param("description");
+    }
+
+
+    public static String getExternalIdParam(TaxonomyChangeCommand cmd) {
+        return cmd.param("externalId");
+    }
+
+
+    public static boolean getConcreteParam(TaxonomyChangeCommand cmd) {
+        return cmd.paramAsBoolean("concrete");
+    }
 }
