@@ -1,0 +1,60 @@
+<style>
+    .wtcci-value-cell {
+        border: 1px solid #f5f5f5;
+        background: #fafafa;
+        min-height: 1.2em;
+        margin-bottom: 2px;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <span>Type</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.changeType"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <span>Status</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.status"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <span>Created By</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.createdBy"></span>
+            ( <span ng-bind="$ctrl.change.createdAt"></span> )
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <span>Primary reference</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.a.name"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <span>New value</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.newValue"></span>
+        </div>
+    </div>
+    <div class="row"
+         ng-if="$ctrl.change.b">
+        <div class="col-md-4">
+            <span>Secondary reference</span>
+        </div>
+        <div class="col-md-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.b.name"></span>
+        </div>
+    </div>
+</div>

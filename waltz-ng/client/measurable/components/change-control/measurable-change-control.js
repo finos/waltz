@@ -2,7 +2,7 @@ import template from "./measurable-change-control.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
-import {findHighestSeverity, severityToBootstrapBtnClass} from "../../../common/severity-utils";
+import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 
 const modes = {
     MENU: "MENU",
@@ -13,12 +13,15 @@ const modes = {
 const bindings = {
     measurable: "<",
     changeDomain: "<",
+    onSubmitChange: "<"
 };
 
 
 const initialState = {
     modes: modes,
     mode: modes.MENU,
+    submitDisabled: true,
+    newValue: "",
     selectedOperation: null,
     preview: null,
     command: null
@@ -41,6 +44,24 @@ function controller(notification,
         };
     }
 
+    function calcPreview(command) {
+        return serviceBroker
+            .execute(CORE_API.TaxonomyManagementStore.preview, [ command ])
+            .then(r => {
+                const preview = r.data;
+                vm.preview = preview;
+                const severities = _.map(preview.impacts, "severity");
+                vm.submitButtonClass = determineColorOfSubmitButton(severities);
+            });
+    }
+
+
+    function resetForm(currentValue) {
+        vm.newValue = currentValue;
+        vm.originalValue = currentValue;
+        vm.submitDisabled = true;
+    }
+
 
     const updateMenu = {
         name: "Update",
@@ -55,10 +76,30 @@ function controller(notification,
                 description: `The name of the taxonomy item may be changed, however care should be 
                     taken to prevent inadvertently altering the <em>meaning</em> of the item`,
                 icon: "edit",
+                onShow: () => {
+                    resetForm(vm.measurable.name);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Description",
                 code: "UPDATE_DESCRIPTION",
-                icon: "edit"
+                icon: "edit",
+                description: `The description of the taxonomy item may be changed, however care should be 
+                    taken to prevent inadvertently altering the <em>meaning</em> of the item.`,
+                onShow: () => {
+                    resetForm(vm.measurable.description);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Concrete",
                 code: "UPDATE_CONCRETENESS",
@@ -70,19 +111,25 @@ function controller(notification,
                 icon: "edit",
                 onShow: () => {
                     vm.command = mkUpdCmd(!vm.measurable.concrete);
-                    return serviceBroker
-                        .execute(CORE_API.TaxonomyManagementStore.preview, [ vm.command ])
-                        .then(r => {
-                            vm.preview = r.data;
-                            vm.submitButtonClass = severityToBootstrapBtnClass(
-                                findHighestSeverity(
-                                    _.map(vm.preview.impacts, "severity")));
-                        })
+                    vm.submitDisabled = false;
+                    calcPreview(vm.command);
                 }
             }, {
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
-                icon: "edit"
+                icon: "edit",
+                description: `The external identifier of the taxonomy item may be changed, however care should be 
+                    taken to prevent potentially breaking downstream consumers / reporting systems that rely
+                    on the identifier.`,
+                onShow: () => {
+                    resetForm(vm.measurable.externalId);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Move",
                 code: "MOVE",
@@ -99,7 +146,11 @@ function controller(notification,
         options: [
             {
                 name: "Add Child",
-                code: "ADD",
+                code: "ADD_CHILD",
+                icon: "plus-circle"
+            }, {
+                name: "Add Peer",
+                code: "ADD_PEER",
                 icon: "plus-circle"
             }, {
                 name: "Clone",
@@ -170,12 +221,10 @@ function controller(notification,
             : Promise.resolve();
     };
 
-    vm.onSubmitChange = () => {
-        serviceBroker
-            .execute(
-                CORE_API.TaxonomyManagementStore.submitPendingChange,
-                [ vm.command ])
-            .then(r => notification.info("Change submitted"))
+    vm.onSubmit = () => {
+        if (vm.submitDisabled) return;
+        vm.onSubmitChange(vm.command)
+            .then(vm.onDismiss);
     };
 
 }

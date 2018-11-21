@@ -21,33 +21,63 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
+import {entity as Entities} from "../../../common/services/enums/entity";
 
 
 const modes = {
-    TREE_VIEW : "TREE_VIEW",
+    SUMMARY : "SUMMARY",
     NODE_VIEW: "NODE_VIEW",
     CHANGE_VIEW: "CHANGE_VIEW"
 };
 
 
 const initialState = {
-    category: null,
+    changeDomain: null,
     measurables: [],
     selectedMeasurable: null,
     selectedChange: null,
     recentlySelected: [],
     pendingChanges: [],
-    mode: modes.TREE_VIEW
+    mode: modes.SUMMARY
 };
+
+
+function loadChangesByDomain(serviceBroker, changeDomain) {
+    if (!changeDomain) {
+        return Promise.resolve([]);
+    }
+    return serviceBroker
+        .loadViewData(
+            CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
+            [ changeDomain ],
+            { force: true })
+        .then(r => r.data);
+}
 
 
 function controller($q,
                     $state,
                     $stateParams,
+                    notification,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const categoryId = $stateParams.id;
+
+    // -- util
+
+    function reloadPending() {
+        loadChangesByDomain(serviceBroker, toEntityRef(vm.category))
+            .then(cs => vm.pendingChanges = cs);
+    }
+
+    const clearSelections = () => {
+        vm.selectedMeasurable = null;
+        vm.selectedChange = null;
+    };
+
+
+    // -- boot
 
     vm.$onInit = () => {
         serviceBroker
@@ -57,30 +87,69 @@ function controller($q,
         serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
             .then(r => vm.category = _.find(r.data, { id: categoryId }))
-            .then(() => serviceBroker.loadViewData(
-                    CORE_API.TaxonomyManagementStore.findPendingChangesByDomain,
-                    [ toEntityRef(vm.category) ]))
-            .then(r => vm.pendingChanges = console.log(r.data) || r.data);
+            .then(reloadPending);
     };
 
-    const clearSelections = () => {
-        vm.selectedMeasurable = null;
-        vm.selectedChange = null;
-    };
 
-    vm.onSelect = (d) => {
+    // -- interact
+
+    vm.onSelect = (treeNode) => {
         clearSelections();
         vm.mode = modes.NODE_VIEW;
-        vm.recentlySelected = _.unionBy(vm.recentlySelected, [d], d => d.id);
-        vm.selectedMeasurable = d;
+        vm.recentlySelected = _.unionBy(vm.recentlySelected, [treeNode], d => d.id);
+        vm.selectedMeasurable = treeNode;
+    };
+
+    vm.onDiscardPendingChange = (change) => {
+        const proceed = confirm("Are you sure that you wish to discard this change?");
+        if (!proceed) { return Promise.resolve(false); }
+        return serviceBroker
+            .execute(
+                CORE_API.TaxonomyManagementStore.removeById,
+                [ change.id ])
+            .then(() => {
+                notification.info("Change discarded");
+                reloadPending();
+                return true;
+            })
+            .catch(e => {
+                const msg = `Failed to discard change: ${e.message}`;
+                notification.error(msg);
+                console.error(msg, { e })
+            });
+    };
+
+    vm.onApplyPendingChange = (change) => {
+        return serviceBroker
+            .execute(
+                CORE_API.TaxonomyManagementStore.applyPendingChange,
+                [ change.id ])
+            .then(() => {
+                notification.info("Change applied");
+                reloadPending();
+                return true;
+            })
+    };
+
+    vm.onSubmitChange = (change) => {
+        return serviceBroker
+            .execute(
+                CORE_API.TaxonomyManagementStore.submitPendingChange,
+                [ change ])
+            .then(r => {
+                notification.info("Change submitted");
+                reloadPending();
+            });
     };
 
     vm.onDismissSelection = () => {
         clearSelections();
-        vm.mode = modes.TREE_VIEW;
+        vm.mode = modes.SUMMARY;
     };
 
-
+    vm.onClearRecentlyViewed = () => {
+        vm.recentlySelected = [];
+    };
 
 }
 
@@ -89,6 +158,7 @@ controller.$inject = [
     "$q",
     "$state",
     "$stateParams",
+    "Notification",
     "ServiceBroker"
 ];
 

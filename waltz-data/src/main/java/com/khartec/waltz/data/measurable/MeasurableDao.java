@@ -132,12 +132,33 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public boolean updateConcreteFlag(Long id, boolean newValue) {
+    public boolean updateConcreteFlag(Long id, boolean newValue, String userId) {
+        return updateField(id, MEASURABLE.CONCRETE, newValue, userId);
+    }
+
+
+    public boolean updateName(long id, String newValue, String userId) {
+        return updateField(id, MEASURABLE.NAME, newValue, userId);
+    }
+
+
+    public boolean updateDescription(long id, String newValue, String userId) {
+        return updateField(id, MEASURABLE.DESCRIPTION, newValue, userId);
+    }
+
+
+    public boolean updateExternalId(long id, String newValue, String userId) {
+        return updateField(id, MEASURABLE.EXTERNAL_ID, newValue, userId);
+    }
+
+
+    private <T> boolean updateField(long id, Field<T> field, T value, String userId) {
         return dsl
                 .update(MEASURABLE)
-                .set(MEASURABLE.CONCRETE, newValue)
+                .set(field, value)
+                .set(MEASURABLE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(MEASURABLE.LAST_UPDATED_BY, userId)
                 .where(MEASURABLE.ID.eq(id))
-                .and(MEASURABLE.CONCRETE.eq(!newValue))
                 .execute() == 1;
     }
 }

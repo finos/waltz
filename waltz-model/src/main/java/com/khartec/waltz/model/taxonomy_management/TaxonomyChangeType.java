@@ -2,7 +2,8 @@ package com.khartec.waltz.model.taxonomy_management;
 
 public enum TaxonomyChangeType {
 
-    ADD,
+    ADD_PEER,
+    ADD_CHILD,
     REMOVE,
     DEPRECATE,
     UPDATE_NAME,
