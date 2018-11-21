@@ -21,7 +21,7 @@ const initialState = {
     modes: modes,
     mode: modes.MENU,
     submitDisabled: true,
-    newValue: "",
+    commandParams: {},
     selectedOperation: null,
     preview: null,
     command: null
@@ -34,19 +34,29 @@ function controller(notification,
 
     const vm = initialiseData(this, initialState);
 
-    function mkUpdCmd(newValue) {
+    function mkUpdCmd() {
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
             a: toEntityRef(vm.measurable),
-            newValue: newValue+"",
+            params: vm.commandParams,
             createdBy: vm.userName
         };
     }
 
-    function calcPreview(command) {
+    function mkPreviewCmd() {
+        return {
+            changeType: vm.selectedOperation.code,
+            changeDomain: toEntityRef(vm.changeDomain),
+            a: toEntityRef(vm.measurable),
+            params: {},
+            createdBy: vm.userName
+        };
+    }
+
+    function calcPreview() {
         return serviceBroker
-            .execute(CORE_API.TaxonomyManagementStore.preview, [ command ])
+            .execute(CORE_API.TaxonomyManagementStore.preview, [ mkPreviewCmd() ])
             .then(r => {
                 const preview = r.data;
                 vm.preview = preview;
@@ -56,9 +66,8 @@ function controller(notification,
     }
 
 
-    function resetForm(currentValue) {
-        vm.newValue = currentValue;
-        vm.originalValue = currentValue;
+    function resetForm(params) {
+        vm.commandParams = Object.assign({}, params);
         vm.submitDisabled = true;
     }
 
@@ -77,13 +86,12 @@ function controller(notification,
                     taken to prevent inadvertently altering the <em>meaning</em> of the item`,
                 icon: "edit",
                 onShow: () => {
-                    resetForm(vm.measurable.name);
-                    vm.command = mkUpdCmd(vm.newValue);
-                    calcPreview(vm.command);
+                    resetForm({ name: vm.measurable.name });
+                    calcPreview();
                 },
                 onChange: () => {
-                    vm.submitDisabled = vm.newValue === vm.originalValue;
-                    vm.command = mkUpdCmd(vm.newValue);
+                    vm.submitDisabled = vm.commandParams.name === vm.measurable.name;
+                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Description",
@@ -92,13 +100,12 @@ function controller(notification,
                 description: `The description of the taxonomy item may be changed, however care should be 
                     taken to prevent inadvertently altering the <em>meaning</em> of the item.`,
                 onShow: () => {
-                    resetForm(vm.measurable.description);
-                    vm.command = mkUpdCmd(vm.newValue);
-                    calcPreview(vm.command);
+                    resetForm({ description: vm.measurable.description });
+                    calcPreview();
                 },
                 onChange: () => {
-                    vm.submitDisabled = vm.newValue === vm.originalValue;
-                    vm.command = mkUpdCmd(vm.newValue);
+                    vm.submitDisabled = vm.commandParams.description === vm.measurable.description;
+                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Concrete",
@@ -110,9 +117,9 @@ function controller(notification,
                     specific enough to accurately describe the portfolio.`,
                 icon: "edit",
                 onShow: () => {
-                    vm.command = mkUpdCmd(!vm.measurable.concrete);
+                    resetForm({ concrete: !vm.measurable.concrete });
                     vm.submitDisabled = false;
-                    calcPreview(vm.command);
+                    calcPreview();
                 }
             }, {
                 name: "External Id",
@@ -122,13 +129,12 @@ function controller(notification,
                     taken to prevent potentially breaking downstream consumers / reporting systems that rely
                     on the identifier.`,
                 onShow: () => {
-                    resetForm(vm.measurable.externalId);
-                    vm.command = mkUpdCmd(vm.newValue);
-                    calcPreview(vm.command);
+                    resetForm({ externalId: vm.measurable.externalId });
+                    calcPreview();
                 },
                 onChange: () => {
-                    vm.submitDisabled = vm.newValue === vm.originalValue;
-                    vm.command = mkUpdCmd(vm.newValue);
+                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
+                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Move",
@@ -147,7 +153,18 @@ function controller(notification,
             {
                 name: "Add Child",
                 code: "ADD_CHILD",
-                icon: "plus-circle"
+                icon: "plus-circle",
+                description: "Adds a new element to the taxonomy underneath the currently selected item.",
+                onShow: () => {
+                    resetForm({ concrete: true });
+                    calcPreview();
+                },
+                onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
+                onChange: () => {
+                    const required = [vm.commandParams.name];
+                    vm.submitDisabled = _.some(required, _.isEmpty);
+                    vm.command = mkUpdCmd();
+                }
             }, {
                 name: "Add Peer",
                 code: "ADD_PEER",
@@ -183,8 +200,8 @@ function controller(notification,
     };
 
     vm.menus = [
-        updateMenu,
         creationMenu,
+        updateMenu,
         destructiveMenu
     ];
 
@@ -226,7 +243,6 @@ function controller(notification,
         vm.onSubmitChange(vm.command)
             .then(vm.onDismiss);
     };
-
 }
 
 

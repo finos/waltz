@@ -23,7 +23,10 @@
     <div ng-switch-when="OPERATION">
         <div class="row">
             <div class="col-sm-12">
-                <h4 ng-bind="$ctrl.selectedOperation.title || $ctrl.selectedOperation.name"></h4>
+                <h4>
+                    <waltz-icon name="{{$ctrl.selectedOperation.icon}}"></waltz-icon>
+                    <span ng-bind="$ctrl.selectedOperation.title || $ctrl.selectedOperation.name"></span>
+                </h4>
                 <div class="help-block"
                      ng-bind-html="$ctrl.selectedOperation.description">
                 </div>
@@ -54,11 +57,78 @@
                     Close
                 </a>
 
-
+                <pre ng-bind="$ctrl.commandParams|json"></pre>
             </div>
+
+
         </div>
     </div>
 </div>
+
+
+<!-- OPERATION fragments -->
+
+<script type="text/ng-template"
+        id="wmcc/ADD_CHILD.html">
+    <p>
+        Adding a child to node: <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+    <div>
+        <div class="form-group">
+            <label for="wmcc.add-child.name"
+                   class="control-label">
+                Name:
+            </label>
+            <input type="text"
+                   class="form-control"
+                   placeholder="New external id for item"
+                   ng-model="$ctrl.commandParams.name"
+                   ng-change="$ctrl.selectedOperation.onChange()"
+                   id="wmcc.add-child.name">
+        </div>
+
+        <div class="form-group">
+            <label for="wmcc.add-child.description"
+                   class="control-label">
+                Description:
+            </label>
+            <textarea class="form-control"
+                      placeholder="Description for item"
+                      ng-model="$ctrl.commandParams.description"
+                      ng-change="$ctrl.selectedOperation.onChange()"
+                      id="wmcc.add-child.description">
+            </textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="wmcc.add-child.external-id"
+                   class="control-label">
+                External Id:
+            </label>
+            <input type="text"
+                   class="form-control"
+                   placeholder="New external id for item"
+                   ng-model="$ctrl.commandParams.externalId"
+                   ng-change="$ctrl.selectedOperation.onChange()"
+                   id="wmcc.add-child.external-id">
+        </div>
+
+        <div class="form-group">
+            <label for="wmcc.add-child.concrete"
+                   class="control-label">
+                Concrete:
+            </label>
+            <div class="form-control">
+                <waltz-toggle id="wmcc.add-child.concrete"
+                              on-toggle="$ctrl.selectedOperation.onToggleConcrete()"
+                              label-on="Concrete, applications may map to this item"
+                              label-off="Non-Concrete, applications cannot map to this item"
+                              state="$ctrl.commandParams.concrete">
+                </waltz-toggle>
+            </div>
+        </div>
+    </div>
+</script>
 
 
 <script type="text/ng-template"
@@ -81,7 +151,7 @@
         id="wmcc/UPDATE_NAME.html">
     <p>
         The name for this taxonomy item is currently set
-        to <kbd ng-bind="$ctrl.originalValue"></kbd>
+        to <kbd ng-bind="$ctrl.measurable.name"></kbd>
     </p>
     <div>
        <div class="form-group">
@@ -92,7 +162,7 @@
             <input type="text"
                    class="form-control"
                    placeholder="New name for item"
-                   ng-model="$ctrl.newValue"
+                   ng-model="$ctrl.commandParams.name"
                    ng-change="$ctrl.selectedOperation.onChange()"
                    id="wmcc.new-name">
         </div>
@@ -121,12 +191,13 @@
             <input type="text"
                    class="form-control"
                    placeholder="New external id for item"
-                   ng-model="$ctrl.newValue"
+                   ng-model="$ctrl.commandParams.externalId"
                    ng-change="$ctrl.selectedOperation.onChange()"
                    id="wmcc.new-ext-id">
         </div>
     </div>
 </script>
+
 
 <script type="text/ng-template"
         id="wmcc/UPDATE_DESCRIPTION.html">
@@ -142,7 +213,7 @@
             </label>
             <textarea class="form-control"
                       placeholder="New description for item"
-                      ng-model="$ctrl.newValue"
+                      ng-model="$ctrl.commandParams.description"
                       ng-change="$ctrl.selectedOperation.onChange()"
                       id="wmcc.new-desc">
             </textarea>

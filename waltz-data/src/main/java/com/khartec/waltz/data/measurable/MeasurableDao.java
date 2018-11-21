@@ -161,4 +161,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.ID.eq(id))
                 .execute() == 1;
     }
+
+    public boolean create(Measurable measurable) {
+        return false;
+    }
 }
