@@ -21,7 +21,6 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
-import {entity as Entities} from "../../../common/services/enums/entity";
 
 
 const modes = {
@@ -132,12 +131,11 @@ function controller($q,
     };
 
     vm.onSubmitChange = (change) => {
-        console.log('osc', { change })
         return serviceBroker
             .execute(
                 CORE_API.TaxonomyManagementStore.submitPendingChange,
                 [ change ])
-            .then(r => {
+            .then(() => {
                 notification.info("Change submitted");
                 reloadPending();
             });

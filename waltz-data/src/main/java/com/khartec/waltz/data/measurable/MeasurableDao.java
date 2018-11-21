@@ -32,6 +32,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
@@ -162,7 +163,21 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .execute() == 1;
     }
 
+
     public boolean create(Measurable measurable) {
-        return false;
+        int rc = dsl.insertInto(MEASURABLE)
+                .set(MEASURABLE.MEASURABLE_CATEGORY_ID, measurable.categoryId())
+                .set(MEASURABLE.PARENT_ID, measurable.parentId().orElse(null))
+                .set(MEASURABLE.EXTERNAL_ID, measurable.externalId().orElse(null))
+                .set(MEASURABLE.EXTERNAL_PARENT_ID, measurable.externalParentId().orElse(null))
+                .set(MEASURABLE.NAME, measurable.name())
+                .set(MEASURABLE.CONCRETE, measurable.concrete())
+                .set(MEASURABLE.DESCRIPTION, measurable.description())
+                .set(MEASURABLE.PROVENANCE, "waltz")
+                .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
+                .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
+                .execute();
+
+        return rc == 1;
     }
 }

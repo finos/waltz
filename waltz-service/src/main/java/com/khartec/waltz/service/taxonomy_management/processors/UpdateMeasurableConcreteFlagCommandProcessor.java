@@ -53,7 +53,7 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
                         .copyOf(cmd)
                         .withPrimaryReference(m.entityReference()));
 
-        boolean newValue = getConcreteParam(cmd);
+        boolean newValue = getConcreteParam(cmd, true);
 
         if (hasNoChange(m.concrete(), newValue, "Concrete Flag")) {
             return preview.build();
@@ -77,7 +77,7 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
 
         measurableService.updateConcreteFlag(
                 cmd.primaryReference().id(),
-                getConcreteParam(cmd),
+                getConcreteParam(cmd, true),
                 userId);
 
         return ImmutableTaxonomyChangeCommand

@@ -10,6 +10,8 @@ import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
@@ -28,7 +30,7 @@ public class AddChildMeasurableCommandProcessor implements TaxonomyCommandProces
 
     @Override
     public TaxonomyChangeType type() {
-        return TaxonomyChangeType.UPDATE_NAME;
+        return TaxonomyChangeType.ADD_CHILD;
     }
 
 
@@ -56,19 +58,23 @@ public class AddChildMeasurableCommandProcessor implements TaxonomyCommandProces
         doBasicValidation(cmd);
         validateMeasurable(measurableService, cmd);
 
-        Measurable measurable = ImmutableMeasurable
+        Measurable parentMeasurable = measurableService.getById(cmd.changeDomain().id());
+
+
+        Measurable newMeasurable = ImmutableMeasurable
                 .builder()
                 .categoryId(cmd.changeDomain().id())
                 .parentId(cmd.primaryReference().id())
                 .name(getNameParam(cmd))
                 .description(getDescriptionParam(cmd))
-                .externalId(getExternalIdParam(cmd))
-                .concrete(getConcreteParam(cmd))
+                .externalId(Optional.ofNullable(getExternalIdParam(cmd)))
+                .externalParentId(parentMeasurable.externalParentId())
+                .concrete(getConcreteParam(cmd, true))
                 .lastUpdatedBy(userId)
                 .lastUpdatedAt(DateTimeUtilities.nowUtc())
                 .build();
 
-        measurableService.create(measurable, userId);
+        measurableService.create(newMeasurable, userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
