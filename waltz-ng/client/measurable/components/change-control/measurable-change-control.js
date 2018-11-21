@@ -24,7 +24,6 @@ const initialState = {
     commandParams: {},
     selectedOperation: null,
     preview: null,
-    command: null
 };
 
 
@@ -34,24 +33,23 @@ function controller(notification,
 
     const vm = initialiseData(this, initialState);
 
-    function mkUpdCmd() {
+    function mkCmd(params = {}) {
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
-            a: toEntityRef(vm.measurable),
-            params: vm.commandParams,
-            createdBy: vm.userName
+            primaryReference: toEntityRef(vm.measurable),
+            params: params,
+            createdBy: vm.userName,
+            lastUpdatedBy: vm.userName
         };
     }
 
+    function mkUpdCmd() {
+        return mkCmd(vm.commandParams);
+    }
+
     function mkPreviewCmd() {
-        return {
-            changeType: vm.selectedOperation.code,
-            changeDomain: toEntityRef(vm.changeDomain),
-            a: toEntityRef(vm.measurable),
-            params: {},
-            createdBy: vm.userName
-        };
+        return mkCmd();
     }
 
     function calcPreview() {
@@ -91,7 +89,6 @@ function controller(notification,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.name === vm.measurable.name;
-                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Description",
@@ -105,7 +102,6 @@ function controller(notification,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.description === vm.measurable.description;
-                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Concrete",
@@ -134,7 +130,6 @@ function controller(notification,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
-                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Move",
@@ -163,7 +158,6 @@ function controller(notification,
                 onChange: () => {
                     const required = [vm.commandParams.name];
                     vm.submitDisabled = _.some(required, _.isEmpty);
-                    vm.command = mkUpdCmd();
                 }
             }, {
                 name: "Add Peer",
@@ -226,7 +220,6 @@ function controller(notification,
 
     vm.onDismiss = () => {
         vm.mode = modes.MENU;
-        vm.command = null;
         vm.preview = null;
     };
 
@@ -240,7 +233,8 @@ function controller(notification,
 
     vm.onSubmit = () => {
         if (vm.submitDisabled) return;
-        vm.onSubmitChange(vm.command)
+        const cmd = mkUpdCmd(vm.commandParams);
+        vm.onSubmitChange(cmd)
             .then(vm.onDismiss);
     };
 }

@@ -94,7 +94,7 @@ public class TaxonomyManagementUtilities {
     }
 
 
-    public static boolean getConcreteParam(TaxonomyChangeCommand cmd) {
-        return cmd.paramAsBoolean("concrete");
+    public static boolean getConcreteParam(TaxonomyChangeCommand cmd, boolean dflt) {
+        return cmd.paramAsBoolean("concrete", dflt);
     }
 }

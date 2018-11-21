@@ -70,8 +70,8 @@ public abstract class TaxonomyChangeCommand implements
     }
 
 
-    public boolean paramAsBoolean(String key) {
-        return Boolean.valueOf(params().get(key));
+    public boolean paramAsBoolean(String key, boolean dflt) {
+        return Boolean.valueOf(params().getOrDefault(key, Boolean.toString(dflt)));
     }
 
 
