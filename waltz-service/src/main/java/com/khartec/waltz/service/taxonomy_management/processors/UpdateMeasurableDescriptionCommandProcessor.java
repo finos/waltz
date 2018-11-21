@@ -8,8 +8,6 @@ import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +16,6 @@ import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUt
 
 @Service
 public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyCommandProcessor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableDescriptionCommandProcessor.class);
 
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
@@ -40,6 +36,7 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
         return TaxonomyChangeType.UPDATE_DESCRIPTION;
     }
 
+
     @Override
     public EntityKind domain() {
         return EntityKind.MEASURABLE_CATEGORY;
@@ -54,9 +51,9 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
                 .builder()
                 .command(ImmutableTaxonomyChangeCommand
                         .copyOf(cmd)
-                        .withA(m.entityReference()));
+                        .withPrimaryReference(m.entityReference()));
 
-        if (hasNoChange(m.description(), cmd.newValue(), "Description")) {
+        if (hasNoChange(m.description(), getDescriptionParam(cmd), "Description")) {
             return preview.build();
         }
 
@@ -76,14 +73,14 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
         validateMeasurable(measurableService, cmd);
 
         measurableService.updateDescription(
-                cmd.a().id(),
-                cmd.newValue(),
+                cmd.primaryReference().id(),
+                getDescriptionParam(cmd),
                 userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
-                .withExecutedAt(DateTimeUtilities.nowUtc())
-                .withExecutedBy(userId)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withLastUpdatedBy(userId)
                 .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED);
     }
 }

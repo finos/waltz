@@ -8,8 +8,6 @@ import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +16,6 @@ import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUt
 
 @Service
 public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCommandProcessor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableConcreteFlagCommandProcessor.class);
 
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
@@ -55,9 +51,9 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
                 .builder()
                 .command(ImmutableTaxonomyChangeCommand
                         .copyOf(cmd)
-                        .withA(m.entityReference()));
+                        .withPrimaryReference(m.entityReference()));
 
-        boolean newValue = cmd.valueAsBoolean();
+        boolean newValue = getConcreteParam(cmd);
 
         if (hasNoChange(m.concrete(), newValue, "Concrete Flag")) {
             return preview.build();
@@ -80,14 +76,14 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
         validateMeasurable(measurableService, cmd);
 
         measurableService.updateConcreteFlag(
-                cmd.a().id(),
-                cmd.valueAsBoolean(),
+                cmd.primaryReference().id(),
+                getConcreteParam(cmd),
                 userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
-                .withExecutedAt(DateTimeUtilities.nowUtc())
-                .withExecutedBy(userId)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withLastUpdatedBy(userId)
                 .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED);
     }
 

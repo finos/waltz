@@ -120,4 +120,8 @@ public class MeasurableService {
     public boolean updateExternalId(long id, String newValue, String userId) {
         return measurableDao.updateExternalId(id, newValue, userId);
     }
+
+    public boolean create(Measurable measurable, String userId) {
+        return measurableDao.create(measurable);
+    }
 }

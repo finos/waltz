@@ -20,6 +20,7 @@ import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUt
 public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableNameCommandProcessor.class);
+    public static final String PARAM_NAME = "name";
 
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
@@ -40,6 +41,7 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
         return TaxonomyChangeType.UPDATE_NAME;
     }
 
+
     @Override
     public EntityKind domain() {
         return EntityKind.MEASURABLE_CATEGORY;
@@ -54,9 +56,9 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
                 .builder()
                 .command(ImmutableTaxonomyChangeCommand
                         .copyOf(cmd)
-                        .withA(m.entityReference()));
+                        .withPrimaryReference(m.entityReference()));
 
-        if (hasNoChange(m.name(), cmd.newValue(), "Name")) {
+        if (hasNoChange(m.name(), cmd.param(PARAM_NAME), "Name")) {
             return preview.build();
         }
 
@@ -75,17 +77,15 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
         validateMeasurable(measurableService, cmd);
 
         measurableService.updateName(
-                cmd.a().id(),
-                cmd.newValue(),
+                cmd.primaryReference().id(),
+                cmd.param(PARAM_NAME),
                 userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
-                .withExecutedAt(DateTimeUtilities.nowUtc())
-                .withExecutedBy(userId)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withLastUpdatedBy(userId)
                 .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED);
     }
-
-
 
 }
