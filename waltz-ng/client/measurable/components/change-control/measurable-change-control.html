@@ -105,6 +105,29 @@
     </waltz-taxonomy-change-command-preview>
 </script>
 
+
+<script type="text/ng-template"
+        id="wmcc/UPDATE_EXTERNAL_ID.html">
+    <p>
+        The external id for this taxonomy item is currently set
+        to <kbd ng-bind="$ctrl.originalValue"></kbd>
+    </p>
+    <div>
+       <div class="form-group">
+            <label for="wmcc.new-ext-id"
+                   class="control-label">
+                New External Id:
+            </label>
+            <input type="text"
+                   class="form-control"
+                   placeholder="New external id for item"
+                   ng-model="$ctrl.newValue"
+                   ng-change="$ctrl.selectedOperation.onChange()"
+                   id="wmcc.new-ext-id">
+        </div>
+    </div>
+</script>
+
 <script type="text/ng-template"
         id="wmcc/UPDATE_DESCRIPTION.html">
     <p>
