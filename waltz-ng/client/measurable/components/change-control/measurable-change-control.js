@@ -117,7 +117,19 @@ function controller(notification,
             }, {
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
-                icon: "edit"
+                icon: "edit",
+                description: `The external identifier of the taxonomy item may be changed, however care should be 
+                    taken to prevent potentially breaking downstream consumers / reporting systems that rely
+                    on the identifier.`,
+                onShow: () => {
+                    resetForm(vm.measurable.externalId);
+                    vm.command = mkUpdCmd(vm.newValue);
+                    calcPreview(vm.command);
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.newValue === vm.originalValue;
+                    vm.command = mkUpdCmd(vm.newValue);
+                }
             }, {
                 name: "Move",
                 code: "MOVE",

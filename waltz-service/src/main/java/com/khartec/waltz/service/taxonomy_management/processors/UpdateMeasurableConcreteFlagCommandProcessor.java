@@ -1,11 +1,13 @@
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
-public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFieldUpdateCommandProcessor {
+public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCommandProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(UpdateMeasurableConcreteFlagCommandProcessor.class);
 
@@ -39,6 +41,12 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
     }
 
 
+    @Override
+    public EntityKind domain() {
+        return EntityKind.MEASURABLE_CATEGORY;
+    }
+
+
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
         Measurable m = validateMeasurable(measurableService, cmd);
@@ -51,7 +59,7 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
 
         boolean newValue = cmd.valueAsBoolean();
 
-        if (hasNoChange(m, newValue)) {
+        if (hasNoChange(m.concrete(), newValue, "Concrete Flag")) {
             return preview.build();
         }
 
@@ -73,7 +81,8 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
 
         measurableService.updateConcreteFlag(
                 cmd.a().id(),
-                cmd.valueAsBoolean());
+                cmd.valueAsBoolean(),
+                userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
@@ -83,16 +92,5 @@ public class UpdateMeasurableConcreteFlagCommandProcessor extends MeasurableFiel
     }
 
 
-    // --- helpers
-
-    private boolean hasNoChange(Measurable m, boolean newValue) {
-        boolean currentState = m.concrete();
-        if (currentState == newValue) {
-            LOG.info("Aborting command as nothing to do, concrete flag is already {}", newValue);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
 }

@@ -56,9 +56,7 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
                         .copyOf(cmd)
                         .withA(m.entityReference()));
 
-        String newName = cmd.newValue();
-
-        if (hasNoChange(m, newName)) {
+        if (hasNoChange(m.name(), cmd.newValue(), "Name")) {
             return preview.build();
         }
 
@@ -67,7 +65,6 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
                     findCurrentRatingMappings(measurableRatingService, cmd),
                     Severity.INFORMATION,
                     "Current app mappings exist to item, these may be misleading if the name change alters the meaning of this item");
-
 
         return preview.build();
     }
@@ -79,7 +76,8 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
 
         measurableService.updateName(
                 cmd.a().id(),
-                cmd.newValue());
+                cmd.newValue(),
+                userId);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
@@ -89,16 +87,5 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
     }
 
 
-    // --- helpers
-
-    private boolean hasNoChange(Measurable m, String newValue) {
-        String currentName = m.name();
-        if (currentName.equals(newValue)) {
-            LOG.info("Aborting command as nothing to do, name already {}", newValue);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
 }
