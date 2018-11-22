@@ -1,6 +1,7 @@
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -11,7 +12,10 @@ import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
@@ -32,8 +36,8 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
 
 
     @Override
-    public TaxonomyChangeType type() {
-        return TaxonomyChangeType.UPDATE_CONCRETENESS;
+    public Set<TaxonomyChangeType> supportedTypes() {
+        return asSet(TaxonomyChangeType.CLONE.UPDATE_CONCRETENESS);
     }
 
 

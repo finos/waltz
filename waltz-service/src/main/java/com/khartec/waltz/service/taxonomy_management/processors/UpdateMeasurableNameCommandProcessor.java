@@ -1,6 +1,7 @@
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -12,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
@@ -37,8 +40,8 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
 
 
     @Override
-    public TaxonomyChangeType type() {
-        return TaxonomyChangeType.UPDATE_NAME;
+    public Set<TaxonomyChangeType> supportedTypes() {
+        return SetUtilities.asSet(TaxonomyChangeType.UPDATE_NAME);
     }
 
 

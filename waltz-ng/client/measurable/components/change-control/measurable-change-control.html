@@ -56,11 +56,7 @@
                    class="clickable">
                     Close
                 </a>
-
-                <pre ng-bind="$ctrl.commandParams|json"></pre>
             </div>
-
-
         </div>
     </div>
 </div>
@@ -68,65 +64,26 @@
 
 <!-- OPERATION fragments -->
 
+
+
+<script type="text/ng-template"
+        id="wmcc/ADD_PEER.html">
+    <p>
+        Adding a peer to node:
+        <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+    <div ng-include="'wmcc/_ADD_NODE.html'">
+    </div>
+</script>
+
+
 <script type="text/ng-template"
         id="wmcc/ADD_CHILD.html">
     <p>
-        Adding a child to node: <kbd ng-bind="$ctrl.measurable.name"></kbd>
+        Adding a child to node:
+        <kbd ng-bind="$ctrl.measurable.name"></kbd>
     </p>
-    <div>
-        <div class="form-group">
-            <label for="wmcc.add-child.name"
-                   class="control-label">
-                Name:
-            </label>
-            <input type="text"
-                   class="form-control"
-                   placeholder="New external id for item"
-                   ng-model="$ctrl.commandParams.name"
-                   ng-change="$ctrl.selectedOperation.onChange()"
-                   id="wmcc.add-child.name">
-        </div>
-
-        <div class="form-group">
-            <label for="wmcc.add-child.description"
-                   class="control-label">
-                Description:
-            </label>
-            <textarea class="form-control"
-                      placeholder="Description for item"
-                      ng-model="$ctrl.commandParams.description"
-                      ng-change="$ctrl.selectedOperation.onChange()"
-                      id="wmcc.add-child.description">
-            </textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="wmcc.add-child.external-id"
-                   class="control-label">
-                External Id:
-            </label>
-            <input type="text"
-                   class="form-control"
-                   placeholder="New external id for item"
-                   ng-model="$ctrl.commandParams.externalId"
-                   ng-change="$ctrl.selectedOperation.onChange()"
-                   id="wmcc.add-child.external-id">
-        </div>
-
-        <div class="form-group">
-            <label for="wmcc.add-child.concrete"
-                   class="control-label">
-                Concrete:
-            </label>
-            <div class="form-control">
-                <waltz-toggle id="wmcc.add-child.concrete"
-                              on-toggle="$ctrl.selectedOperation.onToggleConcrete()"
-                              label-on="Concrete, applications may map to this item"
-                              label-off="Non-Concrete, applications cannot map to this item"
-                              state="$ctrl.commandParams.concrete">
-                </waltz-toggle>
-            </div>
-        </div>
+    <div ng-include="'wmcc/_ADD_NODE.html'">
     </div>
 </script>
 
@@ -250,6 +207,65 @@
     </ul>
     <div class="help-block"
          ng-bind-html="menu.description">
+    </div>
+</script>
+
+
+
+<script type="text/ng-template"
+        id="wmcc/_ADD_NODE.html">
+    <div class="form-group">
+        <label for="wmcc.add-child.name"
+               class="control-label">
+            Name:
+        </label>
+        <input type="text"
+               class="form-control"
+               placeholder="New external id for item"
+               ng-model="$ctrl.commandParams.name"
+               ng-change="$ctrl.selectedOperation.onChange()"
+               id="wmcc.add-child.name">
+    </div>
+
+    <div class="form-group">
+        <label for="wmcc.add-child.description"
+               class="control-label">
+            Description:
+        </label>
+        <textarea class="form-control"
+                  placeholder="Description for item"
+                  ng-model="$ctrl.commandParams.description"
+                  ng-change="$ctrl.selectedOperation.onChange()"
+                  id="wmcc.add-child.description">
+            </textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="wmcc.add-child.external-id"
+               class="control-label">
+            External Id:
+        </label>
+        <input type="text"
+               class="form-control"
+               placeholder="New external id for item"
+               ng-model="$ctrl.commandParams.externalId"
+               ng-change="$ctrl.selectedOperation.onChange()"
+               id="wmcc.add-child.external-id">
+    </div>
+
+    <div class="form-group">
+        <label for="wmcc.add-child.concrete"
+               class="control-label">
+            Concrete:
+        </label>
+        <div class="form-control">
+            <waltz-toggle id="wmcc.add-child.concrete"
+                          on-toggle="$ctrl.selectedOperation.onToggleConcrete()"
+                          label-on="Concrete, applications may map to this item"
+                          label-off="Non-Concrete, applications cannot map to this item"
+                          state="$ctrl.commandParams.concrete">
+            </waltz-toggle>
+        </div>
     </div>
 </script>
 

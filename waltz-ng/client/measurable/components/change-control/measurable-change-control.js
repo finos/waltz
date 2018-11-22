@@ -162,7 +162,17 @@ function controller(notification,
             }, {
                 name: "Add Peer",
                 code: "ADD_PEER",
-                icon: "plus-circle"
+                icon: "plus-circle",
+                description: "Adds a new element to the taxonomy next to the currently selected item.",
+                onShow: () => {
+                    resetForm({ concrete: true });
+                    calcPreview();
+                },
+                onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
+                onChange: () => {
+                    const required = [vm.commandParams.name];
+                    vm.submitDisabled = _.some(required, _.isEmpty);
+                }
             }, {
                 name: "Clone",
                 code: "CLONE",
