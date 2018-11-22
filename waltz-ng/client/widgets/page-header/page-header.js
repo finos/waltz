@@ -27,8 +27,7 @@ export const pageHeaderDefaultOffset = 60;
 const bindings = {
     name: "@",
     icon: "@",
-    small: "@",
-    tour: "<"
+    small: "@"
 };
 
 
@@ -65,12 +64,6 @@ function controller($document,
         angular
             .element($window)
             .off("scroll", scrollListener);
-    };
-
-    vm.startTour = () => {
-        if (vm.tour) {
-            vm.tour.start();
-        }
     };
 
     vm.scrollToTop = () => {
