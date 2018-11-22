@@ -11,26 +11,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
-public class AddChildMeasurableCommandProcessor implements TaxonomyCommandProcessor {
+public class AddMeasurableCommandProcessor implements TaxonomyCommandProcessor {
 
     private final MeasurableService measurableService;
 
 
     @Autowired
-    public AddChildMeasurableCommandProcessor(MeasurableService measurableService) {
+    public AddMeasurableCommandProcessor(MeasurableService measurableService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         this.measurableService = measurableService;
     }
 
 
     @Override
-    public TaxonomyChangeType type() {
-        return TaxonomyChangeType.ADD_CHILD;
+    public Set<TaxonomyChangeType> supportedTypes() {
+        return asSet(
+                TaxonomyChangeType.ADD_CHILD,
+                TaxonomyChangeType.ADD_PEER);
     }
 
 
@@ -58,17 +62,19 @@ public class AddChildMeasurableCommandProcessor implements TaxonomyCommandProces
         doBasicValidation(cmd);
         validateMeasurable(measurableService, cmd);
 
-        Measurable parentMeasurable = measurableService.getById(cmd.changeDomain().id());
+        Measurable primaryReference = measurableService.getById(cmd.primaryReference().id());
 
+        Optional<Long> parentId = cmd.changeType() == TaxonomyChangeType.ADD_CHILD
+                ? primaryReference.id()
+                : primaryReference.parentId();
 
         Measurable newMeasurable = ImmutableMeasurable
                 .builder()
                 .categoryId(cmd.changeDomain().id())
-                .parentId(cmd.primaryReference().id())
+                .parentId(parentId)
                 .name(getNameParam(cmd))
                 .description(getDescriptionParam(cmd))
                 .externalId(Optional.ofNullable(getExternalIdParam(cmd)))
-                .externalParentId(parentMeasurable.externalParentId())
                 .concrete(getConcreteParam(cmd, true))
                 .lastUpdatedBy(userId)
                 .lastUpdatedAt(DateTimeUtilities.nowUtc())

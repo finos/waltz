@@ -2,6 +2,7 @@ package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.taxonomy_management.*;
+import org.jooq.lambda.tuple.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static java.util.stream.Collectors.toMap;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class TaxonomyChangeService {
@@ -29,7 +32,12 @@ public class TaxonomyChangeService {
     @Autowired
     public TaxonomyChangeService(
             List<TaxonomyCommandProcessor> processors) {
-        processorsByType = indexBy(p -> p.type(), processors);
+        processorsByType = processors
+                .stream()
+                .flatMap(p -> p.supportedTypes()
+                        .stream()
+                        .map(st -> tuple(st, p)))
+                .collect(toMap(t -> t.v1, t -> t.v2));
     }
 
 
