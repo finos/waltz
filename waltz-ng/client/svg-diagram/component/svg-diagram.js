@@ -56,8 +56,6 @@ function controller($element, $window) {
 
         if (_.isNil(vm.blockProcessor)) return;
 
-        console.log("diagram", { d: vm.diagram, bp: vm.blockProcessor});
-
         const svg = $element.append(vm.diagram.svg);
 
         resize($element, $window);
