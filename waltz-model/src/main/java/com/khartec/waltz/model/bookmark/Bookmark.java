@@ -60,4 +60,12 @@ public abstract class Bookmark implements
         return false;
     }
 
+
+    public EntityReference entityReference() {
+        return EntityReference.mkRef(
+                EntityKind.BOOKMARK,
+                id().orElse(null),
+                title().orElse(""),
+                description().orElse(""));
+    }
 }

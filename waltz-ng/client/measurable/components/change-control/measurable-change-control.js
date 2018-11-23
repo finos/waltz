@@ -2,7 +2,7 @@ import template from "./measurable-change-control.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
-import {findHighestSeverity, severityToBootstrapBtnClass} from "../../../common/severity-utils";
+import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 
 const modes = {
     MENU: "MENU",
@@ -13,15 +13,17 @@ const modes = {
 const bindings = {
     measurable: "<",
     changeDomain: "<",
+    onSubmitChange: "<"
 };
 
 
 const initialState = {
     modes: modes,
     mode: modes.MENU,
+    submitDisabled: true,
+    commandParams: {},
     selectedOperation: null,
     preview: null,
-    command: null
 };
 
 
@@ -31,14 +33,40 @@ function controller(notification,
 
     const vm = initialiseData(this, initialState);
 
-    function mkUpdCmd(newValue) {
+    function mkCmd(params = {}) {
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
-            a: toEntityRef(vm.measurable),
-            newValue: newValue+"",
-            createdBy: vm.userName
+            primaryReference: toEntityRef(vm.measurable),
+            params: params,
+            createdBy: vm.userName,
+            lastUpdatedBy: vm.userName
         };
+    }
+
+    function mkUpdCmd() {
+        return mkCmd(vm.commandParams);
+    }
+
+    function mkPreviewCmd() {
+        return mkCmd();
+    }
+
+    function calcPreview() {
+        return serviceBroker
+            .execute(CORE_API.TaxonomyManagementStore.preview, [ mkPreviewCmd() ])
+            .then(r => {
+                const preview = r.data;
+                vm.preview = preview;
+                const severities = _.map(preview.impacts, "severity");
+                vm.submitButtonClass = determineColorOfSubmitButton(severities);
+            });
+    }
+
+
+    function resetForm(params) {
+        vm.commandParams = Object.assign({}, params);
+        vm.submitDisabled = true;
     }
 
 
@@ -55,10 +83,26 @@ function controller(notification,
                 description: `The name of the taxonomy item may be changed, however care should be 
                     taken to prevent inadvertently altering the <em>meaning</em> of the item`,
                 icon: "edit",
+                onShow: () => {
+                    resetForm({ name: vm.measurable.name });
+                    calcPreview();
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.commandParams.name === vm.measurable.name;
+                }
             }, {
                 name: "Description",
                 code: "UPDATE_DESCRIPTION",
-                icon: "edit"
+                icon: "edit",
+                description: `The description of the taxonomy item may be changed, however care should be 
+                    taken to prevent inadvertently altering the <em>meaning</em> of the item.`,
+                onShow: () => {
+                    resetForm({ description: vm.measurable.description });
+                    calcPreview();
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.commandParams.description === vm.measurable.description;
+                }
             }, {
                 name: "Concrete",
                 code: "UPDATE_CONCRETENESS",
@@ -69,20 +113,24 @@ function controller(notification,
                     specific enough to accurately describe the portfolio.`,
                 icon: "edit",
                 onShow: () => {
-                    vm.command = mkUpdCmd(!vm.measurable.concrete);
-                    return serviceBroker
-                        .execute(CORE_API.TaxonomyManagementStore.preview, [ vm.command ])
-                        .then(r => {
-                            vm.preview = r.data;
-                            vm.submitButtonClass = severityToBootstrapBtnClass(
-                                findHighestSeverity(
-                                    _.map(vm.preview.impacts, "severity")));
-                        })
+                    resetForm({ concrete: !vm.measurable.concrete });
+                    vm.submitDisabled = false;
+                    calcPreview();
                 }
             }, {
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
-                icon: "edit"
+                icon: "edit",
+                description: `The external identifier of the taxonomy item may be changed, however care should be 
+                    taken to prevent potentially breaking downstream consumers / reporting systems that rely
+                    on the identifier.`,
+                onShow: () => {
+                    resetForm({ externalId: vm.measurable.externalId });
+                    calcPreview();
+                },
+                onChange: () => {
+                    vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
+                }
             }, {
                 name: "Move",
                 code: "MOVE",
@@ -99,8 +147,32 @@ function controller(notification,
         options: [
             {
                 name: "Add Child",
-                code: "ADD",
-                icon: "plus-circle"
+                code: "ADD_CHILD",
+                icon: "plus-circle",
+                description: "Adds a new element to the taxonomy underneath the currently selected item.",
+                onShow: () => {
+                    resetForm({ concrete: true });
+                    calcPreview();
+                },
+                onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
+                onChange: () => {
+                    const required = [vm.commandParams.name];
+                    vm.submitDisabled = _.some(required, _.isEmpty);
+                }
+            }, {
+                name: "Add Peer",
+                code: "ADD_PEER",
+                icon: "plus-circle",
+                description: "Adds a new element to the taxonomy next to the currently selected item.",
+                onShow: () => {
+                    resetForm({ concrete: true });
+                    calcPreview();
+                },
+                onToggleConcrete: () => vm.commandParams.concrete = ! vm.commandParams.concrete,
+                onChange: () => {
+                    const required = [vm.commandParams.name];
+                    vm.submitDisabled = _.some(required, _.isEmpty);
+                }
             }, {
                 name: "Clone",
                 code: "CLONE",
@@ -116,24 +188,21 @@ function controller(notification,
         color: "#b40400",
         options: [
             {
-                name: "Merge",
-                code: "MERGE",
-                icon: "code-fork"
-            }, {
-                name: "Deprecate",
-                code: "DEPRECATE",
-                icon: "exclamation-triangle"
-            }, {
-                name: "Destroy",
+                name: "Remove",
                 code: "REMOVE",
-                icon: "trash"
+                icon: "trash",
+                description: "Removes the item and all of it's children from the taxonomy",
+                onShow: () => {
+                    resetForm();
+                    calcPreview();
+                },
             }
         ]
     };
 
     vm.menus = [
-        updateMenu,
         creationMenu,
+        updateMenu,
         destructiveMenu
     ];
 
@@ -158,7 +227,6 @@ function controller(notification,
 
     vm.onDismiss = () => {
         vm.mode = modes.MENU;
-        vm.command = null;
         vm.preview = null;
     };
 
@@ -170,14 +238,12 @@ function controller(notification,
             : Promise.resolve();
     };
 
-    vm.onSubmitChange = () => {
-        serviceBroker
-            .execute(
-                CORE_API.TaxonomyManagementStore.submitPendingChange,
-                [ vm.command ])
-            .then(r => notification.info("Change submitted"))
+    vm.onSubmit = () => {
+        if (vm.submitDisabled) return;
+        const cmd = mkUpdCmd(vm.commandParams);
+        vm.onSubmitChange(cmd)
+            .then(vm.onDismiss);
     };
-
 }
 
 

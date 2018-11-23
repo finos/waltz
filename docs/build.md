@@ -28,6 +28,12 @@ mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
 
 When you run the first build (using `mvn package`) the schema will be generated using the liquibase maven task (ref: `waltz-schema/pom.xml`).  
 
+### Importing sample data
+
+Starting with release 1.14 (alpha) we will make sample data sets available via the release pages.  
+See [Dump and restore](dump_and_restore.md) for details on how to import these changes.
+
+
 ## Setting up maven profiles
 
 Waltz uses maven profiles to target the build against the correct database.  Generic db vendor settings are located in  

@@ -103,7 +103,25 @@ public class MeasurableService {
     }
 
 
-    public boolean updateConcreteFlag(Long id, boolean newValue) {
-        return measurableDao.updateConcreteFlag(id, newValue);
+    public boolean updateConcreteFlag(Long id, boolean newValue, String userId) {
+        return measurableDao.updateConcreteFlag(id, newValue, userId);
+    }
+
+
+    public boolean updateName(long id, String newValue, String userId) {
+        return measurableDao.updateName(id, newValue, userId);
+    }
+
+
+    public boolean updateDescription(long id, String newValue, String userId) {
+        return measurableDao.updateDescription(id, newValue, userId);
+    }
+
+    public boolean updateExternalId(long id, String newValue, String userId) {
+        return measurableDao.updateExternalId(id, newValue, userId);
+    }
+
+    public boolean create(Measurable measurable, String userId) {
+        return measurableDao.create(measurable);
     }
 }

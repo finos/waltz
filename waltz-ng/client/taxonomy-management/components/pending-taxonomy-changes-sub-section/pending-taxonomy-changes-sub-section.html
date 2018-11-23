@@ -1,10 +1,55 @@
 <div>
 
-    <!-- LIST -->
-    <waltz-pending-taxonomy-changes-list pending-changes="$ctrl.pendingChanges"
-                                         on-select="$ctrl.onSelectPendingChange">
-    </waltz-pending-taxonomy-changes-list>
+    <div ng-if="$ctrl.mode === 'LIST'">
+        <!-- LIST -->
+        <div class="help-block">
+            Pending changes that have not yet been applied to this taxonomy.
+            Select a change to either apply it or discard.
+        </div>
+        <waltz-pending-taxonomy-changes-list pending-changes="$ctrl.pendingChanges"
+                                             on-select="$ctrl.onSelectPendingChange">
+        </waltz-pending-taxonomy-changes-list>
+    </div>
 
 
+    <div ng-if="$ctrl.mode === 'VIEW'">
+        <!-- OVERVIEW -->
+        <div ng-if="$ctrl.selectedPendingChange">
+            <h4>Change detail</h4>
+            <waltz-taxonomy-change-command-info change="$ctrl.selectedPendingChange">
+            </waltz-taxonomy-change-command-info>
+        </div>
+
+
+        <!-- PREVIEW -->
+        <div ng-if="$ctrl.preview">
+            <hr>
+            <h4>Preview of impacts</h4>
+            <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+            </waltz-taxonomy-change-command-preview>
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div ng-if="$ctrl.preview">
+            <span>
+                <button class="btn btn-sm"
+                        ng-click="$ctrl.onApplyPendingChange($ctrl.selectedPendingChange)"
+                        ng-class="$ctrl.submitButtonClass">
+                    Apply change now
+                </button>
+
+                <button class="btn btn-sm btn-default"
+                        ng-click="$ctrl.onDiscardPendingChange($ctrl.selectedPendingChange)">
+                    Discard change
+                </button>
+
+                <a ng-click="$ctrl.onDismiss()"
+                   class="clickable">
+                    Cancel
+                </a>
+            </span>
+        </div>
+    </div>
 
 </div>

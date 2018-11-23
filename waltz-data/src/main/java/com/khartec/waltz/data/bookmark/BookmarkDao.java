@@ -25,13 +25,12 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,8 +76,8 @@ public class BookmarkDao {
 
 
     public List<Bookmark> findByReference(EntityReference reference) {
-        return dsl.select()
-                .from(BOOKMARK)
+        return dsl
+                .selectFrom(BOOKMARK)
                 .where(BOOKMARK.PARENT_ID.eq(reference.id()))
                 .and(BOOKMARK.PARENT_KIND.eq(reference.kind().name()))
                 .orderBy(BOOKMARK.IS_PRIMARY.desc(), BOOKMARK.TITLE.asc())
@@ -87,8 +86,8 @@ public class BookmarkDao {
 
 
     public Bookmark getById(long bookmarkId) {
-        return dsl.select()
-                .from(BOOKMARK)
+        return dsl
+                .selectFrom(BOOKMARK)
                 .where(BOOKMARK.ID.eq(bookmarkId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -156,9 +155,13 @@ public class BookmarkDao {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BookmarkDao{");
-        sb.append('}');
-        return sb.toString();
+        return "BookmarkDao{}";
     }
 
+    public Collection<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .selectFrom(BOOKMARK)
+                .where(BOOKMARK.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

@@ -11,18 +11,6 @@
             <span ng-bind="$ctrl.name | truncateMiddle:50"></span>
 
             <small ng-bind="$ctrl.small"></small>
-
-            <span class="small pull-right"
-                  uib-popover="Tour Guide"
-                  popover-trigger="mouseenter"
-                  popover-placement="left">
-                <waltz-icon name="map-o"
-                            ng-if="$ctrl.tour.stepCount > 0"
-                            class="clickable"
-                            ng-click="$ctrl.startTour()">
-                </waltz-icon>
-                &nbsp;
-            </span>
         </h2>
     </div>
 

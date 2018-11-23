@@ -38,7 +38,6 @@ const initialState = {
     specification: null,
     selectedSpecDefinition: {},
     selectableSpecDefinitions: [],
-    tour: [],
     visibility: {
         diagramEditor: false,
         overviewEditor: false
@@ -127,8 +126,7 @@ function controller($q,
                     physicalSpecDefinitionFieldStore,
                     physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
-                    serviceBroker,
-                    tourService)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
@@ -198,12 +196,7 @@ function controller($q,
         });
 
     specPromise
-        .then(() => loadSpecDefinitions());
-
-    // tour
-    specPromise
-        .then(() => tourService.initialiseForKey('main.physical-flow.view', true))
-        .then(tour => vm.tour = tour)
+        .then(() => loadSpecDefinitions())
         .then(() => addToHistory(historyStore, vm.physicalFlow, vm.specification));
 
 
@@ -320,8 +313,7 @@ controller.$inject = [
     'PhysicalSpecDefinitionFieldStore',
     'PhysicalSpecDefinitionSampleFileStore',
     'PhysicalSpecificationStore',
-    'ServiceBroker',
-    'TourService'
+    'ServiceBroker'
 ];
 
 

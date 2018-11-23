@@ -103,7 +103,6 @@ import SvgDiagram from "./svg-diagram";
 import System from "./system";
 import Technology from "./technology";
 import TaxonomyManagement from "./taxonomy-management";
-import Tour from "./tour";
 import User from "./user";
 import UserContribution from "./user-contribution";
 import Welcome from "./welcome";
@@ -198,7 +197,6 @@ const dependencies = [
     SvgDiagram(),
     System(),
     Technology(),
-    Tour(),
     User(),
     UserContribution(),
     TaxonomyManagement(),

@@ -21,6 +21,7 @@ import angular from "angular";
 import TaxonomyManagementStore from "./services/taxonomy-management-store";
 import PendingTaxonomyChangesList from "./components/pending-taxonomy-changes-list/pending-taxonomy-changes-list";
 import PendingTaxonomyChangesSubSection from "./components/pending-taxonomy-changes-sub-section/pending-taxonomy-changes-sub-section";
+import TaxonomyChangeInfo from "./components/taxonomy-change-command-info/taxonomy-change-command-info";
 import TaxonomyChangePreview from "./components/taxonomy-change-command-preview/taxonomy-change-command-preview";
 import {registerStores, registerComponents} from "../common/module-utils";
 
@@ -34,6 +35,7 @@ export default () => {
     registerComponents(module, [
         PendingTaxonomyChangesList,
         PendingTaxonomyChangesSubSection,
+        TaxonomyChangeInfo,
         TaxonomyChangePreview ]);
 
     return module.name;

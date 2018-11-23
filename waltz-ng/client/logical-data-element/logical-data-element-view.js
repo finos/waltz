@@ -27,7 +27,6 @@ import template from './logical-data-element-view.html';
 
 const initialState = {
     logicalDataElement: null,
-    tour: [],
     bookmarksSection: dynamicSections.bookmarksSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
     relatedPhysicalFieldSection: dynamicSections.relatedPhysicalFieldSection,
@@ -60,8 +59,7 @@ function addToHistory(historyStore, logicalDataElement) {
 
 function controller($stateParams,
                     historyStore,
-                    serviceBroker,
-                    tourService)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
@@ -80,8 +78,6 @@ function controller($stateParams,
         .then(r => vm.logicalDataElement = r.data);
 
     logicalElementPromise
-        .then(() => tourService.initialiseForKey('main.logical-data-element.view', true))
-        .then(tour => vm.tour = tour)
         .then(() => addToHistory(historyStore, vm.logicalDataElement));
 }
 
@@ -90,7 +86,6 @@ controller.$inject = [
     '$stateParams',
     'HistoryStore',
     'ServiceBroker',
-    'TourService'
 ];
 
 
