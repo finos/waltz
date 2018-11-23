@@ -31,7 +31,7 @@ const bindings = {
 function resize(elem, win) {
 
     const width = win.innerWidth * 0.7 || 1024;
-    console.log("Resize window", width);
+
     select(elem[0])
         .select("svg")
         .attr("width", `${width}px`)
@@ -73,7 +73,6 @@ function controller($element, $window) {
             }));
 
         _.each(blocks, vm.blockProcessor);
-
     };
 
 }
