@@ -89,6 +89,17 @@
 
 
 <script type="text/ng-template"
+        id="wmcc/REMOVE.html">
+    <p>
+        Remove node:
+        <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+    <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+    </waltz-taxonomy-change-command-preview>
+</script>
+
+
+<script type="text/ng-template"
         id="wmcc/UPDATE_CONCRETENESS.html">
     <p>
         The concrete flag for this taxonomy item is currently set

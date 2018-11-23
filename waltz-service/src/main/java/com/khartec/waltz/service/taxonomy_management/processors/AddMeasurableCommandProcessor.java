@@ -48,13 +48,12 @@ public class AddMeasurableCommandProcessor implements TaxonomyCommandProcessor {
         doBasicValidation(cmd);
         Measurable m = validateMeasurable(measurableService, cmd);
 
-        ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
+        return ImmutableTaxonomyChangePreview
                 .builder()
                 .command(ImmutableTaxonomyChangeCommand
                         .copyOf(cmd)
-                        .withPrimaryReference(m.entityReference()));
-
-        return preview.build();
+                        .withPrimaryReference(m.entityReference()))
+                .build();
     }
 
 

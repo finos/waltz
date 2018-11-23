@@ -188,17 +188,14 @@ function controller(notification,
         color: "#b40400",
         options: [
             {
-                name: "Merge",
-                code: "MERGE",
-                icon: "code-fork"
-            }, {
-                name: "Deprecate",
-                code: "DEPRECATE",
-                icon: "exclamation-triangle"
-            }, {
-                name: "Destroy",
+                name: "Remove",
                 code: "REMOVE",
-                icon: "trash"
+                icon: "trash",
+                description: "Removes the item and all of it's children from the taxonomy",
+                onShow: () => {
+                    resetForm();
+                    calcPreview();
+                },
             }
         ]
     };
