@@ -38,7 +38,7 @@ function controller($q,
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
-
+        console.log('mcl init')
         userPreferenceService
             .savePreference(lastViewedMeasurableCategoryKey, categoryId);
 

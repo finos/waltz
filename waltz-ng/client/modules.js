@@ -46,6 +46,7 @@ import Attestation from "./attestation";
 import AuthSources from "./auth-sources";
 import Bookmarks from "./bookmarks";
 import ChangeInitiative from "./change-initiative";
+import ClientCacheKey from "./client_cache_key";
 import Complexity from "./complexity";
 import Common_Module from "./common/module";
 import ChangeLog from "./change-log";
@@ -109,6 +110,29 @@ import UserContribution from "./user-contribution";
 import Welcome from "./welcome";
 import Widgets from "./widgets";
 
+
+const stateProviderOverride = () => {
+    const module = angular.module('waltz.stateProviderOverride', []);
+
+    function setupStateProviderOverride($stateProvider) {
+        const $delegate = $stateProvider.state;
+        $stateProvider.state = function(name, definition) {
+            if (!definition.resolve) {
+                definition.resolve = {};
+            }
+            return $delegate.apply(this, arguments);
+        };
+    };
+
+    setupStateProviderOverride.$inject = ['$stateProvider'];
+
+    module.config(setupStateProviderOverride);
+
+    return module.name;
+};
+
+
+
 const dependencies = [
     "ui.bootstrap",
     "ui.router",
@@ -131,6 +155,7 @@ const dependencies = [
     "angular-loading-bar",
 
     // -- waltz-modules ---
+    stateProviderOverride(), // has to be called before any routes are registered
     AccessLog(),
     Actor(),
     Alias(),
@@ -142,6 +167,7 @@ const dependencies = [
     AuthSources(),
     Bookmarks(),
     ChangeInitiative(),
+    ClientCacheKey(),
     Complexity(),
     Common_Module(),
     ChangeLog(),
