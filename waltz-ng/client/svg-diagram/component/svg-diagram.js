@@ -31,7 +31,6 @@ const bindings = {
 function resize(elem, win) {
 
     const width = win.innerWidth * 0.7 || 1024;
-
     select(elem[0])
         .select("svg")
         .attr("width", `${width}px`)
@@ -56,7 +55,9 @@ function controller($element, $window) {
 
         if (_.isNil(vm.blockProcessor)) return;
 
-        const svg = $element.append(vm.diagram.svg);
+        const svg = $element
+            .empty()
+            .append(vm.diagram.svg);
 
         resize($element, $window);
 
