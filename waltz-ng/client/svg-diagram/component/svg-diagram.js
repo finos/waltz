@@ -54,12 +54,7 @@ function controller($element, $window) {
     vm.$onChanges = () => {
         if (!vm.diagram) return;
 
-        if (latch === true) {
-            return;
-        }
-
-        latch = vm.diagram !== null && vm.blockProcessor !== null;
-        console.log("diagram", { latch, d: vm.diagram, bp: vm.blockProcessor});
+        if (_.isNil(vm.blockProcessor)) return;
 
         const svg = $element.append(vm.diagram.svg);
 
