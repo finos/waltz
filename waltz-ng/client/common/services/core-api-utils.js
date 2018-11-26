@@ -30,6 +30,7 @@ import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/servi
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
+import {ClientCacheKeyStore_API as ClientCacheKeyStore} from "../../client_cache_key/services/client-cache-key-store";
 import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
@@ -97,6 +98,7 @@ export const CORE_API = {
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
+    ClientCacheKeyStore,
     ComplexityStore,
     DatabaseStore,
     DataTypeStore,

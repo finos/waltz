@@ -113,8 +113,22 @@ export default (module) => {
 
 
     function configServiceBroker($rootScope, serviceBroker) {
-        $rootScope.$on('$stateChangeSuccess', () => {
-            serviceBroker.resetViewData();
+        $rootScope.$on('$stateChangeStart', (event, toState) => {
+            toState.resolve.pauseStateChange = () => serviceBroker
+                .loadViewData(CORE_API.ClientCacheKeyStore.findAll, [], {force: false})
+                .then(r => r.data)
+                .then(oldCacheKeys => {
+                    serviceBroker.resetViewData();
+
+                    return serviceBroker.loadViewData(CORE_API.ClientCacheKeyStore.findAll, [], {force: true})
+                        .then(r => r.data)
+                        .then(newCacheKeys => {
+                            const differences = _.differenceWith(newCacheKeys, oldCacheKeys, _.isEqual);
+                            if (differences.length > 0) {
+                                serviceBroker.resetAppData();
+                            }
+                        });
+                });
         });
     }
 

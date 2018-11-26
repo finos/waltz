@@ -38,7 +38,6 @@ function controller($q,
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
-
         userPreferenceService
             .savePreference(lastViewedMeasurableCategoryKey, categoryId);
 
