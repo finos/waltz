@@ -15,6 +15,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
@@ -72,7 +73,7 @@ public class AddMeasurableCommandProcessor implements TaxonomyCommandProcessor {
                 .categoryId(cmd.changeDomain().id())
                 .parentId(parentId)
                 .name(getNameParam(cmd))
-                .description(getDescriptionParam(cmd))
+                .description(mkSafe(getDescriptionParam(cmd)))
                 .externalId(Optional.ofNullable(getExternalIdParam(cmd)))
                 .concrete(getConcreteParam(cmd, true))
                 .lastUpdatedBy(userId)
