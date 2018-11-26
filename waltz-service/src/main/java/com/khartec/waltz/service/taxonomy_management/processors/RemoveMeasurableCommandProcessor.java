@@ -3,11 +3,11 @@ package com.khartec.waltz.service.taxonomy_management.processors;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.measurable.ImmutableMeasurable;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -32,17 +31,22 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
     private final MeasurableService measurableService;
     private final MeasurableRatingService measurableRatingService;
     private final BookmarkService bookmarkService;
+    private final InvolvementService involvementService;
 
 
     @Autowired
     public RemoveMeasurableCommandProcessor(MeasurableService measurableService,
                                             MeasurableRatingService measurableRatingService,
+                                            InvolvementService involvementService,
                                             BookmarkService bookmarkService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
+        checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(bookmarkService, "bookmarkService cannot be null");
+
         this.measurableService = measurableService;
         this.measurableRatingService = measurableRatingService;
+        this.involvementService = involvementService;
         this.bookmarkService = bookmarkService;
     }
 
@@ -74,14 +78,23 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         previewChildNodeRemovals(preview, selectionOptions);
         previewAppMappingRemovals(preview, selectionOptions);
         previewBookmarkRemovals(preview, selectionOptions);
-//        removeEntityRelationships(dsl, measurableIdSelector);
-//        removeFlowDiagramLinks(dsl, measurableIdSelector);
-//        removeEntitySvgDiagram(dsl, measurableIdSelector);
-//        removeInvolvements(dsl, measurableIdSelector);
-//        removeRoadmapScenarios(dsl, measurableIdSelector);
+        previewInvolvementRemovals(preview, selectionOptions);
+
+        // TODO: entityRelationships, flowDiagrams, entitySvgDiagrams, roadmapScenarios
 
         return preview.build();
     }
+
+
+    private void previewInvolvementRemovals(ImmutableTaxonomyChangePreview.Builder preview,
+                                            IdSelectionOptions selectionOptions) {
+        addToPreview(
+                preview,
+                map(involvementService.findByGenericEntitySelector(selectionOptions), r -> r.entityReference()),
+                Severity.ERROR,
+                "Involvements (links to people) associated to this item (or it's children) will be removed");
+    }
+
 
     private void previewBookmarkRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                          IdSelectionOptions selectionOptions) {
@@ -90,7 +103,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
                 preview,
                 map(bookmarks, r -> r.entityReference()),
                 Severity.ERROR,
-                "Bookmarks against this item (or it's children) will be removed");
+                "Bookmarks associated to this item (or it's children) will be removed");
     }
 
 
@@ -101,7 +114,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
                 preview,
                 map(ratings, r -> r.entityReference()),
                 Severity.ERROR,
-                "Application ratings against this item (or it's children) will be removed");
+                "Application ratings associated to this item (or it's children) will be removed");
     }
 
 
@@ -120,7 +133,38 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         doBasicValidation(cmd);
         validateMeasurable(measurableService, cmd);
 
-      throw new UnsupportedOperationException("TODO: remove is not yet implemented");
+
+        IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);
+
+        removeBookmarks(selectionOptions);
+        removeInvolvements(selectionOptions);
+        removeAppMappings(selectionOptions);
+        removeMeasurables(selectionOptions);
+
+        // TODO: entityRelationships, flowDiagrams, entitySvgDiagrams, roadmapScenarios
+
+        return ImmutableTaxonomyChangeCommand.copyOf(cmd)
+                .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED)
+                .withLastUpdatedBy(userId)
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+    }
+
+    private int removeMeasurables(IdSelectionOptions selectionOptions) {
+        return measurableService.deleteByIdSelector(selectionOptions);
+    }
+
+    private int removeAppMappings(IdSelectionOptions selectionOptions) {
+        return measurableRatingService.deleteByMeasurableIdSelector(selectionOptions);
+    }
+
+
+    private int removeInvolvements(IdSelectionOptions selectionOptions) {
+        return involvementService.deleteByGenericEntitySelector(selectionOptions);
+    }
+
+
+    private int removeBookmarks(IdSelectionOptions selectionOptions) {
+        return bookmarkService.deleteByBookmarkIdSelector(selectionOptions);
     }
 
 }

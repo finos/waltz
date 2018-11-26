@@ -180,4 +180,19 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
         return rc == 1;
     }
+
+
+    /**
+     * Bulk removes measurables by using the passed in selector.
+     * Removed measurables are _deleted_ from the database.
+     *
+     * @param selector gives id's of measurables to remove
+     * @return count of removed measurables
+     */
+    public int deleteByIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .deleteFrom(MEASURABLE)
+                .where(MEASURABLE.ID.in(selector))
+                .execute();
+    }
 }

@@ -94,13 +94,14 @@ public class BookmarkDao {
 
 
     /**
-     * @param id
+     * @param id bookmark identifier of item to be deleted
      * @return true if bookmark deleted
      */
     public boolean deleteById(long id) {
         checkTrue(id >= 0, "id must be positive");
 
-        return dsl.delete(BOOKMARK)
+        return dsl
+                .delete(BOOKMARK)
                 .where(BOOKMARK.ID.eq(id))
                 .execute() == 1;
     }
@@ -158,10 +159,34 @@ public class BookmarkDao {
         return "BookmarkDao{}";
     }
 
+
+    /**
+     * Retrieves a collection of bookmarks via a passed in selector.  Missing bookmarks are silently
+     * ignored therefore the result.size() &lt;= the number of ids returned by the selector.
+     *
+     * @param selector A sub-query that returns the set of bookmark ids that need to be retrieved
+     * @return A collection of bookmarks corresponding to the selector.
+     */
     public Collection<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
         return dsl
                 .selectFrom(BOOKMARK)
                 .where(BOOKMARK.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    /**
+     * Bulk removes bookmarks via a passed in selector sub-query.
+     * Removed bookmarks are _deleted_ from the database.
+
+     * @param selector sub-query which returns a set of id's of bookmarks
+     * @return count of bookmarks removed
+     */
+    public int deleteByBookmarkIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .deleteFrom(BOOKMARK)
+                .where(BOOKMARK.ID.in(selector))
+                .execute();
+    }
+
 }

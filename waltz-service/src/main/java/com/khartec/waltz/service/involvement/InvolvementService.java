@@ -20,12 +20,15 @@
 package com.khartec.waltz.service.involvement;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceUtilities;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
@@ -37,6 +40,7 @@ import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,11 +57,12 @@ public class InvolvementService {
 
 
     private final ChangeLogService changeLogService;
-    private final InvolvementDao dao;
+    private final InvolvementDao involvementDao;
     private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final InvolvementKindService involvementKindService;
     private final PersonDao personDao;
+    private final GenericSelectorFactory genericSelectorFactory;
 
     private Map<Long, String> involvementKindIdToNameMap;
 
@@ -65,19 +70,22 @@ public class InvolvementService {
     @Autowired
     public InvolvementService(ChangeLogService changeLogService,
                               InvolvementDao dao,
+                              GenericSelectorFactory genericSelectorFactory,
                               EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
                               EntityReferenceNameResolver entityReferenceNameResolver,
                               InvolvementKindService involvementKindService,
                               PersonDao personDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(dao, "dao must not be null");
+        checkNotNull(dao, "involvementDao must not be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
         checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
         checkNotNull(involvementKindService, "involvementKindService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
 
         this.changeLogService = changeLogService;
-        this.dao = dao;
+        this.involvementDao = dao;
+        this.genericSelectorFactory = genericSelectorFactory;
         this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.involvementKindService = involvementKindService;
@@ -87,45 +95,46 @@ public class InvolvementService {
 
     public List<Involvement> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return time("IS.findByEntityReference", () -> dao.findByEntityReference(ref));
+        return time("IS.findByEntityReference", () -> involvementDao.findByEntityReference(ref));
     }
 
 
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return time("IS.findDirectApplicationsByEmployeeId", () -> dao.findDirectApplicationsByEmployeeId(employeeId));
+        return time("IS.findDirectApplicationsByEmployeeId", () -> involvementDao.findDirectApplicationsByEmployeeId(employeeId));
     }
 
 
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return time("IS.findAllApplicationsByEmployeeId", () -> dao.findAllApplicationsByEmployeeId(employeeId));
+        return time("IS.findAllApplicationsByEmployeeId", () -> involvementDao.findAllApplicationsByEmployeeId(employeeId));
     }
 
 
     public List<EndUserApplication> findAllEndUserApplicationsBySelector(EntityIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         return time("IS.findAllEndUserApplicationsBySelector",
-                () -> dao.findAllEndUserApplicationsByEmployeeId(endUserAppIdSelectorFactory.apply(options)));
+                () -> involvementDao.findAllEndUserApplicationsByEmployeeId(endUserAppIdSelectorFactory.apply(options)));
     }
 
 
     public List<Involvement> findByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return dao.findByEmployeeId(employeeId);
+        return involvementDao.findByEmployeeId(employeeId);
     }
 
 
     public List<Person> findPeopleByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return time("IS.findPeopleByEntityReference", () -> dao.findPeopleByEntityReference(ref));
+        return time("IS.findPeopleByEntityReference", () -> involvementDao.findPeopleByEntityReference(ref));
     }
+
 
     public boolean addEntityInvolvement(String userId,
                                         EntityReference entityReference,
                                         EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);
-        boolean result = dao.save(involvement) == 1;
+        boolean result = involvementDao.save(involvement) == 1;
         if (result) {
             logChange(entityReference, userId, command);
         }
@@ -137,11 +146,25 @@ public class InvolvementService {
                                            EntityReference entityReference,
                                            EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);
-        boolean result = dao.remove(involvement) == 1;
+        boolean result = involvementDao.remove(involvement) == 1;
         if (result) {
             logChange(entityReference, userId, command);
         }
         return result;
+    }
+
+
+    public Collection<Involvement> findByGenericEntitySelector(IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.apply(selectionOptions);
+        return involvementDao.findByGenericEntitySelector(genericSelector);
+    }
+
+
+    public int deleteByGenericEntitySelector(IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory
+                .apply(selectionOptions);
+        return involvementDao
+                .deleteByGenericEntitySelector(genericSelector);
     }
 
 
@@ -187,8 +210,10 @@ public class InvolvementService {
 
 
     private String resolveName(EntityReference ref) {
-        return applyToFirst(entityReferenceNameResolver.resolve(newArrayList(ref)),
-                EntityReferenceUtilities::pretty).orElseGet(() -> ref.toString());
+        return applyToFirst(
+                    entityReferenceNameResolver.resolve(newArrayList(ref)),
+                    EntityReferenceUtilities::pretty)
+                .orElseGet(() -> ref.toString());
     }
 
 
