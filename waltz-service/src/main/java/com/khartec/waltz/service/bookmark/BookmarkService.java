@@ -113,4 +113,11 @@ public class BookmarkService {
     public Collection<Bookmark> findByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
         return bookmarkDao.findByBookmarkIdSelector(bookmarkIdSelectorFactory.apply(selectionOptions));
     }
+
+    public int deleteByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
+        Select<Record1<Long>> selector = bookmarkIdSelectorFactory
+                .apply(selectionOptions);
+        return bookmarkDao
+                .deleteByBookmarkIdSelector(selector);
+    }
 }

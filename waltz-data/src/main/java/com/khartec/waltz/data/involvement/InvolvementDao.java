@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.involvement;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
@@ -37,6 +38,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +98,22 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
+                .fetch(involvementMapper);
+    }
+
+
+    /**
+     * Returns a set of involvements given by a selector which returns entities the involvements
+     * are associated to.
+     *
+     * @param genericSelector gives the criteria to determine the involvements to return
+     * @return collection of involvements
+     */
+    public Collection<Involvement> findByGenericEntitySelector(GenericSelector genericSelector) {
+        return dsl
+                .selectFrom(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
                 .fetch(involvementMapper);
     }
 
@@ -234,4 +252,21 @@ public class InvolvementDao {
         return condition;
     }
 
+
+    /**
+     * Deletes a set of involvements given by a selector which returns entities the involvements
+     * are associated to.
+     * Removed involvements are _deleted_ from the database.
+     *
+     *
+     * @param genericSelector gives the criteria to determine the involvements to remove
+     * @return count of removed involvements
+     */
+    public int deleteByGenericEntitySelector(GenericSelector genericSelector) {
+        return dsl
+                .deleteFrom(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
+                .execute();
+    }
 }

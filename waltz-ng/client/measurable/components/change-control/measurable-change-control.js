@@ -195,6 +195,7 @@ function controller(notification,
                 onShow: () => {
                     resetForm();
                     calcPreview();
+                    vm.submitDisabled = false;
                 },
             }
         ]
