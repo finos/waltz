@@ -127,7 +127,6 @@ export default (module) => {
                             if (differences.length > 0) {
                                 serviceBroker.resetAppData();
                             }
-                            console.log('done state change')
                         });
                 });
         });
