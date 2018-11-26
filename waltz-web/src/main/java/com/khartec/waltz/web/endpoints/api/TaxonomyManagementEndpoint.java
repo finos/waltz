@@ -19,8 +19,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyChangeService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -67,25 +65,25 @@ public class TaxonomyManagementEndpoint implements Endpoint {
 
     private void registerSubmitPendingChange(String path) {
         postForDatum(path, (req, resp) -> {
-            TaxonomyChangeCommand cmd = ImmutableTaxonomyChangeCommand
-                    .copyOf(readBody(req, TaxonomyChangeCommand.class))
-                    .withCreatedAt(DateTimeUtilities.nowUtc())
-                    .withCreatedBy(getUsername(req));
-            return taxonomyChangeService.submitPendingChange(cmd);
+            return taxonomyChangeService.submitDraftChange(
+                    readBody(req, TaxonomyChangeCommand.class),
+                    getUsername(req));
         });
     }
 
 
     private void registerFindPendingChangesByDomain(String path) {
         getForList(path, (req, resp) -> {
-            return taxonomyChangeService.findPendingChangesByDomain(getEntityReference(req));
+            return taxonomyChangeService.findDraftChangesByDomain(getEntityReference(req));
         });
     }
 
 
     private void registerRemoveById(String path) {
         deleteForDatum(path, (req, resp) -> {
-            return taxonomyChangeService.removeById(getId(req));
+            return taxonomyChangeService.removeById(
+                    getId(req),
+                    getUsername(req));
         });
     }
 
