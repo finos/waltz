@@ -99,6 +99,7 @@ public class TaxonomyChangeService {
 
 
     public boolean removeById(long id, String userId) {
+        verifyUserHasPermissions(userId);
         return taxonomyChangeDao.removeById(id, userId);
     }
 
@@ -111,15 +112,20 @@ public class TaxonomyChangeService {
 
 
     private void verifyUserHasPermissions(String userId, EntityReference changeDomain) {
-        if (! userRoleService.hasRole(userId, Role.TAXONOMY_EDITOR)) {
-            throw new NotAuthorizedException();
-        }
+        verifyUserHasPermissions(userId);
 
         if (changeDomain.kind() == EntityKind.MEASURABLE_CATEGORY) {
             MeasurableCategory category = measurableCategoryService.getById(changeDomain.id());
             if (! category.editable()) {
                 throw new NotAuthorizedException("Unauthorised: Category is not editable");
             }
+        }
+    }
+
+
+    private void verifyUserHasPermissions(String userId) {
+        if (! userRoleService.hasRole(userId, Role.TAXONOMY_EDITOR)) {
+            throw new NotAuthorizedException();
         }
     }
 
