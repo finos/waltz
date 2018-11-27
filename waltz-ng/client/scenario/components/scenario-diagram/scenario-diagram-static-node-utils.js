@@ -38,7 +38,7 @@ export function updateUnit(selection, options) {
     selection
         .selectAll("text")
         .attr("fill", d => {
-            const color = colorScale(d.state.rating);
+            const color = colorScale(d.state.rating).brighter(2.5);
             return determineForegroundColor(color.r, color.g, color.b);
         });
 
