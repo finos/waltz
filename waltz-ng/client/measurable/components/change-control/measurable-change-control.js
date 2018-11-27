@@ -243,7 +243,12 @@ function controller(notification,
         if (vm.submitDisabled) return;
         const cmd = mkUpdCmd(vm.commandParams);
         vm.onSubmitChange(cmd)
-            .then(vm.onDismiss);
+            .then(vm.onDismiss)
+            .catch(e => {
+                const message = `Error when submitting command: ${_.get(e, ["data", "message"], "Unknown")}`;
+                console.log(message, e);
+                notification.error(message)
+            });
     };
 }
 

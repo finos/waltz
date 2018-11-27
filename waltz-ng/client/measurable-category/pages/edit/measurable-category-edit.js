@@ -128,6 +128,11 @@ function controller($q,
                 reloadPending();
                 return true;
             })
+            .catch(e => {
+                const message = `Error when applying command: ${_.get(e, ["data", "message"], "Unknown")}`;
+                console.log(message, e);
+                notification.error(message)
+            });
     };
 
     vm.onSubmitChange = (change) => {
