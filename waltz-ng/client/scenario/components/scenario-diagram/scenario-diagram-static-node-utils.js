@@ -1,4 +1,5 @@
 import {truncateText} from "../../../common/d3-utils";
+import { determineForegroundColor } from "../../../common/colors";
 
 
 const nodeWidth = 160;
@@ -33,6 +34,13 @@ export const NODE_STYLES = {
 export function updateUnit(selection, options) {
 
     const colorScale = options.colorScale;
+
+    selection
+        .selectAll("text")
+        .attr("fill", d => {
+            const color = colorScale(d.state.rating);
+            return determineForegroundColor(color.r, color.g, color.b);
+        });
 
     selection
         .select(`rect.${NODE_STYLES.nodeCell}`)
