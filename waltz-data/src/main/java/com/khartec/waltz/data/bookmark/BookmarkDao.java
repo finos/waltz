@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.bookmark;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -176,16 +177,16 @@ public class BookmarkDao {
 
 
     /**
-     * Bulk removes bookmarks via a passed in selector sub-query.
+     * Bulk removes bookmarks via a passed in parent-ref selector sub-query.
      * Removed bookmarks are _deleted_ from the database.
-
-     * @param selector sub-query which returns a set of id's of bookmarks
+     * @param parentRefSelector sub-query which returns a set of parent-refs associated to bookmark to be deleted
      * @return count of bookmarks removed
      */
-    public int deleteByBookmarkIdSelector(Select<Record1<Long>> selector) {
+    public int deleteByParentSelector(GenericSelector parentRefSelector) {
         return dsl
                 .deleteFrom(BOOKMARK)
-                .where(BOOKMARK.ID.in(selector))
+                .where(BOOKMARK.PARENT_ID.in(parentRefSelector.selector()))
+                .and(BOOKMARK.PARENT_KIND.eq(parentRefSelector.kind().name()))
                 .execute();
     }
 

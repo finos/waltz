@@ -19,18 +19,14 @@
 
 package com.khartec.waltz.service.bookmark;
 
-import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.bookmark.BookmarkDao;
 import com.khartec.waltz.data.bookmark.BookmarkIdSelectorFactory;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import org.jooq.Record1;
-import org.jooq.Select;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +34,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
 
 
 @Service
@@ -47,17 +42,21 @@ public class BookmarkService {
     private final BookmarkDao bookmarkDao;
     private final ChangeLogService changeLogService;
     private final BookmarkIdSelectorFactory bookmarkIdSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory;
 
 
     @Autowired
     public BookmarkService(BookmarkDao bookmarkDao,
                            BookmarkIdSelectorFactory bookmarkIdSelectorFactory,
+                           GenericSelectorFactory genericSelectorFactory,
                            ChangeLogService changeLogService) {
         checkNotNull(bookmarkDao, "bookmarkDao must not be null");
         checkNotNull(bookmarkIdSelectorFactory, "bookmarkIdSelectorFactory cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         this.bookmarkDao = bookmarkDao;
         this.bookmarkIdSelectorFactory = bookmarkIdSelectorFactory;
+        this.genericSelectorFactory = genericSelectorFactory;
         this.changeLogService = changeLogService;
     }
 
@@ -115,9 +114,9 @@ public class BookmarkService {
     }
 
     public int deleteByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
-        Select<Record1<Long>> selector = bookmarkIdSelectorFactory
-                .apply(selectionOptions);
+        GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
         return bookmarkDao
-                .deleteByBookmarkIdSelector(selector);
+                .deleteByParentSelector(selector);
     }
+
 }
