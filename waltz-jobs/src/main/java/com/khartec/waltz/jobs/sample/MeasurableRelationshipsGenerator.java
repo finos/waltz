@@ -73,7 +73,8 @@ public class MeasurableRelationshipsGenerator {
                 .collect(toList());
 
         System.out.println("Deleting existing Measurable relationships ...");
-        int deleteCount = dsl.deleteFrom(ENTITY_RELATIONSHIP)
+        int deleteCount = dsl
+                .deleteFrom(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.PROVENANCE.eq(PROVENANCE)
                         .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.MEASURABLE.name()))
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.MEASURABLE.name())))

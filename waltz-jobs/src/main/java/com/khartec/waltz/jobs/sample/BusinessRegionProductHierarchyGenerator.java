@@ -183,6 +183,7 @@ public class BusinessRegionProductHierarchyGenerator {
             mcr.setExternalId(CATEGORY_EXTERNAL_ID);
             mcr.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
             mcr.setLastUpdatedBy("admin");
+            mcr.setRatingSchemeId(1L);
 
             dsl.insertInto(MEASURABLE_CATEGORY)
                     .set(mcr)
