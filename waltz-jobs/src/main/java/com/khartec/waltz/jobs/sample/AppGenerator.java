@@ -61,7 +61,7 @@ public class AppGenerator {
 
         List<AppRegistrationRequest> registrationRequests = new ArrayList<>();
 
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 500; i++) {
             String animal = randomPick(animals.toArray(new String[0])) + " - " + i;
 
 

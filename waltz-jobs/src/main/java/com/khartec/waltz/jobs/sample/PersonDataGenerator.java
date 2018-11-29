@@ -19,9 +19,12 @@
 
 package com.khartec.waltz.jobs.sample;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.PersonKind;
+import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import io.codearte.jfairy.Fairy;
@@ -35,6 +38,8 @@ import java.util.Random;
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.jobs.sample.SampleData.departmentNames;
 import static com.khartec.waltz.jobs.sample.SampleData.jobTitles;
+
+//import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 
 
 public class PersonDataGenerator {
@@ -51,6 +56,9 @@ public class PersonDataGenerator {
 
         PersonService personService = ctx.getBean(PersonService.class);
         PersonHierarchyService personHierarchyService = ctx.getBean(PersonHierarchyService.class);
+        OrganisationalUnitService organisationalUnitService = ctx.getBean(OrganisationalUnitService.class);
+
+        List<Long> orgUnitIds = IdUtilities.toIds(organisationalUnitService.findAll());
 
         Person person = fairy.person();
 
@@ -62,12 +70,14 @@ public class PersonDataGenerator {
                 .departmentName("CEO")
                 .displayName(person.getFullName())
                 .email(person.getEmail())
+                .isRemoved(false)
+                .organisationalUnitId(10)
                 .build();
 
 
         peeps.add(root);
 
-        visit(root, 1);
+        visit(root, 1, orgUnitIds);
 
 
         System.out.println(peeps.size());
@@ -81,7 +91,9 @@ public class PersonDataGenerator {
     private static final Random rnd = new Random();
     private static int counter = 0;
 
-    private static void visit(ImmutablePerson parent, int level) {
+    private static void visit(ImmutablePerson parent,
+                              int level,
+                              List<Long> orgUnitIds) {
 
         if (level > MAX_DEPTH) return;
 
@@ -106,11 +118,13 @@ public class PersonDataGenerator {
                     .departmentName(randomPick(departmentNames))
                     .displayName(person.getFullName())
                     .email((counter++) + person.getEmail())
+                    .isRemoved(false)
+                    .organisationalUnitId(ListUtilities.randomPick(orgUnitIds))
                     .build();
 
             peeps.add(p);
 
-            visit(p, nextLevel);
+            visit(p, nextLevel, orgUnitIds);
 
 
         }
