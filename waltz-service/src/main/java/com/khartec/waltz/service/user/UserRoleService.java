@@ -99,27 +99,26 @@ public class UserRoleService {
 
 
     public boolean updateRoles(String userName, String targetUserName, List<Role> newRoles) {
-        LOG.info("Updating roles for userName: " + targetUserName + ", new roles: " + newRoles);
+        LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, newRoles);
 
         Person person = personService.getPersonByUserId(targetUserName);
         if(person == null) {
-            LOG.warn(targetUserName + " does not exist, cannot update roles");
-            return false;
+            LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
+        } else {
+            ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
+                    .parentReference(EntityReference.mkRef(EntityKind.PERSON, person.id().get()))
+                    .severity(Severity.INFORMATION)
+                    .userId(userName)
+                    .message(String.format(
+                            "Roles for %s updated to %s",
+                            targetUserName,
+                            newRoles
+                    ))
+                    .childKind(Optional.empty())
+                    .operation(Operation.UPDATE)
+                    .build();
+            changeLogService.write(logEntry);
         }
-
-        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(EntityReference.mkRef(EntityKind.PERSON, person.id().get()))
-                .severity(Severity.INFORMATION)
-                .userId(userName)
-                .message(String.format(
-                        "Roles for %s updated to %s",
-                        targetUserName,
-                        newRoles
-                        ))
-                .childKind(Optional.empty())
-                .operation(Operation.UPDATE)
-                .build();
-        changeLogService.write(logEntry);
 
         return userRoleDao.updateRoles(targetUserName, newRoles);
     }
