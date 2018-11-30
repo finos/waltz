@@ -2,7 +2,7 @@
 
 <!-- toc -->
 
-- [Status: DEVELOPMENT](#status-development)
+- [Status: RELEASED](#status-development)
 - [Terminology](#terminology)
 - [Motivation](#motivation)
 - [Commands](#commands)
@@ -51,30 +51,27 @@ it is desirable that Waltz provide the facility to adequately manage it within t
 ## Commands
  
 ### Commands: Measurable 
-| Change | Description | Concerns | Priority | Impl. Complexity |
-| --- | --- | --- | --- | --- |
-| **Rename** | Alter the displayed name of the measurable | Care must be taken to not alter the meaning of the measurable item as all existing references will not reflect the new name | HIGH | LOW |
-| **Update description** | Alter the descriptive text of a measurable | Care must be taken to not alter the meaning of the measurable item | HIGH | LOW |
-| **Update concrete flag** | desc | concerns | HIGH | LOW |
-| **Update externalId** | desc | downstream consumers | HIGH | LOW |
-| **Add** | desc | concerns | HIGH | LOW |
-| **Move** | desc | concerns | HIGH | MEDIUM |
-| **Migrate**| Migrate links/references from one measurable to another | concerns | HIGH | HIGH |
-| **Delete** | desc | concerns | HIGH | HIGH |
-| **Deprecate** | Marks an item as deprecated and should be no longer considered a valid option.  Used to communicate an intent to remove from a future version of the taxonomy. | Will need ddl update to support. Full gui support may take a while | MEDIUM | MEDIUM / HIGH |
+| Implemented (1.14) | Change | Description | Concerns | Priority | Impl. Complexity |
+| --- |--- | --- | --- | --- | --- |
+| Y | **Rename** | Alter the displayed name of the measurable | Care must be taken to not alter the meaning of the measurable item as all existing references will not reflect the new name | HIGH | LOW |
+| Y | **Update description** | Alter the descriptive text of a measurable | Care must be taken to not alter the meaning of the measurable item | HIGH | LOW |
+| Y | **Update concrete flag** | desc | concerns | HIGH | LOW |
+| Y | **Update externalId** | desc | downstream consumers | HIGH | LOW |
+| Y | **Add** | desc | concerns | HIGH | LOW |
+| N | **Move** | desc | concerns | HIGH | MEDIUM |
+| N | **Migrate**| Migrate links/references from one measurable to another | concerns | HIGH | HIGH |
+| Y | **Delete** | desc | concerns | HIGH | HIGH |
+| N | **Deprecate** | Marks an item as deprecated and should be no longer considered a valid option.  Used to communicate an intent to remove from a future version of the taxonomy. | Will need ddl update to support. Full gui support may take a while | MEDIUM | MEDIUM / HIGH |
 
 
 ### Commands: Measurable Category 
-| Change | Description | Concerns | Priority | Impl. Complexity |
-| --- | --- | --- | --- | --- |
-| **Rename** | Alter the displayed name of the measurable category | Care must be taken to ensure meaning is not altered. For example if a measurable category consisting of countries was renamed from 'Trading Locations' to 'Processing Locations' then the underlying meaning has been changed and all mappings are potentially invalid | MEDIUM | LOW |
-| **Update description** | Alter the descriptive text which describes the measurable category | None | MEDIUM | LOW |
-| **Update externalId** | External Ids are typically used when integrating with upstream or downstream systems | Potential unknown impact | LOW | LOW |
-| **Delete category** | Remove the category and all items within it [1] | Very destructive. | LOW | MEDIUM |
+| Implemented (1.14) | Change | Description | Concerns | Priority | Impl. Complexity |
+| --- | --- | --- | --- | --- | --- |
+| N | **Rename** | Alter the displayed name of the measurable category | Care must be taken to ensure meaning is not altered. For example if a measurable category consisting of countries was renamed from 'Trading Locations' to 'Processing Locations' then the underlying meaning has been changed and all mappings are potentially invalid | MEDIUM | LOW |
+| N | **Update description** | Alter the descriptive text which describes the measurable category | None | MEDIUM | LOW |
+| N | **Update externalId** | External Ids are typically used when integrating with upstream or downstream systems | Potential unknown impact | LOW | LOW |
+| N | **Delete category** | Remove the category and all items within it [1] | Very destructive. | LOW | MEDIUM |
 
-
-### Commands: Data Type 
-TBD: Similar to Measurable Operations  ?
 
   
 ## Persistence
@@ -88,20 +85,14 @@ Commands that alter taxonomies will be captured in a new table `taxonomy_changel
 | `change_type` | enum | **y** | one of: 'ADD | 
 | `change_domain_kind` | enum | **y** | typically either `MEASURABLE_CATEGORY` or `DATA_TYPE` |
 | `change_domain_id` | long | **y** | `-1` for data types |
-| `kind_a` | enum | **y** | main entity kind this command is operating on |
-| `id_a` | long | **y** | main entity id this command is operating on |
-| `kind_b` | enum | _n_ | optional secondary entity kind this command is operating on |
-| `id_b` | long | _n_ | optional secondary entity id this command is operating on |
-| `new_value` | string | _n_ | string value to use in cases of rename etc, may be parsed for boolean value (e.g. concrete flag) |
+| `primary_ref_kind` | enum | **y** | main entity kind this command is operating on |
+| `primary_ref_id` | long | **y** | main entity id this command is operating on |
+| `params` | string | _n_ | simple json `{ k:string -> v:string }` map to supply arguments |
 | `change_status` | enum | **y** | tbc | 
 | `created_by` | string | **y** | who created this change user id |
 | `created_on` | timestamp | **y** | when this change was created |   
 | `executed_date` | string | _n_ | who executed this change |   
 | `executed_by` | timestamp | _n_ | when this change was app    lied |   
-
-
-*Possible extensions* : batching via _changesets_ to indicate a transactional unit of 
-work.  
 
 
 ## Command Processing
