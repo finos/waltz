@@ -100,4 +100,19 @@ public class SetUtilities {
         return working;
     }
 
+
+    public static <T, K> Set<T> uniqBy(Collection<T> xs, Function<T, K> comparator) {
+        Set<K> seen = new HashSet<>();
+        return xs.stream()
+                .filter(x -> {
+                    K k = comparator.apply(x);
+                    if (seen.contains(k)) {
+                        return false;
+                    } else {
+                        seen.add(k);
+                        return true;
+                    }
+                })
+                .collect(Collectors.toSet());
+    }
 }
