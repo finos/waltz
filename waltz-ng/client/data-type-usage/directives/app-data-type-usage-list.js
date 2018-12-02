@@ -20,7 +20,7 @@
 import _ from "lodash";
 import allUsageKinds from "../usage-kinds";
 import {notEmpty} from "../../common";
-import template from './app-data-type-usage-list.html';
+import template from "./app-data-type-usage-list.html";
 
 const BINDINGS = {
     usages: "<"
@@ -36,56 +36,59 @@ const initialState = {
 
 function consolidateUsages(usages = []) {
     return _.chain(usages)
-        .groupBy('dataTypeCode')
+        .groupBy("dataTypeId")
         .mapValues(xs => _.chain(xs)
-            .map('usage')
+            .map("usage")
             .filter(u => u.isSelected || notEmpty(u.description))
             .value())
         .value();
 }
 
 
-function findUsage(usages = [], dataTypeCode, usageKind) {
-    return _.find(usages, { dataTypeCode , usage : { kind: usageKind }});
+function findUsage(usages = [], dataTypeId, usageKind) {
+    return _.find(usages, { dataTypeId: Number(dataTypeId) , usage : { kind: usageKind }});
 }
+
 
 function controller($scope) {
     const vm = _.defaultsDeep(this, initialState);
 
     $scope.$watch(
-        'ctrl.usages',
-        (usages = []) => vm.consolidatedUsages = consolidateUsages(usages)
+        "ctrl.usages",
+        (usages = []) => {
+            vm.consolidatedUsages = consolidateUsages(usages);
+            console.log({ usages, cu: vm.consolidatedUsages })
+        }
     );
 
-    vm.isSelected = (dataTypeCode, usageKind) => {
-        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+    vm.isSelected = (dataTypeId, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
         return foundUsage && foundUsage.usage.isSelected;
     };
 
-    vm.hasDescription = (dataTypeCode, usageKind) => {
-        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+    vm.hasDescription = (dataTypeId, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
         return foundUsage && foundUsage.usage.description;
     };
 
-    vm.lookupDescription = (dataTypeCode, usageKind) => {
-        const foundUsage = findUsage(vm.usages, dataTypeCode, usageKind);
+    vm.lookupDescription = (dataTypeId, usageKind) => {
+        const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
         return foundUsage
             ? foundUsage.usage.description
             : "";
     };
-
 }
 
 
-controller.$inject = ['$scope'];
+controller.$inject = ["$scope"];
 
 
 const directive = {
-    restrict: 'E',
+    restrict: "E",
     replace: false,
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     scope: {},
     bindToController: BINDINGS
 };
