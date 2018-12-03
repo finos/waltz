@@ -22,7 +22,7 @@ function getKey(group) {
     return `lastViewedSvg.${group}`;
 }
 
-function setLastViewed(index, diagram, localStorageService, $state) {
+function setLastViewed($state, index, diagram, localStorageService) {
     const lastViewed = {
         group: diagram.group,
         index: index
@@ -30,7 +30,7 @@ function setLastViewed(index, diagram, localStorageService, $state) {
     localStorageService.set(getKey($state.current.name), lastViewed);
 }
 
-function controller($timeout, localStorageService, $state) {
+function controller($timeout, $state, localStorageService) {
     const vm = this;
 
     vm.$onInit = () => {
@@ -40,7 +40,7 @@ function controller($timeout, localStorageService, $state) {
     vm.show = (index, diagram) => {
         // timeout needed to prevent IE from crashing
         $timeout(() => diagram.visible = true, 100);
-        setLastViewed(index, diagram, localStorageService, $state)
+        setLastViewed($state, index, diagram, localStorageService)
     };
 
     vm.hide = (diagram) => {
@@ -51,8 +51,8 @@ function controller($timeout, localStorageService, $state) {
 
 controller.$inject = [
     "$timeout",
-    "localStorageService",
-    "$state"
+    "$state",
+    "localStorageService"
 ];
 
 
