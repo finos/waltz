@@ -34,9 +34,13 @@
                    uib-popover-template="'wdtt-popover.html'"
                    popover-trigger="mouseenter"
                    popover-popup-delay="300"
-                   popover-append-to-body="true">
-                    <strong ng-bind="node.name">
-                    </strong>
+                   popover-append-to-body="true"
+                   ng-style="{
+                                'font-style': node.concrete ? 'inherit' : 'italic',
+                                'font-weight': node.concrete ? 'bold' : 'bolder'
+                              }">
+                    <span ng-bind="node.name">
+                    </span>
                 </a>
                 <waltz-rag-line class='waltz-visibility-child-50'
                                  scores="node.cumulativeCounts"
