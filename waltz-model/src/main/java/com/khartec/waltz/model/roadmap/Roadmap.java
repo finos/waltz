@@ -28,7 +28,7 @@ public abstract class Roadmap implements
                 .kind(EntityKind.ROADMAP)
                 .id(id().get())
                 .name(name())
-                .description(Optional.ofNullable(description()))
+                .description(description())
                 .entityLifecycleStatus(entityLifecycleStatus())
                 .build();
     }

@@ -46,7 +46,7 @@ public abstract class OrganisationalUnit implements
                 .kind(EntityKind.ORG_UNIT)
                 .id(id().get())
                 .name(name())
-                .description(Optional.ofNullable(description()))
+                .description(description())
                 .build();
     }
 }
