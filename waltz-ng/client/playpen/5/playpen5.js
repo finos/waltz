@@ -27,10 +27,8 @@ function controller() {
 
     const vm = Object.assign(this, initialState);
 
-    vm.entityReference = {
-        kind: 'CHANGE_INITIATIVE',
-        id: 1
-    };
+
+
 
 }
 

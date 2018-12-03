@@ -20,6 +20,8 @@
 import angular from "angular";
 
 import playpenView5 from "./playpen5";
+import { registerComponents } from '../../common/module-utils';
+import DynamicNavAid from "./dynamic-nav-aid";
 
 
 export default () => {
@@ -35,6 +37,11 @@ export default () => {
                     views: { 'content@': playpenView5 }
                 })
         }
+    ]);
+
+
+    registerComponents(module, [
+        DynamicNavAid
     ]);
 
     return module.name;
