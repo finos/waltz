@@ -1,0 +1,42 @@
+id	parentId	name	description
+2300	2000	Balance Services	Capabilities to consolidate EoD balances and positions from the business and provide them to the Control Functions
+5600	5000	Calendar Services	Single reference services for calendar events. It is the consolidation of system and business events used to drive all of the applications across the globe.
+1200	1000	Cashflow Manager	Cashflow services for the bank. The consolidation and management of the cashflow ladders supporting the liquidity business.
+5500	5000	Client Services	All client services in the bank including data services and KYC.
+3600	3000	Client Reporting	Production of Client Statements and regulatory client submissions.
+3500	3000	Collateral Services	Collateral management for the bank. Including granting, verifying, and giving advice on collateral transactions in order to reduce credit risk in unsecured financial transactions.
+4300	4000	Compliance Services	The compliance department ensures that a bank does not cross the lines drawn by legislators, regulators or its board of directors. 
+3200	3000	Confirmation Services	Third-party guaranty by a financial intermediary (such as a confirming house or a bank) to a seller (or exporter) that that a named buyer's (or importer's) letter of credit will be paid (honoured) if all conditions specified in it are met. Also called confirming.
+2000		Controlled Data Services	Preamble about Controlled Data Services, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+3220	3200	Dispute Management	Dispute management facilitates rapid and efficient resolution of disputes between clients.
+4000		Enterprise Control	The overarching capability to control and report across the businesses.
+1500	1000	EoD Analytics Services	Capability to produce the EoD measures to support Finance, Risk and Compliance.
+2500	2000	Explains	Preamble about Explains, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+3210	3200	Fail Management	Management of assets and debts incurred whn a client defaults.
+4200	4000	Finance	Management of the Banks balance sheet including Regulatory and Statuary reporting
+4400	4000	Fraud	Looking across the different communication and transaction channels to proactive track Fraud within the bank.
+5200	5000	Hierarchies	Capability to provide hierarchical information across the organisation. Including Legal, Management, Financial, Risk Hierarchites.
+5300	5000	Instrument	Capability to provide clean, consolidated instrument data to applications across teh bank
+2100	2000	Intraday Events	Preamble about Intraday Events, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+1400	1000	Local Position Services	Front Office real-time Position Services
+1300	1000	Local Risk Services	Front Office Real Time Risk Services
+5400	5000	Market Data	Consolidation and distribution of market data across the banks systems
+3400	3000	Nostro	Services to facilitate Nostro management and external Nostro reconciliations
+3000		Operations	Post Trade event Management Services
+3300	3000	Payments	Payment Capability provides outgoing transactions across numerous channels including SWIFT and BACS.
+2400	2000	P&L	Management and reporting of business P&L to support product control
+2200	2000	Positions	Preamble about Positions, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+5100	5000	Product	Preamble about Product, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+5000		Reference Data Services	Preamble about Reference Data Services, Lorem ipsum is a pseudo-Latin text used in web design, typography, layout, and printing in place of English to emphasise design elements over content. It's also called placeholder (or filler) text. It's a convenient tool for mock-ups
+4100	4000	Risk	Management of the Bank various Risks
+2600	2000	Risk	Capability to provide the EoD Risk data across the different control functions
+1000		Sales & Trading	Ability to price and trade a product.
+3100	3000	Settlements	Bank settlement system across all business lines. Providing aggregation of settlement instructions for efficiency.
+1100	1000	Trade Manager	Management of the Trade and it's life cycle events
+3700	3000	Trade Reporting	Regulatory Trade Reporting across the different business lines.
+6000		Data Management	Data Management Functions
+6100	6000	ETL	Extract Transform Load
+6200	6000	Exceptions	Exception Management
+6300	6000	Log Management	Management of log files
+6400	6000	Security	Authentication and authorization
+6500	6000	Reporting	Report Generation
