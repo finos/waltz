@@ -30,7 +30,7 @@ function setLastViewed($state, index, diagram, localStorageService) {
     localStorageService.set(getKey($state.current.name), lastViewed);
 }
 
-function controller($timeout, $state, localStorageService) {
+function controller($state, $timeout, localStorageService) {
     const vm = this;
 
     vm.$onInit = () => {
@@ -50,8 +50,8 @@ function controller($timeout, $state, localStorageService) {
 
 
 controller.$inject = [
-    "$timeout",
     "$state",
+    "$timeout",
     "localStorageService"
 ];
 
