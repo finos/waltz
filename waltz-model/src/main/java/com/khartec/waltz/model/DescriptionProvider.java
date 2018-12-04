@@ -25,6 +25,7 @@ import org.immutables.value.Value;
 public interface DescriptionProvider {
 
     @Value
+    @Value.Auxiliary
     @Nullable
     String description();
 }

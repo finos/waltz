@@ -69,7 +69,7 @@ public class EntityReferenceTests {
         Assert.assertTrue(entityRef.id() == 5);
         Assert.assertTrue(entityRef.kind() == EntityKind.APPLICATION);
         Assert.assertFalse(entityRef.name().isPresent());
-        Assert.assertFalse(entityRef.description().isPresent());
+        Assert.assertNull(entityRef.description());
     }
 
 
@@ -88,8 +88,8 @@ public class EntityReferenceTests {
         Assert.assertTrue(entityRef.name().isPresent());
         Assert.assertTrue(entityRef.name().get() == "Kangaroo");
 
-        Assert.assertTrue(entityRef.description().isPresent());
-        Assert.assertTrue(entityRef.description().get() == "Kangaroo is an application");
+        Assert.assertNotNull(entityRef.description());
+        Assert.assertTrue(entityRef.description() == "Kangaroo is an application");
     }
 
 
