@@ -8,7 +8,7 @@ const baseState = {
 const viewState = {
     url: "scenario/{id:int}",
     views: {
-        "content@": ScenarioView.component
+        "content@": ScenarioView
     }
 };
 
