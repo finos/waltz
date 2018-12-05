@@ -27,23 +27,70 @@ I will assume:
 ## Installation
 
 We need:
-- Webapp container
-- Database
+- Resource Group (e.g. `waltz-khartec`)
+- Tomcat Container (e.g. `waltz-tc`)
+- SQL Server (e.g. `waltz-khartec-db-server`)
+    - with an elastic pool
+    - SQL Database (e.g. `waltzdb`)
 
 
-Creating a web-app, using tomcat 8.5
+## Database Configuration
+     
+For remote connection to database, you will need to change the firewall settings on 
+the server and allow connection from your device (`Add Client IP`).  
+ 
+You will need the jdbc connection url for configuring Waltz (via `waltz.properties`). 
+This may be obtained from the SQL Server options menu, (`Settings > Connection Strings`).
 
-Add database
 
-Add elastic pool
+### Setting up the schema
 
+If you wish to setup the schema you will need to run liquibase as described in the 
+document: [Liquibase setup](https://github.com/khartec/waltz/blob/master/waltz-data/src/main/ddl/liquibase/README.md)
+
+### Data
+
+Test data can be generated via a Java application in `waltz-jobs/src/main/..../LoadAll` or 
+imported from an example set (pre-built sample sets are available on the Github releases pages).
+
+
+## Web App deployment / configuration
+ 
 Setup FTP/SFTP using the details given on the app page (`FTP/deployment username`)
 and a password from the `deployment center/ftp/user credentials` page.
 
-Copy the war file into the `<ftpsite>/site/wwwroot/bin/apache-tomcat-8.5.24/webapps`
+Copy the war file,`waltz-web.war` (which is either built from source or obtained from the Github 
+release page), into the `<ftpsite>/site/wwwroot/bin/apache-tomcat-8.5.24/webapps`.
 
-**TO BE IMPROVED:** Wait for it to expand then copy a `waltz.properties` file into the expanded war.
+### Preparing the configuration (waltz.properties)
 
-If using sample data generators you will need to ensure that a person has the admin user name
+We need a standard `waltz.properties` file to deploy alongside the Waltz WAR file. An example
+is shown below:
 
 
+```
+# Remote Azure
+database.url=jdbc:sqlserver://waltz-khartec-db-server.database.windows.net:1433;database=waltzdb;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+database.user=waltz-admin
+database.password=xxxx
+database.schema=dbo
+database.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+jooq.dialect=SQLSERVER2014
+
+database.pool.max=16
+
+waltz.from.email=dwatkins@khartec.com
+waltz.base.url=http://localhost:8000/
+
+database.performance.query.slow.threshold=10
+```
+
+### Deploying the configuration properties
+    
+*This section needs to be improved* as there should be a better way to supply the 
+runtime properties to the deployed Waltz instance. 
+
+Wait for it to expand then copy a `waltz.properties` file into 
+the expanded war at location:
+    
+    <ftpsite>/site/wwwroot/bin/apache-tomcat-8.5.24/webapps/waltz-web/WEB-INF/classes
