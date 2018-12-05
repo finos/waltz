@@ -27,20 +27,21 @@ I will assume:
 ## Installation
 
 We need:
-- Resource Group (e.g. `waltz-khartec`)
+- Resource Group (e.g. `waltz-khartec`) 
 - Tomcat Container (e.g. `waltz-tc`)
-- SQL Server (e.g. `waltz-khartec-db-server`)
-    - with an elastic pool
+- SQL Server (e.g. `waltz-khartec-db-server`) - [image](images/2_azure_add_database_resource.png)
+    - with an elastic pool - [image](images/3_azure_add_database_elastic_pool.png)
     - SQL Database (e.g. `waltzdb`)
 
+You should end up with a configuration similar to thie [image](images/4_azure_view_group.png)
 
 ## Database Configuration
      
 For remote connection to database, you will need to change the firewall settings on 
-the server and allow connection from your device (`Add Client IP`).  
+the server and allow connection from your device (`Add Client IP`) - [image](images/5_add_hole_in_sql_firewall_for_laptop.png)  
  
 You will need the jdbc connection url for configuring Waltz (via `waltz.properties`). 
-This may be obtained from the SQL Server options menu, (`Settings > Connection Strings`).
+This may be obtained from the SQL Server options menu, (`Settings > Connection Strings`) - [image](images/6_get_jdbc_url.png)
 
 
 ### Setting up the schema
