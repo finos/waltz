@@ -33,7 +33,7 @@ We need:
     - with an elastic pool - [image](images/3_azure_add_database_elastic_pool.png)
     - SQL Database (e.g. `waltzdb`)
 
-You should end up with a configuration similar to thie [image](images/4_azure_view_group.png)
+You should end up with a configuration similar to this [image](images/4_azure_view_group.png)
 
 ## Database Configuration
      
