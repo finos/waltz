@@ -33,15 +33,14 @@ controller.$inject = [
 
 
 const component = {
-    controller,
-    template,
     bindings,
-    controllerAs: "$ctrl"
+    controller,
+    template
 };
 
 
 export default {
-    id: "waltzScenarioView",
+    id: "waltzRoadmapView",
     component
 };
 

@@ -112,9 +112,10 @@ export default (module) => {
     ];
 
 
-    function configServiceBroker($rootScope, serviceBroker) {
-        $rootScope.$on('$stateChangeStart', (event, toState) => {
-            toState.resolve.pauseStateChange = () => serviceBroker
+    function configServiceBroker($transitions, serviceBroker) {
+        $transitions.onEnter({}, (transition, state, opts) => {
+
+            const promise = serviceBroker
                 .loadViewData(CORE_API.ClientCacheKeyStore.findAll, [], {force: false})
                 .then(r => r.data)
                 .then(oldCacheKeys => {
@@ -129,10 +130,11 @@ export default (module) => {
                             }
                         });
                 });
+            transition.promise.finally(promise);
         });
     }
 
-    configServiceBroker.$inject = ['$rootScope', 'ServiceBroker'];
+    configServiceBroker.$inject = ['$transitions', 'ServiceBroker'];
 
     module
         .run(loadFromServer)

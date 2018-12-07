@@ -25,12 +25,13 @@ import "angular-sanitize";
 import "angular-tree-control";
 import "angular-ui-notification";
 import "angular-ui-grid/ui-grid";
-import "angular-ui-router";
 import "angular-ui-bootstrap";
 import "ng-tags-input";
 import "ng-showdown";
 import "satellizer";
 import "ui-select";
+
+import "@uirouter/angularjs";
 
 import AngularFormly from "angular-formly";
 import AngularFormlyTemplates from "angular-formly-templates-bootstrap";
@@ -110,28 +111,6 @@ import Welcome from "./welcome";
 import Widgets from "./widgets";
 
 
-const stateProviderOverride = () => {
-    const module = angular.module('waltz.stateProviderOverride', []);
-
-    function setupStateProviderOverride($stateProvider) {
-        const $delegate = $stateProvider.state;
-        $stateProvider.state = function(name, definition) {
-            if (!definition.resolve) {
-                definition.resolve = {};
-            }
-            return $delegate.apply(this, arguments);
-        };
-    };
-
-    setupStateProviderOverride.$inject = ['$stateProvider'];
-
-    module.config(setupStateProviderOverride);
-
-    return module.name;
-};
-
-
-
 const dependencies = [
     "ui.bootstrap",
     "ui.router",
@@ -154,7 +133,6 @@ const dependencies = [
     "angular-loading-bar",
 
     // -- waltz-modules ---
-    stateProviderOverride(), // has to be called before any routes are registered
     AccessLog(),
     Actor(),
     Alias(),

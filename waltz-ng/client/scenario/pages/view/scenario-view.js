@@ -42,10 +42,9 @@ controller.$inject = [
 
 
 const component = {
+    bindings,
     controller,
     template,
-    bindings,
-    controllerAs: "$ctrl"
 };
 
 

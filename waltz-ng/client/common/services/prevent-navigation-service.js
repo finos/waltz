@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function handleConfirmDiscardChanges(e, vetoFn, deregisterListeners) {
+function handleConfirmDiscardChanges(cancelFn, vetoFn, deregisterListeners) {
     if(vetoFn()) {
         const confirmed = confirm("This will discard your changes, OK to confirm");
         if (!confirmed) {
-            e.preventDefault();
+            return cancelFn();
         } else {
             deregisterListeners();
         }
@@ -31,19 +31,13 @@ function handleConfirmDiscardChanges(e, vetoFn, deregisterListeners) {
 }
 
 
-function service() {
+function service($transitions) {
 
     const setupWarningDialog = (scope, vetoFn) => {
-        const deregisterLocationListener = scope.$on('$locationChangeStart',
-            e => handleConfirmDiscardChanges(e, vetoFn, deregisterListeners));
 
-        const deregisterStateListener = scope.$on('$stateChangeStart',
-            e => handleConfirmDiscardChanges(e, vetoFn, deregisterListeners));
-
-        const deregisterListeners = () => {
-            deregisterStateListener();
-            deregisterLocationListener();
-        }
+        const deregisterTransitionListener = $transitions.onEnter({}, (transition) => {
+            return handleConfirmDiscardChanges(() => false, vetoFn, deregisterTransitionListener);
+        });
     };
 
 
@@ -53,7 +47,7 @@ function service() {
 }
 
 
-service.$inject = [];
+service.$inject = ["$transitions"];
 
 
 export default service;
