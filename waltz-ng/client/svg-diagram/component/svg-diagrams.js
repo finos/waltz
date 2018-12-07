@@ -18,13 +18,29 @@
  */
 import template from "./svg-diagrams.html";
 
+function getKey(group) {
+    return `lastViewedSvg.${group}`;
+}
 
-function controller($timeout) {
+function setLastViewed($state, index, diagram, localStorageService) {
+    const lastViewed = {
+        group: diagram.group,
+        index: index
+    };
+    localStorageService.set(getKey($state.current.name), lastViewed);
+}
+
+function controller($state, $timeout, localStorageService) {
     const vm = this;
 
-    vm.show = (diagram) => {
+    vm.$onInit = () => {
+        vm.active = localStorageService.get(getKey($state.current.name)).index;
+    };
+
+    vm.show = (index, diagram) => {
         // timeout needed to prevent IE from crashing
         $timeout(() => diagram.visible = true, 100);
+        setLastViewed($state, index, diagram, localStorageService)
     };
 
     vm.hide = (diagram) => {
@@ -34,7 +50,9 @@ function controller($timeout) {
 
 
 controller.$inject = [
-    "$timeout"
+    "$state",
+    "$timeout",
+    "localStorageService"
 ];
 
 
