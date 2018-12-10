@@ -83,27 +83,22 @@ function determinePopupPosition(evt, $window, $element) {
 }
 
 
-function combineDiagrams(flowDiagram, flowActions = []) {
+function enrichDiagram(flowDiagram, flowActions = []) {
 
-    const convertFlowDiagramFn = d => {
-        return {
-            id: d.id,
-            isRemoved: d.isRemoved,
-            type: "Flow",
-            kind: d.kind,
-            layoutData: d.layoutData,
-            name: d.name,
-            icon: "random",
-            description: d.description,
-            actions: flowActions,
-            lastUpdatedAt: d.lastUpdatedAt,
-            lastUpdatedBy: d.lastUpdatedBy
-        };
+    return {
+        id: flowDiagram.id,
+        isRemoved: flowDiagram.isRemoved,
+        type: "Flow",
+        kind: flowDiagram.kind,
+        layoutData: flowDiagram.layoutData,
+        name: flowDiagram.name,
+        icon: "random",
+        description: flowDiagram.description,
+        actions: flowActions,
+        lastUpdatedAt: flowDiagram.lastUpdatedAt,
+        lastUpdatedBy: flowDiagram.lastUpdatedBy
     };
 
-    const normalize = (normalizeFn, diagram) => _.map(diagram, normalizeFn);
-
-    return normalize(convertFlowDiagramFn, flowDiagram)[0];
 }
 
 function controller($element,
@@ -153,16 +148,13 @@ function controller($element,
     function reload(newId) {
         let id = newId ? newId : vm.parentEntityRef.id;
 
-        const promises = [
-            loadFlowDiagram(true, id)
-        ];
-        return $q.all(promises)
+        return loadFlowDiagram(true, id)
             .then((flowDiagram) => {
                 flowDiagramStateService.reset();
                 flowDiagramStateService
                     .load(id)
                     .then(() => loadVisibility());
-                vm.diagram = combineDiagrams(flowDiagram, flowActions);
+                vm.diagram = enrichDiagram(flowDiagram, flowActions);
                 return vm.diagram;
             });
     }
