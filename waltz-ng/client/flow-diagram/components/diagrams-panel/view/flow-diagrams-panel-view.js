@@ -85,19 +85,11 @@ function determinePopupPosition(evt, $window, $element) {
 
 function enrichDiagram(flowDiagram, flowActions = []) {
 
-    return {
-        id: flowDiagram.id,
-        isRemoved: flowDiagram.isRemoved,
-        type: "Flow",
-        kind: flowDiagram.kind,
-        layoutData: flowDiagram.layoutData,
-        name: flowDiagram.name,
-        icon: "random",
-        description: flowDiagram.description,
-        actions: flowActions,
-        lastUpdatedAt: flowDiagram.lastUpdatedAt,
-        lastUpdatedBy: flowDiagram.lastUpdatedBy
-    };
+    return Object.assign(
+        {},
+        flowDiagram,
+        {type: "Flow", icon: "random", actions: flowActions}
+    );
 
 }
 
