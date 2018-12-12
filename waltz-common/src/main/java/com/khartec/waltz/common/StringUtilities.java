@@ -141,9 +141,17 @@ public class StringUtilities {
                 .trim();
     }
 
+
     public static char firstChar(String str, char dflt) {
         return mkSafe(str).length() > 0
                 ? str.charAt(0)
                 : dflt;
+    }
+
+
+    public static Optional<String> toOptional(String str) {
+        return isEmpty(str)
+                ? Optional.empty()
+                : Optional.of(str);
     }
 }

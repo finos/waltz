@@ -20,6 +20,7 @@ import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import org.supercsv.io.CsvMapReader;
@@ -41,7 +42,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.stream.Collectors.*;
 
-@Component
+//@Component
 public class ScenarioRatingImporter {
 
     private final DSLContext dsl;
@@ -51,10 +52,10 @@ public class ScenarioRatingImporter {
     private final ScenarioAxisItemDao scenarioAxisItemDao;
     private final ScenarioDao scenarioDao;
 
-
     private Map<String, Application> assetCodeToApplicationMap;
 
 
+//    @Autowired
     public ScenarioRatingImporter(ApplicationDao applicationDao,
                                   DSLContext dsl,
                                   MeasurableDao measurableDao,
@@ -70,16 +71,14 @@ public class ScenarioRatingImporter {
         this.scenarioDao = scenarioDao;
 
 
-        List<Application> allApps = dsl.select()
-                .from(APPLICATION)
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
-        assetCodeToApplicationMap = indexBy(a -> a.assetCode().get(), allApps);
     }
 
 
     public static void main(String[] args) throws Exception {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        ctx.register(ScenarioRatingImporter.class);
         ScenarioRatingImporter importer = ctx.getBean(ScenarioRatingImporter.class);
+
 
         String filename = "scenario-rating-import-template.csv";
         importer.importScenarioRatings(filename);
@@ -87,6 +86,13 @@ public class ScenarioRatingImporter {
 
 
     public void importScenarioRatings(String filename) throws IOException {
+
+
+        List<Application> allApps = dsl.select()
+                .from(APPLICATION)
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+        assetCodeToApplicationMap = indexBy(a -> a.assetCode().get(), allApps);
+
         List<ScenarioRatingRow> ratingRows = parseData(filename);
 
         Map<String, Map<String, List<ScenarioRatingRow>>> rowsGroupedByRoadmapByScenario = ratingRows
