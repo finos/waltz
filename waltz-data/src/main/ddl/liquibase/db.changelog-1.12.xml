@@ -125,7 +125,7 @@
         <sql>
             UPDATE logical_flow
             SET entity_lifecycle_status = 'REMOVED'
-            WHERE is_removed = 1
+            WHERE is_removed = ${true.value}
         </sql>
     </changeSet>
 
