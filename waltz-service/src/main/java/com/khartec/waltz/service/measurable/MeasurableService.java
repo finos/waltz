@@ -117,7 +117,21 @@ public class MeasurableService {
         return measurableDao.updateDescription(id, newValue, userId);
     }
 
+
     public boolean updateExternalId(long id, String newValue, String userId) {
         return measurableDao.updateExternalId(id, newValue, userId);
+    }
+
+
+    public boolean create(Measurable measurable, String userId) {
+        return measurableDao.create(measurable);
+    }
+
+
+    public int deleteByIdSelector(IdSelectionOptions selectionOptions) {
+        Select<Record1<Long>> selector = measurableIdSelectorFactory
+                .apply(selectionOptions);
+        return measurableDao
+                .deleteByIdSelector(selector);
     }
 }

@@ -37,7 +37,7 @@ import static com.khartec.waltz.common.Checks.checkTrue;
  * Represents a generic entity reference.  Note that the optional name
  * and description fields are not used in equals/hashcode computations.
  */
-public abstract class EntityReference implements EntityLifecycleStatusProvider {
+public abstract class EntityReference implements EntityLifecycleStatusProvider, DescriptionProvider {
 
     public abstract EntityKind kind();
     public abstract long id();
@@ -46,8 +46,6 @@ public abstract class EntityReference implements EntityLifecycleStatusProvider {
     @Value.Auxiliary
     public abstract Optional<String> name();
 
-    @Value.Auxiliary
-    public abstract Optional<String> description();
 
     @Value.Default
     public  EntityLifecycleStatus entityLifecycleStatus() { return  EntityLifecycleStatus.ACTIVE; }
@@ -75,7 +73,7 @@ public abstract class EntityReference implements EntityLifecycleStatusProvider {
                 .kind(kind)
                 .id(id)
                 .name(Optional.ofNullable(name))
-                .description(Optional.ofNullable(description))
+                .description(description)
                 .build();
     }
 

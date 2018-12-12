@@ -67,24 +67,56 @@
 
 
             <!-- ... MEASURABLE -->
-            <div class="form-group"
-                 ng-if="$ctrl.visibility.measurableSelector">
-                <label class="control-label">
-                    Related
-                    <span ng-bind="$ctrl.counterpartType"></span>
-                </label>
-                <treecontrol class="tree-light"
-                             tree-model="$ctrl.nodes"
-                             options="$ctrl.treeOptions"
-                             on-selection="$ctrl.onMeasurableSelection(node)"
-                             order-by="'-name'">
-                    <span>{{ node.name }}</span>
-                </treecontrol>
-                <div class="help-block">
-                    Select the <span ng-bind="$ctrl.counterpartType"></span> entity you wish to associate.
-                </div>
-            </div>
+            <waltz-sub-section ng-if="$ctrl.visibility.measurableSelector"
+                               name="{{$ctrl.counterpartType}} - Selector">
+                <content>
+                    <div style="padding:8px">
+                        <div class="form-group">
+                            <div class="help-block">
+                                Select the <span ng-bind="$ctrl.counterpartType"></span> entity you wish to associate.
+                            </div>
+                            <div class="waltz-scroll-region-300">
+                                <treecontrol class="tree-light"
+                                             tree-model="$ctrl.nodes"
+                                             options="$ctrl.treeOptions"
+                                             on-selection="$ctrl.onMeasurableSelection(node)"
+                                             order-by="'-name'">
+                                    <span ng-bind="node.name"></span>
+                                </treecontrol>
+                            </div>
 
+                            <div class="wmt-search-region"
+                                 style="padding-top: 10px">
+                                <waltz-icon name="search"
+                                            ng-class="{
+                                                'wmt-search-active' : $ctrl.searchTerms.length > 0,
+                                                'wmt-search-inactive' : $ctrl.searchTerms.length == 0
+                                            }">
+                                </waltz-icon>
+                                <input type='search'
+                                       class="form-control"
+                                       name="searchTerms"
+                                       ng-model="$ctrl.searchTerms"
+                                       ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
+                                       ng-model-options="{ debounce: 200 }"
+                                       placeholder="Search">
+                                &nbsp;
+                                <waltz-icon name="close"
+                                            style="color: darkred"
+                                            ng-if="$ctrl.searchTerms.length > 0"
+                                            class="clickable"
+                                            ng-click="$ctrl.clearSearch()">
+                                </waltz-icon>
+                            </div>
+
+                        </div>
+                    </div>
+                </content>
+
+            </waltz-sub-section>
+
+
+            <br>
 
             <!-- DESCRIPTION -->
             <div class="form-group">

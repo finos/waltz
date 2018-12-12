@@ -201,9 +201,13 @@ function service($injector) {
         vm.viewDataCacheRefreshListeners.clear();
     };
 
+    const resetAppData = () => {
+        vm.appData.clear();
+    };
+
     const resetAll = () => {
         resetViewData();
-        vm.appData.clear();
+        resetAppData();
     };
 
 
@@ -212,6 +216,7 @@ function service($injector) {
         loadAppData,
         loadViewData,
         resetViewData,
+        resetAppData,
         resetAll
     };
 }

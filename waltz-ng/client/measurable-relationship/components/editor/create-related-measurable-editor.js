@@ -20,7 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
@@ -91,6 +91,7 @@ function controller(notification, serviceBroker) {
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
                 vm.measurables = _.filter(r.data, { categoryId });
+                vm.searchNodes = prepareSearchNodes(vm.measurables);
                 vm.nodes = prepareTree(vm.measurables);
             });
 
@@ -186,6 +187,7 @@ function controller(notification, serviceBroker) {
 
     vm.onMeasurableCategorySelection = (category) => {
         loadMeasurableTree(category.id);
+        vm.counterpartType = category.name;
     };
 
     vm.isFormValid = () => {
@@ -215,6 +217,10 @@ function controller(notification, serviceBroker) {
         }
     };
 
+
+    vm.searchTermsChanged = (termStr = "") => {
+        vm.nodes = prepareTree(doSearch(termStr, vm.searchNodes));
+    };
 
     // -- API ---
 

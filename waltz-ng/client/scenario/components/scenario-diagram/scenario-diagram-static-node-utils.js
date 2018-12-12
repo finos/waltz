@@ -1,4 +1,5 @@
 import {truncateText} from "../../../common/d3-utils";
+import { determineForegroundColor } from "../../../common/colors";
 
 
 const nodeWidth = 160;
@@ -35,9 +36,16 @@ export function updateUnit(selection, options) {
     const colorScale = options.colorScale;
 
     selection
+        .selectAll("text")
+        .attr("fill", d => {
+            const color = colorScale(d.state.rating).brighter(2);
+            return determineForegroundColor(color.r, color.g, color.b);
+        });
+
+    selection
         .select(`rect.${NODE_STYLES.nodeCell}`)
         .attr("stroke",  d => colorScale(d.state.rating))
-        .attr("fill", d => colorScale(d.state.rating).brighter(2.5));
+        .attr("fill", d => colorScale(d.state.rating).brighter(2));
 
     selection
         .select(`rect.${NODE_STYLES.nodeCellRatingIndicator}`)
@@ -46,7 +54,7 @@ export function updateUnit(selection, options) {
 
     selection
         .select(`path.${NODE_STYLES.nodeCellCommentIndicator}`)
-        .attr("fill", d => colorScale(d.state.rating).brighter(d.state.comment ? 0 : 2.5));
+        .attr("fill", d => colorScale(d.state.rating).brighter(d.state.comment ? 0 : 2));
 }
 
 

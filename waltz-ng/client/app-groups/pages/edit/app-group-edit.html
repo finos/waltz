@@ -5,8 +5,8 @@
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>
-                <a ui-sref="main.app-group.view ({ id:ctrl.appGroup.id })">
-                    {{ ctrl.appGroup.name }}
+                <a ui-sref="main.app-group.view ({ id:ctrl.appGroup.id })"
+                   ng-bind="ctrl.appGroup.name">
                 </a>
             </li>
             <li>Edit</li>
@@ -141,8 +141,8 @@
 
                                 <td>
                                     <a ng-click="ctrl.focusOnApp(app)"
-                                       class="clickable">
-                                        {{ app.name }}
+                                       class="clickable"
+                                       ng-bind="app.name">
                                     </a>
                                 </td>
                                 <td>
@@ -178,7 +178,7 @@
 
                 <!-- Selectors -->
                 <uib-tabset>
-                    <uib-tab heading="Bulk Editor">
+                    <uib-tab heading="Single Editor">
                         <!-- Single Selector -->
                         <div style="padding: 1em 0">
                             <span>
@@ -191,7 +191,7 @@
                         </div>
                     </uib-tab>
 
-                    <uib-tab heading="Single Editor">
+                    <uib-tab heading="Bulk Editor">
                         <!-- Bulk selector -->
                         <div style="padding: 1em 0">
                             <waltz-bulk-application-selector existing-refs="ctrl.applications"
@@ -206,15 +206,15 @@
                             <ul class="list-unstyled">
                                 <li ng-repeat="app in ctrl.history">
                                     <span ng-if="!ctrl.isAppInGroup(app.stateParams)"
-                                       class='clickable'
-                                       ng-click="ctrl.addRecentViewed(app)">
+                                          class='clickable'
+                                          ng-click="ctrl.addRecentViewed(app)">
                                         <waltz-icon fixed-width="true"
                                                     class="text-muted"
                                                     name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
                                         <span ng-bind="::app.name"></span>
                                     </span>
                                     <span ng-if="ctrl.isAppInGroup(app.stateParams)"
-                                       class='text-muted'>
+                                          class='text-muted'>
                                         <waltz-icon fixed-width="true"
                                                     name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
                                         <span ng-bind="::app.name"
@@ -233,7 +233,10 @@
                 <div ng-if="ctrl.focusApp">
                     <hr>
 
-                    <h4>Focused on: {{ ctrl.focusApp.app.name }}</h4>
+                    <h4>
+                        Focused on:
+                        <span ng-bind="ctrl.focusApp.app.name"></span>
+                    </h4>
 
 
                     <div class="row">

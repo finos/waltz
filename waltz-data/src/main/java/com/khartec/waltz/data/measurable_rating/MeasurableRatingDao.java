@@ -258,6 +258,14 @@ public class MeasurableRatingDao {
     }
 
 
+    public int deleteByMeasurableIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .deleteFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .execute();
+    }
+
+
     // --- utils
 
     private Condition mkLifecycleStatusCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {

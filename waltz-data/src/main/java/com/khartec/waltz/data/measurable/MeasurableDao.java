@@ -32,6 +32,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
@@ -160,5 +161,38 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.LAST_UPDATED_BY, userId)
                 .where(MEASURABLE.ID.eq(id))
                 .execute() == 1;
+    }
+
+
+    public boolean create(Measurable measurable) {
+        int rc = dsl.insertInto(MEASURABLE)
+                .set(MEASURABLE.MEASURABLE_CATEGORY_ID, measurable.categoryId())
+                .set(MEASURABLE.PARENT_ID, measurable.parentId().orElse(null))
+                .set(MEASURABLE.EXTERNAL_ID, measurable.externalId().orElse(null))
+                .set(MEASURABLE.EXTERNAL_PARENT_ID, measurable.externalParentId().orElse(null))
+                .set(MEASURABLE.NAME, measurable.name())
+                .set(MEASURABLE.CONCRETE, measurable.concrete())
+                .set(MEASURABLE.DESCRIPTION, measurable.description())
+                .set(MEASURABLE.PROVENANCE, "waltz")
+                .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
+                .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
+                .execute();
+
+        return rc == 1;
+    }
+
+
+    /**
+     * Bulk removes measurables by using the passed in selector.
+     * Removed measurables are _deleted_ from the database.
+     *
+     * @param selector gives id's of measurables to remove
+     * @return count of removed measurables
+     */
+    public int deleteByIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .deleteFrom(MEASURABLE)
+                .where(MEASURABLE.ID.in(selector))
+                .execute();
     }
 }

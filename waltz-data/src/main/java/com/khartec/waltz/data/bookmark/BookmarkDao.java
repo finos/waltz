@@ -19,19 +19,19 @@
 
 package com.khartec.waltz.data.bookmark;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,8 +77,8 @@ public class BookmarkDao {
 
 
     public List<Bookmark> findByReference(EntityReference reference) {
-        return dsl.select()
-                .from(BOOKMARK)
+        return dsl
+                .selectFrom(BOOKMARK)
                 .where(BOOKMARK.PARENT_ID.eq(reference.id()))
                 .and(BOOKMARK.PARENT_KIND.eq(reference.kind().name()))
                 .orderBy(BOOKMARK.IS_PRIMARY.desc(), BOOKMARK.TITLE.asc())
@@ -87,21 +87,22 @@ public class BookmarkDao {
 
 
     public Bookmark getById(long bookmarkId) {
-        return dsl.select()
-                .from(BOOKMARK)
+        return dsl
+                .selectFrom(BOOKMARK)
                 .where(BOOKMARK.ID.eq(bookmarkId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     /**
-     * @param id
+     * @param id bookmark identifier of item to be deleted
      * @return true if bookmark deleted
      */
     public boolean deleteById(long id) {
         checkTrue(id >= 0, "id must be positive");
 
-        return dsl.delete(BOOKMARK)
+        return dsl
+                .delete(BOOKMARK)
                 .where(BOOKMARK.ID.eq(id))
                 .execute() == 1;
     }
@@ -156,9 +157,37 @@ public class BookmarkDao {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("BookmarkDao{");
-        sb.append('}');
-        return sb.toString();
+        return "BookmarkDao{}";
+    }
+
+
+    /**
+     * Retrieves a collection of bookmarks via a passed in selector.  Missing bookmarks are silently
+     * ignored therefore the result.size() &lt;= the number of ids returned by the selector.
+     *
+     * @param selector A sub-query that returns the set of bookmark ids that need to be retrieved
+     * @return A collection of bookmarks corresponding to the selector.
+     */
+    public Collection<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
+        return dsl
+                .selectFrom(BOOKMARK)
+                .where(BOOKMARK.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    /**
+     * Bulk removes bookmarks via a passed in parent-ref selector sub-query.
+     * Removed bookmarks are _deleted_ from the database.
+     * @param parentRefSelector sub-query which returns a set of parent-refs associated to bookmark to be deleted
+     * @return count of bookmarks removed
+     */
+    public int deleteByParentSelector(GenericSelector parentRefSelector) {
+        return dsl
+                .deleteFrom(BOOKMARK)
+                .where(BOOKMARK.PARENT_ID.in(parentRefSelector.selector()))
+                .and(BOOKMARK.PARENT_KIND.eq(parentRefSelector.kind().name()))
+                .execute();
     }
 
 }

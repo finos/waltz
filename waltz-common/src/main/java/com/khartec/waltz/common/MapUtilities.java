@@ -187,4 +187,21 @@ public class MapUtilities {
     }
 
 
+    /**
+     * Given two maps where `map1` (provides the 'domain') goes from K1 -> K2 and
+     * `map2` (provides the 'range') goes from K2 -> V returns a new map which
+     * joins map1 and map2 giving a result which goes directly
+     * from K1 -> V
+     * @param map1 the domain map
+     * @param map2 the range map
+     * @param <K1> the key of the domain
+     * @param <K2> the value of the domain and the key of the range map
+     * @param <V> the value of the range map
+     * @return a map going from K1 -> V
+     */
+    public static <K1, K2, V> Map<K1, V> compose(Map<K1, K2> map1, Map<K2, V> map2) {
+        Map<K1, V> result = new HashMap();
+        map1.entrySet().forEach(e -> result.put(e.getKey(), map2.get(e.getValue())));
+        return result;
+    }
 }

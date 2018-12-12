@@ -31,7 +31,6 @@ const bindings = {
 function resize(elem, win) {
 
     const width = win.innerWidth * 0.7 || 1024;
-
     select(elem[0])
         .select("svg")
         .attr("width", `${width}px`)
@@ -54,14 +53,11 @@ function controller($element, $window) {
     vm.$onChanges = () => {
         if (!vm.diagram) return;
 
-        if (latch === true) {
-            return;
-        }
+        if (_.isNil(vm.blockProcessor)) return;
 
-        latch = vm.diagram !== null && vm.blockProcessor !== null;
-        console.log("diagram", { latch, d: vm.diagram, bp: vm.blockProcessor});
-
-        const svg = $element.append(vm.diagram.svg);
+        const svg = $element
+            .empty()
+            .append(vm.diagram.svg);
 
         resize($element, $window);
 

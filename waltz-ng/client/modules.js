@@ -25,12 +25,13 @@ import "angular-sanitize";
 import "angular-tree-control";
 import "angular-ui-notification";
 import "angular-ui-grid/ui-grid";
-import "angular-ui-router";
 import "angular-ui-bootstrap";
 import "ng-tags-input";
 import "ng-showdown";
 import "satellizer";
 import "ui-select";
+
+import "@uirouter/angularjs";
 
 import AngularFormly from "angular-formly";
 import AngularFormlyTemplates from "angular-formly-templates-bootstrap";
@@ -46,6 +47,7 @@ import Attestation from "./attestation";
 import AuthSources from "./auth-sources";
 import Bookmarks from "./bookmarks";
 import ChangeInitiative from "./change-initiative";
+import ClientCacheKey from "./client_cache_key";
 import Complexity from "./complexity";
 import Common_Module from "./common/module";
 import ChangeLog from "./change-log";
@@ -103,11 +105,11 @@ import SvgDiagram from "./svg-diagram";
 import System from "./system";
 import Technology from "./technology";
 import TaxonomyManagement from "./taxonomy-management";
-import Tour from "./tour";
 import User from "./user";
 import UserContribution from "./user-contribution";
 import Welcome from "./welcome";
 import Widgets from "./widgets";
+
 
 const dependencies = [
     "ui.bootstrap",
@@ -142,6 +144,7 @@ const dependencies = [
     AuthSources(),
     Bookmarks(),
     ChangeInitiative(),
+    ClientCacheKey(),
     Complexity(),
     Common_Module(),
     ChangeLog(),
@@ -198,7 +201,6 @@ const dependencies = [
     SvgDiagram(),
     System(),
     Technology(),
-    Tour(),
     User(),
     UserContribution(),
     TaxonomyManagement(),

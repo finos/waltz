@@ -8,7 +8,7 @@ const baseState = {
 const viewState = {
     url: "roadmap/{id:int}",
     views: {
-        "content@": RoadmapView.component
+        "content@": RoadmapView.id
     }
 };
 

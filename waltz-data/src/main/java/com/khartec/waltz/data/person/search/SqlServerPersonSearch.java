@@ -56,7 +56,7 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
         return dsl
                 .select(PERSON.fields())
                 .from(PERSON)
-                .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .where(PERSON.EMAIL.startsWith(query).or(JooqUtilities.MSSQL.mkContainsPrefix(terms)))
                 .and(maybeFilterRemoved)
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);

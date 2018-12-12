@@ -8,17 +8,11 @@ import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 public interface TaxonomyCommandProcessor {
 
     Logger LOG = LoggerFactory.getLogger(TaxonomyCommandProcessor.class);
-
-    default void checkType(TaxonomyChangeCommand cmd, TaxonomyChangeType expectedType) {
-        Checks.checkTrue(
-                cmd.changeType() == expectedType,
-                "Incorrect type, expected [$s] got [%s]",
-                expectedType,
-                cmd.changeType());
-    }
 
 
     default void checkDomain(TaxonomyChangeCommand cmd, EntityKind expectedDomain) {
@@ -43,14 +37,17 @@ public interface TaxonomyCommandProcessor {
     TaxonomyChangePreview preview(TaxonomyChangeCommand cmd);
     TaxonomyChangeCommand apply(TaxonomyChangeCommand command, String userId);
 
-    TaxonomyChangeType type();
+    Set<TaxonomyChangeType> supportedTypes();
     EntityKind domain();
 
 
     default void doBasicValidation(TaxonomyChangeCommand cmd) {
         cmd.validate();
         checkDomain(cmd, domain());
-        checkType(cmd, type());
-    }
+        Checks.checkTrue(
+                supportedTypes().contains(cmd.changeType()),
+                "Incorrect type, expected [$s] got [%s]",
+                supportedTypes(),
+                cmd.changeType());  }
 
 }

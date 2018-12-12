@@ -1,9 +1,9 @@
 <div>
-    <uib-tabset>
+    <uib-tabset active="$ctrl.active">
         <uib-tab heading='{{ diagram.name }}'
                  ng-repeat="diagram in $ctrl.diagrams | orderBy:'priority'"
                  deselect="$ctrl.hide(diagram)"
-                 select="$ctrl.show(diagram)">
+                 select="$ctrl.show($index, diagram)">
             <div ng-if="diagram.visible">
                 <waltz-svg-diagram diagram="diagram"
                                    block-processor="$ctrl.blockProcessor">

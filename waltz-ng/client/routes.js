@@ -72,8 +72,8 @@ configureRoutes.$inject = [
 
 // -- SCROLLER ---
 
-function configureScrollToTopOnChange($rootScope, $doc) {
-    $rootScope.$on("$stateChangeSuccess", () => {
+function configureScrollToTopOnChange($doc, $transitions) {
+    $transitions.onSuccess({}, (transition) => {
         $doc[0].body.scrollTop = 0;
         $doc[0].documentElement.scrollTop = 0;
     });
@@ -81,19 +81,19 @@ function configureScrollToTopOnChange($rootScope, $doc) {
 
 
 configureScrollToTopOnChange.$inject = [
-    "$rootScope",
-    "$document"
+    "$document",
+    "$transitions"
 ];
 
 
 // -- NAG ---
 
-function configureBetaNagMessageNotification($rootScope,
+function configureBetaNagMessageNotification($transitions,
                                              nagMessageService,
                                              notification) {
 
     const nagFunction = (message = "") => {
-        $rootScope.$on("$stateChangeSuccess", () => {
+        $transitions.onSuccess({}, (transition) => {
             notification.info(message);
         });
     };
@@ -103,7 +103,7 @@ function configureBetaNagMessageNotification($rootScope,
 
 
 configureBetaNagMessageNotification.$inject = [
-    "$rootScope",
+    "$transitions",
     "NagMessageService",
     "Notification"
 ];
@@ -111,71 +111,58 @@ configureBetaNagMessageNotification.$inject = [
 
 // -- STATE CHANGE ---
 
-function configureStateChangeListener($rootScope, $window, accessLogStore) {
-    $rootScope.$on(
-        "$stateChangeSuccess",
-        (event, toState, toParams /* fromState, fromParams */ ) => {
-            const {name} = toState;
-            const infoPromise = accessLogStore.write(name, toParams);
+function configureStateChangeListener($transitions, $window, accessLogStore) {
+    $transitions.onSuccess({}, (transition) => {
+        const {name} = transition.to();
+        const infoPromise = accessLogStore.write(name, transition.params());
 
-            if (__ENV__ === "prod") {
-                infoPromise.then(info => {
-                    if (info.revision != __REVISION__) {
-                        console.log(
-                            "Waltz reloading as server reported version does not match client. Server:",
-                            info,
-                            "client: ",
-                            __REVISION__);
-                        $window.location.reload()
-                    }
-                })
-
-            }
+        if (__ENV__ === "prod") {
+            infoPromise.then(info => {
+                if (info.revision != __REVISION__) {
+                    console.log(
+                        "Waltz reloading as server reported version does not match client. Server:",
+                        info,
+                        "client: ",
+                        __REVISION__);
+                    $window.location.reload()
+                }
+            })
         }
-    );
+    });
 }
 
 
 configureStateChangeListener.$inject = [
-    "$rootScope",
+    "$transitions",
     "$window",
     "AccessLogStore"
 ];
 
 // -- ROUTE DEBUGGER ---
 
-function configureRouteDebugging($rootScope) {
+function configureRouteDebugging($transitions, $trace) {
 
-    $rootScope.$on("$stateChangeError",function(event, toState, toParams, fromState, fromParams, error){
-        console.log("$stateChangeError - fired when an error occurs during transition.");
-        console.log(arguments);
+    $transitions.onError({}, (transition) => {
+        const to = transition.to();
+        const from = transition.from();
+        const params = transition.params();
+        console.error("Transition Error - fired when an error occurs during transition.", {to, from, params});
     });
 
-    $rootScope.$on("$stateNotFound",function(event, unfoundState, fromState, fromParams){
-        console.log(`$stateNotFound ${unfoundState.to} - fired when a state cannot be found by its name.`);
-        console.log(unfoundState, fromState, fromParams);
-    });
 
     // UNCOMMENT FOR FINE GRAINED LOGGING
-    //
-    // $rootScope.$on("$stateChangeStart",function(event, toState, toParams, fromState, fromParams){
-    //     console.log(`$stateChangeStart to ${toState.name} - fired when the transition begins.`, {toState, toParams} );
-    // });
-    // $rootScope.$on("$stateChangeSuccess",function(event, toState, toParams, fromState, fromParams){
-    //     console.log(`$stateChangeSuccess to ${toState.name} - fired once the state transition is complete.`);
-    // });
-    // $rootScope.$on("$viewContentLoading",function(event, viewConfig){
-    //     console.log("$viewContentLoading - view begins loading - dom not rendered", viewConfig);
-    // });
-
+    // $trace.enable('TRANSITION');
 }
 
-configureRouteDebugging.$inject = ["$rootScope"];
+configureRouteDebugging.$inject = [
+    "$transitions",
+    "$trace"
+];
 
 
 // -- INACTIVITY TIMER ---
 
-function configureInactivityTimer($rootScope, $timeout, $window, settingsService) {
+function configureInactivityTimer($timeout, $transitions, $window, settingsService) {
     const uiInactivityTimeoutSettingKey = "ui.inactivity-timeout";
 
     const reloadPage = () => {
@@ -186,24 +173,19 @@ function configureInactivityTimer($rootScope, $timeout, $window, settingsService
     settingsService
         .findOrDefault(uiInactivityTimeoutSettingKey, null)
         .then(inactivityTime  => {
-
             if(inactivityTime) {
                 console.log("Configuring inactivity timer for " + inactivityTime + " ms");
                 let timeoutPromise = $timeout(reloadPage, inactivityTime);
 
-                $rootScope.$on(
-                    "$stateChangeSuccess",
-                    (event, toState, toParams /* fromState, fromParams */) => {
+                $transitions.onSuccess({}, (transition) => {
+                    //if existing timeout promise, then cancel
+                    if (timeoutPromise) {
+                        $timeout.cancel(timeoutPromise);
+                    };
 
-                        //if existing timeout promise, then cancel
-                        if (timeoutPromise) {
-                            $timeout.cancel(timeoutPromise);
-                        };
-
-                        // set a new countdown
-                        timeoutPromise = $timeout(reloadPage, inactivityTime);
-                    }
-                );
+                    // set a new countdown
+                    timeoutPromise = $timeout(reloadPage, inactivityTime);
+                });
             }
 
         });
@@ -212,11 +194,12 @@ function configureInactivityTimer($rootScope, $timeout, $window, settingsService
 
 
 configureInactivityTimer.$inject = [
-    "$rootScope",
     "$timeout",
+    "$transitions",
     "$window",
     "SettingsService"
 ];
+
 
 
 // -- SETUP ---

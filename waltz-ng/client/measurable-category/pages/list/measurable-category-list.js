@@ -21,10 +21,14 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-list.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
+import roles from "../../../user/roles";
 
 
 const initialState = {
     category: null,
+    visibility: {
+        editButton: false
+    }
 };
 
 
@@ -32,12 +36,14 @@ function controller($q,
                     $state,
                     $stateParams,
                     serviceBroker,
-                    userPreferenceService) {
+                    userPreferenceService,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
+
 
         userPreferenceService
             .savePreference(lastViewedMeasurableCategoryKey, categoryId);
@@ -54,7 +60,16 @@ function controller($q,
             .then(r => {
                 vm.categories = r.data;
                 vm.category = _.find(vm.categories, { id: $stateParams.id });
+                if (vm.category.editable) {
+                    userService
+                        .whoami()
+                        .then(user => vm.visibility.editButton = userService
+                            .hasRole(
+                                user,
+                                roles.TAXONOMY_EDITOR.key));
+                }
             });
+
 
         const countPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableRatingStore.countByMeasurableCategory, [categoryId])
@@ -103,7 +118,8 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "ServiceBroker",
-    "UserPreferenceService"
+    "UserPreferenceService",
+    "UserService"
 ];
 
 

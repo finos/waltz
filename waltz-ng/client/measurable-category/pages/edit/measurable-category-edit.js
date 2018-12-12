@@ -21,7 +21,6 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
-import {entity as Entities} from "../../../common/services/enums/entity";
 
 
 const modes = {
@@ -129,6 +128,11 @@ function controller($q,
                 reloadPending();
                 return true;
             })
+            .catch(e => {
+                const message = `Error when applying command: ${_.get(e, ["data", "message"], "Unknown")}`;
+                console.log(message, e);
+                notification.error(message)
+            });
     };
 
     vm.onSubmitChange = (change) => {
@@ -136,7 +140,7 @@ function controller($q,
             .execute(
                 CORE_API.TaxonomyManagementStore.submitPendingChange,
                 [ change ])
-            .then(r => {
+            .then(() => {
                 notification.info("Change submitted");
                 reloadPending();
             });

@@ -78,6 +78,17 @@
                                          extract="measurable-category/{{$ctrl.category.id}}"
                                          filename="{{$ctrl.category.name}}.csv">
                 </waltz-data-extract-link>
+
+                <span ng-if="$ctrl.visibility.editButton">
+                    &nbsp;
+                    <a class="btn btn-primary btn-xs clickable"
+                       ui-sref="main.measurable-category.edit ({id: $ctrl.category.id})">
+                        <waltz-icon name="wrench"></waltz-icon>
+                        Maintain
+                    </a>
+                </span>
+
+
             </div>
         </div>
     </div>

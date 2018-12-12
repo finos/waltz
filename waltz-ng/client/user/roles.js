@@ -79,6 +79,11 @@ export default {
         name: "Survey admin",
         description: "Can create and modify survey templates"
     },
+    "TAXONOMY_EDITOR" : {
+        key: "TAXONOMY_EDITOR",
+        name: "Taxonomy Editor",
+        description: "Can modify taxonomies that are flagged as editable"
+    },
     "USER_ADMIN" : {
         key: "USER_ADMIN",
         name: "User Admin",

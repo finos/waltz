@@ -8,53 +8,44 @@
 </style>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <span>Type</span>
         </div>
-        <div class="col-md-8 wtcci-value-cell">
+        <div class="col-sm-8 wtcci-value-cell">
             <span ng-bind="$ctrl.change.changeType"></span>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <span>Status</span>
         </div>
-        <div class="col-md-8 wtcci-value-cell">
+        <div class="col-sm-8 wtcci-value-cell">
             <span ng-bind="$ctrl.change.status"></span>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <span>Created By</span>
         </div>
-        <div class="col-md-8 wtcci-value-cell">
+        <div class="col-sm-8 wtcci-value-cell">
             <span ng-bind="$ctrl.change.createdBy"></span>
             ( <span ng-bind="$ctrl.change.createdAt"></span> )
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <span>Primary reference</span>
         </div>
-        <div class="col-md-8 wtcci-value-cell">
-            <span ng-bind="$ctrl.change.a.name"></span>
+        <div class="col-sm-8 wtcci-value-cell">
+            <span ng-bind="$ctrl.change.primaryReference.name"></span>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
-            <span>New value</span>
+        <div class="col-sm-4">
+            <span>Parameters</span>
         </div>
-        <div class="col-md-8 wtcci-value-cell">
-            <span ng-bind="$ctrl.change.newValue"></span>
-        </div>
-    </div>
-    <div class="row"
-         ng-if="$ctrl.change.b">
-        <div class="col-md-4">
-            <span>Secondary reference</span>
-        </div>
-        <div class="col-md-8 wtcci-value-cell">
-            <span ng-bind="$ctrl.change.b.name"></span>
+        <div class="col-sm-8 wtcci-value-cell">
+            <pre ng-bind="$ctrl.change.params | json"></pre>
         </div>
     </div>
 </div>

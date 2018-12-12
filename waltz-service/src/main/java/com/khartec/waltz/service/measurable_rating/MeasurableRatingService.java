@@ -206,4 +206,12 @@ public class MeasurableRatingService {
         return measurableRatingDao.findByCategory(id);
     }
 
+
+    public int deleteByMeasurableIdSelector(IdSelectionOptions selectionOptions) {
+        Select<Record1<Long>> selector = measurableIdSelectorFactory
+                .apply(selectionOptions);
+        return measurableRatingDao
+                .deleteByMeasurableIdSelector(selector);
+    }
+
 }
