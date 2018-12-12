@@ -79,6 +79,14 @@ public class DataTypeGenerator implements SampleDataGenerator {
                 .set(DATA_TYPE.PARENT_ID, 6000L)
                 .execute();
 
+        dsl.insertInto(DATA_TYPE)
+                .set(DATA_TYPE.CODE, "UNKNOWN")
+                .set(DATA_TYPE.DESCRIPTION, "Unknown")
+                .set(DATA_TYPE.NAME, "Unknown")
+                .set(DATA_TYPE.ID, 1L)
+                .set(DATA_TYPE.UNKNOWN, true)
+                .execute();
+
         return null;
     }
 
