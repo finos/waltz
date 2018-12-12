@@ -60,6 +60,11 @@
     <property name="true.value" value="1" dbms="mysql"/>
     <property name="true.value" value="true" dbms="postgresql"/>
 
+    <property name="false.value" value="0" dbms="oracle"></property>
+    <property name="false.value" value="0" dbms="mssql"></property>
+    <property name="false.value" value="0" dbms="mysql"></property>
+    <property name="false.value" value="false" dbms="postgresql"></property>
+
 
     <!-- DICTIONARY -->
     <property name="assetcode.type" value="VARCHAR(255)"></property>

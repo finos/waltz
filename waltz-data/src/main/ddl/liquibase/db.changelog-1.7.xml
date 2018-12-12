@@ -287,12 +287,27 @@
     </changeSet>
 
     <changeSet id="20171024-2623-2"
-               author="kamransaleem">
+               author="kamransaleem"
+               dbms="mssql,mysql">
         <sql>
             UPDATE data_type
             SET unknown = 1
             WHERE id = (
                 SELECT value
+                FROM settings
+                WHERE name = 'settings.data-type.unknown-id'
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="20171024-2623-2"
+               author="kamransaleem"
+               dbms="postgresql">
+        <sql>
+            UPDATE data_type
+            SET unknown = TRUE
+            WHERE id = (
+                SELECT cast(value as int)
                 FROM settings
                 WHERE name = 'settings.data-type.unknown-id'
             )

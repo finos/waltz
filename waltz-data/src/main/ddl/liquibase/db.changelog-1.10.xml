@@ -136,7 +136,7 @@
         </sql>
         <sql>
             update rating_scheme_item
-                set user_selectable = 0
+                set user_selectable = ${false.value}
                 where code = 'Z';
         </sql>
     </changeSet>
