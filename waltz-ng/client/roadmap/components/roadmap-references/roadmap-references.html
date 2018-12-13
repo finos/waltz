@@ -33,14 +33,17 @@
                     <div ng-if="$ctrl.references.length === 0">
                         <waltz-no-data>
                             <message>
-                                <strong>Not linked</strong>to any roadmap scenarios.
-                                <br>
-                                <a ng-if="$ctrl.permissions.admin"
-                                   class="clickable"
-                                   ng-click="$ctrl.onShowAddRoadmap()">
-                                    <waltz-icon name="plus"></waltz-icon>
-                                    Add Roadmap?
-                                </a>
+                                <p>
+                                    <strong>Not linked</strong>to any roadmap scenarios.
+                                </p>
+                                <p>
+                                    <a ng-if="$ctrl.permissions.admin"
+                                       class="clickable"
+                                       ng-click="$ctrl.onShowAddRoadmap()">
+                                        <waltz-icon name="plus"></waltz-icon>
+                                        Add Roadmap?
+                                    </a>
+                                </p>
                             </message>
                         </waltz-no-data>
                         <br>

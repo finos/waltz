@@ -1,4 +1,5 @@
 <div>
+    <!-- ACTIONS -->
     <waltz-section-actions>
         <a waltz-has-role="RATING_EDITOR"
            ng-if="$ctrl.visibility.editor === false"
@@ -18,11 +19,14 @@
         </button>
     </waltz-section-actions>
 
+
+    <!-- SOURCE DATA OVERLAY -->
     <waltz-source-data-overlay visible="$ctrl.visibility.overlay"
                                entities="['MEASURABLE_RATING', 'PROCESS']">
     </waltz-source-data-overlay>
 
 
+    <!-- VIEW -->
     <div ng-if="$ctrl.visibility.editor === false">
         <!-- TABS -->
         <div class="row"
@@ -61,10 +65,6 @@
             </div>
         </div>
 
-        <br>
-
-        <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-roadmap-references>
 
         <!-- NO DATA -->
         <div class="row"
@@ -72,15 +72,34 @@
             <div class="col-md-12">
                 <waltz-no-data>
                     <message>
-                        <strong>No data</strong>
-                        available for this entity
+                        <p>
+                            <strong>No ratings</strong>
+                            available for this entity.
+                        </p>
+                        <p waltz-has-role="RATING_EDITOR">
+                            <a class="clickable"
+                               ng-if="$ctrl.visibility.editor === false"
+                               ng-click="$ctrl.visibility.editor = true">
+                                <waltz-icon name="plus"></waltz-icon>
+                                Add some ratings.
+                            </a>
+                        </p>
                     </message>
                 </waltz-no-data>
             </div>
         </div>
+
+        <br>
+
+
+        <!-- ROADMAPS -->
+        <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-roadmap-references>
+
     </div>
 
 
+    <!-- EDITOR -->
     <div>
         <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
                                             starting-category-id="$ctrl.visibility.tab"
