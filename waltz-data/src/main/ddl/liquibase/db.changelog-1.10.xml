@@ -136,7 +136,7 @@
         </sql>
         <sql>
             update rating_scheme_item
-                set user_selectable = 0
+                set user_selectable = ${false.value}
                 where code = 'Z';
         </sql>
     </changeSet>
@@ -164,6 +164,24 @@
                 mc.rating_scheme_definition_id = rs.id
             WHERE
                 mc.name = rs.name;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20180514-3144-6a"
+               author="davidwatkins73"
+               dbms="postgresql">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <sql>
+            update
+                measurable_category
+            set
+                rating_scheme_definition_id = rs.id
+            from
+                measurable_category mc
+                    inner join
+                    rating_scheme rs
+                    on
+                    rs.name = mc.name;
         </sql>
     </changeSet>
 
