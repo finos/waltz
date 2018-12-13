@@ -69,7 +69,7 @@ public class IOUtilities {
      *     <li>directory: <code>${user.home}/.waltz</code></li>
      * </ul>
      * @param fileName file (or path) to be located
-     * @return Resource representing the file or <code>null</code> if not found
+     * @return Resource representing the file
      */
     public static Resource getFileResource(String fileName) {
         Resource resource = new ClassPathResource(fileName);
