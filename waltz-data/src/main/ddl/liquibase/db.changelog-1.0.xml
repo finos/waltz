@@ -2109,7 +2109,7 @@
 
     <changeSet author="dwatkins"
                id="20160629-253-3"
-               dbms="mssql,maria">
+               dbms="mssql,mysql">
         <sql>
             INSERT INTO data_type_usage (entity_id, entity_kind, data_type_code, usage_kind)
                 SELECT DISTINCT df.source_entity_id as entity_id, df.source_entity_kind as entity_kind, df.data_type as data_type_code, 'DISTRIBUTOR' as usage_kind
