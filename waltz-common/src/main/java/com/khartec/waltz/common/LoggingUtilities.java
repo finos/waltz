@@ -27,12 +27,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class LoggingUtilities {
 
     private static final String LOG_CONFIG_FILE_NAME = "waltz-logback.xml";
 
 
+    /**
+     * Initialises logging for Waltz.  This will attempt to locate a
+     * file called <code>waltz-logback.xml</code> from either:
+     * <ul>
+     *     <li>
+     *         root of classpath
+     *     </li>
+     *     <li>
+     *         directory: <code>${user.home}/.waltz</code>
+     *     </li>
+     * </ul>
+     *
+     * Note: this file is allowed to use System.out to communicate
+     * failures to the operator.
+     */
     public static void configureLogging() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
@@ -43,9 +59,12 @@ public class LoggingUtilities {
                                 + " from classpath or " + System.getProperty("user.home") + "/.waltz/");
 
             Resource logbackConfigFile = IOUtilities.getFileResource(LOG_CONFIG_FILE_NAME);
+
             if (logbackConfigFile.exists()) {
-                System.out.println("Found logback configuration file at: " + logbackConfigFile.getFile().getAbsolutePath());
-                configurator.doConfigure(logbackConfigFile.getFile());
+                System.out.println("Found logback configuration file: " + logbackConfigFile);
+                try (InputStream configInputStream = logbackConfigFile.getInputStream()) {
+                    configurator.doConfigure(configInputStream);
+                }
             } else {
                 System.out.println("Logback configuration file not found..");
             }
