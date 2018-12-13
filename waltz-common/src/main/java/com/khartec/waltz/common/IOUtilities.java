@@ -62,6 +62,15 @@ public class IOUtilities {
     }
 
 
+    /**
+     * Attempts to locate <code>fileName</code> via either:
+     * <ul>
+     *     <li>root of classpath</li>
+     *     <li>directory: <code>${user.home}/.waltz</code></li>
+     * </ul>
+     * @param fileName file (or path) to be located
+     * @return Resource representing the file or <code>null</code> if not found
+     */
     public static Resource getFileResource(String fileName) {
         Resource resource = new ClassPathResource(fileName);
         if (!resource.exists()) {
