@@ -261,6 +261,6 @@ export function mkRatingSchemeColorScale(scheme = {}) {
 
 export function determineForegroundColor(r, g, b) {
     return useBlackAsForeground(r, g, b)
-        ? "#000"
-        : "#fff"
+        ? "rgba(50, 50, 50, 0.9)"
+        : "rgba(255, 255, 255, 0.9)";
 }
