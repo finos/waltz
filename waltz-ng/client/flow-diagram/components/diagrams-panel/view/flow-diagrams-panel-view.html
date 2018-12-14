@@ -31,6 +31,17 @@
             </a>
         </div>
         |
+        <!-- ACTIONS -->
+        <div waltz-has-role="LINEAGE_EDITOR">
+            <span ng-repeat="action in $ctrl.diagram.actions">
+                <a ng-click="action.execute($ctrl.diagram)"
+                   class="clickable">
+                    <waltz-icon name="{{ action.icon }}"></waltz-icon>
+                    <span ng-bind="action.name"></span>
+                </a>
+            </span>
+            |
+        </div>
         <a ui-sref="main.flow-diagram.view ({id: $ctrl.diagram.id })"
            class="clickable">
             <waltz-icon name="link">

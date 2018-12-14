@@ -154,6 +154,7 @@ function controller($q,
 
     vm.onDiagramDismiss = () => {
         vm.selectedDiagram = null;
+        reload();
     };
 
     vm.onEditorClose = () => {
