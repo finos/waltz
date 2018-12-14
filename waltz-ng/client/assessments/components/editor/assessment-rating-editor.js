@@ -68,8 +68,11 @@ function controller($q, serviceBroker) {
         const saveMethod = ctx.rating
             ? CORE_API.AssessmentRatingStore.update
             : CORE_API.AssessmentRatingStore.create;
+
+        const condition = ctx.dropdownEntries.filter(r => r.code === value);
+
         return serviceBroker
-            .execute(saveMethod, [vm.parentEntityRef, ctx.id, value, comments])
+            .execute(saveMethod, [vm.parentEntityRef, ctx.id, value, condition[0].name, comments])
             .then(() => loadAll(true));
     };
 
