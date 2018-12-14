@@ -92,7 +92,6 @@ public class MeasurableRatingDao {
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
-                .plannedDate(Optional.ofNullable(r.getPlannedDate()).map(Date::toLocalDate).orElse(null))
                 .build();
     };
 
@@ -116,7 +115,6 @@ public class MeasurableRatingDao {
         record.setMeasurableId(command.measurableId());
         record.setRating(Character.toString(command.rating()));
         record.setDescription(command.description());
-        record.setPlannedDate(command.plannedDate().map(Date::valueOf).orElse(null));
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
         record.setLastUpdatedBy(command.lastUpdate().by());
         record.setProvenance(command.provenance());

@@ -155,7 +155,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .measurableId(getLong(request, "measurableId"))
                 .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
                 .description(body.getOrDefault("description", ""))
-                .plannedDate(plannedDate)
                 .lastUpdate(LastUpdate.mkForUser(username))
                 .provenance("waltz")
                 .build();

@@ -17,22 +17,21 @@
         <div ng-if="$ctrl.selected != null"
              class="waltz-fade-if">
             <div>
-                <h4>
+                <div style="font-weight: bolder">
                     <a class='clickable'
-                       style="font-weight: lighter;"
                        ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
                         <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
-                </h4>
+                </div>
 
                 <div ng-if="$ctrl.selected.measurable.description">
-                    <waltz-markdown class="small"
+                    <waltz-markdown style="font-weight: lighter;"
                                     text="$ctrl.selected.measurable.description">
                     </waltz-markdown>
                     <br>
                 </div>
 
-                <br>
+                <hr>
 
                 <div>
                     <div class="row">
@@ -45,28 +44,18 @@
                             </waltz-rating-indicator-cell>
                         </div>
                     </div>
-                    <div class="row"
-                         ng-if="$ctrl.selected.rating.plannedDate">
-                        <div class="col-sm-3 waltz-display-field-label">
-                            Planned Date
-                        </div>
-                        <div class="col-sm-9">
-                            <span class="small"
-                                  ng-bind="$ctrl.selected.rating.plannedDate || 'No planned date'">
-                            </span>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-sm-3 waltz-display-field-label">
                             Description
                         </div>
                         <div class="col-sm-9">
-                            <span class="small"
+                            <span style="font-weight: lighter"
                                   ng-bind="$ctrl.selected.rating.description || 'No comment given'">
                             </span>
                         </div>
                     </div>
                 </div>
+                <hr>
                 <div class="pull-right small">
                     <waltz-last-updated entity="$ctrl.selected.rating">
                     </waltz-last-updated>

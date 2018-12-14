@@ -96,12 +96,17 @@
 <script type="text/ng-template"
         id="wmrep-rating-picker.html">
     <hr>
-    <h4 ng-bind="$ctrl.selected.measurable.name"></h4>
-    <div class="waltz-scroll-region-100">
+    <b style="font-weight: bolder"
+       ng-bind="$ctrl.selected.measurable.name">
+    </b>
+    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 300 }">
         <div class="text-muted">
             <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
         </div>
     </div>
+
+    <br>
+
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">
         <br>
@@ -114,9 +119,8 @@
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
-        <hr>
-
         <div ng-if="$ctrl.selected.rating">
+            <waltz-icon name="warning"></waltz-icon>
             This entity already exhibits this characteristic.  You may change
             the rating, comment or remove this characteristic.
         </div>
@@ -146,8 +150,9 @@
 
 
         <!-- COMMENT -->
-        <div class="row" ng-if="$ctrl.selected.rating">
-            <hr>
+        <div class="row"
+             style="padding-top: 8px;"
+             ng-if="$ctrl.selected.rating">
             <div class="col-sm-3">
                 Comments:
             </div>
@@ -161,8 +166,8 @@
 
         <!-- CANCEL -->
         <div class="row">
-            <hr>
             <div class="col-sm-12">
+                <hr>
                 <a class="clickable" ng-click="$ctrl.doCancel()">
                     &laquo; Back
                 </a>

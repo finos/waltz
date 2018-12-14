@@ -15,7 +15,8 @@
         color: #959595;
         text-transform: uppercase;
         letter-spacing: 1px;
-        background: linear-gradient(270deg, rgb(254, 254, 254) 0%, #f9f9f4 100%);
+        border-bottom: 1px solid #f9f9f4;
+        background: linear-gradient(270deg, rgb(254, 254, 254) 50%, #f9f9f4 100%);
     }
 
     .wss-small-name {
@@ -36,7 +37,8 @@
     margin: 0;
     display: block;
     width: 100%;
-    background: linear-gradient(90deg, rgb(254, 254, 254) 0%, #f9f9f4 100%);
+    border-top: 1px solid #f9f9f4;
+    background: linear-gradient(90deg, rgb(254, 254, 254) 50%, #f9f9f4 100%);
     > * {
         padding-top: 4px;
         padding-right: 4px;

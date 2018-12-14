@@ -156,12 +156,17 @@ function controller($q,
             });
     };
 
-    const reset = () => {
+    const deselectMeasurable = () => {
         vm.saveInProgress = false;
-        vm.selected = {};
-
+        vm.selected = Object.assign({}, vm.selected, { measurable: null });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
     };
 
+    const selectMeasurable = (measurable, rating) => {
+        const category = _.find(vm.categories, ({ id: measurable.categoryId }));
+        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
+    };
 
     // -- BOOT --
 
@@ -178,10 +183,7 @@ function controller($q,
             { id: vm.parentEntityRef.id });
 
     vm.onMeasurableSelect = (measurable, rating) => {
-        const category = _.find(vm.categories, ({ id: measurable.categoryId }));
-        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
-        vm.visibility.schemeOverview = false;
-        vm.visibility.ratingPicker = true;
+        selectMeasurable(measurable, rating);
     };
 
     vm.onRatingSelect = r => {
@@ -202,14 +204,13 @@ function controller($q,
     };
 
     vm.doCancel = () => {
-        reset();
-        vm.visibility.ratingPicker = false;
+        deselectMeasurable();
+
     };
 
     vm.onTabChange = (categoryId) => {
-        reset();
+        deselectMeasurable();
         vm.visibility.tab = categoryId;
-        vm.visibility.schemeOverview = true;
 
         const category = vm.categoriesById[categoryId];
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
@@ -227,7 +228,6 @@ function controller($q,
         vm.visibility.showAllCategories = true;
         recalcTabs();
     };
-
 
 }
 

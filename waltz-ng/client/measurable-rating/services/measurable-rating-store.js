@@ -76,17 +76,17 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const create = (ref, measurableId, rating = "Z", description = "", plannedDate = null) => {
+    const create = (ref, measurableId, rating = "Z", description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description})
             .then(d => d.data);
     };
 
-    const update = (ref, measurableId, rating = "Z", description = "", plannedDate = null) => {
+    const update = (ref, measurableId, rating = "Z", description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description, plannedDate })
+            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
             .then(d => d.data);
     };
 

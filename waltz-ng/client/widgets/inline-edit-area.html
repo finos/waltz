@@ -1,5 +1,6 @@
 <div>
-    <div ng-if="$ctrl.mode == $ctrl.Modes.VIEWING">
+    <div ng-if="$ctrl.mode == $ctrl.Modes.VIEWING"
+         class="waltz-visibility-parent">
 
         <span ng-bind="$ctrl.value"></span>
 
@@ -7,11 +8,11 @@
               class="text-muted"
               ng-hide="$ctrl.value"></span>
 
-        <button ng-click="$ctrl.edit()"
-                class="btn btn-xs btn-primary">
+        <a ng-click="$ctrl.edit()"
+           class="clickable waltz-visibility-child-30">
             <waltz-icon name="pencil-square-o"></waltz-icon>
             Edit
-        </button>
+        </a>
     </div>
 
 
