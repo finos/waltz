@@ -208,6 +208,10 @@ function controller($q,
 
     };
 
+    vm.onRemoveAll = (categoryId) => {
+        console.log('ora', { categoryId });
+    };
+
     vm.onTabChange = (categoryId) => {
         deselectMeasurable();
         vm.visibility.tab = categoryId;

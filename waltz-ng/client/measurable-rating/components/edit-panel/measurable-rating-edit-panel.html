@@ -2,12 +2,6 @@
 
     <!-- INSTRUCTIONS / PICKER -->
     <div class="col-sm-4">
-        <!-- INSTRUCTIONS -->
-        <div class="help-block"
-             ng-if="$ctrl.visibility.instructions"
-             ng-include="'wmrep-instructions.html'">
-        </div>
-
         <!-- SCHEME OVERVIEW -->
         <div ng-if="$ctrl.visibility.schemeOverview"
              ng-include="'wmrep-scheme-overview.html'">
@@ -17,6 +11,13 @@
         <div ng-if="$ctrl.visibility.ratingPicker"
              ng-include="'wmrep-rating-picker.html'">
         </div>
+
+        <!-- INSTRUCTIONS -->
+        <div class="help-block"
+             ng-if="$ctrl.visibility.instructions"
+             ng-include="'wmrep-instructions.html'">
+        </div>
+
     </div>
 
     <!-- TABS & TREES -->
@@ -28,7 +29,7 @@
 </div>
 
 
-
+<!-- MAIN SECTION -->
 <script type="text/ng-template"
         id="wmrep-main-tabs.html">
     <div class="waltz-tabs">
@@ -44,16 +45,15 @@
                id="{{ tab.category.id + '_' + $id }}">
         <label for="{{ tab.category.id + '_' + $id }}"
                ng-repeat-end>
-                <span ng-bind="tab.category.name"
-                      ng-class="{ italics: tab.ratings.length == 0 }">
-                </span>
+            <span ng-bind="tab.category.name"
+                  ng-class="{ italics: tab.ratings.length == 0 }">
+            </span>
             <span ng-show='tab.ratings.length > 0'
                   class="small text-muted">
-                    -
-                    <span ng-bind="tab.ratings.length"></span>
-                </span>
+                -
+                <span ng-bind="tab.ratings.length"></span>
+            </span>
         </label>
-
 
         <!-- SHOW ALL CATEGORIES -->
         <span ng-if="$ctrl.hasHiddenTabs"
@@ -63,12 +63,12 @@
               popover-popup-delay="300"
               popover-trigger="mouseenter"
               style="padding: 5px 10px;
-                         display: block;
-                         float: left;
-                         cursor: pointer;">
-                <waltz-icon name="plus"></waltz-icon>
-                Show all categories
-            </span>
+                     display: block;
+                     float: left;
+                     cursor: pointer;">
+            <waltz-icon name="plus"></waltz-icon>
+            Show all categories
+        </span>
 
         <!-- TAB CONTENT -->
         <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"
@@ -87,12 +87,27 @@
 
             <br>
             <p class="text-muted small"
-               ng-bind="tab.category.description"></p>
+               ng-bind="tab.category.description">
+            </p>
+
+
+            <div ng-if="tab.ratings.length > 0">
+                <a ng-click="$ctrl.onRemoveAll(tab.category.id)"
+                   class="clickable text-danger">
+                    <waltz-icon name="trash"></waltz-icon>
+                    Remove all mappings
+                </a>
+                for this category
+                (<span ng-bind="tab.category.name"></span>)
+            </div>
         </div>
+
+
     </div>
 </script>
 
 
+<!-- PICKER -->
 <script type="text/ng-template"
         id="wmrep-rating-picker.html">
     <hr>
@@ -148,7 +163,6 @@
             </div>
         </div>
 
-
         <!-- COMMENT -->
         <div class="row"
              style="padding-top: 8px;"
@@ -167,7 +181,7 @@
         <!-- CANCEL -->
         <div class="row">
             <div class="col-sm-12">
-                <hr>
+                <br>
                 <a class="clickable" ng-click="$ctrl.doCancel()">
                     &laquo; Back
                 </a>
@@ -178,9 +192,9 @@
 </script>
 
 
+<!-- SCHEME OVERVIEW -->
 <script type="text/ng-template"
         id="wmrep-scheme-overview.html">
-    <hr>
     <b>Rating Scheme</b>
     <table class="table table-condensed">
         <thead>
@@ -216,19 +230,28 @@
         </tbody>
     </table>
 </script>
+
+
+<!-- INSTRUCTIONS -->
 <script type="text/ng-template"
         id="wmrep-instructions.html">
+    <hr>
     <b>
-    <waltz-icon name="info-circle"></waltz-icon>
-    Instructions
+        <waltz-icon name="info-circle"></waltz-icon>
+        Instructions
     </b>
     <p>
-    This section allows you to describe this entity in terms
-    of the taxonomy items (viewpoints) it supports.
-    <br>
-    <b>Firstly</b> select a taxonomy and then pick an item from that taxonomy
-    which this entity exhibits.
-    <b>Once selected</b> a list of ratings will be shown for you to pick from.
-    You may also provide a comment.
+        This section allows you to describe this entity in terms
+        of the taxonomy items (viewpoints) it supports.
+        <br>
+        <b>Firstly</b> select a taxonomy and then pick an item from that taxonomy
+        which this entity exhibits.
+        <b>Once selected</b> a list of ratings will be shown for you to pick from.
+        You may also provide a comment.
     </p>
+    <p>
+        By default we only show categories for which mappings exist.  Click on the
+        'Show All Categories' link to see the other categories.
+    </p>
+
 </script>
