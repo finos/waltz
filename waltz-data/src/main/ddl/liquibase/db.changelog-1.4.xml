@@ -328,7 +328,8 @@
 
     <!-- 2348 -->
     <changeSet id="20170614-2348-1"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="mssql,mysql">
         <comment>2348: cleanup dead relationships</comment>
         <sql>
             DELETE er

@@ -77,15 +77,15 @@ public class XlsImporter {
 
         Long componentCategoryId = makeComponentCategory();
 
-//        removeExistingCategories();
-//        makeOrgUnits(workbook);
-//        makeApps(workbook);
-//        updateAppsWithOrgUnits(workbook);
-//        makeDataTypes();
-//        makeFlows(workbook);
-//        makeDomainTaxonomies(workbook);
-//        makeAppToDomainMappings(workbook);
-//        makeMeasurableRelationships(workbook);
+        removeExistingCategories();
+        makeOrgUnits(workbook);
+        makeApps(workbook);
+        updateAppsWithOrgUnits(workbook);
+        makeDataTypes();
+        makeFlows(workbook);
+        makeDomainTaxonomies(workbook);
+        makeAppToDomainMappings(workbook);
+        makeMeasurableRelationships(workbook);
         makeComponentTaxonomy(workbook, componentCategoryId);
         makeAppToComponentMappings(workbook, componentCategoryId);
 

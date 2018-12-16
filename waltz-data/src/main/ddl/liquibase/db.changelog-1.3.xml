@@ -384,10 +384,20 @@
 
     <!-- 1874 -->
     <changeSet id="20170330-1874-1"
-               author="rovats">
+               author="rovats"
+               dbms="mssql,mysql">
         <comment>1874: Prevent duplicate survey template names</comment>
         <addUniqueConstraint columnNames="name"
                              constraintName="unique_name"
+                             tableName="survey_template"/>
+    </changeSet>
+
+    <changeSet id="20170330-1874-1"
+               author="davidwatkins73"
+               dbms="postgresql">
+        <comment>1874: Prevent duplicate survey template names</comment>
+        <addUniqueConstraint columnNames="name"
+                             constraintName="survey_template_unique_name"
                              tableName="survey_template"/>
     </changeSet>
 
@@ -534,7 +544,8 @@
     </changeSet>
 
     <changeSet id="20170331-1881-2"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="mssql,mysql">
         <comment>1881: remove flows where sender no longer exists</comment>
         <sql>
             DELETE pf
@@ -548,7 +559,8 @@
     </changeSet>
 
     <changeSet id="20170331-1881-3"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="mssql,mysql">
         <comment>1881: remove flows where target no longer exists</comment>
         <sql>
             DELETE pf
@@ -595,7 +607,8 @@
     </changeSet>
 
     <changeSet id="20170331-1881-5"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="mssql,mysql">
         <comment>1881: create missing logical flows (and mark them as removed)</comment>
         <sql>
             INSERT INTO logical_flow (
@@ -711,7 +724,8 @@
 
     <!-- 1916 -->
     <changeSet id="20170404-1916-1"
-               author="rovats">
+               author="rovats"
+               dbms="mssql,mysql">
         <comment>1916: Unique names required for unique names</comment>
         <dropUniqueConstraint tableName="survey_template"
                               constraintName="unique_name"
@@ -1010,7 +1024,8 @@
 
     <!-- 1979 -->
     <changeSet author="rovats"
-               id="20170411-1979-1">
+               id="20170411-1979-1"
+               dbms="mssql,mysql">
         <comment>1979: Logical Flows: Mark as is_removed where source/target doesn't exist</comment>
         <sql>
             UPDATE logical_flow set

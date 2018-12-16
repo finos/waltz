@@ -206,7 +206,8 @@
     </changeSet>
 
     <changeSet author="dwatkins"
-               id="20161216-1251-3">
+               id="20161216-1251-3"
+               dbms="mssql,mysql">
         <sql>
             INSERT INTO measurable_rating (entity_id,
             entity_kind,
