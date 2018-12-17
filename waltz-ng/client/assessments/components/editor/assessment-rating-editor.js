@@ -69,7 +69,7 @@ function controller($q, serviceBroker) {
             ? CORE_API.AssessmentRatingStore.update
             : CORE_API.AssessmentRatingStore.create;
 
-        const rating = _.find(ctx.dropdownEntries, ['code', value]).name;
+        const rating = _.find(ctx.dropdownEntries, {"code": value}).name;
 
         return serviceBroker
             .execute(saveMethod, [vm.parentEntityRef, ctx.id, value, rating, comments])
