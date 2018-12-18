@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.entity_alias;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.EntityAliasRecord;
 import org.jooq.Condition;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
@@ -40,6 +42,7 @@ public class EntityAliasDao {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityAliasDao.class);
+    private static final String PROVENANCE = "waltz";
 
     private final DSLContext dsl;
 
@@ -63,15 +66,24 @@ public class EntityAliasDao {
 
         LOG.info("Updating aliases for entity: {}, aliases: {}", ref, aliases);
 
+        Set<String> currentAliases = SetUtilities.fromCollection(findAliasesForEntityReference(ref));
+        Set<String> requiredAliases = SetUtilities.fromCollection(aliases);
+
+        Set<String> toRemove = SetUtilities.minus(currentAliases, requiredAliases);
+        Set<String> toAdd = SetUtilities.minus(requiredAliases, currentAliases);
+
         dsl.delete(ENTITY_ALIAS)
                 .where(constrainByEntityReference(ref))
+                .and(ENTITY_ALIAS.ALIAS.in(toRemove))
                 .execute();
 
-        List<EntityAliasRecord> records = aliases.stream()
-                .map(t -> new EntityAliasRecord(ref.id(), t, ref.kind().name()))
+        List<EntityAliasRecord> records = toAdd
+                .stream()
+                .map(t -> new EntityAliasRecord(ref.id(), t, ref.kind().name(), PROVENANCE))
                 .collect(Collectors.toList());
 
-        return dsl.batchInsert(records)
+        return dsl
+                .batchInsert(records)
                 .execute();
     }
 
