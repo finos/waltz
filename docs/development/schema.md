@@ -13,10 +13,8 @@
 
 
 ## Table Deletion
-
-Process:
  
-- Issue should be created and flagged with both the `DDL Change` and `Removal` tags
+- An issue should be created and flagged with both the `DDL Change` and `Removal` tags
 - Deletion should only happen 2 point releases after the feature code has been removed
   - e.g. TourGuides were removed in 1.4 but the tables were not scheduled for deletion until 1.6
 - Deletion should be performed via _Liquibase_
