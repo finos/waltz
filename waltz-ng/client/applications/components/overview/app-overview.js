@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
-import template from './app-overview.html';
+import template from "./app-overview.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -75,8 +75,8 @@ function controller($state, serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.ComplexityStore.findBySelector,
-                [{ entityReference: vm.parentEntityRef, scope: 'EXACT' }])
-            .then(r => vm.complexity = _.get(r.data, '[0]'));
+                [{ entityReference: vm.parentEntityRef, scope: "EXACT" }])
+            .then(r => vm.complexity = _.get(r.data, "[0]"));
     }
 
     function loadOrganisationalUnit() {
@@ -113,36 +113,26 @@ function controller($state, serviceBroker) {
 
     vm.tagSelected = (keyword) => {
         const params = { tag: keyword };
-        $state.go('main.entity-tag.explorer', params);
+        $state.go("main.entity-tag.explorer", params);
     };
 
-    vm.saveAliases = (aliases = []) => {
-        return serviceBroker
-            .execute(
-                CORE_API.AliasStore.update,
-                [ vm.parentEntityRef, aliases ])
-            .then(r => {
-                vm.aliases = r.data;
-                vm.dismissAliasEditor();
-            });
-    };
+    vm.saveAliases = (aliases = []) => serviceBroker
+        .execute(
+            CORE_API.AliasStore.update,
+            [ vm.parentEntityRef, aliases ])
+        .then(r =>  vm.aliases = r.data);
 
-    vm.saveTags = (tags = []) => {
-        return serviceBroker
-            .execute(
-                CORE_API.EntityTagStore.update,
-                [ vm.parentEntityRef, tags ])
-            .then(r => {
-                vm.tags = r.data;
-                vm.dismissTagEditor();
-            });
-    };
+    vm.saveTags = (tags = []) => serviceBroker
+        .execute(
+            CORE_API.EntityTagStore.update,
+            [ vm.parentEntityRef, tags ])
+        .then(r => vm.tags = r.data);
 }
 
 
 controller.$inject = [
-    '$state',
-    'ServiceBroker',
+    "$state",
+    "ServiceBroker",
 ];
 
 
@@ -155,5 +145,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAppOverview'
+    id: "waltzAppOverview"
 };

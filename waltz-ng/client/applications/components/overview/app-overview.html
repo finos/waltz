@@ -68,12 +68,12 @@
                         <waltz-keyword-list ng-if="!$ctrl.visibility.aliasEditor"
                                             keywords="$ctrl.aliases">
                             <last>
-                    <span class="small">
-                        <a ng-click="$ctrl.showAliasEditor()"
-                           class="clickable">
-                            update
-                        </a>
-                    </span>
+                                <span class="small">
+                                    <a ng-click="$ctrl.showAliasEditor()"
+                                       class="clickable">
+                                        update
+                                    </a>
+                                </span>
                             </last>
                             <empty>
                                 <i class="text-muted">
@@ -96,19 +96,20 @@
                         Tags
                     </div>
                     <div class="col-sm-4">
-                        <waltz-keyword-list keywords="$ctrl.tags"
+                        <waltz-keyword-list ng-if="!$ctrl.visibility.tagEditor"
+                                            keywords="$ctrl.tags"
                                             on-select="$ctrl.tagSelected(keyword)">
                             <last>
-                    <span class="small">
-                        <a ng-click="$ctrl.showTagEditor()"
-                           class="clickable">
-                            update
-                        </a>
-                    </span>
+                                <span class="small">
+                                    <a ng-click="$ctrl.showTagEditor()"
+                                       class="clickable">
+                                        update
+                                    </a>
+                                </span>
                             </last>
                             <empty>
                                 <i class="text-muted">
-                                    No aliases defined,
+                                    No tags defined,
                                     <a class="clickable"
                                        ng-click="$ctrl.showTagEditor()">
                                         add one.

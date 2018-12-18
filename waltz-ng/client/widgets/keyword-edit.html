@@ -2,17 +2,16 @@
     <tags-input class="bootstrap"
                 ng-model="$ctrl.working"
                 replace-spaces-with-dashes="false"
+                on-tag-added="$ctrl.save()"
+                on-tag-removed="$ctrl.save()"
                 placeholder="Edit">
     </tags-input>
 
     <div style='margin-top: 4px'>
-        <button class="btn btn-xs btn-success"
-                ng-click="$ctrl.save()">
-            Update
-        </button>
         <a class="clickable small"
            ng-click="$ctrl.onCancel()">
-            Cancel
+            <waltz-icon name="close"></waltz-icon>
+            Close
         </a>
     </div>
 </div>
