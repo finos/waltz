@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.data.entity_tag;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -31,11 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.schema.tables.EntityTag.ENTITY_TAG;
@@ -108,14 +107,15 @@ public class EntityTagDao {
                     record.setEntityId(ref.id());
                     record.setEntityKind(ref.kind().name());
                     record.setTag(t);
-                    record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+                    record.setLastUpdatedAt(nowUtcTimestamp());
                     record.setLastUpdatedBy(username);
                     record.setProvenance("waltz");
                     return record;
                 })
                 .collect(Collectors.toList());
 
-        return dsl.batchInsert(records)
+        return dsl
+                .batchInsert(records)
                 .execute();
     }
 }

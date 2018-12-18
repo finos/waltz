@@ -59,23 +59,26 @@ public class ActorDao {
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isExternal(record.getIsExternal())
+                .provenance(record.getProvenance())
                 .build();
     };
 
 
-    public static final Function<Actor, ActorRecord> TO_RECORD_MAPPER = ik -> {
+    public static final Function<Actor, ActorRecord> TO_RECORD_MAPPER = actor -> {
 
         ActorRecord record = new ActorRecord();
-        record.setName(ik.name());
-        record.setDescription(ik.description());
-        record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
-        record.setLastUpdatedBy(ik.lastUpdatedBy());
-        record.setIsExternal(ik.isExternal());
-
-        ik.id().ifPresent(record::setId);
+        record.setName(actor.name());
+        record.setDescription(actor.description());
+        record.setLastUpdatedAt(Timestamp.valueOf(actor.lastUpdatedAt()));
+        record.setLastUpdatedBy(actor.lastUpdatedBy());
+        record.setIsExternal(actor.isExternal());
+        record.setProvenance(actor.provenance());
+        actor.id().ifPresent(record::setId);
 
         return record;
     };
+
+    private static final String PROVENANCE = "waltz";
 
 
     private final DSLContext dsl;
@@ -119,6 +122,7 @@ public class ActorDao {
         record.setIsExternal(command.isExternal());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        record.setProvenance(PROVENANCE);
         record.store();
 
         return record.getId();
