@@ -264,6 +264,21 @@ public class MeasurableRatingDao {
     }
 
 
+    public int removeForCategory(EntityReference ref, long categoryId) {
+        SelectConditionStep<Record1<Long>> relevantMeasurableIds = DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId));
+
+        return dsl
+                .deleteFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.in(relevantMeasurableIds))
+                .execute();
+    }
+
+
     // --- utils
 
     private Condition mkLifecycleStatusCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {

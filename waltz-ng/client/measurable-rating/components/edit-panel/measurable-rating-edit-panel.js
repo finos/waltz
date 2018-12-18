@@ -97,29 +97,37 @@ function controller($q,
                 recalcTabs();
                 if (vm.startingCategoryId) {
                     vm.onTabChange(vm.startingCategoryId);
+                } else if (!vm.visibility.tab) {
+                    const startingTab = _.get(vm.tabs, [0, "category", "id"], null);
+                    if (startingTab) { vm.onTabChange(startingTab); }
                 }
             });
 
     };
 
     const recalcTabs = function () {
+        const hasNoRatings = vm.ratings.length === 0;
+        const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
         vm.tabs = mkTabs(
             vm.categories,
             vm.ratingSchemesById,
             vm.measurables,
             vm.ratings,
-            vm.visibility.showAllCategories);
+            showAllCategories);
 
         vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
     };
+
 
     const getDescription = () => _.get(
         vm.selected,
         ["rating", "description"]);
 
+
     const getRating = () => _.get(
         vm.selected,
         ["rating", "rating"]);
+
 
     const doSave = (rating, description) => {
         const saveFn = determineSaveFn(vm.selected, measurableRatingStore);
@@ -140,6 +148,7 @@ function controller($q,
             });
     };
 
+
     const doRemove = () => {
 
         if (! vm.selected.rating) return $q.reject();
@@ -156,17 +165,20 @@ function controller($q,
             });
     };
 
+
     const deselectMeasurable = () => {
         vm.saveInProgress = false;
         vm.selected = Object.assign({}, vm.selected, { measurable: null });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
     };
 
+
     const selectMeasurable = (measurable, rating) => {
         const category = _.find(vm.categories, ({ id: measurable.categoryId }));
         vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
     };
+
 
     // -- BOOT --
 
@@ -181,6 +193,7 @@ function controller($q,
         .href(
             kindToViewState(vm.parentEntityRef.kind),
             { id: vm.parentEntityRef.id });
+
 
     vm.onMeasurableSelect = (measurable, rating) => {
         selectMeasurable(measurable, rating);
@@ -208,8 +221,24 @@ function controller($q,
 
     };
 
+
     vm.onRemoveAll = (categoryId) => {
-        console.log('ora', { categoryId });
+        if (confirm("Do you really want to remove all ratings in this category ?")) {
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingStore.removeByCategory,
+                    [vm.parentEntityRef, categoryId])
+                .then(r => {
+                    notification.info("Removed all ratings for category");
+                    vm.ratings = r.data;
+                    recalcTabs();
+                })
+                .catch(e => {
+                    const message = "Error removing all ratings for category: " + e.message;
+                    console.log(message, { e });
+                    notification.error(message);
+                });
+        }
     };
 
     vm.onTabChange = (categoryId) => {

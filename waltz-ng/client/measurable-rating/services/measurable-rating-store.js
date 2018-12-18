@@ -79,21 +79,28 @@ function store($http, baseApiUrl) {
     const create = (ref, measurableId, rating = "Z", description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description})
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description})
             .then(d => d.data);
     };
 
     const update = (ref, measurableId, rating = "Z", description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`, { rating, description })
+            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
             .then(d => d.data);
     };
 
     const remove = (ref, measurableId) => {
         checkIsEntityRef(ref);
         return $http
-            .delete(`${baseUrl}/entity/${ref.kind}/${ref.id}/${measurableId}`)
+            .delete(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`)
+            .then(d => d.data);
+    };
+
+    const removeByCategory = (ref, categoryId) => {
+        checkIsEntityRef(ref);
+        return $http
+            .delete(`${baseUrl}/entity/${ref.kind}/${ref.id}/category/${categoryId}`)
             .then(d => d.data);
     };
 
@@ -108,7 +115,8 @@ function store($http, baseApiUrl) {
         statsForRelatedMeasurables,
         create,
         update,
-        remove
+        remove,
+        removeByCategory
     };
 
 }
@@ -174,8 +182,12 @@ export const MeasurableRatingStore_API = {
         serviceName,
         serviceFnName: "remove",
         description: "remove a measurable"
+    },
+    removeByCategory: {
+        serviceName,
+        serviceFnName: "removeByCategory",
+        description: "remove a measurable"
     }
-
 };
 
 

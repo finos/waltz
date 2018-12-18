@@ -19,14 +19,17 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
+import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
+import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -56,17 +59,20 @@ public class MeasurableRatingService {
     private final PerspectiveRatingDao perspectiveRatingDao;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final ChangeLogService changeLogService;
+    private final MeasurableCategoryDao measurableCategoryDao;
 
 
     @Autowired
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
+                                   MeasurableCategoryDao measurableCategoryDao,
                                    MeasurableIdSelectorFactory measurableIdSelectorFactory,
                                    PerspectiveRatingDao perspectiveRatingDao,
                                    ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                    ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
+        checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
         checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         checkNotNull(perspectiveRatingDao, "perspectiveRatingDao cannot be null");
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
@@ -74,6 +80,7 @@ public class MeasurableRatingService {
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
+        this.measurableCategoryDao = measurableCategoryDao;
         this.measurableIdSelectorFactory = measurableIdSelectorFactory;
         this.perspectiveRatingDao = perspectiveRatingDao;
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
@@ -118,6 +125,37 @@ public class MeasurableRatingService {
                 measurableRatingDao::create,
                 "Added: %s with a rating of: %s",
                 Operation.ADD);
+    }
+
+
+    /**
+     * Removes all ratings for the given entity where the associated
+     * measurable belongs to the given category.
+     * @param ref EntityReference of the entity linked to the measurables
+     * @param categoryId  Measurable Category identifier
+     * @param username who is doing the removal
+     * @return
+     */
+    public Collection<MeasurableRating> removeForCategory(EntityReference ref, long categoryId, String username) {
+        checkNotNull(ref, "Cannot remove entity ratings for a category if the given entity reference is null");
+
+        MeasurableCategory category = checkNotNull(
+                measurableCategoryDao.getById(categoryId),
+                "Cannot find category: %d", categoryId);
+
+        int numRemoved = measurableRatingDao.removeForCategory(ref, categoryId);
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(format("Removed all ratings for category: %s", category.name()))
+                .parentReference(ref)
+                .userId(username)
+                .createdAt(DateTimeUtilities.nowUtc())
+                .severity(Severity.INFORMATION)
+                .childKind(EntityKind.MEASURABLE)
+                .operation(Operation.REMOVE)
+                .build());
+        
+        return findForEntity(ref);
     }
 
 

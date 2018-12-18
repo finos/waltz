@@ -1,6 +1,7 @@
 package com.khartec.waltz.jobs.clients.c1.sc1;
 
 import com.khartec.waltz.common.CollectionUtilities;
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.common.StreamUtilities.Siphon;
@@ -15,6 +16,8 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
+import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
+import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.records.*;
 import com.khartec.waltz.service.DIConfiguration;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,9 +33,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -88,8 +93,72 @@ public class XlsImporter {
         makeMeasurableRelationships(workbook);
         makeComponentTaxonomy(workbook, componentCategoryId);
         makeAppToComponentMappings(workbook, componentCategoryId);
+        makeProjects(workbook);
+        makeAppToProjectMappings(workbook);
 
     }
+
+    private int makeAppToProjectMappings(Workbook workbook) {
+        removeAllAppToProjectMappings();
+        Map<String, Long> changeExtToIdMap = loadChangeExtToIdMap();
+        Map<String, Long> appExtToIdMap = loadAppExtToIdMap();
+        List<EntityRelationshipRecord> records = streamRows(workbook, SheetDefinition.PROJECT)
+                .skip(1)
+                .map(ProjectRow::fromRow)
+                .map(p -> tuple(appExtToIdMap.get(p.applicationId()), changeExtToIdMap.get(p.projectObjectId())))
+                .filter(t -> t.v1 != null && t.v2 != null)
+                .map(t -> {
+                    EntityRelationshipRecord record = dsl.newRecord(ENTITY_RELATIONSHIP);
+                    record.setKindA(EntityKind.APPLICATION.name());
+                    record.setIdA(t.v1);
+                    record.setRelationship(RelationshipKind.RELATES_TO.name());
+                    record.setKindB(EntityKind.CHANGE_INITIATIVE.name());
+                    record.setIdB(t.v2);
+                    record.setLastUpdatedBy("admin");
+                    record.setLastUpdatedAt(nowUtcTimestamp());
+                    record.setProvenance(PROVENANCE);
+                    return record;
+                })
+                .collect(Collectors.toList());
+
+        int[] rc = dsl.batchInsert(records).execute();
+        log("Created %d app relations to projects\n", rc.length);
+        return rc.length;
+    }
+
+
+    private int makeProjects(Workbook workbook) {
+        removeAllProjects();
+        AtomicLong ctr = new AtomicLong(0);
+
+        List<ChangeInitiativeRecord> records = streamRows(workbook, SheetDefinition.PROJECT)
+                .skip(1)
+                .map(ProjectRow::fromRow)
+                .collect(toMap(p -> p.projectObjectId(), Function.identity(), (p1, p2) -> p1))
+                .values()
+                .stream()
+                .map(p -> {
+                    ChangeInitiativeRecord record = dsl.newRecord(CHANGE_INITIATIVE);
+                    record.setId(ctr.incrementAndGet());
+                    record.setName(p.projectName());
+                    record.setExternalId(p.projectObjectId());
+                    record.setDescription("Project: " + p.projectName());
+                    record.setKind(ChangeInitiativeKind.PROJECT.name());
+                    record.setProvenance(PROVENANCE);
+                    record.setLifecyclePhase(p.lifecyclePhase().name());
+                    Date startDate = DateTimeUtilities.toSqlDate(p.startDate());
+                    Date endDate = DateTimeUtilities.toSqlDate(p.endDate());
+                    record.setStartDate(startDate);
+                    record.setEndDate(endDate);
+                    return record;
+                })
+                .collect(Collectors.toList());
+
+        int[] rc = dsl.batchInsert(records).execute();
+        log("Created %d projects\n", rc.length);
+        return rc.length;
+    }
+
 
     private void removeExistingCategories() {
         dsl.deleteFrom(MEASURABLE_CATEGORY)
@@ -438,7 +507,7 @@ public class XlsImporter {
 
         return rc.length;
     }
-    
+
 
     private OrganisationalUnitRecord mkOrgUnitRecord(long id, Long parentId, String name, String extId) {
         OrganisationalUnitRecord record = dsl.newRecord(ORGANISATIONAL_UNIT);
@@ -556,6 +625,16 @@ public class XlsImporter {
     }
 
 
+    private Map<String, Long> loadChangeExtToIdMap() {
+        return makeExtToIdMap(dsl
+                .select(CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.EXTERNAL_ID)
+                .from(CHANGE_INITIATIVE)
+                .fetch(r -> tuple(
+                        r.get(CHANGE_INITIATIVE.ID),
+                        r.get(CHANGE_INITIATIVE.EXTERNAL_ID))));
+    }
+
+
     private Map<String, Long> loadAppExtToIdMap() {
         return makeExtToIdMap(dsl
                 .select(APPLICATION.ID, APPLICATION.ASSET_CODE)
@@ -633,6 +712,24 @@ public class XlsImporter {
         return dsl
                 .deleteFrom(MEASURABLE)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .execute();
+    }
+
+
+    private int removeAllAppToProjectMappings() {
+        int rc = dsl.deleteFrom(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.PROVENANCE.eq(PROVENANCE))
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())
+                        .or(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                .execute();
+
+        return rc;
+    }
+
+
+    private int removeAllProjects() {
+        return dsl
+                .deleteFrom(CHANGE_INITIATIVE)
                 .execute();
     }
 
@@ -732,7 +829,7 @@ public class XlsImporter {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         XlsImporter importer = ctx.getBean(XlsImporter.class);
 
-        String filename = "clients\\c1\\sc1\\anonymous_data_v1.0.xlsx";
+        String filename = "clients\\c1\\sc1\\full_anonymous_data_v1.0.xlsx";
         importer.load(filename);
     }
 

@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.measurable_rating.*;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
@@ -68,7 +69,8 @@ public class MeasurableRatingEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":measurableId");
+        String modifyMeasurableForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId");
+        String modifyCategoryForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
         String findByAppSelectorPath = mkPath(BASE_URL, "app-selector");
         String findByCategoryPath = mkPath(BASE_URL, "category", ":id");
@@ -105,13 +107,23 @@ public class MeasurableRatingEndpoint implements Endpoint {
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);
-        postForList(modifyPath, this::createRoute);
-        putForList(modifyPath, this::updateRoute);
-        deleteForList(modifyPath, this::removeRoute);
+        postForList(modifyMeasurableForEntityPath, this::createRoute);
+        putForList(modifyMeasurableForEntityPath, this::updateRoute);
+        deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
+        deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurablePath, countByMeasurableRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
         postForList(statsForRelatedMeasurablePath, statsForRelatedMeasurableRoute);
         postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
+    }
+
+    private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
+        requireRole(userRoleService, request, Role.RATING_EDITOR);
+
+        EntityReference ref = getEntityReference(request);
+        long category = getLong(request, "categoryId");
+
+        return measurableRatingService.removeForCategory(ref, category, getUsername(request));
     }
 
 
