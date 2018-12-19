@@ -85,7 +85,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         SaveAssessmentRatingCommand command = mkCommand(request);
         AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
         def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
-        return assessmentRatingService.update(command);
+        return assessmentRatingService.update(command, getUsername(request));
     }
 
 
@@ -93,7 +93,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         SaveAssessmentRatingCommand command = mkCommand(request);
         AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
         def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
-        return assessmentRatingService.create(command);
+        return assessmentRatingService.create(command, getUsername(request));
     }
 
 
@@ -109,7 +109,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
         AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
         def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
-        return assessmentRatingService.remove(command);
+        return assessmentRatingService.remove(command, getUsername(request));
     }
 
 
@@ -123,6 +123,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
+                .ratingName(StringUtilities.mkSafe((String) body.get("ratingName")))
                 .description(StringUtilities.mkSafe((String) body.get("description")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
