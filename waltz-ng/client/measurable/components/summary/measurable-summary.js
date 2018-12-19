@@ -20,7 +20,7 @@ import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {entity as EntityKinds, entity} from "../../../common/services/enums/entity";
+import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
 import template from "./measurable-summary.html";
 import {initialiseData} from "../../../common/index";
@@ -40,7 +40,8 @@ const bindings = {
 
 const initialState = {
     applications: [],
-    techStats: []
+    techStats: [],
+    hierarchyMode: "RELEVANT"
 };
 
 
@@ -100,27 +101,42 @@ function controller(serviceBroker, $state) {
                 CORE_API.MeasurableStore.findAll)
             .then(r => {
                 vm.measurable = _.find(r.data, { id: vm.parentEntityRef.id });
-                const all = _.filter(r.data, { categoryId: vm.measurable.categoryId});
+                const all = _.filter(r.data, m => m.categoryId === vm.measurable.categoryId);
                 const roots = populateParents(all, true);
                 const m = findNode(roots, vm.measurable.id);
                 const parents = getParents(m);
                 const children =  flattenChildren(m);
                 const limb = _.union(parents, [m], children);
-                vm.hierarchy = _.map(limb,n => {
+                const relevantHierarchy = _.map(limb,n => {
                     const cpy = Object.assign({}, n, { parent: n.parent ? n.parent.id : null});
                     delete cpy.children;
                     return cpy;
-                } );
-            })
+                });
+                vm.entireHierarchy = all;
+                vm.relevantHierarchy = relevantHierarchy;
+                vm.hierarchy = vm.relevantHierarchy;
+            });
     };
+
 
     vm.onSelectNavItem = (item) => {
         if (item.id === vm.parentEntityRef.id) {
             return; // nothing to do, user clicked on self
         }
         $state.go(
-            kindToViewState(EntityKinds.MEASURABLE.key),
+            kindToViewState(entity.MEASURABLE.key),
             { id: item.id });
+    };
+
+
+    vm.onToggleHierarchyMode = () => {
+        if (vm.hierarchyMode === "ENTIRE") {
+            vm.hierarchyMode = "RELEVANT";
+            vm.hierarchy = vm.relevantHierarchy;
+        } else {
+            vm.hierarchyMode = "ENTIRE";
+            vm.hierarchy = vm.entireHierarchy;
+        }
     };
 
 }
