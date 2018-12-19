@@ -19,7 +19,6 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {getParents, populateParents} from "../../../common/hierarchy-utils";
 
 import template from "./measurable-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -34,8 +33,8 @@ const initialState = {
 function logHistory(measurable, historyStore) {
     return historyStore
         .put(measurable.name,
-            'MEASURABLE',
-            'main.measurable.view',
+            "MEASURABLE",
+            "main.measurable.view",
             { id: measurable.id });
 }
 
@@ -47,8 +46,8 @@ function controller($q,
                     historyStore) {
 
     const id = $stateParams.id;
-    const ref = { id, kind: 'MEASURABLE' };
-    const childrenSelector = { entityReference: ref, scope: 'CHILDREN' };
+    const ref = { id, kind: "MEASURABLE" };
+    const childrenSelector = { entityReference: ref, scope: "CHILDREN" };
 
     const vm = initialiseData(this, initialState);
     vm.entityReference = ref;
@@ -63,14 +62,8 @@ function controller($q,
             serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
                 .then(result => {
                     const all = result.data;
-                    const withParents = populateParents(all);
-                    vm.measurable = _.find(withParents, { id });
+                    vm.measurable = _.find(all, { id });
                     vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.measurable.name});
-                    vm.parents = getParents(vm.measurable);
-                    vm.children = _.chain(all)
-                        .filter({ parentId: id })
-                        .sortBy('name')
-                        .value();
                 }),
         ]);
 
@@ -79,12 +72,6 @@ function controller($q,
             serviceBroker
                 .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
                 .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })),
-            serviceBroker
-                .loadViewData(CORE_API.ApplicationStore.findBySelector, [childrenSelector])
-                .then(r => vm.applications = r.data),
-            serviceBroker
-                .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [childrenSelector])
-                .then(r => vm.techStats = r.data)
         ]);
 
 
@@ -98,28 +85,28 @@ function controller($q,
         .then(loadWave3);
 
     vm.$onInit = () => {
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('MEASURABLE');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('MEASURABLE');
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("MEASURABLE");
+        vm.sections = dynamicSectionManager.findUserSectionsForKind("MEASURABLE");
     };
 
     // -- DYNAMIC SECTIONS
 
-    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, 'MEASURABLE');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'MEASURABLE');
+    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, "MEASURABLE");
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "MEASURABLE");
 }
 
 
 controller.$inject = [
-    '$q',
-    '$stateParams',
-    'DynamicSectionManager',
-    'ServiceBroker',
-    'HistoryStore'
+    "$q",
+    "$stateParams",
+    "DynamicSectionManager",
+    "ServiceBroker",
+    "HistoryStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

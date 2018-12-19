@@ -20,51 +20,28 @@ import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {entity} from "../../../common/services/enums/entity";
+import {entity as EntityKinds, entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
 import template from "./measurable-summary.html";
 import {initialiseData} from "../../../common/index";
+import {
+    findNode,
+    flattenChildren,
+    getParents,
+    populateParents
+} from "../../../common/hierarchy-utils";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
-    parentEntityRef: "<",
-    scope: "@?",
-    applications: "<",
-    children: "<",
-    measurable: "<",
-    parents: "<",
-    serverStats: "<"
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
-    scope: "CHILDREN"
+    applications: [],
+    techStats: []
 };
-
-
-function enrichWithRefs(measurables = []) {
-    return _.map(
-        measurables,
-        d => Object.assign(
-            {},
-            d,
-            { entityReference: {kind: "MEASURABLE", id: d.id, name: d.name, description: d.description }}));
-}
-
-
-function prepareChildRefs(children = [], measurable = {}) {
-    const cs = _.chain(children)
-        .filter(c => c.id !== measurable.id)  // not self
-        .filter(c => c.parentId === measurable.id) // only immediate children
-        .value();
-    return enrichWithRefs(cs);
-}
-
-
-function prepareParentRefs(parents = [], measurable = {}) {
-    const ps = _.filter(parents, p => p.id !== measurable.id); // not self
-    return enrichWithRefs(ps);
-}
 
 
 function prepareRelationshipStats(stats = []) {
@@ -76,14 +53,29 @@ function prepareRelationshipStats(stats = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, $state) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: vm.scope
+            scope: "CHILDREN"
         };
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ApplicationStore.findBySelector,
+                [selector])
+            .then(r => vm.applications = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.TechnologyStatisticsService.findBySelector,
+                [selector])
+            .then(r => {
+                vm.techStats = r.data;
+                vm.enrichedServerStats = enrichServerStats(vm.techStats.serverStats)
+            });
 
         serviceBroker
             .loadViewData(
@@ -96,31 +88,47 @@ function controller(serviceBroker) {
                 CORE_API.ComplexityStore.findBySelector,
                 [ selector ])
             .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.tallyByEntityReference,
+                [ vm.parentEntityRef ])
+            .then(r => vm.relationshipStats = prepareRelationshipStats(r.data));
+
+        serviceBroker
+            .loadAppData(
+                CORE_API.MeasurableStore.findAll)
+            .then(r => {
+                vm.measurable = _.find(r.data, { id: vm.parentEntityRef.id });
+                const all = _.filter(r.data, { categoryId: vm.measurable.categoryId});
+                const roots = populateParents(all, true);
+                const m = findNode(roots, vm.measurable.id);
+                const parents = getParents(m);
+                const children =  flattenChildren(m);
+                const limb = _.union(parents, [m], children);
+                vm.hierarchy = _.map(limb,n => {
+                    const cpy = Object.assign({}, n, { parent: n.parent ? n.parent.id : null});
+                    delete cpy.children;
+                    return cpy;
+                } );
+            })
     };
 
-    vm.$onChanges = (c) => {
-        if (c.serverStats) vm.enrichedServerStats = enrichServerStats(vm.serverStats);
-        if (c.children || c.measurable) vm.childRefs = prepareChildRefs(vm.children, vm.measurable);
-        if (c.parents || c.measurable) vm.parentRefs = prepareParentRefs(vm.parents, vm.measurable);
-
-        if (vm.measurable) {
-            vm.entityRef = {
-                kind: "MEASURABLE",
-                id: vm.measurable.id
-            };
-
-            serviceBroker
-                .loadViewData(
-                    CORE_API.MeasurableRelationshipStore.tallyByEntityReference,
-                    [ { id: vm.measurable.id, kind: "MEASURABLE" }])
-                .then(r => vm.relationshipStats = prepareRelationshipStats(r.data));
+    vm.onSelectNavItem = (item) => {
+        if (item.id === vm.parentEntityRef.id) {
+            return; // nothing to do, user clicked on self
         }
+        $state.go(
+            kindToViewState(EntityKinds.MEASURABLE.key),
+            { id: item.id });
     };
+
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "$state"
 ];
 
 

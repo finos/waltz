@@ -146,9 +146,9 @@ function configureRouteDebugging($transitions, $trace) {
         const to = transition.to();
         const from = transition.from();
         const params = transition.params();
-        console.error("Transition Error - fired when an error occurs during transition.", {to, from, params});
+        const error = transition.error();
+        console.error("Transition Error - fired when an error occurs during transition.", {to, from, params, error});
     });
-
 
     // UNCOMMENT FOR FINE GRAINED LOGGING
     // $trace.enable('TRANSITION');
