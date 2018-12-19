@@ -33,7 +33,8 @@ public abstract class Actor implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider,
-        WaltzEntity {
+        WaltzEntity,
+        ProvenanceProvider {
 
     public abstract boolean isExternal();
 

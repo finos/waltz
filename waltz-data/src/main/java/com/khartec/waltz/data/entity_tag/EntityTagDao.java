@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.data.entity_tag;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -31,11 +31,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.schema.tables.EntityTag.ENTITY_TAG;
@@ -96,26 +97,34 @@ public class EntityTagDao {
     public int[] updateTags(EntityReference ref, Collection<String> tags, String username) {
         LOG.info("Updating tags for entity ref: {}, tags: {} ", ref, tags);
 
+        Set<String> currentTags = SetUtilities.fromCollection(findTagsForEntityReference(ref));
+        Set<String> requiredTags = SetUtilities.fromCollection(tags);
+
+        Set<String> toRemove = SetUtilities.minus(currentTags, requiredTags);
+        Set<String> toAdd = SetUtilities.minus(requiredTags, currentTags);
+
         dsl.delete(ENTITY_TAG)
                 .where(ENTITY_TAG.ENTITY_ID.eq(ref.id()))
                 .and(ENTITY_TAG.ENTITY_KIND.eq(ref.kind().name()))
+                .and(ENTITY_TAG.TAG.in(toRemove))
                 .execute();
 
-        List<EntityTagRecord> records = tags
+        List<EntityTagRecord> records = toAdd
                 .stream()
                 .map(t -> {
                     EntityTagRecord record = new EntityTagRecord();
                     record.setEntityId(ref.id());
                     record.setEntityKind(ref.kind().name());
                     record.setTag(t);
-                    record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+                    record.setLastUpdatedAt(nowUtcTimestamp());
                     record.setLastUpdatedBy(username);
                     record.setProvenance("waltz");
                     return record;
                 })
                 .collect(Collectors.toList());
 
-        return dsl.batchInsert(records)
+        return dsl
+                .batchInsert(records)
                 .execute();
     }
 }
