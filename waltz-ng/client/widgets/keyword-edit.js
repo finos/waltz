@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import _ from 'lodash';
-import {initialiseData} from '../common';
-import template from './keyword-edit.html';
+import angular from "angular";
+import _ from "lodash";
+import {initialiseData} from "../common";
+import template from "./keyword-edit.html";
 
 
 /**
@@ -32,9 +32,9 @@ import template from './keyword-edit.html';
 
 
 const bindings = {
-    onCancel: '<',
-    onSave: '<',
-    keywords: '<'
+    onCancel: "<",
+    onSave: "<",
+    keywords: "<"
 };
 
 
@@ -51,7 +51,7 @@ function controller() {
     };
 
     vm.save = () => {
-        const values = _.map(vm.working, 'text');
+        const values = _.map(vm.working, "text");
         vm.onSave(values);
     };
 }
