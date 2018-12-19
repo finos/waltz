@@ -1,9 +1,16 @@
+@import "../../style/animations";
+
 .waltz-sub-section {
     margin-right: 0;
     margin-left: 0;
     &.show-border {
-        box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
-        border-radius: 3px;
+        box-shadow: 0 1px 2px 0 hsla(0, 0%, 0%, 0.2);
+        border-radius: 1px;
+        border-top: 1px solid #f9f9f4;
+        transition: box-shadow ease-in-out $animation-speed;
+        &:hover {
+            box-shadow: 0 2px 4px 0 hsla(0, 0%, 0%, 0.2);
+        }
     }
 
     .wss-name {
@@ -15,13 +22,24 @@
         color: #959595;
         text-transform: uppercase;
         letter-spacing: 1px;
-        background-color: #f6f6f6;
+        border-bottom: 1px solid #f9f9f4;
+        background: linear-gradient(270deg, rgb(254, 254, 254) 50%, #f9f9f4 100%);
+        transition: font-weight ease-in $animation-speed;
     }
 
     .wss-small-name {
         @extend .wss-name;
         font-size: 9px;
     }
+
+    &:hover .wss-name {
+        font-weight: bolder;
+    }
+
+    &:hover .waltz-sub-section-controls {
+        font-weight: bolder;
+    }
+
 }
 
 
@@ -29,14 +47,15 @@
     margin: 6px 16px;
 }
 
-
 .waltz-sub-section-controls {
     font-size: smaller;
     height: 1.8em;
     margin: 0;
     display: block;
     width: 100%;
-    background-color: #f6f6f6;
+    border-top: 1px solid #f9f9f4;
+    background: linear-gradient(90deg, rgb(254, 254, 254) 50%, #f9f9f4 100%);
+    transition: font-weight ease-in-out $animation-speed;
     > * {
         padding-top: 4px;
         padding-right: 4px;

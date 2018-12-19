@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+@import "variables";
 
 div.waltz-tabs {
 
@@ -26,8 +27,10 @@ div.waltz-tabs {
             background: #fff;
             border-color: #ccc;
             border-bottom: none;
+            font-weight: bolder;
+
             cursor:default;
-            border-top: 3px solid #e36209;
+            border-top: 3px solid #e36209
         }
 
         &:disabled + label {
@@ -39,7 +42,8 @@ div.waltz-tabs {
     }
 
     label {
-        color: $link-color;
+        color: desaturate($link-color, 10);
+        font-weight: lighter;
         display: block;
         float: left;
         padding: 5px 10px;

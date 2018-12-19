@@ -21,10 +21,12 @@
 <div ng-if="$ctrl.diagrams.length === 0">
     <waltz-no-data>
         <message>
-            <strong>
-                No diagrams
-            </strong>
-            have been associated
+            <p>
+                <strong>
+                    No diagrams
+                </strong>
+                have been associated
+            </p>
             <div ng-include="'weds-make-new-diagram.html'"></div>
         </message>
     </waltz-no-data>
@@ -149,15 +151,14 @@
 <!-- MAKE NEW DIAGRAM (template) -->
 <script type="text/ng-template"
         id="weds-make-new-diagram.html">
-    <div ng-if="$ctrl.visibility.makeNew">
-        <div waltz-has-role="LINEAGE_EDITOR">
-            <hr>
+    <p ng-if="$ctrl.visibility.makeNew">
+        <span waltz-has-role="LINEAGE_EDITOR">
             <a ng-click="$ctrl.onMakeNewFlowDiagram()"
                class="clickable">
                 <waltz-icon name="plus"></waltz-icon>
-                Make new flow diagram
+                Create new flow diagram
             </a>
-        </div>
-    </div>
+        </span>
+    </p>
 </script>
 

@@ -19,7 +19,6 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
 import {mkTabs} from "../../measurable-rating-utils";
@@ -30,7 +29,7 @@ import template from "./measurable-rating-edit-panel.html";
 
 const bindings = {
     parentEntityRef: "<",
-    startingCategoryId: "<"
+    startingCategoryId: "<?"
 };
 
 
@@ -40,20 +39,21 @@ function determineSaveFn(selected, store) {
         : store.update;
 }
 
-
 const initialState = {
     selected: null,
     measurables: [],
     categories: [],
-    plannedDateCache: {},
     ratings: [],
     ratingSchemesById: {},
     ratingItemsBySchemeIdByCode: {},
     tabs: [],
     saveInProgress: false,
-    startingCategoryId: 0,
+    startingCategoryId: null,
     unusedCategories: [],
     visibility: {
+        ratingPicker: false,
+        instructions: true,
+        schemeOverview: false,
         showAllCategories: false,
         tab: null
     }
@@ -66,22 +66,6 @@ function controller($q,
                     notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-        loadData(true);
-    };
-
-
-    const recalcTabs = function () {
-        vm.tabs = mkTabs(
-            vm.categories,
-            vm.ratingSchemesById,
-            vm.measurables,
-            vm.ratings,
-            vm.visibility.showAllCategories);
-
-        vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
-    };
 
     const loadData = (force) => {
         // -- LOAD ---
@@ -111,44 +95,59 @@ function controller($q,
         $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
             .then(() => {
                 recalcTabs();
-                vm.onTabChange(vm.startingCategoryId);
+                if (vm.startingCategoryId) {
+                    vm.onTabChange(vm.startingCategoryId);
+                } else if (!vm.visibility.tab) {
+                    const startingTab = _.get(vm.tabs, [0, "category", "id"], null);
+                    if (startingTab) { vm.onTabChange(startingTab); }
+                }
             });
 
     };
 
-    // -- INTERACT ---
+    const recalcTabs = function () {
+        const hasNoRatings = vm.ratings.length === 0;
+        const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
+        vm.tabs = mkTabs(
+            vm.categories,
+            vm.ratingSchemesById,
+            vm.measurables,
+            vm.ratings,
+            showAllCategories);
 
-    const getDescription = () => vm.selected.rating
-        ? vm.selected.rating.description
-        : null;
+        vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
+    };
 
-    const getRating = () => vm.selected.rating
-        ? vm.selected.rating.rating
-        : null;
 
-    const getPlannedDate = () => vm.selected.rating
-        ? vm.selected.rating.plannedDate
-        : null;
+    const getDescription = () => _.get(
+        vm.selected,
+        ["rating", "description"]);
 
-    const doSave = (rating, description, plannedDate) => {
+
+    const getRating = () => _.get(
+        vm.selected,
+        ["rating", "rating"]);
+
+
+    const doSave = (rating, description) => {
         const saveFn = determineSaveFn(vm.selected, measurableRatingStore);
 
         const savePromise = saveFn(
             vm.parentEntityRef,
             vm.selected.measurable.id,
             rating,
-            description,
-            plannedDate);
+            description);
 
         return savePromise
             .then(rs => vm.ratings = rs)
             .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
-                const newRating = { rating, description, plannedDate };
+                const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             });
     };
+
 
     const doRemove = () => {
 
@@ -166,36 +165,38 @@ function controller($q,
             });
     };
 
-    const reset = () => {
+
+    const deselectMeasurable = () => {
         vm.saveInProgress = false;
-        vm.selected = {};
+        vm.selected = Object.assign({}, vm.selected, { measurable: null });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
     };
 
 
-    // If the new rating is one that doesn't require a plan date, it should be set to null
-    // we persist the old one locally to allow easy retrieval
-    const resetPlannedDate = (ratingSchemeId, measurableId, oldRating, newRating) => {
-        if(getPlannedDate()) {
-            //cache existing date
-            _.set(vm.plannedDateCache, `${ratingSchemeId}.${measurableId}.${oldRating}`, getPlannedDate());
-        }
-
-        if (vm.getNeedsPlannedDate(ratingSchemeId, newRating)) {
-            return _.get(vm.plannedDateCache, `${ratingSchemeId}.${measurableId}.${newRating}`, null);
-        } else {
-            return null;
-        }
+    const selectMeasurable = (measurable, rating) => {
+        const category = _.find(vm.categories, ({ id: measurable.categoryId }));
+        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
     };
 
+
+    // -- BOOT --
+
+    vm.$onInit = () => {
+        loadData(true);
+    };
+
+
+    // -- INTERACT ---
 
     vm.backUrl = $state
         .href(
             kindToViewState(vm.parentEntityRef.kind),
             { id: vm.parentEntityRef.id });
 
+
     vm.onMeasurableSelect = (measurable, rating) => {
-        const category = _.find(vm.categories, ({ id: measurable.categoryId }));
-        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
+        selectMeasurable(measurable, rating);
     };
 
     vm.onRatingSelect = r => {
@@ -203,24 +204,47 @@ function controller($q,
         if (! vm.selected.measurable.concrete) return; // not concrete
         if (r === getRating()) return; // rating not changed
 
-        const plannedDate = resetPlannedDate(vm.selected.ratingScheme.id, vm.selected.measurable.id, getRating(), r);
         return r === "X"
             ? doRemove()
                 .then(() => notification.success("Removed"))
-            : doSave(r, getDescription(), plannedDate)
+            : doSave(r, getDescription())
                 .then(() => notification.success("Saved"));
     };
 
     vm.onSaveComment = (comment) => {
-        return doSave(getRating(), comment, getPlannedDate())
+        return doSave(getRating(), comment)
             .then(() => notification.success("Saved Comment"))
     };
 
-    vm.doCancel = reset;
+    vm.doCancel = () => {
+        deselectMeasurable();
+
+    };
+
+
+    vm.onRemoveAll = (categoryId) => {
+        if (confirm("Do you really want to remove all ratings in this category ?")) {
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingStore.removeByCategory,
+                    [vm.parentEntityRef, categoryId])
+                .then(r => {
+                    notification.info("Removed all ratings for category");
+                    vm.ratings = r.data;
+                    recalcTabs();
+                })
+                .catch(e => {
+                    const message = "Error removing all ratings for category: " + e.message;
+                    console.log(message, { e });
+                    notification.error(message);
+                });
+        }
+    };
 
     vm.onTabChange = (categoryId) => {
+        deselectMeasurable();
         vm.visibility.tab = categoryId;
-        reset();
+
         const category = vm.categoriesById[categoryId];
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
         vm.selected = {
@@ -238,20 +262,6 @@ function controller($q,
         recalcTabs();
     };
 
-    vm.getNeedsPlannedDate = (ratingSchemeId, ratingCode) => {
-        if(ratingSchemeId && ratingCode) {
-            return vm.ratingItemsBySchemeIdByCode[ratingSchemeId]
-                .ratingsByCode[ratingCode]
-                .needsPlannedDate;
-        }
-        return false;
-    };
-
-    vm.onUpdatePlannedDate = (itemId, data) => {
-        const newPlannedDate = timeFormat("%Y-%m-%d")(data.newVal);
-        return doSave(getRating(), getDescription(), newPlannedDate)
-            .then(() => notification.success("Saved Planned Date"))
-    };
 }
 
 

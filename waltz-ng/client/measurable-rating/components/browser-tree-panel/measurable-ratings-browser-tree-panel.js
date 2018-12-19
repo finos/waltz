@@ -36,7 +36,7 @@ import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -51,37 +51,31 @@ const initialState = {
         loading: false
     },
     selectedMeasurable: null,
-    onLoadDetail: () => log('onLoadDetail')
+    onLoadDetail: () => log("onLoadDetail")
 };
 
 
 function prepareColumnDefs(measurableCategory) {
     return [
-        mkLinkGridCell('Name', 'application.name', 'application.id', 'main.app.view'),
+        mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
         {
-            field: 'application.assetCode',
-            name: 'Asset Code',
-            width: '10%'
+            field: "application.assetCode",
+            name: "Asset Code",
+            width: "10%"
         },
         {
-            field: 'rating.name',
-            name: 'Rating',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-rating-indicator-cell rating="row.entity.rating" show-name="true"></waltz-rating-indicator-cell></div>',
-            width: '10%'
+            field: "rating.name",
+            name: "Rating",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-rating-indicator-cell rating=\"row.entity.rating\" show-name=\"true\"></waltz-rating-indicator-cell></div>",
+            width: "10%"
         },
         {
-            field: 'measurable.name',
+            field: "measurable.name",
             name: measurableCategory.name
         },
         {
-            field: 'rating.description',
-            name: 'Comment'
-        },
-        {
-            field: 'rating.plannedDate',
-            name: 'Planned Date',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>',
-            width: '13%'
+            field: "rating.description",
+            name: "Comment"
         }
     ];
 }
@@ -104,7 +98,7 @@ function prepareTableData(measurable,
                           ratings = [],
                           measurablesById = {}) {
 
-    const appsById = _.keyBy(applications, 'id');
+    const appsById = _.keyBy(applications, "id");
     const relevantMeasurableIds = findChildIds(measurable);
 
     const data = _
@@ -116,13 +110,13 @@ function prepareTableData(measurable,
                 rating: Object.assign(
                     {},
                     ratingScheme.ratingsByCode[r.rating],
-                    { plannedDate: r.plannedDate, description: r.description}),
+                    { description: r.description}),
                 measurable: measurablesById[r.measurableId]
             };
         })
         .value();
 
-    return _.sortBy(data, 'application.name');
+    return _.sortBy(data, "application.name");
 }
 
 
@@ -143,7 +137,7 @@ function loadMeasurables(serviceBroker, selector, holder) {
         .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, [selector])
         .then(r => {
             holder.measurables = r.data;
-            holder.measurablesById = _.keyBy(r.data, 'id');
+            holder.measurablesById = _.keyBy(r.data, "id");
         });
 }
 
@@ -208,7 +202,7 @@ function controller($q, serviceBroker) {
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
 
         vm.columnDefs = prepareColumnDefs(category);
-        if (_.isFunction(_.get(promise, 'then'))) {
+        if (_.isFunction(_.get(promise, "then"))) {
             promise
                 .then(ratings => vm.tableData = prepareTableData(
                     measurable,
@@ -218,7 +212,7 @@ function controller($q, serviceBroker) {
                     vm.measurablesById))
                 .then(() => vm.visibility.loading = false);
         } else {
-            log('was expecting promise, got: ', promise);
+            log("was expecting promise, got: ", promise);
             vm.visibility.loading = false;
         }
     };
@@ -232,8 +226,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -246,5 +240,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzMeasurableRatingsBrowserTreePanel'
+    id: "waltzMeasurableRatingsBrowserTreePanel"
 };

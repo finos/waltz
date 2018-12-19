@@ -92,7 +92,6 @@ public class MeasurableRatingDao {
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
-                .plannedDate(Optional.ofNullable(r.getPlannedDate()).map(Date::toLocalDate).orElse(null))
                 .build();
     };
 
@@ -116,7 +115,6 @@ public class MeasurableRatingDao {
         record.setMeasurableId(command.measurableId());
         record.setRating(Character.toString(command.rating()));
         record.setDescription(command.description());
-        record.setPlannedDate(command.plannedDate().map(Date::valueOf).orElse(null));
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdate().at()));
         record.setLastUpdatedBy(command.lastUpdate().by());
         record.setProvenance(command.provenance());
@@ -262,6 +260,21 @@ public class MeasurableRatingDao {
         return dsl
                 .deleteFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .execute();
+    }
+
+
+    public int removeForCategory(EntityReference ref, long categoryId) {
+        SelectConditionStep<Record1<Long>> relevantMeasurableIds = DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId));
+
+        return dsl
+                .deleteFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.in(relevantMeasurableIds))
                 .execute();
     }
 
