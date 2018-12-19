@@ -17,7 +17,8 @@
             <span>
                 <a ng-click="$ctrl.visibility.editor = true"
                    ng-if="! $ctrl.visibility.editor"
-                   class="clickable">
+                   class="clickable"
+                   waltz-has-role="{{ $ctrl.editRole }}">
                     Edit
                 </a>
 
