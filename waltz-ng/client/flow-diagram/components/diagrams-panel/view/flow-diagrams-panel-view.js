@@ -83,29 +83,76 @@ function determinePopupPosition(evt, $window, $element) {
 }
 
 
+function enrichDiagram(flowDiagram, flowActions = []) {
+
+    return Object.assign(
+        {},
+        flowDiagram,
+        {type: "Flow", icon: "random", actions: flowActions}
+    );
+
+}
+
 function controller($element,
                     $q,
                     $window,
                     $timeout,
                     flowDiagramStateService,
-                    serviceBroker) {
+                    serviceBroker,
+                    notification) {
     const vm = initialiseData(this, initialState);
 
     const loadVisibility = () =>
         vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
 
-    vm.$onInit = () => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.FlowDiagramStore.getById,
-                [ vm.parentEntityRef.id ],
-                { force: true })
-            .then(r => vm.diagram = r.data);
+    const loadFlowDiagram = (force = true, id) => serviceBroker
+        .loadViewData(
+            CORE_API.FlowDiagramStore.getById,
+            [ id ],
+            { force })
+        .then(r => vm.diagram = r.data);
 
-        flowDiagramStateService.reset();
-        flowDiagramStateService
-            .load(vm.parentEntityRef.id)
-            .then(() => loadVisibility());
+    const flowActions = [
+        {
+            name: "Clone",
+            icon: "clone",
+            execute: (diagram) => {
+                const newName = prompt("What should the cloned copy be called?", `Copy of ${diagram.name}`);
+                if (newName == null) {
+                    notification.warning("Clone cancelled");
+                    return;
+                }
+                if (_.isEmpty(newName.trim())) {
+                    notification.warning("Clone cancelled, no name given");
+                    return;
+                }
+                serviceBroker
+                    .execute(CORE_API.FlowDiagramStore.clone, [diagram.id, newName])
+                    .then(newId => {
+                        notification.success("Diagram cloned");
+                        reload(newId.data);
+                    })
+                    .catch(e => notification.error(`Failed to clone diagram: ${e.data.message}`));
+
+            }}
+    ];
+
+    function reload(newId) {
+        let id = newId ? newId : vm.parentEntityRef.id;
+
+        return loadFlowDiagram(true, id)
+            .then((flowDiagram) => {
+                flowDiagramStateService.reset();
+                flowDiagramStateService
+                    .load(id)
+                    .then(() => loadVisibility());
+                vm.diagram = enrichDiagram(flowDiagram, flowActions);
+                return vm.diagram;
+            });
+    }
+
+    vm.$onInit = () => {
+        reload();
     };
 
     vm.toggleLayer = (layer) => {
@@ -204,7 +251,8 @@ controller.$inject = [
     '$window',
     '$timeout',
     'FlowDiagramStateService',
-    'ServiceBroker'
+    'ServiceBroker',
+    'Notification'
 ];
 
 
