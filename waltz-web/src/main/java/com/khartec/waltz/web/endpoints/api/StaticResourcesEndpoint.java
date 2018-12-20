@@ -129,7 +129,7 @@ public class StaticResourcesEndpoint implements Endpoint {
             for(int i = 0; i < lines.size(); i++) {
                 String line = lower(lines.get(i));
 
-                if (line.contains("<base href=") && notEmpty(request.contextPath())) {
+                if (line.contains("<base href=")) {
                     LOG.info("Found <base> tag: " + line + ", adding context path: " + request.contextPath());
                     line = String.format("\t<base href=\"%s/\" />", request.contextPath());
                     LOG.info("Updated <base> tag: " + line);
