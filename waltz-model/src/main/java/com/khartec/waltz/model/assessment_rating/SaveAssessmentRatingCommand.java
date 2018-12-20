@@ -33,6 +33,7 @@ public abstract class SaveAssessmentRatingCommand extends AssessmentRatingComman
         ProvenanceProvider {
 
     public abstract long ratingId();
+    public abstract String ratingName();
 }
 
 
