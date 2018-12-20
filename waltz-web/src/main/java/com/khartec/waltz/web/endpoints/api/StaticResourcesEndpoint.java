@@ -123,7 +123,7 @@ public class StaticResourcesEndpoint implements Endpoint {
     private InputStream modifyIndexBaseTagIfNeeded(Request request,
                                                    String resolvedPath,
                                                    InputStream resourceStream) throws IOException {
-        if(resolvedPath.endsWith("index.html")) {
+        if(resolvedPath.endsWith("index.html") && notEmpty(request.contextPath())) {
             List<String> lines = readLines(resourceStream);
 
             for(int i = 0; i < lines.size(); i++) {
