@@ -117,7 +117,7 @@ function controller($element,
             name: "Clone",
             icon: "clone",
             execute: (diagram) => {
-                const newName = prompt("What should the cloned copy be called ?", `Copy of ${diagram.name}`);
+                const newName = prompt("What should the cloned copy be called?", `Copy of ${diagram.name}`);
                 if (newName == null) {
                     notification.warning("Clone cancelled");
                     return;
