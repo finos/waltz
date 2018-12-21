@@ -17,26 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import moment from 'moment';
-import {extent, max} from 'd3-array';
-import {axisBottom, axisLeft} from 'd3-axis';
-import {nest} from 'd3-collection';
-import {scaleLinear} from 'd3-scale';
-import {select} from 'd3-selection';
-import {curveLinear, line} from 'd3-shape';
-import {timeFormat} from 'd3-time-format';
-import 'd3-selection-multi';
+import _ from "lodash";
+import moment from "moment";
+import {extent, max} from "d3-array";
+import {axisBottom, axisLeft} from "d3-axis";
+import {nest} from "d3-collection";
+import {scaleLinear} from "d3-scale";
+import {select} from "d3-selection";
+import {curveLinear, line} from "d3-shape";
+import {timeFormat} from "d3-time-format";
+import "d3-selection-multi";
 
-import {initialiseData, isEmpty} from '../../../common';
-import {variableScale} from '../../../common/colors';
-import template from './entity-statistic-history-chart.html';
+import {initialiseData, isEmpty} from "../../../common";
+import {variableScale} from "../../../common/colors";
+import template from "./entity-statistic-history-chart.html";
 
 
 const bindings = {
-    points: '<',
-    onHover: '<',
-    highlightedDate: '<'
+    points: "<",
+    onHover: "<",
+    highlightedDate: "<"
 };
 
 
@@ -46,13 +46,13 @@ const initialState = {
 
 function prepareSections(svg) {
     const chart = svg
-        .append('g');
+        .append("g");
     const xAxis = chart
-        .append('g')
-        .classed('weshc-axis', true);
+        .append("g")
+        .classed("weshc-axis", true);
     const yAxis = chart
-        .append('g')
-        .classed('weshc-axis', true);
+        .append("g")
+        .classed("weshc-axis", true);
     return {
         svg,
         chart,
@@ -106,13 +106,13 @@ function mkScales(points = [], dimensions) {
 
 function drawPoints(section, points = [], scales) {
     const pointSelection = section
-        .selectAll('.point')
-        .data(points, p => p.date + '_' + p.series);
+        .selectAll(".point")
+        .data(points, p => p.date + "_" + p.series);
 
     const newPoints = pointSelection
         .enter()
-        .append('circle')
-        .classed('point', true)
+        .append("circle")
+        .classed("point", true)
         .attrs({
             fill: d => variableScale(d.series),
             opacity: 0.7,
@@ -127,7 +127,7 @@ function drawPoints(section, points = [], scales) {
         .merge(newPoints)
         .attr("cx", p => scales.x(p.date))
         .attr("cy", p => scales.y(p.count))
-        .attr('r', 3);
+        .attr("r", 3);
 
 }
 
@@ -143,17 +143,17 @@ function drawLines(section, points = [], scales) {
         .entries(points);
 
     const pathSelector = section
-        .selectAll('.line')
+        .selectAll(".line")
         .data(bySeries, s => s.key);
 
     const newLines = pathSelector
         .enter()
         .append("path")
-        .classed('line', true)
+        .classed("line", true)
         .attrs({
             stroke: d => variableScale(d.key),
             "stroke-width": 1,
-            fill: 'none',
+            fill: "none",
             opacity: 0.7
         });
 
@@ -177,11 +177,11 @@ function adjustSections(sections, dimensions) {
 
     sections
         .chart
-        .attr('transform', `translate(${ dimensions.margins.left }, ${ dimensions.margins.top })`);
+        .attr("transform", `translate(${ dimensions.margins.left }, ${ dimensions.margins.top })`);
 
     sections
         .xAxis
-        .attr('transform', `translate(0, ${ dimensions.height - (dimensions.margins.top + dimensions.margins.bottom) })`);
+        .attr("transform", `translate(0, ${ dimensions.height - (dimensions.margins.top + dimensions.margins.bottom) })`);
 }
 
 
@@ -196,30 +196,30 @@ function drawBands(section,
                    scales,
                    onHover) {
 
-    const numDates = _.uniqBy(_.map(points, 'date'), d => d + "").length;
+    const numDates = _.uniqBy(_.map(points, "date"), d => d + "").length;
     const width = scales.x.range()[1];
     const bandWidth = width / numDates;
     const extraHeight = 30;
 
     const dates = _.chain(points)
-        .map('date')
+        .map("date")
         .uniqBy(d => d.getTime())
         .value();
 
     const bands = section
-        .selectAll('rect.band')
+        .selectAll("rect.band")
         .data(dates, d => d.getTime());
 
     const newBands = bands
         .enter()
-        .append('rect')
+        .append("rect")
         .classed("band", true)
-        .attr('pointer-events', 'all')
-        .style('visibility', 'hidden')
-        .on('mouseenter.band-hover', d => {
+        .attr("pointer-events", "all")
+        .style("visibility", "hidden")
+        .on("mouseenter.band-hover", d => {
             tryInvoke(onHover, d);
         })
-        .on('mouseleave.band-hover', () => {
+        .on("mouseleave.band-hover", () => {
             tryInvoke(onHover, null);
         })
        ;
@@ -240,20 +240,20 @@ function pickDatesForXAxis(scale) {
     const start = moment(dateDomain[0]);
     const end = moment(dateDomain[1]);
 
-    const diff = end.diff(start, 'days');
+    const diff = end.diff(start, "days");
     const jump = Math.ceil(diff / 16);
 
     if (diff < 2) {
         return _.map(
             _.range(diff + 1),
-            x => start.add(x, 'days').toDate().getTime());
+            x => start.add(x, "days").toDate().getTime());
     }
 
-    let ptr = start.add(jump, 'days');
+    let ptr = start.add(jump, "days");
     const dates = [];
     while (ptr.isBefore(end)) {
         dates.push(ptr.toDate().getTime());
-        ptr = ptr.add(jump * 2, 'days');
+        ptr = ptr.add(jump * 2, "days");
     }
 
     return dates;
@@ -296,7 +296,7 @@ function drawAxes(sections, points = [], scales) {
 function draw(sections,
               width,
               points = [],
-              onHover = () => console.log('weshc: no onHover provided')) {
+              onHover = () => console.log("weshc: no onHover provided")) {
     const dimensions = mkDimensions(width);
     const scales = mkScales(points, dimensions);
 
@@ -318,7 +318,7 @@ function draw(sections,
 function controller($element, $window) {
 
     const vm = initialiseData(this, initialState);
-    const svg = select($element.find('svg')[0]);
+    const svg = select($element.find("svg")[0]);
 
     const svgSections = prepareSections(svg);
 
@@ -337,24 +337,25 @@ function controller($element, $window) {
         if (changes.highlightedDate) {
             svg.selectAll(".point")
                 .attr("r", p => isHighlighted(p) ? 6 : 3);
-        } else {
+        }
+        if (changes.points) {
             debouncedRender();
         }
     };
 
     vm.$onInit = () => angular
         .element($window)
-        .on('resize', debouncedRender);
+        .on("resize", debouncedRender);
 
     vm.$onDestroy = () => angular
         .element($window)
-        .off('resize', debouncedRender);
+        .off("resize", debouncedRender);
 }
 
 
 controller.$inject = [
-    '$element',
-    '$window'
+    "$element",
+    "$window"
 ];
 
 
