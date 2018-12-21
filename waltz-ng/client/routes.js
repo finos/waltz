@@ -41,7 +41,7 @@ warmUpCache.$inject = [
 ];
 
 
-function configureRoutes($stateProvider, $urlRouterProvider) {
+function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.when("", "/home");
 
@@ -62,9 +62,14 @@ function configureRoutes($stateProvider, $urlRouterProvider) {
                 "content": {template: WelcomeHtml}
             }
         });
+
+    $locationProvider
+        .html5Mode(true)
+        .hashPrefix("#");
 }
 
 configureRoutes.$inject = [
+    "$locationProvider",
     "$stateProvider",
     "$urlRouterProvider"
 ];

@@ -27,12 +27,15 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.khartec.waltz.common.IOUtilities.copyStream;
+import static com.khartec.waltz.common.IOUtilities.readLines;
+import static com.khartec.waltz.common.StringUtilities.lower;
+import static com.khartec.waltz.common.StringUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.getMimeType;
 import static java.lang.String.format;
 
@@ -73,10 +76,12 @@ public class StaticResourcesEndpoint implements Endpoint {
                     response.type(getMimeType(resolvedPath));
 
                     addCacheHeadersIfNeeded(response, resolvedPath);
+                    InputStream modifiedStream = modifyIndexBaseTagIfNeeded(request, resolvedPath, resourceAsStream);
+
                     OutputStream out = response
                             .raw()
                             .getOutputStream();
-                    copyStream(resourceAsStream, out);
+                    copyStream(modifiedStream, out);
                     out.flush();
 
                     return new Object(); // indicate we have handled the request
@@ -105,14 +110,70 @@ public class StaticResourcesEndpoint implements Endpoint {
     }
 
 
+    /**
+     * index.html need to have a <base href="/[site_context]/" /> tag in the head section to ensure
+     * html5 mode works correctly in AngularJS.  This method will ensure the existing <base href="/" /> tag
+     * is replace with one that includes the correct site context as deployed.
+     * @param request
+     * @param resolvedPath
+     * @param resourceStream
+     * @return the modified input stream with the amended <base> tag or the original unmodified resourceStream
+     * @throws IOException
+     */
+    private InputStream modifyIndexBaseTagIfNeeded(Request request,
+                                                   String resolvedPath,
+                                                   InputStream resourceStream) throws IOException {
+        if(resolvedPath.endsWith("index.html") && notEmpty(request.contextPath())) {
+            List<String> lines = readLines(resourceStream);
+
+            for(int i = 0; i < lines.size(); i++) {
+                String line = lower(lines.get(i));
+
+                if (line.contains("<base href=")) {
+                    LOG.info("Found <base> tag: " + line + ", adding context path: " + request.contextPath());
+                    line = String.format("\t<base href=\"%s/\" />", request.contextPath());
+                    LOG.info("Updated <base> tag: " + line);
+                    lines.set(i, line);
+
+                    // done, exit loop
+                    break;
+                }
+
+                if (line.contains("</head>") ) {
+                    // don't need to continue if have reached here and no base tag found
+                    break;
+                }
+            }
+
+            // copy amended file into a stream
+            try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                 OutputStreamWriter writer = new OutputStreamWriter(outputStream)) {
+
+                for(String line : lines) {
+                    writer.write(line);
+                    writer.write(System.lineSeparator());
+                }
+
+                writer.flush();
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+                return inputStream;
+            }
+        }
+        return resourceStream;
+    }
+
+
     private String resolvePath(Request request) {
+        final String indexPath = "static/index.html";
         String path = request.pathInfo().replaceFirst("/", "");
-        String resourcePath = path.length() > 0 ? ("static/" + path) : "static/index.html";
+        String resourcePath = path.length() > 0 ? ("static/" + path) : indexPath;
 
         URL resource = classLoader.getResource(resourcePath);
 
         if (resource == null) {
-            return null;
+            // 404: return index.html
+            resource = classLoader.getResource(indexPath);
+            resourcePath = indexPath;
         }
 
         boolean isDirectory = resource
