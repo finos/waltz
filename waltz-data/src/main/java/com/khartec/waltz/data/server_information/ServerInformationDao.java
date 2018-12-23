@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -46,7 +47,6 @@ import static org.jooq.impl.DSL.*;
 
 @Repository
 public class ServerInformationDao {
-
 
     private final DSLContext dsl;
 
@@ -73,6 +73,7 @@ public class ServerInformationDao {
                 .hardwareEndOfLifeDate(row.getHwEndOfLifeDate())
                 .operatingSystemEndOfLifeDate(row.getOsEndOfLifeDate())
                 .lifecycleStatus(LifecycleStatus.valueOf(row.getLifecycleStatus()))
+                .externalId(Optional.ofNullable(row.getExternalId()))
                 .build();
     };
 
@@ -119,9 +120,9 @@ public class ServerInformationDao {
                                     SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.LIFECYCLE_STATUS,
-                                    SERVER_INFORMATION.PROVENANCE)
-                            .values(
-                                    s.hostname(),
+                                    SERVER_INFORMATION.PROVENANCE,
+                                    SERVER_INFORMATION.EXTERNAL_ID)
+                            .values(s.hostname(),
                                     s.operatingSystem(),
                                     s.operatingSystemVersion(),
                                     s.country(),
@@ -132,7 +133,8 @@ public class ServerInformationDao {
                                     toSqlDate(s.hardwareEndOfLifeDate()),
                                     toSqlDate(s.operatingSystemEndOfLifeDate()),
                                     s.lifecycleStatus().name(),
-                                    s.provenance()))
+                                    s.provenance(),
+                                    s.externalId().orElse(null)))
                     .collect(Collectors.toList()))
                 .execute();
     }
@@ -178,4 +180,5 @@ public class ServerInformationDao {
                 .hardwareEndOfLifeStatusCounts(calculateStringTallies(serverInfo, hwEolStatusInner))
                 .build();
     }
+
 }
