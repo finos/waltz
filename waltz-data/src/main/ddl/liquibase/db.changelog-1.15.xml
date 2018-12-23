@@ -43,4 +43,17 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 3701 - add ext-if to server_information -->
+    <changeSet id="20181223-3701-1"
+               author="davidwatkins73">
+        <comment>3701: add ext-id to server_information</comment>
+        <addColumn tableName="server_information">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

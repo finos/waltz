@@ -18,22 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import * as ServerInfoStore from './services/server-info-store';
+import angular from "angular";
+import ServerInfoStore from "./services/server-info-store";
 import {registerStores} from "../common/module-utils";
-import ServerPies from './components/server-pies';
-import ServerList from './directives/server-list';
+import ServerPies from "./components/server-pies";
+import ServerList from "./directives/server-list";
 
 
 export default () => {
 
-    const module = angular.module('waltz.server.info', []);
+    const module = angular.module("waltz.server.info", []);
 
     module
-        .component('waltzServerPies', ServerPies);
+        .component("waltzServerPies", ServerPies);
 
     module
-        .directive('waltzServerList', ServerList);
+        .directive("waltzServerList", ServerList);
 
     registerStores(module, [ServerInfoStore]);
 

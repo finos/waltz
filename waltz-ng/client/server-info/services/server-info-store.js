@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export function store($http, baseUrl) {
@@ -25,14 +25,16 @@ export function store($http, baseUrl) {
 
     const findByAssetCode = (assetCode) =>
         $http
+            .get(`${BASE}/asse-code/${assetCode}`)
             .then(result => result.data);
 
     const findByAppId = (appId) =>
-        $http.get(`${BASE}/app-id/${appId}`)
+        $http
+            .get(`${BASE}/app-id/${appId}`)
             .then(result => result.data);
 
 
-    const findStatsForSelector = (id, kind, scope = 'EXACT') => {
+    const findStatsForSelector = (id, kind, scope = "EXACT") => {
         const options = _.isObject(id)
             ? id
             : {scope, entityReference: {id, kind}};
@@ -50,28 +52,35 @@ export function store($http, baseUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'ServerInfoStore';
+export const serviceName = "ServerInfoStore";
 
 
 export const ServerInfoStore_API = {
     findByAssetCode: {
         serviceName,
-        serviceFnName: 'findByAssetCode',
-        description: 'executes findByAssetCodes'
+        serviceFnName: "findByAssetCode",
+        description: "executes findByAssetCodes"
     },
     findByAppId: {
         serviceName,
-        serviceFnName: 'findByAppId',
-        description: 'executes findByAppId'
+        serviceFnName: "findByAppId",
+        description: "executes findByAppId"
     },
     findStatsForSelector: {
         serviceName,
-        serviceFnName: 'findStatsForSelector',
-        description: 'executes findStatsForSelector'
+        serviceFnName: "findStatsForSelector",
+        description: "executes findStatsForSelector"
     }
+};
+
+
+
+export default {
+    serviceName,
+    store
 };
