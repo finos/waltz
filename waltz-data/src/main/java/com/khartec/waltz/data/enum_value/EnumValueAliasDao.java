@@ -17,33 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.enum_value;
+package com.khartec.waltz.data.enum_value;
 
 
-import com.khartec.waltz.data.enum_value.EnumValueDao;
-import com.khartec.waltz.model.EnumValue;
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.stereotype.Repository;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.ENUM_VALUE_ALIAS;
 
-@Service
-public class EnumValueService {
+@Repository
+public class EnumValueAliasDao {
 
-    private final EnumValueDao enumValueDao;
+    private final DSLContext dsl;
 
 
     @Autowired
-    public EnumValueService(EnumValueDao enumValueDao) {
-        checkNotNull(enumValueDao, "enumValueDao cannot be null");
-        this.enumValueDao = enumValueDao;
+    public EnumValueAliasDao(DSLContext dsl) {
+        checkNotNull(dsl, "dsl cannot be null");
+        this.dsl = dsl;
     }
 
 
-    public List<EnumValue> findAll() {
-        return enumValueDao.findAll();
+    public Aliases<String> mkAliases(EnumValueKind kind) {
+        Aliases<String> aliases = new Aliases<>();
+        dsl.select(ENUM_VALUE_ALIAS.ENUM_KEY, ENUM_VALUE_ALIAS.ALIAS)
+            .from(ENUM_VALUE_ALIAS)
+            .where(ENUM_VALUE_ALIAS.ENUM_TYPE.eq(kind.dbValue()))
+            .fetch()
+            .forEach(r -> aliases.register(r.value1(), r.value2()));
+
+        return aliases;
+
     }
 
 }

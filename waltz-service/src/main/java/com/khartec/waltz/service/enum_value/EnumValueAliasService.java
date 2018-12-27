@@ -20,30 +20,29 @@
 package com.khartec.waltz.service.enum_value;
 
 
-import com.khartec.waltz.data.enum_value.EnumValueDao;
-import com.khartec.waltz.model.EnumValue;
+import com.khartec.waltz.common.Aliases;
+import com.khartec.waltz.data.enum_value.EnumValueAliasDao;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
-public class EnumValueService {
+public class EnumValueAliasService {
 
-    private final EnumValueDao enumValueDao;
+    private final EnumValueAliasDao enumValueAliasDao;
 
 
     @Autowired
-    public EnumValueService(EnumValueDao enumValueDao) {
-        checkNotNull(enumValueDao, "enumValueDao cannot be null");
-        this.enumValueDao = enumValueDao;
+    public EnumValueAliasService(EnumValueAliasDao enumValueAliasDao) {
+        checkNotNull(enumValueAliasDao, "enumValueAliasDao cannot be null");
+        this.enumValueAliasDao = enumValueAliasDao;
     }
 
 
-    public List<EnumValue> findAll() {
-        return enumValueDao.findAll();
+    public Aliases<String> mkAliases(EnumValueKind kind) {
+        return enumValueAliasDao.mkAliases(kind);
     }
 
 }

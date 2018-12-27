@@ -22,9 +22,13 @@ package com.khartec.waltz.data.enum_value;
 
 import com.khartec.waltz.model.EnumValue;
 import com.khartec.waltz.model.ImmutableEnumValue;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.EnumValueRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -47,6 +51,15 @@ public class EnumValueDao {
                 .icon(r.getIconName())
                 .position(r.getPosition())
                 .build();
+
+
+    public static Condition mkExistsCondition(EnumValueKind kind, String key) {
+        return DSL.exists(
+                DSL.selectFrom(Tables.ENUM_VALUE)
+                        .where(Tables.ENUM_VALUE.TYPE.eq(kind.dbValue()))
+                        .and(Tables.ENUM_VALUE.KEY.eq(key)));
+    }
+
 
     private final DSLContext dsl;
 
