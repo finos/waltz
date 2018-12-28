@@ -41,6 +41,7 @@ public abstract class Measurable implements
         DescriptionProvider,
         ParentIdProvider,
         ExternalIdProvider,
+        EntityLifecycleStatusProvider,
         ExternalParentIdProvider,
         LastUpdatedProvider,
         ProvenanceProvider,
@@ -67,6 +68,7 @@ public abstract class Measurable implements
                 .id(id().get())
                 .name(name())
                 .description(description())
+                .entityLifecycleStatus(entityLifecycleStatus())
                 .build();
     }
 }

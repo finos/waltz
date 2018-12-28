@@ -23,6 +23,7 @@ package com.khartec.waltz.data.measurable;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable.ImmutableMeasurable;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -37,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -62,6 +64,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .provenance(r.getProvenance())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
+                .entityLifecycleStatus(readEnum(r.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .build();
     };
 
@@ -191,7 +194,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
      */
     public int deleteByIdSelector(Select<Record1<Long>> selector) {
         return dsl
-                .deleteFrom(MEASURABLE)
+                .update(MEASURABLE)
+                .set(MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.REMOVED.name())
                 .where(MEASURABLE.ID.in(selector))
                 .execute();
     }
