@@ -61,7 +61,7 @@ function controller($q, serviceBroker) {
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
         { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
         { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
         { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
         { field: 'specification.description', displayName: 'Description', width: "23%" }

@@ -18,7 +18,6 @@
  */
 
 import {frequencyKind} from "../../common/services/enums/frequency-kind";
-import {transportKind} from "../../common/services/enums/transport-kind";
 import {toOptions} from "../../common/services/enums";
 
 
@@ -28,7 +27,7 @@ export const transportField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions(transportKind, true),
+        options: toOptions("TransportKind", true),
         label: 'Transport',
         placeholder: '',
         required: true

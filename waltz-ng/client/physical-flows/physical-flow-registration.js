@@ -88,7 +88,7 @@ function controller(
     vm.similarFlowDefs = [
         { field: 'specification.name', displayName: 'Name', width: "10%" },
         { field: 'specification.format', displayName: 'Format', width: "10%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"transportKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
         { field: 'physicalFlow.basisOffset', displayName: 'Basis', width: "10%", cellFilter: 'toBasisOffset' },
         { field: 'specification.description', displayName: 'Description' }
