@@ -56,4 +56,28 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 3673 - add parent data type id to lde -->
+    <changeSet id="20181227-3673-1"
+               author="rovats">
+        <comment>3673 - add parent data type id to lde</comment>
+        <addColumn tableName="logical_data_element">
+            <column name="parent_data_type_id"
+                    type="${id.type}"
+                    defaultValue="-1">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20181227-3673-2"
+               author="rovats">
+        <comment>3673 - update lde parent data type to unknown</comment>
+        <sql>
+            UPDATE logical_data_element
+            SET parent_data_type_id = (select min(id) from data_type where unknown = ${true.value})
+            WHERE exists(select * from data_type where unknown = ${true.value})
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

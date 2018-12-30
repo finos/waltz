@@ -84,6 +84,12 @@ export const dynamicSections = {
         icon: "pie-chart",
         id: 11,
     },
+    entityDiagramsSection: {
+        componentId: "entity-diagrams-section",
+        name: "Diagrams",
+        icon: "picture-o",
+        id: 12
+    },
     involvedPeopleSection: {
         componentId: "involved-people-section",
         name: "People",
@@ -190,25 +196,25 @@ export const dynamicSections = {
         componentId: "change-initiative-navigator-section",
         name: "Change Initiatives",
         icon: "paper-plane-o",
-        id: 30,
+        id: 30
     },
     relatedPhysicalFieldSection: {
         componentId: "related-physical-spec-defn-field-section",
         name: "Physical Fields",
         icon: "file-code-o",
-        id: 40,
+        id: 40
     },
     relatedOrgUnitSection: {
         componentId: "related-org-unit-section",
         name: "Organisation Units",
         icon: "sitemap",
-        id: 50,
+        id: 50
     },
-    entityDiagramsSection: {
-        componentId: "entity-diagrams-section",
-        name: "Diagrams",
-        icon: "picture-o",
-        id: 12
+    logicalDataElementsSection: {
+        componentId: "logical-data-elements-section",
+        name: "Logical Data Elements",
+        icon: "asterisk",
+        id: 60
     }
 
 };
@@ -309,6 +315,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.authSourcesSection,
         dynamicSections.dataTypeOriginatorsSection,
         dynamicSections.dataTypeFlowSection,
+        dynamicSections.logicalDataElementsSection,
         dynamicSections.changeLogSection
     ],
     "APP_GROUP": [

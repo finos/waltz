@@ -18,13 +18,16 @@
  */
 
 import angular from 'angular';
-import {registerStores} from '../common/module-utils';
+import {registerComponents, registerStores} from "../common/module-utils";
 import routes from './routes';
+import LogicalDataElementsSection from "./components/logical-data-elements-section/logical-data-elements-section";
 import * as LogicalDataElementStore from './services/logical-data-element-store';
 
 
 function setup() {
     const module = angular.module('waltz.logical.data.element', []);
+
+    registerComponents(module, [LogicalDataElementsSection]);
 
     registerStores(module, [LogicalDataElementStore]);
 

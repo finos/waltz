@@ -30,6 +30,7 @@ public class LogicalDataElementDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .type(FieldDataType.valueOf(record.getType()))
+                .parentDataTypeId(record.getParentDataTypeId())
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .provenance(record.getProvenance())
                 .build();

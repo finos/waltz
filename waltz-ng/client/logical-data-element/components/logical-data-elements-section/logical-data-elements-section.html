@@ -1,0 +1,30 @@
+<div>
+
+    <div class="row" ng-if="$ctrl.dataElements.length > 0">
+        <div class="col-md-6"
+             ng-repeat="typeGroup in $ctrl.groupedDataElements">
+            <div>
+                <h4 ng-bind="typeGroup.dataType.name"></h4>
+
+                <div ng-class="{'waltz-scroll-region-250': typeGroup.dataElementRefs.length > 15 }">
+
+                    <ul class="small list-unstyled">
+                        <li ng-repeat="dataElementRef in typeGroup.dataElementRefs">
+                            <waltz-entity-link entity-ref="dataElementRef"
+                                               icon-placement="none">
+                            </waltz-entity-link>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <waltz-no-data ng-if="$ctrl.dataElements.length == 0">
+        <message>
+            <strong>No logical data elements found</strong>
+        </message>
+    </waltz-no-data>
+
+</div>
