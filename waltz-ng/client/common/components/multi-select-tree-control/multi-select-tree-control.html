@@ -34,7 +34,7 @@
                 <input type="checkbox"
                        checked
                        ng-if="$ctrl.checkedMap[node.id]"
-                       ng-disabled="!node.concrete"
+                       ng-disabled="!node.concrete && !node.unknown"
                        ng-click="$ctrl.onNodeUncheck(node.id)">
                 <input type="checkbox"
                        ng-if="!$ctrl.checkedMap[node.id]"

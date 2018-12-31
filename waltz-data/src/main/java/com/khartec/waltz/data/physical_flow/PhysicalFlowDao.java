@@ -19,8 +19,10 @@
 
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.data.enum_value.EnumValueDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
@@ -62,12 +64,12 @@ public class PhysicalFlowDao {
                 .criticality(Criticality.valueOf(record.getCriticality()))
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
-                .transport(TransportKind.valueOf(record.getTransport()))
+                .transport(record.getTransport())
                 .specificationDefinitionId(Optional.ofNullable(record.getSpecificationDefinitionId()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
-                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(Timestamp::toLocalDateTime))
                 .isRemoved(record.getIsRemoved())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .build();
@@ -142,7 +144,7 @@ public class PhysicalFlowDao {
         Condition sameFlow = PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId())
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
-                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport()))
                 .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()));
 
         return findByCondition(sameFlow);
@@ -152,7 +154,7 @@ public class PhysicalFlowDao {
     public PhysicalFlow getByParsedFlow(PhysicalFlowParsed flow) {
         Condition attributesMatch = PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset())
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
-                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport()))
                 .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().name()))
                 .and(PHYSICAL_FLOW.IS_REMOVED.isFalse());
 
@@ -171,7 +173,7 @@ public class PhysicalFlowDao {
         Condition specDataTypeMatch = PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(flow.dataType().id());
 
 
-        PhysicalFlow match = dsl
+        return dsl
                 .select(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
                 .join(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
@@ -182,17 +184,15 @@ public class PhysicalFlowDao {
                 .and(attributesMatch)
                 .and(specDataTypeMatch)
                 .fetchOne(TO_DOMAIN_MAPPER);
-
-        return match;
     }
 
 
     /**
      * Returns the flow in the database that matches the parameter based on all attributes except possibly id
-     * @param flow
-     * @return
+     * @param flow the physical flow to match against
+     * @return matching flow or null
      */
-    public PhysicalFlow getByPhysicalFlow(PhysicalFlow flow) {
+    public PhysicalFlow matchPhysicalFlow(PhysicalFlow flow) {
 
         Condition idCondition = flow.id().isPresent()
                 ? PHYSICAL_FLOW.ID.eq(flow.id().get())
@@ -203,7 +203,7 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId()))
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
-                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().name()))
+                .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport()))
                 .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().name()))
                 .and(idCondition)
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -234,7 +234,7 @@ public class PhysicalFlowDao {
         record.setLogicalFlowId(flow.logicalFlowId());
 
         record.setFrequency(flow.frequency().name());
-        record.setTransport(flow.transport().name());
+        record.setTransport(flow.transport());
         record.setBasisOffset(flow.basisOffset());
         record.setCriticality(flow.criticality().name());
 
@@ -244,7 +244,7 @@ public class PhysicalFlowDao {
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
-        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(Timestamp::valueOf).orElse(null));
         record.setIsRemoved(flow.isRemoved());
         record.setProvenance("waltz");
         record.setExternalId(flow.externalId().orElse(null));
@@ -299,7 +299,6 @@ public class PhysicalFlowDao {
 
 
     private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
-
         Condition isOwner = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
 
@@ -321,7 +320,6 @@ public class PhysicalFlowDao {
 
 
     private Select<Record> findByConsumerEntityReferenceQuery(EntityReference consumer) {
-
         Condition matchesLogicalFlow = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(consumer.kind().name()))
                 .and(NOT_REMOVED);
@@ -336,7 +334,6 @@ public class PhysicalFlowDao {
 
 
     private Select<Record> findByProducerAndConsumerEntityReferenceQuery(EntityReference producer, EntityReference consumer) {
-
         Condition matchesLogicalFlow = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(consumer.kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(consumer.id()))
@@ -351,17 +348,27 @@ public class PhysicalFlowDao {
                 .where(dsl.renderInlined(matchesLogicalFlow));
     }
 
+
     public int updateCriticality(long flowId, Criticality criticality) {
         return updateEnum(flowId, PHYSICAL_FLOW.CRITICALITY, criticality.name());
     }
+
 
     public int updateFrequency(long flowId, FrequencyKind frequencyKind) {
         return updateEnum(flowId, PHYSICAL_FLOW.FREQUENCY, frequencyKind.name());
     }
 
-    public int updateTransport(long flowId, TransportKind transportKind) {
-        return updateEnum(flowId, PHYSICAL_FLOW.TRANSPORT, transportKind.name());
+
+    public int updateTransport(long flowId, String transport) {
+        Condition enumValueExists = EnumValueDao.mkExistsCondition(EnumValueKind.TRANSPORT_KIND, transport);
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.TRANSPORT, transport)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .and(enumValueExists)
+                .execute();
     }
+
 
     public int updateBasisOffset(long flowId, int basis) {
         return dsl
@@ -371,6 +378,7 @@ public class PhysicalFlowDao {
                 .execute();
     }
 
+
     public int updateDescription(long flowId, String description) {
         return dsl
                 .update(PHYSICAL_FLOW)
@@ -379,13 +387,15 @@ public class PhysicalFlowDao {
                 .execute();
     }
 
+
     public boolean hasPhysicalFlows(long logicalFlowId) {
         return dsl.fetchCount(DSL.selectFrom(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
                 .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
     }
 
-    // ---
+
+    // --- helpers
 
     private int updateEnum(long flowId, TableField<PhysicalFlowRecord, String> field, String value) {
         return dsl

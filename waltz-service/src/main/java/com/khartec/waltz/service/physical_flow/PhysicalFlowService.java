@@ -105,14 +105,6 @@ public class PhysicalFlowService {
     }
 
 
-    public List<PhysicalFlow> findByProducerAndConsumerEntityReferences(EntityReference producer, EntityReference consumer) {
-        checkNotNull(producer, "producer cannot be null");
-        checkNotNull(consumer, "consumer cannot be null");
-
-        return physicalFlowDao.findByProducerAndConsumer(producer, consumer);
-    }
-
-
     public List<PhysicalFlow> findBySpecificationId(long specificationId) {
         return physicalFlowDao.findBySpecificationId(specificationId);
     }
@@ -352,7 +344,7 @@ public class PhysicalFlowService {
             case "frequency":
                 return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(command.value()));
             case "transport":
-                return physicalFlowDao.updateTransport(flowId, TransportKind.valueOf(command.value()));
+                return physicalFlowDao.updateTransport(flowId, command.value());
             case "basisOffset":
                 return physicalFlowDao.updateBasisOffset(flowId, Integer.parseInt(command.value()));
             case "description":
