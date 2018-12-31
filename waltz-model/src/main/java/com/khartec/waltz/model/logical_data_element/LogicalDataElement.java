@@ -1,10 +1,9 @@
 package com.khartec.waltz.model.logical_data_element;
 
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.FieldDataType;
-import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.*;
+import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableLogicalDataElement.class)
@@ -24,7 +23,7 @@ public abstract class LogicalDataElement implements
 
 
     public abstract FieldDataType type();
-
+    public abstract long parentDataTypeId();
 
     @Value.Default
     public String provenance() {

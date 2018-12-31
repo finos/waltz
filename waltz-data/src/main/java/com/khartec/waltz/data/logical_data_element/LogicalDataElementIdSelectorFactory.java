@@ -20,7 +20,9 @@
 package com.khartec.waltz.data.logical_data_element;
 
 import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -38,8 +40,12 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPE
 @Service
 public class LogicalDataElementIdSelectorFactory implements IdSelectorFactory {
 
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+
+
     @Autowired
-    public LogicalDataElementIdSelectorFactory() {
+    public LogicalDataElementIdSelectorFactory(DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 
@@ -47,11 +53,30 @@ public class LogicalDataElementIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
+            case DATA_TYPE:
+                return mkForDataType(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForSpecification(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
+
+        ImmutableIdSelectionOptions dtSelectorOptions = ImmutableIdSelectionOptions.builder()
+                .entityReference(options.entityReference())
+                .scope(options.scope())
+                .build();
+
+        Select<Record1<Long>> dtSelector = dataTypeIdSelectorFactory.apply(dtSelectorOptions);
+
+        return DSL
+                .selectDistinct(LOGICAL_DATA_ELEMENT.ID)
+                .from(LOGICAL_DATA_ELEMENT)
+                .where(LOGICAL_DATA_ELEMENT.PARENT_DATA_TYPE_ID.in(dtSelector))
+                .and(LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 
@@ -61,9 +86,12 @@ public class LogicalDataElementIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(LOGICAL_DATA_ELEMENT.ID)
                 .from(LOGICAL_DATA_ELEMENT)
-                .innerJoin(PHYSICAL_SPEC_DEFN_FIELD).on(PHYSICAL_SPEC_DEFN_FIELD.LOGICAL_DATA_ELEMENT_ID.eq(LOGICAL_DATA_ELEMENT.ID))
-                .innerJoin(PHYSICAL_SPEC_DEFN).on(PHYSICAL_SPEC_DEFN.ID.eq(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID))
-                .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(options.entityReference().id()));
+                .innerJoin(PHYSICAL_SPEC_DEFN_FIELD)
+                    .on(PHYSICAL_SPEC_DEFN_FIELD.LOGICAL_DATA_ELEMENT_ID.eq(LOGICAL_DATA_ELEMENT.ID))
+                .innerJoin(PHYSICAL_SPEC_DEFN)
+                    .on(PHYSICAL_SPEC_DEFN.ID.eq(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID))
+                .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(options.entityReference().id()))
+                .and(LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 }
