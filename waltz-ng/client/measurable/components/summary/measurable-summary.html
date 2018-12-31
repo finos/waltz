@@ -1,4 +1,5 @@
-<div class="waltz-page-summary waltz-page-summary-attach">
+<div class="waltz-page-summary waltz-page-summary-attach"
+     ng-class="{'ws-inactive': $ctrl.measurable.entityLifecycleStatus === 'REMOVED'}">
 
     <waltz-no-data ng-if="!$ctrl.measurable">
         <message>No information for this measurable</message>

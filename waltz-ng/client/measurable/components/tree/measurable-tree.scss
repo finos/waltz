@@ -27,3 +27,13 @@
         background-color: #bec7e3;
     }
 }
+
+.wmt-measurable-removed {
+    font-style: italic;
+    color: #AAA;
+    text-decoration: line-through rgba(125, 125, 125, 0.3);
+}
+
+.wmt-measurable-pending {
+    color: #ba632d;
+}
