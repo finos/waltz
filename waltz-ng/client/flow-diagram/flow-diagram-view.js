@@ -150,7 +150,7 @@ function controller(
                 {},
                 pf,
                 {
-                    transportName: displayNameService.lookup('transportKind', pf.transport),
+                    transportName: displayNameService.lookup('TransportKind', pf.transport),
                     frequencyName: displayNameService.lookup('frequencyKind', pf.frequency),
                     specificationName: physicalSpecsById[pf.specificationId]
                                         ? physicalSpecsById[pf.specificationId].name

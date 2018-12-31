@@ -54,7 +54,7 @@ public abstract class PhysicalFlowParsed {
     public abstract FrequencyKind frequency();
 
     @Nullable
-    public abstract TransportKind transport();
+    public abstract String transport();
 
     @Nullable
     public abstract EntityReference dataType();

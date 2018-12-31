@@ -20,61 +20,48 @@
 package com.khartec.waltz.data.enum_value;
 
 
-import com.khartec.waltz.model.EnumValue;
-import com.khartec.waltz.model.ImmutableEnumValue;
+import com.khartec.waltz.common.Aliases;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.records.EnumValueRecord;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
+import static com.khartec.waltz.schema.Tables.*;
+import static java.util.Optional.ofNullable;
 
 @Repository
-public class EnumValueDao {
-
-
-    private static final RecordMapper<? super EnumValueRecord, EnumValue> TO_DOMAIN_MAPPER = r ->
-            ImmutableEnumValue
-                .builder()
-                .type(r.getType())
-                .key(r.getKey())
-                .name(r.getDisplayName())
-                .description(r.getDescription())
-                .icon(r.getIconName())
-                .position(r.getPosition())
-                .build();
-
-
-    public static Condition mkExistsCondition(EnumValueKind kind, String key) {
-        return DSL.exists(
-                DSL.selectFrom(Tables.ENUM_VALUE)
-                        .where(Tables.ENUM_VALUE.TYPE.eq(kind.dbValue()))
-                        .and(Tables.ENUM_VALUE.KEY.eq(key)));
-    }
-
+public class EnumValueAliasDao {
 
     private final DSLContext dsl;
 
 
     @Autowired
-    public EnumValueDao(DSLContext dsl) {
+    public EnumValueAliasDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
 
 
-    public List<EnumValue> findAll() {
-        return dsl.selectFrom(ENUM_VALUE)
+    public Aliases<String> mkAliases(EnumValueKind kind) {
+        Aliases<String> aliases = new Aliases<>();
+
+        // join on ENUM_VALUE in case there are no aliases
+        dsl.select(ENUM_VALUE.KEY, DSL.coalesce(ENUM_VALUE_ALIAS.ALIAS, ENUM_VALUE.KEY))
+                .from(ENUM_VALUE)
+                .leftOuterJoin(ENUM_VALUE_ALIAS)
+                .on(ENUM_VALUE.KEY.eq(ENUM_VALUE_ALIAS.ENUM_KEY))
+                .where(ENUM_VALUE.TYPE.eq(kind.dbValue()))
                 .fetch()
-                .map(TO_DOMAIN_MAPPER);
+                .forEach(r -> aliases.register(
+                        r.value1(),
+                        r.value2()));
+
+        return aliases;
+
     }
 
 }
