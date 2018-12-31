@@ -65,7 +65,11 @@
 <!-- NODE CONTENT -->
 <script type="text/ng-template"
         id="wmt/measurable-node.html">
-    <span ng-class="{ 'italics' : ! node.concrete }"
+    <span ng-class="{
+            'italics' : ! node.concrete,
+            'wmt-measurable-removed': node.entityLifecycleStatus === 'REMOVED',
+            'wmt-measurable-pending': node.entityLifecycleStatus === 'PENDING'
+          }"
           ng-bind="node.name">
     </span>
     <span class="wmt-bar-chart"

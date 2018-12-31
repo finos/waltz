@@ -31,7 +31,7 @@ import _ from 'lodash';
  */
 export function enrichPhysicalFlow(physFlow, displayNameService) {
     const frequencyName = displayNameService.lookup('frequencyKind', physFlow.frequency);
-    const transportName = displayNameService.lookup('transportKind', physFlow.transport);
+    const transportName = displayNameService.lookup('TransportKind', physFlow.transport);
     const criticalityName = displayNameService.lookup('physicalFlowCriticality', physFlow.criticality);
     const displayNames = { frequencyName, transportName, criticalityName };
     return Object.assign({}, physFlow, displayNames);

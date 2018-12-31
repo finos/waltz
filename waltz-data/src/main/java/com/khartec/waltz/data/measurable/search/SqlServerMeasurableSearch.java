@@ -54,9 +54,12 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
 
+        Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
         List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
                 .from(MEASURABLE)
                 .where(externalIdCondition)
+                .and(entityLifecycleCondition)
                 .orderBy(MEASURABLE.EXTERNAL_ID)
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
@@ -70,6 +73,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
         List<Measurable> measurablesViaName = dsl.selectDistinct(MEASURABLE.fields())
                 .from(MEASURABLE)
                 .where(nameCondition)
+                .and(entityLifecycleCondition)
                 .orderBy(MEASURABLE.NAME)
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
@@ -77,6 +81,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
         List<Measurable> measurablesViaFullText = dsl
                 .selectFrom(MEASURABLE)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
+                .and(entityLifecycleCondition)
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 

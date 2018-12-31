@@ -203,9 +203,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         String username = getUsername(request);
 
         PhysicalFlowCreateCommand command = readBody(request, PhysicalFlowCreateCommand.class);
-        PhysicalFlowCreateCommandResponse cmdResponse = physicalFlowService.create(command, username);
-
-        return cmdResponse;
+        return physicalFlowService.create(command, username);
     }
 
 

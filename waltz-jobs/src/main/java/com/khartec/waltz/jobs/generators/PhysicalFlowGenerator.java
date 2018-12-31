@@ -19,9 +19,10 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ArrayUtilities;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
-import com.khartec.waltz.model.physical_flow.TransportKind;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.DSLContext;
@@ -38,6 +39,7 @@ import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
+import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -48,7 +50,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
     private static final Random rnd = new Random();
 
 
-    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> logicalFlowIds) {
+    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> logicalFlowIds, List<String> transportKinds) {
 
         return IntStream.range(0, logicalFlowIds.size() - 1)
                 .mapToObj(i -> {
@@ -60,7 +62,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setDescription("Description: " + spec + " - " + logicalFlowId.toString());
                     record.setProvenance(SAMPLE_DATA_PROVENANCE);
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
-                    record.setTransport(ArrayUtilities.randomPick(TransportKind.values()).name());
+                    record.setTransport(ListUtilities.randomPick(transportKinds));
                     record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
                     record.setLastUpdatedBy("admin");
                     return record;
@@ -77,6 +79,12 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
+
+        List<String> transportKinds = dsl
+                .select(ENUM_VALUE.KEY)
+                .from(ENUM_VALUE)
+                .where(ENUM_VALUE.TYPE.eq(EnumValueKind.TRANSPORT_KIND.dbValue()))
+                .fetch(ENUM_VALUE.KEY);
 
         List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl.select(
                     LOGICAL_FLOW.ID,
@@ -100,7 +108,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
         for (PhysicalSpecification spec : specifications) {
             Collection<Long> flowIds = flowIdsBySourceApp.get(spec.owningEntity().id());
             if (!isEmpty(flowIds)) {
-                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(flowIds));
+                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(flowIds), transportKinds);
                 flowBatch.addAll(physicalFlowRecords);
             }
 

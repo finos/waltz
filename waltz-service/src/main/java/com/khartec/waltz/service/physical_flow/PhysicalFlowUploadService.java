@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.physical_flow;
 
+import com.khartec.waltz.common.Aliases;
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
@@ -16,6 +17,7 @@ import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
@@ -24,6 +26,7 @@ import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecifica
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import com.khartec.waltz.service.enum_value.EnumValueAliasService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +53,7 @@ public class PhysicalFlowUploadService {
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
+    private final EnumValueAliasService enumValueAliasService;
 
     private final Pattern basisOffsetRegex = Pattern.compile("T?(?<offset>[\\+\\-]?\\d+)");
 
@@ -61,7 +65,8 @@ public class PhysicalFlowUploadService {
                                      LogicalFlowDecoratorService logicalFlowDecoratorService,
                                      PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                      PhysicalFlowDao physicalFlowDao,
-                                     PhysicalSpecificationDao physicalSpecificationDao) {
+                                     PhysicalSpecificationDao physicalSpecificationDao,
+                                     EnumValueAliasService enumValueAliasService) {
         checkNotNull(actorDao, "actorDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
@@ -70,7 +75,7 @@ public class PhysicalFlowUploadService {
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
-
+        checkNotNull(enumValueAliasService, "enumValueAliasService cannot be null");
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
         this.dataTypeDao = dataTypeDao;
@@ -79,6 +84,7 @@ public class PhysicalFlowUploadService {
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
+        this.enumValueAliasService = enumValueAliasService;
     }
 
 
@@ -98,10 +104,11 @@ public class PhysicalFlowUploadService {
         Map<String, Application> applicationsByAssetCode = loadApplicationsByAssetCode();
         Map<String, Actor> actorsByNameMap = loadActorsByName();
         Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
+        Aliases<String> transportAliases = loadTransportAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
-                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, dataTypesByNameOrCodeMap, cmd))
+                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, dataTypesByNameOrCodeMap, transportAliases, cmd))
                 .collect(toList());
 
         // enumerate and locate an existing physical flows that exist - iff no parse errors
@@ -121,7 +128,7 @@ public class PhysicalFlowUploadService {
         return responses;
     }
 
-
+    
     public List<PhysicalFlowUploadCommandResponse> upload(String username,
                                                           List<PhysicalFlowUploadCommand> cmds) throws Exception {
         checkNotNull(cmds, "cmds cannot be empty");
@@ -178,6 +185,7 @@ public class PhysicalFlowUploadService {
     private PhysicalFlowUploadCommandResponse validateCommand(Map<String, Actor> actorsByName,
                                                               Map<String, Application> applicationsByAssetCode,
                                                               Map<String, DataType> dataTypeMap,
+                                                              Aliases<String> transportAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -217,10 +225,12 @@ public class PhysicalFlowUploadService {
             errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
         }
 
-        TransportKind transport = TransportKind.parse(cmd.transport(), (s) -> null);
-        if (transport == null) {
-            errors.put("transport", String.format("%s is not a recognised value", cmd.transport()));
-        }
+        String transport = transportAliases
+                .lookup(cmd.transport())
+                .orElseGet(() -> {
+                    errors.put("transport", String.format("%s is not a recognised value", cmd.transport()));
+                    return null;
+                });
 
         Criticality criticality = Criticality.parse(cmd.criticality(), (s) -> null);
         if (criticality == null) {
@@ -402,12 +412,17 @@ public class PhysicalFlowUploadService {
 
 
     private long getOrCreatePhysicalFlow(PhysicalFlow newFlow) {
-        PhysicalFlow existing = physicalFlowDao.getByPhysicalFlow(newFlow);
+        PhysicalFlow existing = physicalFlowDao.matchPhysicalFlow(newFlow);
         if (existing != null) {
             return existing.id().get();
         } else {
             return physicalFlowDao.create(newFlow);
         }
     }
+
+    private Aliases<String> loadTransportAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND);
+    }
+
 
 }
