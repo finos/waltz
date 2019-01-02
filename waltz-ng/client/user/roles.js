@@ -76,7 +76,7 @@ export default {
     },
     "SURVEY_TEMPLATE_ADMIN" : {
         key: "SURVEY_TEMPLATE_ADMIN",
-        name: "Survey admin",
+        name: "Survey Template Admin",
         description: "Can create and modify survey templates"
     },
     "TAXONOMY_EDITOR" : {
