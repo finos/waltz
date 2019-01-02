@@ -370,4 +370,30 @@
                     columnName="is_removed"/>
     </changeSet>
 
+
+    <!-- Taxonomy Management: params should be a string -->
+    <changeSet id="20190101-3624-1"
+               author="kamransaleem">
+        <comment>Taxonomy Management: params should be a string</comment>
+        <modifyDataType tableName="taxonomy_change"
+                        columnName="params"
+                        newDataType="${description.type}" />
+    </changeSet>
+
+    <changeSet id="20190101-3624-2"
+               author="kamransaleem">
+        <comment>Taxonomy Management: copy description to params</comment>
+        <sql>
+            UPDATE taxonomy_change SET params = description;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190101-3624-3"
+               author="kamransaleem">
+        <comment>Taxonomy Management: set description to NULL</comment>
+        <update tableName="taxonomy_change">
+            <column name="description" type="${description.type}" />
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
