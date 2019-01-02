@@ -354,4 +354,20 @@
         </sql>
     </changeSet>
 
+
+    <!-- 3707 - Logical Flow: drop is_removed column -->
+    <changeSet id="20190102-3707-1"
+               author="davidwatkins73">
+        <comment>3707: Logical Flow: drop is_removed column, first remove default value</comment>
+        <dropDefaultValue tableName="logical_flow"
+                          columnName="is_removed"/>
+    </changeSet>
+
+    <changeSet id="20190102-3707-2"
+               author="davidwatkins73">
+        <comment>3707: Logical Flow: drop is_removed column</comment>
+        <dropColumn tableName="logical_flow"
+                    columnName="is_removed"/>
+    </changeSet>
+
 </databaseChangeLog>
