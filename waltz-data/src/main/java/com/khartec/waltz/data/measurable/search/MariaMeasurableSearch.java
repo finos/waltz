@@ -24,26 +24,72 @@ import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.impl.DSL;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static java.util.Collections.emptyList;
 
 public class MariaMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
-    private static final String QUERY
+    private static final String FULL_TEXT_QUERY
             = "SELECT * FROM measurable\n"
             + " WHERE\n"
             + "  MATCH(name, description, external_id)\n"
             + "  AGAINST (?)\n"
+            + "  AND ?\n" // lifecycle condition
             + " LIMIT ?";
 
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
-        return records.map(MeasurableDao.TO_DOMAIN_MAPPER);
+    public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
+        List<String> terms = mkTerms(query);
+
+        if (terms.isEmpty()) {
+            return emptyList();
+        }
+
+        Condition externalIdCondition = terms.stream()
+                .map(term -> MEASURABLE.EXTERNAL_ID.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
+        List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(externalIdCondition)
+                .and(entityLifecycleCondition)
+                .orderBy(MEASURABLE.EXTERNAL_ID)
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        Condition nameCondition = terms.stream()
+                .map(term -> MEASURABLE.NAME.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Measurable> measurablesViaName = dsl.selectDistinct(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(nameCondition)
+                .and(entityLifecycleCondition)
+                .orderBy(MEASURABLE.NAME)
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        List<Measurable> measurablesViaFullText = dsl.fetch(FULL_TEXT_QUERY, query, entityLifecycleCondition, options.limit())
+                .map(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }
 
 }
