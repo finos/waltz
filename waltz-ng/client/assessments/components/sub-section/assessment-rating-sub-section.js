@@ -28,7 +28,9 @@ function controller(serviceBroker) {
                 const hasDefinitions = (r.data || []).length > 0;
                 const allReadOnly = _.every(r.data, d => d.isReadOnly);
 
-                vm.editRole = _.find(r.data, {"entityKind": vm.parentEntityRef.kind}).permittedRole;
+                if (!(vm.editRole = _.find(r.data, {"entityKind": vm.parentEntityRef.kind}).permittedRole)) {
+                    vm.editRole = 'NULL';
+                }
                 vm.visibility.editBtn = hasDefinitions && ! allReadOnly;
             });
     };
