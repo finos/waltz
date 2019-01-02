@@ -56,6 +56,17 @@ migrate
       migrate
 ```
 
+### Sample .sh file (PostgreSQL)
+```
+#!/bin/sh
+liquibase --driver=org.postgresql.Driver \
+      --classpath=<path to driver>/postgresql-42.2.5.jar \
+      --changeLogFile=../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml \
+      --url="jdbc:postgresql://<host>:<port>/waltz" \
+      --username=<user> \
+      --password=<password> \
+      migrate
+```
 
 Waltz provides sample files:
 - `migrate*.*`
@@ -96,6 +107,19 @@ updateSQL
       --classpath=<path to driver>/mariadb-java-client/1.3.2/mariadb-java-client-1.3.2.jar \
       --changeLogFile=<path to changelog master>/db.changelog-master.xml \
       --url="jdbc:mysql://<hostname>:<port>/<database>" \
+      --username=<user> \
+      --password=<password> \
+      updateSQL
+```
+
+
+### Sample .sh file (PostgreSQL)
+```
+#!/bin/sh
+liquibase --driver=org.postgresql.Driver \
+      --classpath=<path to driver>/postgresql-42.2.5.jar \
+      --changeLogFile=../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml \
+      --url="jdbc:postgresql://<host>:<port>/waltz" \
       --username=<user> \
       --password=<password> \
       updateSQL

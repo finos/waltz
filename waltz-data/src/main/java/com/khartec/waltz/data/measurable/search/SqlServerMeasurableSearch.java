@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
@@ -42,7 +43,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
 
     @Override
     public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(lower(query));
 
         if (terms.isEmpty()) {
             return emptyList();

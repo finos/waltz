@@ -24,11 +24,14 @@ import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
 
 import java.util.List;
+
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static java.util.Collections.emptyList;
 
 public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
@@ -36,7 +39,7 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
             = "SELECT *, "
             + " ts_rank_cd(setweight(to_tsvector(name), 'A') "
             + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
+            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A'), "
             + "     plainto_tsquery(?)"
             + " ) AS rank"
             + " FROM measurable"
@@ -44,14 +47,26 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
             + "     || setweight(to_tsvector(description), 'D') "
             + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
             + "     @@ plainto_tsquery(?)"
+            + "  AND ?\n" // lifecycle condition
             + " ORDER BY rank DESC"
             + " LIMIT ?";
 
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms, options.limit());
-        return records.map(MeasurableDao.TO_DOMAIN_MAPPER);
+    public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
+
+        List<String> terms = mkTerms(query);
+
+        if (terms.isEmpty()) {
+            return emptyList();
+        }
+
+        Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
+        List<Measurable> measurablesViaFullText = dsl.fetch(SEARCH_POSTGRES, query, query, entityLifecycleCondition, options.limit())
+                .map(MeasurableDao.TO_DOMAIN_MAPPER);
+
+        return measurablesViaFullText;
     }
 
 }
