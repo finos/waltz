@@ -12,7 +12,7 @@
   - Restriction imposed by Postgres
 
 
-## Table Deletion
+## Table/Column Deletion
  
 - An issue should be created and flagged with both the `DDL Change` and `Removal` tags
 - Deletion should only happen 2 point releases after the feature code has been removed
