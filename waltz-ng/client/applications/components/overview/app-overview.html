@@ -159,8 +159,8 @@
                                         timestamp="$ctrl.app.plannedRetirementDate">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.plannedRetirementDate">
-                    -
-                </span>
+                            -
+                        </span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
                         Actual Retirement:
@@ -170,10 +170,14 @@
                                         timestamp="$ctrl.app.actualRetirementDate">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.actualRetirementDate">
-                    -
-                </span>
+                            -
+                        </span>
                     </div>
                 </div>
+
+                <!-- Entity Enum -->
+                <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-entity-enum>
 
                 <div class="row">
                     <div class="col-sm-2 waltz-display-field-label">
