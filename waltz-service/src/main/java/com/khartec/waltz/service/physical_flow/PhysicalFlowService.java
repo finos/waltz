@@ -156,12 +156,20 @@ public class PhysicalFlowService {
         if (commandOutcome == CommandOutcome.SUCCESS) {
             PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
 
+            String flowRemovalMessage = String.format(
+                    "Physical flow: %s, from: %s, to: %s removed.",
+                    specification.name(),
+                    safeName(logicalFlow.source()),
+                    safeName(logicalFlow.target()));
+
             logChange(username,
-                    logicalFlow.source(),
-                    String.format("Physical flow: %s, from: %s, to: %s removed.",
-                            specification.name(),
-                            safeName(logicalFlow.source()),
-                            safeName(logicalFlow.target())),
+                    mkRef(PHYSICAL_FLOW, physicalFlow.id().get()),
+                    flowRemovalMessage,
+                    Operation.REMOVE);
+
+            logChange(username,
+                    mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
+                    flowRemovalMessage,
                     Operation.REMOVE);
 
             logChange(username,
