@@ -48,6 +48,7 @@ function prepareTree(dataTypes = [], usageCounts = []) {
     const dataTypesById = _.keyBy(dataTypes, "id");
     _.chain(usageCounts)
         .filter(uc => uc.decoratorEntityReference.kind === "DATA_TYPE")
+        .filter(uc => ! _.isNil(dataTypesById[uc.decoratorEntityReference.id]))
         .forEach(uc => {
             const dtId = uc.decoratorEntityReference.id;
             const dt = dataTypesById[dtId];
