@@ -114,14 +114,14 @@
                         <waltz-editable-field on-save="$ctrl.updateDescription"
                                               field-type="textarea"
                                               initial-val="field.description"
-                                              item-id="field.id">
+                                              ctx="field">
                         </waltz-editable-field>
                     </td>
                     <td>
                         <waltz-editable-field on-save="$ctrl.updateLogicalElement"
                                               field-type="logical-data-element"
                                               initial-val="$ctrl.logicalDataElementsById[field.logicalDataElementId]"
-                                              item-id="field.id">
+                                              ctx="field">
                         </waltz-editable-field>
                     </td>
                 </tr>

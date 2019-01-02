@@ -167,10 +167,10 @@ function controller($q,
             });
     };
 
-    vm.updateFieldDescription = (fieldId, change) => {
+    vm.updateFieldDescription = (change, field) => {
         const cmd = { newDescription: change.newVal };
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [field.id, cmd])
             .then(result => {
                 if (result) {
                     notification.success(`Updated description for field`);
@@ -181,10 +181,10 @@ function controller($q,
             });
     };
 
-    vm.updateLogicalDataElement = (fieldId, change) => {
+    vm.updateLogicalDataElement = (change, field) => {
         const cmd = { newLogicalDataElement: change.newVal };
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [field.id, cmd])
             .then(result => {
                 if (result) {
                     notification.success(`Updated logical data element for field`);

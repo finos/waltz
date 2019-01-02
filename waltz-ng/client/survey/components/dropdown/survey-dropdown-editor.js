@@ -88,8 +88,7 @@ function controller(notification) {
         vm.creatingEntry = false;
     };
 
-    vm.updateValue = (entryId, data) => {
-        //entry id is likely to be undefined and cannot be relied upon (when we have new entries)
+    vm.updateValue = (data) => {
         if (!valueExists(data.newVal)) {
             vm.entries = _.map(vm.entries, e => {
                 if(e.value === data.oldVal) {

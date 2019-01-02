@@ -86,7 +86,7 @@ function controller($stateParams,
     };
 
 
-    vm.editRecipient = (instanceRecipientId, data) => {
+    vm.editRecipient = (data, instanceRecipientId) => {
         const cmd = mkUpdateRecipientCommand(instanceRecipientId, data.newVal, vm.surveyInstance.id);
         surveyInstanceStore
             .updateRecipient(vm.surveyInstance.id, cmd)
@@ -134,7 +134,7 @@ function controller($stateParams,
             });
     };
 
-    vm.updateDueDate = (instanceId, change) => {
+    vm.updateDueDate = (change, instanceId) => {
         if (!change.newVal) {
             notification.error('Due date cannot be blank');
         } else {

@@ -317,7 +317,7 @@ function controller($q,
         vm.visibility.anyPopup = true;
     };
 
-    vm.onSaveTitle = (id, t) => {
+    vm.onSaveTitle = (t, id) => {
         flowDiagramStateService.processCommands([{
             command: "SET_TITLE",
             payload: t.newVal
@@ -328,12 +328,12 @@ function controller($q,
             .then(() => notification.success("Saved Title"))
     };
 
-    vm.onSaveDescription = (id, t) => {
+    vm.onSaveDescription = (d) => {
         flowDiagramStateService.processCommands([{
             command: "SET_DESCRIPTION",
-            payload: t.newVal
+            payload: d.newVal
         }]);
-        vm.description = t.newVal;
+        vm.description = d.newVal;
 
         flowDiagramStateService.updateDescription()
             .then(() => notification.success("Saved Description"))

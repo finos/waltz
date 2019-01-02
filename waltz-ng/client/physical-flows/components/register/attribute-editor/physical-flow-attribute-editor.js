@@ -28,6 +28,7 @@ import {
 } from "../../../formly/physical-flow-fields";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 import template from './physical-flow-attribute-editor.html';
+import {toOptions} from "../../../../common/services/enums";
 
 
 const bindings = {
@@ -94,11 +95,14 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll)
             .then(r => {
+                const enumsByType = _.groupBy(r.data, "type");
+
+                transportField.templateOptions.options = toOptions(enumsByType["TransportKind"]);
+
                 const criticalityValuesByCode = _
-                    .chain(r.data)
-                    .filter({ type: 'physicalFlowCriticality'})
+                    .chain(enumsByType["physicalFlowCriticality"])
                     .map(c => ({ code: c.key, name: c.name }))
-                    .keyBy('code')
+                    .keyBy("code")
                     .value();
                 criticalityField.templateOptions.options = [
                     criticalityValuesByCode['VERY_HIGH'],

@@ -27,7 +27,7 @@ export const transportField = {
     templateOptions: {
         valueProp: 'code',
         labelProp: 'name',
-        options: toOptions("TransportKind", true),
+        options: [],
         label: 'Transport',
         placeholder: '',
         required: true

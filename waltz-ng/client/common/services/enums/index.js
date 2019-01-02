@@ -96,13 +96,18 @@ export function getEnumName(enumValues = {}, key) {
 
 
 /**
- * Used to convert a map of ( { code -> displayName }
+ * Used to convert a map of ( { code -> displayName } or a list of items
+ * taken directly from the `enum-store`.
  * @param lookups
  * @param excludeUnknown
  */
-export function toOptions(lookups = {}, excludeUnknown = false) {
-    return _.chain(lookups)
-        .map((v, k) => ({name: v.name, code: k, position: v.position}))
+export function toOptions(items = {}, excludeUnknown = false) {
+    const converter = _.isArray(items)
+        ? x => Object.assign({}, { code: x.key }, x)
+        : (v, k) => ({name: v.name, code: k, position: v.position});
+
+    return _.chain(items)
+        .map(converter)
         .sortBy(["position", "name"])
         .reject(o => o.code === "UNKNOWN" && excludeUnknown)
         .value();

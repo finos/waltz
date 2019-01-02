@@ -40,16 +40,16 @@ function controller($q,
             .then(() => notification.success('Updated'));
     }
 
-    vm.updateName = (id, change) => {
+    vm.updateName = (change, kind) => {
         if(change.newVal === "") return $q.reject("Too short");
-        return update(id, { name: change })
-            .then(() => _.find(vm.involvementKinds, {'id': id}).name = change.newVal);
+        return update(kind.id, { name: change })
+            .then(() => _.find(vm.involvementKinds, {'id': kind.id}).name = change.newVal);
     };
 
-    vm.updateDescription = (id, change) => {
+    vm.updateDescription = (change, kind) => {
         if(change.newVal === "") return $q.reject("Too short");
-        return update(id, { description: change })
-            .then(() => _.find(vm.involvementKinds, {'id': id}).description = change.newVal);
+        return update(kind.id, { description: change })
+            .then(() => _.find(vm.involvementKinds, {'id': kind.id}).description = change.newVal);
     };
 
 
@@ -66,8 +66,6 @@ function controller($q,
                 vm.newinvolvementKind = {};
                 loadInvolvementKinds();
             });
-
-
     };
 
     vm.cancelNewinvolvementKind = () => {

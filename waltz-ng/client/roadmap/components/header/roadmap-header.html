@@ -44,7 +44,7 @@
                 <div class="col-sm-9">
                     <waltz-editable-field field-type="text"
                                           on-save="$ctrl.onSaveRoadmapName"
-                                          item-id="$ctrl.roadmap"
+                                          ctx="$ctrl.roadmap"
                                           save-label="Save"
                                           edit-role="SCENARIO_ADMIN"
                                           initial-val="$ctrl.roadmap.name">
@@ -77,7 +77,7 @@
                 <div class="col-sm-9">
                     <waltz-editable-field field-type="textarea"
                                           on-save="$ctrl.onSaveRoadmapDescription"
-                                          item-id="$ctrl.roadmap"
+                                          ctx="$ctrl.roadmap"
                                           save-label="Save"
                                           initial-val="$ctrl.roadmap.description"
                                           empty-label="No description provided"

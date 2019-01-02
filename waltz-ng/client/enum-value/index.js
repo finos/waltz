@@ -32,7 +32,7 @@ export default () => {
         .service("EnumValueService", EnumValueService);
 
     registerStores(module, [ EnumValueStore ]);
-    registerComponents(module, [ EnumValue ])
+    registerComponents(module, [ EnumValue ]);
 
     return module.name;
 };

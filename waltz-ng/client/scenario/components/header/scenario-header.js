@@ -66,7 +66,7 @@ function controller($q,
     };
 
 
-    vm.onSaveScenarioName = (ctx, data) => {
+    vm.onSaveScenarioName = (data, ctx) => {
         return updateField(
             ctx.id,
             CORE_API.ScenarioStore.updateName,
@@ -76,7 +76,7 @@ function controller($q,
             .then(() => reloadAllData());
     };
 
-    vm.onSaveScenarioDescription = (ctx, data) => {
+    vm.onSaveScenarioDescription = (data, ctx) => {
         return updateField(
             ctx.id,
             CORE_API.ScenarioStore.updateDescription,
@@ -86,7 +86,7 @@ function controller($q,
             .then(() => reloadAllData());
     };
 
-    vm.onSaveScenarioEffectiveDate = (ctx, data) => {
+    vm.onSaveScenarioEffectiveDate = (data, ctx) => {
         return updateField(
             ctx.id,
             CORE_API.ScenarioStore.updateEffectiveDate,

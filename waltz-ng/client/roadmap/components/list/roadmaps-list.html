@@ -21,7 +21,7 @@
                         <td>
                             <waltz-editable-field field-type="text"
                                                   on-save="$ctrl.onSaveRoadmapName"
-                                                  item-id="roadmap"
+                                                  ctx="roadmap"
                                                   save-label="Save"
                                                   initial-val="roadmap.name">
                             </waltz-editable-field>
@@ -45,7 +45,7 @@
                         <td>
                             <waltz-editable-field field-type="textarea"
                                                   on-save="$ctrl.onSaveRoadmapDescription"
-                                                  item-id="roadmap"
+                                                  ctx="roadmap"
                                                   save-label="Save"
                                                   initial-val="roadmap.description"
                                                   empty-label="No description provided"

@@ -148,15 +148,16 @@ function controller($location,
         vm.saveResponse(questionId);
     };
 
-    vm.saveComment = (questionId, valObj) => {
-        if (! vm.surveyResponses[questionId]) {
-            vm.surveyResponses[questionId] = {};
+    vm.saveComment = (valObj, question) => {
+        const questionResponse = vm.surveyResponses[question.id];
+        if (! questionResponse) {
+            vm.surveyResponses[question.id] = {};
         }
-        vm.surveyResponses[questionId].comment = valObj.newVal;
+        questionResponse.comment = valObj.newVal;
 
         return surveyInstanceStore.saveResponse(
             vm.surveyInstance.id,
-            Object.assign({'questionId': questionId}, vm.surveyResponses[questionId])
+            Object.assign({'questionId': question.id}, questionResponse)
         );
     };
 

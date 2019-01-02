@@ -23,10 +23,10 @@ import template from "./editable-field.html";
 
 const bindings = {
     initialVal: "<",
-    onSave: "<",
+    onSave: "<",  // e.g.: (d, ctx) => console.log(d.newVal, d.oldVal, ctx)
     fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date | markdown
     dateFormat: "@",
-    itemId: "<",
+    ctx: "<",
     buttonLabel: "@",
     saveLabel: "@?",
     editRole: "@",
@@ -73,7 +73,6 @@ function controller() {
         vm.errorMessage = e;
     };
 
-
     vm.save = () => {
         const data = {
             newVal: vm.newVal,
@@ -82,7 +81,7 @@ function controller() {
 
         vm.saving = true;
 
-        const promise = vm.onSave(vm.itemId, data);
+        const promise = vm.onSave(data, vm.ctx);
 
         if (promise) {
             promise.then(saveComplete, saveFailed)
@@ -91,19 +90,16 @@ function controller() {
         }
     };
 
-
     vm.edit = () => {
         vm.editing = true;
         vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
     };
-
 
     vm.cancel = () => {
         vm.editing = false;
         vm.saving = false;
         vm.errorMessage = "";
     };
-
 
     vm.entitySelect = (entity) => {
         vm.newVal = entity;
