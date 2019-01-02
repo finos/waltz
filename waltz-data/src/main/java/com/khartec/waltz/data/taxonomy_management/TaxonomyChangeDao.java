@@ -76,8 +76,8 @@ public class TaxonomyChangeDao {
         r.setDomainId(cmd.changeDomain().id());
         r.setLastUpdatedAt(Timestamp.valueOf(cmd.lastUpdatedAt()));
         r.setLastUpdatedBy(cmd.lastUpdatedBy());
-        r.setDescription(writeParams(cmd.params())); // TODO: #3624
-        r.setParams(0L); // TODO: #3624
+        r.setDescription(null);
+        r.setParams(writeParams(cmd.params()));
         r.setCreatedAt(Timestamp.valueOf(cmd.createdAt()));
         r.setCreatedBy(cmd.createdBy());
         return r;
@@ -86,9 +86,8 @@ public class TaxonomyChangeDao {
 
     private static Map<String, ? extends String> readParams(Record r) {
         try {
-            // TODO: #3624: this is a massive hack, params is the wrong type (!) therefore using desc
             return JSON_MAPPER.readValue(
-                    r.get(TAXONOMY_CHANGE.DESCRIPTION),
+                    r.get(TAXONOMY_CHANGE.PARAMS),
                     Map.class);
         } catch (Exception e) {
             return new HashMap<>();
