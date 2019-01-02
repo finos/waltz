@@ -63,8 +63,8 @@ liquibase --driver=org.postgresql.Driver \
       --classpath=<path to driver>/postgresql-42.2.5.jar \
       --changeLogFile=../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml \
       --url="jdbc:postgresql://<host>:<port>/waltz" \
-      --username=waltz_user \
-      --password=WaltzU@123 \
+      --username=<user> \
+      --password=<password> \
       migrate
 ```
 
@@ -120,7 +120,7 @@ liquibase --driver=org.postgresql.Driver \
       --classpath=<path to driver>/postgresql-42.2.5.jar \
       --changeLogFile=../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml \
       --url="jdbc:postgresql://<host>:<port>/waltz" \
-      --username=waltz_user \
-      --password=WaltzU@123 \
+      --username=<user> \
+      --password=<password> \
       updateSQL
 ```
