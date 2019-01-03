@@ -95,7 +95,7 @@
                                       field-type="date"
                                       date-format="yyyy-MM-dd"
                                       initial-val="ctrl.surveyInstance.dueDate"
-                                      item-id="ctrl.surveyInstance.id"
+                                      ctx="ctrl.surveyInstance.id"
                                       edit-role="SURVEY_ADMIN">
                 </waltz-editable-field>
             </div>
@@ -173,7 +173,7 @@
                                               edit-role="SURVEY_ADMIN"
                                               field-type="person"
                                               initial-val="r.person"
-                                              item-id="r.instanceRecipientId">
+                                              ctx="r.instanceRecipientId">
                         </waltz-editable-field>
                     </li>
                 </ul>

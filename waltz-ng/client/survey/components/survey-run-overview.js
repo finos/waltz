@@ -43,7 +43,7 @@ const initialState = {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.updateDueDate = (itemId, data) => {
+    vm.updateDueDate = (data) => {
         invokeFunction(vm.onUpdateDueDate, data.newVal);
     };
 }

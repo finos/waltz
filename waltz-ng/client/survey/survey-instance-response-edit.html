@@ -257,7 +257,7 @@
                         <waltz-editable-field ng-if="qi.question.allowComment"
                                               fieldType="textarea"
                                               initial-val="ctrl.surveyResponses[qi.question.id].comment"
-                                              item-id="qi.question.id"
+                                              ctx="qi.question"
                                               on-save="ctrl.saveComment"
                                               button-label="Comment"
                                               class="small text-muted">

@@ -37,8 +37,8 @@ const initialState = {
     specDefinition: {},
     selectableDefinitions: [],
     onDefinitionSelect: (def) => console.log('psdp::onDefinitionSelect', def),
-    onUpdateFieldDescription: (fieldId, change) => console.log('psdp::onUpdateFieldDescription', { fieldId, change }),
-    onUpdateLogicalDataElement: (fieldId, change) => console.log('psdp::onUpdateLogicalDataElement', { fieldId, change })
+    onUpdateFieldDescription: (change, field) => console.log('psdp::onUpdateFieldDescription', { field, change }),
+    onUpdateLogicalDataElement: (change, field) => console.log('psdp::onUpdateLogicalDataElement', { field, change })
 };
 
 
@@ -53,13 +53,13 @@ function controller($q) {
 
     vm.definitionSelected = (def) => invokeFunction(vm.onDefinitionSelect, def);
 
-    vm.updateDescription = (id, change) => {
+    vm.updateDescription = (change, f) => {
         if (_.isEmpty(change.newVal)) return $q.reject("Too short");
-        return invokeFunction(vm.onUpdateFieldDescription, id, change);
+        return invokeFunction(vm.onUpdateFieldDescription, change, f);
     };
 
-    vm.updateLogicalElement = (id, change) => {
-        return invokeFunction(vm.onUpdateLogicalDataElement, id, change);
+    vm.updateLogicalElement = (change, f) => {
+        return invokeFunction(vm.onUpdateLogicalDataElement, change, f);
     };
 }
 

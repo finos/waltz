@@ -10,7 +10,7 @@
             <td>
                 <waltz-editable-field field-type="text"
                                       on-save="$ctrl.onSaveName"
-                                      item-id="$ctrl.scenario"
+                                      ctx="$ctrl.scenario"
                                       save-label="Save"
                                       initial-val="$ctrl.scenario.name">
                 </waltz-editable-field>
@@ -23,7 +23,7 @@
             <td>
                 <waltz-editable-field field-type="date"
                                       on-save="$ctrl.onSaveEffectiveDate"
-                                      item-id="$ctrl.scenario"
+                                      ctx="$ctrl.scenario"
                                       save-label="Save"
                                       initial-val="$ctrl.scenario.effectiveDate">
                 </waltz-editable-field>
@@ -88,7 +88,7 @@
             <td>
                 <waltz-editable-field field-type="textarea"
                                       on-save="$ctrl.onSaveDescription"
-                                      item-id="$ctrl.scenario"
+                                      ctx="$ctrl.scenario"
                                       save-label="Save"
                                       initial-val="$ctrl.scenario.description"
                                       empty-label="No description provided"

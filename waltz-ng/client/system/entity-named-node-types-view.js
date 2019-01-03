@@ -43,32 +43,32 @@ function controller($q,
     const vm = initialiseData(this, initialState);
     const componentId = 'entity-named-note-types-view';
 
-    function update(id, change) {
+    function update(noteType, change) {
         return serviceBroker
-            .execute(CORE_API.EntityNamedNoteTypeStore.update, [id, change])
+            .execute(CORE_API.EntityNamedNoteTypeStore.update, [noteType.id, change])
             .then(() => {
                 loadNoteTypes(true);
                 notification.success('Updated');
             });
     }
 
-    vm.updateName = (id, change) => {
+    vm.updateName = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { name: change.newVal });
+        return update(type, { name: change.newVal });
     };
 
-    vm.updateDescription = (id, change) => {
+    vm.updateDescription = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { description: change.newVal });
+        return update(type, { description: change.newVal });
     };
 
-    vm.updateIsReadOnly = (id, change) => {
-        return update(id, { isReadOnly: change.newVal });
+    vm.updateIsReadOnly = (change, type) => {
+        return update(type, { isReadOnly: change.newVal });
     };
 
-    vm.updateApplicableEntityKinds = (id, change) => {
+    vm.updateApplicableEntityKinds = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
-        return update(id, { applicableEntityKinds: splitEntityKinds(change.newVal) });
+        return update(type, { applicableEntityKinds: splitEntityKinds(change.newVal) });
     };
 
     vm.startNewNoteType = () => {

@@ -271,7 +271,7 @@ function controller($q,
         }
     };
 
-    vm.updateFieldDescription = (fieldId, change) => {
+    vm.updateFieldDescription = (change, fieldId) => {
         const cmd = { newDescription: change.newVal };
         serviceBroker
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
@@ -285,7 +285,7 @@ function controller($q,
             });
     };
 
-    vm.updateLogicalDataElement = (fieldId, change) => {
+    vm.updateLogicalDataElement = (change, fieldId) => {
         const cmd = { newLogicalDataElement: change.newVal };
         serviceBroker
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])

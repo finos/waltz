@@ -45,18 +45,18 @@ function controller($q, serviceBroker) {
 
     // -- interact ---
 
-    vm.onSaveName = (ctx, data) => {
-        vm.onSaveScenarioName(ctx, data)
+    vm.onSaveName = (data, ctx) => {
+        vm.onSaveScenarioName(data, ctx)
             .then(() => reload());
     };
 
-    vm.onSaveDescription = (ctx, data) => {
-        vm.onSaveScenarioDescription(ctx, data)
+    vm.onSaveDescription = (data, ctx) => {
+        vm.onSaveScenarioDescription(data, ctx)
             .then(() => reload());
     };
 
-    vm.onSaveEffectiveDate = (ctx, data) => {
-        vm.onSaveScenarioEffectiveDate(ctx, data)
+    vm.onSaveEffectiveDate = (data, ctx) => {
+        vm.onSaveScenarioEffectiveDate(data, ctx)
             .then(() => reload());
     };
 

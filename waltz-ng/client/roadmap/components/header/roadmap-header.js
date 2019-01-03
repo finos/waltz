@@ -52,7 +52,7 @@ function controller($q,
     };
 
 
-    vm.onSaveRoadmapName = (ctx, data) => {
+    vm.onSaveRoadmapName = (data, ctx) => {
         return updateField(
                 ctx.id,
                 CORE_API.RoadmapStore.updateName,
@@ -62,7 +62,7 @@ function controller($q,
             .then(() => reloadAllData());
     };
 
-    vm.onSaveRoadmapDescription = (ctx, data) => {
+    vm.onSaveRoadmapDescription = (data, ctx) => {
         return updateField(
                 ctx.id,
                 CORE_API.RoadmapStore.updateDescription,

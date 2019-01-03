@@ -34,28 +34,28 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    function update(id, change) {
-        const updateCmd = Object.assign(change, { id });
+    function update(actor, change) {
+        const updateCmd = Object.assign(change, { id: actor.id });
         return actorService.update(updateCmd)
             .then(() => notification.success('Updated'));
     }
 
-    vm.updateName = (id, change) => {
+    vm.updateName = (change, actor) => {
         if(change.newVal === "") return $q.reject("Too short");
-        return update(id, { name: change })
-            .then(() => _.find(vm.actors, {'id': id}).name = change.newVal);
+        return update(actor, { name: change })
+            .then(() => _.find(vm.actors, {'id': actor.id}).name = change.newVal);
     };
 
-    vm.updateDescription = (id, change) => {
+    vm.updateDescription = (change, actor) => {
         if(change.newVal === "") return $q.reject("Too short");
-        return update(id, { description: change })
-            .then(() => _.find(vm.actors, {'id': id}).description = change.newVal);
+        return update(actor, { description: change })
+            .then(() => _.find(vm.actors, {'id': actor.id}).description = change.newVal);
     };
 
-    vm.updateIsExternal = (id, change) => {
+    vm.updateIsExternal = (change, actor) => {
         if(change.newVal === null) return $q.reject("No value provided");
-        return update(id, { isExternal: change })
-            .then(() => _.find(vm.actors, {'id': id}).isExternal = change.newVal);
+        return update(actor, { isExternal: change })
+            .then(() => _.find(vm.actors, {'id': actor.id}).isExternal = change.newVal);
     };
 
 
