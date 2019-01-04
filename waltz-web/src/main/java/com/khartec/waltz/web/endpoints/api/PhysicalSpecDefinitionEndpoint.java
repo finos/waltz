@@ -58,11 +58,16 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String getActiveForSpecificationPath = mkPath(BASE_URL, "active", "specification", ":id");
         String findForSpecificationPath = mkPath(BASE_URL, "specification", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String createPath = mkPath(BASE_URL, "specification", ":id");
         String updateStatusPath = mkPath(BASE_URL, "specification", ":id", "status");
         String deletePath = mkPath(BASE_URL, "specification", ":id");
+
+
+        DatumRoute<PhysicalSpecDefinition> getActiveForSpecificationRoute =
+                (req, res) -> specDefinitionService.getActiveForSpecification(getId(req));
 
         ListRoute<PhysicalSpecDefinition> findForSpecificationRoute =
                 (req, res) -> specDefinitionService.findForSpecification(getId(req));
@@ -98,6 +103,7 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
         };
 
 
+        getForDatum(getActiveForSpecificationPath, getActiveForSpecificationRoute);
         getForList(findForSpecificationPath, findForSpecificationRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
 

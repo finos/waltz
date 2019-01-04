@@ -32,7 +32,12 @@
              ng-class="{
                 'wpfes-current': candidate.id == $ctrl.current.id
              }"
-             ng-click="$ctrl.select(candidate)">
+             ng-click="$ctrl.select(candidate)"
+             uib-popover-template="'wpfes/popup.html'"
+             popover-append-to-body="true"
+             popover-trigger="mouseenter"
+             popover-popup-delay="200"
+             ng-mouseenter="$ctrl.mouseEnterSpecRow(candidate)">
             <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
             <div class="col-md-2"><span ng-bind="candidate.externalId"></span></div>
             <div class="col-md-2"><span ng-bind="candidate.format"></span></div>
@@ -139,5 +144,53 @@
         </div>
     </div>
 
-
 </div>
+
+
+<!-- PHYSICAL SPEC DETAILS POPUP -->
+<script type="text/ng-template"
+        id="wpfes/popup.html">
+    <waltz-no-data ng-if="!$ctrl.popup.specDefinitionFields.length > 0">
+        <message>No field information for this physical specification</message>
+    </waltz-no-data>
+
+    <div ng-if="$ctrl.popup.specDefinitionFields">
+
+        <div>
+            Available fields for <strong ng-bind="candidate.name">
+                                 </strong>
+            <hr>
+        </div>
+
+        <table class="table table-condensed table-striped">
+            <colgroup>
+                <col width="30%">
+                <col width="20%">
+                <col width="50%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="field in $ctrl.popup.specDefinitionFields | orderBy:'position'">
+                <td>
+                    <span ng-bind="field.name">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="field.type">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="field.description">
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>

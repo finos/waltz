@@ -37,6 +37,12 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const getActiveForSpecificationId = (specId) => {
+        return $http
+            .get(`${base}/active/specification/${specId}`)
+            .then(r => r.data);
+    };
+
     const create = (specId, command) => {
         return $http
             .post(`${base}/specification/${specId}`, command)
@@ -59,6 +65,7 @@ export function store($http, baseApiUrl) {
     return {
         findBySelector,
         findForSpecificationId,
+        getActiveForSpecificationId,
         create,
         updateStatus,
         deleteSpecification
@@ -85,6 +92,11 @@ export const PhysicalSpecDefinitionStore_API = {
         serviceName,
         serviceFnName: 'findForSpecificationId',
         description: 'executes findForSpecificationId'
+    },
+    getActiveForSpecificationId: {
+        serviceName,
+        serviceFnName: 'getActiveForSpecificationId',
+        description: 'executes getActiveForSpecificationId'
     },
     create: {
         serviceName,

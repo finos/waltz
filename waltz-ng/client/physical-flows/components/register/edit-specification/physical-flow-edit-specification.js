@@ -18,10 +18,12 @@
  */
 
 import _ from "lodash";
+import { CORE_API } from '../../../../common/services/core-api-utils';
 import {initialiseData} from "../../../../common";
 import {toEntityRef} from '../../../../common/entity-utils';
 import {dataFormatKind} from "../../../../common/services/enums/data-format-kind";
 import {toOptions} from "../../../../common/services/enums";
+
 import template from './physical-flow-edit-specification.html';
 
 
@@ -53,11 +55,14 @@ const initialState = {
         canSubmit: false,
         message: null
     },
-    formatOptions: toOptions(dataFormatKind, true)
+    formatOptions: toOptions(dataFormatKind, true),
+    popup: {
+        specDefinitionFields: []
+    }
 };
 
 
-function controller() {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -110,10 +115,27 @@ function controller() {
     vm.$onInit = () => {
         vm.visibility.search = vm.candidates.length > SEARCH_CUTOFF;
     };
+
+    vm.mouseEnterSpecRow = (spec) => {
+        serviceBroker
+            .loadViewData(CORE_API.PhysicalSpecDefinitionStore.getActiveForSpecificationId, [spec.id])
+            .then(r => r.data)
+            .then(specDefn => {
+                if(specDefn) {
+                    return serviceBroker.loadViewData(CORE_API.PhysicalSpecDefinitionFieldStore.findForSpecDefinitionId, [specDefn.id]);
+                } else {
+                    return Promise.resolve({});
+                }
+            })
+            .then(r => r.data)
+            .then(specDefnFields => vm.popup.specDefinitionFields = specDefnFields);
+    };
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    "ServiceBroker"
+];
 
 
 const component = {

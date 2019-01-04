@@ -93,6 +93,14 @@ public class PhysicalSpecDefinitionDao {
     }
 
 
+    public PhysicalSpecDefinition getActiveForSpecification(long specificationId) {
+        return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
+                .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))
+                .and(PHYSICAL_SPEC_DEFN.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
                 .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))

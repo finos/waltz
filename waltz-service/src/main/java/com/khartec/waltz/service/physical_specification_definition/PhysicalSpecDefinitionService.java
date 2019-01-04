@@ -142,6 +142,11 @@ public class PhysicalSpecDefinitionService {
     }
 
 
+    public PhysicalSpecDefinition getActiveForSpecification(long specificationId) {
+        return physicalSpecDefinitionDao.getActiveForSpecification(specificationId);
+    }
+
+    
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
         return physicalSpecDefinitionDao.findForSpecification(specificationId);
     }
