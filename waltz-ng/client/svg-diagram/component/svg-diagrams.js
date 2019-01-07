@@ -34,10 +34,8 @@ function controller($state, $timeout, localStorageService) {
     const vm = this;
 
     vm.$onInit = () => {
-        const localStorage = localStorageService.get(getKey($state.current.name));
-        if (localStorage){
-            vm.active = localStorage.index;
-        }
+        const activeTab = localStorageService.get(getKey($state.current.name));
+        vm.active = activeTab ? activeTab.index : 0;
     };
 
     vm.show = (index, diagram) => {
