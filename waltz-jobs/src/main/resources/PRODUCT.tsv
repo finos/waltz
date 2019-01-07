@@ -20,7 +20,7 @@ id	parent	Name	kind
 5201	5200	Metals	PRODUCT
 5202	5200	Energy	PRODUCT
 5203	5200	Agricultural	PRODUCT
-5203	5200	Environmental	PRODUCT
+5206	5200	Environmental	PRODUCT
 5204	5200	Freight	PRODUCT
 5205	5200	Multi Commodity Exotic	PRODUCT
 5301	5300	Spot	PRODUCT

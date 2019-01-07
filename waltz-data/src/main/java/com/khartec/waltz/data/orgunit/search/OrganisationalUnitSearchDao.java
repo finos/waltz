@@ -21,6 +21,7 @@ package com.khartec.waltz.data.orgunit.search;
 
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -31,6 +32,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.khartec.waltz.data.JooqUtilities.*;
 
 @Repository
 public class OrganisationalUnitSearchDao {
@@ -57,16 +60,15 @@ public class OrganisationalUnitSearchDao {
 
     private FullTextSearch<OrganisationalUnit> determineSearcher(SQLDialect dialect) {
 
-        if (dialect == SQLDialect.POSTGRES) {
+        if (isPostgres(dialect)) {
             return new PostgresOrganisationalUnitSearch();
         }
 
-        if (dialect == SQLDialect.MARIADB) {
+        if (isMariaDB(dialect)) {
             return new MariaOrganisationalUnitSearch();
         }
 
-        // cannot do direct comparison as may not be present.
-        if (dialect.name().equals("SQLSERVER2014")) {
+        if (isSQLServer(dialect)) {
             return new SqlServerOrganisationalUnitSearch();
         }
 
