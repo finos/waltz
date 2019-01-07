@@ -32,6 +32,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
+import static com.khartec.waltz.data.JooqUtilities.*;
+
 @Repository
 public class MeasurableSearchDao {
 
@@ -58,15 +60,15 @@ public class MeasurableSearchDao {
 
     private FullTextSearch<Measurable> determineSearcher(SQLDialect dialect) {
 
-        if (dialect == SQLDialect.POSTGRES) {
+        if (isPostgres(dialect)) {
             return new PostgresMeasurableSearch();
         }
 
-        if (dialect == SQLDialect.MARIADB) {
+        if (isMariaDB(dialect)) {
             return new MariaMeasurableSearch();
         }
 
-        if (dialect.name().startsWith("SQLSERVER")) {
+        if (isSQLServer(dialect)) {
             return new SqlServerMeasurableSearch();
         }
 

@@ -32,6 +32,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
+import static com.khartec.waltz.data.JooqUtilities.*;
+
 @Repository
 public class PersonSearchDao {
 
@@ -57,15 +59,15 @@ public class PersonSearchDao {
 
     private FullTextSearch<Person> determineSearcher(SQLDialect dialect) {
 
-        if (dialect == SQLDialect.POSTGRES) {
+        if (isPostgres(dialect)) {
             return new PostgresPersonSearch();
         }
 
-        if (dialect == SQLDialect.MARIADB) {
+        if (isMariaDB(dialect)) {
             return new MariaPersonSearch();
         }
 
-        if (dialect.name().equals("SQLSERVER2014")) {
+        if (isSQLServer(dialect)) {
             return new SqlServerPersonSearch();
         }
 

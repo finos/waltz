@@ -161,6 +161,22 @@ public class JooqUtilities {
     }
 
 
+    public static boolean isPostgres(SQLDialect dialect) {
+        return dialect == SQLDialect.POSTGRES;
+    }
+
+
+    public static boolean isMariaDB(SQLDialect dialect) {
+        return dialect == SQLDialect.MARIADB;
+    }
+
+
+    public static boolean isSQLServer(SQLDialect dialect) {
+        // cannot do direct comparison to enum as may not be present (i.e. in community edition)
+        return dialect.name().startsWith("SQLSERVER");
+    }
+
+
     public static class MSSQL {
 
         public static SQL mkContains(Collection<String> terms) {

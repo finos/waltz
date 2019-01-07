@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.data.JooqUtilities.*;
 
 @Repository
 public class ApplicationSearchDao {
@@ -62,15 +63,15 @@ public class ApplicationSearchDao {
 
     private FullTextSearch<Application> determineSearcher(SQLDialect dialect) {
 
-        if (dialect == SQLDialect.POSTGRES) {
+        if (isPostgres(dialect)) {
             return new PostgresAppSearch();
         }
 
-        if (dialect == SQLDialect.MARIADB) {
+        if (isMariaDB(dialect)) {
             return new MariaAppSearch();
         }
 
-        if (dialect.name().startsWith("SQLSERVER")) {
+        if (isSQLServer(dialect)) {
             return new SqlServerAppSearch();
         }
 

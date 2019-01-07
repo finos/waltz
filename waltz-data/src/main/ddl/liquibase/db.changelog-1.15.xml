@@ -398,6 +398,16 @@
 
 
     <!-- Measurables: unique composite index on category and external id  -->
+    <changeSet id="20190102-3687-0"
+               author="davidwatkins73">
+        <update tableName="measurable">
+            <column name="external_id"
+                    value="PRODUCT _ 5206"/>
+            <where>name='Environmental' AND measurable_category_id=4 AND external_id='PRODUCT _ 5203'</where>
+        </update>
+    </changeSet>
+
+
     <changeSet id="20190102-3687-1"
                author="kamransaleem"
                dbms="mysql,postgresql">
