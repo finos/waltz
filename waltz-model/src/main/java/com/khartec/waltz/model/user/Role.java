@@ -19,9 +19,9 @@
 
 package com.khartec.waltz.model.user;
 
+import com.khartec.waltz.common.EnumUtilities;
+
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public enum Role {
@@ -48,9 +48,6 @@ public enum Role {
 
 
     public static Set<String> allNames() {
-        return Stream
-                .of(Role.values())
-                .map(r -> r.name())
-                .collect(Collectors.toSet());
+        return EnumUtilities.names(Role.values());
     }
 }

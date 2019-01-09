@@ -1,7 +1,7 @@
 <div id="people-section">
 
     <waltz-section-actions>
-        <button waltz-has-role-for-entity-kind="{{$ctrl.parentEntityRef.kind}}"
+        <button waltz-has-role-for-entity-kind="{{$ctrl.parentEntityRef.kind}},PERSON"
                 ng-click="$ctrl.editMode(true)"
                 class="btn btn-xs btn-primary"
                 ng-if="$ctrl.visibility.editor === false">

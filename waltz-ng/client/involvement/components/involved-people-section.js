@@ -26,7 +26,7 @@ import {aggregatePeopleInvolvements} from "../involvement-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
@@ -46,13 +46,13 @@ function mkGridData(involvements = [], displayNameService) {
     return _.chain(involvements)
         .map(inv => {
             const roles = _.map(inv.involvements, ik => ({
-                    provenance: ik.provenance,
-                    displayName: displayNameService.lookup('involvementKind', ik.kindId)
-                }));
+                provenance: ik.provenance,
+                displayName: displayNameService.lookup("involvementKind", ik.kindId)
+            }));
 
             const rolesDisplayName = _.chain(roles)
-                .map('displayName')
-                .join(', ')
+                .map("displayName")
+                .join(", ")
                 .value();
 
             return {
@@ -61,7 +61,7 @@ function mkGridData(involvements = [], displayNameService) {
                 rolesDisplayName
             }
         })
-        .sortBy('person.displayName')
+        .sortBy("person.displayName")
         .value();
 }
 
@@ -71,7 +71,7 @@ function mkEntityRef(person) {
         return {
             id: person.id,
             name: person.displayName,
-            kind: 'PERSON'
+            kind: "PERSON"
         };
     }
     return person;
@@ -85,7 +85,7 @@ function mkCurrentInvolvements(involvements = []) {
             return _.map(i.involvements, inv => ({
                 entity: personEntityRef,
                 involvement: +inv.kindId,
-                isReadOnly: inv.provenance !== 'waltz'
+                isReadOnly: inv.provenance !== "waltz"
             }));
         })
         .value();
@@ -133,14 +133,14 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
 
         vm.allowedInvolvements = _.map(
-            displayNameService.getAllByType('involvementKind'),
+            displayNameService.getAllByType("involvementKind"),
             (name, id) => ({ value: +id, name }));
     };
 
     vm.columnDefs = [
         {
-            field: 'person.displayName',
-            displayName: 'Name',
+            field: "person.displayName",
+            displayName: "Name",
             cellTemplate: `
                 <div class="ui-grid-cell-contents"> 
                     <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - 
@@ -149,14 +149,14 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
                     </a>
                 </div>`
         },
-        { field: 'person.title', displayName: 'Title' },
-        { field: 'person.officePhone', displayName: 'Telephone' },
+        { field: "person.title", displayName: "Title" },
+        { field: "person.officePhone", displayName: "Telephone" },
         {
-            field: 'rolesDisplayName',
-            displayName: 'Roles',
+            field: "rolesDisplayName",
+            displayName: "Roles",
             sortingAlgorithm: (a, b) => {
-                const aNames = _.join(_.map(a, 'displayName'));
-                const bNames = _.join(_.map(b, 'displayName'));
+                const aNames = _.join(_.map(a, "displayName"));
+                const bNames = _.join(_.map(b, "displayName"));
                 return aNames.localeCompare(bNames);
             },
             cellTemplate: `
@@ -199,10 +199,10 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
 
 controller.$inject = [
-    '$q',
-    'DisplayNameService',
-    'ServiceBroker',
-    'InvolvedSectionService'
+    "$q",
+    "DisplayNameService",
+    "ServiceBroker",
+    "InvolvedSectionService"
 ];
 
 

@@ -22,13 +22,15 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-list.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
 import roles from "../../../user/roles";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 
 const initialState = {
     category: null,
     visibility: {
         editButton: false
-    }
+    },
+    peopleSection: dynamicSections.involvedPeopleSection
 };
 
 
@@ -43,7 +45,6 @@ function controller($q,
     const categoryId = $stateParams.id;
 
     vm.$onInit = () => {
-
 
         userPreferenceService
             .savePreference(lastViewedMeasurableCategoryKey, categoryId);
@@ -108,7 +109,6 @@ function controller($q,
                 };
             });
     };
-
 
 }
 

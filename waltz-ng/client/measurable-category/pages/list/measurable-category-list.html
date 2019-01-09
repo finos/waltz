@@ -15,7 +15,6 @@
         </ol>
     </waltz-page-header>
 
-
     <div class='waltz-page-summary-attach waltz-page-summary'>
 
         <div class="row">
@@ -87,10 +86,14 @@
                         Maintain
                     </a>
                 </span>
-
-
             </div>
         </div>
     </div>
+
+    <br>
+
+    <waltz-dynamic-section-wrapper section="$ctrl.peopleSection"
+                                   parent-entity-ref="$ctrl.category">
+    </waltz-dynamic-section-wrapper>
 </div>
 

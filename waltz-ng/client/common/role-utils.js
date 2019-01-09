@@ -22,10 +22,15 @@ import roles from "../user/roles";
 
 /**
  * Given an entity kind, returns the user roles required for editing
+ *
+ * Note this file should correspond to the Java impl:
+ * `com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind(...)`
+ *
  * @param kind
+ * @param secondaryKind (Optional) secondary kind
  * @returns role
  */
-export function getEditRoleForEntityKind(kind) {
+export function getEditRoleForEntityKind(kind, secondaryKind) {
     switch (kind) {
         case "APPLICATION":
             return roles.APP_EDITOR.key;
@@ -35,6 +40,10 @@ export function getEditRoleForEntityKind(kind) {
             return roles.CAPABILITY_EDITOR.key;
         case "ORG_UNIT":
             return roles.ORG_UNIT_EDITOR.key;
+        case "MEASURABLE_CATEGORY":
+            return secondaryKind
+                ? roles.CAPABILITY_EDITOR
+                : roles.TAXONOMY_EDITOR;
         case "DATA_TYPE":
             return roles.AUTHORITATIVE_SOURCE_EDITOR.key;
         case "SCENARIO":
