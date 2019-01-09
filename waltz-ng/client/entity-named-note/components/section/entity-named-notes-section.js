@@ -68,7 +68,7 @@ function controller($q, notification, serviceBroker, userService) {
                 .then(recalcAvailableTypes);
         }
 
-        const role = getEditRoleForEntityKind(vm.parentEntityRef.kind);
+        const role = getEditRoleForEntityKind(vm.parentEntityRef.kind, "ENTITY_NAMED_NOTE");
         userService
             .whoami()
             .then(user => vm.hasRole = userService.hasRole(user, role));

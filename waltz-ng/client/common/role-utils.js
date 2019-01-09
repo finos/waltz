@@ -37,13 +37,15 @@ export function getEditRoleForEntityKind(kind, secondaryKind) {
         case "CHANGE_INITIATIVE":
             return roles.CHANGE_INITIATIVE_EDITOR.key;
         case "MEASURABLE":
-            return roles.CAPABILITY_EDITOR.key;
+            return secondaryKind
+                ? roles.CAPABILITY_EDITOR.key
+                : roles.TAXONOMY_EDITOR.key;
         case "ORG_UNIT":
             return roles.ORG_UNIT_EDITOR.key;
         case "MEASURABLE_CATEGORY":
             return secondaryKind
-                ? roles.CAPABILITY_EDITOR
-                : roles.TAXONOMY_EDITOR;
+                ? roles.CAPABILITY_EDITOR.key
+                : roles.TAXONOMY_EDITOR.key;
         case "DATA_TYPE":
             return roles.AUTHORITATIVE_SOURCE_EDITOR.key;
         case "SCENARIO":

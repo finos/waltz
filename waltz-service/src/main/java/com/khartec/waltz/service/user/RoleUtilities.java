@@ -99,7 +99,10 @@ public class RoleUtilities {
 
 
     private static Role getRequiredRoleForMeasurableCategory(Operation op, EntityKind additionalKind) {
-        return CAPABILITY_EDITOR;
+        return Optional
+                .ofNullable(additionalKind)
+                .map(k -> Role.CAPABILITY_EDITOR)
+                .orElse(Role.TAXONOMY_EDITOR);
     }
 
 
