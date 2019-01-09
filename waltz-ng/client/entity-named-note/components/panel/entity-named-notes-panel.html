@@ -63,7 +63,7 @@
                         <span ng-bind="note.namedNoteTypeId | toDisplayName:'entityNamedNoteType'"></span>
                         <span ng-if="! $ctrl.noteTypesById[note.namedNoteTypeId].isReadOnly"
                               class="waltz-visibility-child-30 pull-right"
-                              waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}">
+                              waltz-has-role-for-entity-kind="{{ $ctrl.parentEntityRef.kind }}, ENTITY_NAMED_NOTE">
                             <a class="clickable"
                                ng-click="$ctrl.startEditNote(note)">
                                 <waltz-icon name="pencil"></waltz-icon>

@@ -42,6 +42,7 @@ public class RoleUtilities {
         REQUIRED_ROLES.put(EntityKind.CHANGE_INITIATIVE, RoleUtilities::getRequiredRoleForChangeInitiative);
         REQUIRED_ROLES.put(EntityKind.MEASURABLE, RoleUtilities::getRequiredRoleForMeasurable);
         REQUIRED_ROLES.put(EntityKind.ORG_UNIT, RoleUtilities::getRequiredRoleForOrgUnit);
+        REQUIRED_ROLES.put(EntityKind.MEASURABLE_CATEGORY, RoleUtilities::getRequiredRoleForMeasurableCategory);
     }
 
 
@@ -57,6 +58,9 @@ public class RoleUtilities {
 
 
     /**
+     * Note: this method should correspond with the js file:
+     * <code>role-utils.js:getEditRoleForEntityKind</code>
+     *
      * @param kind Primary entity kind involved in this request
      * @param op Operation to perform (ignored)
      * @param additionalKind Secondary entity kind involved in request
@@ -87,6 +91,14 @@ public class RoleUtilities {
      * is restricted to those with the `TAXONOMY_EDITOR` role.
      */
     private static Role getRequiredRoleForMeasurable(Operation op, EntityKind additionalKind) {
+        return Optional
+                .ofNullable(additionalKind)
+                .map(k -> Role.CAPABILITY_EDITOR)
+                .orElse(Role.TAXONOMY_EDITOR);
+    }
+
+
+    private static Role getRequiredRoleForMeasurableCategory(Operation op, EntityKind additionalKind) {
         return Optional
                 .ofNullable(additionalKind)
                 .map(k -> Role.CAPABILITY_EDITOR)

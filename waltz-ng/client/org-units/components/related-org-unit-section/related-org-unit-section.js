@@ -52,7 +52,7 @@ function canEdit(UserService, entityRef) {
     const kind = entityRef.kind;
     switch(kind){
         case "ROADMAP":
-            const role = getEditRoleForEntityKind(kind);
+            const role = getEditRoleForEntityKind(kind, "ORG_UNIT");
             return UserService
                 .whoami()
                 .then(user => UserService.hasRole(user, role));

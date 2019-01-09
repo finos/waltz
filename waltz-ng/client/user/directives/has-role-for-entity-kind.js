@@ -18,41 +18,56 @@
  */
 
 import {getEditRoleForEntityKind} from "../../common/role-utils";
+import {initialiseData} from "../../common";
 
 
-const BINDINGS = {
-    entityKind: '@waltzHasRoleForEntityKind'
+const bindings = {
+    entityKind: "@waltzHasRoleForEntityKind"
 };
 
 
-function controller($scope, UserService) {
-    const vm = this;
-    vm.show = false;
+const initialState = {
+    show: false
+};
 
-    $scope.$watch('ctrl.entityKind', (nv) => {
-        if (! nv) return;
 
-        const role = getEditRoleForEntityKind(nv);
+const splitRegExp = new RegExp(",\\s*");
+
+/**
+ * NOTE: this is not a true 1.5+ component as we need it to
+ * work as an attribute level directive and components can
+ * only be declared as elements.
+ *
+ * @param UserService
+ */
+function controller(UserService) {
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = (nv) => {
+        if (! vm.entityKind) return;
+        const bits = _.split(vm.entityKind, splitRegExp);
+        const primaryEntity = bits[0];
+        const secondaryEntity = bits[1];
+        const requiredRole = getEditRoleForEntityKind(primaryEntity, secondaryEntity);
         UserService
             .whoami()
-            .then(user => vm.show = UserService.hasRole(user, role));
-    });
+            .then(user => vm.show = UserService.hasRole(user, requiredRole));
+    };
 }
 
 
 controller.$inject = [
-    '$scope',
-    'UserService'
+    "UserService"
 ];
 
 
 export default () => ({
     replace: true,
-    restrict: 'A',
+    restrict: "A",
     transclude: true,
     scope: {},
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
-    template: '<span ng-show="ctrl.show"><ng-transclude></ng-transclude></span>',
+    bindToController: bindings,
+    controllerAs: "$ctrl",
+    template: "<span ng-show=\"$ctrl.show\"><ng-transclude></ng-transclude></span>",
     controller
 });

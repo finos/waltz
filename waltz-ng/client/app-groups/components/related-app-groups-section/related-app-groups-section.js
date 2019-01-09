@@ -54,7 +54,7 @@ function canEdit(serviceBroker, UserService, entityRef) {
         case "CHANGE_INITIATIVE":
             return Promise.resolve(true);
         case "ROADMAP":
-            const role = getEditRoleForEntityKind("ROADMAP");
+            const role = getEditRoleForEntityKind("ROADMAP", "APP_GROUP");
             return UserService
                 .whoami()
                 .then(user => UserService.hasRole(user, role));

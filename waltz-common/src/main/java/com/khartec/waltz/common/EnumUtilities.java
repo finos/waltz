@@ -66,6 +66,13 @@ public class EnumUtilities {
     }
 
 
+    /**
+     * Given an array of enums (typically via <code>MyEnum.values()</code>)
+     * this will return a {@link Set} of the enum names
+     * @param enums Array of enums to get the names from
+     * @param <T> Type of enum values
+     * @return Set of names associated to the given enum
+     */
     public static <T extends Enum> Set<String> names(T... enums) {
         return Stream
                 .of(enums)
@@ -73,8 +80,10 @@ public class EnumUtilities {
                 .collect(Collectors.toSet());
     }
 
+
     public static <T extends Enum> Set<String> names(Collection<T> enums) {
-        return enums.stream()
+        return enums
+                .stream()
                 .map(t -> t.name())
                 .collect(Collectors.toSet());
     }
