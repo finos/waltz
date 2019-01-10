@@ -3,11 +3,13 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 import {determineColorOfSubmitButton} from "../../../common/severity-utils";
+import {buildHierarchies} from "../../../common/hierarchy-utils";
 
 const modes = {
     MENU: "MENU",
     OPERATION: "OPERATION",
 };
+
 
 
 const bindings = {
@@ -17,13 +19,21 @@ const bindings = {
 };
 
 
+const rootNode = {
+    id: "", // setting to empty string so it can be deserialized in java
+    name: "[Root]"
+};
+
+
 const initialState = {
+    commandParams: {},
     modes: modes,
     mode: modes.MENU,
-    submitDisabled: true,
-    commandParams: {},
-    selectedOperation: null,
     preview: null,
+    parent: null,
+    root: rootNode,
+    selectedOperation: null,
+    submitDisabled: true
 };
 
 
@@ -34,11 +44,13 @@ function controller(notification,
     const vm = initialiseData(this, initialState);
 
     function mkCmd(params = {}) {
+        const paramProcessor = vm.selectedOperation.paramProcessor || _.identity;
+
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
             primaryReference: toEntityRef(vm.measurable),
-            params: params,
+            params: paramProcessor(params),
             createdBy: vm.userName,
             lastUpdatedBy: vm.userName
         };
@@ -134,7 +146,31 @@ function controller(notification,
             }, {
                 name: "Move",
                 code: "MOVE",
-                icon: "arrows"
+                icon: "arrows",
+                description: `Taxonomy items can be moved from one part of the tree to another.  Be aware that
+                    child nodes <em>will</em> move with their parent. Also note that this operation may affect the 
+                    <em>cumulative</em> values for the impacted branches.`,
+                onChange: (dest) => {
+                    if (dest.id === vm.parent.id) {
+                        notification.warning("Same parent selected, ignoring....");
+                        vm.commandParams.destination = null;
+                        vm.submitDisabled = true;
+                    } else {
+                        vm.commandParams.destination = dest;
+                        vm.submitDisabled = false;
+                    }
+                },
+                onReset: () => {
+                    vm.commandParams.destination = null;
+                    vm.submitDisabled = true;
+                },
+                onShow: () => {
+                    resetForm();
+                },
+                paramProcessor: (d) => ({
+                    destinationId: d.destination.id,
+                    destinationName: d.destination.name
+                })
             }
         ]
     };
@@ -173,10 +209,6 @@ function controller(notification,
                     const required = [vm.commandParams.name];
                     vm.submitDisabled = _.some(required, _.isEmpty);
                 }
-            }, {
-                name: "Clone",
-                code: "CLONE",
-                icon: "clone"
             }
         ]
     };
@@ -213,6 +245,14 @@ function controller(notification,
         userService
             .whoami()
             .then(u => vm.userName = u.userName);
+
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => {
+                const measurables = _.filter(r.data, { categoryId: vm.changeDomain.id});
+                vm.parent = _.find(measurables, { id: vm.measurable.parentId}) || vm.root;
+                vm.tree = buildHierarchies(measurables, false);
+            });
     };
 
     vm.$onChanges = (c) => {

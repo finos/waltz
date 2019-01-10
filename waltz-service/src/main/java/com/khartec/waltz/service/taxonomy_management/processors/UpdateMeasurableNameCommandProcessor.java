@@ -53,7 +53,7 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
 
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
-        Measurable m = validateMeasurable(measurableService, cmd);
+        Measurable m = validatePrimaryMeasurable(measurableService, cmd);
 
         ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
                 .builder()
@@ -77,7 +77,7 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        validateMeasurable(measurableService, cmd);
+        validatePrimaryMeasurable(measurableService, cmd);
 
         measurableService.updateName(
                 cmd.primaryReference().id(),

@@ -134,4 +134,17 @@ public class MeasurableService {
         return measurableDao
                 .deleteByIdSelector(selector);
     }
+
+
+    /**
+     *
+     * @param measurableId
+     * @param destinationId
+     * @param userId
+     */
+    public boolean move(Long measurableId, Long destinationId, String userId) {
+        checkNotNull(measurableId, "Cannot move a measurable with a null id");
+        return measurableDao.move(measurableId, destinationId, userId);
+
+    }
 }

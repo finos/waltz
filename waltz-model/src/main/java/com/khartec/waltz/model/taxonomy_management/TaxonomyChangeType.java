@@ -11,7 +11,6 @@ public enum TaxonomyChangeType {
     UPDATE_CONCRETENESS,
     UPDATE_EXTERNAL_ID,
     MOVE,
-    MERGE,
-    CLONE
+    MERGE
 
 }

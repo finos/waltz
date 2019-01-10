@@ -81,6 +81,9 @@
                 <span ng-if="$ctrl.visibility.editButton">
                     &nbsp;
                     <a class="btn btn-primary btn-xs clickable"
+                       uib-popover="Maintain the taxonomy (add, update, delete, move etc.)"
+                       popover-placement="bottom"
+                       popover-trigger="mouseenter"
                        ui-sref="main.measurable-category.edit ({id: $ctrl.category.id})">
                         <waltz-icon name="wrench"></waltz-icon>
                         Maintain
