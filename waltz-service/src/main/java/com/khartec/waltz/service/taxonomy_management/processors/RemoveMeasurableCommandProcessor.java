@@ -65,7 +65,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
-        Measurable primaryMeasurable = validateMeasurable(measurableService, cmd);
+        Measurable primaryMeasurable = validatePrimaryMeasurable(measurableService, cmd);
 
         ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
                 .builder()
@@ -131,7 +131,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        validateMeasurable(measurableService, cmd);
+        validatePrimaryMeasurable(measurableService, cmd);
 
 
         IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);

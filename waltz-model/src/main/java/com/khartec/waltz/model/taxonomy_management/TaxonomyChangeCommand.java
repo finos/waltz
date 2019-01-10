@@ -9,6 +9,7 @@ import org.immutables.value.Value;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
 
 @Value.Immutable
 @JsonSerialize(as =  ImmutableTaxonomyChangeCommand.class)
@@ -72,6 +73,12 @@ public abstract class TaxonomyChangeCommand implements
 
     public boolean paramAsBoolean(String key, boolean dflt) {
         return Boolean.valueOf(params().getOrDefault(key, Boolean.toString(dflt)));
+    }
+
+
+    public Long paramAsLong(String key, Long dflt) {
+        String strVal = params().get(key);
+        return isEmpty(strVal) ? dflt : Long.valueOf(strVal);
     }
 
 

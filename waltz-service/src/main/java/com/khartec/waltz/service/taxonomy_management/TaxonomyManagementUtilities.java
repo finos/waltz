@@ -21,9 +21,17 @@ import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 public class TaxonomyManagementUtilities {
 
 
-    public static Measurable validateMeasurable(MeasurableService measurableService,
-                                                TaxonomyChangeCommand cmd) {
+    public static Measurable validatePrimaryMeasurable(MeasurableService measurableService,
+                                                       TaxonomyChangeCommand cmd) {
         long measurableId = cmd.primaryReference().id();
+        long categoryId = cmd.changeDomain().id();
+        return validateMeasurableInCategory(measurableService, measurableId, categoryId);
+    }
+
+
+    public static Measurable validateMeasurableInCategory(MeasurableService measurableService,
+                                                long measurableId,
+                                                long categoryId) {
         Measurable measurable = measurableService.getById(measurableId);
 
         checkNotNull(
@@ -32,11 +40,11 @@ public class TaxonomyManagementUtilities {
                 measurableId);
 
         checkTrue(
-                cmd.changeDomain().id() == measurable.categoryId(),
+                categoryId == measurable.categoryId(),
                 "Measurable [%s / %d] is not in category [%d], instead it is in category [%d]",
                 measurable.name(),
                 measurable.id(),
-                cmd.changeDomain().id(),
+                categoryId,
                 measurable.categoryId());
 
         return measurable;

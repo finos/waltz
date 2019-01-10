@@ -30,6 +30,8 @@ import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,6 +50,8 @@ import static java.util.Optional.ofNullable;
 
 @Repository
 public class MeasurableDao implements FindEntityReferencesByIdSelector {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MeasurableDao.class);
 
     public static RecordMapper<Record, Measurable> TO_DOMAIN_MAPPER = record -> {
         MeasurableRecord r = record.into(MEASURABLE);
@@ -199,4 +203,31 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.ID.in(selector))
                 .execute();
     }
+
+
+    public boolean move(Long measurableId, Long destinationId, String userId) {
+        LOG.info(
+                "Moving measurable: {} to {}",
+                measurableId,
+                destinationId == null
+                        ? "root of category"
+                        : destinationId);
+
+        Select<? extends Record1<String>> destinationExtId = destinationId == null
+                ? null
+                : DSL
+                    .select(MEASURABLE.EXTERNAL_ID)
+                    .from(MEASURABLE)
+                    .where(MEASURABLE.ID.eq(destinationId));
+
+        return dsl
+                .update(MEASURABLE)
+                .set(MEASURABLE.PARENT_ID, destinationId)
+                .set(MEASURABLE.EXTERNAL_PARENT_ID, destinationExtId)
+                .set(MEASURABLE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(MEASURABLE.LAST_UPDATED_BY, userId)
+                .where(MEASURABLE.ID.eq(measurableId))
+                .execute() == 1;
+    }
+
 }

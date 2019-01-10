@@ -61,20 +61,16 @@ public class FunctionUtilities {
      * @param name The name to use when logging timing information
      * @param supplier The function that performs the calculation to be timed
      * @param <T> Return type of the supplier
-     * @return
+     * @return The value produced by the supplier
      */
     public static <T> T time(String name, Supplier<T> supplier) {
-        // LOG.info("-- begin [" + name + "]");
-
         long st = System.currentTimeMillis();
 
         try {
             T r = supplier.get();
             long end = System.currentTimeMillis();
 
-            // LOG.info("-- end [" + name + "]");
-            LOG.info("-- dur [" + name + "]: " + (end - st));
-            //LOG.info("-- result [" + name + "]: " + r);
+            LOG.info("-- dur [{}]: {}", name, (end - st));
             return r;
         } catch (Exception e) {
             String msg = String.format("Unexpected error when timing [%s]: %s", name, e.getMessage());

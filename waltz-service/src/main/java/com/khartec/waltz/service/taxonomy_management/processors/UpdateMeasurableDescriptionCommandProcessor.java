@@ -1,7 +1,6 @@
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -49,7 +48,7 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
 
     public TaxonomyChangePreview preview(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
-        Measurable m = validateMeasurable(measurableService, cmd);
+        Measurable m = validatePrimaryMeasurable(measurableService, cmd);
 
         ImmutableTaxonomyChangePreview.Builder preview = ImmutableTaxonomyChangePreview
                 .builder()
@@ -74,7 +73,7 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        validateMeasurable(measurableService, cmd);
+        validatePrimaryMeasurable(measurableService, cmd);
 
         measurableService.updateDescription(
                 cmd.primaryReference().id(),
