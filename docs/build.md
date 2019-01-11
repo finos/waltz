@@ -8,6 +8,7 @@ Waltz is built using [Maven](https://maven.apache.org/).
 - [Maven 3](https://maven.apache.org/)
 - [JDK 8](http://www.oracle.com/technetwork/java/javase/overview/index.html)
 - [Node](https://nodejs.org/en/)
+  - [NPM](https://www.npmjs.com/) v6+
 - [Sass](http://sass-lang.com/)
 - Database - either
   - [MariaDB](https://mariadb.org/)
