@@ -64,8 +64,7 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
         });
 
     $locationProvider
-        .html5Mode(true)
-        .hashPrefix("#");
+        .html5Mode(true);
 }
 
 configureRoutes.$inject = [
