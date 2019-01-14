@@ -85,7 +85,8 @@ function controller() {
         const promise = vm.onSave(vm.itemId, data);
 
         if (promise) {
-            promise.then(saveComplete, saveFailed)
+            promise.then(saveComplete, saveFailed);
+            vm.initialVal = data.newVal;
         } else {
             saveComplete();
         }

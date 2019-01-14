@@ -1,34 +1,26 @@
 <waltz-sub-section name="Assessments">
     <content>
         <div class="waltz-sub-section-content">
-            <div ng-if="! $ctrl.visibility.editor"
-                 class="waltz-highlight-if">
-                <waltz-assessment-rating-panel parent-entity-ref="$ctrl.parentEntityRef">
-                </waltz-assessment-rating-panel>
-            </div>
-            <div ng-if="$ctrl.visibility.editor"
-                 class="waltz-highlight-if">
-                <waltz-assessment-rating-editor parent-entity-ref="$ctrl.parentEntityRef">
-                </waltz-assessment-rating-editor>
+            <div ng-switch="$ctrl.mode">
+                <div ng-switch-when="LIST">
+                    <waltz-assessment-rating-list assessments="$ctrl.assessments"
+                                                  on-select="$ctrl.onSelect">
+                    </waltz-assessment-rating-list>
+                </div>
+                <div ng-switch-when="VIEW">
+                    <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
+                                             on-save="$ctrl.onSave">
+                    </waltz-assessment-editor>
+                    <a ng-click="$ctrl.onClose()"
+                       class="clickable pull-right">
+                        <waltz-icon name="close"></waltz-icon>
+                    </a>
+                    <a ng-click="$ctrl.onRemove($ctrl.selectedAssessment)"
+                       class="clickable">
+                        <waltz-icon name="trash"></waltz-icon>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="waltz-sub-section-controls"
-             ng-if="$ctrl.visibility.editBtn">
-            <span>
-                <a ng-click="$ctrl.visibility.editor = true"
-                   ng-if="! $ctrl.visibility.editor"
-                   class="clickable"
-                   waltz-has-role="{{ $ctrl.editRole }}">
-                    Edit
-                </a>
-
-                <a ng-click="$ctrl.visibility.editor = false"
-                   ng-if="$ctrl.visibility.editor"
-                   class="clickable">
-                    Done
-                </a>
-            </span>
-        </div>
-
     </content>
 </waltz-sub-section>
