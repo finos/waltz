@@ -37,69 +37,69 @@ export function mkRatingsKeyHandler(ratings,
 }
 
 export const baseRagNames = {
-    'R': {
-        rating: 'R',
-        name: 'Poor',
+    "R": {
+        rating: "R",
+        name: "Poor",
         position: 30,
-        color: '#DA524B'
+        color: "#DA524B"
     },
-    'A': {
-        rating: 'A',
-        name: 'Adequate',
+    "A": {
+        rating: "A",
+        name: "Adequate",
         position: 20,
-        color: '#D9923F'
+        color: "#D9923F"
     },
-    'G': {
-        rating: 'G',
-        name: 'Good',
+    "G": {
+        rating: "G",
+        name: "Good",
         position: 10,
-        color: '#5BB65D'
+        color: "#5BB65D"
     },
-    'Z': {
-        rating: 'Z',
-        name: 'Unknown',
+    "Z": {
+        rating: "Z",
+        name: "Unknown",
         position: 40,
-        color: '#939393'
+        color: "#939393"
     },
-    'X': {
-        rating: 'X',
-        name: 'Not Applicable',
+    "X": {
+        rating: "X",
+        name: "Not Applicable",
         position: 50,
-        color: '#D1D1D1'
+        color: "#D1D1D1"
     }
 };
 
 
 export const investmentRagNames = {
-    'R': {
-        rating: 'R',
-        name: 'Disinvest',
+    "R": {
+        rating: "R",
+        name: "Disinvest",
         position: 30,
-        color: '#DA524B'
+        color: "#DA524B"
     },
-    'A': {
-        rating: 'A',
-        name: 'Maintain',
+    "A": {
+        rating: "A",
+        name: "Maintain",
         position: 20,
-        color: '#D9923F'
+        color: "#D9923F"
     },
-    'G': {
-        rating: 'G',
-        name: 'Invest',
+    "G": {
+        rating: "G",
+        name: "Invest",
         position: 10,
-        color: '#5BB65D'
+        color: "#5BB65D"
     },
-    'Z': {
-        rating: 'Z',
-        name: 'Unknown',
+    "Z": {
+        rating: "Z",
+        name: "Unknown",
         position: 40,
-        color: '#939393'
+        color: "#939393"
     },
-    'X': {
-        rating: 'X',
-        name: 'Not Applicable',
+    "X": {
+        rating: "X",
+        name: "Not Applicable",
         position: 50,
-        color: '#D1D1D1'
+        color: "#D1D1D1"
     }
 };
 
@@ -110,9 +110,9 @@ const ragNameSchemes = {
 };
 
 
-export function ragToRatingSchemeItem(code = 'Z', schemeName = 'base') {
+export function ragToRatingSchemeItem(code = "Z", schemeName = "base") {
     const scheme = ragNameSchemes[schemeName] || baseRagNames;
-    return scheme[code] || scheme['Z'];
+    return scheme[code] || scheme["Z"];
 }
 
 
@@ -124,8 +124,8 @@ export function ragToRatingSchemeItem(code = 'Z', schemeName = 'base') {
 export function indexRatingSchemes(schemes = []) {
     return _.chain(schemes)
         .map(scheme => Object.assign({}, scheme, {
-            ratingsByCode: _.keyBy(scheme.ratings, 'rating'),
-            ratingsById: _.keyBy(scheme.ratings, 'id'),
+            ratingsByCode: _.keyBy(scheme.ratings, "rating"),
+            ratingsById: _.keyBy(scheme.ratings, "id"),
         }))
         .keyBy("id")
         .value();
@@ -134,38 +134,54 @@ export function indexRatingSchemes(schemes = []) {
 export function distinctRatingCodes(schemes = {}) {
     return _.chain(schemes)
         .flatMap((v,k) => v.ratings)
-        .map('rating')
+        .map("rating")
         .uniq()
         .value();
 }
 
 
 export function mkAuthoritativeRatingSchemeItems(displayNameService) {
-    const resolveName = k => displayNameService.lookup('AuthoritativenessRating', k);
+    const resolveName = k => displayNameService.lookup("AuthoritativenessRating", k);
     return {
-        'DISCOURAGED': {
-            rating: 'R',
-            name: resolveName('DISCOURAGED'),
+        "DISCOURAGED": {
+            rating: "R",
+            name: resolveName("DISCOURAGED"),
             position: 30,
-            color: '#DA524B'
-       },
-       'SECONDARY': {
-            rating: 'A',
-            name: resolveName('SECONDARY'),
-            position: 20,
-            color: '#D9923F'
-       },
-       'PRIMARY': {
-            rating: 'G',
-            name: resolveName('PRIMARY'),
-            position: 10,
-            color: '#5BB65D'
+            color: "#DA524B"
         },
-       'NO_OPINION': {
-            rating: 'Z',
-            name: resolveName('NO_OPINION'),
+        "SECONDARY": {
+            rating: "A",
+            name: resolveName("SECONDARY"),
+            position: 20,
+            color: "#D9923F"
+        },
+        "PRIMARY": {
+            rating: "G",
+            name: resolveName("PRIMARY"),
+            position: 10,
+            color: "#5BB65D"
+        },
+        "NO_OPINION": {
+            rating: "Z",
+            name: resolveName("NO_OPINION"),
             position: 40,
-            color: '#939393'
+            color: "#939393"
         }
     };
+}
+
+
+export function getDefaultRating(ratings = []) {
+    const defaultRating = _
+        .chain(ratings)
+        .sortBy(["position"])
+        .head()
+        .value();
+
+    const fallback = () => {
+        console.log("Could not determine default rating, using hard-coded [G]", { givenRatings: ratings });
+        return "G";
+    };
+
+    return _.get(defaultRating, ["rating"], fallback());
 }

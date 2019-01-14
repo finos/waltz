@@ -6,6 +6,7 @@ import {event, select, selectAll} from "d3-selection";
 import roles from "../../../user/roles";
 
 import template from "./roadmap-scenario-diagram.html";
+import {getDefaultRating} from "../../../ratings/rating-utils";
 
 
 const bindings = {
@@ -199,7 +200,7 @@ function controller($q,
 
 
     function mkAxisItemMenu() {
-        return (data, elem, index) => {
+        return (data) => {
             const hide = {
                 title: "Hide",
                 action: (elm, d) => $timeout(() => {
@@ -230,7 +231,7 @@ function controller($q,
 
             return _.compact([
                 hide,
-                data.axisOrientation === 'COLUMN' ? contract : null,
+                data.axisOrientation === "COLUMN" ? contract : null,
                 data.axisOrientation === 'COLUMN' ? expand : null
             ]);
         };
@@ -377,12 +378,7 @@ function controller($q,
 
 
     const getLastOrDefaultRating = (app) => {
-        const getDefaultRating = () => _.chain(vm.ratingsByCode)
-            .values()
-            .sortBy(["position"])
-            .head()
-            .value();
-        return _.get(vm.lastRatings, [app.id], getDefaultRating())
+        return vm.lastRatings[app.id] || getDefaultRating(_.values(vm.ratingsByCode));
     };
 
 
