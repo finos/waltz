@@ -57,7 +57,7 @@ function controller(notification) {
 
 
 controller.$inject = [
-    'Notification'
+    "Notification"
 ];
 
 

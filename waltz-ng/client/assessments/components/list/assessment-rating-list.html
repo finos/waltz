@@ -18,7 +18,7 @@
                         <col width="70%">
                     </colgroup>
                     <tbody>
-                        <tr ng-repeat="def in $ctrl.assessments">
+                        <tr ng-repeat="item in $ctrl.assessments">
 
                             <!-- definition name -->
                             <td class="wft-label">
@@ -27,41 +27,37 @@
                                       popover-trigger="mouseenter"
                                       popover-popup-delay="300"
                                       popover-append-to-body="true">
-                                    <span ng-bind="def.definition.name"></span>
-                                    <span class="small text-muted"
-                                          ng-if="def.definition.externalId">
-                                        (<span ng-bind="def.definition.externalId"> </span>)
-                                    </span>
+                                    <span ng-bind="item.definition.name"></span>
                                 </span>
                             </td>
                             <!-- rating -->
                             <td valign="top">
-                                <span ng-if="def.rating"
+                                <span ng-if="item.rating"
                                       uib-popover-template="'arp-popover.html'"
                                       popover-placement="right"
                                       popover-trigger="mouseenter"
                                       popover-popup-delay="300"
                                       popover-append-to-body="true">
-                                    <a ng-click="$ctrl.onSelect(def)"
+                                    <a ng-click="$ctrl.onSelect(item)"
                                        class="clickable">
-                                        <waltz-rating-indicator-cell rating="def.ratingItem">
+                                        <waltz-rating-indicator-cell rating="item.ratingItem">
                                         </waltz-rating-indicator-cell>
-                                        <span ng-bind="def.ratingItem.name">
+                                        <span ng-bind="item.ratingItem.name">
                                         </span>
                                     </a>
-                                    <span ng-if="def.rating.description">
+                                    <span ng-if="item.rating.description">
                                         <br>
                                         <span class="small text-muted"
                                               style="padding-left: 22px"
-                                              ng-bind="def.rating.description | limitTo: 30">
+                                              ng-bind="item.rating.description | limitTo: 30">
                                         </span>
-                                        <span ng-if="def.rating.description.length > 30">
+                                        <span ng-if="item.rating.description.length > 30">
                                             ...
                                         </span>
                                     </span>
                                 </span>
-                                <span ng-if="!def.rating">
-                                    <a ng-click="$ctrl.onSelect(def)"
+                                <span ng-if="!item.rating">
+                                    <a ng-click="$ctrl.onSelect(item)"
                                        class="clickable">Not Provided</a>
                                 </span>
                             </td>
@@ -78,9 +74,9 @@
     <div>
         <div>
             <div>
-                <strong ng-bind="def.ratingItem.name"></strong>
+                <strong ng-bind="item.ratingItem.name"></strong>
             </div>
-            <span ng-bind="def.rating.description"
+            <span ng-bind="item.rating.description"
                    class="text-muted">
             </span>
         </div>
@@ -88,7 +84,7 @@
         <br>
 
         <div class="small">
-            <waltz-last-updated entity="def.rating">
+            <waltz-last-updated entity="item.rating">
             </waltz-last-updated>
         </div>
     </div>
@@ -100,13 +96,13 @@
     <div>
         <div>
             <div>
-                <strong ng-bind="def.name"></strong>
+                <strong ng-bind="item.name"></strong>
                 <span class="small text-muted"
-                      ng-if="def.externalId">
-                    (<span ng-bind="def.externalId"> </span>)
+                      ng-if="item.externalId">
+                    (<span ng-bind="item.externalId"> </span>)
                 </span>
             </div>
-            <div ng-bind="def.description"
+            <div ng-bind="item.description"
                   class="text-muted">
             </div>
         </div>

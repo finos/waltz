@@ -9,10 +9,7 @@
                 </colgroup>
                 <tr>
                     <td class="wft-label">
-                        <span ng-bind="$ctrl.assessment.ratingItem.name"></span>
-                        <span ng-if="$ctrl.assessment.definition.externalId">
-                                (<span ng-bind="$ctrl.assessment.definition.externalId"> </span>)
-                        </span>
+                        <span ng-bind="$ctrl.assessment.definition.name"></span>
                     </td>
                     <td valign="top">
                         <span ng-if="$ctrl.assessment.definition.isReadOnly === false">
@@ -20,11 +17,12 @@
                                                      entries="$ctrl.assessment.dropdownEntries"
                                                      comments-allowed="false"
                                                      on-save="$ctrl.onSaveRating"
-                                                     empty-label="No rating, add one here first"
+                                                     empty-label="No rating provided"
                                                      edit-role="{{ $ctrl.assessment.definition.permittedRole }}"
                                                      ctx="$ctrl.assessment">
                             </waltz-editable-dropdown>
                             <waltz-editable-field field-type="textarea"
+                                                  ng-if="$ctrl.assessment.rating"
                                                   on-save="$ctrl.onSaveDescription"
                                                   initial-val="$ctrl.assessment.rating.description"
                                                   empty-label="No description provided"
