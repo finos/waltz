@@ -39,7 +39,11 @@ function controller($q, serviceBroker) {
                 vm.ratingSchemes = ratingSchemes;
 
                 vm.assessments = mkEnrichedAssessmentDefinitions(vm.assessmentDefinitions, vm.ratingSchemes, vm.assessmentRatings);
-                console.log("after reload", vm.assessments);
+                if (vm.selectedAssessment) {
+                    // re-find the selected assessment
+                    vm.selectedAssessment = _.find(vm.assessments, a => a.definition.id === vm.selectedAssessment.definition.id);
+                }
+                console.log("after reload", { a: vm.assessments, s: vm.selectedAssessment })
             });
     };
 
@@ -74,7 +78,7 @@ function controller($q, serviceBroker) {
             : CORE_API.AssessmentRatingStore.create;
         return serviceBroker
             .execute(saveMethod, [vm.parentEntityRef, ctx.definition.id, value, comments])
-            .then(d => console.log("saved", vm.assessments));
+            .then(d => loadAll());
     };
 
 
