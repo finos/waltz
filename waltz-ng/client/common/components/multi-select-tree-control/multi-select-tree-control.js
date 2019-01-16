@@ -51,13 +51,6 @@ function haltEvent() {
 }
 
 
-function expandSearchNotes(hierarchy = []) {
-    return hierarchy.length < 30  // pre-expand small trees
-        ? _.clone(hierarchy)
-        : [];
-}
-
-
 function mkCheckedMap(nodes = [], checked = []) {
     return _.reduce(nodes, (acc, n) => {
         acc[n.id] = _.includes(checked, n.id);
