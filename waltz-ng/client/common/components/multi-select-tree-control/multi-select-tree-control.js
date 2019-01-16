@@ -52,7 +52,6 @@ function haltEvent() {
 
 
 function expandSearchNotes(hierarchy = []) {
-    console.log("esn", { hierarchy });
     return hierarchy.length < 30  // pre-expand small trees
         ? _.clone(hierarchy)
         : [];
