@@ -43,7 +43,6 @@ function controller($q, serviceBroker) {
                     // re-find the selected assessment
                     vm.selectedAssessment = _.find(vm.assessments, a => a.definition.id === vm.selectedAssessment.definition.id);
                 }
-                console.log("after reload", { a: vm.assessments, s: vm.selectedAssessment })
             });
     };
 
@@ -64,7 +63,6 @@ function controller($q, serviceBroker) {
     };
 
     vm.onRemove = (ctx) => {
-        console.log("REMOVING VALUE", ctx);
         return serviceBroker
             .execute(CORE_API.AssessmentRatingStore.remove, [vm.parentEntityRef, ctx.definition.id])
             .then(() => vm.onClose());
@@ -72,7 +70,6 @@ function controller($q, serviceBroker) {
 
 
     vm.onSave = (value, comments, ctx) => {
-        console.log({value: value, comments: comments, ctx: ctx});
         const saveMethod = ctx.rating
             ? CORE_API.AssessmentRatingStore.update
             : CORE_API.AssessmentRatingStore.create;

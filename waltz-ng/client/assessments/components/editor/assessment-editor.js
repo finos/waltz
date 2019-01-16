@@ -35,16 +35,13 @@ const initialState = {
 
 function controller(notification) {
     const vm = initialiseData(this, initialState);
-    console.log("selected ass", vm.assessment);
 
     vm.onSaveRating = (value) => {
         const comments = vm.assessment.rating ? vm.assessment.rating.description : "";
-        console.log("osr", { value, vm, description: comments});
         return vm.onSave(value, comments, vm.assessment);
     };
 
     vm.onSaveDescription = (value, comments) => {
-        console.log("osd", { value, comments, vm});
         const rating = vm.assessment.rating;
         if (rating){
             return vm.onSave(rating.ratingId, comments.newVal, vm.assessment);
