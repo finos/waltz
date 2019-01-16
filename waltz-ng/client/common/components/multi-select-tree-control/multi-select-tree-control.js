@@ -35,10 +35,8 @@ const bindings = {
 
 
 const initialState = {
-    items: [],
     expandedItemIds: [],
     expandedNodes: [],
-    checkedItemIds: [],
     checkedMap: {},
     hierarchy: [],
     onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
@@ -47,8 +45,15 @@ const initialState = {
 };
 
 
+function haltEvent() {
+    preventDefault(event);
+    stopPropagation(event);
+}
+
+
 function expandSearchNotes(hierarchy = []) {
-    return hierarchy.length < 6  // pre-expand small trees
+    console.log("esn", { hierarchy });
+    return hierarchy.length < 30  // pre-expand small trees
         ? _.clone(hierarchy)
         : [];
 }
@@ -111,24 +116,25 @@ function controller() {
 
     vm.onNodeCheck = (id) => {
         invokeFunction(vm.onCheck, id);
-        preventDefault(event);
-        stopPropagation(event);
+        haltEvent();
     };
+
 
     vm.onNodeUncheck = (id) => {
         invokeFunction(vm.onUncheck, id);
-        preventDefault(event);
-        stopPropagation(event);
+        haltEvent();
     };
 
     vm.$onChanges = changes => {
         if(changes.items) {
-            vm.hierarchy = buildHierarchies(vm.items);
+            vm.hierarchy = buildHierarchies(vm.items, false);
             vm.searchNodes = prepareSearchNodes(vm.items);
         }
 
-        if(!expandedItemsLatch && (changes.items || changes.expandedItemIds)) {
-            if (vm.expandedItemIds && vm.items) {
+        if(changes.items || changes.expandedItemIds) {
+            if (expandedItemsLatch) {
+                return;
+            } else if (vm.expandedItemIds && vm.items) {
                 vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
                 expandedItemsLatch = true;
             }
@@ -139,11 +145,11 @@ function controller() {
 
     vm.searchTermsChanged = (termStr = "") => {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
-        vm.hierarchy = buildHierarchies(matchingNodes);
+        vm.hierarchy = buildHierarchies(matchingNodes, false);
 
         vm.expandedNodes = termStr.length === 0
             ? expandSelectedNodes(vm.items, vm.expandedItemIds)
-            : expandSearchNotes(vm.hierarchy);
+            : matchingNodes;
     };
 
     vm.clearSearch = () => {
