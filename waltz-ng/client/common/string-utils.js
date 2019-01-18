@@ -196,3 +196,11 @@ export function toPercentage(numerator = 0, denominator = 0, fixedPlaces = 1) {
         : Number(((numerator / denominator) * 100).toFixed(fixedPlaces)).toString();
 }
 
+
+/**
+ * Formats the given object into a JSON string representation
+ * @param d - object to format
+ */
+export function fmt(d){
+    return JSON.stringify(d, null, 2);
+}

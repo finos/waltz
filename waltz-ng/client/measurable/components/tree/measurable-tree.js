@@ -75,13 +75,6 @@ function prepareTree(measurables = []) {
 }
 
 
-function prepareExpandedNodes(hierarchy = []) {
-    return hierarchy.length < 6  // pre-expand small trees
-        ? _.clone(hierarchy)
-        : [];
-}
-
-
 function prepareChartScale(hierarchy) {
     const maxCount = _.get(
             _.maxBy(hierarchy, "totalCount"),
@@ -96,7 +89,14 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.searchTermsChanged = (termStr = "") => {
-        vm.hierarchy = prepareTree(doSearch(termStr, vm.searchNodes));
+        if (termStr === "") {
+            vm.hierarchy = prepareTree(vm.measurables);
+            vm.expandedNodes = [];
+        } else {
+            const matchedNodes = doSearch(termStr, vm.searchNodes);
+            vm.hierarchy = prepareTree(matchedNodes);
+            vm.expandedNodes = matchedNodes;
+        }
     };
 
     vm.clearSearch = () => {
@@ -108,7 +108,7 @@ function controller() {
         if (c.measurables) {
             vm.searchNodes = prepareSearchNodes(vm.measurables);
             vm.hierarchy = prepareTree(vm.measurables);
-            vm.expandedNodes = prepareExpandedNodes(vm.hierarchy);
+            vm.expandedNodes = [];
             vm.chartScale = prepareChartScale(vm.hierarchy);
         }
     };

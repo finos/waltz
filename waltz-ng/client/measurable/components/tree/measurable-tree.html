@@ -8,6 +8,7 @@
     <input type='search'
            class="form-control"
            name="searchTerms"
+           autocomplete="off"
            ng-model="$ctrl.searchTerms"
            ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
            ng-model-options="{ debounce: 200 }"

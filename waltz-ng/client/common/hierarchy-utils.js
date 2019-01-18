@@ -16,29 +16,36 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
 /**
  *  Given a set of nodes with id and parentId constructs a 'searchStr' property for each
- *  node which is the concatenation of a specified property (attr) of all the nodes
+ *  node which is the concatenation of a specified property (attr) (or function) of all the nodes
  *  parent nodes.
  */
-export function prepareSearchNodes(nodes = [], attr = 'name', parentKey = 'parentId') {
-    const nodesById = _.keyBy(nodes, 'id');
+export function prepareSearchNodes(nodes = [],
+                                   attr = "name",
+                                   parentKey = "parentId") {
+    const nodesById = _.keyBy(nodes, "id");
+
+    const attrFn = _.isString(attr)
+        ? n => n[attr]
+        : attr;
 
     return _.map(nodes, n => {
         let ptr = n;
-        let searchStr = '';
+        let searchStr = "";
         const nodePath = [];
         while (ptr) {
             nodePath.push(ptr);
-            searchStr += (ptr[attr] || '') + ' ';
+            searchStr += (attrFn(ptr) || "") + " ";
             const parentId = ptr[parentKey];
             ptr = nodesById[parentId];
         }
         return {
             searchStr: searchStr.toLowerCase(),
+            node: n,
             nodePath
         };
     });
@@ -54,17 +61,17 @@ export function prepareSearchNodes(nodes = [], attr = 'name', parentKey = 'paren
  * @param termStr
  * @param searchNodes
  */
-export function doSearch(termStr = '', searchNodes = []) {
+export function doSearch(termStr = "", searchNodes = []) {
     const terms = _.split(termStr.toLowerCase(), /\W+/);
 
     return _
         .chain(searchNodes)
         .filter(sn => {
             const noTerms = termStr.trim().length === 0;
-            const allMatch = _.every(terms, t => sn.searchStr.indexOf(t) >=0)
+            const allMatch = _.every(terms, t => sn.searchStr.indexOf(t) >=0);
             return noTerms || allMatch;
         })
-        .flatMap('nodePath')
+        .flatMap("nodePath")
         .uniqBy(n => n.id)
         .value();
 }
@@ -87,7 +94,7 @@ export function doSearch(termStr = '', searchNodes = []) {
 export function populateParents(nodes, parentsAsRefs = true) {
     const byId = _.chain(_.cloneDeep(nodes))
         .map(u => _.merge(u, { children: [], parent: null }))
-        .keyBy('id')
+        .keyBy("id")
         .value();
 
     _.each(_.values(byId), u => {
