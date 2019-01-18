@@ -31,10 +31,17 @@
 
 
 
-    <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
+    <waltz-no-data xxng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
         <message>
-            <strong>No Physical Flow</strong> detail available for this
+            <strong>No Physical Flow</strong> detail available for this.
             <span ng-bind="$ctrl.primaryRef.kind | toDisplayName:'entity'">
+            </span>
+            <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                Add one
+                 <a class="clickable"
+                    ui-sref="main.physical-flow.registration ($ctrl.primaryRef)">
+                    Here
+                </a>
             </span>
         </message>
     </waltz-no-data>
