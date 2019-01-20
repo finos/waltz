@@ -24,6 +24,7 @@ import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -58,8 +59,9 @@ public class MeasurableRatingHarness {
         List<MeasurableRatingTally> directTallies = measurableRatingDao.statsForRelatedMeasurable(directSelector);
         List<MeasurableRatingTally> indirectTallies = measurableRatingDao.statsForRelatedMeasurable(indirectSelector);
 
-        System.out.printf("Direct / %d\n", directTallies.size());
-        System.out.printf("Indirect / %d\n", indirectTallies.size());
+
+        List<Tally<Long>> tallies = measurableRatingDao.tallyByMeasurableCategoryId(1L);
+        System.out.println(tallies);
     }
 
 }

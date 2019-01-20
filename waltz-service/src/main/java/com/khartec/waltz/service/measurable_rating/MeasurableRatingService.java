@@ -134,7 +134,7 @@ public class MeasurableRatingService {
      * @param ref EntityReference of the entity linked to the measurables
      * @param categoryId  Measurable Category identifier
      * @param username who is doing the removal
-     * @return
+     * @return The remaining mappings for the given entity
      */
     public Collection<MeasurableRating> removeForCategory(EntityReference ref, long categoryId, String username) {
         checkNotNull(ref, "Cannot remove entity ratings for a category if the given entity reference is null");
@@ -143,7 +143,7 @@ public class MeasurableRatingService {
                 measurableCategoryDao.getById(categoryId),
                 "Cannot find category: %d", categoryId);
 
-        int numRemoved = measurableRatingDao.removeForCategory(ref, categoryId);
+        measurableRatingDao.removeForCategory(ref, categoryId);
 
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(format("Removed all ratings for category: %s", category.name()))
@@ -175,11 +175,6 @@ public class MeasurableRatingService {
 
         }
         return findForEntity(command.entityReference());
-    }
-
-
-    public List<Tally<Long>> tallyByMeasurableId() {
-        return measurableRatingDao.tallyByMeasurableId();
     }
 
 

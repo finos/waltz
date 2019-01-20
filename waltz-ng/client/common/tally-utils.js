@@ -19,15 +19,6 @@
 
 import _ from "lodash";
 
-export function talliesById(tallies) {
-    return _.reduce(
-        tallies,
-        (acc, tally) => {
-            acc[tally.id] = tally.count;
-            return acc;
-        },
-        {});
-}
 
 /**
  * Given an array of objects and a groupingSelector will return an array of values along with their counts
@@ -36,7 +27,7 @@ export function talliesById(tallies) {
  * @param groupingSelector
  * @returns {*}
  */
-export function tallyBy(data = [], groupingSelector = 'key') {
+export function tallyBy(data = [], groupingSelector = "key") {
     return _.chain(data)
         .countBy(groupingSelector)
         .map((v, k) => ({ key: k, count: v }))
@@ -52,23 +43,24 @@ export function tallyBy(data = [], groupingSelector = 'key') {
  * @param childKey
  * @returns {function(*)}
  */
-export function buildPropertySummer (countKey = 'directCount',
-                                     totalKey = 'totalCount',
-                                     childKey = 'indirectCount') {
+export function buildPropertySummer(countKey = "directCount",
+                                    totalKey = "totalCount",
+                                    childKey = "indirectCount") {
     const summer = (node) => {
         if (node == null) {
             return 0;
         }
 
-        const count = Number(node[countKey] || 0);
+        const directCount = Number(node[countKey] || 0);
         const sum = _.sumBy(node.children, summer); // recursive step
 
+        const cumulativeTotal = sum + directCount;
         if (node.children) {
-            node[totalKey] = sum + count;
+            node[totalKey] = cumulativeTotal;
             node[childKey] = sum;
         }
 
-        return count + sum;
+        return cumulativeTotal;
     };
     return summer;
-};
+}
