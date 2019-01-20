@@ -73,7 +73,9 @@ function controller($q,
 
 
         const countPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.countByMeasurableCategory, [categoryId])
+            .loadViewData(
+                CORE_API.MeasurableRatingStore.countByMeasurableCategory,
+                [categoryId])
             .then(r => r.data);
 
         serviceBroker

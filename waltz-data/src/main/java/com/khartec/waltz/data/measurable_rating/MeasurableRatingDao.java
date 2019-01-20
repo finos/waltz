@@ -51,7 +51,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
-import static com.khartec.waltz.data.JooqUtilities.calculateLongTallies;
+import static com.khartec.waltz.data.JooqUtilities.TO_LONG_TALLY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -201,26 +201,20 @@ public class MeasurableRatingDao {
 
     // --- stats
 
-    public List<Tally<Long>> tallyByMeasurableId() {
-        return calculateLongTallies(
-                dsl,
-                MEASURABLE_RATING,
-                MEASURABLE_RATING.MEASURABLE_ID,
-                DSL.trueCondition());
-    }
-
-
     public List<Tally<Long>> tallyByMeasurableCategoryId(long categoryId) {
-        SelectConditionStep<Record1<Long>> measurableIds = dsl
-                .select(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId));
+        SelectHavingStep<Record2<Long, Integer>> query = dsl
+                .select(MEASURABLE_RATING.MEASURABLE_ID, DSL.count())
+                .from(MEASURABLE_RATING)
+                .innerJoin(MEASURABLE)
+                .on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name()))
+                .groupBy(MEASURABLE_RATING.MEASURABLE_ID);
 
-        return calculateLongTallies(
-                dsl,
-                MEASURABLE_RATING,
-                MEASURABLE_RATING.MEASURABLE_ID,
-                MEASURABLE_RATING.MEASURABLE_ID.in(measurableIds));
+        return query.fetch(TO_LONG_TALLY);
     }
 
 

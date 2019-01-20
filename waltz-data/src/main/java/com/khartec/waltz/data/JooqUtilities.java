@@ -135,12 +135,12 @@ public class JooqUtilities {
             Table table,
             Field<Long> fieldToTally,
             Condition recordsInScopeCondition) {
-        return makeTallyQuery(
+        SelectHavingStep<Record2<Long, Integer>> query = makeTallyQuery(
                 dsl,
                 table,
                 fieldToTally,
-                recordsInScopeCondition)
-        .fetch(TO_LONG_TALLY);
+                recordsInScopeCondition);
+        return query.fetch(TO_LONG_TALLY);
     }
 
 
