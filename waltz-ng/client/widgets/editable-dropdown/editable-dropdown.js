@@ -31,6 +31,7 @@ const bindings = {
     onSave: "<",
     onRemove: "<?",
     editRole: "@",
+    emptyLabel: "@",
     ctx: "<?"
 };
 
@@ -54,8 +55,8 @@ function controller() {
         vm.currentComments = vm.initialComments;
 
         if (vm.entries) {
-            vm.dropdownValues = _.orderBy(vm.entries, ['position', 'name']);
-            vm.dropdownsByCode = _.keyBy(vm.dropdownValues, 'code');
+            vm.dropdownValues = _.orderBy(vm.entries, ["position", "name"]);
+            vm.dropdownsByCode = _.keyBy(vm.dropdownValues, "code");
         }
     };
 
@@ -82,7 +83,7 @@ function controller() {
     };
 
     vm.getName = (code) => {
-        return _.get(vm, ['dropdownsByCode', code, 'name'], code);
+        return _.get(vm, ["dropdownsByCode", code, "name"], code);
     };
 
     vm.isDirty = () => {
@@ -102,7 +103,7 @@ const component = {
 };
 
 
-const id = 'waltzEditableDropdown';
+const id = "waltzEditableDropdown";
 
 
 export default {

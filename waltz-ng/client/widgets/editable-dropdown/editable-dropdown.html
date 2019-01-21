@@ -4,7 +4,8 @@
     <span ng-if='!$ctrl.visibility.editor'>
 
         <span ng-bind="$ctrl.getName($ctrl.currentVal)"></span>
-        <span ng-if="$ctrl.currentComments"
+        <span ng-if="! $ctrl.getName($ctrl.currentVal)" ng-bind="$ctrl.emptyLabel"></span>
+        <span ng-if="$ctrl.currentComments && $ctrl.commentsAllowed === 'true'"
               ng-bind="$ctrl.currentComments"
               class="small text-muted">
         </span>
@@ -46,7 +47,7 @@
         </select>
 
         <input type="text"
-               ng-if="$ctrl.commentsAllowed"
+               ng-if="$ctrl.commentsAllowed === 'true'"
                placeholder="Comment..."
                ng-model="$ctrl.currentComments"
                class="form-control input-sm small text-muted">
