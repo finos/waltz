@@ -86,6 +86,7 @@ function controller() {
 
         if (promise) {
             promise.then(saveComplete, saveFailed)
+                   .then(() => vm.initialVal = data.newVal);
         } else {
             saveComplete();
         }

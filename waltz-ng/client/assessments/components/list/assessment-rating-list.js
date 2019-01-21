@@ -17,24 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import services from './services';
-import { registerComponents } from '../common/module-utils';
-import AssessmentEditor from './components/editor/assessment-editor';
-import AssessmentRatingList from './components/list/assessment-rating-list';
-import AssessmentRatingSubSection from './components/sub-section/assessment-rating-sub-section';
+import {initialiseData} from "../../../common";
+import template from "./assessment-rating-list.html";
 
 
-export default () => {
+const bindings = {
+    assessments: "<",
+    onSelect: "<"
+};
 
-    const module = angular.module('waltz.assessments', []);
 
-    services(module);
+const initialState = {
+};
 
-    registerComponents(module, [
-        AssessmentEditor,
-        AssessmentRatingList,
-        AssessmentRatingSubSection
-    ]);
 
-    return module.name;
+function controller() {
+    const vm = initialiseData(this, initialState);
+}
+
+
+controller.$inject = [
+];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default {
+    component,
+    id: "waltzAssessmentRatingList"
 };
