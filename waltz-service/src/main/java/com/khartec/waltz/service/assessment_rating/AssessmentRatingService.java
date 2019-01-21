@@ -19,10 +19,13 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
+import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.data.assessment_rating.AssessmentRatingDao;
+import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
@@ -42,16 +45,24 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 public class AssessmentRatingService {
 
     private final AssessmentRatingDao assessmentRatingDao;
+    private final AssessmentDefinitionDao assessmentDefinitionDao;
+    private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
 
     @Autowired
     public AssessmentRatingService(
             AssessmentRatingDao assessmentRatingDao,
+            AssessmentDefinitionDao assessmentDefinitionDao,
+            RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService) {
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
+        checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
+        checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.assessmentRatingDao = assessmentRatingDao;
+        this.ratingSchemeDAO = ratingSchemeDAO;
+        this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.changeLogService = changeLogService;
 
     }
@@ -63,12 +74,13 @@ public class AssessmentRatingService {
 
 
     public boolean update(SaveAssessmentRatingCommand command, String username) {
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(String.format(
-                        "Updated architecture funding recommendation as [%s - %s]",
-                        command.ratingName(),
+                        "Updated " + assessmentDefinition.name() + " as [%s - %s]",
+                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
-                .parentReference(mkRef(CHANGE_INITIATIVE, command.entityReference().id()))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
                 .userId(username)
                 .childKind(command.entityReference().kind())
                 .severity(Severity.INFORMATION)
@@ -84,10 +96,10 @@ public class AssessmentRatingService {
     public boolean create(SaveAssessmentRatingCommand command, String username) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(String.format(
-                        "Created architecture funding recommendation as [%s - %s]",
-                        command.ratingName(),
+                        "Created " + assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name() + " as [%s - %s]",
+                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
-                .parentReference(mkRef(CHANGE_INITIATIVE, command.entityReference().id()))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
                 .userId(username)
                 .childKind(command.entityReference().kind())
                 .severity(Severity.INFORMATION)
@@ -103,8 +115,8 @@ public class AssessmentRatingService {
     public boolean remove(RemoveAssessmentRatingCommand command, String username) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(String.format(
-                        "Removed architecture funding recommendation"))
-                .parentReference(mkRef(CHANGE_INITIATIVE, command.entityReference().id()))
+                 "Removed " + assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name()))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
                 .userId(username)
                 .childKind(command.entityReference().kind())
                 .severity(Severity.INFORMATION)

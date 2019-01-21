@@ -123,7 +123,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
-                .ratingName(StringUtilities.mkSafe((String) body.get("ratingName")))
                 .description(StringUtilities.mkSafe((String) body.get("description")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
