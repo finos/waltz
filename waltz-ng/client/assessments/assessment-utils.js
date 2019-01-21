@@ -25,31 +25,36 @@ import {indexRatingSchemes} from "../ratings/rating-utils";
  * with the rating item (describing the dropdown option)
  *
  * @param assessmentDefinitions
- * @param ratingSchemes
- * @param assessmentRatings
+ * @param schemes
+ * @param assessments
  */
-export function mkEnrichedAssessmentDefinitions(assessmentDefinitions = [],
-                                                ratingSchemes = [],
-                                                assessmentRatings = []) {
-    const ratingSchemesByIdByItemId = indexRatingSchemes(ratingSchemes);
-    const ratingsByDefinitionId = _.keyBy(assessmentRatings, 'assessmentDefinitionId');
+export function mkEnrichedAssessmentDefinitions(definitions = [],
+                                                schemes = [],
+                                                assessments = []) {
+    const schemesByIdByRatingId = indexRatingSchemes(schemes);
+    const assessmentsByDefinitionId = _.keyBy(assessments, 'assessmentDefinitionId');
 
     return _
-        .chain(assessmentDefinitions)
-        .map(d => {
-            const ratingScheme = _.get(ratingSchemesByIdByItemId, `[${d.ratingSchemeId}]`);
-            const rating = _.get(ratingsByDefinitionId, `[${d.id}]`, null);
-            const ratingItem = rating != null
-                ? _.get(ratingScheme, `ratingsById[${rating.ratingId}]`)
+        .chain(definitions)
+        .map(definition => {
+            const scheme = _.get(schemesByIdByRatingId, `[${definition.ratingSchemeId}]`);
+            const assessment = _.get(assessmentsByDefinitionId, `[${definition.id}]`, null);
+            const ratingSchemeItem = assessment != null
+                ? _.get(scheme, `ratingsById[${assessment.ratingId}]`)
                 : null;
 
             const dropdownEntries = _.map(
-                ratingScheme.ratings,
+                scheme.ratings,
                 r => Object.assign(
                     {},
-                    { name: r.name, code: r.id, position: r.position }));
+                    r,
+                    { code: r.id }));
 
-            return Object.assign({}, d, { rating, ratingItem, dropdownEntries });
+            return {
+                definition,
+                rating: assessment,
+                ratingItem: ratingSchemeItem,
+                dropdownEntries };
         })
         .orderBy('name')
         .value();
