@@ -2,7 +2,7 @@ The following notice should appear in source files:
 
 ```
 Waltz - Enterprise Architecture
-Copyright (C) 2017 Waltz open source project
+Copyright (C) 2019 Waltz open source project
 See README.md for more information
 
 This program is free software: you can redistribute it and/or modify

@@ -6,9 +6,9 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 
 [Learn more](http://www.waltz-technology.com/)
 
-[Building notes](https://github.com/khartec/waltz/blob/master/docs/build.md).
+[Building notes](docs/development/build.md)
 
-[Running](https://github.com/khartec/waltz/blob/master/waltz-web/README.md)
+[Running](waltz-web/README.md)
 
 ---
 
