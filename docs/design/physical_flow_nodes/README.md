@@ -1,5 +1,21 @@
 # Design for Physical Flow Nodes within Waltz
 
+[TOC levels=2-3]:  # "# Contents"
+
+# Contents
+- [Status: DRAFT](#status-draft)
+- [Terminology](#terminology)
+- [Motivation](#motivation)
+- [Proposal](#proposal)
+- [Persistence](#persistence)
+    - [Physical Flow Node table](#physical-flow-node-table)
+    - [Server Information and Database Information tables](#server-information-and-database-information-tables)
+    - [Impact / Risks](#impact--risks)
+    - [Limitations](#limitations)
+- [Example Screens](#example-screens)
+- [Possible future enhancements](#possible-future-enhancements)
+    - [Resource Information](#resource-information)
+
 
 ## Status: DRAFT
 
