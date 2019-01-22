@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
@@ -114,5 +115,14 @@ public class RatingSchemeDAO {
                 .orderBy(RATING_SCHEME_ITEM.POSITION.asc())
                 .fetch(TO_ITEM_MAPPER);
     }
+
+
+    public RagName getRagNameById(long id){
+        checkNotNull(id, "id cannot be null");
+        return dsl.selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.eq(id))
+                .fetchOne(TO_ITEM_MAPPER);
+    }
+
 
 }
