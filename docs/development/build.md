@@ -32,7 +32,7 @@ When you run the first build (using `mvn package`) the schema will be generated 
 ### Importing sample data
 
 Starting with release 1.14 (alpha) we will make sample data sets available via the release pages.  
-See [Dump and restore](dump_and_restore.md) for details on how to import these changes.
+See [Dump and restore](database/dump_and_restore.md) for details on how to import these changes.
 
 
 ## Setting up maven profiles
