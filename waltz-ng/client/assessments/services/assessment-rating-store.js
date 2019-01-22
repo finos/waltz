@@ -32,17 +32,17 @@ export function store($http, BaseApiUrl) {
     };
 
 
-    const create = (ref, assessmentDefinitionId, ratingId, ratingName, description = null) => {
+    const create = (ref, assessmentDefinitionId, ratingId, description = null) => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, ratingName, description })
+            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, description })
             .then(d => d.data);
     };
 
-    const update = (ref, assessmentDefinitionId, ratingId, ratingName, description = null) => {
+    const update = (ref, assessmentDefinitionId, ratingId, description = null) => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, ratingName, description })
+            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, description })
             .then(d => d.data);
     };
 
