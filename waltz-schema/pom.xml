@@ -13,7 +13,7 @@
 
 
     <properties>
-        <jooq.version>3.10.7</jooq.version>
+        <jooq.version>3.11.9</jooq.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
@@ -28,7 +28,7 @@
                 <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
                 <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.util.mariadb.MariaDBDatabase</jooq.database>
+                <jooq.database>org.jooq.meta.mariadb.MariaDBDatabase</jooq.database>
                 <database.catalog></database.catalog> <!-- only required for MSSQL -->
             </properties>
         </profile>
@@ -45,7 +45,7 @@
                 <jdbc.version>4.0</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jooq.group>org.jooq.pro</jooq.group>
-                <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
         </profile>
@@ -61,7 +61,7 @@
                 <jdbc.version>6.1.0.jre8</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
                 <jooq.group>org.jooq.pro</jooq.group>
-                <jooq.database>org.jooq.util.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
         </profile>
@@ -75,7 +75,7 @@
                 <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jooq.dialect>POSTGRES</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.util.postgres.PostgresDatabase</jooq.database>
+                <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
                 <database.catalog></database.catalog> <!-- only required for MSSQL -->
             </properties>
         </profile>
