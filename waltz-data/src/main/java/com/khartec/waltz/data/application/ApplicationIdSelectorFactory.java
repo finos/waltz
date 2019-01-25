@@ -229,7 +229,8 @@ public class ApplicationIdSelectorFactory implements IdSelectorFactory {
 
     private SelectConditionStep<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
         if (options.scope() != EXACT) {
-            LOG.info("App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
+            throw new UnsupportedOperationException(
+                    "App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
         }
         return dsl
                 .selectDistinct(appGroup.APPLICATION_ID)
