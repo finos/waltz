@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdatedProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
-import com.khartec.waltz.model.server_information.ImmutableServerUsage;
 import org.immutables.value.Value;
 
 
