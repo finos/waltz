@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.server_information;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
@@ -41,6 +42,7 @@ import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.stream.Collectors.counting;
 import static org.jooq.impl.DSL.*;
 
@@ -61,7 +63,6 @@ public class ServerInformationDao {
 
         return ImmutableServerInformation.builder()
                 .id(row.getId())
-                .assetCode(row.getAssetCode())
                 .hostname(row.getHostname())
                 .virtual(isVirtual)
                 .operatingSystem(row.getOperatingSystem())
@@ -88,7 +89,12 @@ public class ServerInformationDao {
     public List<ServerInformation> findByAssetCode(String assetCode) {
         return dsl.select()
                 .from(SERVER_INFORMATION)
-                .where(SERVER_INFORMATION.ASSET_CODE.eq(assetCode))
+                .join(SERVER_USAGE)
+                    .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
+                    .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .join(APPLICATION)
+                    .on(APPLICATION.ID.eq(SERVER_USAGE.ENTITY_ID))
+                .where(APPLICATION.ASSET_CODE.eq(assetCode))
                 .fetch(recordMapper);
     }
 
@@ -96,9 +102,10 @@ public class ServerInformationDao {
     public List<ServerInformation> findByAppId(long appId) {
         return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
-                .innerJoin(APPLICATION)
-                .on(SERVER_INFORMATION.ASSET_CODE.in(APPLICATION.ASSET_CODE, APPLICATION.ASSET_CODE))
-                .where(APPLICATION.ID.eq(appId))
+                .innerJoin(SERVER_USAGE)
+                    .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
+                    .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(SERVER_USAGE.ENTITY_ID.eq(appId))
                 .fetch(recordMapper);
     }
 
@@ -116,7 +123,6 @@ public class ServerInformationDao {
                                     SERVER_INFORMATION.IS_VIRTUAL,
                                     SERVER_INFORMATION.ENVIRONMENT,
                                     SERVER_INFORMATION.LOCATION,
-                                    SERVER_INFORMATION.ASSET_CODE,
                                     SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.LIFECYCLE_STATUS,
@@ -129,7 +135,6 @@ public class ServerInformationDao {
                                     s.virtual(),
                                     s.environment(),
                                     s.location(),
-                                    s.assetCode(),
                                     toSqlDate(s.hardwareEndOfLifeDate()),
                                     toSqlDate(s.operatingSystemEndOfLifeDate()),
                                     s.lifecycleStatus().name(),
@@ -149,22 +154,20 @@ public class ServerInformationDao {
         Field<String> hwEolStatusInner = DSL.field("hw_eol_status_inner", String.class);
         Field<Boolean> isVirtualInner = DSL.field("is_virtual_inner", Boolean.class);
 
-        Condition condition = SERVER_INFORMATION.ASSET_CODE
-                .in(select(APPLICATION.ASSET_CODE)
-                        .from(APPLICATION)
-                        .where(APPLICATION.ID.in(appIdSelector)));
+        Condition condition = SERVER_USAGE.ENTITY_ID.in(appIdSelector)
+                .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         // de-duplicate host names, as one server can host multiple apps
         Result<? extends Record> serverInfo = dsl.select(
-                    max(SERVER_INFORMATION.ENVIRONMENT).as(environmentInner),
-                    max(SERVER_INFORMATION.OPERATING_SYSTEM).as(operatingSystemInner),
-                    max(SERVER_INFORMATION.LOCATION).as(locationInner),
-                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE)).as(osEolStatusInner),
-                    max(mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE)).as(hwEolStatusInner),
-                    cast(max(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0)), Boolean.class).as(isVirtualInner))
+                    SERVER_INFORMATION.ENVIRONMENT.as(environmentInner),
+                    SERVER_INFORMATION.OPERATING_SYSTEM.as(operatingSystemInner),
+                    SERVER_INFORMATION.LOCATION.as(locationInner),
+                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE).as(osEolStatusInner),
+                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE).as(hwEolStatusInner),
+                    cast(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0), Boolean.class).as(isVirtualInner))
                 .from(SERVER_INFORMATION)
+                .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .where(condition)
-                .groupBy(SERVER_INFORMATION.HOSTNAME)
                 .fetch();
 
         Map<Boolean, Long> virtualAndPhysicalCounts = serverInfo.stream()

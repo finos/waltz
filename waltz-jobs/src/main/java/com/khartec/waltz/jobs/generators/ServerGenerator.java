@@ -20,15 +20,20 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.schema.tables.records.ServerUsageRecord;
 import org.jooq.DSLContext;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.ApplicationContext;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
@@ -56,6 +61,14 @@ public class ServerGenerator implements SampleDataGenerator {
                     + randomPick(SampleData.serverPostfixes);
     }
 
+
+    private static List<Long> getServerIds(DSLContext dsl) {
+        return dsl.select(SERVER_INFORMATION.ID)
+                .from(SERVER_INFORMATION)
+                .fetch(SERVER_INFORMATION.ID);
+    }
+
+
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
 
@@ -80,7 +93,6 @@ public class ServerGenerator implements SampleDataGenerator {
                                     .operatingSystem(isCommonHost ? SampleData.operatingSystems[0] : randomPick(SampleData.operatingSystems))
                                     .operatingSystemVersion(isCommonHost ? SampleData.operatingSystemVersions[0] : randomPick(SampleData.operatingSystemVersions))
                                     .country("UK")
-                                    .assetCode("wltz-0" + rnd.nextInt(4000))
                                     .hardwareEndOfLifeDate(
                                             rnd.nextInt(10) > 5
                                                     ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
@@ -95,8 +107,25 @@ public class ServerGenerator implements SampleDataGenerator {
                                     .build());
                 });
 
-        // servers.forEach(System.out::println);
         serverDao.bulkSave(servers);
+
+        // create server usages
+        List<Long> appIds = getAppIds(dsl);
+        List<Long> serverIds = getServerIds(dsl);
+
+        HashSet<Tuple2<Long,Long>> serverAppMappings = new HashSet<>();
+
+        IntStream.range(0, 20_000)
+                .forEach(i -> {
+                    serverAppMappings.add(Tuple.tuple(ListUtilities.randomPick(serverIds), ListUtilities.randomPick(appIds)));
+                });
+
+        List<ServerUsageRecord> serverUsages = serverAppMappings
+                .stream()
+                .map(t -> mkServerUsageRecord(t.v1, t.v2))
+                .collect(Collectors.toList());
+
+        dsl.batchInsert(serverUsages).execute();
 
         return null;
     }
@@ -109,5 +138,16 @@ public class ServerGenerator implements SampleDataGenerator {
                 .where(SERVER_INFORMATION.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
                 .execute();
         return true;
+    }
+
+
+    private static ServerUsageRecord mkServerUsageRecord(long serverId, long appId) {
+        ServerUsageRecord r = new ServerUsageRecord();
+        r.setServerId(serverId);
+        r.setEntityKind(EntityKind.APPLICATION.name());
+        r.setEntityId(appId);
+        r.setLastUpdatedBy("admin");
+        r.setProvenance("waltz");
+        return r;
     }
 }

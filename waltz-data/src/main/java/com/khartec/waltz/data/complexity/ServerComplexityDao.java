@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.complexity;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
@@ -31,6 +32,7 @@ import java.util.List;
 
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 @Repository
 public class ServerComplexityDao {
@@ -48,7 +50,7 @@ public class ServerComplexityDao {
 
 
     public List<Tally<String>> findCountsByAssetCodes(String... assetCodes) {
-        return findCountsByAssetCodes(SERVER_INFORMATION.ASSET_CODE.in(assetCodes));
+        return findCountsByAssetCodes(APPLICATION.ASSET_CODE.in(assetCodes));
     }
 
 
@@ -62,15 +64,16 @@ public class ServerComplexityDao {
     }
 
 
-    public List<Tally<Long>> findCountsByAppIdSelector(Select<Record1<Long>> idSelector) {
-        Checks.checkNotNull(idSelector, "idSelector cannot be null");
+    public List<Tally<Long>> findCountsByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        Checks.checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
-        return dsl.select(APPLICATION.ID, SERVER_COUNT_FIELD)
+        return dsl.select(SERVER_USAGE.ENTITY_ID, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
-                .innerJoin(APPLICATION)
-                .on(SERVER_INFORMATION.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
-                .where(APPLICATION.ID.in(idSelector))
-                .groupBy(APPLICATION.ID)
+                .innerJoin(SERVER_USAGE)
+                        .on(SERVER_USAGE.ENTITY_ID.eq(SERVER_INFORMATION.ID))
+                .where(SERVER_USAGE.ENTITY_ID.in(appIdSelector))
+                .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .groupBy(SERVER_USAGE.ENTITY_ID)
                 .fetch(r -> ImmutableTally.<Long>builder()
                         .id(r.value1())
                         .count(r.value2())
@@ -81,10 +84,15 @@ public class ServerComplexityDao {
     private List<Tally<String>> findCountsByAssetCodes(Condition condition) {
         Checks.checkNotNull(condition, "Condition must be given, use DSL.trueCondition() for 'none'");
 
-        return dsl.select(SERVER_INFORMATION.ASSET_CODE, SERVER_COUNT_FIELD)
+        return dsl.select(APPLICATION.ASSET_CODE, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
+                .innerJoin(SERVER_USAGE)
+                    .on(SERVER_USAGE.ENTITY_ID.eq(SERVER_INFORMATION.ID))
+                .innerJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(SERVER_USAGE.ENTITY_ID))
+                    .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .where(condition)
-                .groupBy(SERVER_INFORMATION.ASSET_CODE)
+                .groupBy(APPLICATION.ASSET_CODE)
                 .orderBy(SERVER_COUNT_FIELD.desc())
                 .fetch(r -> ImmutableTally.<String>builder()
                         .id(r.value1())
@@ -96,10 +104,11 @@ public class ServerComplexityDao {
 
     private int calculateBaseline(Condition condition) {
         return dsl.select(DSL.max(SERVER_COUNT_FIELD))
-                .from(DSL.select(SERVER_INFORMATION.ASSET_CODE, SERVER_COUNT_FIELD)
-                        .from(SERVER_INFORMATION)
+                .from(DSL.select(SERVER_USAGE.ENTITY_ID, SERVER_COUNT_FIELD)
+                        .from(SERVER_USAGE)
                         .where(condition)
-                        .groupBy(SERVER_INFORMATION.ASSET_CODE))
+                        .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .groupBy(SERVER_USAGE.ENTITY_ID))
                 .fetchOne(r -> r.value1());
     }
 
