@@ -82,19 +82,19 @@
         <comment>3783: insert server usages from server information</comment>
         <sql>
             INSERT INTO server_usage(server_id, entity_kind, entity_id, last_updated_by, provenance)
-            SELECT
-                min(si2.id) AS server_id,
+            SELECT distinct
+                shi.min_id AS server_id,
                 'APPLICATION' AS entity_kind,
                 app.id AS entity_id,
                 'admin' AS last_updated_by,
                 'waltz' AS provenance
-            FROM server_information si1
-            JOIN server_information si2 ON si1.hostname = si2.hostname
-            JOIN application app ON app.asset_code = si1.asset_code
-            GROUP BY
-                si1.hostname,
-                si1.asset_code,
-                app.id
+            FROM server_information si
+            INNER JOIN (
+                SELECT hostname, min(id) AS min_id
+                FROM server_information
+                GROUP BY hostname
+            ) AS shi ON shi.hostname = si.hostname
+            JOIN application app ON app.asset_code = si.asset_code
         </sql>
     </changeSet>
 
