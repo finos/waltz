@@ -19,21 +19,28 @@
  */
 
 import angular from "angular";
+import { registerComponents, registerStores } from "../common/module-utils";
+
 import ServerInfoStore from "./services/server-info-store";
-import {registerStores} from "../common/module-utils";
-import ServerPies from "./components/server-pies";
-import ServerList from "./directives/server-list";
+import Routes from './routes';
+
+import ServerPies from "./components/server-pies/server-pies";
+import ServerOverview from "./components/overview/server-overview";
+
+import ServerView from "./pages/view/server-view";
 
 
 export default () => {
 
     const module = angular.module("waltz.server.info", []);
 
-    module
-        .component("waltzServerPies", ServerPies);
+    module.config(Routes);
 
-    module
-        .directive("waltzServerList", ServerList);
+    registerComponents(module, [
+        ServerPies,
+        ServerOverview,
+        ServerView
+    ]);
 
     registerStores(module, [ServerInfoStore]);
 

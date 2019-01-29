@@ -19,8 +19,10 @@
 
 import _ from "lodash";
 import {termSearch, perhaps} from "../../../common";
-import template from './technology-section.html';
 import {CORE_API} from "../../../common/services/core-api-utils";
+import { mkLinkGridCell } from '../../../common/grid-utils';
+
+import template from './technology-section.html';
 
 
 const bindings = {
@@ -67,7 +69,7 @@ function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "
 function prepareServerGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        { field: 'hostname', displayName: 'Host' },
+        mkLinkGridCell('Host', 'hostname', 'id', 'main.server.view'),
         { field: 'environment' },
         {
             field: 'virtual',
@@ -201,7 +203,6 @@ function controller($animate, uiGridConstants, serviceBroker) {
     vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
 
     vm.doSearch = () => refresh(vm.qry);
-
 
     vm.hasAnyData = () => {
         const hasServers = perhaps(() => vm.servers.length > 0, false);

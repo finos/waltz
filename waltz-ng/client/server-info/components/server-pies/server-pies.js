@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../common/colors";
-import {toKeyCounts} from "../../common";
-import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
+import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../../common/colors";
+import {toKeyCounts} from "../../../common";
+import {endOfLifeStatus} from "../../../common/services/enums/end-of-life-status";
 import template from './server-pies.html';
 
 
@@ -95,4 +95,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzServerPies",
+    component
+};

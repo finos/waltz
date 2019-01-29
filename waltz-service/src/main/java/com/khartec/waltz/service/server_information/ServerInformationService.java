@@ -60,6 +60,16 @@ public class ServerInformationService {
     }
 
 
+    public ServerInformation getById(long id) {
+        return serverInformationDao.getById(id);
+    }
+
+
+    public ServerInformation getByExternalId(String externalId) {
+        return  serverInformationDao.getByExternalId(externalId);
+    }
+
+
     public ServerSummaryStatistics calculateStatsForAppSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return serverInformationDao.calculateStatsForAppSelector(selector);

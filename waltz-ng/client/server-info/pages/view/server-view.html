@@ -1,0 +1,33 @@
+
+<waltz-page-header icon="server"
+                   name="{{ $ctrl.serverInfo.hostname }}"
+                   small="{{ $ctrl.serverInfo.externalId }}">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li>Servers</li>
+        <li><span ng-bind="$ctrl.serverInfo.hostname"></span></li>
+    </ol>
+</waltz-page-header>
+
+
+<waltz-server-overview parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-server-overview>
+
+<br>
+
+<!-- Entity Named Notes -->
+<waltz-dynamic-section-wrapper section="$ctrl.entityNamedNotesSection"
+                               parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-section-wrapper>
+
+
+<!-- APPS -->
+<waltz-dynamic-section-wrapper section="$ctrl.appsSection"
+                               parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-section-wrapper>
+
+
+<!-- Bookmarks -->
+<waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                               parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-section-wrapper>
