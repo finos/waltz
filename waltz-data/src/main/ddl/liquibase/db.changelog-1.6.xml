@@ -114,7 +114,7 @@
 
     <changeSet id="20170808-2474-1a"
                author="kamransaleem"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <comment>2488: rename attestation_pkey to attestation_1_6_pkey</comment>
 
         <dropPrimaryKey constraintName="attestation_pkey"

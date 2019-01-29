@@ -410,7 +410,7 @@
 
     <changeSet id="20190102-3687-1"
                author="kamransaleem"
-               dbms="mysql,postgresql">
+               dbms="mysql,postgresql,h2">
         <comment>Measurables: unique composite index on category and external id</comment>
         <createIndex tableName="measurable"
                      indexName="idx_category_ext_id_not_null"

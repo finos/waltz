@@ -185,6 +185,17 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20180514-3144-6b"
+               author="davidwatkins73"
+               dbms="h2">
+        <comment>3144: Add user_selectable to rating_scheme_item</comment>
+        <sql>
+            UPDATE measurable_category mc
+            SET mc.rating_scheme_definition_id =
+                (SELECT rs.id FROM rating_scheme rs WHERE rs.name = mc.name)
+        </sql>
+    </changeSet>
+
     <changeSet id="20180516-3144-7"
                author="davidwatkins73">
         <renameColumn tableName="measurable_category"

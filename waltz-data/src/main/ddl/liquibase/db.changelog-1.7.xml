@@ -302,7 +302,7 @@
 
     <changeSet id="20171024-2623-2"
                author="kamransaleem"
-               dbms="postgresql">
+               dbms="postgresql,h2">
         <sql>
             UPDATE data_type
             SET unknown = TRUE
@@ -340,7 +340,7 @@
 
     <changeSet id="20171030-2768-2"
                author="rovats"
-               dbms="mssql">
+               dbms="mssql,h2,postgresql">
         <comment>2768: Application: Drop unique constraint on name</comment>
         <dropIndex tableName="application"
                    indexName="unique_name" />
