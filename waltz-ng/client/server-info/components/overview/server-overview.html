@@ -1,0 +1,92 @@
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="waltz-display-section">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Name
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.hostname"></span>
+                <span ng-if="$ctrl.serverInfo.externalId"
+                      class="text-muted">
+                    (<span ng-bind="$ctrl.serverInfo.externalId"></span>)
+                </span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Location
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.location"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Lifecycle Status
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.lifecycleStatus | toDisplayName:'lifecycleStatus'"></span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Environment
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.environment"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Operating System
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.operatingSystem"></span>
+                <span ng-if="$ctrl.serverInfo.operatingSystemVersion"
+                      class="text-muted">
+                    (version: <span ng-bind="$ctrl.serverInfo.operatingSystemVersion"></span>)
+                </span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                OS End of Life
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.operatingSystemEndOfLifeStatus | toDisplayName:'endOfLifeStatus'"></span>
+                <span ng-if="$ctrl.serverInfo.operatingSystemEndOfLifeDate"
+                      class="text-muted">
+                    (<waltz-from-now timestamp="$ctrl.serverInfo.operatingSystemEndOfLifeDate"
+                                     days-only="true">
+                    </waltz-from-now>)
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Hardware End of Life
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.serverInfo.hardwareEndOfLifeStatus | toDisplayName:'endOfLifeStatus'"></span>
+                <span ng-if="$ctrl.serverInfo.hardwareEndOfLifeDate"
+                      class="text-muted">
+                    (<waltz-from-now timestamp="$ctrl.serverInfo.hardwareEndOfLifeDate"
+                                     days-only="true">
+                    </waltz-from-now>)
+                </span>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Virtual
+            </div>
+            <div class="col-sm-4">
+                <span>
+                    <input type="checkbox"
+                           checked
+                           ng-if="$ctrl.serverInfo.virtual"
+                           ng-disabled="true">
+                     <input type="checkbox"
+                            ng-if="!$ctrl.serverInfo.virtual"
+                            ng-disabled="true">
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

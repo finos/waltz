@@ -35,7 +35,8 @@ import static com.khartec.waltz.model.EndOfLifeStatus.calculateEndOfLifeStatus;
 public abstract class ServerInformation implements
         IdProvider,
         ProvenanceProvider,
-        ExternalIdProvider {
+        ExternalIdProvider,
+        WaltzEntity {
 
     public abstract String hostname();
     public abstract String operatingSystem();
@@ -74,6 +75,16 @@ public abstract class ServerInformation implements
     @Value.Default
     public boolean virtual() {
         return false;
+    }
+
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.SERVER)
+                .id(id().get())
+                .name(hostname())
+                .entityLifecycleStatus(EntityLifecycleStatus.ACTIVE)
+                .build();
     }
 
 }

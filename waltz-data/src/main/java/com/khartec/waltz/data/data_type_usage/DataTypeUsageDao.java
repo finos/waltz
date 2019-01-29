@@ -167,7 +167,7 @@ public class DataTypeUsageDao {
         return dsl
                 .select(DATA_TYPE_USAGE.fields())
                 .from(DATA_TYPE_USAGE)
-                .where(dsl.renderInlined(condition))
+                .where(condition)
                 .fetch(TO_USAGE_MAPPER);
     }
 

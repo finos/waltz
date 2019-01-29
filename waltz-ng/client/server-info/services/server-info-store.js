@@ -43,10 +43,25 @@ export function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+
+    const getById = (serverId) =>
+        $http
+            .get(`${BASE}/${serverId}`)
+            .then(result => result.data);
+
+
+    const getByExternalId = (externalId) =>
+        $http
+            .get(`${BASE}/external-id/${externalId}`)
+            .then(result => result.data);
+
+
     return {
         findByAssetCode,
         findByAppId,
-        findStatsForSelector
+        findStatsForSelector,
+        getById,
+        getByExternalId
     };
 }
 
@@ -75,7 +90,17 @@ export const ServerInfoStore_API = {
         serviceName,
         serviceFnName: "findStatsForSelector",
         description: "executes findStatsForSelector"
-    }
+    },
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "executes getById"
+    },
+    getByExternalId: {
+        serviceName,
+        serviceFnName: "getByExternalId",
+        description: "executes getByExternalId"
+    },
 };
 
 

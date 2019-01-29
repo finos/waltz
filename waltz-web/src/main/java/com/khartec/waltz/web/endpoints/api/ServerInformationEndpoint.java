@@ -30,8 +30,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -55,6 +54,8 @@ public class ServerInformationEndpoint implements Endpoint {
 
         String findByAssetCodePath = mkPath(BASE_URL, "asset-code", ":assetCode");
         String findByAppIdPath = mkPath(BASE_URL, "app-id", ":id");
+        String getByIdPath = mkPath(BASE_URL, ":id");
+        String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String calculateStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
 
         ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
@@ -63,11 +64,20 @@ public class ServerInformationEndpoint implements Endpoint {
         ListRoute<ServerInformation> findByAppIdRoute = (request, response)
                 -> serverInformationService.findByAppId(getId(request));
 
+        DatumRoute<ServerInformation> getByIdRoute = (request, response)
+                -> serverInformationService.getById(getId(request));
+
+        DatumRoute<ServerInformation> getByExternalIdRoute = (request, response)
+                -> serverInformationService.getByExternalId(request.params("externalId"));
+
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
                 -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
+
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getByExternalIdPath, getByExternalIdRoute);
         postForDatum(calculateStatsForAppSelectorPath, calculateStatsForAppSelectorRoute);
     }
 

@@ -77,5 +77,8 @@ export function kindToViewState(kind) {
     if (kind === "ROADMAP") {
         return "main.roadmap.view";
     }
+    if (kind === "SERVER") {
+        return "main.server.view";
+    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }

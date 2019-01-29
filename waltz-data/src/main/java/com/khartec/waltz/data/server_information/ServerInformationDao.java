@@ -53,7 +53,7 @@ public class ServerInformationDao {
     private final DSLContext dsl;
 
 
-    private final RecordMapper<Record, ServerInformation> recordMapper = r -> {
+    private static final RecordMapper<Record, ServerInformation> TO_DOMAIN_MAPPER = r -> {
 
         ServerInformationRecord row = r.into(ServerInformationRecord.class);
 
@@ -95,7 +95,7 @@ public class ServerInformationDao {
                 .join(APPLICATION)
                     .on(APPLICATION.ID.eq(SERVER_USAGE.ENTITY_ID))
                 .where(APPLICATION.ASSET_CODE.eq(assetCode))
-                .fetch(recordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -106,7 +106,23 @@ public class ServerInformationDao {
                     .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                     .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .where(SERVER_USAGE.ENTITY_ID.eq(appId))
-                .fetch(recordMapper);
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public ServerInformation getById(long id) {
+        return dsl.select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public ServerInformation getByExternalId(String externalId) {
+        return dsl.select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.EXTERNAL_ID.eq(externalId))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

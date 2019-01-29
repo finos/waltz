@@ -62,6 +62,11 @@ public class ServerGenerator implements SampleDataGenerator {
     }
 
 
+    private static String mkExernalId(int i) {
+        return "server-" + i;
+    }
+
+
     private static List<Long> getServerIds(DSLContext dsl) {
         return dsl.select(SERVER_INFORMATION.ID)
                 .from(SERVER_INFORMATION)
@@ -104,6 +109,7 @@ public class ServerGenerator implements SampleDataGenerator {
                                     .virtual(isCommonHost || rnd.nextInt(10) > 7)
                                     .provenance(SAMPLE_DATA_PROVENANCE)
                                     .lifecycleStatus(randomPick(LifecycleStatus.values()))
+                                    .externalId(mkExernalId(i))
                                     .build());
                 });
 
