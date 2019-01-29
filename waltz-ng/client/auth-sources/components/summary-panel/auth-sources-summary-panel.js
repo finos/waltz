@@ -24,6 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -137,10 +138,12 @@ function controller($q, serviceBroker) {
     };
 
     const loadSummaryStats = () => {
+        if(! vm.entityReference) return;
+
         const inboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [ { entityReference: vm.parentEntityRef, scope: 'CHILDREN' }])
+                [ mkSelectionOptions(vm.entityReference)])
             .then(r => {
                 vm.inboundStats = toStats(r.data);
                 drawPie(vm.inboundStats, inboundOptions);
@@ -149,7 +152,7 @@ function controller($q, serviceBroker) {
         const outboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
-                [ { entityReference: vm.parentEntityRef, scope: 'CHILDREN' }])
+                [ mkSelectionOptions(vm.entityReference)])
             .then(r => {
                 vm.outboundStats = toStats(r.data);
                 drawPie(vm.outboundStats, outboundOptions);

@@ -22,6 +22,7 @@ import {isEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from './rated-flow-summary-panel.html';
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -136,32 +137,24 @@ function controller(serviceBroker)
 
         if (!vm.entityReference) return;
 
-        const childSelector = {
-            entityReference: vm.entityReference,
-            scope: 'CHILDREN'
-        };
-
-        const exactSelector = {
-            entityReference: vm.entityReference,
-            scope: 'EXACT'
-        };
+        const selector = mkSelectionOptions(vm.entityReference);
 
         serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
-                [ childSelector ])
+                [ selector ])
             .then(r => vm.apps= r.data);
 
         serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [ childSelector ])
+                [ selector ])
             .then(r => vm.childSummaries = processSummaries(r.data));
 
         serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [ exactSelector ])
+                [ selector ])
             .then(r => vm.exactSummaries = processSummaries(r.data));
 
     };
@@ -169,22 +162,19 @@ function controller(serviceBroker)
     vm.onTableClick = (clickData) => {
         if (clickData.type === 'CELL') {
 
-            const childSelector = {
-                entityReference: vm.entityReference,
-                scope: 'CHILDREN'
-            };
+            const selector = mkSelectionOptions(vm.entityReference);
 
             const flowData = {};
             serviceBroker
                 .loadViewData(
                     CORE_API.LogicalFlowStore.findBySelector,
-                    [ childSelector ])
+                    [ selector ])
                 .then(r => {
                     flowData.flows = r.data;
                     return serviceBroker
                         .loadViewData(
                             CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                            [ childSelector ]);
+                            [ selector ]);
                 })
                 .then(r => {
                     flowData.decorators = r.data;
