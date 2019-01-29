@@ -102,8 +102,9 @@ public class AuthSourceRatingCalculator {
 
 
     private int[] update(DataType dataType, EntityReference vantageRef) {
-        LOG.info("Updating ratings for auth source - dataType: {}, vantage point: {}",
-                dataType,
+        LOG.debug("Updating ratings for auth source - dataType name: {}, id: {}, vantage point: {}",
+                dataType.name(),
+                dataType.id().get(),
                 vantageRef);
 
         IdSelectionOptions selectorOptions = mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
@@ -124,9 +125,10 @@ public class AuthSourceRatingCalculator {
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
-        LOG.info("Need to update {} ratings due to auth source change - dataType: {}, parent: {}",
+        LOG.debug("Need to update {} ratings due to auth source change - dataType name: {}, id: {}, parent: {}",
                 modifiedDecorators.size(),
-                dataType,
+                dataType.name(),
+                dataType.id().get(),
                 vantageRef);
 
         return updateDecorators(modifiedDecorators);
