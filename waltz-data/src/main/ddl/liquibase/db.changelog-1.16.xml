@@ -1,0 +1,171 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017  Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.16.xml">
+
+    <changeSet id="20190124-3783-1"
+               author="kamransaleem">
+        <comment>3783: Server Usage table</comment>
+        <createTable tableName="server_usage">
+            <column name="server_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20190124-3783-2"
+               author="kamransaleem">
+        <comment>3783: Server Usage unique index</comment>
+        <createIndex tableName="server_usage"
+                     unique="true"
+                     indexName="idx_server_usage_server_entity">
+            <column name="server_id"
+                    type="${id.type}" />
+            <column name="entity_kind"
+                    type="${enum.type}" />
+            <column name="entity_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190124-3783-2b"
+                author="kamransaleem">
+        <comment>3783: Server Usage primary key</comment>
+        <addPrimaryKey columnNames="server_id, entity_kind, entity_id"
+                       constraintName="server_usage_pkey"
+                       tableName="server_usage"/>
+    </changeSet>
+
+    <changeSet id="20190124-3783-3"
+               author="kamransaleem">
+        <comment>3783: insert server usages from server information</comment>
+        <sql>
+            INSERT INTO server_usage(server_id, entity_kind, entity_id, last_updated_by, provenance)
+            SELECT distinct
+                shi.min_id AS server_id,
+                'APPLICATION' AS entity_kind,
+                app.id AS entity_id,
+                'admin' AS last_updated_by,
+                'waltz' AS provenance
+            FROM server_information si
+            INNER JOIN (
+                SELECT hostname, min(id) AS min_id
+                FROM server_information
+                GROUP BY hostname
+            ) AS shi ON shi.hostname = si.hostname
+            JOIN application app ON app.asset_code = si.asset_code
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190124-3783-4"
+               author="kamransaleem">
+        <comment>3783: remove asset code from server information leaving the min id server in each case</comment>
+        <sql>
+            DELETE
+            FROM server_information
+            WHERE id NOT IN (
+                SELECT *
+                FROM (
+                    SELECT min(id) AS id
+                    FROM server_information
+                    GROUP BY hostname
+                ) as del
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190124-3783-5a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3783: drop the asset code index</comment>
+        <sql>
+            DROP INDEX idx_asset_code ON server_information
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190124-3783-5"
+               author="kamransaleem">
+        <comment>3783: drop the asset code column</comment>
+        <sql>
+            ALTER TABLE server_information
+            DROP COLUMN asset_code
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190124-3783-6a"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3783: alter server_information.id to long</comment>
+        <dropPrimaryKey constraintName="server_information_pkey"
+                        tableName="server_information" />
+    </changeSet>
+
+    <changeSet id="20190124-3783-6b"
+               author="kamransaleem">
+        <comment>3783: alter server_information.id to long</comment>
+        <modifyDataType tableName="server_information"
+                        columnName="id"
+                        newDataType="${id.type}" />
+    </changeSet>
+
+    <changeSet id="20190124-3783-6c"
+               author="kamransaleem"
+               dbms="mysql">
+        <addAutoIncrement tableName="server_information"
+                          columnName="id"
+                          columnDataType="${id.type}"
+                          incrementBy="1"/>
+    </changeSet>
+
+    <changeSet id="20190124-3783-6d"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>3783: reinstate primary key</comment>
+        <addPrimaryKey columnNames="id"
+                       constraintName="server_information_pkey"
+                       tableName="server_information" />
+    </changeSet>
+
+
+</databaseChangeLog>

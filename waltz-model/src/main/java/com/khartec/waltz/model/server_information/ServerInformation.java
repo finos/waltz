@@ -35,7 +35,6 @@ import static com.khartec.waltz.model.EndOfLifeStatus.calculateEndOfLifeStatus;
 public abstract class ServerInformation implements
         IdProvider,
         ProvenanceProvider,
-        AssetCodeProvider,
         ExternalIdProvider {
 
     public abstract String hostname();
