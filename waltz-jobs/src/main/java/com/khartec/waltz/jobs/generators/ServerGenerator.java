@@ -47,15 +47,6 @@ public class ServerGenerator implements SampleDataGenerator {
 
 
     private static String mkHostName(int i) {
-        // have some hosts serving multiple apps
-        if (rnd.nextInt(10) > 8) {
-            String hostName = SampleData.serverPrefixes[rnd.nextInt(SampleData.serverPrefixes.length - 1)]
-                    + "00"
-                    + SampleData.serverPostfixes[SampleData.serverPostfixes.length - 1];
-            commonHostNames.add(hostName);
-            return hostName;
-        }
-
         return randomPick(SampleData.serverPrefixes)
                     + i
                     + randomPick(SampleData.serverPostfixes);

@@ -168,4 +168,74 @@
     </changeSet>
 
 
+    <!-- 3736: Add Servers to FT Index -->
+    <changeSet id="20190130-3736-1"
+               author="kamransaleem">
+        <comment>3736: Server Information hostname to name.type</comment>
+        <modifyDataType tableName="server_information"
+                        columnName="hostname"
+                        newDataType="${name.type}" />
+    </changeSet>
+
+    <changeSet id="20190130-3736-2"
+               author="kamransaleem"
+               dbms="mssql"
+               context="!exclude-ft">
+        <comment>3736: Add Servers to FT Index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX ON server_information
+            (hostname, external_id, operating_system, location)
+            KEY INDEX server_information_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190130-3736-2"
+               author="kamransaleem"
+               dbms="mysql"
+               context="!exclude-ft">
+        <comment>3736: Add Servers to FT Index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX server_information_ft_idx
+            ON server_information (hostname, external_id, operating_system, location)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20190130-3736-3"
+               author="kamransaleem">
+        <comment>3736: Server Information index on hostname</comment>
+        <createIndex indexName="idx_si_hostname"
+                     tableName="server_information"
+                     unique="true">
+            <column name="hostname"
+                    type="${name.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190130-3736-4"
+               author="kamransaleem"
+               dbms="mysql,postgresql,h2">
+        <comment>3736: Server Information index on hostname</comment>
+        <createIndex indexName="idx_si_external_id"
+                     tableName="server_information"
+                     unique="true">
+            <column name="external_id"
+                    type="${external-id.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190130-3736-4"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>Measurables: unique composite index on category and external id</comment>
+        <sql>
+            CREATE UNIQUE NONCLUSTERED INDEX idx_si_external_id
+            ON [server_information]([external_id])
+            WHERE [external_id] IS NOT NULL;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
