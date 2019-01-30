@@ -31,11 +31,13 @@
     <property name="clob.type" value="text" dbms="mssql"></property>
     <property name="clob.type" value="longtext" dbms="mysql"></property>
     <property name="clob.type" value="text" dbms="postgresql"></property>
+    <property name="clob.type" value="clob" dbms="h2"></property>
 
     <property name="now.value" value="current_timestamp" dbms="oracle"></property>
     <property name="now.value" value="getutcdate()" dbms="mssql"></property>
     <property name="now.value" value="now()" dbms="mysql"></property>
     <property name="now.value" value="now()" dbms="postgresql"></property>
+    <property name="now.value" value="now()" dbms="h2"></property>
 
     <property name="today.value" value="current_date" dbms="oracle"></property>
     <property name="today.value" value="getutcdate()" dbms="mssql"></property>
@@ -46,24 +48,29 @@
     <property name="long.type" value="BIGINT" dbms="mssql"></property>
     <property name="long.type" value="BIGINT" dbms="mysql"></property>
     <property name="long.type" value="BIGINT" dbms="postgresql"></property>
+    <property name="long.type" value="BIGINT" dbms="h2"></property>
 
     <property name="int.type" value="NUMBER(9)" dbms="oracle"></property>
     <property name="int.type" value="int" dbms="mssql"></property>
     <property name="int.type" value="INTEGER" dbms="mysql"></property>
     <property name="int.type" value="INTEGER" dbms="postgresql"></property>
+    <property name="int.type" value="INT" dbms="h2"></property>
 
     <property name="longvarchar.type" value="nvarchar(4000)" dbms="mssql"></property>
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
     <property name="longvarchar.type" value="varchar(4000)" dbms="postgresql"></property>
+    <property name="longvarchar.type" value="LONGVARCHAR" dbms="h2"></property>
 
     <property name="true.value" value="1" dbms="mssql"/>
     <property name="true.value" value="1" dbms="mysql"/>
     <property name="true.value" value="true" dbms="postgresql"/>
+    <property name="true.value" value="true" dbms="h2"/>
 
     <property name="false.value" value="0" dbms="oracle"></property>
     <property name="false.value" value="0" dbms="mssql"></property>
     <property name="false.value" value="0" dbms="mysql"></property>
     <property name="false.value" value="false" dbms="postgresql"></property>
+    <property name="false.value" value="false" dbms="h2"></property>
 
 
     <!-- DICTIONARY -->

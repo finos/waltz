@@ -20,6 +20,20 @@
     <profiles>
 
         <profile>
+            <id>waltz-h2</id>
+            <properties>
+                <jdbc.group>com.h2database</jdbc.group>
+                <jdbc.artifact>h2</jdbc.artifact>
+                <jdbc.version>1.4.197</jdbc.version>
+                <jdbc.driver>org.h2.Driver</jdbc.driver>
+                <jooq.dialect>H2</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.meta.h2.H2Database</jooq.database>
+                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+            </properties>
+        </profile>
+
+        <profile>
             <id>waltz-mariadb</id>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
@@ -29,7 +43,6 @@
                 <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.meta.mariadb.MariaDBDatabase</jooq.database>
-                <database.catalog></database.catalog> <!-- only required for MSSQL -->
             </properties>
         </profile>
 

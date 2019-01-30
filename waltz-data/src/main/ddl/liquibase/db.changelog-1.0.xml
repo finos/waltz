@@ -744,7 +744,7 @@
 
     <changeSet author="dwatkins"
                id="20160106-idx-3"
-               dbms="postgresql">
+               dbms="h2,postgresql">
         <createIndex indexName="idx_si_asset_code"
                      tableName="server_information"
                      unique="false">
@@ -2019,7 +2019,7 @@
     <!-- 244 entity statistics - rename -->
     <changeSet author="kamransaleem"
                id="20160624-244-1"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <renameTable newTableName="entity_statistic_definition"
                      oldTableName="entity_statistic"/>
 
@@ -2556,6 +2556,7 @@
     </changeSet>
 
     <changeSet id="20160830-447-2"
+               dbms="mysql,postgresql,mssql"
                author="rovats">
         <addColumn tableName="data_flow">
             <column autoIncrement="true"
@@ -2565,6 +2566,19 @@
                              primaryKeyName="data_flow_pkey"/>
             </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="20160830-447-2-h2"
+               dbms="h2"
+               author="davidwatkins73">
+        <addColumn tableName="data_flow">
+            <column autoIncrement="true"
+                    name="id"
+                    type="BIGSERIAL">
+            </column>
+        </addColumn>
+        <addPrimaryKey tableName="data_flow"
+                       columnNames="id"/>
     </changeSet>
 
     <changeSet id="20160830-447-3"
@@ -3261,7 +3275,7 @@
     <!-- 747 actor rename to actor-->
     <changeSet author="kamransaleem"
                id="20161021-747-1"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <renameTable oldTableName="involvement_kind"
                      newTableName="actor" />
 
@@ -3307,7 +3321,7 @@
     <!-- 750 - Rename DataFlow / DataFlowDecorator to LogicalFlow LogicalFlowDecorator -->
     <changeSet author="dwatkins"
                id="20161107-750-1"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <dropPrimaryKey tableName="data_flow"/>
 
         <renameTable oldTableName="data_flow"
@@ -3497,7 +3511,7 @@
 
     <changeSet id="20161111-942-1"
                author="kamransaleem"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
 
         <dropDefaultValue columnName="last_updated_at"
                           tableName="actor" />

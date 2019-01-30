@@ -1,5 +1,9 @@
 extraction:
   java:
+    index:
+      maven:
+        settings_file: .lgtm.settings.xml
     after_prepare:
       # Disable modules that require a running SQL server in order to build
-      - sed -i -e '/\s*<module>waltz-\(service\|web\|jobs\|data\|schema\)<\/module>/d' pom.xml
+      # - sed -i -e '/\s*<module>waltz-\(service\|web\|jobs\|data\|schema\)<\/module>/d' pom.xml
+      - sed -i -e '/\s*<module>waltz-web<\/module>/d' pom.xml

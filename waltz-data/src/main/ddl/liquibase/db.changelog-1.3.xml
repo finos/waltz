@@ -394,7 +394,7 @@
 
     <changeSet id="20170330-1874-1"
                author="davidwatkins73"
-               dbms="postgresql">
+               dbms="postgresql,h2">
         <comment>1874: Prevent duplicate survey template names</comment>
         <addUniqueConstraint columnNames="name"
                              constraintName="survey_template_unique_name"
@@ -682,7 +682,7 @@
 
     <changeSet id="20170404-1881-8a"
                author="davidwatkins73"
-               dbms="mssql">
+               dbms="mssql,h2">
         <comment>1881: Remove indexes before removing columns</comment>
         <dropIndex tableName="physical_flow"
                    indexName="idx_target_entity"/>
