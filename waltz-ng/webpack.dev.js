@@ -8,6 +8,8 @@ module.exports = merge(common, {
     devServer: {
         contentBase: "./dist",
         disableHostCheck: true,
-        historyApiFallback: true
+        historyApiFallback: {
+            disableDotRule: true
+        }
     }
 });

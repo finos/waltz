@@ -56,12 +56,19 @@ export function store($http, baseUrl) {
             .then(result => result.data);
 
 
+    const getByHostname = (hostname) =>
+        $http
+            .get(`${BASE}/hostname/${hostname}`)
+            .then(result => result.data);
+
+
     return {
         findByAssetCode,
         findByAppId,
         findStatsForSelector,
         getById,
-        getByExternalId
+        getByExternalId,
+        getByHostname
     };
 }
 
@@ -100,6 +107,11 @@ export const ServerInfoStore_API = {
         serviceName,
         serviceFnName: "getByExternalId",
         description: "executes getByExternalId"
+    },
+    getByHostname: {
+        serviceName,
+        serviceFnName: "getByHostname",
+        description: "executes getByHostname"
     },
 };
 

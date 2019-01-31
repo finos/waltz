@@ -74,7 +74,12 @@ public class ServerInformationService {
 
 
     public ServerInformation getByExternalId(String externalId) {
-        return  serverInformationDao.getByExternalId(externalId);
+        return serverInformationDao.getByExternalId(externalId);
+    }
+
+
+    public ServerInformation getByHostname(String hostname) {
+        return serverInformationDao.getByHostname(hostname);
     }
 
 

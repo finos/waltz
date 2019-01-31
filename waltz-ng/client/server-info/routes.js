@@ -21,11 +21,18 @@ const serverViewByExternalIdBouncerState = {
 };
 
 
+const serverViewByHostnameBouncerState = {
+    url: "/hostname/{hostname}",
+    resolve: { hostnameBouncer }
+};
+
+
 function setup($stateProvider) {
     $stateProvider
         .state("main.server", baseState)
         .state("main.server.view", viewState)
-        .state("main.server.external-id", serverViewByExternalIdBouncerState);
+        .state("main.server.external-id", serverViewByExternalIdBouncerState)
+        .state("main.server.hostname", serverViewByHostnameBouncerState);
 }
 
 setup.$inject = [
@@ -51,6 +58,27 @@ function externalIdBouncer($state, $stateParams, serviceBroker) {
 }
 
 externalIdBouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
+];
+
+
+function hostnameBouncer($state, $stateParams, serviceBroker) {
+    const hostname = $stateParams.hostname;
+    serviceBroker
+        .loadViewData(CORE_API.ServerInfoStore.getByHostname, [hostname])
+        .then(r => {
+            const element = r.data;
+            if(element) {
+                $state.go("main.server.view", {id: element.id});
+            } else {
+                console.log(`Cannot find server corresponding to hostname: ${hostname}`);
+            }
+        });
+}
+
+hostnameBouncer.$inject = [
     "$state",
     "$stateParams",
     "ServiceBroker"
