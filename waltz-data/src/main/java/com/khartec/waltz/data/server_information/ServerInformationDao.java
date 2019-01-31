@@ -126,6 +126,14 @@ public class ServerInformationDao {
     }
 
 
+    public ServerInformation getByHostname(String hostname) {
+        return dsl.select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
+                .where(SERVER_INFORMATION.HOSTNAME.eq(hostname))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public int[] bulkSave(List<ServerInformation> servers) {
         return dsl
                 .batch(servers.stream()

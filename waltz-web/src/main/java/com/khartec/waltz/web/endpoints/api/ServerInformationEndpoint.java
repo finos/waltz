@@ -56,6 +56,7 @@ public class ServerInformationEndpoint implements Endpoint {
         String findByAppIdPath = mkPath(BASE_URL, "app-id", ":id");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
+        String getByHostnamePath = mkPath(BASE_URL, "hostname", ":hostname");
         String calculateStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
 
         ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
@@ -70,6 +71,9 @@ public class ServerInformationEndpoint implements Endpoint {
         DatumRoute<ServerInformation> getByExternalIdRoute = (request, response)
                 -> serverInformationService.getByExternalId(request.params("externalId"));
 
+        DatumRoute<ServerInformation> getByHostnameRoute = (request, response)
+                -> serverInformationService.getByHostname(request.params("hostname"));
+
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
                 -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
@@ -78,6 +82,7 @@ public class ServerInformationEndpoint implements Endpoint {
         getForList(findByAppIdPath, findByAppIdRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getByExternalIdPath, getByExternalIdRoute);
+        getForDatum(getByHostnamePath, getByHostnameRoute);
         postForDatum(calculateStatsForAppSelectorPath, calculateStatsForAppSelectorRoute);
     }
 
