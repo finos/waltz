@@ -168,4 +168,10 @@
     </changeSet>
 
 
+    <changeSet id="20190131-3608-1"
+               author="davidwatkins73">
+        <comment>3608: Remove tour table</comment>
+        <dropTable tableName="tour"/>
+    </changeSet>
+
 </databaseChangeLog>
