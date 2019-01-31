@@ -53,7 +53,7 @@ public class ServerInformationDao {
     private final DSLContext dsl;
 
 
-    private static final RecordMapper<Record, ServerInformation> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<Record, ServerInformation> TO_DOMAIN_MAPPER = r -> {
 
         ServerInformationRecord row = r.into(ServerInformationRecord.class);
 
