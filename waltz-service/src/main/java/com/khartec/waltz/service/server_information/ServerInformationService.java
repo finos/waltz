@@ -21,7 +21,10 @@ package com.khartec.waltz.service.server_information;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
+import com.khartec.waltz.data.server_information.search.ServerInformationSearchDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import org.jooq.Record1;
@@ -37,17 +40,22 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class ServerInformationService {
 
-    private final ServerInformationDao serverInformationDao;
     private final ApplicationIdSelectorFactory selectorFactory;
+    private final ServerInformationDao serverInformationDao;
+    private final ServerInformationSearchDao serverInformationSearchDao;
 
 
     @Autowired
-    public ServerInformationService(ServerInformationDao serverInfoDao, ApplicationIdSelectorFactory selectorFactory) {
-        checkNotNull(serverInfoDao, "serverInformationDao must not be null");
+    public ServerInformationService(ApplicationIdSelectorFactory selectorFactory,
+                                    ServerInformationDao serverInfoDao,
+                                    ServerInformationSearchDao serverInformationSearchDao) {
         checkNotNull(selectorFactory, "selectorFactory cannot be null");
+        checkNotNull(serverInfoDao, "serverInformationDao must not be null");
+        checkNotNull(serverInformationSearchDao, "serverInformationSearchDao cannot be null");
 
-        this.serverInformationDao = serverInfoDao;
         this.selectorFactory = selectorFactory;
+        this.serverInformationDao = serverInfoDao;
+        this.serverInformationSearchDao = serverInformationSearchDao;
     }
 
     public List<ServerInformation> findByAssetCode(String assetCode) {
@@ -74,5 +82,16 @@ public class ServerInformationService {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return serverInformationDao.calculateStatsForAppSelector(selector);
     }
+
+
+    public List<ServerInformation> search(String query) {
+        return search(query, EntitySearchOptions.mkForEntity(EntityKind.SERVER));
+    }
+
+
+    public List<ServerInformation> search(String query, EntitySearchOptions options) {
+        return serverInformationSearchDao.search(query, options);
+    }
+
 
 }

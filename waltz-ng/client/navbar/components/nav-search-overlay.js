@@ -19,6 +19,7 @@
 
 import {CORE_API} from "../../common/services/core-api-utils";
 import {entityLifecycleStatuses, initialiseData} from "../../common/index";
+import {entity} from "../../common/services/enums/entity";
 
 import template from "./nav-search-overlay.html";
 
@@ -33,17 +34,18 @@ const bindings = {
 
 const initialState = {
     categories: [
-        "APPLICATION",
-        "PERSON",
-        "ACTOR",
-        "CHANGE_INITIATIVE",
-        "DATA_TYPE",
-        "APP_GROUP",
-        "ORG_UNIT",
-        "MEASURABLE",
-        "PHYSICAL_SPECIFICATION",
-        "LOGICAL_DATA_ELEMENT",
-        "ROADMAP"
+        entity.APPLICATION.key,
+        entity.PERSON.key,
+        entity.ACTOR.key,
+        entity.CHANGE_INITIATIVE.key,
+        entity.DATA_TYPE.key,
+        entity.APP_GROUP.key,
+        entity.ORG_UNIT.key,
+        entity.MEASURABLE.key,
+        entity.PHYSICAL_SPECIFICATION.key,
+        entity.LOGICAL_DATA_ELEMENT.key,
+        entity.ROADMAP.key,
+        entity.SERVER.key
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -141,17 +143,18 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, "APPLICATION");
-        handleSearch(query, "CHANGE_INITIATIVE");
-        handleSearch(query, "DATA_TYPE");
-        handleSearch(query, "PERSON");
-        handleSearch(query, "MEASURABLE");
-        handleSearch(query, "ORG_UNIT");
-        handleSearch(query, "ACTOR");
-        handleSearch(query, "PHYSICAL_SPECIFICATION");
-        handleSearch(query, "APP_GROUP");
-        handleSearch(query, "LOGICAL_DATA_ELEMENT");
-        handleSearch(query, "ROADMAP");
+        handleSearch(query, entity.APPLICATION.key,);
+        handleSearch(query, entity.CHANGE_INITIATIVE.key,);
+        handleSearch(query, entity.DATA_TYPE.key,);
+        handleSearch(query, entity.PERSON.key,);
+        handleSearch(query, entity.MEASURABLE.key,);
+        handleSearch(query, entity.ORG_UNIT.key,);
+        handleSearch(query, entity.ACTOR.key,);
+        handleSearch(query, entity.PHYSICAL_SPECIFICATION.key,);
+        handleSearch(query, entity.APP_GROUP.key,);
+        handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key,);
+        handleSearch(query, entity.ROADMAP.key,);
+        handleSearch(query, entity.SERVER.key,);
     };
 
     vm.doSearch = () => doSearch(vm.query);

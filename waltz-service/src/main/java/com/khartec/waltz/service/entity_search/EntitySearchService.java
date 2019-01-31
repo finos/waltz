@@ -35,6 +35,7 @@ import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.roadmap.RoadmapService;
+import com.khartec.waltz.service.server_information.ServerInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +63,7 @@ public class EntitySearchService {
     private final PersonService personService;
     private final PhysicalSpecificationService physicalSpecificationService;
     private final RoadmapService roadmapService;
+    private final ServerInformationService serverInformationService;
 
 
     @Autowired
@@ -76,7 +78,8 @@ public class EntitySearchService {
                                OrganisationalUnitService organisationalUnitService,
                                PersonService personService,
                                PhysicalSpecificationService physicalSpecificationService,
-                               RoadmapService roadmapService) {
+                               RoadmapService roadmapService,
+                               ServerInformationService serverInformationService) {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
@@ -89,6 +92,7 @@ public class EntitySearchService {
         checkNotNull(personService, "personService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(roadmapService, "roadmapService cannot be null");
+        checkNotNull(serverInformationService, "serverInformationService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -102,15 +106,16 @@ public class EntitySearchService {
         this.personService = personService;
         this.physicalSpecificationService = physicalSpecificationService;
         this.roadmapService = roadmapService;
+        this.serverInformationService = serverInformationService;
     }
 
 
-    public List<EntityReference> search(String terms, EntitySearchOptions options) {
-        checkNotNull(terms, "terms cannot be null");
+    public List<EntityReference> search(String query, EntitySearchOptions options) {
+        checkNotNull(query, "query cannot be null");
         checkNotNull(options, "options cannot be null");
 
         List<Future<Collection<? extends WaltzEntity>>> futures = options.entityKinds().stream()
-                .map(ek -> dbExecutorPool.submit(mkCallable(ek, terms, options)))
+                .map(ek -> dbExecutorPool.submit(mkCallable(ek, query, options)))
                 .collect(toList());
 
         return futures.stream()
@@ -121,31 +126,33 @@ public class EntitySearchService {
 
 
     private Callable<Collection<? extends WaltzEntity>> mkCallable(EntityKind entityKind,
-                                                                   String terms,
+                                                                   String query,
                                                                    EntitySearchOptions options) {
         switch (entityKind) {
             case ACTOR:
-                return () -> actorService.search(terms, options);
+                return () -> actorService.search(query, options);
             case APPLICATION:
-                return () -> applicationService.search(terms, options);
+                return () -> applicationService.search(query, options);
             case APP_GROUP:
-                return () -> appGroupService.search(terms, options);
+                return () -> appGroupService.search(query, options);
             case CHANGE_INITIATIVE:
-                return () -> changeInitiativeService.search(terms, options);
+                return () -> changeInitiativeService.search(query, options);
             case DATA_TYPE:
-                return () -> dataTypeService.search(terms);
+                return () -> dataTypeService.search(query);
             case LOGICAL_DATA_ELEMENT:
-                return () -> logicalDataElementService.search(terms, options);
+                return () -> logicalDataElementService.search(query, options);
             case MEASURABLE:
-                return () -> measurableService.search(terms, options);
+                return () -> measurableService.search(query, options);
             case ORG_UNIT:
-                return () -> organisationalUnitService.search(terms, options);
+                return () -> organisationalUnitService.search(query, options);
             case PERSON:
-                return () -> personService.search(terms, options);
+                return () -> personService.search(query, options);
             case PHYSICAL_SPECIFICATION:
-                return () -> physicalSpecificationService.search(terms, options);
+                return () -> physicalSpecificationService.search(query, options);
             case ROADMAP:
-                return () -> roadmapService.search(terms, options);
+                return () -> roadmapService.search(query, options);
+            case SERVER:
+                return () -> serverInformationService.search(query, options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }
