@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {initialiseData} from "../../common/index";
-import template from './playpen4.html';
+import template from "./playpen4.html";
 
 const initialState = {
-    parentEntityRef: { kind: 'ORG_UNIT', id: 6018 },
-    foo: 'baa'
+    parentEntityRef: { kind: "ORG_UNIT", id: 6018 },
+    foo: "baa"
 };
 
 
 
-function controller(serviceBroker, $stateParams) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
 
@@ -37,15 +37,13 @@ function controller(serviceBroker, $stateParams) {
 
 
 controller.$inject = [
-    'ServiceBroker',
-    '$stateParams'
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

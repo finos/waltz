@@ -281,7 +281,7 @@ function controller(notification,
 
     vm.onSubmit = () => {
         if (vm.submitDisabled) return;
-        const cmd = mkUpdCmd(vm.commandParams);
+        const cmd = mkUpdCmd();
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
             .catch(e => {

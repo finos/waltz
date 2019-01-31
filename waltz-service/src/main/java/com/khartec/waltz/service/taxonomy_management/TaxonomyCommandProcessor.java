@@ -18,7 +18,7 @@ public interface TaxonomyCommandProcessor {
     default void checkDomain(TaxonomyChangeCommand cmd, EntityKind expectedDomain) {
         Checks.checkTrue(
                 cmd.changeDomain().kind() == expectedDomain,
-                "Incorrect domain, expected [$s] got [%s]",
+                "Incorrect domain, expected [%s] got [%s]",
                 expectedDomain,
                 cmd.changeDomain().kind());
     }
@@ -46,7 +46,7 @@ public interface TaxonomyCommandProcessor {
         checkDomain(cmd, domain());
         Checks.checkTrue(
                 supportedTypes().contains(cmd.changeType()),
-                "Incorrect type, expected [$s] got [%s]",
+                "Incorrect type, expected [%s] got [%s]",
                 supportedTypes(),
                 cmd.changeType());  }
 

@@ -25,6 +25,8 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.scenario.ScenarioService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.Arrays;
+
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 
 
@@ -43,7 +45,7 @@ public class ScenarioHarness {
                     AxisOrientation.ROW,
                     newArrayList(118L, 161L));
 
-        System.out.println(result);
+        System.out.println(Arrays.toString(result));
 
     }
 

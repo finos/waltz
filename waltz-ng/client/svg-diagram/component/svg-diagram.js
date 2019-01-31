@@ -40,7 +40,6 @@ function resize(elem, win) {
 
 function controller($element, $window) {
     const vm = this;
-    let latch = false;
 
     vm.$onInit = () => angular
         .element($window)

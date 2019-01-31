@@ -26,9 +26,6 @@ import playpenView4 from "./4/playpen4";
 import dynaTestView from "./dyna-test-view/dyna-test-view";
 
 import {registerComponents} from '../common/module-utils';
-import * as EntityDataSourcingPanel from './4/entity-data-sourcing-panel/entity-data-sourcing-panel';
-import * as FlowExplorer from './4/flow-explorer/flow-explorer';
-import * as FooWidget from './4/foo-widget/foo-widget';
 import list from './list.html';
 
 export default () => {
@@ -70,10 +67,7 @@ export default () => {
         }
     ]);
 
-    registerComponents(module, [
-        FlowExplorer,
-        FooWidget,
-        EntityDataSourcingPanel]);
+    registerComponents(module, []);
     return module.name;
 
 };
