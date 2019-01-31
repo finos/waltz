@@ -18,58 +18,23 @@
  */
 
 
-import _ from "lodash";
 import template from "./playpen1.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 import {initialiseData} from "../../common";
-import {
-    mkRandomMeasurable,
-    mkRandomRowData,
-    prepareData
-} from "../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 
 const initData = {
 
 
 };
 
-function mkDemoData(colCount, rowCount) {
-    return {
-        rowData: _.times(rowCount, () => mkRandomRowData(colCount)),
-        columnHeadings: _.times(colCount, i => mkRandomMeasurable(i, "col")),
-        rowHeadings: _.times(rowCount, i => mkRandomMeasurable(i, "row"))
-    }
-}
-
-
 function controller($element, $q, serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
-
     vm.$onInit = () => {
-        const cmd = {
-            "changeType": "UPDATE_CONCRETENESS",
-            "changeDomain": {
-                "kind": "MEASURABLE_CATEGORY",
-                "id": 4,
-            },
-            "a": {
-                "kind": "MEASURABLE",
-                "id": 587,
-            },
-            "newValue": "false",
-            "createdBy": "admin"
-        };
-        serviceBroker
-            .execute(
-                CORE_API.TaxonomyManagementStore.preview,
-                [ cmd ])
-            .then(r => vm.preview = r.data);
     };
 }
 
-controller.$inject = ["$element", "$q", "ServiceBroker"];
+controller.$inject = [];
 
 const view = {
     template,
