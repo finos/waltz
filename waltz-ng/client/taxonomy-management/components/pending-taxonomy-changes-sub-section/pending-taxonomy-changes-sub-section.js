@@ -62,7 +62,8 @@ function controller(notification, serviceBroker) {
 
     vm.onApplyPendingChange = (c) => {
         vm.onApplyChange(c)
-            .then(vm.onDismiss);
+            .then(vm.onDismiss)
+            .then(reload);
     };
 
 }

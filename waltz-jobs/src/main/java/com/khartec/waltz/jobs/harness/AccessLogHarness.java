@@ -25,6 +25,8 @@ import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.Optional;
+
 
 public class AccessLogHarness {
 
@@ -37,7 +39,7 @@ public class AccessLogHarness {
 
         accessLogDao.write(ImmutableAccessLog.builder().params("{b:2}").state("my.state").userId("bob").build());
 
-        accessLogDao.findForUserId("bob", null).forEach(System.out::println);
+        accessLogDao.findForUserId("bob", Optional.empty()).forEach(System.out::println);
 
     }
 

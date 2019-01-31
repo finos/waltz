@@ -19,7 +19,6 @@
 
 import {initialiseData} from "../../../common";
 import template from "./assessment-editor.html";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {

@@ -130,7 +130,6 @@ public class PhysicalFlowService {
         checkNotNull(command, "command cannot be null");
 
         PhysicalFlow physicalFlow = physicalFlowDao.getById(command.flowId());
-        LogicalFlow logicalFlow = logicalFlowService.getById(physicalFlow.logicalFlowId());
 
         CommandOutcome commandOutcome = CommandOutcome.SUCCESS;
         String responseMessage = null;
@@ -141,6 +140,7 @@ public class PhysicalFlowService {
             commandOutcome = CommandOutcome.FAILURE;
             responseMessage = "Flow not found";
         } else {
+            LogicalFlow logicalFlow = logicalFlowService.getById(physicalFlow.logicalFlowId());
             int deleteCount = physicalFlowDao.delete(command.flowId());
 
             if (deleteCount == 0) {
@@ -150,41 +150,41 @@ public class PhysicalFlowService {
                 isSpecificationUnused = !physicalSpecificationDao.isUsed(physicalFlow.specificationId());
                 isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
-        }
 
-        // log changes against source and target entities
-        if (commandOutcome == CommandOutcome.SUCCESS) {
-            PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
+            // log changes against source and target entities
+            if (commandOutcome == CommandOutcome.SUCCESS) {
+                PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
 
-            String flowRemovalMessage = String.format(
-                    "Physical flow: %s, from: %s, to: %s removed.",
-                    specification.name(),
-                    safeName(logicalFlow.source()),
-                    safeName(logicalFlow.target()));
+                String flowRemovalMessage = String.format(
+                        "Physical flow: %s, from: %s, to: %s removed.",
+                        specification.name(),
+                        safeName(logicalFlow.source()),
+                        safeName(logicalFlow.target()));
 
-            logChange(username,
-                    mkRef(PHYSICAL_FLOW, physicalFlow.id().get()),
-                    flowRemovalMessage,
-                    Operation.REMOVE);
+                logChange(username,
+                        mkRef(PHYSICAL_FLOW, physicalFlow.id().get()),
+                        flowRemovalMessage,
+                        Operation.REMOVE);
 
-            logChange(username,
-                    mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
-                    flowRemovalMessage,
-                    Operation.REMOVE);
+                logChange(username,
+                        mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
+                        flowRemovalMessage,
+                        Operation.REMOVE);
 
-            logChange(username,
-                    logicalFlow.target(),
-                    String.format("Physical flow: %s, from: %s removed.",
-                            specification.name(),
-                            safeName(logicalFlow.source())),
-                    Operation.REMOVE);
+                logChange(username,
+                        logicalFlow.target(),
+                        String.format("Physical flow: %s, from: %s removed.",
+                                specification.name(),
+                                safeName(logicalFlow.source())),
+                        Operation.REMOVE);
 
-            logChange(username,
-                    logicalFlow.source(),
-                    String.format("Physical flow: %s, to: %s removed.",
-                            specification.name(),
-                            safeName(logicalFlow.target())),
-                    Operation.REMOVE);
+                logChange(username,
+                        logicalFlow.source(),
+                        String.format("Physical flow: %s, to: %s removed.",
+                                specification.name(),
+                                safeName(logicalFlow.target())),
+                        Operation.REMOVE);
+            }
         }
 
 

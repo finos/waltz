@@ -69,7 +69,7 @@ public class IdUtilities {
      * <br>
      * Returns .
      * @param idProvider object which implements IdProvider
-     * @param exceptionMessage, message to use if idProvider.id() == empty
+     * @param exceptionMessage message to use if idProvider.id() == empty
      * @return the id if it is present
      */
     public static Long ensureHasId(IdProvider idProvider, String exceptionMessage) {
