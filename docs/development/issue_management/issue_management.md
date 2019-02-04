@@ -28,8 +28,8 @@ There are several tags used to categorise the issues, important ones are:
 
 ## Milestones
 
-We broadly a milestones per release (`1.12`, `1.13`, `1.14` etc).  The _under development_ 
-release is split into three milestones:
+We use a milestones per release (`1.12`, `1.13`, `1.14` etc).  The _under development_ 
+release is then split into three further milestones:
 
 | Milestone | Description |
 | --- | --- |
