@@ -37,21 +37,17 @@ export default () => {
     const module = angular.module("waltz.measurable.rating", []);
 
     module
-        .config(Routes)
-        ;
-
+        .config(Routes);
 
     registerStores(module, [measurableRatingStore]);
-
 
     module
         .component("waltzMeasurableRatingAppSection", MeasurableRatingAppSection)
         .component("waltzMeasurableRatingExplorerSection", MeasurableRatingExplorerSection)
         .component("waltzMeasurableRatingPanel", MeasurableRatingPanel)
-        .component("waltzMeasurableRatingTree", MeasurableRatingTree)
+        .component("waltzMeasurableRatingTree", MeasurableRatingTree) // vanilla tree
         .component("waltzMeasurableRatingsBrowser", MeasurableRatingsBrowser)
-        .component("waltzRelatedMeasurablesSection", RelatedMeasurablesSection)
-        ;
+        .component("waltzRelatedMeasurablesSection", RelatedMeasurablesSection);
 
     registerComponents(module, [
         MeasurableRatingsBrowserSection,
