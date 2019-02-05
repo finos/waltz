@@ -49,9 +49,9 @@
                             Description
                         </div>
                         <div class="col-sm-9">
-                            <span style="font-weight: lighter"
-                                  ng-bind="$ctrl.selected.rating.description || 'No comment given'">
-                            </span>
+                            <waltz-markdown style="font-weight: lighter"
+                                            text="$ctrl.selected.rating.description || 'No comment given'">
+                            </waltz-markdown>
                         </div>
                     </div>
                 </div>

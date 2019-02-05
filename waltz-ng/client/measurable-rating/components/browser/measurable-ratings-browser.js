@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {distinctRatingCodes, indexRatingSchemes} from "../../../ratings/rating-utils";
@@ -38,6 +38,7 @@ const bindings = {
     categories: '<',
     ratingTallies: '<',
     onSelect: '<',
+    onCategorySelect: '<',
     scrollHeight: '<'
 };
 
@@ -111,7 +112,7 @@ function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) 
 
 function findFirstNonEmptyTab(tabs = []) {
     const firstNonEmptyTab = _.find(tabs, t => t.treeData.length > 0);
-    return _.get(firstNonEmptyTab || tabs[0], 'category.id');
+    return firstNonEmptyTab || tabs[0];
 }
 
 
@@ -162,13 +163,19 @@ function controller(serviceBroker) {
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
         } else {
-            vm.tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
+            const tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
+            const tab = findFirstNonEmptyTab(tabs);
+
+            vm.tabs = tabs;
+            vm.visibility.tab = _.get(tab, ["category", "id"]);
+
             vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
-            vm.visibility.tab = findFirstNonEmptyTab(vm.tabs);
             vm.maxTotal = _.max(
                 _.flatMap(
                     _.values(vm.ratingsMap),
-                    r => _.get(r, 'compound.total', [0])));
+                    r => _.get(r, ["compound", "total"], [0])));
+
+            vm.onTabChange(tab);
         }
     };
 
@@ -189,6 +196,10 @@ function controller(serviceBroker) {
             ];
         }
         prepareData();
+    };
+
+    vm.onTabChange = (tc) => {
+        invokeFunction(vm.onCategorySelect, tc.category);
     };
 }
 

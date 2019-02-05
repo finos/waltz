@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
 import org.supercsv.io.CsvListWriter;
@@ -45,19 +46,25 @@ public abstract class BaseDataExtractor {
     public abstract void register();
 
 
-    protected Object writeFile(String suggestedFilename, CSVSerializer extractor, Response response) throws Exception {
+    protected Object writeFile(String suggestedFilename,
+                               String clob,
+                               Response response) throws Exception {
         response.type(MimeTypes.Type.TEXT_PLAIN.name());
         response.header("Content-disposition", "attachment; filename="+suggestedFilename);
+        return clob;
+    }
 
+
+    protected Object writeFile(String suggestedFilename,
+                               CSVSerializer extractor,
+                               Response response) throws Exception {
         StringWriter bodyWriter = new StringWriter();
         CsvPreference csvPreference = CsvPreference.EXCEL_PREFERENCE;
         CsvListWriter csvWriter = new CsvListWriter(bodyWriter, csvPreference);
         csvWriter.write("sep=" + Character.toString((char) csvPreference.getDelimiterChar()));
-
         extractor.accept(csvWriter);
-
         csvWriter.flush();
-        return bodyWriter.toString();
+        return writeFile(suggestedFilename, bodyWriter.toString(), response);
     }
 
 }

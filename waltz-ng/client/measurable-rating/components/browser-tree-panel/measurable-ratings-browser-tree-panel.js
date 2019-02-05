@@ -218,11 +218,11 @@ function controller($q, serviceBroker) {
     };
 
 
-    vm.onGridInitialise = (e) => {
-        vm.exportGrid = () => e.exportFn(`${vm.selectedMeasurable.name} Ratings.csv`);
+    vm.onCategorySelect = (c) => {
+        vm.activeCategory = c;
     };
-
 }
+
 
 
 controller.$inject = [
