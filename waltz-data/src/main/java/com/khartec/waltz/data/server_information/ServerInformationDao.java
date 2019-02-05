@@ -111,24 +111,21 @@ public class ServerInformationDao {
 
 
     public ServerInformation getById(long id) {
-        return dsl.select(SERVER_INFORMATION.fields())
-                .from(SERVER_INFORMATION)
+        return dsl.selectFrom(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public ServerInformation getByExternalId(String externalId) {
-        return dsl.select(SERVER_INFORMATION.fields())
-                .from(SERVER_INFORMATION)
+        return dsl.selectFrom(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.EXTERNAL_ID.eq(externalId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public ServerInformation getByHostname(String hostname) {
-        return dsl.select(SERVER_INFORMATION.fields())
-                .from(SERVER_INFORMATION)
+        return dsl.selectFrom(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.HOSTNAME.eq(hostname))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }

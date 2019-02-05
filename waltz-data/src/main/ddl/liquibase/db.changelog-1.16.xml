@@ -244,4 +244,54 @@
         <dropTable tableName="tour"/>
     </changeSet>
 
+
+    <!-- 3803: Physical Flow Participant table-->
+    <changeSet id="20190131-3803-1"
+               author="kamransaleem">
+        <comment>3803: Physical Flow Participant table</comment>
+        <createTable tableName="physical_flow_participant">
+            <column name="physical_flow_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="kind"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="participant_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="participant_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20190131-3803-2"
+               author="kamransaleem">
+        <addPrimaryKey columnNames="physical_flow_id, participant_entity_id, participant_entity_kind, kind"
+                       constraintName="physical_flow_participant_pkey"
+                       tableName="physical_flow_participant" />
+    </changeSet>
+
+
 </databaseChangeLog>
