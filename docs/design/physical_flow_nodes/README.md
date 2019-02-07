@@ -69,14 +69,14 @@ flows are restored.
 
 ### Physical Flow Node table
 
-Nodes for physical flows will be captured in the `physical_flow_node`
+Nodes for physical flows will be captured in the `physical_flow_participant`
 table. A row in this table will effectively reference actual servers or
 databases that are participating in a physical flow, along with a
 designation indicating which side of the flow the node is acting.
 
 | Column             | Type      | Mandatory | Description                                                   |
 |:-------------------|:----------|:----------|:--------------------------------------------------------------|
-| `id`               | seq       | **y**     | PK                                                            |
+| `physical_flow_id` | long      | **y**     | id of the physical flow                                                            |
 | `side`             | enum      | **y**     | one of: `SOURCE` or `TARGET` to indicate the side of the flow |
 | `node_entity_kind` | enum      | **y**     | flow node entity kind                                         |
 | `node_entity_id`   | long      | **y**     | flow node entity id                                           |
@@ -85,6 +85,7 @@ designation indicating which side of the flow the node is acting.
 | `last_updated_at`  | timestamp | **y**     | when this record was created                                  |
 | `provenance`       | string    | **y**     | the provenance of the record                                  |
 
+primary key on (`physical_flow_id`, `side`, `node_entity_kind`, `node_entity_id`)
 
 ### Server Information and Database Information tables
 

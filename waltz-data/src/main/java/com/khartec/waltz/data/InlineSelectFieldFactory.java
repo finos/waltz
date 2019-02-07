@@ -110,6 +110,7 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.ORG_UNIT, tuple(ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME));
         mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
         mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
+        mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.HOSTNAME));
         return mappings;
     }
 
@@ -132,6 +133,7 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.EMPLOYEE_ID));
         mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.EXTERNAL_ID));
         mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, PHYSICAL_FLOW.EXTERNAL_ID));
+        mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.EXTERNAL_ID));
         return mappings;
     }
 
