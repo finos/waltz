@@ -43,9 +43,12 @@ import static java.util.stream.Collectors.toList;
 @Repository
 public class FlowDiagramEntityDao {
 
+    private static final com.khartec.waltz.schema.tables.FlowDiagramEntity fde = FLOW_DIAGRAM_ENTITY.as("fde");
+
+
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-            FLOW_DIAGRAM_ENTITY.ENTITY_ID,
-            FLOW_DIAGRAM_ENTITY.ENTITY_KIND,
+            fde.ENTITY_ID,
+            fde.ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
 
@@ -86,33 +89,26 @@ public class FlowDiagramEntityDao {
 
 
     public List<FlowDiagramEntity> findForDiagram(long diagramId) {
-        return dsl
-                .select(FLOW_DIAGRAM_ENTITY.fields())
-                .select(ENTITY_NAME_FIELD)
-                .from(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .fetch(TO_DOMAIN_MAPPER);
+        return doBasicQuery(fde.DIAGRAM_ID.eq(diagramId));
     }
 
 
     public List<FlowDiagramEntity> findForEntity(EntityReference ref) {
-        return dsl
-                .select(FLOW_DIAGRAM_ENTITY.fields())
-                .select(ENTITY_NAME_FIELD)
-                .from(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(ref.kind().name()))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(ref.id()))
-                .fetch(TO_DOMAIN_MAPPER);
+        Condition condition = fde.ENTITY_KIND.eq(ref.kind().name())
+                .and(fde.ENTITY_ID.eq(ref.id()));
+        return doBasicQuery(condition);
     }
 
 
-    public List<FlowDiagramEntity> findForSelector(Select<Record1<Long>> selector) {
-        return dsl
-                .select(FLOW_DIAGRAM_ENTITY.fields())
-                .select(ENTITY_NAME_FIELD)
-                .from(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.in(selector))
-                .fetch(TO_DOMAIN_MAPPER);
+    public List<FlowDiagramEntity> findForDiagramSelector(Select<Record1<Long>> selector) {
+        return doBasicQuery(fde.DIAGRAM_ID.in(selector));
+    }
+
+
+    public List<FlowDiagramEntity> findForEntitySelector(EntityKind kind, Select<Record1<Long>> selector) {
+        Condition condition = fde.ENTITY_ID.in(selector)
+                .and(fde.ENTITY_KIND.eq(kind.name()));
+        return doBasicQuery(condition);
     }
 
 
@@ -135,20 +131,23 @@ public class FlowDiagramEntityDao {
      * @return
      */
     public int deleteForDiagram(long diagramId) {
-        return dsl.deleteFrom(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
+        return dsl
+                .deleteFrom(fde)
+                .where(fde.DIAGRAM_ID.eq(diagramId))
+                .and(fde.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
                 .execute();
     }
 
 
     public boolean deleteEntityForDiagram(long diagramId, EntityReference entityReference) {
-        return dsl.deleteFrom(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(entityReference.kind().name()))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(entityReference.id()))
+        return dsl
+                .deleteFrom(fde)
+                .where(fde.DIAGRAM_ID.eq(diagramId))
+                .and(fde.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(fde.ENTITY_ID.eq(entityReference.id()))
                 .execute() == 1;
     }
+
 
     public void clone(long diagramId, Long clonedDiagramId) {
         List<FlowDiagramEntity> diagramEntities = findForDiagram(diagramId);
@@ -156,7 +155,18 @@ public class FlowDiagramEntityDao {
                 .copyOf(d)
                 .withDiagramId(clonedDiagramId));
         createEntities(clonedDiagramEntities);
-
-
     }
+
+
+    // --- helpers
+
+    private List<FlowDiagramEntity> doBasicQuery(Condition condition) {
+        return dsl
+                .select(fde.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(fde)
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
 }

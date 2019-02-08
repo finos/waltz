@@ -60,7 +60,7 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
         ListRoute<FlowDiagramEntity> findByDiagramIdRoute = (req, res)
                 -> flowDiagramEntityService.findByDiagramId(getId(req));
         ListRoute<FlowDiagramEntity> findForSelectorRoute = (req, res)
-                -> flowDiagramEntityService.findForSelector(readIdSelectionOptionsFromBody(req));
+                -> flowDiagramEntityService.findForDiagramSelector(readIdSelectionOptionsFromBody(req));
         ListRoute<FlowDiagramEntity> findByEntityRoute = (req, res)
                 -> flowDiagramEntityService.findByEntityReference(getEntityReference(req));
 
