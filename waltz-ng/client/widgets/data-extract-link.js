@@ -29,7 +29,7 @@ const bindings = {
     method: "@",
     filename: "@",
     requestBody: "<",
-    styling: "@?"
+    styling: "@?" // link | button
 };
 
 

@@ -1,4 +1,4 @@
-# Design for Physical Flow Nodes within Waltz
+# Design for Physical Flow Participants within Waltz
 
 [TOC levels=2-3]:  # "# Contents"
 
@@ -8,7 +8,7 @@
 - [Motivation](#motivation)
 - [Proposal](#proposal)
 - [Persistence](#persistence)
-    - [Physical Flow Node table](#physical-flow-node-table)
+    - [Physical Flow Participant table](#physical-flow-participant-table)
     - [Server Information and Database Information tables](#server-information-and-database-information-tables)
     - [Impact / Risks](#impact--risks)
     - [Limitations](#limitations)
@@ -34,7 +34,7 @@ In the following section we will use the following terminology:
   a logical flow. The physical flow has attributes to indicate the
   flow's frequency, transport mechanism and a specification of the
   contents transferred.
-- _Physical Flow Node_: the facilitating server, database or resource
+- _Physical Flow Participant_: the facilitating server, database or resource
   participating on either end of the physical flow.
 
 
@@ -44,7 +44,7 @@ Waltz represents the transfer of data between sources and recipients in
 some detail. This proves useful for architects to gain an understanding
 of the information flow between entities. There is a proposal to better
 support disaster recovery scenarios for flows by extending existing
-information on physical flows with detail of the _nodes_ involved in
+information on physical flows with detail of the _participants_ involved in
 facilitating them. This will help Ops teams to ensure all relevant
 servers and/or databases are recovered to ensure critical application
 flows are restored.
@@ -52,45 +52,46 @@ flows are restored.
 
 ## Proposal
 
-1. Represent the _nodes_ involved on the source and target ends.
-   Examples of _nodes_ are _Server_, _Database_, _Service_, _Load
+1. Represent the _participants_ involved on the source and target ends.
+   Examples of _participants_ are _Server_, _Database_, _Service_, _Load
    Balancer_.
-2. Ability to view the details of a _Node_ on a dedicated page, the
+2. Ability to view the details of a _Participant_ on a dedicated page, the
    details may include a list of the physical flows and applications
    that involve the aforementioned.
 3. Data Quality metrics to highlights physical flows that have no
    relevant disaster recovery annotations.
 4. Ability to view all critical flows in aggregate and be able to
-   navigate to the relevent nodes to assist with an actual disaster
+   navigate to the relevent participants to assist with an actual disaster
    recovery situation. Export support would be useful in this case.
 
 
 ## Persistence
 
-### Physical Flow Node table
+### Physical Flow Participant table
 
-Nodes for physical flows will be captured in the `physical_flow_node`
+Participants for physical flows will be captured in the `physical_flow_participant`
 table. A row in this table will effectively reference actual servers or
 databases that are participating in a physical flow, along with a
-designation indicating which side of the flow the node is acting.
+designation indicating which side of the flow the participant is acting.
 
-| Column             | Type      | Mandatory | Description                                                   |
-|:-------------------|:----------|:----------|:--------------------------------------------------------------|
-| `id`               | seq       | **y**     | PK                                                            |
-| `side`             | enum      | **y**     | one of: `SOURCE` or `TARGET` to indicate the side of the flow |
-| `node_entity_kind` | enum      | **y**     | flow node entity kind                                         |
-| `node_entity_id`   | long      | **y**     | flow node entity id                                           |
-| `description`      | string    | n         | a description of the nature of the participation of the node  |
-| `last_updated_by`  | string    | **y**     | user id of last editor or creator if new                      |
-| `last_updated_at`  | timestamp | **y**     | when this record was created                                  |
-| `provenance`       | string    | **y**     | the provenance of the record                                  |
+| Column                    | Type      | Mandatory | Description                                                          |
+|:--------------------------|:----------|:----------|:---------------------------------------------------------------------|
+| `physical_flow_id`        | long      | **y**     | id of the physical flow                                              |
+| `side`                    | enum      | **y**     | one of: `SOURCE` or `TARGET` to indicate the side of the flow        |
+| `participant_entity_kind` | enum      | **y**     | flow participant entity kind                                         |
+| `participant_entity_id`   | long      | **y**     | flow participant entity id                                           |
+| `description`             | string    | n         | a description of the nature of the participation of the participant  |
+| `last_updated_by`         | string    | **y**     | user id of last editor or creator if new                             |
+| `last_updated_at`         | timestamp | **y**     | when this record was created                                         |
+| `provenance`              | string    | **y**     | the provenance of the record                                         |
 
+primary key on (`physical_flow_id`, `side`, `participant_entity_kind`, `participant_entity_id`)
 
 ### Server Information and Database Information tables
 
 The existing tables `server_information` and `database_information` will
 continue to persist servers or databases respectively that are
-referenced as nodes. The existing tables are denormalised, resulting in
+referenced as participants. The existing tables are denormalised, resulting in
 the potential for a server or database to be repeated in several rows if
 shared amongst multiple applications.
 
@@ -146,11 +147,11 @@ Support for these may be incorporated in the future.
 
 ## Example Screens
 
-- Node Information page
-  - Overview information on the node
+- Participant Information page
+  - Overview information on the participant
   - Related applications
-  - Physical flows the _node_ is party to
-  - Installed Software Packages on the _node_
+  - Physical flows the _participant_ is party to
+  - Installed Software Packages on the _participant_
   - Bookmarks
   - Entity Notes, incorporating:
     -   Support contacts

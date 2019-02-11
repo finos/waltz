@@ -3,6 +3,7 @@
         <input type="radio"
                ng-repeat-start="tab in $ctrl.tabs"
                ng-model="$ctrl.visibility.tab"
+               ng-change="$ctrl.onTabChange(tab)"
                ng-value="tab.category.id"
                ng-disabled="tab.treeData.length === 0"
                name="measurable_ratings_browser"

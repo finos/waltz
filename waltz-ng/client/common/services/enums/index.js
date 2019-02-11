@@ -39,6 +39,7 @@ import {lifecyclePhase} from "./lifecycle-phase";
 import {lifecycleStatus} from "./lifecycle-status";
 import {usageKind} from "./usage-kind";
 import {orgUnitKind} from "./org-unit-kind";
+import {participantKind} from "./participation-kind";
 import {rag} from "./rag";
 import {relationshipKind} from "./relationship-kind";
 import {releaseLifecycleStatus} from "./release-lifecycle-status";
@@ -79,6 +80,7 @@ export const enums = {
     dataFormatKind,
     lifecycleStatus,
     fieldDataType,
+    participantKind,
     physicalSpecDefinitionType,
     rag,
     relationshipKind,

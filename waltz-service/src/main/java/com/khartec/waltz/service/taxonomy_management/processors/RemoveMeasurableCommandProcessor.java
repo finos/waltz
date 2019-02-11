@@ -7,6 +7,7 @@ import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
@@ -17,13 +18,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.common.SetUtilities.minus;
+import static com.khartec.waltz.common.SetUtilities.*;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
+import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.addToPreview;
+import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validatePrimaryMeasurable;
 
 @Service
 public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcessor {
@@ -32,22 +33,26 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
     private final MeasurableRatingService measurableRatingService;
     private final BookmarkService bookmarkService;
     private final InvolvementService involvementService;
+    private final FlowDiagramEntityService flowDiagramEntityService;
 
 
     @Autowired
     public RemoveMeasurableCommandProcessor(MeasurableService measurableService,
                                             MeasurableRatingService measurableRatingService,
                                             InvolvementService involvementService,
-                                            BookmarkService bookmarkService) {
+                                            BookmarkService bookmarkService,
+                                            FlowDiagramEntityService flowDiagramEntityService) {
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
         checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(bookmarkService, "bookmarkService cannot be null");
+        checkNotNull(flowDiagramEntityService, "flowDiagramEntityService cannot be null");
 
         this.measurableService = measurableService;
         this.measurableRatingService = measurableRatingService;
         this.involvementService = involvementService;
         this.bookmarkService = bookmarkService;
+        this.flowDiagramEntityService = flowDiagramEntityService;
     }
 
 
@@ -79,10 +84,28 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         previewAppMappingRemovals(preview, selectionOptions);
         previewBookmarkRemovals(preview, selectionOptions);
         previewInvolvementRemovals(preview, selectionOptions);
+        previewFlowDiagramRemovals(preview, selectionOptions);
 
-        // TODO: entityRelationships, flowDiagrams, entitySvgDiagrams, roadmapScenarios
+        // TODO: entityRelationships, entitySvgDiagrams, roadmapScenarios
 
         return preview.build();
+    }
+
+    private void previewFlowDiagramRemovals(ImmutableTaxonomyChangePreview.Builder preview,
+                                            IdSelectionOptions selectionOptions) {
+
+        Set<EntityReference> refs = flowDiagramEntityService
+                .findForEntitySelector(selectionOptions)
+                .stream()
+                .map(e -> e.entityReference())
+                .collect(Collectors.toSet());
+
+        addToPreview(
+                preview,
+                refs,
+                Severity.WARNING,
+                "Relationships to flow diagrams will be removed");
+
     }
 
 
@@ -149,9 +172,11 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc());
     }
 
+
     private int removeMeasurables(IdSelectionOptions selectionOptions) {
         return measurableService.deleteByIdSelector(selectionOptions);
     }
+
 
     private int removeAppMappings(IdSelectionOptions selectionOptions) {
         return measurableRatingService.deleteByMeasurableIdSelector(selectionOptions);

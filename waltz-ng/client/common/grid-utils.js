@@ -61,7 +61,7 @@ export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacemen
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link entity-ref="row.entity.${entityRefField}" 
-                                   icon-placement="'${iconPlacement}'">
+                                   icon-placement="${iconPlacement}">
                 </waltz-entity-link>
             </div>`
     };
