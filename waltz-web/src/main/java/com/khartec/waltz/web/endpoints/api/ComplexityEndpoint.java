@@ -53,7 +53,7 @@ public class ComplexityEndpoint implements Endpoint {
         String rebuildPath = mkPath(BASE_URL, "rebuild");
 
         DatumRoute<ComplexityRating> getForAppRoute = (request, response) -> service.getForApp(getId(request));
-        ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readIdSelectionOptionsFromBody(request));
+        ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readAppIdSelectionOptionsFromBody(request));
         DatumRoute<Integer> rebuildRoute = (request, response) -> service.rebuild();
 
         getForDatum(getForAppPath, getForAppRoute);

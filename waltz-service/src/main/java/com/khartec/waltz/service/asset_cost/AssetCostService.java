@@ -22,8 +22,10 @@ package com.khartec.waltz.service.asset_cost;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.cost.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.cost.ApplicationCost;
+import com.khartec.waltz.model.cost.AssetCost;
+import com.khartec.waltz.model.cost.Cost;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.tuple.Tuple2;
@@ -70,7 +72,7 @@ public class AssetCostService {
     }
 
 
-    public List<ApplicationCost> findAppCostsByAppIds(IdSelectionOptions options) {
+    public List<ApplicationCost> findAppCostsByAppIds(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = idSelectorFactory.apply(options);
 
@@ -81,7 +83,7 @@ public class AssetCostService {
     }
 
 
-    public List<ApplicationCost> findTopAppCostsByAppIds(IdSelectionOptions options, int limit) {
+    public List<ApplicationCost> findTopAppCostsByAppIds(ApplicationIdSelectionOptions options, int limit) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = idSelectorFactory.apply(options);
 
@@ -92,7 +94,7 @@ public class AssetCostService {
     }
 
 
-    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(IdSelectionOptions options) {
+    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);
@@ -104,7 +106,7 @@ public class AssetCostService {
     }
 
 
-    public Cost calculateTotalCostForAppSelector(IdSelectionOptions options) {
+    public Cost calculateTotalCostForAppSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = idSelectorFactory.apply(options);

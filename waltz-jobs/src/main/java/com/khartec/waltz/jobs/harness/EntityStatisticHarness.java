@@ -21,6 +21,7 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.DIConfiguration;
@@ -66,10 +67,7 @@ GROUP BY outcome;
                 .forEach(System.out::println);
 
 */
-        IdSelectionOptions selectionOptions = ImmutableIdSelectionOptions.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.ORG_UNIT, 70))
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
+        ApplicationIdSelectionOptions selectionOptions = ApplicationIdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 70), HierarchyQueryScope.CHILDREN);
 
         // count by value
         List<TallyPack<String>> countByValueTallyPacks = service.calculateHistoricStatTally(10100L, RollupKind.COUNT_BY_ENTITY, selectionOptions, Duration.WEEK);

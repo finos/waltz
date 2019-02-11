@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.common.SetUtilities;
 import org.immutables.value.Value;
 
-import java.util.List;
 import java.util.Set;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableIdSelectionOptions.class)

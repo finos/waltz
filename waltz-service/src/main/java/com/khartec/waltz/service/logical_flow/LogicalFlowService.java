@@ -30,6 +30,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.*;
@@ -236,7 +237,7 @@ public class LogicalFlowService {
      * @param options
      * @return
      */
-    public LogicalFlowStatistics calculateStats(IdSelectionOptions options) {
+    public LogicalFlowStatistics calculateStats(ApplicationIdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
             case CHANGE_INITIATIVE:
@@ -251,7 +252,7 @@ public class LogicalFlowService {
     }
 
 
-    private LogicalFlowStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
+    private LogicalFlowStatistics calculateStatsForAppIdSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);

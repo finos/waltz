@@ -24,6 +24,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -70,7 +72,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
-                return wrapAppIdSelector(options);
+                ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
+                return wrapAppIdSelector(appOptions);
             case DATA_TYPE:
                 return mkForDataType(options);
             case FLOW_DIAGRAM:
@@ -81,6 +84,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
+
+
 
     private Select<Record1<Long>> mkForPhysicalSpecification(IdSelectionOptions options) {
         ensureScopeIsExact(options);
@@ -106,7 +111,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> wrapAppIdSelector(IdSelectionOptions options) {
+    private Select<Record1<Long>> wrapAppIdSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
         Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)

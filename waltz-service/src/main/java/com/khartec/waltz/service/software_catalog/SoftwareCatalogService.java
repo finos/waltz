@@ -24,7 +24,7 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
 import com.khartec.waltz.data.software_catalog.SoftwareUsageDao;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.*;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
@@ -91,7 +91,7 @@ public class SoftwareCatalogService {
     }
 
 
-    public SoftwareSummaryStatistics calculateStatisticsForAppIdSelector(IdSelectionOptions options) {
+    public SoftwareSummaryStatistics calculateStatisticsForAppIdSelector(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 

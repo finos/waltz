@@ -75,7 +75,7 @@ public class ServerInformationEndpoint implements Endpoint {
                 -> serverInformationService.getByHostname(request.params("hostname"));
 
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
-                -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
+                -> serverInformationService.calculateStatsForAppSelector(readAppIdSelectionOptionsFromBody(request));
 
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);

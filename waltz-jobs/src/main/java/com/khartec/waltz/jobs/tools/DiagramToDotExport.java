@@ -22,8 +22,8 @@ package com.khartec.waltz.jobs.tools;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -56,7 +56,7 @@ public class DiagramToDotExport {
 
         EntityReference diagRef = mkRef(EntityKind.FLOW_DIAGRAM, 1L);
 
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(diagRef, HierarchyQueryScope.EXACT);
+        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(diagRef, HierarchyQueryScope.EXACT);
         List<Application> apps = applicationService.findByAppIdSelector(options);
         List<LogicalFlow> flows = logicalFlowService.findBySelector(options);
 

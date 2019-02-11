@@ -97,11 +97,11 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
         ListRoute<DecoratorRatingSummary> summarizeInboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeInboundForSelector(
-                        readIdSelectionOptionsFromBody(request));
+                        readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeOutboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeOutboundForSelector(
-                        readIdSelectionOptionsFromBody(request));
+                        readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForAllRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeForAll();
