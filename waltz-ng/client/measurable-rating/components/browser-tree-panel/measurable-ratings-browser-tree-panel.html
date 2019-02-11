@@ -5,42 +5,47 @@
                                               measurables="$ctrl.measurables"
                                               categories="$ctrl.measurableCategories"
                                               scroll-height="500"
-                                              on-select="$ctrl.onSelect">
+                                              on-select="$ctrl.onSelect"
+                                              on-category-select="$ctrl.onCategorySelect">
             </waltz-measurable-ratings-browser>
+
         </div>
         <div class="col-sm-6">
+            <br><br><br>
+            <div ng-if="$ctrl.activeCategory">
+                <p class="text-muted">
+                    <waltz-markdown text="$ctrl.activeCategory.description"></waltz-markdown>
+                </p>
+                <waltz-data-extract-link name="Download all {{$ctrl.activeCategory.name}} ratings"
+                                         method="POST"
+                                         request-body="$ctrl.selector"
+                                         extract="measurable-rating/{{$ctrl.activeCategory.id}}"
+                                         styling="link">
+                </waltz-data-extract-link>
+                <hr>
+            </div>
             <waltz-loading-notification show="$ctrl.visibility.loading"
                                         style="padding-top: 54px;"
                                         name="Loading">
             </waltz-loading-notification>
+
             <div ng-if="$ctrl.tableData"
                  class="waltz-fade-if">
-                <h4>
-                    <span ng-bind="$ctrl.selectedMeasurable.name">
-                    </span>
-                    <a class="small small"
+                <strong>
+                    <a ng-bind="$ctrl.selectedMeasurable.name"
                        ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
-                        ( more &raquo; )
                     </a>
-                </h4>
-                <p class="small text-muted">
+                </strong>
+                <p class="text-muted">
                     <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
                 </p>
 
                 <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
                                         searchPlaceholderText="Search"
-                                        exportFilename="ratings.csv"
-                                        on-initialise="$ctrl.onGridInitialise">
+                                        exportFilename="ratings.csv">
                 </waltz-grid-with-search>
-                
-                <div class="pull-right" style="margin-bottom: 4px">
-                    <a class="clickable waltz-visibility-child-30"
-                       ng-click="$ctrl.exportGrid()">
-                        <waltz-icon name="download"></waltz-icon>
-                        Export ratings
-                    </a>
-                </div>
+
             </div>
         </div>
     </div>

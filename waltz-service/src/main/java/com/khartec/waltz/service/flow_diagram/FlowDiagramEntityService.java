@@ -19,6 +19,8 @@
 
 package com.khartec.waltz.service.flow_diagram;
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramEntityDao;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
@@ -42,16 +44,20 @@ public class FlowDiagramEntityService {
 
     private final FlowDiagramEntityDao flowDiagramEntityDao;
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory;
 
 
     @Autowired
     public FlowDiagramEntityService(FlowDiagramEntityDao flowDiagramEntityDao,
-                                    FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory) {
+                                    FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory,
+                                    GenericSelectorFactory genericSelectorFactory) {
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
         checkNotNull(flowDiagramIdSelectorFactory, "flowDiagramIdSelectorFactory cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
 
         this.flowDiagramEntityDao = flowDiagramEntityDao;
         this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
+        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 
@@ -66,10 +72,17 @@ public class FlowDiagramEntityService {
     }
 
 
-    public List<FlowDiagramEntity> findForSelector(IdSelectionOptions options) {
+    public List<FlowDiagramEntity> findForEntitySelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        GenericSelector selector = genericSelectorFactory.apply(options);
+        return flowDiagramEntityDao.findForEntitySelector(selector.kind(), selector.selector());
+    }
+
+
+    public List<FlowDiagramEntity> findForDiagramSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = flowDiagramIdSelectorFactory.apply(options);
-        return flowDiagramEntityDao.findForSelector(selector);
+        return flowDiagramEntityDao.findForDiagramSelector(selector);
     }
 
 
