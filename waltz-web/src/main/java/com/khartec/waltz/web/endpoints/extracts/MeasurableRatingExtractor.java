@@ -24,6 +24,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
@@ -63,7 +64,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
         String path = mkPath("data-extract", "measurable-rating", ":id");
         post(path, (request, response) -> {
             long categoryId = getId(request);
-            IdSelectionOptions selectionOpts = readIdSelectionOptionsFromBody(request);
+            ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(selectionOpts);
 
 
