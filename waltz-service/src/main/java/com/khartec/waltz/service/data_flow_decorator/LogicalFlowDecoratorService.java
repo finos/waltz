@@ -26,6 +26,7 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
@@ -53,6 +54,7 @@ import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.*;
+import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
 
 @Service
 public class LogicalFlowDecoratorService {
@@ -117,7 +119,7 @@ public class LogicalFlowDecoratorService {
             case APP_GROUP:
             case ORG_UNIT:
             case PERSON:
-                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(mkOpts(options));
                 return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(
                         APPLICATION,
                         selector,
@@ -148,7 +150,8 @@ public class LogicalFlowDecoratorService {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
-                return findByAppIdSelector(options);
+                ApplicationIdSelectionOptions appOptions = mkOpts(options);
+                return findByAppIdSelector(appOptions);
             case DATA_TYPE:
                 return findByDataTypeIdSelector(options);
             default:
@@ -249,14 +252,14 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public List<DecoratorRatingSummary> summarizeInboundForSelector(IdSelectionOptions options) {
+    public List<DecoratorRatingSummary> summarizeInboundForSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.summarizeInboundForSelector(selector);
     }
 
 
-    public List<DecoratorRatingSummary> summarizeOutboundForSelector(IdSelectionOptions options) {
+    public List<DecoratorRatingSummary> summarizeOutboundForSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.summarizeOutboundForSelector(selector);
@@ -277,7 +280,7 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private Collection<LogicalFlowDecorator> findByAppIdSelector(IdSelectionOptions options) {
+    private Collection<LogicalFlowDecorator> findByAppIdSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.findByAppIdSelector(selector);

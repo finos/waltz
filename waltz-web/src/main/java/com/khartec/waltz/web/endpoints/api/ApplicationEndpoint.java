@@ -179,7 +179,7 @@ public class ApplicationEndpoint implements Endpoint {
         };
 
         ListRoute<Application> findBySelectorRoute = ((request, response)
-                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
+                -> appService.findByAppIdSelector(readAppIdSelectionOptionsFromBody(request)));
 
         ListRoute<Application> findByAssetCodeRoute = ((request, response)
                 -> appService.findByAssetCode(request.params("assetCode")));

@@ -21,8 +21,10 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.jobs.harness.HarnessUtilities;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.server_information.ServerInformationService;
 import org.jooq.DSLContext;
@@ -42,13 +44,12 @@ public class ServerHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
 
-        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
-                .entityReference(ImmutableEntityReference.builder()
+        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
+                ImmutableEntityReference.builder()
                         .kind(EntityKind.ORG_UNIT)
                         .id(10)
-                        .build())
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
+                        .build(),
+                HierarchyQueryScope.CHILDREN);
 
         for (int i = 0; i < 5; i++) {
             HarnessUtilities.time("stats", () -> serverInfoService.calculateStatsForAppSelector(options));

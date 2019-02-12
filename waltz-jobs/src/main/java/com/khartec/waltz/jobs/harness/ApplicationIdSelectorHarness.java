@@ -19,12 +19,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
@@ -47,7 +49,7 @@ public class ApplicationIdSelectorHarness {
 
         ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(
+        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.MEASURABLE, 1L),
                 HierarchyQueryScope.EXACT);
 
@@ -58,6 +60,30 @@ public class ApplicationIdSelectorHarness {
 
         System.out.println("--- sz: "+apps.size());
         apps.forEach(System.out::println);
+
+
+        ApplicationIdSelectionOptions opt1 = ApplicationIdSelectionOptions.mkOpts(
+                EntityReference.mkRef(EntityKind.ORG_UNIT, 20),
+                HierarchyQueryScope.CHILDREN
+        );
+
+        ApplicationIdSelectionOptions opt2= ApplicationIdSelectionOptions.mkOpts(
+                EntityReference.mkRef(EntityKind.ORG_UNIT, 20),
+                HierarchyQueryScope.CHILDREN,
+                SetUtilities.fromArray(ApplicationKind.EXTERNALLY_HOSTED, ApplicationKind.EUC)
+        );
+
+        List<Application> apps1 = applicationService.findByAppIdSelector(opt1);
+        List<Application> apps2 = applicationService.findByAppIdSelector(opt2);
+
+        System.out.println("--- apps 1 size: "+apps1.size());
+//        apps1.forEach(System.out::println);
+
+
+        System.out.println("--- apps 2 size: "+apps2.size());
+//        apps2.forEach(System.out::println);
+
+
         System.out.println("--- done");
     }
 

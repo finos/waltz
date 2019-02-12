@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.Tables.SCENARIO_AXIS_ITEM;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;

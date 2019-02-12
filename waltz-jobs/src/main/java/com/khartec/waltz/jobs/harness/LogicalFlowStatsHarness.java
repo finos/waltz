@@ -22,7 +22,7 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
@@ -36,7 +36,7 @@ public class LogicalFlowStatsHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
 
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(
+        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 50L),
                 HierarchyQueryScope.CHILDREN);
 

@@ -85,7 +85,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRating> findByAppSelectorRoute = (request, response)
-                -> measurableRatingService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.findByAppIdSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRating> findByCategoryRoute = (request, response)
                 -> measurableRatingService.findByCategory(getId(request));
@@ -94,7 +94,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.tallyByMeasurableCategoryId(getId(request));
 
         ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
-                -> measurableRatingService.statsByAppSelector(readIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.statsByAppSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRatingTally> statsForRelatedMeasurableRoute = (request, response)
                 -> measurableRatingService.statsForRelatedMeasurable(readIdSelectionOptionsFromBody(request));

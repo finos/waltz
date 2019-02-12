@@ -97,7 +97,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         };
 
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
-                -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
+                -> logicalFlowService.calculateStats(readAppIdSelectionOptionsFromBody(request));
 
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));

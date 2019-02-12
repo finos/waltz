@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.readAppIdSelectionOptionsFromBody;
 import static spark.Spark.post;
 
 
@@ -74,14 +74,14 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
     @Override
     public void register() {
         post(mkPath("data-extract", "logical-flows"), (request, response) -> {
-            IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+            ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
             CSVSerializer serializer = extract(options);
             return writeFile("logical-flows.csv", serializer, response);
         });
     }
 
 
-    private CSVSerializer extract(IdSelectionOptions options) {
+    private CSVSerializer extract(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 

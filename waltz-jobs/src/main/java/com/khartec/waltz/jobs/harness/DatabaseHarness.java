@@ -21,6 +21,8 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.database_information.DatabaseInformationDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.database_information.DatabaseInformationService;
 import org.jooq.DSLContext;
@@ -53,7 +55,7 @@ public class DatabaseHarness {
         System.out.println(eolCounts);
         */
 
-        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
+        ApplicationIdSelectionOptions options = ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ImmutableEntityReference.builder()
                         .kind(EntityKind.ORG_UNIT)
                         .id(10)

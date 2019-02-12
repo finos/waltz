@@ -29,6 +29,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
@@ -279,7 +280,7 @@ public class AuthoritativeSourceService {
     // -- HELPERS
 
     private Condition mkConsumerSelectionCondition(EntityReference ref, HierarchyQueryScope scope) {
-        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref, scope));
+        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(ref, scope));
         return AuthoritativeSourceDao.CONSUMER_APP.ID.in(appIdSelector);
     }
 

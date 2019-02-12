@@ -38,7 +38,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hikari.version>2.6.3</hikari.version>
-        <immutables.version>2.5.6</immutables.version>
+        <immutables.version>2.7.5</immutables.version>
         <jackson.version>2.9.5</jackson.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.9.0</jackson-jsr310.version>
@@ -211,6 +211,12 @@
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
                 <version>${archunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.dbunit</groupId>
+                <artifactId>dbunit</artifactId>
+                <version>${dbunit.version}</version>
                 <scope>test</scope>
             </dependency>
 

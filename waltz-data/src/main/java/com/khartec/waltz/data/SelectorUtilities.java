@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.web.json;
+package com.khartec.waltz.data;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import org.immutables.value.Value;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 
-import java.util.List;
+import static com.khartec.waltz.common.Checks.checkTrue;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableEntityStatisticQueryOptions.class)
-@JsonDeserialize(as = ImmutableEntityStatisticQueryOptions.class)
-public abstract class EntityStatisticQueryOptions {
+public class SelectorUtilities {
 
-    public abstract ApplicationIdSelectionOptions selector();
-    public abstract List<Long> statisticIds();
+    public static <T extends IdSelectionOptions> void ensureScopeIsExact(T options) {
+        checkTrue(
+                options.scope() == HierarchyQueryScope.EXACT,
+                "Only EXACT scope supported");
+    }
 
 }

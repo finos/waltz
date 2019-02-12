@@ -26,7 +26,7 @@ import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
@@ -42,7 +42,6 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.stream.Collectors.toList;
 
 
@@ -107,7 +106,7 @@ public class AuthSourceRatingCalculator {
                 dataType.id().get(),
                 vantageRef);
 
-        IdSelectionOptions selectorOptions = mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
+        ApplicationIdSelectionOptions selectorOptions = ApplicationIdSelectionOptions.mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
 
         Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao

@@ -22,6 +22,7 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -39,7 +40,8 @@ public class MeasurableRatingExporterHarness {
 
         ApplicationIdSelectorFactory applicationIdSelectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
 
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(mkOpts(mkRef(EntityKind.ORG_UNIT, 10L),
+        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(
+                mkRef(EntityKind.ORG_UNIT, 10L),
                 HierarchyQueryScope.CHILDREN));
 //
 //

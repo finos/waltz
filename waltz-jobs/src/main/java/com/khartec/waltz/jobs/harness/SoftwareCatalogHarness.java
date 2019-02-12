@@ -20,6 +20,7 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
@@ -40,11 +41,7 @@ public class SoftwareCatalogHarness {
                 .id(20L)
                 .build();
 
-
-        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
+        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(ref, HierarchyQueryScope.CHILDREN);
 
         SoftwareSummaryStatistics stats = softwareCatalogService.calculateStatisticsForAppIdSelector(options);
         System.out.println("stats:"+stats);
