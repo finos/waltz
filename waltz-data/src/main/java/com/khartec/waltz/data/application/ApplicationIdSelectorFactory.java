@@ -391,13 +391,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
      * @return
      */
     private Condition mkApplicationConditions(ApplicationIdSelectionOptions options) {
-        Condition kindCondition = options.applicationKind().map(a -> APPLICATION.KIND.eq(a.name())).orElse(DSL.trueCondition());
-        Condition lifecyclePhaseCondition = options.lifecyclePhase().map(a -> APPLICATION.LIFECYCLE_PHASE.eq(a.name())).orElse(DSL.trueCondition());
-        Condition criticalityCondition = options.criticality().map(a -> APPLICATION.BUSINESS_CRITICALITY.eq(a.name())).orElse(DSL.trueCondition());
-
-        return kindCondition
-                .and(lifecyclePhaseCondition)
-                .and(criticalityCondition)
+        return APPLICATION.KIND.in(options.applicationKinds())
                 .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 

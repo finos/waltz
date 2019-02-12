@@ -19,15 +19,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
@@ -71,9 +70,7 @@ public class ApplicationIdSelectorHarness {
         ApplicationIdSelectionOptions opt2= ApplicationIdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 20),
                 HierarchyQueryScope.CHILDREN,
-                ApplicationKind.EXTERNALLY_HOSTED,
-                LifecyclePhase.PRODUCTION,
-                Criticality.MEDIUM
+                SetUtilities.fromArray(ApplicationKind.EXTERNALLY_HOSTED, ApplicationKind.EUC)
         );
 
         List<Application> apps1 = applicationService.findByAppIdSelector(opt1);

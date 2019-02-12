@@ -21,10 +21,13 @@ package com.khartec.waltz.model.application;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.immutables.value.Value;
 
-import java.util.Optional;
+import java.util.Set;
 
 
 @Value.Immutable
@@ -32,38 +35,29 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableApplicationIdSelectionOptions.class)
 public abstract class ApplicationIdSelectionOptions extends IdSelectionOptions {
 
-
     public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
-                                                       HierarchyQueryScope scope,
-                                                       ApplicationKind applicationKind,
-                                                       LifecyclePhase lifecyclePhase,
-                                                       Criticality criticality) {
+                                                       HierarchyQueryScope scope) {
         return ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(scope)
-                .applicationKind(Optional.ofNullable(applicationKind))
-                .lifecyclePhase(Optional.ofNullable(lifecyclePhase))
-                .criticality(Optional.ofNullable(criticality))
+                .build();
+    }
+
+
+    public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
+                                                       HierarchyQueryScope scope,
+                                                       Set<ApplicationKind> applicationKinds) {
+        return ImmutableApplicationIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .applicationKinds(applicationKinds)
                 .build();
     }
 
 
     public static ApplicationIdSelectionOptions mkOpts(IdSelectionOptions options,
-                                                       ApplicationKind applicationKind,
-                                                       LifecyclePhase lifecyclePhase,
-                                                       Criticality criticality) {
-        return mkOpts(options.entityReference(), options.scope(), applicationKind, lifecyclePhase, criticality);
-    }
-
-
-    public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
-                                                       HierarchyQueryScope scope) {
-        return mkOpts(
-                ref,
-                scope,
-                null,
-                null,
-                null);
+                                                       Set<ApplicationKind> applicationKinds) {
+        return mkOpts(options.entityReference(), options.scope(), applicationKinds);
     }
 
 
@@ -81,20 +75,14 @@ public abstract class ApplicationIdSelectionOptions extends IdSelectionOptions {
         if(options instanceof ApplicationIdSelectionOptions) {
             appOptions = (ApplicationIdSelectionOptions) options;
         } else {
-            appOptions = mkOpts(
-                    options,
-                    null,
-                    null,
-                    null);
+            appOptions = mkOpts(options);
         }
         return appOptions;
     }
 
 
-
-    public abstract Optional<ApplicationKind> applicationKind();
-
-    public abstract Optional<LifecyclePhase> lifecyclePhase();
-
-    public abstract Optional<Criticality> criticality();
+    @Value.Default
+    public Set<ApplicationKind> applicationKinds() {
+        return SetUtilities.fromArray(ApplicationKind.values());
+    }
 }
