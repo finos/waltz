@@ -37,7 +37,6 @@
         <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <dbunit.version>2.6.0</dbunit.version>
         <hikari.version>2.6.3</hikari.version>
         <immutables.version>2.7.5</immutables.version>
         <jackson.version>2.9.5</jackson.version>
