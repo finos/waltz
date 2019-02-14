@@ -17,23 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from "./app-asset-code-view.html";
+import template from "./change-initiative-external-id-view.html";
 
 
 function controller($state,
                     $stateParams,
-                    resolvedAppsByAssetCode) {
+                    changeInitiatives) {
 
     const vm = this;
 
-    vm.resolvedAppsByAssetCode = resolvedAppsByAssetCode || [];
-    vm.assetCode = $stateParams.assetCode;
+    vm.changeInitiatives = changeInitiatives || [];
+    vm.externalId = $stateParams.externalId;
 
-    const goToApp = app => $state.go("main.app.view", { id: app.id }, { location: false });
+    const goToCI = ci => $state.go(
+        "main.change-initiative.view",
+        { id: ci.id },
+        { location: false });
 
     // if single app for asset code, navigate to the app now
-    if (vm.resolvedAppsByAssetCode.length === 1) {
-        goToApp(resolvedAppsByAssetCode[0]);
+    if (vm.changeInitiatives.length === 1) {
+        goToCI(vm.changeInitiatives[0]);
     }
 }
 
@@ -41,7 +44,7 @@ function controller($state,
 controller.$inject = [
     "$state",
     "$stateParams",
-    "resolvedAppsByAssetCode"
+    "changeInitiatives"
 ];
 
 

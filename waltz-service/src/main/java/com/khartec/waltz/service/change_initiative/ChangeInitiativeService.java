@@ -181,4 +181,7 @@ public class ChangeInitiativeService {
             )));
     }
 
+    public Collection<ChangeInitiative> findByExternalId(String externalId) {
+        return changeInitiativeDao.findByExternalId(externalId);
+    }
 }

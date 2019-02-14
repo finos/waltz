@@ -42,6 +42,12 @@ const viewByCodeState = {
     resolve: {dataType: dataTypeByCodeResolver }
 };
 
+const viewByExternalIdState = {
+    url: 'data-types/external-id/{code}',
+    views: {'content@': ViewPage },
+    resolve: {dataType: dataTypeByCodeResolver }
+};
+
 
 const viewState = {
     url: 'data-types/{id:int}',
@@ -55,6 +61,7 @@ function setup($stateProvider) {
         .state('main.data-type', baseState)
         .state('main.data-type.list', listState)
         .state('main.data-type.code', viewByCodeState)
+        .state('main.data-type.external-id', viewByExternalIdState)
         .state('main.data-type.view', viewState);
 }
 

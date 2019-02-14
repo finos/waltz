@@ -17,27 +17,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ChangeInitiativeView from './pages/view/change-initiative-view';
+import ChangeInitiativeView from "./pages/view/change-initiative-view";
+import {CORE_API} from "../common/services/core-api-utils";
+import ChangeInitiativeExternalIdView from "./pages/external-id-view/change-initiative-external-id-view";
 
 const baseState = {
-    url: 'change-initiative'
+    url: "change-initiative"
 };
 
 
 const viewState = {
-    url: '/{id:int}',
-    views: { 'content@': ChangeInitiativeView }
+    url: "/{id:int}",
+    views: { "content@": ChangeInitiativeView }
 };
+
+
+const viewByExternalIdState = {
+    url: "/external-id/{externalId}",
+    views: {
+        "content@": ChangeInitiativeExternalIdView
+    },
+    resolve: { changeInitiatives: changeInitiativeResolver }
+};
+
+
+
+function changeInitiativeResolver(serviceBroker, $stateParams) {
+    return serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findByExternalId, [ $stateParams.externalId ])
+        .then(r => r.data);
+}
+
+changeInitiativeResolver.$inject = ["ServiceBroker", "$stateParams"];
+
+
 
 
 function setupRoutes($stateProvider) {
     $stateProvider
-        .state('main.change-initiative', baseState)
-        .state('main.change-initiative.view', viewState);
+        .state("main.change-initiative", baseState)
+        .state("main.change-initiative.view", viewState)
+        .state("main.change-initiative.external-id", viewByExternalIdState);
 }
 
 
-setupRoutes.$inject = ['$stateProvider'];
+setupRoutes.$inject = ["$stateProvider"];
 
 
 export default setupRoutes;
