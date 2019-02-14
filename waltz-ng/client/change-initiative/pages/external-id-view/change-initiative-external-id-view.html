@@ -1,0 +1,34 @@
+<div>
+    <waltz-page-header icon="paper-plane-o"
+                       name="Matching Change Initiatives"
+                       small="{{ ctrl.externalId }}">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Waltz</li>
+        </ol>
+    </waltz-page-header>
+    <div class="waltz-page-summary waltz-page-summary-attach">
+
+        <div ng-if="ctrl.changeInitiatives.length > 1">
+            <p class="help-block">
+                Several Change Initiatives match the supplied external id.
+                <br>
+                Please select one:
+            </p>
+            <ul class="list-unstyled">
+                <li ng-repeat="ci in ctrl.changeInitiatives | orderBy:'name'">
+                    <a ng-bind='ci.name'
+                       ui-sref="main.change-initiative.view ({ id: ci.id })">
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <waltz-no-data ng-if="ctrl.changeInitiatives.length === 0">
+            <message>
+                <strong>No Change Initiatives</strong> found with matching external id.
+            </message>
+
+        </waltz-no-data>
+    </div>
+</div>

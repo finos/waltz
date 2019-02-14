@@ -54,6 +54,16 @@ const appViewByAssetCodeState = {
 };
 
 
+
+const appViewByExternalIdState = {
+    url: '/external-id/{assetCode}',
+    views: {
+        'content@': AppViewAssetCode
+    },
+    resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
+};
+
+
 const appEditState = {
     url: '/{id:int}/edit',
     resolve: {
@@ -70,6 +80,7 @@ function setup($stateProvider) {
         .state('main.app.registration', appRegistrationState)
         .state('main.app.view', appViewState)
         .state('main.app.asset-code', appViewByAssetCodeState)
+        .state('main.app.external-id', appViewByExternalIdState)
         .state('main.app.edit', appEditState)
 }
 
