@@ -149,8 +149,9 @@
     </waltz-dynamic-section-wrapper>
 
 
-    <waltz-physical-flow-participants-section parent-entity-ref="ctrl.entityReference">
-    </waltz-physical-flow-participants-section>
+    <waltz-dynamic-section-wrapper section="ctrl.physicalFlowParticipantsSection"
+                                   parent-entity-ref="ctrl.entityReference">
+    </waltz-dynamic-section-wrapper>
 
 
     <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
