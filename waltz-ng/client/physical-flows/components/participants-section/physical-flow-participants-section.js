@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CORE_API } from '../../../common/services/core-api-utils';
-import { mkEntityLinkGridCell } from '../../../common/grid-utils';
-import { initialiseData, invokeFunction } from '../../../common';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkEntityLinkGridCell } from "../../../common/grid-utils";
+import { initialiseData } from "../../../common";
 
-import template from './physical-flow-participants-section.html';
+import template from "./physical-flow-participants-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    onInitialise: '<'
+    parentEntityRef: "<",
+    onInitialise: "<"
 };
 
 
@@ -41,29 +41,21 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.columnDefs = [
-        Object.assign(mkEntityLinkGridCell('Name', 'participant'), { width: "20%"} ),
-        { field: 'kind', displayName: 'Participation Kind', width: "15%", cellFilter: "toDisplayName:'participantKind'" },
-        { field: 'description', displayName: 'Description' }
+        Object.assign(mkEntityLinkGridCell("Name", "participant"), { width: "20%"} ),
+        { field: "kind", displayName: "Participation Kind", width: "15%", cellFilter: "toDisplayName:'participantKind'" },
+        { field: "description", displayName: "Description" }
     ];
 
     vm.$onInit = () => {
         serviceBroker
-            .loadViewData(CORE_API.PhysicalFlowParticipantStore.findByPhysicalFlowId, [vm.parentEntityRef.id])
+            .loadViewData(
+                CORE_API.PhysicalFlowParticipantStore.findByPhysicalFlowId,
+                [ vm.parentEntityRef.id ])
             .then(r => {
-                console.log('data: ', r.data)
                 vm.tableData = r.data
             });
     };
 
-    vm.onGridInitialise = (api) => {
-        vm.gridApi = api;
-    };
-
-    vm.exportGrid = () => {
-        vm.gridApi.exportFn('physical_flow_participants.csv');
-    };
-
-    invokeFunction(vm.onInitialise, {export: vm.exportGrid });
 }
 
 
@@ -81,5 +73,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowParticipantsSection'
+    id: "waltzPhysicalFlowParticipantsSection"
 };

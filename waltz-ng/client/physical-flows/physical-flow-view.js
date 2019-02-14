@@ -45,7 +45,8 @@ const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    entityDiagramsSection: dynamicSections.entityDiagramsSection
+    entityDiagramsSection: dynamicSections.entityDiagramsSection,
+    physicalFlowParticipantsSection: dynamicSections.physicalFlowParticipantsSection
 };
 
 
@@ -53,8 +54,8 @@ const initialState = {
 function mkHistoryObj(flow, spec) {
     return {
         name: spec.name,
-        kind: 'PHYSICAL_FLOW',
-        state: 'main.physical-flow.view',
+        kind: "PHYSICAL_FLOW",
+        state: "main.physical-flow.view",
         stateParams: { id: flow.id }
     };
 }
@@ -91,18 +92,18 @@ function navigateToLastView($state, historyStore) {
     if (lastHistoryItem) {
         $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
     } else {
-        $state.go('main.home');
+        $state.go("main.home");
     }
 }
 
 
 function getSelectedSpecDefinition(specDefinitions = [], selectedSpecDefId = null) {
     if (selectedSpecDefId) {
-        const defsById = _.keyBy(specDefinitions, 'id');
+        const defsById = _.keyBy(specDefinitions, "id");
         return defsById[selectedSpecDefId];
     } else {
         // find the active definition
-        return _.find(specDefinitions, d => d.status === 'ACTIVE');
+        return _.find(specDefinitions, d => d.status === "ACTIVE");
     }
 }
 
@@ -133,7 +134,7 @@ function controller($q,
     const flowId = $stateParams.id;
     vm.entityReference = {
         id: flowId,
-        kind: 'PHYSICAL_FLOW'
+        kind: "PHYSICAL_FLOW"
     };
 
 
@@ -146,7 +147,7 @@ function controller($q,
         .then(r => vm.physicalFlow = r.data);
 
     physicalFlowPromise
-        .then(physicalFlow => serviceBroker
+        .then(() => serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowStore.getById,
                 [vm.physicalFlow.logicalFlowId]))
@@ -159,7 +160,7 @@ function controller($q,
                 [physicalFlow.specificationId]))
         .then(r => {
             vm.specification = r.data;
-            vm.specificationReference = toEntityRef(r.data, 'PHYSICAL_SPECIFICATION');
+            vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
         });
 
     // spec definitions
@@ -178,8 +179,8 @@ function controller($q,
                     .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
 
                 const selectionOptions = {
-                    scope: 'EXACT',
-                    entityReference: { kind: 'PHYSICAL_SPECIFICATION', id:vm.selectedSpecDefinition.def.specificationId }
+                    scope: "EXACT",
+                    entityReference: { kind: "PHYSICAL_SPECIFICATION", id:vm.selectedSpecDefinition.def.specificationId }
                 };
 
                 const logicalElementsPromise = serviceBroker
@@ -203,7 +204,7 @@ function controller($q,
     const deleteSpecification = () => {
         physicalSpecificationStore.deleteById(vm.specification.id)
             .then(r => {
-                if (r.outcome === 'SUCCESS') {
+                if (r.outcome === "SUCCESS") {
                     notification.success(`Specification ${vm.specification.name} deleted`);
                 } else {
                     notification.error(r.message);
@@ -216,7 +217,7 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.physicalFlow.logicalFlowId])
             .then(r => {
-                if (r.outcome === 'SUCCESS') {
+                if (r.outcome === "SUCCESS") {
                     notification.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
                 } else {
                     notification.error(r.message);
@@ -226,8 +227,8 @@ function controller($q,
     };
 
     const handleDeleteFlowResponse = (response) => {
-        if (response.outcome === 'SUCCESS') {
-            notification.success('Physical flow deleted');
+        if (response.outcome === "SUCCESS") {
+            notification.success("Physical flow deleted");
             removeFromHistory(historyStore, vm.physicalFlow, vm.specification);
 
             if (response.isSpecificationUnused || response.isLastPhysicalFlow) {
@@ -250,7 +251,7 @@ function controller($q,
     };
 
     vm.deleteFlow = () => {
-        if (confirm('Are you sure you want to delete this flow ?')) {
+        if (confirm("Are you sure you want to delete this flow ?")) {
             physicalFlowStore
                 .deleteById(flowId)
                 .then(r => handleDeleteFlowResponse(r));
@@ -258,15 +259,15 @@ function controller($q,
     };
 
     vm.updateSpecDefinitionId = (newSpecDef) => {
-        if (confirm('Are you sure you want to change the specification definition version used by this flow ?')) {
+        if (confirm("Are you sure you want to change the specification definition version used by this flow ?")) {
             physicalFlowStore
                 .updateSpecDefinitionId(flowId, {
                     newSpecDefinitionId: newSpecDef.id
                 })
-                .then(r => {
+                .then(() => {
                     vm.physicalFlow.specificationDefinitionId = newSpecDef.id;
                     loadSpecDefinitions();
-                    notification.success('Specification definition version updated successfully');
+                    notification.success("Specification definition version updated successfully");
                 });
         }
     };
@@ -277,10 +278,10 @@ function controller($q,
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
             .then(result => {
                 if (result) {
-                    notification.success(`Updated description for field`);
+                    notification.success("Updated description for field");
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error(`Could not update field description`);
+                    notification.error("Could not update field description");
                 }
             });
     };
@@ -291,10 +292,10 @@ function controller($q,
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
             .then(result => {
                 if (result) {
-                    notification.success(`Updated logical data element for field`);
+                    notification.success("Updated logical data element for field");
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error(`Could not update logical data element`);
+                    notification.error("Could not update logical data element");
                 }
             });
     };
@@ -303,22 +304,22 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    '$stateParams',
-    'HistoryStore',
-    'Notification',
-    'PhysicalFlowStore',
-    'PhysicalSpecDefinitionStore',
-    'PhysicalSpecDefinitionFieldStore',
-    'PhysicalSpecDefinitionSampleFileStore',
-    'PhysicalSpecificationStore',
-    'ServiceBroker'
+    "$q",
+    "$state",
+    "$stateParams",
+    "HistoryStore",
+    "Notification",
+    "PhysicalFlowStore",
+    "PhysicalSpecDefinitionStore",
+    "PhysicalSpecDefinitionFieldStore",
+    "PhysicalSpecDefinitionSampleFileStore",
+    "PhysicalSpecificationStore",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

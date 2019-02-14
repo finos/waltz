@@ -17,25 +17,19 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<waltz-section name="Participants"
-               icon="cubes"
-               id="physical-flows-section"
-               collapsible="false">
 
-    <div ng-if="$ctrl.tableData.length > 0">
-        <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                entries="$ctrl.tableData"
-                                on-initialise="$ctrl.onGridInitialise"
-                                class="small">
-        </waltz-grid-with-search>
-    </div>
 
-    <waltz-no-data ng-if="$ctrl.tableData.length == 0">
-        <message>
-            <strong>No Participant</strong> detail available for this
-            <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'">
-            </span>
-        </message>
-    </waltz-no-data>
+<div ng-if="$ctrl.tableData.length > 0">
+    <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                            entries="$ctrl.tableData"
+                            on-initialise="$ctrl.onGridInitialise">
+    </waltz-grid-with-search>
+</div>
 
-</waltz-section>
+<waltz-no-data ng-if="$ctrl.tableData.length == 0">
+    <message>
+        <strong>No Participant</strong> detail available for this
+        <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'">
+        </span>
+    </message>
+</waltz-no-data>
