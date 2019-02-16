@@ -80,7 +80,6 @@ function expandSelectedNodes(nodes = [], expandedIds = []) {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-    let expandedItemsLatch = false;
 
     vm.treeOptions = {
         nodeChildren: "children",
@@ -123,13 +122,8 @@ function controller() {
             vm.searchNodes = prepareSearchNodes(vm.items);
         }
 
-        if(changes.items || changes.expandedItemIds) {
-            if (expandedItemsLatch) {
-                return;
-            } else if (vm.expandedItemIds && vm.items) {
-                vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
-                expandedItemsLatch = true;
-            }
+        if(changes.items && changes.expandedItemIds) {
+            vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 
         vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);

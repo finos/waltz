@@ -57,11 +57,12 @@ function controller($q, serviceBroker, notification) {
             .compact()
             .map("parentId")
             .uniq()
+            .compact()
             .value();
     }
 
     function reloadData() {
-        serviceBroker
+        return serviceBroker
             .loadViewData(
                 CORE_API.ScenarioStore.loadAxis,
                 [ vm.scenarioId, vm.axisOrientation ],
