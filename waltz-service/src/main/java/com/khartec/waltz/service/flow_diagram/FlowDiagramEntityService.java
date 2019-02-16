@@ -103,4 +103,12 @@ public class FlowDiagramEntityService {
         int[] rc = flowDiagramEntityDao.createEntities(entities);
         return rc[0] == 1;
     }
+
+
+    public int deleteForEntitySelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        GenericSelector selector = genericSelectorFactory.apply(options);
+        return flowDiagramEntityDao.deleteForGenericEntitySelector(selector);
+
+    }
 }

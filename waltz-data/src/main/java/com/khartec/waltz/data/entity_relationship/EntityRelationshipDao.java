@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.entity_relationship;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -113,16 +114,15 @@ public class EntityRelationshipDao {
     }
 
 
+    public Collection<EntityRelationship> findForGenericEntitySelector(GenericSelector selector) {
+        Condition anyMatch = mkGenericSelectorCondition(selector);
+        return doQuery(anyMatch);
+    }
+
+
     public Collection<EntityRelationship> findRelationshipsInvolving(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-
-        return dsl
-                .select(ENTITY_RELATIONSHIP.fields())
-                .select(NAME_A, NAME_B)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name())))
-                .or(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name())))
-                .fetch(TO_DOMAIN_MAPPER);
+        return doQuery(mkExactRefMatchCondition(ref));
     }
 
 
@@ -146,7 +146,6 @@ public class EntityRelationshipDao {
                         r -> EntityKind.valueOf(r.get(0, String.class)),
                         r -> r.get(1, Integer.class),
                         (a, b) -> a + b));
-
     }
 
 
@@ -179,7 +178,7 @@ public class EntityRelationshipDao {
 
         return dsl
                 .deleteFrom(ENTITY_RELATIONSHIP)
-                .where(keyMatches(key))
+                .where(mkExactKeyMatchCondition(key))
                 .execute() == 1;
     }
 
@@ -192,44 +191,78 @@ public class EntityRelationshipDao {
                 .set(ENTITY_RELATIONSHIP.DESCRIPTION, params.description())
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, username)
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .where(keyMatches(key))
+                .where(mkExactKeyMatchCondition(key))
                 .execute() == 1;
 
     }
 
 
+    public int deleteForGenericEntitySelector(GenericSelector selector) {
+        return doDelete(mkGenericSelectorCondition(selector));
+    }
+
+
     public int removeAnyInvolving(EntityReference entityReference) {
-        Condition matchesA = ENTITY_RELATIONSHIP.KIND_A.eq(entityReference.kind().name())
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(entityReference.id()));
-
-        Condition matchesB = ENTITY_RELATIONSHIP.KIND_B.eq(entityReference.kind().name())
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(entityReference.id()));
-
-        return dsl.deleteFrom(ENTITY_RELATIONSHIP)
-                .where(matchesA.or(matchesB))
-                .execute();
+        return doDelete(mkExactRefMatchCondition(entityReference));
     }
 
 
     // --- HELPERS ---
+
+
+    private int doDelete(Condition condition) {
+        return dsl
+                .deleteFrom(ENTITY_RELATIONSHIP)
+                .where(condition)
+                .execute();
+    }
+
+
+    private Collection<EntityRelationship> doQuery(Condition condition) {
+        return dsl
+                .select(ENTITY_RELATIONSHIP.fields())
+                .select(NAME_A, NAME_B)
+                .from(ENTITY_RELATIONSHIP)
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
 
     private boolean exists(EntityRelationshipKey key) {
 
         int count = dsl.fetchCount(
                 DSL.select()
                         .from(ENTITY_RELATIONSHIP)
-                        .where(keyMatches(key)));
+                        .where(mkExactKeyMatchCondition(key)));
 
         return count > 0;
     }
 
 
-    private Condition keyMatches(EntityRelationshipKey key) {
+    private Condition mkExactRefMatchCondition(EntityReference ref) {
+        Condition matchesA = ENTITY_RELATIONSHIP.ID_A.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()));
+        Condition matchesB = ENTITY_RELATIONSHIP.ID_B.eq(ref.id()).and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
+        return matchesA.or(matchesB);
+    }
+
+
+    private Condition mkExactKeyMatchCondition(EntityRelationshipKey key) {
         return ENTITY_RELATIONSHIP.ID_A.eq(key.a().id())
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(key.a().kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(key.b().id())
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(key.b().kind().name())))
                 .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind().name()));
+    }
+
+
+    private Condition mkGenericSelectorCondition(GenericSelector selector) {
+        Condition matchesA = ENTITY_RELATIONSHIP.ID_A.in(selector.selector())
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(selector.kind().name()));
+
+        Condition matchesB = ENTITY_RELATIONSHIP.ID_B.in(selector.selector())
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(selector.kind().name()));
+
+        return matchesA.or(matchesB);
     }
 
 }
