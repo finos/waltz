@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,44 +16,51 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { initialiseData } from "../../../common/index";
 
-import template from "./dynamic-sections-view.html";
-
+import { initialiseData, invokeFunction } from "../../../common";
+import { FILTER_CHANGED_EVENT } from "../../constants";
 
 const bindings = {
-    filters: "<",
-    parentEntityRef: "<",
-    sections: "<",
-    onRemove: "<"
+    onFiltersChanged: "<",
 };
 
 
 const initialState = {
     filters: {},
-    onRemove: (s) => console.log("wdsv: onRemove, default impl", s)
+
+    onFiltersChanged: (filters) => console.log("wfcw - filters changed: ", filters)
 };
 
 
-function controller() {
-    initialiseData(this, initialState);
+function controller($scope) {
+    const vm = initialiseData(this, initialState);
+
+    const filterChangedListener = $scope.$on(FILTER_CHANGED_EVENT, (event, data) => {
+        vm.filters = Object.assign({}, data);
+        invokeFunction(vm.onFiltersChanged, vm.filters);
+    });
+
+
+    vm.$onDestroy = () => {
+        // unsubscribe
+        filterChangedListener();
+    };
 }
 
 
 controller.$inject = [
+    "$scope"
 ];
 
+
 const component = {
-    controller,
+    template: "",
     bindings,
-    template
+    controller
 };
 
 
-const id = "waltzDynamicSectionsView";
-
-
 export default {
-    id,
-    component
+    component,
+    id: "waltzFilterChangeWatcher"
 };

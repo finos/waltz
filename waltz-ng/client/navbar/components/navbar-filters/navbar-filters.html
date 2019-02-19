@@ -1,0 +1,14 @@
+<ul class="nav navbar-nav navbar-right"
+    style="padding-right: 20px">
+    <li>
+        <a class="clickable"
+           ng-click="$ctrl.showOverlay()">
+            <waltz-icon name="filter"></waltz-icon>
+            Filters
+            <b class="caret"></b>
+        </a>
+    </li>
+    <waltz-nav-filters-overlay on-dismiss="$ctrl.dismissOverlay"
+                               visible="$ctrl.visibility.overlay">
+    </waltz-nav-filters-overlay>
+</ul>

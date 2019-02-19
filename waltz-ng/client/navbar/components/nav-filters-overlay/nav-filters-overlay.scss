@@ -1,0 +1,23 @@
+@import "../../../../style/util";
+@import "../../../../style/variables";
+
+.waltz-nav-filters-overlay {
+    top: 52px;
+    right: 100px;
+    position: absolute;
+    background-color: #fafafa;
+    width:50%;
+    border: 1px solid #ccc;
+    outline: none;
+
+    @include waltz-box-shadow();
+
+    .wnfo-main {
+        margin: 10px;
+        padding-right: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 30vh;
+    }
+}
+

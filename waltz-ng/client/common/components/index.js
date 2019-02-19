@@ -18,6 +18,7 @@
  */
 import BooleanRenderer from "./boolean-renderer";
 import BucketChart from "./bucket-chart";
+import FilterChangedWatcher from "./filter-change-watcher/filter-change-watcher";
 import LastUpdated from "./last-updated/last-updated";
 import MultiSelectTreeControl from "./multi-select-tree-control/multi-select-tree-control";
 import SearchControl from "./search-control/search-control";
@@ -47,6 +48,7 @@ export default (module) => {
         .component("waltzDatePickerFormInput", DatePickerFormInput);
 
     registerComponents(module, [
+        FilterChangedWatcher,
         MiniActions
     ]);
 

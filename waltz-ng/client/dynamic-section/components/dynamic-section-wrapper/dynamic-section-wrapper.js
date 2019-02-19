@@ -18,19 +18,21 @@
  */
 
 import {initialiseData} from "../../../common/index";
-
-import template from './dynamic-section-wrapper.html';
 import {sectionToTemplate} from "../../dynamic-section-utils";
+
+import template from "./dynamic-section-wrapper.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    section: '<',
-    onRemove: '<',
+    parentEntityRef: "<",
+    filters: "<",
+    section: "<",
+    onRemove: "<",
 };
 
 
 const initialState = {
+    sectionScope: null
 };
 
 
@@ -38,23 +40,24 @@ function controller($element, $compile, $scope) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const sectionScope = $scope.$new();
-        sectionScope.parentEntityRef = vm.parentEntityRef;
-        sectionScope.section = vm.section;
-        sectionScope.onRemove = vm.onRemove;
-        sectionScope.canRemove = vm.canRemove;
+        vm.sectionScope = $scope.$new();
+        vm.sectionScope.parentEntityRef = vm.parentEntityRef;
+        vm.sectionScope.filters = vm.filters;
+        vm.sectionScope.section = vm.section;
+        vm.sectionScope.onRemove = vm.onRemove;
+        vm.sectionScope.canRemove = vm.canRemove;
 
         const linkFn = $compile(sectionToTemplate(vm.section));
-        const content = linkFn(sectionScope);
+        const content = linkFn(vm.sectionScope);
         $element.append(content);
     };
 }
 
 
 controller.$inject=[
-    '$element',
-    '$compile',
-    '$scope'
+    "$element",
+    "$compile",
+    "$scope"
 ];
 
 
@@ -67,5 +70,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzDynamicSectionWrapper'
+    id: "waltzDynamicSectionWrapper"
 }

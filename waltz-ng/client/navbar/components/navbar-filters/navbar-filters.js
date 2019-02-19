@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,44 +16,51 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { initialiseData } from "../../../common/index";
 
-import template from "./dynamic-sections-view.html";
+import {initialiseData} from "../../../common";
 
+import template from "./navbar-filters.html";
 
 const bindings = {
-    filters: "<",
-    parentEntityRef: "<",
-    sections: "<",
-    onRemove: "<"
 };
 
 
 const initialState = {
-    filters: {},
-    onRemove: (s) => console.log("wdsv: onRemove, default impl", s)
+    visibility: {
+        overlay: false
+    }
 };
 
 
-function controller() {
-    initialiseData(this, initialState);
+function controller($timeout) {
+
+    const vm = initialiseData(this, initialState);
+
+    const dismissOverlay = (e) => $timeout(
+        () => vm.visibility.overlay = false,
+        200);
+
+    vm.dismissOverlay = dismissOverlay;
+
+    vm.showOverlay = () => {
+        vm.visibility.overlay = true;
+    }
 }
 
 
 controller.$inject = [
+    "$timeout"
 ];
 
+
 const component = {
-    controller,
     bindings,
+    controller,
     template
 };
 
 
-const id = "waltzDynamicSectionsView";
-
-
 export default {
-    id,
-    component
+    component,
+    id: "waltzNavbarFilters"
 };

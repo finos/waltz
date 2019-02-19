@@ -25,6 +25,7 @@ import template from "./app-group-view.html";
 
 
 const initialState = {
+    filters: {},
     groupDetail: null,
     sections: [],
     availableSections: []
@@ -62,6 +63,10 @@ function controller($stateParams,
                     { id });
             });
 
+    };
+
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
     };
 
     // -- INTERACT --

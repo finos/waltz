@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,49 +17,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../common";
-
-import template from './navbar-search.html';
-
-const bindings = {
-};
-
-
-const initialState = {
-    query: '',
-    visibility: {
-        overlay: false
-    }
-};
-
-
-function controller($timeout) {
-
-    const vm = initialiseData(this, initialState);
-
-    const dismissResults = (e) => $timeout(
-        () => vm.visibility.overlay = false,
-        200);
-
-    vm.dismissResults = dismissResults;
-
-    vm.showSearch = () => vm.visibility.overlay = true;
-}
-
-
-controller.$inject = [
-    '$timeout'
-];
-
-
-const component = {
-    bindings,
-    controller,
-    template
-};
-
-
-export default {
-    component,
-    id: 'waltzNavbarSearch'
-};
+export const FILTER_CHANGED_EVENT = "waltz::filters::changed";
