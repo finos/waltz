@@ -294,4 +294,15 @@
     </changeSet>
 
 
+    <changeSet id="20190216-3826-1"
+               author="davidwatkins73">
+        <update tableName="enum_value">
+            <column name="type"
+                    value="scenarioType"
+                    type="${enum.type}"/>
+            <where>type = 'scenarioStatus'</where>
+        </update>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -215,6 +215,12 @@ export const dynamicSections = {
         name: "Logical Data Elements",
         icon: "asterisk",
         id: 60
+    },
+    physicalFlowParticipantsSection: {
+        componentId: "physical-flow-participants-section",
+        name: "Flow Participants",
+        icon: "cubes",
+        id: 70
     }
 
 };

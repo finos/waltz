@@ -7,6 +7,7 @@ import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.entity_relationship.EntityRelationshipService;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
@@ -19,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.*;
@@ -29,30 +31,34 @@ import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUt
 @Service
 public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcessor {
 
-    private final MeasurableService measurableService;
-    private final MeasurableRatingService measurableRatingService;
     private final BookmarkService bookmarkService;
-    private final InvolvementService involvementService;
+    private final EntityRelationshipService entityRelationshipService;
     private final FlowDiagramEntityService flowDiagramEntityService;
+    private final InvolvementService involvementService;
+    private final MeasurableRatingService measurableRatingService;
+    private final MeasurableService measurableService;
 
 
     @Autowired
-    public RemoveMeasurableCommandProcessor(MeasurableService measurableService,
-                                            MeasurableRatingService measurableRatingService,
+    public RemoveMeasurableCommandProcessor(BookmarkService bookmarkService,
+                                            EntityRelationshipService entityRelationshipService,
+                                            FlowDiagramEntityService flowDiagramEntityService,
                                             InvolvementService involvementService,
-                                            BookmarkService bookmarkService,
-                                            FlowDiagramEntityService flowDiagramEntityService) {
-        checkNotNull(measurableService, "measurableService cannot be null");
-        checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
-        checkNotNull(involvementService, "involvementService cannot be null");
+                                            MeasurableRatingService measurableRatingService,
+                                            MeasurableService measurableService) {
         checkNotNull(bookmarkService, "bookmarkService cannot be null");
+        checkNotNull(entityRelationshipService, "entityRelationshipService cannot be null");
         checkNotNull(flowDiagramEntityService, "flowDiagramEntityService cannot be null");
+        checkNotNull(involvementService, "involvementService cannot be null");
+        checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
+        checkNotNull(measurableService, "measurableService cannot be null");
 
-        this.measurableService = measurableService;
-        this.measurableRatingService = measurableRatingService;
-        this.involvementService = involvementService;
         this.bookmarkService = bookmarkService;
+        this.entityRelationshipService = entityRelationshipService;
         this.flowDiagramEntityService = flowDiagramEntityService;
+        this.involvementService = involvementService;
+        this.measurableRatingService = measurableRatingService;
+        this.measurableService = measurableService;
     }
 
 
@@ -85,11 +91,30 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         previewBookmarkRemovals(preview, selectionOptions);
         previewInvolvementRemovals(preview, selectionOptions);
         previewFlowDiagramRemovals(preview, selectionOptions);
+        previewEntityRelationships(preview, selectionOptions);
 
-        // TODO: entityRelationships, entitySvgDiagrams, roadmapScenarios
+        // TODO: entitySvgDiagrams, roadmapScenarios
 
         return preview.build();
     }
+
+
+    private void previewEntityRelationships(ImmutableTaxonomyChangePreview.Builder preview,
+                                            IdSelectionOptions options) {
+        Set<EntityReference> refs = entityRelationshipService
+                .findForGenericEntitySelector(options)
+                .stream()
+                .flatMap(rel -> Stream.of(rel.a(), rel.b()))
+                .filter(ref -> !ref.equals(options.entityReference()))
+                .collect(Collectors.toSet());
+
+        addToPreview(
+                preview,
+                refs,
+                Severity.WARNING,
+                "Entity Relationships will be removed");
+    }
+
 
     private void previewFlowDiagramRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                             IdSelectionOptions selectionOptions) {
@@ -163,13 +188,23 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         removeInvolvements(selectionOptions);
         removeAppMappings(selectionOptions);
         removeMeasurables(selectionOptions);
+        removeFlowDiagrams(selectionOptions);
+        removeEntityRelationshipsDiagrams(selectionOptions);
 
-        // TODO: entityRelationships, flowDiagrams, entitySvgDiagrams, roadmapScenarios
+        // TODO: entitySvgDiagrams, roadmapScenarios
 
         return ImmutableTaxonomyChangeCommand.copyOf(cmd)
                 .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED)
                 .withLastUpdatedBy(userId)
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+    }
+
+    private int removeEntityRelationshipsDiagrams(IdSelectionOptions selectionOptions) {
+        return entityRelationshipService.deleteForGenericEntitySelector(selectionOptions);
+    }
+
+    private int removeFlowDiagrams(IdSelectionOptions selectionOptions) {
+        return flowDiagramEntityService.deleteForEntitySelector(selectionOptions);
     }
 
 

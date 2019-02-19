@@ -1,5 +1,5 @@
 <!-- SCENARIOS -->
-<table class="small table table-condensed">
+<table class="table table-condensed">
     <colgroup>
         <col width="30%">
         <col width="10%">
@@ -18,6 +18,11 @@
         <th>Last modified</th>
     </tr>
     </thead>
+    <tr ng-if="$ctrl.scenarios.length === 0">
+        <td colspan="6">
+            No scenarios have been created for this roadmap
+        </td>
+    </tr>
     <tr ng-repeat="scenario in $ctrl.scenarios track by scenario.id"
         class="waltz-visibility-parent">
         <td>

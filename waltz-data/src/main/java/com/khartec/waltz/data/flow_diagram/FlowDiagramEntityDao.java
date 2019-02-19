@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.flow_diagram;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -127,8 +128,9 @@ public class FlowDiagramEntityDao {
      * Removes entities associated with diagram except for measurables
      * which remain as they are explicitly linked to diagrams, not implicitly
      * stored as part of the the diagram picture.
-     * @param diagramId
-     * @return
+     *
+     * @param diagramId the diagram to remove entites from
+     * @return count of removed diagrams
      */
     public int deleteForDiagram(long diagramId) {
         return dsl
@@ -139,6 +141,13 @@ public class FlowDiagramEntityDao {
     }
 
 
+    /**
+     * Deletes a specific entity associated with the given diagram id.
+     *
+     * @param diagramId the diagram to remove the entity from
+     * @param entityReference the entity to remove
+     * @return boolean indicating success or failure
+     */
     public boolean deleteEntityForDiagram(long diagramId, EntityReference entityReference) {
         return dsl
                 .deleteFrom(fde)
@@ -149,6 +158,28 @@ public class FlowDiagramEntityDao {
     }
 
 
+    /**
+     * Deletes all references to entities captured by the generic selector.
+     *
+     * @param selector generic selector
+     * @return count of removed entities
+     */
+    public int deleteForGenericEntitySelector(GenericSelector selector) {
+        return dsl
+                .deleteFrom(fde)
+                .where(fde.ENTITY_KIND.eq(selector.kind().name()))
+                .and(fde.ENTITY_ID.in(selector.selector()))
+                .execute();
+    }
+
+
+    /**
+     * Duplicates the entities referenced by `diagramId` into a new diagram, referenced
+     * by `clonedDiagramId`
+     *
+     * @param diagramId the diagram to copy from
+     * @param clonedDiagramId the target diagram
+     */
     public void clone(long diagramId, Long clonedDiagramId) {
         List<FlowDiagramEntity> diagramEntities = findForDiagram(diagramId);
         List<FlowDiagramEntity> clonedDiagramEntities = map(diagramEntities, d -> ImmutableFlowDiagramEntity
@@ -168,5 +199,6 @@ public class FlowDiagramEntityDao {
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 
 }

@@ -32,6 +32,13 @@ function store($http, BaseApiUrl) {
     };
 
 
+    const findByExternalId = (extId) => {
+        return $http
+            .get(`${BASE}/external-id/${extId}`)
+            .then(r => r.data);
+    };
+
+
     const findHierarchyBySelector = (selector) => {
         checkIsIdSelector(selector);
         return $http
@@ -65,6 +72,7 @@ function store($http, BaseApiUrl) {
 
     return {
         findBySelector,
+        findByExternalId,
         findHierarchyBySelector,
         findRelatedForId,
         getById,
@@ -84,6 +92,11 @@ export const ChangeInitiativeStore_API = {
         serviceName,
         serviceFnName: 'findBySelector',
         description: 'finds change initiatives by id selector'
+    },
+    findByExternalId: {
+        serviceName,
+        serviceFnName: 'findByExternalId',
+        description: 'finds change initiatives by external id'
     },
     findHierarchyBySelector: {
         serviceName,

@@ -107,4 +107,12 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
         return findForSelector(hierarchySelector);
     }
+
+
+    public Collection<ChangeInitiative> findByExternalId(String externalId) {
+        return dsl
+                .selectFrom(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.EXTERNAL_ID.eq(externalId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }
