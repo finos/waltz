@@ -19,14 +19,15 @@
 
 package com.khartec.waltz.service.entity_relationship;
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_relationship.Directionality;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,21 +42,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class EntityRelationshipService {
 
     private final EntityRelationshipDao entityRelationshipDao;
-    private final UserRoleService userRoleService;
-    private final ChangeLogService changeLogService;
+    private final GenericSelectorFactory genericSelectorFactory;
 
 
     @Autowired
     public EntityRelationshipService(EntityRelationshipDao entityRelationshipDao,
-                                     ChangeLogService changeLogService,
-                                     UserRoleService userRoleService) {
+                                     GenericSelectorFactory genericSelectorFactory) {
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
-        checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
 
         this.entityRelationshipDao = entityRelationshipDao;
-        this.changeLogService = changeLogService;
-        this.userRoleService = userRoleService;
+        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 
@@ -107,4 +104,14 @@ public class EntityRelationshipService {
         }
     }
 
+
+    public Collection<EntityRelationship> findForGenericEntitySelector(IdSelectionOptions selectionOptions) {
+        GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
+        return entityRelationshipDao.findForGenericEntitySelector(selector);
+    }
+
+    public int deleteForGenericEntitySelector(IdSelectionOptions selectionOptions) {
+        GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
+        return entityRelationshipDao.deleteForGenericEntitySelector(selector);
+    }
 }
