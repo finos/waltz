@@ -17,28 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {initialiseData} from "../../../common";
 
-import {checkIsDynamicSection} from "../common/checks";
+import template from "./navbar-search.html";
 
-export function sectionToTemplate(section) {
-    try {
-        checkIsDynamicSection(section);
-    } catch (e) {
-        console.log("Skipping section", { section, e });
+const bindings = {
+};
+
+
+const initialState = {
+    query: "",
+    visibility: {
+        overlay: false
     }
+};
 
-    const tagName = "waltz-" + section.componentId;
 
-    return `
-        <waltz-dynamic-section parent-entity-ref="$ctrl.parentEntityRef" 
-                               class="waltz-dynamic-section ${tagName} waltz-dynamic-section-${section.id}"
-                               section="$ctrl.section"
-                               on-remove="$ctrl.onRemove">
-            <${tagName} parent-entity-ref="$ctrl.parentEntityRef" 
-                        filters="$ctrl.filters">
-            </${tagName}>
-        </waltz-dynamic-section>
-    `;
+function controller($timeout) {
+
+    const vm = initialiseData(this, initialState);
+
+    const dismissResults = (e) => $timeout(
+        () => vm.visibility.overlay = false,
+        200);
+
+    vm.dismissResults = dismissResults;
+
+    vm.showSearch = () => vm.visibility.overlay = true;
 }
 
 
+controller.$inject = [
+    "$timeout"
+];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default {
+    component,
+    id: "waltzNavbarSearch"
+};

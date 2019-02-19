@@ -18,6 +18,7 @@
  */
 
 
+import _ from "lodash";
 import {checkIsEntityRef} from "./checks";
 
 export function getDefaultScopeForEntityKind(kind) {
@@ -48,4 +49,25 @@ export function mkSelectionOptions(entityReference, scope, entityLifecycleStatus
         scope: scope || getDefaultScopeForEntityKind(entityReference.kind),
         entityLifecycleStatuses
     };
+}
+
+
+export function mkApplicationSelectionOptions(entityReference,
+                                              scope,
+                                              entityLifecycleStatuses = ["ACTIVE"],
+                                              filters = {}) {
+
+    const appKinds = _.get(filters, "APPLICATION.applicationKind");
+    const filteredApplicationKinds = appKinds
+        ? _.chain(appKinds)
+            .pickBy((v, k) => v === true)
+            .keys()
+            .value()
+        : undefined;
+
+    const options = mkSelectionOptions(entityReference, scope, entityLifecycleStatuses);
+    return Object.assign(
+        {},
+        options,
+        { applicationKinds: filteredApplicationKinds });
 }

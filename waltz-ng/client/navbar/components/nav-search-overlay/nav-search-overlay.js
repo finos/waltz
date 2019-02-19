@@ -17,9 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from "../../common/services/core-api-utils";
-import {entityLifecycleStatuses, initialiseData} from "../../common/index";
-import {entity} from "../../common/services/enums/entity";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {entityLifecycleStatuses, initialiseData} from "../../../common/index";
+import {entity} from "../../../common/services/enums/entity";
+import {isDescendant} from "../../../common/browser-utils";
 
 import template from "./nav-search-overlay.html";
 
@@ -54,18 +55,6 @@ const initialState = {
 };
 
 
-function isDescendant(parent, child) {
-    let node = child.parentNode;
-    while (node != null) {
-        if (node == parent) {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
-}
-
-
 
 function controller($element,
                     $document,
@@ -89,10 +78,10 @@ function controller($element,
             const input = $element.find("input")[0];
             input.focus();
             $timeout(() => $document.on("click", documentClick), 200);
-            $timeout(() => $element.on("keydown", vm.onOverlayKeypress), 200);
+            $timeout(() => $element.on("keydown", onOverlayKeypress), 200);
         }  else {
             $document.off("click", documentClick);
-            $element.off("keydown", vm.onOverlayKeypress);
+            $element.off("keydown", onOverlayKeypress);
         }
     };
 
@@ -176,7 +165,7 @@ function controller($element,
         evt.stopPropagation();
     };
 
-    vm.onOverlayKeypress = (evt) => {
+    const onOverlayKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
             vm.dismiss();
         }

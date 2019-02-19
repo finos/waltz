@@ -1,0 +1,41 @@
+<div class="waltz-nav-filters-overlay waltz-fade-if"
+     ng-if="$ctrl.visible"
+     tabindex="110">
+
+    <div class="wnfo-main">
+        <!-- Dismiss -->
+        <small class="pull-right">
+            <a class="clickable"
+               ng-click="$ctrl.dismiss()">
+                <waltz-icon name="close"></waltz-icon>
+            </a>
+        </small>
+
+        <div>
+            <span class="small text-muted">Global filters can be applied to include / exclude data from view</span>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-sm-3">
+                <strong>Application Kind</strong>
+            </div>
+
+            <div class="col-sm-9">
+                <div ng-repeat="(appKind, val) in $ctrl.filterSelections.APPLICATION.applicationKind">
+                    <label class="small">
+                        <input type="checkbox"
+                               id="{{appKind}}"
+                               ng-model="$ctrl.filterSelections.APPLICATION.applicationKind[appKind]"
+                               ng-change="$ctrl.filterChanged()">
+                        <span ng-bind="appKind | toDisplayName:'applicationKind'">
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>

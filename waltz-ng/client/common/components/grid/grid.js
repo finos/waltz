@@ -41,7 +41,7 @@ const initialState = {
     rowTemplate: null,
     scopeProvider: null,
     onInitialise: (e) => {}
-  };
+};
 
 
 function controller(uiGridExporterConstants,
