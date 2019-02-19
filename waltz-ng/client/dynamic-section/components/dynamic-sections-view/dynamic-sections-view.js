@@ -30,20 +30,17 @@ const bindings = {
 
 
 const initialState = {
-    // filters: {},
+    filters: {},
     onRemove: (s) => console.log("wdsv: onRemove, default impl", s)
 };
 
 
-function controller($scope) {
-
-    const vm = initialiseData(this, initialState);
-
-
+function controller() {
+    initialiseData(this, initialState);
 }
 
+
 controller.$inject = [
-    "$scope"
 ];
 
 const component = {

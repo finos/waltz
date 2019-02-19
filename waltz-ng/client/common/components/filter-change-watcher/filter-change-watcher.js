@@ -20,9 +20,6 @@
 import { initialiseData, invokeFunction } from "../../../common";
 import { FILTER_CHANGED_EVENT } from "../../constants";
 
-import template from "./filter-change-watcher.html";
-
-
 const bindings = {
     onFiltersChanged: "<",
 };
@@ -57,7 +54,7 @@ controller.$inject = [
 
 
 const component = {
-    template,
+    template: "",
     bindings,
     controller
 };
