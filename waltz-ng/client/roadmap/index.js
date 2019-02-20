@@ -28,6 +28,7 @@ import RoadmapScenarioAxisConfig from "./components/roadmap-scenario-axis-config
 import RoadmapScenarioDiagram from "./components/roadmap-scenario-diagram/roadmap-scenario-diagram";
 import RoadmapStore from "./services/roadmap-store";
 import RoadmapView from "./pages/view/roadmap-view";
+import RoadmapList from "./pages/list/roadmap-list";
 import Routes from "./routes";
 
 import {registerComponents, registerStores} from "../common/module-utils";
@@ -45,7 +46,8 @@ export default () => {
         RoadmapScenarioConfig,
         RoadmapScenarioDiagram,
         RoadmapHeader,
-        RoadmapView
+        RoadmapView,
+        RoadmapList
     ]);
 
     registerStores(module, [
