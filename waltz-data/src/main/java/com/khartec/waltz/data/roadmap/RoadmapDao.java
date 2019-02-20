@@ -1,7 +1,6 @@
 package com.khartec.waltz.data.roadmap;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -27,12 +26,14 @@ import java.util.stream.Stream;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.StreamUtilities.concat;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -137,6 +138,11 @@ public class RoadmapDao {
     }
 
 
+    public Collection<RoadmapAndScenarioOverview> findAllRoadmapsAndScenarios() {
+        return findRoadmapsAndScenariosViaCondition(DSL.trueCondition());
+    }
+
+
     public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
         SelectConditionStep<Record1<Long>> scenarioSelector = DSL
                 .select(SCENARIO_RATING_ITEM.SCENARIO_ID)
@@ -144,8 +150,7 @@ public class RoadmapDao {
                 .where(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(ratedEntity.kind().name()))
                 .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(ratedEntity.id()));
 
-        return findRoadmapsAndScenariosViaScenarioSelector(
-                scenarioSelector);
+        return findRoadmapsAndScenariosViaSelector(scenarioSelector);
     }
 
 
@@ -158,27 +163,7 @@ public class RoadmapDao {
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ROADMAP.name()));
 
-        Collection<Roadmap> roadmaps = findRoadmapsBySelector(roadmapIdSelector);
-
-        Map<Long, List<Scenario>> scenariosByRoadmapId = dsl
-                .select(SCENARIO.fields())
-                .from(SCENARIO)
-                .where(SCENARIO.ROADMAP_ID.in(roadmapIdSelector))
-                .and(ScenarioDao.NOT_REMOVED)
-                .fetch(ScenarioDao.TO_DOMAIN_MAPPER)
-                .stream()
-                .collect(Collectors.groupingBy(s -> s.roadmapId()));
-
-        return roadmaps
-                .stream()
-                .map(r -> ImmutableRoadmapAndScenarioOverview.builder()
-                        .roadmap(r)
-                        .scenarios(scenariosByRoadmapId.getOrDefault(
-                                r.id().get(),
-                                Collections.emptyList()))
-                        .build())
-                .collect(Collectors.toList());
-
+        return findRoadmapsAndScenariosViaSelector(roadmapIdSelector);
     }
 
 
@@ -203,31 +188,47 @@ public class RoadmapDao {
 
         return newRecord.getId();
     }
+
+
     // -- helpers
 
-    private List<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaScenarioSelector(Select<Record1<Long>> scenarioSelector) {
-        List<Field<?>> fields = StreamUtilities.concat(
-                ROADMAP.fieldStream(),
-                SCENARIO.fieldStream(),
-                Stream.of(ROW_TYPE_NAME, COLUMN_KIND_NAME))
+
+    private Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaSelector(SelectConditionStep<Record1<Long>> scenarioSelector) {
+        Condition condition = SCENARIO.ID.in(scenarioSelector);
+        return findRoadmapsAndScenariosViaCondition(condition);
+    }
+
+
+    private List<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaCondition(Condition condition) {
+        List<Field<?>> fields = concat(
+                    ROADMAP.fieldStream(),
+                    SCENARIO.fieldStream(),
+                    Stream.of(ROW_TYPE_NAME, COLUMN_KIND_NAME))
                 .collect(Collectors.toList());
 
-        List<Tuple2<Roadmap, Scenario>> roadmapScenarioTuples = dsl
+        Condition scenarioActive = DSL
+                .coalesce(SCENARIO.LIFECYCLE_STATUS, "") // coalesce as scenario is null when there are no scenarios
+                .notEqual(EntityLifecycleStatus.REMOVED.name());
+
+        SelectConditionStep<Record> qry = dsl
                 .selectDistinct(fields)
                 .from(ROADMAP)
-                .innerJoin(SCENARIO)
+                .leftJoin(SCENARIO)
                 .on(SCENARIO.ROADMAP_ID.eq(ROADMAP.ID))
-                .where(SCENARIO.ID.in(scenarioSelector))
+                .where(condition)
                 .and(IS_ACTIVE)
-                .and(ScenarioDao.NOT_REMOVED)
-                .fetch(r -> tuple(
-                        TO_DOMAIN_MAPPER.map(r),  // roadmap
-                        ScenarioDao.TO_DOMAIN_MAPPER.map(r))); // scenario
+                .and(scenarioActive);
+
+        List<Tuple2<Roadmap, Scenario>> roadmapScenarioTuples = qry.fetch(
+                r -> tuple(
+                        RoadmapDao.TO_DOMAIN_MAPPER.map(r),  // roadmap
+                        r.get(SCENARIO.ID) != null ? ScenarioDao.TO_DOMAIN_MAPPER.map(r) : null)); // scenario
 
         Map<Long, List<Scenario>> scenariosByRoadmapId = roadmapScenarioTuples
                 .stream()
                 .map(t -> t.v2)
                 .distinct()
+                .filter(Objects::nonNull)
                 .collect(groupingBy(Scenario::roadmapId));
 
         return roadmapScenarioTuples
@@ -238,7 +239,9 @@ public class RoadmapDao {
                 .map(r -> ImmutableRoadmapAndScenarioOverview
                         .builder()
                         .roadmap(r)
-                        .scenarios(scenariosByRoadmapId.get(r.id().get()))
+                        .scenarios(r.id()
+                                .map(id -> scenariosByRoadmapId.getOrDefault(id, emptyList()))
+                                .orElse(emptyList()))
                         .build())
                 .collect(toList());
     }

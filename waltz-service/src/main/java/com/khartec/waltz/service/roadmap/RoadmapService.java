@@ -136,6 +136,11 @@ public class RoadmapService {
     }
 
 
+    public Collection<RoadmapAndScenarioOverview> findAllRoadmapsAndScenarios() {
+        return roadmapDao.findAllRoadmapsAndScenarios();
+    }
+
+
     public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
         return roadmapDao.findRoadmapsAndScenariosByRatedEntity(ratedEntity);
     }
