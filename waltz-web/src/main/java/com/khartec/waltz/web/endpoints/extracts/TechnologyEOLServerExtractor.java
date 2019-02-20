@@ -30,12 +30,12 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
     public void register() {
         String path = mkPath("data-extract", "technology-server", ":id");
         get(path, (request, response) -> {
-            long runId = getId(request);
+            long ouId = getId(request);
 
             String orgUnitName = dsl
                     .select(ORGANISATIONAL_UNIT.NAME)
                     .from(ORGANISATIONAL_UNIT)
-                    .where(ORGANISATIONAL_UNIT.ID.eq(runId))
+                    .where(ORGANISATIONAL_UNIT.ID.eq(ouId))
                     .fetchOne(ORGANISATIONAL_UNIT.NAME);
 
             checkNotNull(orgUnitName, "org unit cannot be null");
@@ -48,13 +48,13 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
             return writeFile(
                     suggestedFilename,
-                    extract(runId),
+                    extract(ouId),
                     response);
         });
     }
 
 
-    public CSVSerializer extract(long runId) {
+    public CSVSerializer extract(long ouId) {
         return csvWriter -> {
             csvWriter.writeHeader(
                     "Org Unit",
@@ -68,7 +68,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
             SelectConditionStep<Record1<Long>> ids = dsl.select(ENTITY_HIERARCHY.ID)
                     .from(ENTITY_HIERARCHY)
-                    .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(runId))
+                    .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ouId))
                     .and(ENTITY_HIERARCHY.KIND.eq("ORG_UNIT"));
 
             Select<Record> qry = dsl
