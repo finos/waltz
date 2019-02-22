@@ -24,7 +24,8 @@ import template from './group-technology-summary.html';
 
 
 const bindings = {
-    stats: '<'
+    stats: '<',
+    parentEntityRef: '<'
 };
 
 const initialState = {
