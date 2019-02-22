@@ -85,8 +85,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
     private String mkFilename(EntityReference ref) {
         return sanitizeName(ref.name().orElse(ref.kind().name()))
-                        + "-technology-server-eol"
-                        + ".csv";
+                        + "-technology-server-eol.csv";
     }
 
 
@@ -95,6 +94,5 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
                 .replace(".", "-")
                 .replace(" ", "-")
                 .replace(",", "-");
-
     }
 }
