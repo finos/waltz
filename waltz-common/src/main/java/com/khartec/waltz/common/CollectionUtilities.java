@@ -153,4 +153,10 @@ public class CollectionUtilities {
         return xs == null || xs.isEmpty();
     }
 
+
+    public static <X> Optional<X> maybeFirst(Collection<X> xs) {
+        return isEmpty(xs)
+                ? Optional.empty()
+                : Optional.of(first(xs));
+    }
 }
