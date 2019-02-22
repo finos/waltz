@@ -1,11 +1,12 @@
 <div>
-    <div class="pull-right">
+      <div class="pull-right">
         <waltz-data-extract-link name="Export"
                                  styling="link"
-                                 extract="technology-server/{{$ctrl.parentEntityRef.id}}"
+                                 extract="technology-server/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
                                  filename="{{technology-server-eol}}.csv">
         </waltz-data-extract-link>
     </div>
+
 
     <div ng-if="$ctrl.visibility.servers">
         <h4 style="padding-left:32px">
@@ -57,7 +58,7 @@
         <div class="pull-right" style="padding-top: 2em">
             <waltz-data-extract-link name="Export"
                                      styling="link"
-                                     extract="technology-database/{{$ctrl.parentEntityRef.id}}"
+                                     extract="technology-database/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
                                      filename="{{technology-database-eol}}.csv">
             </waltz-data-extract-link>
         </div>
