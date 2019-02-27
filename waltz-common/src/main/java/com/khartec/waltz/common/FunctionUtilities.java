@@ -103,7 +103,7 @@ public class FunctionUtilities {
      * @param <Y> Type of return value
      * @return Always returns the `result` object
      */
-    public static <X, Y> Function<X, Y> always(Y result) {
+    public static <X, Y> Function<? super X, Y> always(Y result) {
         return (x) -> result;
     }
 }
