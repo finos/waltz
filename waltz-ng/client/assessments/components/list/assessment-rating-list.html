@@ -45,16 +45,6 @@
                                         <span ng-bind="item.ratingItem.name">
                                         </span>
                                     </a>
-                                    <span ng-if="item.rating.description">
-                                        <br>
-                                        <span class="small text-muted"
-                                              style="padding-left: 22px"
-                                              ng-bind="item.rating.description | limitTo: 30">
-                                        </span>
-                                        <span ng-if="item.rating.description.length > 30">
-                                            ...
-                                        </span>
-                                    </span>
                                 </span>
                                 <span ng-if="!item.rating">
                                     <a ng-click="$ctrl.onSelect(item)"
