@@ -29,6 +29,23 @@ FROM measurable AS child
   INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
 WHERE child.measurable_category_id = 12;
 
+-- apps in and org unit without any ratings against a measurable category
+select * from application
+where id in (
+    (
+        select app.id from application app
+        inner join entity_hierarchy eh on eh.id = app.organisational_unit_id
+        where eh.ancestor_id = 3125
+        and eh.kind = 'ORG_UNIT'
+        and app.entity_lifecycle_status = 'ACTIVE'
+    ) except (
+        select mr.entity_id from measurable_rating mr
+        inner join measurable m on m.id = mr.measurable_id
+        inner join measurable_category mc on mc.id = m.measurable_category_id
+        where mc.external_id = 'FUNCTION'
+    )
+);
+
 
 --[SURVEYS]---
 
