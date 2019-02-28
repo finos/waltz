@@ -22,9 +22,9 @@ package com.khartec.waltz.common;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static java.util.stream.Collectors.toList;
 
 
 public class ListUtilities {
@@ -54,6 +54,21 @@ public class ListUtilities {
     }
 
 
+    /**
+     * Given a collection of elements will return a list containing only non-null elements
+     *
+     * @param ts collection if items
+     * @param <T> type of each item
+     * @return list of non-null items
+     */
+    public static <T> List<T> compact(Collection<T> ts) {
+        checkNotNull(ts, "Cannot compact a null list");
+        return ts.stream()
+                .filter(Objects::nonNull)
+                .collect(toList());
+    }
+
+
     @SafeVarargs
     public static <T> List<T> concat(List<T>... tss) {
         List<T> result = new ArrayList<>();
@@ -69,7 +84,7 @@ public class ListUtilities {
     public static <A, B> List<B> map(List<A> as, Function<A, B> mapper) {
         return as.stream()
                 .map(mapper)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 
@@ -86,7 +101,7 @@ public class ListUtilities {
     public static <T> List<T> filter(Predicate<T> predicate, List<T> ts) {
         return ts.stream()
                 .filter(predicate)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 
@@ -94,7 +109,7 @@ public class ListUtilities {
         checkNotNull(ts, "list must not be null");
         return ts.stream()
                 .skip(count)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
 

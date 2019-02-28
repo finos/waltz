@@ -205,7 +205,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public boolean move(Long measurableId, Long destinationId, String userId) {
+    public boolean updateParentId(Long measurableId, Long destinationId, String userId) {
         LOG.info(
                 "Moving measurable: {} to {}",
                 measurableId,
