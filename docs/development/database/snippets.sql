@@ -43,6 +43,7 @@ where id in (
         inner join measurable m on m.id = mr.measurable_id
         inner join measurable_category mc on mc.id = m.measurable_category_id
         where mc.external_id = 'FUNCTION'
+        and mr.entity_kind = 'APPLICATION'
     )
 );
 
