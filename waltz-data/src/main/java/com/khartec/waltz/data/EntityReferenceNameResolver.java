@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.head;
+import static com.khartec.waltz.common.CollectionUtilities.maybeFirst;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -52,7 +52,7 @@ public class EntityReferenceNameResolver {
     }
 
     public Optional<EntityReference> resolve(EntityReference ref) {
-        return head(resolve(newArrayList(ref)));
+        return maybeFirst(resolve(newArrayList(ref)));
     }
 
     public List<EntityReference> resolve(List<EntityReference> refs) {

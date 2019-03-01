@@ -305,4 +305,16 @@
     </changeSet>
 
 
+    <changeSet id="20190208-3854-1"
+               author="xLcc">
+        <comment>3854: Add last_updated_at to data types</comment>
+        <addColumn tableName="data_type">
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

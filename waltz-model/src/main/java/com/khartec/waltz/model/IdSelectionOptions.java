@@ -48,7 +48,7 @@ public abstract class IdSelectionOptions {
                 .scope(scope)
                 .build();
     }
-    
+
     public static IdSelectionOptions mkOpts(EntityReference ref) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
