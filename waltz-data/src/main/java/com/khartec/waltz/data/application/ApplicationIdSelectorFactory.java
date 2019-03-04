@@ -39,6 +39,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -382,17 +383,6 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                     .on(APPLICATION.ID.eq(joinField))
                 .where(condition)
                 .and(NOT_REMOVED);
-    }
-
-
-    /***
-     * creates a select condition taking into account application specific faces in options
-     * @param options
-     * @return
-     */
-    private Condition mkApplicationConditions(ApplicationIdSelectionOptions options) {
-        return APPLICATION.KIND.in(options.applicationKinds())
-                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 }

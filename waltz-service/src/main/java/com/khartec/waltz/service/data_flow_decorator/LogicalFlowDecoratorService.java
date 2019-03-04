@@ -119,7 +119,7 @@ public class LogicalFlowDecoratorService {
             case APP_GROUP:
             case ORG_UNIT:
             case PERSON:
-                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(mkOpts(options));
+                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(options));
                 return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(
                         APPLICATION,
                         selector,

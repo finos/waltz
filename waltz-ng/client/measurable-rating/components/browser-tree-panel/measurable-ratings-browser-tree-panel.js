@@ -20,10 +20,11 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from "./measurable-ratings-browser-tree-panel.html";
 import {indexRatingSchemes} from "../../../ratings/rating-utils";
+
+import template from "./measurable-ratings-browser-tree-panel.html";
 
 /**
  * @name waltz-measurable-ratings-browser-tree-panel
@@ -36,6 +37,7 @@ import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<"
 };
 
@@ -48,7 +50,8 @@ const initialState = {
     ratingTallies: [],
     detail: null,
     visibility: {
-        loading: false
+        loading: false,
+        ratingDetail: false,
     },
     selectedMeasurable: null,
     onLoadDetail: () => log("onLoadDetail")
@@ -166,7 +169,52 @@ function loadRatingSchemes(serviceBroker, holder) {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadRatingsDetail = () => {
+    const clearDetail = () => {
+        vm.measurableRatingsDetail = null;
+        vm.tableData = null;
+    };
+
+    const loadBaseData = () => {
+        vm.selector = mkApplicationSelectionOptions(vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
+
+        const promise = $q.all([
+            loadMeasurableCategories(serviceBroker, vm),
+            loadMeasurables(serviceBroker, vm.selector, vm),
+            loadRatingSchemes(serviceBroker, vm),
+            loadMeasurableRatings(serviceBroker, vm.selector, vm),
+            loadApps(serviceBroker, vm.selector, vm)
+        ]);
+
+        return promise;
+    };
+
+
+    const loadRatings = () => {
+        clearDetail();
+
+        vm.selector = mkApplicationSelectionOptions(vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
+
+        const promise = $q.all([
+            loadApps(serviceBroker, vm.selector, vm),
+            loadMeasurableRatings(serviceBroker, vm.selector, vm),
+        ]);
+
+        if(vm.visibility.ratingDetail) {
+            promise.then(() => vm.onSelect(vm.selectedMeasurable));
+        }
+
+        return promise;
+    };
+
+
+    const loadRatingDetail = () => {
+        clearDetail();
         return vm.measurableRatingsDetail
             ? $q.resolve(vm.measurableRatingsDetail)
             : serviceBroker
@@ -176,28 +224,25 @@ function controller($q, serviceBroker) {
 
 
     vm.$onInit = () => {
-        vm.selector = mkSelectionOptions(vm.parentEntityRef);
-
-        return $q.all([
-            loadMeasurableRatings(serviceBroker, vm.selector, vm),
-            loadMeasurables(serviceBroker, vm.selector, vm),
-            loadMeasurableCategories(serviceBroker, vm),
-            loadApps(serviceBroker, vm.selector, vm),
-            loadRatingSchemes(serviceBroker, vm)
-        ]);
+        loadBaseData()
+            .then(() => loadRatings());
     };
 
 
-    vm.$onChanges = (c) => {
-
+    vm.$onChanges = (changes) => {
+        if(vm.parentEntityRef && changes.filters) {
+            loadRatings();
+        }
     };
 
 
     vm.onSelect = (measurable) => {
+        vm.visibility.ratingDetail = false;
         vm.visibility.loading = true;
+
         vm.tableData = null;
         vm.selectedMeasurable = measurable;
-        const promise = loadRatingsDetail();
+        const promise = loadRatingDetail();
         const category = _.find(vm.measurableCategories, ({ id: measurable.categoryId }));
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
 
@@ -210,7 +255,10 @@ function controller($q, serviceBroker) {
                     vm.applications,
                     ratings,
                     vm.measurablesById))
-                .then(() => vm.visibility.loading = false);
+                .then(() => {
+                    vm.visibility.loading = false;
+                    vm.visibility.ratingDetail = true;
+                });
         } else {
             log("was expecting promise, got: ", promise);
             vm.visibility.loading = false;
@@ -218,7 +266,11 @@ function controller($q, serviceBroker) {
     };
 
 
+
+
     vm.onCategorySelect = (c) => {
+        vm.visibility.ratingDetail = false;
+        clearDetail();
         vm.activeCategory = c;
     };
 }

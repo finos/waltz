@@ -29,7 +29,7 @@
                                         name="Loading">
             </waltz-loading-notification>
 
-            <div ng-if="$ctrl.tableData"
+            <div ng-if="$ctrl.visibility.ratingDetail && $ctrl.tableData"
                  class="waltz-fade-if">
                 <strong>
                     <a ng-bind="$ctrl.selectedMeasurable.name"

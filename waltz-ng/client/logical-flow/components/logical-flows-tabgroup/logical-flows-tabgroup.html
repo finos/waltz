@@ -27,7 +27,8 @@
                 <br>
 
                 <div ng-if="$ctrl.currentTabIndex == 1">
-                    <waltz-logical-flows-boingy-graph parent-entity-ref="$ctrl.parentEntityRef">
+                    <waltz-logical-flows-boingy-graph parent-entity-ref="$ctrl.parentEntityRef"
+                                                      filters="$ctrl.filters">
                     </waltz-logical-flows-boingy-graph>
                 </div>
 

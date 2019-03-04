@@ -20,13 +20,14 @@
 import _ from "lodash";
 import {isEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import { mkApplicationSelectionOptions, mkSelectionOptions } from "../../../common/selector-utils";
 
-import template from './rated-flow-summary-panel.html';
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import template from "./rated-flow-summary-panel.html";
 
 
 const bindings = {
-    entityReference: '<'
+    filters: "<",
+    entityReference: "<"
 };
 
 
@@ -41,7 +42,7 @@ const initialState = {
 function findMatchingDecorators(selection, decorators = []) {
     const matcher = {
         decoratorEntity: {
-            kind: 'DATA_TYPE',
+            kind: "DATA_TYPE",
             id: selection.dataType.id
         },
         rating: selection.rating
@@ -53,7 +54,7 @@ function findMatchingDecorators(selection, decorators = []) {
 
 function findMatchingFlows(flows = [], decorators = []) {
     const flowIds = _.chain(decorators)
-        .map('dataFlowId')
+        .map("dataFlowId")
         .uniq()
         .value();
 
@@ -64,10 +65,10 @@ function findMatchingFlows(flows = [], decorators = []) {
 
 
 function findConsumingApps(flows = [], apps = []) {
-    const appsById = _.keyBy(apps, 'id');
+    const appsById = _.keyBy(apps, "id");
     return _.chain(flows)
-        .filter(f => f.target.kind === 'APPLICATION')
-        .map('target.id')
+        .filter(f => f.target.kind === "APPLICATION")
+        .map("target.id")
         .uniq()
         .map(id => appsById[id])
         .value();
@@ -81,7 +82,7 @@ function findConsumingApps(flows = [], apps = []) {
  * @returns {Array}
  */
 function findPotentialFlows(flows = [], apps =[]) {
-    const appIds = _.map(apps, 'id');
+    const appIds = _.map(apps, "id");
     return _.filter(flows, f => _.includes(appIds, f.target.id));
 }
 
@@ -107,7 +108,7 @@ function controller(serviceBroker)
     const processSummaries = (xs) => {
         vm.visibility.chart = vm.visibility.chart || _.size(xs) > 0;
 
-        if (vm.entityReference.kind === 'DATA_TYPE') {
+        if (vm.entityReference.kind === "DATA_TYPE") {
             const relevantIds = [];
             const descend = (ptr) => {
                 relevantIds.push(ptr);
@@ -120,24 +121,20 @@ function controller(serviceBroker)
 
             return _.filter(xs, x => {
                 const decorator = x.decoratorEntityReference;
-                return decorator.kind = 'DATA_TYPE' && _.includes(relevantIds, decorator.id);
+                return decorator.kind = "DATA_TYPE" && _.includes(relevantIds, decorator.id);
             });
         } else {
             return xs;
         }
     };
 
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.dataTypes = r.data);
-    };
 
-    vm.$onChanges = () => {
-
-        if (!vm.entityReference) return;
-
-        const selector = mkSelectionOptions(vm.entityReference);
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.entityReference,
+            undefined,
+            undefined,
+            vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -156,11 +153,25 @@ function controller(serviceBroker)
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
                 [ selector ])
             .then(r => vm.exactSummaries = processSummaries(r.data));
+    };
 
+    vm.$onInit = () => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.dataTypes = r.data);
+    };
+
+    vm.$onChanges = (changes) => {
+
+        if (!vm.entityReference) return;
+
+        if (changes.filters) {
+            loadAll();
+        }
     };
 
     vm.onTableClick = (clickData) => {
-        if (clickData.type === 'CELL') {
+        if (clickData.type === "CELL") {
 
             const selector = mkSelectionOptions(vm.entityReference);
 
@@ -187,7 +198,7 @@ function controller(serviceBroker)
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -200,5 +211,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzRatedFlowSummaryPanel'
+    id: "waltzRatedFlowSummaryPanel"
 };

@@ -20,9 +20,9 @@
 import angular from 'angular';
 import {registerComponents, registerStores} from '../common/module-utils';
 import * as AssetCostStore from './services/asset-cost-store';
-import AssetCostsSection from './components/asset-costs-section';
-import AssetCostsGraph from './components/asset-costs-graph';
-import AssetCostTable from './components/asset-cost-table';
+import AssetCostsSection from './components/section/asset-costs-section';
+import AssetCostsGraph from './components/graph/asset-costs-graph';
+import AssetCostTable from './components/table/asset-cost-table';
 
 
 export default () => {
