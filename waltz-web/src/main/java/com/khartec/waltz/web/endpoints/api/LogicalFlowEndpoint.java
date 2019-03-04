@@ -42,9 +42,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
@@ -116,7 +116,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
+    private Integer cleanupOrphansRoute(Request request, Response response) {
         ensureUserHasAdminRights(request);
 
         String username = getUsername(request);
@@ -126,7 +126,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private int cleanupSelfReferencingFlowsRoute(Request request, Response response) throws IOException {
+    private int cleanupSelfReferencingFlowsRoute(Request request, Response response) {
         ensureUserHasAdminRights(request);
 
         String username = getUsername(request);
@@ -139,17 +139,20 @@ public class LogicalFlowEndpoint implements Endpoint {
     private List<LogicalFlow> findBySourceAndTargetsRoute(Request request, Response response) throws IOException {
         List list = readBody(request, List.class);
 
-        List<Tuple2<EntityReference, EntityReference>> sourcesAndTargets = (List<Tuple2<EntityReference, EntityReference>>) list.stream()
-                .map(t -> {
+        @SuppressWarnings("unchecked")
+        List<Tuple2<EntityReference, EntityReference>> sourcesAndTargets = map(
+                list,
+                t -> {
                     Map map = (Map) t;
                     Map source = (Map) map.get("source");
                     Map target = (Map) map.get("target");
                     EntityReference sourceRef = EntityReference.mkRef(source);
                     EntityReference targetRef = EntityReference.mkRef(target);
                     return Tuple.tuple(sourceRef, targetRef);
-                })
-                .collect(Collectors.toList());
-        return logicalFlowService.findBySourceAndTargetEntityReferences(sourcesAndTargets);
+                });
+
+        return logicalFlowService
+                .findBySourceAndTargetEntityReferences(sourcesAndTargets);
     }
 
 
@@ -162,8 +165,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
-        LogicalFlow savedFlow = logicalFlowService.addFlow(addCmd, username);
-        return savedFlow;
+        return logicalFlowService.addFlow(addCmd, username);
     }
 
 
@@ -174,8 +176,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         List<AddLogicalFlowCommand> addCmds = Arrays.asList(readBody(request, AddLogicalFlowCommand[].class));
         LOG.info("User: {}, adding new logical flows: {}", username, addCmds);
-        List<LogicalFlow> savedFlows = logicalFlowService.addFlows(addCmds, username);
-        return savedFlows;
+        return logicalFlowService.addFlows(addCmds, username);
     }
 
 
