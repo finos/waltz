@@ -28,8 +28,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
@@ -53,7 +52,7 @@ public class EndUserAppEndpoint implements Endpoint {
         String countByOrgUnitPath = mkPath(BASE_URL, "count-by", "org-unit");
 
         ListRoute<EndUserApplication> findBySelectorRoute = (request, response)
-                -> endUserAppService.findByOrganisationalUnitSelector(readIdSelectionOptionsFromBody(request));
+                -> endUserAppService.findByOrganisationalUnitSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<Tally<Long>> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
 
