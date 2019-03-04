@@ -24,7 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
-import { mkApplicationSelectionOptions, mkSelectionOptions } from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {

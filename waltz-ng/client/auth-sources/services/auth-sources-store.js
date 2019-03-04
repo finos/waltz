@@ -21,7 +21,7 @@
 import _ from 'lodash';
 import {
     checkIsAuthSourceCreateCommand,
-    checkIsAuthSourceUpdateCommand, checkIsEntityRef,
+    checkIsAuthSourceUpdateCommand,
     checkIsIdSelector
 } from "../../common/checks";
 
