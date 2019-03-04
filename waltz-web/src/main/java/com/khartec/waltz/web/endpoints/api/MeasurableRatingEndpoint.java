@@ -97,7 +97,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.statsByAppSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRatingTally> statsForRelatedMeasurableRoute = (request, response)
-                -> measurableRatingService.statsForRelatedMeasurable(readIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.statsForRelatedMeasurable(readAppIdSelectionOptionsFromBody(request));
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
