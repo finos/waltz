@@ -21,7 +21,8 @@
                  heading="Summary"
                  select="$ctrl.tabSelected('summary', 0)">
             <div class="waltz-panel-content">
-                <waltz-auth-sources-summary-panel parent-entity-ref="$ctrl.parentEntityRef">
+                <waltz-auth-sources-summary-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                  filters="$ctrl.filters">
                 </waltz-auth-sources-summary-panel>
             </div>
         </uib-tab>
@@ -33,7 +34,8 @@
                  select="$ctrl.tabSelected('scorecard', 1)">
             <div class="waltz-panel-content"
                  ng-show="$ctrl.visibility.tab == 1">
-                <waltz-rated-flow-summary-panel entity-reference="$ctrl.parentEntityRef">
+                <waltz-rated-flow-summary-panel entity-reference="$ctrl.parentEntityRef"
+                                                filters="$ctrl.filters">
                 </waltz-rated-flow-summary-panel>
             </div>
         </uib-tab>
@@ -76,7 +78,6 @@
                         </strong>
                     </message>
                 </waltz-no-data>
-
             </div>
         </uib-tab>
 

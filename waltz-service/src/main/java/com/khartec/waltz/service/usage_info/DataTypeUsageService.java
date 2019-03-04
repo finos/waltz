@@ -95,8 +95,8 @@ public class DataTypeUsageService {
     }
 
 
-    public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions dataTypeIdSelectionOptions) {
-        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
+    public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions idSelectionOptions) {
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
         return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector);
     }
 

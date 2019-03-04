@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,8 @@
  */
 
 import _ from "lodash";
-import {mkEntityLinkGridCell} from "../../common/grid-utils";
-import {initialiseData} from "../../common/index";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {initialiseData} from "../../../common/index";
 
 import template from "./asset-cost-table.html";
 
@@ -31,9 +31,9 @@ const DEFAULT_OPTIONS = {
 
 
 const bindings = {
-    costs: '<',
-    options: '<?',
-    csvName: '@?'
+    costs: "<",
+    options: "<?",
+    csvName: "@?"
 };
 
 
@@ -45,15 +45,15 @@ const initialState = {
 
 function prepareColumns(uiGridConstants, options) {
     const kindCol = {
-        field: 'cost.costKind',
-        displayName: 'Cost Type',
+        field: "cost.costKind",
+        displayName: "Cost Type",
         cellFilter: 'toDisplayName:"CostKind"'
     };
 
     const amountCol = {
-        field: 'cost.amount',
-        displayName: 'Amount',
-        cellClass: 'waltz-grid-currency',
+        field: "cost.amount",
+        displayName: "Amount",
+        cellClass: "waltz-grid-currency",
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-currency-amount amount="COL_FIELD">
@@ -62,23 +62,23 @@ function prepareColumns(uiGridConstants, options) {
         filters: [
             {
                 condition: uiGridConstants.filter.GREATER_THAN,
-                placeholder: 'Greater than'
+                placeholder: "Greater than"
             }, {
                 condition: uiGridConstants.filter.LESS_THAN,
-                placeholder: 'Less than'
+                placeholder: "Less than"
             }
         ]
     };
 
     const yearCol = {
-        field: 'cost.year',
-        displayName: 'Year'
+        field: "cost.year",
+        displayName: "Year"
     };
 
-    const appCol = mkEntityLinkGridCell('Application', 'application', 'none');
+    const appCol = mkEntityLinkGridCell("Application", "application", "none");
 
     const assetCodeCol = {
-        field: 'assetCode'
+        field: "assetCode"
     };
 
     return determineColumns({
@@ -125,7 +125,7 @@ function controller(uiGridConstants) {
 
 
 controller.$inject = [
-    'uiGridConstants'
+    "uiGridConstants"
 ];
 
 
@@ -138,6 +138,6 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAssetCostTable'
+    id: "waltzAssetCostTable"
 };
 

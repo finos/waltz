@@ -82,13 +82,13 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findByIdSelectorAndKind(
-                                readIdSelectionOptionsFromBody(request),
+                                readAppIdSelectionOptionsFromBody(request),
                                 getKind(request));
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findBySelector(
-                                readIdSelectionOptionsFromBody(request));
+                                readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlowDecorator> findByFlowIdsAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService

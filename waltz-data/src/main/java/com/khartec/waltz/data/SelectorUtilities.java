@@ -21,8 +21,11 @@ package com.khartec.waltz.data;
 
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import org.jooq.Condition;
 
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 public class SelectorUtilities {
 
@@ -30,6 +33,18 @@ public class SelectorUtilities {
         checkTrue(
                 options.scope() == HierarchyQueryScope.EXACT,
                 "Only EXACT scope supported");
+    }
+
+
+
+    /***
+     * creates a select condition taking into account application specific faces in options
+     * @param options
+     * @return
+     */
+    public static Condition mkApplicationConditions(ApplicationIdSelectionOptions options) {
+        return APPLICATION.KIND.in(options.applicationKinds())
+                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
     }
 
 }

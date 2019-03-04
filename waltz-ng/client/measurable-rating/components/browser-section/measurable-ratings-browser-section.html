@@ -19,7 +19,8 @@
 
     <div ng-if="$ctrl.visibility.treeView"
          class="waltz-fade-if">
-        <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef">
+        <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                     filters="$ctrl.filters">
         </waltz-measurable-ratings-browser-tree-panel>
 
         <br>

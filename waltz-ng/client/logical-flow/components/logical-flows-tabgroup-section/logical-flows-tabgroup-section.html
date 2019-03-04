@@ -12,7 +12,8 @@
     </waltz-source-data-overlay>
 
     <div ng-if="$ctrl.hasFlows">
-        <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef">
+        <waltz-logical-flows-tabgroup parent-entity-ref="$ctrl.parentEntityRef"
+                                      filters="$ctrl.filters">
         </waltz-logical-flows-tabgroup>
     </div>
     <div ng-if="!$ctrl.hasFlows">
@@ -21,6 +22,5 @@
                 <strong>No related flows found.</strong>
             </message>
         </waltz-no-data>
-
     </div>
 </div>

@@ -21,7 +21,7 @@
 import _ from 'lodash';
 import {
     checkIsAuthSourceCreateCommand,
-    checkIsAuthSourceUpdateCommand, checkIsEntityRef,
+    checkIsAuthSourceUpdateCommand,
     checkIsIdSelector
 } from "../../common/checks";
 
@@ -79,18 +79,17 @@ export function store($http, root) {
             .post(BASE, command);
     };
 
-
-    const findNonAuthSources = (entityRef) => {
-        checkIsEntityRef(entityRef);
+    const findNonAuthSources = (selector) => {
+        checkIsIdSelector(selector);
         return $http
-            .get(`${BASE}/non-auth-for/${entityRef.kind}/${entityRef.id}`)
+            .post(`${BASE}/non-auth`, selector)
             .then(r => r.data);
     };
 
-    const findAuthSources = (entityRef) => {
-        checkIsEntityRef(entityRef);
+    const findAuthSources = (selector) => {
+        checkIsIdSelector(selector);
         return $http
-            .get(`${BASE}/auth-for/${entityRef.kind}/${entityRef.id}`)
+            .post(`${BASE}/auth`, selector)
             .then(r => r.data);
     };
 

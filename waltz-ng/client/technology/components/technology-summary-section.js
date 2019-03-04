@@ -18,14 +18,15 @@
  */
 import _ from "lodash";
 import {initialiseData} from "../../common";
-import {mkSelectionOptions} from '../../common/selector-utils';
-import {CORE_API} from '../../common/services/core-api-utils';
+import {mkApplicationSelectionOptions} from "../../common/selector-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
 
-import template from './technology-summary-section.html';
+import template from "./technology-summary-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -38,8 +39,12 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
 
         serviceBroker
             .loadViewData(CORE_API.TechnologyStatisticsService.findBySelector, [selector])
@@ -54,11 +59,23 @@ function controller(serviceBroker) {
                 vm.hasAnyData = hasServerStats || hasDbStats || hasSwStats;
             });
     };
+
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
+    };
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 

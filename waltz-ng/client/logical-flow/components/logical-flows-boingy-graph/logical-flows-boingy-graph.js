@@ -18,11 +18,14 @@
  */
 
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
+
 import template from "./logical-flows-boingy-graph.html";
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<"
 };
 
@@ -258,7 +261,11 @@ function controller($scope,
 
     vm.$onChanges = (c) => {
         if (vm.parentEntityRef) {
-            vm.selector = mkSelectionOptions(vm.parentEntityRef);
+            vm.selector = mkApplicationSelectionOptions(
+                vm.parentEntityRef,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
             loadDetail();
         }
     };

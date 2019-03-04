@@ -167,7 +167,6 @@ function controller(serviceBroker) {
             const tab = findFirstNonEmptyTab(tabs);
 
             vm.tabs = tabs;
-            vm.visibility.tab = _.get(tab, ["category", "id"]);
 
             vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
             vm.maxTotal = _.max(
@@ -175,7 +174,11 @@ function controller(serviceBroker) {
                     _.values(vm.ratingsMap),
                     r => _.get(r, ["compound", "total"], [0])));
 
-            vm.onTabChange(tab);
+            if (! vm.visibility.tab) {
+                // no tab selected, select the first
+                vm.visibility.tab = _.get(tab, ["category", "id"]);
+                vm.onTabChange(tab);
+            }
         }
     };
 
