@@ -22,6 +22,7 @@ import {initialiseData} from "../../../common";
 
 import template from "./measurable-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const initialState = {
@@ -55,38 +56,22 @@ function controller($q,
     vm.scope = childrenSelector.scope;
 
 
-    // -- LOAD ---
-
-    const loadWave1 = () =>
-        $q.all([
-            serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll, [])
-                .then(result => {
-                    const all = result.data;
-                    vm.measurable = _.find(all, { id });
-                    vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.measurable.name});
-                }),
-        ]);
-
-    const loadWave2 = () =>
-        $q.all([
-            serviceBroker
-                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-                .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })),
-        ]);
-
-
-    const loadWave3 = () => logHistory(vm.measurable, historyStore);
-
     // -- BOOT ---
-
-
-    loadWave1()
-        .then(loadWave2)
-        .then(loadWave3);
 
     vm.$onInit = () => {
         vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("MEASURABLE");
         vm.sections = dynamicSectionManager.findUserSectionsForKind("MEASURABLE");
+
+        serviceBroker
+            .loadViewData(CORE_API.MeasurableStore.getById, [ id ])
+            .then(r => {
+                vm.measurable = r.data;
+                vm.entityReference = toEntityRef(vm.measurable);
+            })
+            .then(() => serviceBroker
+                    .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                    .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })))
+            .then(() => logHistory(vm.measurable, historyStore));
     };
 
     // -- DYNAMIC SECTIONS

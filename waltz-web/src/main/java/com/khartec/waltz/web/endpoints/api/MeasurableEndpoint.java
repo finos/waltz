@@ -21,12 +21,14 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.service.measurable.MeasurableService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
@@ -49,6 +51,7 @@ public class MeasurableEndpoint implements Endpoint {
     public void register() {
 
         String findAllPath = mkPath(BASE_URL, "all");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findMeasurablesRelatedToPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByMeasurableIdSelectorPath = mkPath(BASE_URL, "measurable-selector");
         String findByExternalIdPath = mkPath(BASE_URL, "external-id", ":extId");
@@ -56,6 +59,9 @@ public class MeasurableEndpoint implements Endpoint {
 
         ListRoute<Measurable> findAllRoute = (request, response)
                 -> measurableService.findAll();
+
+        DatumRoute<Measurable> getByIdRoute = (request, response)
+                -> measurableService.getById(getId(request));
 
         ListRoute<Measurable> findMeasurablesRelatedToEntityRoute = (request, response)
                 -> measurableService.findMeasurablesRelatedToEntity(getEntityReference(request));
@@ -71,9 +77,10 @@ public class MeasurableEndpoint implements Endpoint {
 
         getForList(findAllPath, findAllRoute);
         getForList(findMeasurablesRelatedToPath, findMeasurablesRelatedToEntityRoute);
-        postForList(findByMeasurableIdSelectorPath, findByMeasurableIdSelectorRoute);
-        getForList(searchPath, searchRoute);
         getForList(findByExternalIdPath, findByExternalIdRoute);
+        postForList(findByMeasurableIdSelectorPath, findByMeasurableIdSelectorRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        getForList(searchPath, searchRoute);
     }
 
 }

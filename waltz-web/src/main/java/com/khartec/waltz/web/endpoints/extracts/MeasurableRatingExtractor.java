@@ -82,6 +82,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
 
             Condition reportConditions = app.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())
                     .and(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                    .and(m.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
                     .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                     .and(mr.ENTITY_ID.in(appSelector))
                     .and(rsi.CODE.eq(mr.RATING));

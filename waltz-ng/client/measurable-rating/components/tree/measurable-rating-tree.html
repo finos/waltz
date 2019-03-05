@@ -45,7 +45,10 @@
                   ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
                   class="no-overflow">
                 <span ng-bind="node.displayName"
-                      ng-class="{ 'italics' : ! node.concrete }">
+                      ng-class="{
+                        'italics' : ! node.concrete,
+                        'waltz-inactive' : node.entityLifecycleStatus === 'REMOVED'
+                      }">
                 </span>
                 <span class="small"
                        ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
@@ -63,7 +66,14 @@
 <script type="text/ng-template"
         id="wmrt-popover.html">
     <div class="small">
-        <strong ng-bind="node.name"></strong>
+        <span ng-if="node.entityLifecycleStatus !== 'REMOVED'">
+            <strong ng-bind="node.name"></strong>
+        </span>
+        <span ng-if="node.entityLifecycleStatus === 'REMOVED'">
+            <del><strong ng-bind="node.name"></strong></del>
+            <span class="text-muted">Inactive</span>
+        </span>
+
         <hr>
         <waltz-markdown text="node.description"></waltz-markdown>
         <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">

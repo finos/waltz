@@ -53,7 +53,7 @@ function controller() {
         if (changes.model && changes.model.currentValue) {
             vm.forest = recalcHierarchy(vm.model);
         }
-        if (changes.selectedNode && changes.selectedNode.currentValue) {
+        if (changes.selectedNode && changes.selectedNode.currentValue && vm.forest) {
             vm.currentNode = findNode(vm.forest, vm.selectedNode.id);
             vm.expandedNodes = findParents(vm.forest, vm.currentNode);
         }

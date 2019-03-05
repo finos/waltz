@@ -24,7 +24,12 @@
                 <waltz-sub-section name="Hierarchy">
                     <content>
                         <div style="padding:8px">
-                            <p class="small help-block">
+                            <div ng-if="$ctrl.measurable.entityLifecycleStatus === 'REMOVED'"
+                                 class="alert alert-warning">
+                                Cannot show hierarchy navigator as node is inactive
+                            </div>
+                            <div ng-if="$ctrl.measurable.entityLifecycleStatus != 'REMOVED'">
+                                <p class="small help-block">
                                 <span ng-if="$ctrl.hierarchyMode == 'RELEVANT'">
                                     Showing parents and children of this node.
                                     <a ng-click="$ctrl.onToggleHierarchyMode()"
@@ -32,18 +37,19 @@
                                         Switch to entire hierarchy.
                                     </a>
                                 </span>
-                                <span ng-if="$ctrl.hierarchyMode == 'ENTIRE'">
+                                    <span ng-if="$ctrl.hierarchyMode == 'ENTIRE'">
                                     Showing the entire hierarchy.
                                     <a ng-click="$ctrl.onToggleHierarchyMode()"
                                        class="clickable">
                                         Switch to only relevant nodes.
                                     </a>
                                 </span>
-                            </p>
-                            <waltz-entity-hierarchy-navigator model="$ctrl.hierarchy"
-                                                              selected-node="$ctrl.measurable"
-                                                              on-select="$ctrl.onSelectNavItem">
-                            </waltz-entity-hierarchy-navigator>
+                                </p>
+                                <waltz-entity-hierarchy-navigator model="$ctrl.hierarchy"
+                                                                  selected-node="$ctrl.measurable"
+                                                                  on-select="$ctrl.onSelectNavItem">
+                                </waltz-entity-hierarchy-navigator>
+                            </div>
                         </div>
                     </content>
                 </waltz-sub-section>
