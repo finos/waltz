@@ -52,7 +52,7 @@ public class EndUserAppEndpoint implements Endpoint {
         String countByOrgUnitPath = mkPath(BASE_URL, "count-by", "org-unit");
 
         ListRoute<EndUserApplication> findBySelectorRoute = (request, response)
-                -> endUserAppService.findByOrganisationalUnitSelector(readAppIdSelectionOptionsFromBody(request));
+                -> endUserAppService.findBySelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<Tally<Long>> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
 

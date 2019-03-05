@@ -271,11 +271,6 @@ public class WebUtilities {
     }
 
 
-    public static EntityIdSelectionOptions readEntityIdOptionsFromBody(Request request) throws java.io.IOException {
-        return readBody(request, EntityIdSelectionOptions.class);
-    }
-
-
 
     /**
      * Reads the body of the request and attempts to convert it into an instance of
