@@ -17,18 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './auth-sources-section.html';
-import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common/index";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { getDefaultScopeForEntityKind, mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { entity } from "../../../common/services/enums/entity";
+import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+
+import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+
+import template from "./auth-sources-section.html";
 
 const bindings = {
-    parentEntityRef: '<',
-    showNonAuthSources: '@?'
+    filters: "<",
+    parentEntityRef: "<",
+    showNonAuthSources: "@?"
 };
 
 
 const initialState = {
     authSources: [],
+    selector: null,
     showNonAuthSources: true,
     visibility: {
         tab: 0,
@@ -41,43 +49,65 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const mkSelector = () => {
+        const scope = vm.parentEntityRef.kind === entity.ORG_UNIT.key
+            ? hierarchyQueryScope.PARENTS.key
+            : getDefaultScopeForEntityKind(vm.parentEntityRef.kind);
+
+        return mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            scope,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
+    };
+
     const loadNonAuthSources = () => {
+        vm.selector = mkSelector();
         serviceBroker
             .loadViewData(
                 CORE_API.AuthSourcesStore.findNonAuthSources,
-                [vm.parentEntityRef])
+                [vm.selector])
             .then(r => vm.nonAuthSources = r.data);
     };
 
     const loadAuthSources = () => {
+        vm.selector = mkSelector();
         serviceBroker
             .loadViewData(
                 CORE_API.AuthSourcesStore.findAuthSources,
-                [vm.parentEntityRef])
+                [vm.selector])
             .then(r => {
                 vm.authSources = r.data;
             })
     };
 
     vm.$onInit = () => {
-        vm.visibility.tab = vm.parentEntityRef.kind === 'DATA_TYPE'
+        vm.visibility.tab = vm.parentEntityRef.kind === "DATA_TYPE"
             ? 1
             : 0;
 
-        vm.visibility.authSourcesList = vm.parentEntityRef.kind === 'ORG_UNIT' || vm.parentEntityRef.kind === 'DATA_TYPE'
+        vm.visibility.authSourcesList = vm.parentEntityRef.kind === "ORG_UNIT" || vm.parentEntityRef.kind === "DATA_TYPE"
+    };
+
+    vm.$onChanges = (changes) => {
+        if (changes.filters) {
+            loadAuthSources();
+            loadNonAuthSources();
+        }
     };
 
     vm.tabSelected = (name, idx) => {
         vm.visibility.tab = idx;
         vm.visibility.editBtn = false;
+
         switch(name) {
-            case 'summary':
+            case "summary":
                 break;
-            case 'authSources':
+            case "authSources":
                 loadAuthSources();
-                vm.visibility.editBtn = vm.parentEntityRef.kind === 'ORG_UNIT';
+                vm.visibility.editBtn = vm.parentEntityRef.kind === "ORG_UNIT";
                 break;
-            case 'nonAuthSources':
+            case "nonAuthSources":
                 loadNonAuthSources();
                 break;
         }
@@ -89,7 +119,7 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 
 export const component = {
@@ -99,4 +129,4 @@ export const component = {
 };
 
 
-export const id = 'waltzAuthSourcesSection';
+export const id = "waltzAuthSourcesSection";

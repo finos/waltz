@@ -18,7 +18,7 @@
  */
 
 import _ from 'lodash';
-import {checkIsEntityInvolvementChangeCommand} from '../../common/checks';
+import { checkIsEntityInvolvementChangeCommand } from '../../common/checks';
 
 
 function store($http, BaseApiUrl) {
@@ -29,11 +29,6 @@ function store($http, BaseApiUrl) {
     const findAppsForEmployeeId = (employeeId) =>
         $http.get(`${BASE}/employee/${employeeId}/applications`)
             .then(result => result.data);
-
-
-    const findEndUserAppsByIdSelector = (options) => $http
-        .post(`${BASE}/end-user-application`, options)
-        .then(r => r.data);
 
 
     const findByEmployeeId = (employeeId) =>
@@ -67,7 +62,6 @@ function store($http, BaseApiUrl) {
 
     return {
         findAppsForEmployeeId,
-        findEndUserAppsByIdSelector,
         findByEmployeeId,
         findByEntityReference,
         findPeopleByEntityReference,
@@ -87,11 +81,6 @@ export const InvolvementStore_API = {
         serviceName,
         serviceFnName: 'findAppsForEmployeeId',
         description: 'finds apps by employee id'
-    },
-    findEndUserAppsByIdSelector: {
-        serviceName,
-        serviceFnName: 'findEndUserAppsByIdSelector',
-        description: 'finds end user apps by app id selector'
     },
     findByEmployeeId: {
         serviceName,

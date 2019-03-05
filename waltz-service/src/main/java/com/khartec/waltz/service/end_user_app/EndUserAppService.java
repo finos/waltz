@@ -19,9 +19,12 @@
 
 package com.khartec.waltz.service.end_user_app;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
+import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
@@ -39,22 +42,31 @@ import static com.khartec.waltz.common.FunctionUtilities.time;
 public class EndUserAppService {
 
     private final EndUserAppDao endUserAppDao;
+    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
 
     @Autowired
     public EndUserAppService(EndUserAppDao endUserAppDao,
+                             EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
                              OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
         checkNotNull(endUserAppDao, "EndUserAppDao is required");
+        checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
         checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.endUserAppDao = endUserAppDao;
+        this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
         this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 
-    public List<EndUserApplication> findByOrganisationalUnitSelector(IdSelectionOptions options) {
+    @Deprecated
+    public List<EndUserApplication> findByOrganisationalUnitSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
+        if(!options.applicationKinds().contains(ApplicationKind.EUC)) {
+            // to account for EUC not being selection on the filters
+            return ListUtilities.newArrayList();
+        }
         Select<Record1<Long>> selector = orgUnitIdSelectorFactory.apply(options);
         return time("EUAS.findByOrganisationalUnitSelector", () -> endUserAppDao.findByOrganisationalUnitSelector(selector));
     }
@@ -63,4 +75,16 @@ public class EndUserAppService {
     public Collection<Tally<Long>> countByOrgUnitId() {
         return time("EUAS.countByOrgUnitId", () -> endUserAppDao.countByOrganisationalUnit());
     }
+
+
+    public List<EndUserApplication> findBySelector(ApplicationIdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        if(!options.applicationKinds().contains(ApplicationKind.EUC)) {
+            // to account for EUC not being selection on the filters
+            return ListUtilities.newArrayList();
+        }
+        Select<Record1<Long>> selector = endUserAppIdSelectorFactory.apply(options);
+        return time("EUAS.findBySelector", () -> endUserAppDao.findBySelector(selector));
+    }
+
 }

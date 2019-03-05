@@ -77,8 +77,8 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         // -- PATHS
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
-        String findNonAuthSourcesPath = mkPath(BASE_URL, "non-auth-for", ":kind", ":id");
-        String findAuthSourcesPath = mkPath(BASE_URL, "auth-for", ":kind", ":id");
+        String findNonAuthSourcesPath = mkPath(BASE_URL, "non-auth");
+        String findAuthSourcesPath = mkPath(BASE_URL, "auth");
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
@@ -95,10 +95,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                 -> authoritativeSourceService.findByApplicationId(getId(request));
 
         ListRoute<NonAuthoritativeSource> findNonAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findNonAuthSources(getEntityReference(request));
+                -> authoritativeSourceService.findNonAuthSources(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<AuthoritativeSource> findAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findAuthSources(getEntityReference(request));
+                -> authoritativeSourceService.findAuthSources(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<AuthoritativeSource> findAllRoute = (request, response)
                 -> authoritativeSourceService.findAll();
@@ -106,10 +106,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
-        getForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
+        postForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
-        getForList(findAuthSourcesPath, findAuthSourcesRoute);
+        postForList(findAuthSourcesPath, findAuthSourcesRoute);
         getForList(BASE_URL, findAllRoute);
         putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);

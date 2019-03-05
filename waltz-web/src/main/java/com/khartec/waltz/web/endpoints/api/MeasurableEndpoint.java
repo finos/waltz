@@ -67,7 +67,7 @@ public class MeasurableEndpoint implements Endpoint {
                 -> measurableService.findMeasurablesRelatedToEntity(getEntityReference(request));
 
         ListRoute<Measurable> findByMeasurableIdSelectorRoute = (request, response)
-                -> measurableService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
+                -> measurableService.findByMeasurableIdSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<Measurable> searchRoute = (request, response)
                 -> measurableService.search(request.params("query"));

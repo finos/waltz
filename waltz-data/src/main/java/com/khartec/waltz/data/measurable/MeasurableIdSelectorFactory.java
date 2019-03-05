@@ -25,6 +25,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.Tables.SCENARIO_AXIS_ITEM;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -66,10 +68,12 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
             case MEASURABLE:
                 return mkForMeasurable(options);
             case ACTOR:
+                return mkForDirectEntityKind(options);
             case APPLICATION:
                 return mkForDirectEntityKind(options);
             case APP_GROUP:
-                return mkForAppGroup(options);
+                ApplicationIdSelectionOptions appIdSelectionOptions = ApplicationIdSelectionOptions.mkOpts(options);
+                return mkForAppGroup(appIdSelectionOptions);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case SCENARIO:
@@ -112,12 +116,15 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
         return mkBaseRatingBasedSelector()
                 .innerJoin(APPLICATION_GROUP_ENTRY)
-                .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID))
-                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+                    .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                .innerJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(APPLICATION_GROUP_ENTRY.APPLICATION_ID))
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()))
+                .and(mkApplicationConditions(options));
     }
 
 

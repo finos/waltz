@@ -18,14 +18,17 @@
  */
 
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {determineStatMethod} from "../../logical-flow-utils";
-import template from './logical-flows-tabgroup.html';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { determineStatMethod } from "../../logical-flow-utils";
+import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+
+import template from "./logical-flows-tabgroup.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 const initialState = {
@@ -88,10 +91,22 @@ function controller($q,
         vm.currentTabIndex = index;
     };
 
-    vm.$onChanges = () => {
+    vm.$onChanges = (changes) => {
         if (vm.parentEntityRef) {
-            vm.selector = mkSelectionOptions(vm.parentEntityRef);
+            vm.selector = mkApplicationSelectionOptions(
+                vm.parentEntityRef,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
             loadStats();
+        }
+
+        if(changes.filters) {
+            if(vm.currentTabIndex > 0) {
+                loadDetail();
+            } else {
+                loadStats();
+            }
         }
     };
 
@@ -99,8 +114,8 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
