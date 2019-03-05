@@ -112,6 +112,7 @@ public class GenericSelectorFactory {
                 return measurableIdSelectorFactory.apply(selectionOptions);
             case ORG_UNIT:
                 return organisationalUnitIdSelectorFactory.apply(selectionOptions);
+            //todo: (KS) Add support for Person
             default:
                 throw new UnsupportedOperationException(String.format("Cannot make generic selector for kind: %s", kind));
         }

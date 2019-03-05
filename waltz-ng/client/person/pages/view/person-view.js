@@ -19,10 +19,11 @@
 
 import {initialiseData} from "../../../common/index";
 import {toEntityRef} from "../../../common/entity-utils";
-import template from './person-view.html';
+import template from "./person-view.html";
 
 
 const initialState = {
+    filters: {},
     availableSections: [],
     sections: []
 };
@@ -39,31 +40,35 @@ function controller(person,
             return;
         }
         vm.person = person;
-        vm.entityRef = toEntityRef(person, 'PERSON');
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('PERSON');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('PERSON');
+        vm.entityRef = toEntityRef(person, "PERSON");
+        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("PERSON");
+        vm.sections = dynamicSectionManager.findUserSectionsForKind("PERSON");
         historyStore.put(
             person.displayName,
-            'PERSON',
-            'main.person.view',
+            "PERSON",
+            "main.person.view",
             { empId: person.employeeId });
     };
 
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
+    };
+
     // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'PERSON');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'PERSON');
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "PERSON");
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "PERSON");
 }
 
 
 controller.$inject = [
-    'person',
-    'DynamicSectionManager',
-    'HistoryStore'
+    "person",
+    "DynamicSectionManager",
+    "HistoryStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

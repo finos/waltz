@@ -11,8 +11,14 @@
     </waltz-page-header>
 
 
+    <!-- Non visual control to watch for filter changes -->
+    <waltz-filter-change-watcher on-filters-changed="ctrl.filtersChanged">
+    </waltz-filter-change-watcher>
+
+
     <!-- SUMMARY -->
     <waltz-person-summary parent-entity-ref="ctrl.entityRef"
+                          filters="ctrl.filters"
                           ng-if="ctrl.entityRef">
     </waltz-person-summary>
 
@@ -34,6 +40,7 @@
 
     <waltz-dynamic-sections-view sections="ctrl.sections"
                                  parent-entity-ref="ctrl.entityRef"
+                                 filters="ctrl.filters"
                                  on-remove="ctrl.removeSection"
                                  ng-if="ctrl.entityRef">
     </waltz-dynamic-sections-view>
