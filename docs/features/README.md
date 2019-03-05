@@ -2,6 +2,7 @@
 
 - [Application Groups](app_groups/README.md)
 - [Asset Costs](asset_costs/README.md)
+- [Bookmarks](bookmarks/README.md)
 - [Logical Flows](logical_flows/README.md)
 - [Flow Diagrams](flow_diagrams/README.md)
 - [Measurables](measurables/README.md)

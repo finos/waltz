@@ -31,6 +31,7 @@ import {
     populateParents
 } from "../../../common/hierarchy-utils";
 import {kindToViewState} from "../../../common/link-utils";
+import {entityLifecycleStatus as EntityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 
 const bindings = {
@@ -65,6 +66,35 @@ function controller(serviceBroker, $state) {
 
         serviceBroker
             .loadViewData(
+                CORE_API.MeasurableStore.getById,
+                [ vm.parentEntityRef.id  ])
+            .then(r => vm.measurable = r.data)
+            .then(() => {
+                if (vm.measurable.entityLifecycleStatus !== EntityLifecycleStatus.REMOVED.key) {
+                    serviceBroker
+                        .loadAppData(
+                            CORE_API.MeasurableStore.findAll)
+                        .then(r => {
+                            const all = _.filter(r.data, m => m.categoryId === vm.measurable.categoryId);
+                            const roots = populateParents(all, true);
+                            const m = findNode(roots, vm.measurable.id);
+                            const parents = getParents(m);
+                            const children = flattenChildren(m);
+                            const limb = _.union(parents, [m], children);
+                            const relevantHierarchy = _.map(limb, n => {
+                                const cpy = Object.assign({}, n, {parent: n.parent ? n.parent.id : null});
+                                delete cpy.children;
+                                return cpy;
+                            });
+                            vm.entireHierarchy = all;
+                            vm.relevantHierarchy = relevantHierarchy;
+                            vm.hierarchy = vm.relevantHierarchy;
+                        })
+                }
+            });
+
+        serviceBroker
+            .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
                 [selector])
             .then(r => vm.applications = r.data);
@@ -96,26 +126,6 @@ function controller(serviceBroker, $state) {
                 [ vm.parentEntityRef ])
             .then(r => vm.relationshipStats = prepareRelationshipStats(r.data));
 
-        serviceBroker
-            .loadAppData(
-                CORE_API.MeasurableStore.findAll)
-            .then(r => {
-                vm.measurable = _.find(r.data, { id: vm.parentEntityRef.id });
-                const all = _.filter(r.data, m => m.categoryId === vm.measurable.categoryId);
-                const roots = populateParents(all, true);
-                const m = findNode(roots, vm.measurable.id);
-                const parents = getParents(m);
-                const children =  flattenChildren(m);
-                const limb = _.union(parents, [m], children);
-                const relevantHierarchy = _.map(limb,n => {
-                    const cpy = Object.assign({}, n, { parent: n.parent ? n.parent.id : null});
-                    delete cpy.children;
-                    return cpy;
-                });
-                vm.entireHierarchy = all;
-                vm.relevantHierarchy = relevantHierarchy;
-                vm.hierarchy = vm.relevantHierarchy;
-            });
     };
 
 

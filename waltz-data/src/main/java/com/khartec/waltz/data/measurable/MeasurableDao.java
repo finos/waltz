@@ -86,6 +86,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     public List<Measurable> findAll() {
         return dsl
                 .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

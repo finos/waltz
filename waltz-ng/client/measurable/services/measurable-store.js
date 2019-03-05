@@ -26,6 +26,10 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/all`)
         .then(d => d.data);
 
+    const getById = (id) => $http
+        .get(`${baseUrl}/id/${id}`)
+        .then(d => d.data);
+
     const findMeasurablesRelatedToPath = (ref) => {
         checkIsEntityRef(ref);
         return $http
@@ -53,6 +57,7 @@ function store($http, baseApiUrl) {
         findByExternalId,
         findMeasurablesRelatedToPath,
         findMeasurablesBySelector,
+        getById,
         search
     };
 
@@ -76,6 +81,11 @@ export const MeasurableStore_API = {
         serviceName,
         serviceFnName: "findAll",
         description: "findAll"
+    },
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "getById"
     },
     findByExternalId: {
         serviceName,
