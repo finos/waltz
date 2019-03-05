@@ -37,6 +37,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static java.lang.String.format;
 
 @Service
 public class MeasurableRelationshipService {
@@ -74,8 +75,11 @@ public class MeasurableRelationshipService {
 
 
     public boolean remove(EntityRelationshipKey command, String username) {
-        logRemoval(command, username);
-        return entityRelationshipDao.remove(command);
+        boolean result = entityRelationshipDao.remove(command);
+        if (result) {
+            logRemoval(command, username);
+        }
+        return result;
     }
 
 
@@ -100,14 +104,21 @@ public class MeasurableRelationshipService {
                         + " cannot be created between " + entityRefA
                         + " and " + entityRefB));
 
-        logAddition(relationship);
-        return entityRelationshipDao.create(relationship);
+
+        boolean result = entityRelationshipDao.create(relationship);
+        if (result) {
+            logAddition(relationship);
+        }
+        return result;
     }
 
 
     public boolean update(EntityRelationshipKey key, UpdateEntityRelationshipParams params, String username) {
-        logUpdate(key, params, username);
-        return entityRelationshipDao.update(key, params, username);
+        boolean result = entityRelationshipDao.update(key, params, username);
+        if (result) {
+            logUpdate(key, params, username);
+        }
+        return result;
     }
 
 
@@ -127,15 +138,21 @@ public class MeasurableRelationshipService {
                 ? " Updated description"
                 : "";
 
+        String msg = format(
+                "Updated explicit relationship from: '%s', to: '%s', with params: '%s'",
+                niceNames.get(0),
+                niceNames.get(1),
+                paramStr);
+
         writeLog(
                 Operation.UPDATE,
                 key.a(),
-                "Updated explicit relationship to: "+ niceNames.get(1) + " with params: " + paramStr,
+                msg,
                 username);
         writeLog(
                 Operation.UPDATE,
                 key.b(),
-                "Updated explicit relationship to: "+ niceNames.get(0) + " with params: " + paramStr,
+                msg,
                 username);
     }
 
@@ -145,15 +162,20 @@ public class MeasurableRelationshipService {
                 key.a(),
                 key.b());
 
+        String msg = format(
+                "Removed explicit relationship from: '%s', to: '%s'",
+                niceNames.get(0),
+                niceNames.get(1));
+
         writeLog(
                 Operation.REMOVE,
                 key.a(),
-                "Removed explicit relationship to: " + niceNames.get(1),
+                msg,
                 username);
         writeLog(
                 Operation.REMOVE,
                 key.b(),
-                "Removed explicit relationship to: " + niceNames.get(0),
+                msg,
                 username);
     }
 
@@ -163,15 +185,20 @@ public class MeasurableRelationshipService {
                 relationship.a(),
                 relationship.b());
 
+        String msg = format(
+                "Added explicit relationship from: '%s', to: '%s'",
+                niceNames.get(0),
+                niceNames.get(1));
+
         writeLog(
                 Operation.ADD,
                 relationship.a(),
-                "Added explicit relationship to " + niceNames.get(1),
+                msg,
                 relationship.lastUpdatedBy());
         writeLog(
                 Operation.ADD,
                 relationship.b(),
-                "Added explicit relationship to " + niceNames.get(0),
+                msg,
                 relationship.lastUpdatedBy());
     }
 
@@ -191,7 +218,7 @@ public class MeasurableRelationshipService {
     private List<String> resolveNames(EntityReference... refs) {
         return map(
                 entityReferenceNameResolver.resolve(newArrayList(refs)),
-                EntityReferenceUtilities::pretty);
+                r -> r.name().orElse("?"));
     }
 
 }

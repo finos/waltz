@@ -26,6 +26,9 @@ import org.immutables.value.Value;
 
 import java.util.Set;
 
+import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableIdSelectionOptions.class)
@@ -45,5 +48,33 @@ public abstract class IdSelectionOptions {
                 .entityReference(ref)
                 .scope(scope)
                 .build();
+    }
+
+    public static IdSelectionOptions mkOpts(EntityReference ref) {
+        return ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(determineDefaultScope(ref.kind()))
+                .build();
+    }
+
+
+    private static HierarchyQueryScope determineDefaultScope(EntityKind kind) {
+        switch (kind) {
+            case ACTOR:
+            case APPLICATION:
+            case APP_GROUP:
+            case CHANGE_INITIATIVE:
+            case FLOW_DIAGRAM:
+            case LOGICAL_DATA_ELEMENT:
+            case LOGICAL_DATA_FLOW:
+            case PHYSICAL_FLOW:
+            case PHYSICAL_SPECIFICATION:
+            case SCENARIO:
+            case SERVER:
+                return EXACT;
+            default:
+                return CHILDREN;
+        }
+
     }
 }

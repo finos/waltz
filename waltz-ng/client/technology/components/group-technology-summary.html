@@ -1,4 +1,13 @@
 <div>
+      <div class="pull-right">
+        <waltz-data-extract-link name="Export"
+                                 styling="link"
+                                 extract="technology-server/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                 filename="{{technology-server-eol}}.csv">
+        </waltz-data-extract-link>
+    </div>
+
+
     <div ng-if="$ctrl.visibility.servers">
         <h4 style="padding-left:32px">
             <waltz-icon name="server">
@@ -46,6 +55,13 @@
 
     <div ng-if="$ctrl.visibility.databases"
          style="border-top: 2px dotted #ddd;">
+        <div class="pull-right" style="padding-top: 2em">
+            <waltz-data-extract-link name="Export"
+                                     styling="link"
+                                     extract="technology-database/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                     filename="{{technology-database-eol}}.csv">
+            </waltz-data-extract-link>
+        </div>
         <h4 style="padding-left:32px; padding-top: 16px;">
             <waltz-icon name="database">
             </waltz-icon>

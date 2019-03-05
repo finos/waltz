@@ -59,6 +59,11 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const findAllRoadmapsAndScenarios = () => {
+        return $http.get(BASE)
+            .then(result => result.data)
+    };
+
     const findRoadmapsAndScenariosByRatedEntity = (ratedEntity) => {
         return $http
             .get(`${BASE}/by-rated-entity/${ratedEntity.kind}/${ratedEntity.id}`)
@@ -86,6 +91,7 @@ function store($http, baseUrl) {
         updateLifecycleStatus,
         updateName,
         addScenario,
+        findAllRoadmapsAndScenarios,
         findRoadmapsAndScenariosByRatedEntity,
         findRoadmapsAndScenariosByFormalRelationship
     };
@@ -141,6 +147,11 @@ export const RoadmapStore_API = {
         serviceName,
         serviceFnName: "findRoadmapsAndScenariosByRatedEntity",
         description: "executes findRoadmapsAndScenariosByRatedEntity [ratedEntityRef]"
+    },
+    findAllRoadmapsAndScenarios: {
+        serviceName,
+        serviceFnName: "findAllRoadmapsAndScenarios",
+        description: "executes findAllRoadmapsAndScenarios []"
     },
     findRoadmapsAndScenariosByFormalRelationship: {
         serviceName,

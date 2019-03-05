@@ -3,7 +3,6 @@ package com.khartec.waltz.service.taxonomy_management.processors;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
@@ -55,18 +54,24 @@ public class MoveMeasurableCommandProcessor implements TaxonomyCommandProcessor 
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         Measurable measurableToMove = validate(cmd);
-        measurableService.move(
-                measurableToMove.id().get(),
-                getDestination(cmd),
-                userId);
+        TaxonomyChangeLifecycleStatus outcome = measurableToMove
+                .id()
+                .map(id -> measurableService
+                    .updateParentId(
+                        id,
+                        getDestination(cmd),
+                        userId))
+                .map(success -> success
+                        ? TaxonomyChangeLifecycleStatus.EXECUTED
+                        : TaxonomyChangeLifecycleStatus.FAILED)
+                .orElse(TaxonomyChangeLifecycleStatus.FAILED);
 
         return ImmutableTaxonomyChangeCommand
                 .copyOf(cmd)
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc())
                 .withLastUpdatedBy(userId)
-                .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED);
+                .withStatus(outcome);
     }
-
 
 
     private Measurable validate(TaxonomyChangeCommand cmd) {

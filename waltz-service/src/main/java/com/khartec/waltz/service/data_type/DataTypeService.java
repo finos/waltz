@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -55,13 +56,19 @@ public class DataTypeService {
     }
 
 
-    public DataType getByCode(String code) {
-        return dataTypeDao.getByCode(code);
-    }
-
-
     public Collection<DataType> search(String query) {
         return searchDao.search(query, EntitySearchOptions.mkForEntity(EntityKind.DATA_TYPE));
     }
 
+    /**
+     * Attempts to return the datatype that has been declared as unknown (if one exists)
+     * @return `Optional.of(unknownDataType)` if an unknown datatype has been defined otherwise `Optional.empty()`.
+     */
+    public Optional<DataType> getUnknownDataType() {
+        return dataTypeDao
+                .getAll()
+                .stream()
+                .filter(DataType::unknown)
+                .findFirst();
+    }
 }

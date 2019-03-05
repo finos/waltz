@@ -1,9 +1,0 @@
-TODO:
-    - Bulk select when picking apps ?
-    - Select rating from rating scheme when picking
-    - Cross reference to app
-    - Add comments
-    - Add to main search (roadmaps and scenarios) ?
-
-DONE:
-    - Add index to scenario (roadmap_id)
