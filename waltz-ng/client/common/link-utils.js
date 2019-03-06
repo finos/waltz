@@ -76,12 +76,12 @@ export function kindToViewState(kind) {
     }
     if (kind === "ROADMAP") {
         return "main.roadmap.view";
+    }    
+    if (kind === "SCENARIO") {
+        return "main.scenario.view";
     }
     if (kind === "SERVER") {
         return "main.server.view";
-    }
-    if (kind === "SCENARIO") {
-        return "main.scenario.view";
     }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
 }
