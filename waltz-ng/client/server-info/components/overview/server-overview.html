@@ -28,10 +28,16 @@
                 <span ng-bind="$ctrl.serverInfo.lifecycleStatus | toDisplayName:'lifecycleStatus'"></span>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
-                Environment
+                Environment/s
             </div>
             <div class="col-sm-4">
-                <span ng-bind="$ctrl.serverInfo.environment"></span>
+                <waltz-keyword-list keywords="$ctrl.environments">
+                   <empty>
+                        <i class="text-muted">
+                            Unknown
+                        </i>
+                    </empty>
+                </waltz-keyword-list>
             </div>
         </div>
 

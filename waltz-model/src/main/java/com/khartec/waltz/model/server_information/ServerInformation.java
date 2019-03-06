@@ -41,7 +41,6 @@ public abstract class ServerInformation implements
     public abstract String hostname();
     public abstract String operatingSystem();
     public abstract String operatingSystemVersion();
-    public abstract String environment();
     public abstract String location();
     public abstract String country();
     public abstract LifecycleStatus lifecycleStatus();

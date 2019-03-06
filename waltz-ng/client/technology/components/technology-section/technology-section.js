@@ -148,8 +148,26 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
 }
 
 
+function enrichServersWithEOLFlags(servers = []) {
+    return _
+        .map(
+            servers,
+            s => Object.assign(
+                {},
+                s,
+                {
+                    "isHwEndOfLife": isEndOfLife(s.hardwareEndOfLifeStatus),
+                    "isOperatingSystemEndOfLife": isEndOfLife(s.operatingSystemEndOfLifeStatus)
+                }));
+}
 
-function controller($animate, uiGridConstants, serviceBroker) {
+
+function combineServersAndUsage(servers = [], serverUsage = []) {
+    const serversById = _.keyBy(servers, "id");
+    return _.map(serverUsage, su => Object.assign({}, serversById[su.serverId], su));
+}
+
+function controller($q, $animate, uiGridConstants, serviceBroker) {
 
     const vm = this;
 
@@ -157,30 +175,35 @@ function controller($animate, uiGridConstants, serviceBroker) {
     function refresh(qry) {
         if (qry) {
             vm.filteredServers = termSearch(vm.servers, qry);
+            vm.filteredServerUsage = termSearch(vm.serverGridOptions.data, qry);
             vm.filteredDatabases = termSearch(vm.databases, qry);
-            console.log('sr', qry, vm.servers.length, vm.filteredServers.length)
         } else {
             vm.filteredServers = vm.servers;
+            vm.filteredServerUsage = vm.serverGridOptions.data;
             vm.filteredDatabases = vm.databases;
         }
     }
 
     vm.$onInit = () => {
-        serviceBroker
+        const usagePromise = serviceBroker
+            .loadViewData(
+                CORE_API.ServerUsageStore.findByReferencedEntity,
+                [ vm.parentEntityRef ])
+            .then(r => vm.serverUsage = r.data);
+
+        const serverPromise = serviceBroker
             .loadViewData(
                 CORE_API.ServerInfoStore.findByAppId,
                 [ vm.parentEntityRef.id ])
             .then(r => {
-                vm.servers = r.data;
-                _.forEach(vm.servers,
-                    (s) => Object.assign(s, {
-                        "isHwEndOfLife": isEndOfLife(s.hardwareEndOfLifeStatus),
-                        "isOperatingSystemEndOfLife": isEndOfLife(s.operatingSystemEndOfLifeStatus)
-                    })
-                );
-                vm.serverGridOptions.data = vm.servers;
-            })
-            .then(() => refresh(vm.qry));
+                vm.servers = enrichServersWithEOLFlags(r.data);
+            });
+
+        $q.all([usagePromise, serverPromise])
+            .then(() => {
+                vm.serverGridOptions.data = combineServersAndUsage(vm.servers, vm.serverUsage);
+                refresh(vm.qry);
+            });
 
         serviceBroker
             .loadViewData(
@@ -213,6 +236,7 @@ function controller($animate, uiGridConstants, serviceBroker) {
 
 
 controller.$inject = [
+    '$q',
     '$animate',
     'uiGridConstants',
     'ServiceBroker'

@@ -30,7 +30,18 @@ const bindings = {
 
 const initialState = {
     serverInfo: null,
+    environments: []
 };
+
+
+function extractUniqueEnvironments(serverUsage = []) {
+    return _
+        .chain(serverUsage)
+        .map(su => su.environment)
+        .uniq()
+        .sort()
+        .value()
+}
 
 
 function controller(serviceBroker) {
@@ -44,6 +55,12 @@ function controller(serviceBroker) {
             serviceBroker
                 .loadViewData(CORE_API.ServerInfoStore.getById, [vm.parentEntityRef.id])
                 .then(r => vm.serverInfo = r.data);
+            serviceBroker
+                .loadViewData(CORE_API.ServerUsageStore.findByServerId, [vm.parentEntityRef.id])
+                .then(r => {
+                    vm.serverUsage = r.data;
+                    vm.environments = extractUniqueEnvironments(vm.serverUsage);
+                });
         }
     };
 }
