@@ -20,6 +20,7 @@ import template from './technology-summary-pies.html';
 
 const bindings = {
     servers: '<',
+    serverUsages: '<',
     databases: '<',
 };
 

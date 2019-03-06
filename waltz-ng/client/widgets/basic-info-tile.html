@@ -1,23 +1,22 @@
-<div class='waltz-info-tile'>
-    <div class="title">
+<div class='waltz-basic-info-tile'>
+    <div class="wbit-title">
         <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
 
         <span ng-bind="$ctrl.name"></span>
 
-        <div class="sub-title"
+        <div class="wbit-sub-title"
              ng-if="$ctrl.subName">
             <span ng-bind="ctrl.subName"></span>
         </div>
     </div>
 
-    <div class="content">
-        <div class="main-content"
-             ng-transclude>
+    <div class="wbit-content">
+        <div ng-transclude>
         </div>
+    </div>
 
-        <div class="text-muted description"
-             ng-bind="$ctrl.description">
-        </div>
+    <div class="text-muted wbit-description"
+         ng-bind="$ctrl.description">
     </div>
 
 </div>

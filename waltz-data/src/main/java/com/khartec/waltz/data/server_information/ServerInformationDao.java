@@ -25,6 +25,8 @@ import com.khartec.waltz.model.server_information.ImmutableServerInformation;
 import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -44,7 +46,8 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.stream.Collectors.counting;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.cast;
+import static org.jooq.impl.DSL.when;
 
 
 @Repository
@@ -67,7 +70,6 @@ public class ServerInformationDao {
                 .virtual(isVirtual)
                 .operatingSystem(row.getOperatingSystem())
                 .operatingSystemVersion(row.getOperatingSystemVersion())
-                .environment(row.getEnvironment())
                 .location(row.getLocation())
                 .country(row.getCountry())
                 .provenance(row.getProvenance())
@@ -100,7 +102,8 @@ public class ServerInformationDao {
 
 
     public List<ServerInformation> findByAppId(long appId) {
-        return dsl.select(SERVER_INFORMATION.fields())
+        return dsl
+                .selectDistinct(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .innerJoin(SERVER_USAGE)
                     .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
@@ -142,7 +145,6 @@ public class ServerInformationDao {
                                     SERVER_INFORMATION.OPERATING_SYSTEM_VERSION,
                                     SERVER_INFORMATION.COUNTRY,
                                     SERVER_INFORMATION.IS_VIRTUAL,
-                                    SERVER_INFORMATION.ENVIRONMENT,
                                     SERVER_INFORMATION.LOCATION,
                                     SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
                                     SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
@@ -154,7 +156,6 @@ public class ServerInformationDao {
                                     s.operatingSystemVersion(),
                                     s.country(),
                                     s.virtual(),
-                                    s.environment(),
                                     s.location(),
                                     toSqlDate(s.hardwareEndOfLifeDate()),
                                     toSqlDate(s.operatingSystemEndOfLifeDate()),
@@ -168,7 +169,6 @@ public class ServerInformationDao {
 
     public ServerSummaryStatistics calculateStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
-        Field<String> environmentInner = DSL.field("environment_inner", String.class);
         Field<String> operatingSystemInner = DSL.field("operating_system_inner", String.class);
         Field<String> locationInner = DSL.field("location_inner", String.class);
         Field<String> osEolStatusInner = DSL.field("os_eol_status_inner", String.class);
@@ -179,17 +179,18 @@ public class ServerInformationDao {
                 .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         // de-duplicate host names, as one server can host multiple apps
-        Result<? extends Record> serverInfo = dsl.select(
-                    SERVER_INFORMATION.ENVIRONMENT.as(environmentInner),
-                    SERVER_INFORMATION.OPERATING_SYSTEM.as(operatingSystemInner),
-                    SERVER_INFORMATION.LOCATION.as(locationInner),
-                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE).as(osEolStatusInner),
-                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE).as(hwEolStatusInner),
-                    cast(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0), Boolean.class).as(isVirtualInner))
+        SelectConditionStep<Record6<Long, String, String, String, String, Boolean>> qry = dsl.selectDistinct(
+                SERVER_INFORMATION.ID,
+                SERVER_INFORMATION.OPERATING_SYSTEM.as(operatingSystemInner),
+                SERVER_INFORMATION.LOCATION.as(locationInner),
+                mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE).as(osEolStatusInner),
+                mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE).as(hwEolStatusInner),
+                cast(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0), Boolean.class).as(isVirtualInner))
                 .from(SERVER_INFORMATION)
                 .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
-                .where(condition)
-                .fetch();
+                .where(condition);
+
+        Result<? extends Record> serverInfo = qry.fetch();
 
         Map<Boolean, Long> virtualAndPhysicalCounts = serverInfo.stream()
                 .collect(Collectors.groupingBy(r -> r.getValue(isVirtualInner), counting()));
@@ -197,12 +198,32 @@ public class ServerInformationDao {
         return ImmutableServerSummaryStatistics.builder()
                 .virtualCount(virtualAndPhysicalCounts.getOrDefault(true, 0L))
                 .physicalCount(virtualAndPhysicalCounts.getOrDefault(false, 0L))
-                .environmentCounts(calculateStringTallies(serverInfo, environmentInner))
+                .environmentCounts(calculateEnvironmentStats(appIdSelector))
                 .operatingSystemCounts(calculateStringTallies(serverInfo, operatingSystemInner))
                 .locationCounts(calculateStringTallies(serverInfo, locationInner))
                 .operatingSystemEndOfLifeStatusCounts(calculateStringTallies(serverInfo, osEolStatusInner))
                 .hardwareEndOfLifeStatusCounts(calculateStringTallies(serverInfo, hwEolStatusInner))
                 .build();
+    }
+
+
+    private List<Tally<String>> calculateEnvironmentStats(Select<Record1<Long>> appIdSelector) {
+        Field<Integer> countField = DSL.count().as("count");
+
+        return dsl
+                .select(SERVER_USAGE.ENVIRONMENT, countField)
+                .from(SERVER_USAGE)
+                .where(SERVER_USAGE.ENTITY_ID.in(appIdSelector))
+                .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .groupBy(SERVER_USAGE.ENVIRONMENT)
+                .fetch()
+                .stream()
+                .map(r -> ImmutableTally.<String>builder()
+                        .id(r.get(SERVER_USAGE.ENVIRONMENT))
+                        .count(r.get(countField))
+                        .build())
+                .collect(Collectors.toList());
+
     }
 
 }

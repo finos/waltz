@@ -72,6 +72,7 @@ import {RatingSchemeStore_API as RatingSchemeStore} from "../../ratings/services
 import {RoadmapStore_API as RoadmapStore} from "../../roadmap/services/roadmap-store";
 import {ScenarioStore_API as ScenarioStore} from "../../scenario/services/scenario-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
+import {ServerUsageStore_API as ServerUsageStore} from "../../server-info/services/server-usage-store";
 import {SettingsStore_API as SettingsStore} from "../../system/services/settings-store";
 import {SharedPreferenceStore_API as SharedPreferenceStore} from "../../shared-preference/services/shared-preference-store";
 import {SourceDataRatingStore_API as SourceDataRatingStore} from "../../source-data-rating/services/source-data-rating-store";
@@ -141,6 +142,7 @@ export const CORE_API = {
     RoadmapStore,
     ScenarioStore,
     ServerInfoStore,
+    ServerUsageStore,
     SettingsStore,
     SharedPreferenceStore,
     SourceDataRatingStore,
