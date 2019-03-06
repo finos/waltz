@@ -19,18 +19,19 @@
 import _ from "lodash";
 import { entityLifecycleStatuses, resetData } from "../common";
 import { kindToViewState } from "../common/link-utils";
-import { mkSelectionOptions } from "../common/selector-utils";
+import { mkApplicationSelectionOptions } from "../common/selector-utils";
 import { hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload } from "./utilities";
-import { dynamicSections } from '../dynamic-section/dynamic-section-definitions';
-import { CORE_API } from '../common/services/core-api-utils';
+import { dynamicSections } from "../dynamic-section/dynamic-section-definitions";
+import { CORE_API } from "../common/services/core-api-utils";
 
 
-import template from './entity-statistic-view.html';
+import template from "./entity-statistic-view.html";
 
 
 const initData = {
     allDefinitions: [],
     applications: [],
+    filters: {},
     orgUnits: [],
     statistic: {
         definition: null,
@@ -41,9 +42,9 @@ const initData = {
     summaries: [],
     navItems: [],
     selectedNavItem: null,
-    parentStateRef: '.',
+    parentStateRef: ".",
     history: [],
-    duration: 'MONTH',
+    duration: "MONTH",
     visibility: {
         related: false
     },
@@ -59,13 +60,12 @@ function mkHistory(history = [], current) {
 }
 
 
-function mkStatisticSelector(entityRef) {
-    const selector = mkSelectionOptions(entityRef);
-    selector.entityLifecycleStatuses = [
-        entityLifecycleStatuses.ACTIVE,
-        entityLifecycleStatuses.PENDING,
-        entityLifecycleStatuses.REMOVED
-    ];
+function mkStatisticSelector(entityRef, filters) {
+    const selector = mkApplicationSelectionOptions(
+        entityRef,
+        undefined,
+        [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED],
+        filters);
 
     return selector;
 }
@@ -84,7 +84,7 @@ function controller($q,
 
     vm.statRef = {
         id: statId,
-        kind: 'ENTITY_STATISTIC'
+        kind: "ENTITY_STATISTIC"
     };
 
     const definitionPromise = serviceBroker
@@ -121,7 +121,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector = mkStatisticSelector(vm.parentRef);
+        const selector = mkStatisticSelector(vm.parentRef, vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -145,7 +145,7 @@ function controller($q,
         vm.parentRef = entityReference;
 
 
-        const selector = mkStatisticSelector(entityReference);
+        const selector = mkStatisticSelector(entityReference, vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -161,7 +161,7 @@ function controller($q,
 
                 const relatedIds = _.chain(related)
                     .filter(s => s !== null)
-                    .map('id')
+                    .map("id")
                     .value();
 
                 return serviceBroker
@@ -203,22 +203,28 @@ function controller($q,
         vm.duration = d;
         loadHistory();
     };
+
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
+        //reload nav item
+        vm.onSelectNavItem(vm.selectedNavItem);
+    };
 }
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    '$stateParams',
-    'EntityStatisticUtilities',
-    'ServiceBroker'
+    "$q",
+    "$state",
+    "$stateParams",
+    "EntityStatisticUtilities",
+    "ServiceBroker"
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };
