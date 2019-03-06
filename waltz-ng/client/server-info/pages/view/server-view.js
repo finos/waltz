@@ -37,7 +37,17 @@ const initialState = {
 };
 
 
-function controller($stateParams, serviceBroker) {
+const addToHistory = (historyStore, server) => {
+    if (! server) { return; }
+    historyStore.put(
+        server.hostname,
+        'SERVER',
+        'main.server.view',
+        { id: server.id });
+};
+
+
+function controller($stateParams, historyStore, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -49,13 +59,17 @@ function controller($stateParams, serviceBroker) {
 
         serviceBroker
             .loadViewData(CORE_API.ServerInfoStore.getById, [vm.parentEntityRef.id])
-            .then(r => vm.serverInfo = r.data);
+            .then(r => {
+                vm.serverInfo = r.data;
+                addToHistory(historyStore, vm.serverInfo);
+            });
     };
 }
 
 
 controller.$inject = [
     "$stateParams",
+    "HistoryStore",
     "ServiceBroker"
 ];
 

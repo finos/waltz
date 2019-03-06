@@ -38,6 +38,10 @@
                     type="${id.type}">
                 <constraints nullable="false" />
             </column>
+            <column name="environment"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
             <column name="last_updated_at"
                     type="TIMESTAMP"
                     defaultValueComputed="${now.value}">
@@ -54,25 +58,11 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="20190124-3783-2"
-               author="kamransaleem">
-        <comment>3783: Server Usage unique index</comment>
-        <createIndex tableName="server_usage"
-                     unique="true"
-                     indexName="idx_server_usage_server_entity">
-            <column name="server_id"
-                    type="${id.type}" />
-            <column name="entity_kind"
-                    type="${enum.type}" />
-            <column name="entity_id"
-                    type="${id.type}" />
-        </createIndex>
-    </changeSet>
 
-    <changeSet id="20190124-3783-2b"
+    <changeSet id="20190124-3783-2"
                 author="kamransaleem">
         <comment>3783: Server Usage primary key</comment>
-        <addPrimaryKey columnNames="server_id, entity_kind, entity_id"
+        <addPrimaryKey columnNames="server_id, entity_id, entity_kind, environment"
                        constraintName="server_usage_pkey"
                        tableName="server_usage"/>
     </changeSet>
@@ -81,11 +71,12 @@
                author="kamransaleem">
         <comment>3783: insert server usages from server information</comment>
         <sql>
-            INSERT INTO server_usage(server_id, entity_kind, entity_id, last_updated_by, provenance)
-            SELECT distinct
+            INSERT INTO server_usage(server_id, entity_kind, entity_id, environment, last_updated_by, provenance)
+            SELECT
                 shi.min_id AS server_id,
                 'APPLICATION' AS entity_kind,
                 app.id AS entity_id,
+                si.environment as environment,
                 'admin' AS last_updated_by,
                 'waltz' AS provenance
             FROM server_information si
@@ -94,7 +85,7 @@
                 FROM server_information
                 GROUP BY hostname
             ) AS shi ON shi.hostname = si.hostname
-            JOIN application app ON app.asset_code = si.asset_code
+            INNER JOIN application app ON app.asset_code = si.asset_code;
         </sql>
     </changeSet>
 
@@ -167,6 +158,26 @@
                        tableName="server_information" />
     </changeSet>
 
+    <changeSet author="dwatkins"
+               id="20190124-3783-7">
+        <dropDefaultValue tableName="server_information"
+                          columnName="environment"/>
+    </changeSet>
+
+    <changeSet id="20190124-3783-8"
+               author="davidwatkins73">
+        <comment>3783: drop environment from server information </comment>
+        <dropColumn tableName="server_information"
+                    columnName="environment"/>
+    </changeSet>
+
+    <changeSet id="20190124-3783-9"
+               author="davidwatkins73">
+        <addDefaultValue tableName="server_usage"
+                         columnName="environment"
+                         defaultValue="UNKNOWN"/>
+    </changeSet>
+
 
     <!-- 3736: Add Servers to FT Index -->
     <changeSet id="20190130-3736-1"
@@ -230,7 +241,7 @@
     <changeSet id="20190130-3736-4"
                author="kamransaleem"
                dbms="mssql">
-        <comment>Measurables: unique composite index on category and external id</comment>
+        <comment>3736: Server Information index on hostname</comment>
         <sql>
             CREATE UNIQUE NONCLUSTERED INDEX idx_si_external_id
             ON [server_information]([external_id])

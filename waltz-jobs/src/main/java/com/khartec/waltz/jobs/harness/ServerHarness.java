@@ -19,17 +19,13 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.jobs.harness.HarnessUtilities;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.server_information.ServerInformationService;
-import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.util.List;
 
 
 public class ServerHarness {
@@ -39,65 +35,9 @@ public class ServerHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         ServerInformationService serverInfoService = ctx.getBean(ServerInformationService.class);
         ServerInformationDao serverInfoDao = ctx.getBean(ServerInformationDao.class);
-        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-
-        IdSelectionOptions options = ImmutableIdSelectionOptions.builder()
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.ORG_UNIT)
-                        .id(10)
-                        .build())
-                .scope(HierarchyQueryScope.CHILDREN)
-                .build();
-
-        for (int i = 0; i < 5; i++) {
-            HarnessUtilities.time("stats", () -> serverInfoService.calculateStatsForAppSelector(options));
-        }
-
-
-        String sql = "\n" +
-                "select \n" +
-                "  coalesce(\n" +
-                "    sum(case [server_information].[is_virtual] when 1 then 1\n" +
-                "                                               else 0\n" +
-                "        end), \n" +
-                "    0) [virtual_count], \n" +
-                "  coalesce(\n" +
-                "    sum(case [server_information].[is_virtual] when 1 then 0\n" +
-                "                                               else 1\n" +
-                "        end), \n" +
-                "    0) [physical_count]\n" +
-                "from [server_information]\n" +
-                "where [server_information].[asset_code] in (\n" +
-                "  select [application].[asset_code]\n" +
-                "  from [application]\n" +
-                "  where [application].[id] in (\n" +
-                "    select [application].[id]\n" +
-                "    from [application]\n" +
-                "    where [application].[organisational_unit_id] in (\n" +
-                "      130, 260, 70, 200, 10, 140, 270, 80, 210, 20, 150, 280, 90, 220, 30, 160, \n" +
-                "      290, 100, 230, 40, 170, 300, 110, 240, 50, 180, 120, 250, 60, 190\n" +
-                "    )\n" +
-                "  )\n" +
-                ");\n";
-
-
-
-        FunctionUtilities.time(
-                "raw q",
-                () -> {
-                    dsl.connection(conn -> {
-                        PreparedStatement stmt = conn.prepareStatement(sql);
-                        ResultSet rs = stmt.executeQuery();
-                        while (rs.next()) {
-                            System.out.println(rs.getBigDecimal(1) + " - " + rs.getBigDecimal(2));
-                        }
-                    });
-                    return null;
-                }
-        );
-
-
+        List<ServerInformation> r = serverInfoDao.findByAppId(16695);
+        System.out.println(r);
 
     }
 

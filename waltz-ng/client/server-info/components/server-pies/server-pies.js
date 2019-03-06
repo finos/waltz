@@ -18,13 +18,14 @@
  */
 
 import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../../common/colors";
-import {toKeyCounts} from "../../../common";
+import {initialiseData, toKeyCounts} from "../../../common";
 import {endOfLifeStatus} from "../../../common/services/enums/end-of-life-status";
 import template from './server-pies.html';
 
 
 const bindings = {
-    servers : '<'
+    servers: '<',
+    serverUsages: '<'
 };
 
 
@@ -36,9 +37,15 @@ const EOL_STATUS_CONFIG = {
     labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
 };
 
+const multiEnvServerDescription = "Note: servers may support multiple environments";
+
+const initialState = {
+    environmentDescription: ""
+};
+
 
 function controller() {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.pie = {
         env: {
@@ -68,19 +75,23 @@ function controller() {
     };
 
 
-    function update(servers) {
+    function update(servers, serverUsages) {
         if (!servers) return;
 
-        vm.pie.env.data = toKeyCounts(servers, d => d.environment);
+        vm.pie.env.data = toKeyCounts(serverUsages, d => d.environment);
         vm.pie.os.data = toKeyCounts(servers, d => d.operatingSystem);
         vm.pie.location.data = toKeyCounts(servers, d => d.location);
         vm.pie.operatingSystemEndOfLifeStatus.data = toKeyCounts(servers, d => d.operatingSystemEndOfLifeStatus);
         vm.pie.hardwareEndOfLifeStatus.data = toKeyCounts(servers, d => d.hardwareEndOfLifeStatus);
+
+        vm.environmentDescription = serverUsages.length > servers.length
+            ? multiEnvServerDescription
+            : "";
     }
 
 
     vm.$onChanges = () => {
-        if(vm.servers) update(vm.servers);
+        if(vm.servers) update(vm.servers, vm.serverUsages);
     };
 }
 

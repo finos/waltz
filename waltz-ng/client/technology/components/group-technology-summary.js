@@ -29,6 +29,7 @@ const bindings = {
 };
 
 const initialState = {
+    environmentDescription: "",
     visibility: {
         servers: false,
         software: false,
@@ -129,6 +130,16 @@ function controller() {
         Object.assign(vm, processSoftwareCatalogStats(vm.stats.softwareStats));
 
         vm.visibility = calculateVisibility(vm.stats);
+
+        const serverStats = vm.stats.serverStats;
+        const totalServers = serverStats.totalCount;
+        const totalEnvs = _.sumBy(serverStats.environmentCounts, d => d.count);
+
+
+        vm.environmentDescription = totalEnvs > totalServers
+            ? "Note: servers may support multiple environments"
+            : "";
+
     };
 
     vm.pieConfig = PIE_CONFIG;
