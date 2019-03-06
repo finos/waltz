@@ -20,11 +20,15 @@
 
 import {getParents} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from '../../../common/services/enums/hierarchy-query-scope';
+import {lifecycleStatus} from '../../../common/services/enums/lifecycle-status';
+
 import template from "./data-type-overview.html";
 
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<"
 };
 
@@ -32,7 +36,13 @@ const bindings = {
 function controller(serviceBroker) {
     const vm = this;
 
-    vm.$onInit = () => {
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            hierarchyQueryScope.CHILDREN.key,
+            [lifecycleStatus.ACTIVE.key],
+            vm.filters)
+
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
@@ -46,15 +56,26 @@ function controller(serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
-                [ mkSelectionOptions(vm.parentEntityRef) ])
+                [ selector ])
             .then(r => vm.apps = r.data);
 
         serviceBroker
             .loadViewData(
                 CORE_API.DataTypeUsageStore.calculateStats,
-                [ mkSelectionOptions(vm.parentEntityRef) ])
+                [ selector ])
             .then(r => vm.usageStats = r.data);
-    }
+    };
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
+    };
 }
 
 

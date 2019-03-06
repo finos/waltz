@@ -10,9 +10,14 @@
         </ol>
     </waltz-page-header>
 
+    <!-- Non visual control to watch for filter changes -->
+    <waltz-filter-change-watcher on-filters-changed="ctrl.filtersChanged">
+    </waltz-filter-change-watcher>
+
 
     <!-- SUMMARY -->
-    <waltz-data-type-overview parent-entity-ref="ctrl.entityRef">
+    <waltz-data-type-overview parent-entity-ref="ctrl.entityRef"
+                              filters="ctrl.filters">
     </waltz-data-type-overview>
 
 
@@ -29,6 +34,7 @@
 
         <waltz-dynamic-sections-view sections="ctrl.sections"
                                      parent-entity-ref="ctrl.entityRef"
+                                     filters="ctrl.filters"
                                      on-remove="ctrl.removeSection">
         </waltz-dynamic-sections-view>
 

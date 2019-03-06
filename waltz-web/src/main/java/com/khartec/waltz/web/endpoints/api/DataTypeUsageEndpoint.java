@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
@@ -92,7 +93,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                 -> dataTypeUsageService.findForDataTypeSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<Tally<String>> findUsageStatsForDataTypeSelectorRoute = (request, response)
-                -> dataTypeUsageService.findUsageStatsForDataTypeSelector(readIdSelectionOptionsFromBody(request));
+                -> dataTypeUsageService.findUsageStatsForDataTypeSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<DataTypeUsage> findForSelectorRoute = (request, response)
                 -> dataTypeUsageService.findForAppIdSelector(EntityKind.APPLICATION, readAppIdSelectionOptionsFromBody(request));
@@ -110,7 +111,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
     private Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeSelectorRoute(Request request,
                                                                                            Response response) throws IOException
     {
-        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+        ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
         UsageKind usageKind = readEnum(request,
                 "usage-kind",
                 UsageKind.class,

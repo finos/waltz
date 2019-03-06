@@ -35,6 +35,12 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableApplicationIdSelectionOptions.class)
 public abstract class ApplicationIdSelectionOptions extends IdSelectionOptions {
 
+    public static ApplicationIdSelectionOptions mkOpts(EntityReference ref) {
+        return mkOpts(
+                ref,
+                determineDefaultScope(ref.kind()));
+    }
+
     public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
                                                        HierarchyQueryScope scope) {
         return ImmutableApplicationIdSelectionOptions.builder()

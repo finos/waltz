@@ -25,6 +25,7 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.schema.tables.Application;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -36,6 +37,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -48,6 +50,9 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+
+    private final static Application CONSUMER_APP = APPLICATION.as("consumer");
+    private final static Application SUPPLIER_APP = APPLICATION.as("supplier");
 
 
     @Autowired
@@ -75,7 +80,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
                 return wrapAppIdSelector(appOptions);
             case DATA_TYPE:
-                return mkForDataType(options);
+                return mkForDataType(ApplicationIdSelectionOptions.mkOpts(options));
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
@@ -140,15 +145,27 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDataType(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
+
+        Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
+        Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
 
         return DSL.select(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                 .from(LOGICAL_FLOW_DECORATOR)
+                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .innerJoin(SUPPLIER_APP)
+                    .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(SUPPLIER_APP.ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .innerJoin(CONSUMER_APP)
+                    .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
-                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
-                .and(NOT_REMOVED);
-
+                    .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .and(SUPPLIER_APP.KIND.in(options.applicationKinds()).or(CONSUMER_APP.KIND.in(options.applicationKinds())))
+                .and(NOT_REMOVED)
+                .and(supplierNotRemoved)
+                .and(consumerNotRemoved);
     }
 
 }

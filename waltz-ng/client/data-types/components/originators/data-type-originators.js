@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import {initialiseData} from '../../../common'
+import {initialiseData} from "../../../common"
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 
-import template from './data-type-originators.html';
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import template from "./data-type-originators.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    flowOriginators: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -39,13 +39,13 @@ const initialState = {
 
 
 function prepareData(dataTypes = [], flowOriginators = {}) {
-    const typesById = _.keyBy(dataTypes, 'id');
+    const typesById = _.keyBy(dataTypes, "id");
 
     // TODO: enrich with dtu flow info
     return _.map(flowOriginators, (apps, typeId) => {
         return {
             dataType: typesById[typeId],
-            appReferences: _.sortBy(apps, 'name')
+            appReferences: _.sortBy(apps, "name")
         };
     });
 
@@ -57,15 +57,16 @@ function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    const loadAll = () => {
         const dtPromise = serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = r.data);
 
+        const selector = mkApplicationSelectionOptions(vm.parentEntityRef, undefined, undefined, vm.filters);
         const originatorPromise = serviceBroker
             .loadViewData(
                 CORE_API.DataTypeUsageStore.findForUsageKindByDataTypeIdSelector,
-                [ 'ORIGINATOR', mkSelectionOptions(vm.parentEntityRef) ])
+                [ "ORIGINATOR", selector ])
             .then(r => vm.flowOriginators = r.data);
 
         dtPromise
@@ -73,15 +74,23 @@ function controller(serviceBroker) {
             .then(() => vm.originators = prepareData(vm.dataTypes, vm.flowOriginators));
     };
 
-    vm.$onChanges = () => {
-        vm.originators = prepareData(vm.dataTypes, vm.flowOriginators);
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
     };
 
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -92,7 +101,7 @@ const component = {
 };
 
 
-const id = 'waltzDataTypeOriginators';
+const id = "waltzDataTypeOriginators";
 
 
 export default {

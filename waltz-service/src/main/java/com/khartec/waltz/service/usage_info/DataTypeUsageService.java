@@ -97,7 +97,8 @@ public class DataTypeUsageService {
 
     public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions idSelectionOptions) {
         Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
-        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector);
+        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(idSelectionOptions);
+        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector, appOptions);
     }
 
 
@@ -107,16 +108,16 @@ public class DataTypeUsageService {
      *
      * (UsageKind, SelectionOptions) ->  { DataType.id -> [ EntityRef... ] }
      * @param usageKind
-     * @param dataTypeIdSelectionOptions
+     * @param options
      * @return
      */
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind usageKind,
-                                                                                       IdSelectionOptions dataTypeIdSelectionOptions) {
+                                                                                       ApplicationIdSelectionOptions options) {
         checkNotNull(usageKind, "usageKind cannot be null");
-        checkNotNull(dataTypeIdSelectionOptions, "dataTypeIdSelectionOptions cannot be null");
+        checkNotNull(options, "options cannot be null");
 
-        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
-        return dataTypeUsageDao.findForUsageKindByDataTypeIdSelector(usageKind, dataTypeIdSelector);
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
+        return dataTypeUsageDao.findForUsageKindByDataTypeIdSelector(usageKind, dataTypeIdSelector, options);
     }
 
 

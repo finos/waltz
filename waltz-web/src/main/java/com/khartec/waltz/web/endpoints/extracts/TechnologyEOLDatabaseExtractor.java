@@ -12,7 +12,7 @@ import spark.Request;
 
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
