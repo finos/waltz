@@ -2,6 +2,7 @@ package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -157,7 +158,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     private void previewAppMappingRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                            IdSelectionOptions selectionOptions) {
-        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(selectionOptions);
+        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(ApplicationIdSelectionOptions.mkOpts(selectionOptions));
         addToPreview(
                 preview,
                 map(ratings, r -> r.entityReference()),

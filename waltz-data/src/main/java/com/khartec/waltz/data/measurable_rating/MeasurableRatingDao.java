@@ -25,6 +25,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -38,7 +39,6 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -167,13 +167,15 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRating> findByMeasurableIdSelector(Select<Record1<Long>> selector,
-                                                             Set<EntityLifecycleStatus> entityLifecycleStatuses) {
+                                                             Set<EntityLifecycleStatus> entityLifecycleStatuses,
+                                                             Set<ApplicationKind> applicationKinds) {
         checkNotNull(selector, "selector cannot be null");
 
         SelectConditionStep<Record> qry = mkBaseQuery()
                 .innerJoin(APPLICATION)
                 .on(APP_JOIN_CONDITION)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
+                .and(APPLICATION.KIND.in(applicationKinds))
                 .and(mkLifecycleStatusCondition(entityLifecycleStatuses));
 
         return qry

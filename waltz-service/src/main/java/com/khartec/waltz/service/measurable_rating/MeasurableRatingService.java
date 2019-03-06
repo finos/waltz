@@ -96,10 +96,10 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
+    public List<MeasurableRating> findByMeasurableIdSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
-        return measurableRatingDao.findByMeasurableIdSelector(selector, options.entityLifecycleStatuses());
+        return measurableRatingDao.findByMeasurableIdSelector(selector, options.entityLifecycleStatuses(), options.applicationKinds());
     }
 
 

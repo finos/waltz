@@ -82,7 +82,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.findForEntity(getEntityReference(request));
 
         ListRoute<MeasurableRating> findByMeasurableSelectorRoute = (request, response)
-                -> measurableRatingService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.findByMeasurableIdSelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRating> findByAppSelectorRoute = (request, response)
                 -> measurableRatingService.findByAppIdSelector(readAppIdSelectionOptionsFromBody(request));

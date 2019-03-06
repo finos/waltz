@@ -22,8 +22,9 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkLinkGridCell} from "../../../common/grid-utils";
 import {mkRatingSchemeColorScale} from "../../../common/colors";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+
 import template from "./measurable-rating-explorer-section.html";
-import {mkSelectionOptions} from "../../../common/selector-utils";
 
 /**
  * @name waltz-measurable-rating-explorer-section
@@ -36,13 +37,14 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
     measurables: [],
-    query: '',
+    query: "",
     pie: null,
     ratings: [],
     visibility: {
@@ -54,12 +56,12 @@ const initialState = {
 function preparePie(ratings = [],
                     ratingScheme = {},
                     onSelect) {
-    const counts = _.countBy(ratings, 'rating');
-    const schemeItemsByCode = _.keyBy(ratingScheme.ratings, 'rating' );
+    const counts = _.countBy(ratings, "rating");
+    const schemeItemsByCode = _.keyBy(ratingScheme.ratings, "rating" );
     const colorScale = mkRatingSchemeColorScale(ratingScheme);
 
     const data = _.chain(ratingScheme.ratings)
-        .reject(schemeItem => schemeItem.rating === 'X')
+        .reject(schemeItem => schemeItem.rating === "X")
         .map(schemeItem => ({
             key: schemeItem.rating,
             count: counts[schemeItem.rating] || 0
@@ -84,7 +86,7 @@ function prepareTableData(ratings = [],
                           measurables = [],
                           scheme = {},
                           appsById = {}) {
-    const measurablesById = _.keyBy(measurables, 'id');
+    const measurablesById = _.keyBy(measurables, "id");
     const ratingItemsByCode = _.keyBy(scheme.ratings, r => r.rating);
 
     return _.chain(ratings)
@@ -109,13 +111,13 @@ const ratingCellTemplate = `
 
 function prepareColumnDefs(measurableCategory, measurables) {
     const initialCols = [
-        mkLinkGridCell('Name', 'entityReference.name', 'entityReference.id', 'main.app.view'),
+        mkLinkGridCell("Name", "entityReference.name", "entityReference.id", "main.app.view"),
         {
-            field: 'entityReference.assetCode',
-            name: 'Asset Code'
+            field: "entityReference.assetCode",
+            name: "Asset Code"
         }, {
-            field: 'rating',
-            name: 'Rating',
+            field: "rating",
+            name: "Rating",
             cellTemplate: ratingCellTemplate,
             sortingAlgorithm: (a, b) => a.name.localeCompare(b.name),
             exportFormatter: (input) => input.name
@@ -125,12 +127,12 @@ function prepareColumnDefs(measurableCategory, measurables) {
     // We only want to show the measurable column if there are multiple measurables to
     // differentiate between.
     const measurableCols = measurables.length > 1
-        ? [ { field: 'measurable.name', name: measurableCategory.name } ]
+        ? [ { field: "measurable.name", name: measurableCategory.name } ]
         : [];
 
     const finalCols = [{
-        field: 'rating.description',
-        name: 'Comment'
+        field: "rating.description",
+        name: "Comment"
     }];
 
     return [].concat(initialCols, measurableCols, finalCols);
@@ -156,11 +158,15 @@ function controller($q, serviceBroker) {
     };
 
     const loadData = () => {
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
 
         const appsPromise = serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [ selector ])
-            .then(r => vm.appsById = _.keyBy(r.data, 'id'));
+            .then(r => vm.appsById = _.keyBy(r.data, "id"));
 
         const schemePromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
@@ -214,8 +220,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'];
+    "$q",
+    "ServiceBroker"];
 
 
 const component = {

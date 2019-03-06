@@ -20,6 +20,12 @@
         </ol>
     </waltz-page-header>
 
+
+    <!-- Non visual control to watch for filter changes -->
+    <waltz-filter-change-watcher on-filters-changed="ctrl.filtersChanged">
+    </waltz-filter-change-watcher>
+
+
     <waltz-measurable-summary parent-entity-ref='ctrl.entityReference'>
     </waltz-measurable-summary>
 
@@ -37,6 +43,7 @@
 
         <waltz-dynamic-sections-view sections="ctrl.sections"
                                      parent-entity-ref="ctrl.entityReference"
+                                     filters="ctrl.filters"
                                      on-remove="ctrl.removeSection">
         </waltz-dynamic-sections-view>
     </div>

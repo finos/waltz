@@ -26,6 +26,7 @@ import {toEntityRef} from "../../../common/entity-utils";
 
 
 const initialState = {
+    filters: {},
     sections: [],
     availableSections: []
 };
@@ -72,6 +73,11 @@ function controller($q,
                     .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
                     .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })))
             .then(() => logHistory(vm.measurable, historyStore));
+    };
+
+
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
     };
 
     // -- DYNAMIC SECTIONS
