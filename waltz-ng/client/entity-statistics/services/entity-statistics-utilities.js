@@ -58,6 +58,12 @@ function utils(serviceBroker) {
                 return serviceBroker
                     .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
                     .then(r => [r.data]);
+            case 'SCENARIO':
+                return serviceBroker
+                    .loadViewData(CORE_API.ScenarioStore.getById, [id])
+                    .then(r => serviceBroker
+                            .loadViewData(CORE_API.ScenarioStore.findForRoadmap, [r.data.scenario.roadmapId]))
+                    .then(r => r.data);
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;
         }
