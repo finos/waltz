@@ -22,13 +22,14 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 
-import template from './data-type-flow-section.html';
+import template from "./data-type-flow-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -53,21 +54,21 @@ function calculateEntities(flows = []) {
 
 const buildGraphTweakers = (decorators = [],
                             onAppSelect) => {
-    const decoratorsByFlowId = _.keyBy(decorators, 'dataFlowId');
+    const decoratorsByFlowId = _.keyBy(decorators, "dataFlowId");
 
     const getRatingForLink = (link) => {
         const decorator = decoratorsByFlowId[link.data.id];
         return decorator
             ? decorator.rating
-            : 'NO_OPINION';
+            : "NO_OPINION";
     };
 
     return {
         node : {
             enter: (selection) => {
                 selection
-                    .on('click.appSelect', onAppSelect)
-                    .on('dblclick.unfix', d => { d.fx = null; d.fy = null; })
+                    .on("click.appSelect", onAppSelect)
+                    .on("dblclick.unfix", d => { d.fx = null; d.fy = null; })
             },
             exit: _.identity,
             update: _.identity
@@ -97,13 +98,13 @@ function mkKeepDecoratorFn(filterOptions = {}) {
     return (decorator) => {
         const rating = decorator.rating;
         switch (rating) {
-            case 'PRIMARY':
+            case "PRIMARY":
                 return filterOptions.showPrimary;
-            case 'SECONDARY':
+            case "SECONDARY":
                 return filterOptions.showSecondary;
-            case 'DISCOURAGED':
+            case "DISCOURAGED":
                 return filterOptions.showDiscouraged;
-            case 'NO_OPINION':
+            case "NO_OPINION":
                 return filterOptions.showNoOpinion;
         }
     };
@@ -118,7 +119,7 @@ function filterDecorators(decorators =[],
 
 function filterFlows(flows = [],
                      decorators = []) {
-    const flowIds = _.map(decorators, 'dataFlowId');
+    const flowIds = _.map(decorators, "dataFlowId");
     return _.filter(flows, f => _.includes(flowIds, f.id));
 
 }
@@ -142,6 +143,34 @@ function controller($q, $scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
+
+        const flowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findBySelector,
+                [ selector ])
+            .then(r => vm.rawFlows = r.data);
+        const decoratorPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelector,
+                [ selector ])
+            .then(r => {
+                vm.rawDecorators = r.data;
+                vm.graphTweakers = buildGraphTweakers(
+                    vm.rawDecorators,
+                    onAppSelect);
+            });
+
+        $q.all([flowPromise, decoratorPromise])
+            .then(() => vm.filterChanged());
+    };
+
+
     vm.filterChanged = () => {
         vm.flowData = filterData(
             vm.rawFlows,
@@ -164,33 +193,21 @@ function controller($q, $scope, serviceBroker) {
     };
 
     vm.$onInit = () => {
-        const selector = mkSelectionOptions(vm.parentEntityRef);
-        const flowPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowStore.findBySelector,
-                [ selector ])
-            .then(r => vm.rawFlows = r.data);
-        const decoratorPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                [ selector ])
-            .then(r => {
-                vm.rawDecorators = r.data;
-                vm.graphTweakers = buildGraphTweakers(
-                    vm.rawDecorators,
-                    onAppSelect);
-            });
+        loadAll();
+    };
 
-        $q.all([flowPromise, decoratorPromise])
-            .then(() => vm.filterChanged());
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
     };
 }
 
 
 controller.$inject = [
-    '$q',
-    '$scope',
-    'ServiceBroker'
+    "$q",
+    "$scope",
+    "ServiceBroker"
 ];
 
 
@@ -201,7 +218,7 @@ const component = {
 };
 
 
-const id = 'waltzDataTypeFlowSection'
+const id = "waltzDataTypeFlowSection"
 
 export default {
     component,

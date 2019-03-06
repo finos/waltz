@@ -24,6 +24,7 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.data_type_usage.ImmutableDataTypeUsage;
 import com.khartec.waltz.model.tally.Tally;
@@ -135,10 +136,15 @@ public class DataTypeUsageDao {
     }
 
 
-    public List<Tally<String>> findUsageStatsForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector) {
+    public List<Tally<String>> findUsageStatsForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector,
+                                                                 ApplicationIdSelectionOptions options) {
         return dsl.select(DATA_TYPE_USAGE.USAGE_KIND, DSL.count())
                 .from(DATA_TYPE_USAGE)
+                .innerJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(DATA_TYPE_USAGE.ENTITY_ID)
+                            .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(DATA_TYPE_USAGE.DATA_TYPE_ID.in(dataTypeIdSelector))
+                .and(APPLICATION.KIND.in(options.applicationKinds()))
                 .groupBy(DATA_TYPE_USAGE.USAGE_KIND)
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
@@ -458,17 +464,17 @@ public class DataTypeUsageDao {
 
 
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind kind,
-                                                                                       Select<Record1<Long>> dataTypeIdSelector) {
+                                                                                       Select<Record1<Long>> dataTypeIdSelector,
+                                                                                       ApplicationIdSelectionOptions options) {
         Result<Record3<Long, Long, String>> records = dsl
                 .select(dt.ID, dtu.ENTITY_ID, app.NAME)
                 .from(dtu)
-                .innerJoin(app)
-                .on(dtu.ENTITY_ID.eq(app.ID))
-                .innerJoin(dt)
-                .on(dt.ID.eq(dtu.DATA_TYPE_ID))
+                .innerJoin(app).on(dtu.ENTITY_ID.eq(app.ID))
+                .innerJoin(dt).on(dt.ID.eq(dtu.DATA_TYPE_ID))
                 .where(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(dt.ID.in(dataTypeIdSelector))
                 .and(dtu.USAGE_KIND.eq(kind.name()))
+                .and(app.KIND.in(options.applicationKinds()))
                 .fetch();
 
         return MapUtilities.groupBy(

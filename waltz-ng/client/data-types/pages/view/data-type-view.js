@@ -26,6 +26,7 @@ import {toEntityRef} from "../../../common/entity-utils";
 const initialState = {
     dataType: null,
     entityRef: null,
+    filters: {},
     sections: [],
     availableSections: []
 };
@@ -55,6 +56,10 @@ function controller(dataType,
     // -- INTERACT --
     vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "DATA_TYPE");
     vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "DATA_TYPE");
+
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
+    };
 }
 
 
