@@ -20,7 +20,7 @@
 
 /**
  * Given an entity kind, this will return the matching
- * ui-router state name if avaialble.  Otherwise it
+ * ui-router state name if available.  Otherwise it
  * will throw an error.
  * @param kind
  * @returns String state name
@@ -76,15 +76,81 @@ export function kindToViewState(kind) {
     }
     if (kind === "ROADMAP") {
         return "main.roadmap.view";
-    }    
+    }
     if (kind === "SCENARIO") {
         return "main.scenario.view";
     }
     if (kind === "SERVER") {
         return "main.server.view";
     }
-    if (kind === "SERVER") {
-        return "main.server.view";
-    }
     throw "Unable to convert kind: "+kind+ " to a ui-view state";
+}
+
+
+/**
+ * Given an view state, this will return the matching
+ * entity kind if available.  Otherwise it
+ * will throw an error.
+ * @param String state name
+ * @returns kind
+ */
+export function viewStateToKind(viewState) {
+    if (viewState === "main.app.view") {
+        return "APPLICATION";
+    }
+    if (viewState === "main.actor.view") {
+        return "ACTOR";
+    }
+    if (viewState === "main.app-group.view") {
+        return "APP_GROUP";
+    }
+    if (viewState === "main.data-type.view") {
+        return "DATA_TYPE";
+    }
+    if (viewState === "main.flow-diagram.view") {
+        return "FLOW_DIAGRAM";
+    }
+    if (viewState === "main.logical-data-element.view") {
+        return "LOGICAL_DATA_ELEMENT";
+    }
+    if (viewState === "main.logical-flow.view") {
+        return "LOGICAL_DATA_FLOW";
+    }
+    if (viewState === "main.measurable.view") {
+        return "MEASURABLE";
+    }
+    if (viewState === "main.measurable-category.view") {
+        return "MEASURABLE_CATEGORY";
+    }
+    if (viewState === "main.org-unit.view") {
+        return "ORG_UNIT";
+    }
+    if (viewState === "main.change-initiative.view") {
+        return "CHANGE_INITIATIVE";
+    }
+    if (viewState === "main.entity-statistic.view") {
+        return "ENTITY_STATISTIC";
+    }
+    if (viewState === "main.person.id") {
+        return "PERSON";
+    }
+    if (viewState === "main.process.view") {
+        return "PROCESS";
+    }
+    if (viewState === "main.physical-specification.view") {
+        return "PHYSICAL_SPECIFICATION";
+    }
+    if (viewState === "main.physical-flow.view") {
+        return "PHYSICAL_FLOW";
+    }
+    if (viewState === "main.roadmap.view") {
+        return "ROADMAP";
+    }
+    if (viewState === "main.scenario.view") {
+        return "SCENARIO";
+    }
+    if (viewState === "main.server.view") {
+        return "SERVER";
+    }
+    throw "Unable to convert view state: "+viewState+ " to an entity kind";
 }
