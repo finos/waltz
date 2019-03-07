@@ -328,4 +328,17 @@
         </addColumn>
     </changeSet>
 
+    <!-- 2801: enum_value Explicit Order -->
+    <changeSet id="20190307-3768-1"
+               author="davidwatkins73">
+        <comment>3768: scenario positions</comment>
+        <addColumn tableName="scenario">
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
