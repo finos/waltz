@@ -116,7 +116,7 @@ function controller($element,
     vm.resetFilters = () => {
         vm.filterSelections = mkFilterSelections();
         vm.filterChanged();
-    }
+    };
 }
 
 
