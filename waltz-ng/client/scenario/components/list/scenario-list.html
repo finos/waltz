@@ -23,7 +23,7 @@
             No scenarios have been created for this roadmap
         </td>
     </tr>
-    <tr ng-repeat="scenario in $ctrl.scenarios track by scenario.id"
+    <tr ng-repeat="scenario in $ctrl.scenarios | orderBy:'position' track by scenario.id"
         class="waltz-visibility-parent">
         <td>
             <span uib-popover-template="'wsl-popover.html'"
