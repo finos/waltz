@@ -71,7 +71,6 @@ public class ServerGenerator implements SampleDataGenerator {
         ServerInformationDao serverDao = ctx.getBean(ServerInformationDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-
         commonHostNames.clear();
 
         List<ServerInformation> servers = ListUtilities.newArrayList();
@@ -84,7 +83,6 @@ public class ServerGenerator implements SampleDataGenerator {
                     servers.add(
                             ImmutableServerInformation.builder()
                                     .hostname(hostName)
-                                    .environment(isCommonHost ? SampleData.environments[0] : randomPick(SampleData.environments))
                                     .location(isCommonHost ? SampleData.locations[0] : randomPick(SampleData.locations))
                                     .operatingSystem(isCommonHost ? SampleData.operatingSystems[0] : randomPick(SampleData.operatingSystems))
                                     .operatingSystemVersion(isCommonHost ? SampleData.operatingSystemVersions[0] : randomPick(SampleData.operatingSystemVersions))
@@ -143,6 +141,7 @@ public class ServerGenerator implements SampleDataGenerator {
         r.setServerId(serverId);
         r.setEntityKind(EntityKind.APPLICATION.name());
         r.setEntityId(appId);
+        r.setEnvironment(randomPick(SampleData.environments));
         r.setLastUpdatedBy("admin");
         r.setProvenance("waltz");
         return r;

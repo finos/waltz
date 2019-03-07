@@ -52,7 +52,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"))
                     .select(SERVER_INFORMATION.HOSTNAME.as("Host Name"),
-                            SERVER_INFORMATION.ENVIRONMENT.as("Environment"),
+                            SERVER_USAGE.ENVIRONMENT.as("Environment"),
                             SERVER_INFORMATION.OPERATING_SYSTEM.as("Operating System"),
                             SERVER_INFORMATION.OS_END_OF_LIFE_DATE.as("Operating System EOL"),
                             SERVER_INFORMATION.HW_END_OF_LIFE_DATE.as("Hardware EOL"),

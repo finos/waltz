@@ -28,6 +28,7 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -51,6 +52,7 @@ public class ServerUsageDao {
 
         return ImmutableServerUsage.builder()
                 .serverId(row.getServerId())
+                .environment(row.getEnvironment())
                 .entityReference(EntityReference.mkRef(entityKind, row.getEntityId()))
                 .lastUpdatedBy(row.getLastUpdatedBy())
                 .lastUpdatedAt(row.getLastUpdatedAt().toLocalDateTime())
@@ -96,11 +98,24 @@ public class ServerUsageDao {
     }
 
 
+    public Collection<ServerUsage> findByServerId(long serverId) {
+        return findByCondition(SERVER_USAGE.SERVER_ID.eq(serverId));
+    }
+
+
+    public Collection<ServerUsage> findByReferencedEntity(EntityReference ref) {
+        return findByCondition(
+                SERVER_USAGE.ENTITY_ID.eq(ref.id())
+                        .and(SERVER_USAGE.ENTITY_KIND.eq(ref.kind().name())));
+    }
+
+
+    // -- helpers ---
+
     private List<ServerUsage> findByCondition(Condition condition) {
         checkNotNull(condition, "condition cannot be null");
         return dsl
-                .select(SERVER_USAGE.fields())
-                .from(SERVER_USAGE)
+                .selectFrom(SERVER_USAGE)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }

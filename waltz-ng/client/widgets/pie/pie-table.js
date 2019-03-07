@@ -29,6 +29,7 @@ const bindings = {
     title: '@',
     subTitle: '@',
     icon: '@',
+    description: '@',
     selectedSegmentKey: '<'
 };
 

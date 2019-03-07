@@ -36,4 +36,9 @@ public abstract class ServerUsage implements
 
     public abstract long serverId();
     public abstract EntityReference entityReference();
+
+    @Value.Default
+    public String environment() {
+        return "UNKNOWN";
+    }
 }

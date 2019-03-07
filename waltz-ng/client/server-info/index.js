@@ -22,6 +22,7 @@ import angular from "angular";
 import { registerComponents, registerStores } from "../common/module-utils";
 
 import ServerInfoStore from "./services/server-info-store";
+import ServerUsageStore from "./services/server-usage-store";
 import Routes from './routes';
 
 import ServerPies from "./components/server-pies/server-pies";
@@ -42,7 +43,10 @@ export default () => {
         ServerView
     ]);
 
-    registerStores(module, [ServerInfoStore]);
+    registerStores(module, [
+        ServerInfoStore,
+        ServerUsageStore
+    ]);
 
     return module.name;
 };
