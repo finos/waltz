@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
 import { initialiseData, invokeFunction } from "../../../common";
 import { isDescendant } from "../../../common/browser-utils";
 import { applicationKind } from "../../../common/services/enums/application-kind";
@@ -110,6 +111,11 @@ function controller($element,
 
     vm.filterChanged = () => {
         $rootScope.$broadcast(FILTER_CHANGED_EVENT, vm.filterSelections);
+    };
+
+    vm.resetFilters = () => {
+        vm.filterSelections = mkFilterSelections();
+        vm.filterChanged();
     };
 }
 

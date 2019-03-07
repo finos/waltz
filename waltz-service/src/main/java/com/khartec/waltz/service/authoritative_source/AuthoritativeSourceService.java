@@ -218,20 +218,24 @@ public class AuthoritativeSourceService {
         Condition customSelectionCriteria;
         GenericSelector genericSelector = genericSelectorFactory.apply(options);
 
+        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
+
         switch(options.entityReference().kind()) {
             case DATA_TYPE:
-                customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(genericSelector.selector());
+                customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(genericSelector.selector())
+                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
 
             case ORG_UNIT:
-                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(genericSelector.selector());
+                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(genericSelector.selector())
+                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
 
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(ApplicationIdSelectionOptions.mkOpts(options));
+                customSelectionCriteria = mkConsumerSelectionCondition(appOptions);
                 break;
 
             default:
@@ -246,22 +250,26 @@ public class AuthoritativeSourceService {
         Condition customSelectionCriteria;
         GenericSelector genericSelector = genericSelectorFactory.apply(options);
 
+        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
+
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
-                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(genericSelector.selector());
+                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(genericSelector.selector())
+                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
             case DATA_TYPE:
                 SelectConditionStep<Record1<String>> codeSelector = DSL
                         .select(DATA_TYPE.CODE)
                         .from(DATA_TYPE)
                         .where(DATA_TYPE.ID.in(genericSelector.selector()));
-                customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector);
+                customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector)
+                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(ApplicationIdSelectionOptions.mkOpts(options));
+                customSelectionCriteria = mkConsumerSelectionCondition(appOptions);
                 break;
             default:
                 throw new UnsupportedOperationException("Cannot calculate auth sources for ref" + options.entityReference());
