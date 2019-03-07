@@ -58,7 +58,7 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 public class AuthoritativeSourceDao {
 
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
-    private final static Application SUPPLIER_APP = APPLICATION.as("supplier");
+    public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
     private final static AggregateFunction<Integer> COUNT_FIELD = DSL.count(LOGICAL_FLOW);
 
 

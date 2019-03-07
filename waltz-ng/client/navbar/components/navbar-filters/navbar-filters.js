@@ -20,6 +20,7 @@
 import {initialiseData} from "../../../common";
 
 import template from "./navbar-filters.html";
+import { viewStateToKind } from '../../../common/link-utils';
 
 const bindings = {
 };
@@ -27,12 +28,34 @@ const bindings = {
 
 const initialState = {
     visibility: {
-        overlay: false
+        overlay: false,
+        filters: true
     }
 };
 
 
-function controller($timeout) {
+function areFiltersVisible(viewStateName) {
+    try {
+        const kind = viewStateToKind(viewStateName);
+        switch (kind) {
+            case "APP_GROUP":
+            case "DATA_TYPE":
+            case "MEASURABLE":
+            case "ORG_UNIT":
+            case "ENTITY_STATISTIC":
+            case "PERSON":
+                return true;
+            default:
+                return false;
+        }
+    } catch (e) {
+        // in case of an unknown viewstate
+        return false;
+    }
+}
+
+
+function controller($timeout, $transitions) {
 
     const vm = initialiseData(this, initialState);
 
@@ -45,11 +68,17 @@ function controller($timeout) {
     vm.showOverlay = () => {
         vm.visibility.overlay = true;
     }
+
+    $transitions.onSuccess({}, (transition) => {
+        const {name} = transition.to();
+        vm.visibility.filters = areFiltersVisible(name);
+    });
 }
 
 
 controller.$inject = [
-    "$timeout"
+    "$timeout",
+    "$transitions"
 ];
 
 
