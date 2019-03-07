@@ -17,19 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {determineStatMethod} from "../../logical-flow-utils";
-import template from './logical-flows-tabgroup-section.html';
+import _ from "lodash";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { determineStatMethod } from "../../logical-flow-utils";
+import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
+
+import template from "./logical-flows-tabgroup-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
-    export: () => console.log('lfts: default do-nothing export function'),
+    export: () => console.log("lfts: default do-nothing export function"),
     visibility: {
         exportButton: false,
         sourcesOverlay: false
@@ -38,7 +41,7 @@ const initialState = {
 
 
 function calcHasFlows(stats) {
-    const counts = _.get(stats, 'flowCounts', {});
+    const counts = _.get(stats, "flowCounts", {});
     const total = _.sum(_.values(counts));
     return total > 0;
 }
@@ -64,9 +67,19 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = () => {
+    vm.$onChanges = (changes) => {
+
         if (vm.parentEntityRef) {
-            vm.selector = mkSelectionOptions(vm.parentEntityRef);
+            vm.selector = mkApplicationSelectionOptions(
+                vm.parentEntityRef,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
+
+            load(vm.selector);
+        }
+
+        if(changes.filters) {
             load(vm.selector);
         }
     };

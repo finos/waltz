@@ -2,8 +2,8 @@ package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
 import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 public class TaxonomyManagementUtilities {
 
@@ -53,7 +52,7 @@ public class TaxonomyManagementUtilities {
 
     public static Set<EntityReference> findCurrentRatingMappings(MeasurableRatingService measurableRatingService,
                                                                  TaxonomyChangeCommand cmd) {
-        IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.EXACT);
+        ApplicationIdSelectionOptions selectionOptions = ApplicationIdSelectionOptions.mkOpts(cmd.primaryReference(), HierarchyQueryScope.EXACT);
         return measurableRatingService
                 .findByMeasurableIdSelector(selectionOptions)
                 .stream()

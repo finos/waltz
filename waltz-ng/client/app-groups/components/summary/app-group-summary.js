@@ -17,22 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import template from './app-group-summary.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+
+import template from "./app-group-summary.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<",
+    filters: "<"
 };
 
 
 const initialState = {
     editable: false,
+    filters: {},
     isSubscribed: false,
 };
 
@@ -40,9 +45,9 @@ const initialState = {
 function determineSubscriptionStatus(isOwner = false, isSubscriber = false) {
     if (isOwner) {
         // we don't want owners to 'abandon' their app groups
-        return 'NOT_APPLICABLE';
+        return "NOT_APPLICABLE";
     } else {
-        return isSubscriber ? 'SUBSCRIBED' : 'UNSUBSCRIBED';
+        return isSubscriber ? "SUBSCRIBED" : "UNSUBSCRIBED";
     }
 }
 
@@ -54,7 +59,7 @@ function controller($q, serviceBroker, userService) {
     const reloadPermissionsEtc = () => {
         const containsCurrentUser = (otherUsers) => _
             .chain(otherUsers)
-            .map('userId')
+            .map("userId")
             .includes(vm.user.userName)
             .value();
 
@@ -64,8 +69,13 @@ function controller($q, serviceBroker, userService) {
         vm.editable = isOwner;
     };
 
-    vm.$onInit = () => {
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            hierarchyQueryScope.EXACT.key,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
 
         const userPromise = userService
             .whoami()
@@ -78,7 +88,7 @@ function controller($q, serviceBroker, userService) {
             .then(r => {
                 vm.appGroup = r.data.appGroup;
                 vm.members = r.data.members;
-                vm.owners = _.filter(vm.members, { role: 'OWNER' });
+                vm.owners = _.filter(vm.members, { role: "OWNER" });
             });
 
         $q.all([userPromise, groupPromise])
@@ -121,7 +131,7 @@ function controller($q, serviceBroker, userService) {
                 .execute(
                     CORE_API.AppGroupStore.subscribe,
                     [vm.parentEntityRef.id])
-                .then(r => vm.subscriptionStatus = 'SUBSCRIBED');
+                .then(r => vm.subscriptionStatus = "SUBSCRIBED");
         };
 
         vm.onUnsubscribe = () => {
@@ -129,17 +139,26 @@ function controller($q, serviceBroker, userService) {
                 .execute(
                     CORE_API.AppGroupStore.unsubscribe,
                     [vm.parentEntityRef.id])
-                .then(() => vm.subscriptionStatus = 'UNSUBSCRIBED');
+                .then(() => vm.subscriptionStatus = "UNSUBSCRIBED");
         };
-
     };
 
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
+    };
 }
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker',
-    'UserService'
+    "$q",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
@@ -151,5 +170,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAppGroupSummary'
+    id: "waltzAppGroupSummary"
 }

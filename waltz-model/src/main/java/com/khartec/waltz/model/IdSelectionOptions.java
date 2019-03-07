@@ -29,6 +29,7 @@ import java.util.Set;
 import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableIdSelectionOptions.class)
 @JsonDeserialize(as = ImmutableIdSelectionOptions.class)
@@ -57,7 +58,7 @@ public abstract class IdSelectionOptions {
     }
 
 
-    private static HierarchyQueryScope determineDefaultScope(EntityKind kind) {
+    public static HierarchyQueryScope determineDefaultScope(EntityKind kind) {
         switch (kind) {
             case ACTOR:
             case APPLICATION:

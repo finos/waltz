@@ -25,13 +25,11 @@ import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityIdSelectionOptions;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.person.Person;
@@ -108,13 +106,6 @@ public class InvolvementService {
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
         return time("IS.findAllApplicationsByEmployeeId", () -> involvementDao.findAllApplicationsByEmployeeId(employeeId));
-    }
-
-
-    public List<EndUserApplication> findAllEndUserApplicationsBySelector(EntityIdSelectionOptions options) {
-        checkNotNull(options, "options cannot be null");
-        return time("IS.findAllEndUserApplicationsBySelector",
-                () -> involvementDao.findAllEndUserApplicationsByEmployeeId(endUserAppIdSelectorFactory.apply(options)));
     }
 
 

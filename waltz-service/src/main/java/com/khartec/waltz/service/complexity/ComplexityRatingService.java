@@ -22,7 +22,7 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.complexity.ComplexityScoreDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.complexity.ComplexityScore;
@@ -92,7 +92,7 @@ public class ComplexityRatingService {
      * @param options
      * @return
      */
-    public List<ComplexityRating> findForAppIdSelector(IdSelectionOptions options) {
+    public List<ComplexityRating> findForAppIdSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
         return complexityScoreDao.findForAppIdSelector(appIdSelector);
     }

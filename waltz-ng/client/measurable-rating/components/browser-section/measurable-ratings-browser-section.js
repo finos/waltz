@@ -30,6 +30,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<"
 };
 
@@ -51,12 +52,6 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
             .then(r => vm.visibility.gridAvailable = r.data.length > 0);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.RoadmapStore.findRoadmapsAndScenariosByFormalRelationship,
-                [ vm.parentEntityRef ])
-            .then(r => vm.roadmapReferences = r.data);
     };
 
     vm.showGridView = () => {

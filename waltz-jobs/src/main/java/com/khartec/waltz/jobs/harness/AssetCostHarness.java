@@ -23,6 +23,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
@@ -49,13 +50,12 @@ public class AssetCostHarness {
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        IdSelectionOptions appIdSelectionOptions = ImmutableIdSelectionOptions.builder()
-                .scope(HierarchyQueryScope.CHILDREN)
-                .entityReference(ImmutableEntityReference.builder()
+        ApplicationIdSelectionOptions appIdSelectionOptions = ApplicationIdSelectionOptions.mkOpts(
+                ImmutableEntityReference.builder()
                         .id(5600)
                         .kind(EntityKind.ORG_UNIT)
-                        .build())
-                .build();
+                        .build(),
+                HierarchyQueryScope.CHILDREN);
 
 
         List<Tuple2<Long, BigDecimal>> costs = service.calculateCombinedAmountsForSelector(appIdSelectionOptions);

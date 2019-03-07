@@ -17,30 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../../../common/index";
-import template from './auth-sources-summary-panel.html';
+import template from "./auth-sources-summary-panel.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
     rowInfo: _.map(
-        ['PRIMARY', 'SECONDARY', 'DISCOURAGED', 'NO_OPINION'],
+        ["PRIMARY", "SECONDARY", "DISCOURAGED", "NO_OPINION"],
         r => ({
             rating: r,
             style: {
-                'border-radius': '2px',
-                'border-color': authoritativeRatingColorScale(r).toString(),
-                'background-color': authoritativeRatingColorScale(r).brighter(2).toString()
+                "border-radius": "2px",
+                "border-color": authoritativeRatingColorScale(r).toString(),
+                "background-color": authoritativeRatingColorScale(r).brighter(2).toString()
             }
         })),
     visibility: {
@@ -53,7 +54,7 @@ const h = 130;
 const w = 60;
 
 const inboundOptions = {
-    selector: '#wassp-inbound',
+    selector: "#wassp-inbound",
     transform: `translate(${w}, ${h / 2})`,
     startAngle: Math.PI,
     endAngle: 2 * Math.PI
@@ -61,7 +62,7 @@ const inboundOptions = {
 
 
 const outboundOptions = {
-    selector: '#wassp-outbound',
+    selector: "#wassp-outbound",
     transform: `translate(0, ${h / 2})`,
     startAngle: Math.PI,
     endAngle: 0
@@ -88,15 +89,17 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const drawPie = (rawStats, options) => {
-
+        // remove any previous elements
+        select(options.selector).selectAll("*").remove();
+        // select(options.selector).remove();
 
         const svg = select(options.selector)
-            .append('svg')
-            .attr('width', w)
-            .attr('height', h);
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
 
-        const g = svg.append('g')
-            .attr('transform', options.transform);
+        const g = svg.append("g")
+            .attr("transform", options.transform);
 
         const isEmpty = _.sum(_.values(rawStats)) == 0;
 
@@ -117,14 +120,14 @@ function controller($q, serviceBroker) {
                 .padAngle(0.07)
                 .cornerRadius(0);
 
-            g.selectAll('.arc')
+            g.selectAll(".arc")
                 .data(pieData)
                 .enter()
-                .append('path')
-                .classed('arc', true)
-                .attr('fill', d => authoritativeRatingColorScale(d.data.key).brighter())
-                .attr('stroke', d => authoritativeRatingColorScale(d.data.key))
-                .attr('d', d => pieArc(d));
+                .append("path")
+                .classed("arc", true)
+                .attr("fill", d => authoritativeRatingColorScale(d.data.key).brighter())
+                .attr("stroke", d => authoritativeRatingColorScale(d.data.key))
+                .attr("d", d => pieArc(d));
         }
     };
 
@@ -138,12 +141,16 @@ function controller($q, serviceBroker) {
     };
 
     const loadSummaryStats = () => {
-        if(! vm.entityReference) return;
+        if(! vm.parentEntityRef) return;
 
         const inboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [ mkSelectionOptions(vm.entityReference)])
+                [ mkApplicationSelectionOptions(
+                    vm.parentEntityRef,
+                    undefined,
+                    undefined,
+                    vm.filters) ])
             .then(r => {
                 vm.inboundStats = toStats(r.data);
                 drawPie(vm.inboundStats, inboundOptions);
@@ -152,7 +159,11 @@ function controller($q, serviceBroker) {
         const outboundPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
-                [ mkSelectionOptions(vm.entityReference)])
+                [ mkApplicationSelectionOptions(
+                    vm.parentEntityRef,
+                    undefined,
+                    undefined,
+                    vm.filters) ])
             .then(r => {
                 vm.outboundStats = toStats(r.data);
                 drawPie(vm.outboundStats, outboundOptions);
@@ -164,12 +175,18 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => {
         loadSummaryStats();
     };
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadSummaryStats();
+        }
+    };
 }
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -180,4 +197,4 @@ export const component = {
 };
 
 
-export const id = 'waltzAuthSourcesSummaryPanel';
+export const id = "waltzAuthSourcesSummaryPanel";

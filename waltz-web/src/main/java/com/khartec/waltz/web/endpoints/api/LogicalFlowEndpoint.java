@@ -89,7 +89,7 @@ public class LogicalFlowEndpoint implements Endpoint {
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
 
         ListRoute<LogicalFlow> findBySelectorRoute = (request, response)
-                -> logicalFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
+                -> logicalFlowService.findBySelector(readAppIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlow> findUpstreamFlowsForEntityReferencesRoute = (request, response) -> {
             EntityReference[] refs = readBody(request, EntityReference[].class);
@@ -97,7 +97,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         };
 
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
-                -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
+                -> logicalFlowService.calculateStats(readAppIdSelectionOptionsFromBody(request));
 
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));

@@ -42,3 +42,15 @@ export function isIE() {
     const match = navigator.userAgent.search(/(?:Edge|MSIE|Trident\/.*; rv:)/);
     return match !== -1;
 }
+
+
+export function isDescendant(parentElement, childElement) {
+    let node = childElement.parentNode;
+    while (node != null) {
+        if (node == parentElement) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}

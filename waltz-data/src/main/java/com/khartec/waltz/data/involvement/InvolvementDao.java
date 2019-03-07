@@ -170,7 +170,7 @@ public class InvolvementDao {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.in(endUserAppIdSelector))
-                .fetch(EndUserAppDao.END_USER_APP_MAPPER);
+                .fetch(EndUserAppDao.TO_DOMAIN_MAPPER);
     }
 
 

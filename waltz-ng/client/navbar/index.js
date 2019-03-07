@@ -19,8 +19,11 @@
 
 import angular from 'angular';
 import {registerComponents} from "../common/module-utils";
-import NavbarSearch from './components/navbar-search';
-import NavSearchOverlay from './components/nav-search-overlay';
+import NavbarFilters from "./components/navbar-filters/navbar-filters"
+import NavbarSearch from './components/navbar-search/navbar-search';
+import NavFiltersOverlay from "./components/nav-filters-overlay/nav-filters-overlay";
+import NavSearchOverlay from './components/nav-search-overlay/nav-search-overlay';
+
 import Navbar from './directives/navbar';
 import NavbarRecentlyViews from './directives/navbar-recently-viewed';
 import NavbarProfile from './directives/navbar-profile';
@@ -36,7 +39,9 @@ export default () => {
         .directive('waltzNavbarProfile', NavbarProfile);
 
     registerComponents(module, [
+        NavbarFilters,
         NavbarSearch,
+        NavFiltersOverlay,
         NavSearchOverlay
     ]);
 

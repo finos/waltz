@@ -17,30 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../../../common';
-import {mkSelectionOptions} from '../../../common/selector-utils';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import template from './apps-section.html';
+import _ from "lodash";
+import { initialiseData } from "../../../common";
+import { mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+
+import template from "./apps-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<",
+    filters: "<"
 };
 
 
 const initialState = {
     apps: [],
     endUserApps: [],
+    // filters: {}
 };
 
 
-
-
 const DEFAULT_APP_SETTINGS = {
-    management: 'End User',
-    kind: 'EUC',
-    overallRating: 'Z'
+    management: "End User",
+    kind: "EUC",
+    overallRating: "Z"
 };
 
 
@@ -49,25 +52,30 @@ function combine(apps = [], endUserApps = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller($scope,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
         vm.combinedApps = combine(vm.apps, vm.endUserApps);
     };
 
-    vm.$onInit = () => {
-        const selectorOptions = mkSelectionOptions(vm.parentEntityRef);
+    const loadAll = () => {
+        const selectorOptions = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            hierarchyQueryScope.EXACT.key,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
 
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
             .then(r => r.data)
             .then(apps => vm.apps = _.map(
                 apps,
-                a => _.assign(a, { management: 'IT' })))
+                a => _.assign(a, { management: "IT" })))
             .then(refresh);
 
-        if (vm.parentEntityRef.kind === 'ORG_UNIT') {
+        if (vm.parentEntityRef.kind === "ORG_UNIT") {
             serviceBroker
                 .loadViewData(CORE_API.EndUserAppStore.findBySelector, [selectorOptions])
                 .then(r => r.data)
@@ -78,18 +86,28 @@ function controller(serviceBroker) {
         }
     };
 
-    vm.$onChanges = () => {
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+    vm.$onChanges = (changes) => {
         vm.combinedApps = combine(vm.apps, vm.endUserApps);
+
+        if(changes.filters) {
+            loadAll();
+        }
     };
 
     vm.onInitialise = (cfg) => {
-        vm.export = () => cfg.exportFn(`apps.csv`);
+        vm.export = () => cfg.exportFn("apps.csv");
     };
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "$scope",
+    "ServiceBroker"
 ];
 
 

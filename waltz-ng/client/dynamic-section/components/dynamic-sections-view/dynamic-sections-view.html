@@ -1,9 +1,11 @@
 <div class="waltz-dynamic-sections-view">
+
     <div ng-repeat="section in $ctrl.sections track by section.id"
          class='waltz-animate-repeat'>
         <waltz-dynamic-section-wrapper section="section"
                                        on-remove="$ctrl.onRemove"
-                                       parent-entity-ref="$ctrl.parentEntityRef">
+                                       parent-entity-ref="$ctrl.parentEntityRef"
+                                       filters="$ctrl.filters">
         </waltz-dynamic-section-wrapper>
     </div>
 

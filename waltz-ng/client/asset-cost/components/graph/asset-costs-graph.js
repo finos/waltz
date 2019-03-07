@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData, isEmpty} from "../../common";
-import {responsivefy} from "../../common/d3-utils";
 import _ from "lodash";
+import "d3-selection-multi";
+import {initialiseData, isEmpty} from "../../../common";
+import {responsivefy} from "../../../common/d3-utils";
 import {scaleLinear, scaleBand} from "d3-scale";
 import {select} from "d3-selection";
 import {extent} from "d3-array";
 import {axisLeft, axisBottom} from "d3-axis";
 import {format} from "d3-format";
-import "d3-selection-multi";
-import namedSettings from "../../system/named-settings";
-import {currenciesByCode} from "../../common/currency-utils";
+import namedSettings from "../../../system/named-settings";
+import {currenciesByCode} from "../../../common/currency-utils";
 
 
-const template = `<div class='waltz-asset-costs-graph'></div>`;
+const template = "<div class='waltz-asset-costs-graph'></div>";
 
 const bindings = {
-    costs: '<',
-    onHover: '<',
-    onSelect: '<'
+    costs: "<",
+    onHover: "<",
+    onSelect: "<"
 };
 
 
@@ -74,7 +74,7 @@ function processCosts(costs = []) {
             return acc;
         }, {})
         .values()
-        .orderBy('total', 'desc')
+        .orderBy("total", "desc")
         .value();
 }
 
@@ -84,8 +84,8 @@ function drawXAxis(xScale, container, currencyFormat) {
         .tickFormat(currencyFormat)
         .ticks(5);
 
-    container.append('g')
-        .attr('transform', `translate(0, ${dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)})`)
+    container.append("g")
+        .attr("transform", `translate(0, ${dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)})`)
         .call(xAxis);
 }
 
@@ -93,8 +93,8 @@ function drawXAxis(xScale, container, currencyFormat) {
 function drawYAxis(yScale, container) {
     const yAxis = axisLeft(yScale);
 
-    container.append('g')
-        .attr('transform', `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
+    container.append("g")
+        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
         .call(yAxis);
 }
 
@@ -103,6 +103,9 @@ function draw(svg, costs = [],
               onHover = _.identity,
               onSelect = _.identity,
               currencyFormat) {
+    // remove any previous elements
+    svg.selectAll("*").remove();
+
     const totalExtent = extent(costs, c => c.total);
 
     const xScale = scaleLinear()
@@ -119,28 +122,28 @@ function draw(svg, costs = [],
         .range([startColor, endColor]);
 
     const g = svg
-        .append('g')
-        .attr('transform', `translate(${dimensions.margin.left},${dimensions.margin.top})`);
+        .append("g")
+        .attr("transform", `translate(${dimensions.margin.left},${dimensions.margin.top})`);
 
     const bars = g
-        .selectAll('.wacg-bar')
+        .selectAll(".wacg-bar")
         .data(costs, d => d.entityRef.id)
         .enter()
-        .append('g')
-        .classed('wacg-bar', true)
+        .append("g")
+        .classed("wacg-bar", true)
         .attr("transform", (d, i) => `translate(0, ${yScale(d.entityRef.name)})`)
         .on("mouseenter.hover", d => onHover(d))
         .on("mouseleave.hover", d => onHover(null))
         .on("click.select", d => onSelect(d));
 
-    bars.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', d => xScale(d.total))
-        .attr('height', yScale.bandwidth())
-        .attr('fill', (d, i) => colorScale(d.total));
+    bars.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", d => xScale(d.total))
+        .attr("height", yScale.bandwidth())
+        .attr("fill", (d, i) => colorScale(d.total));
 
-    bars.append('text')
+    bars.append("text")
         .attr("x", 10)
         .attr("y", yScale.bandwidth() / 2 + 3)  // middle of the bar
         .text(d => currencyFormat(d.total));
@@ -153,10 +156,10 @@ function draw(svg, costs = [],
 function controller($element, $scope, settingsService) {
     const vm = initialiseData(this, initialState);
 
-    const holder = $element.find('div')[0];
+    const holder = $element.find("div")[0];
     const svg = select(holder)
-        .append('svg')
-        .attr('id', 'waltz-asset-costs-graph');
+        .append("svg")
+        .attr("id", "waltz-asset-costs-graph");
 
     let unregisterResponsivefy = () => {};
     let currencyFormat = null;
@@ -171,9 +174,9 @@ function controller($element, $scope, settingsService) {
 
         dimensions.graph.height = 100 + (aggCosts.length * 20);
 
-        svg.attr('width', dimensions.graph.width)
-            .attr('height', dimensions.graph.height)
-            .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        svg.attr("width", dimensions.graph.width)
+            .attr("height", dimensions.graph.height)
+            .attr("viewbox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
         draw(
             svg,
@@ -183,7 +186,7 @@ function controller($element, $scope, settingsService) {
             currencyFormat);
 
         unregisterResponsivefy();
-        $scope.$applyAsync(() => unregisterResponsivefy = responsivefy(svg, 'width-only'));
+        $scope.$applyAsync(() => unregisterResponsivefy = responsivefy(svg, "width-only"));
     };
 
 
@@ -191,7 +194,7 @@ function controller($element, $scope, settingsService) {
 
     vm.$onInit = () => {
         settingsService
-            .findOrDefault(namedSettings.defaultCurrency, 'EUR')
+            .findOrDefault(namedSettings.defaultCurrency, "EUR")
             .then(code => {
                 const currency = currenciesByCode[code]
                 currencyFormat = d => `${currency.symbol}${format(",d")(d)}`;
@@ -205,9 +208,9 @@ function controller($element, $scope, settingsService) {
 
 
 controller.$inject = [
-    '$element',
-    '$scope',
-    'SettingsService'
+    "$element",
+    "$scope",
+    "SettingsService"
 ];
 
 
@@ -220,5 +223,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAssetCostsGraph'
+    id: "waltzAssetCostsGraph"
 };

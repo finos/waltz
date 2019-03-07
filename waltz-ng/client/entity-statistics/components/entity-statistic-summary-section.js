@@ -19,12 +19,14 @@
 
 import {entityLifecycleStatuses, resetData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../common/selector-utils";
-import template from './entity-statistic-summary-section.html';
+import {mkApplicationSelectionOptions} from "../../common/selector-utils";
+
+import template from "./entity-statistic-summary-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -40,6 +42,26 @@ const initData = {
 function controller(serviceBroker) {
     const vm = resetData(this, initData);
 
+    const loadStatTallies = (definition) => {
+        vm.loading = true;
+        const selectionOptions = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            [
+                entityLifecycleStatuses.ACTIVE,
+                entityLifecycleStatuses.PENDING,
+                entityLifecycleStatuses.REMOVED
+            ],
+            vm.filters);
+        serviceBroker
+            .loadViewData(CORE_API.EntityStatisticStore.findStatTallies, [[definition.id], selectionOptions])
+            .then(result => {
+                vm.loading = false;
+                vm.summaries[definition.id] = result.data[0];
+                vm.activeSummary = result.data[0];
+            });
+    };
+
     serviceBroker
         .loadAppData(CORE_API.EntityStatisticStore.findAllActiveDefinitions, [])
         .then(result => vm.definitions = result.data);
@@ -50,29 +72,21 @@ function controller(serviceBroker) {
             vm.loading = false;
             vm.activeSummary = vm.summaries[d.id];
         } else {
-            vm.loading = true;
-            const selectionOptions = mkSelectionOptions(
-                vm.parentEntityRef,
-                null,
-                [
-                    entityLifecycleStatuses.ACTIVE,
-                    entityLifecycleStatuses.PENDING,
-                    entityLifecycleStatuses.REMOVED
-                ]);
-            serviceBroker
-                .loadViewData(CORE_API.EntityStatisticStore.findStatTallies, [[d.id], selectionOptions])
-                .then(result => {
-                    vm.loading = false;
-                    vm.summaries[d.id] = result.data[0];
-                    vm.activeSummary = result.data[0];
-                });
+            loadStatTallies(d)
+        }
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(vm.activeDefinition && changes.filters) {
+            loadStatTallies(vm.activeDefinition);
         }
     };
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -82,6 +96,6 @@ export default {
         bindings,
         controller
     },
-    id: 'waltzEntityStatisticSummarySection'
+    id: "waltzEntityStatisticSummarySection"
 };
 

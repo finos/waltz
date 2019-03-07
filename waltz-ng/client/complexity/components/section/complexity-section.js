@@ -19,18 +19,22 @@
 import _ from "lodash";
 import {initialiseData, isEmpty} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
+
 import template from "./complexity-section.html";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+
 
 const bindings = {
-    parentEntityRef: '<',
-    csvName: '@?'
+    filters: "<",
+    parentEntityRef: "<",
+    csvName: "@?"
 };
 
 
 const initialState = {
-    csvName: 'complexity.csv',
+    csvName: "complexity.csv",
     gridData: [],
     gridDataCount: 0,
     summarySelection: null,
@@ -44,7 +48,7 @@ const initialState = {
 
 
 function mkGridData(complexity = [], apps = []) {
-    const appsByIds = _.keyBy(apps, 'id');
+    const appsByIds = _.keyBy(apps, "id");
 
     return _.chain(complexity)
         .map(c => Object.assign(c, { app: appsByIds[c.id] }))
@@ -57,24 +61,42 @@ function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-    };
+    const loadAll = () => {
+        if (!vm.parentEntityRef) {
+            return;
+        }
 
-    vm.$onChanges = () => {
-        if (! vm.parentEntityRef) return;
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
 
         serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
-                [ selector ])
+                [selector])
             .then(r => vm.apps = r.data);
 
         serviceBroker
             .loadViewData(
                 CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
+                [selector])
             .then(r => vm.complexity = r.data);
+    };
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+
+            if(vm.visibility.detail === true) {
+                vm.gridData = mkGridData(vm.complexity, vm.apps);
+            }
+        }
     };
 
     vm.onSummarySelect = (d) => vm.summarySelection = d;
@@ -90,13 +112,13 @@ function controller(serviceBroker) {
 
         vm.columnDefs = [
             Object.assign(
-                mkLinkGridCell('Application', 'app.name', 'app.id', 'main.app.view'),
-                { sort: { direction: 'asc' }, width: '30%' }
+                mkLinkGridCell("Application", "app.name", "app.id", "main.app.view"),
+                { sort: { direction: "asc" }, width: "30%" }
             ),
-            { field: 'connectionComplexity.score', displayName: 'Connection Score', cellFilter: "toFixed:'2'" },
-            { field: 'measurableComplexity.score', displayName: 'Viewpoints Score', cellFilter: "toFixed:'2'" },
-            { field: 'serverComplexity.score', displayName: 'Server Score', cellFilter: "toFixed:'2'" },
-            { field: 'overallScore', displayName: 'Overall Score', cellFilter: "toFixed:'2'" }
+            { field: "connectionComplexity.score", displayName: "Connection Score", cellFilter: "toFixed:'2'" },
+            { field: "measurableComplexity.score", displayName: "Viewpoints Score", cellFilter: "toFixed:'2'" },
+            { field: "serverComplexity.score", displayName: "Server Score", cellFilter: "toFixed:'2'" },
+            { field: "overallScore", displayName: "Overall Score", cellFilter: "toFixed:'2'" }
         ];
 
         vm.onGridInitialise = (e) => {
@@ -115,7 +137,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -125,5 +147,5 @@ export const component = {
     controller
 };
 
-export const id = 'waltzComplexitySection';
+export const id = "waltzComplexitySection";
 

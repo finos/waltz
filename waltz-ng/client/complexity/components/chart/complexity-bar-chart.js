@@ -100,6 +100,8 @@ function draw(svg,
               complexityChartData = [],
               onHover = _.identity,
               onSelect = _.identity) {
+    // remove any previous elements
+    svg.selectAll("*").remove();
 
     const overallScoreExtent = extent(complexityChartData, c => c.overallScore);
 

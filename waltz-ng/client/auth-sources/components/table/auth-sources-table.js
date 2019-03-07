@@ -106,13 +106,19 @@ function mkColumnDefs(parentRef) {
 }
 
 
-function controller(serviceBroker, enumValueService) {
+function controller($q, serviceBroker, enumValueService) {
 
     const vm = initialiseData(this, initialState);
 
-    const refresh = () => {
+    const mkGridData = () => {
         const dataTypesByCode= _.keyBy(vm.dataTypes, "code");
         const orgUnitsById = _.keyBy(vm.orgUnits, "id");
+
+        if (!vm.columnDefs) {
+            vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
+            vm.gridData = [];
+        }
+
 
         vm.gridData = _.map(vm.authSources, d => {
             const authoritativenessRatingEnum = vm.enums.AuthoritativenessRating[d.rating];
@@ -129,23 +135,22 @@ function controller(serviceBroker, enumValueService) {
         });
     };
 
-    vm.$onInit = () => {
-        enumValueService
+
+    const loadAll = () => {
+        const enumPromise = enumValueService
             .loadEnums()
             .then(r => vm.enums = r);
 
-        serviceBroker
+        const dataTypePromise = serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.dataTypes = r.data)
-            .then(refresh);
+            .then(r => vm.dataTypes = r.data);
 
-        serviceBroker
+        const orgUnitPromise = serviceBroker
             .loadAppData(CORE_API.OrgUnitStore.findAll)
-            .then(r => vm.orgUnits = r.data)
-            .then(refresh);
+            .then(r => vm.orgUnits = r.data);
 
-        vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
-        vm.gridData = [];
+        const baseDataPromise = $q.all([enumPromise, dataTypePromise, orgUnitPromise]);
+        let promise = baseDataPromise;
 
         if (shouldShowConsumers(vm.parentEntityRef)) {
             const selector = {
@@ -153,28 +158,39 @@ function controller(serviceBroker, enumValueService) {
                 scope: "CHILDREN"
             };
 
-            serviceBroker
-                .loadViewData(
-                    CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
-                    [ selector ])
-                .then(r => {
-                    vm.consumersByAuthSourceId = _
-                        .chain(r.data)
-                        .keyBy(d => d.key.id)
-                        .mapValues(v => _.sortBy(v.value, "name"))
-                        .value();
-                    refresh();
-                });
+            promise = baseDataPromise.then(() => {
+                serviceBroker
+                    .loadViewData(
+                        CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
+                        [ selector ])
+                    .then(r => {
+                        vm.consumersByAuthSourceId = _
+                            .chain(r.data)
+                            .keyBy(d => d.key.id)
+                            .mapValues(v => _.sortBy(v.value, "name"))
+                            .value();
+                    });
+            });
         }
+
+        return promise.then(() => mkGridData());
     };
 
-    vm.$onChanges = () => {
-        refresh();
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+    vm.$onChanges = (changes) => {
+        if(changes.authSources) {
+            loadAll();
+        }
     };
 }
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker",
     "EnumValueService"
 ];

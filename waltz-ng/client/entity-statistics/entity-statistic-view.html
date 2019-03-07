@@ -1,4 +1,8 @@
 <div>
+    <!-- Non visual control to watch for filter changes -->
+    <waltz-filter-change-watcher on-filters-changed="ctrl.filtersChanged">
+    </waltz-filter-change-watcher>
+
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
                        small="Indicator"
                        icon="pie-chart">

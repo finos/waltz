@@ -24,7 +24,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -94,7 +94,7 @@ public class ChangeReporter {
 
 
     private static Select<Record1<Long>> mkSelector(ApplicationIdSelectorFactory selectorFactory, EntityReference appGroupRef) {
-        IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(appGroupRef, HierarchyQueryScope.EXACT);
+        ApplicationIdSelectionOptions idSelectionOptions = ApplicationIdSelectionOptions.mkOpts(appGroupRef, HierarchyQueryScope.EXACT);
         return selectorFactory.apply(idSelectionOptions);
     }
 

@@ -43,7 +43,7 @@ public class EndUserAppDao {
 
     private final DSLContext dsl;
 
-    public static final RecordMapper<Record, EndUserApplication> END_USER_APP_MAPPER = r -> {
+    public static final RecordMapper<Record, EndUserApplication> TO_DOMAIN_MAPPER = r -> {
         EndUserApplicationRecord record = r.into(END_USER_APPLICATION);
         return ImmutableEndUserApplication.builder()
                 .name(record.getName())
@@ -64,15 +64,6 @@ public class EndUserAppDao {
     }
 
 
-    @Deprecated
-    public List<EndUserApplication> findByOrganisationalUnitIds(List<Long> orgUnitIds) {
-        return dsl.select(END_USER_APPLICATION.fields())
-                .from(END_USER_APPLICATION)
-                .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitIds))
-                .fetch(END_USER_APP_MAPPER);
-
-    }
-
     public List<Tally<Long>> countByOrganisationalUnit() {
         return JooqUtilities.calculateLongTallies(
                 dsl,
@@ -80,11 +71,18 @@ public class EndUserAppDao {
                 END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
     }
 
-
+    @Deprecated
     public List<EndUserApplication> findByOrganisationalUnitSelector(Select<Record1<Long>> selector) {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(selector))
-                .fetch(END_USER_APP_MAPPER);
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<EndUserApplication> findBySelector(Select<Record1<Long>> selector) {
+        return dsl.selectFrom(END_USER_APPLICATION)
+                .where(END_USER_APPLICATION.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

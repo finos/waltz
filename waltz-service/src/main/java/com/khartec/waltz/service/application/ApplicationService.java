@@ -26,12 +26,8 @@ import com.khartec.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.data.entity_tag.EntityTagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.AppRegistrationRequest;
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
+import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
@@ -112,7 +108,7 @@ public class ApplicationService {
     }
 
 
-    public List<Application> findByAppIdSelector(IdSelectionOptions options) {
+    public List<Application> findByAppIdSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(options);
         return applicationDao.findByAppIdSelector(selector);
     }

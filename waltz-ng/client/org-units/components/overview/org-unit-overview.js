@@ -24,9 +24,13 @@ import {getParents, populateParents, switchToParentIds} from "../../../common/hi
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./org-unit-overview.html";
 import {initialiseData} from "../../../common/index";
+import { mkApplicationSelectionOptions } from '../../../common/selector-utils';
+import { hierarchyQueryScope } from '../../../common/services/enums/hierarchy-query-scope';
+import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
 
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<",
 };
 
@@ -41,11 +45,12 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        const selector = {
-            entityReference: vm.parentEntityRef,
-            scope: "CHILDREN"
-        };
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            hierarchyQueryScope.CHILDREN.key,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -86,6 +91,17 @@ function controller(serviceBroker) {
                 vm.childOrgUnits = _.get(vm, "orgUnit.children", []);
                 vm.descendantOrgUnitTree = switchToParentIds([ vm.orgUnit ]);
             });
+    };
+
+    vm.$onInit = () => {
+
+    };
+
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
+        }
     };
 }
 

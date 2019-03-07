@@ -20,8 +20,9 @@
 package com.khartec.waltz.service.attestation;
 
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.data.IdSelectorFactoryProvider;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
@@ -49,7 +50,7 @@ public class AttestationRunService {
     private final AttestationInstanceRecipientDao attestationInstanceRecipientDao;
     private final AttestationRunDao attestationRunDao;
     private final EmailService emailService;
-    private final IdSelectorFactoryProvider idSelectorFactoryProvider;
+    private final GenericSelectorFactory genericSelectorFactory;
     private final InvolvementDao involvementDao;
 
     @Autowired
@@ -57,20 +58,20 @@ public class AttestationRunService {
                                  AttestationInstanceRecipientDao attestationInstanceRecipientDao,
                                  AttestationRunDao attestationRunDao,
                                  EmailService emailService,
-                                 IdSelectorFactoryProvider idSelectorFactoryProvider,
+                                 GenericSelectorFactory genericSelectorFactory,
                                  InvolvementDao involvementDao) {
         checkNotNull(attestationInstanceRecipientDao, "attestationInstanceRecipientDao cannot be null");
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunDao, "attestationRunDao cannot be null");
         checkNotNull(emailService, "emailService cannot be null");
-        checkNotNull(idSelectorFactoryProvider, "idSelectorFactoryProvider cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationInstanceRecipientDao = attestationInstanceRecipientDao;
         this.attestationRunDao = attestationRunDao;
         this.emailService = emailService;
-        this.idSelectorFactoryProvider = idSelectorFactoryProvider;
+        this.genericSelectorFactory = genericSelectorFactory;
         this.involvementDao = involvementDao;
     }
 
@@ -183,8 +184,8 @@ public class AttestationRunService {
 
 
     private Select<Record1<Long>> mkIdSelector(EntityKind targetEntityKind, IdSelectionOptions selectionOptions) {
-        IdSelectorFactory idSelectorFactory = idSelectorFactoryProvider.getForKind(targetEntityKind);
-        return idSelectorFactory.apply(selectionOptions);
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetEntityKind, selectionOptions);
+        return genericSelector.selector();
     }
 
 

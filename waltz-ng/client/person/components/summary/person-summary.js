@@ -18,19 +18,22 @@
  */
 
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import template from './person-summary.html';
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+
+import template from "./person-summary.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
-    scope: 'CHILDREN',
     organisationalUnit: null
 };
 
@@ -38,8 +41,12 @@ const initialState = {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        const selector = mkSelectionOptions(vm.parentEntityRef);
+    const loadAll = () => {
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            hierarchyQueryScope.CHILDREN.key,
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -55,7 +62,7 @@ function controller(serviceBroker) {
             .then(r => vm.organisationalUnit = Object.assign(
                 {},
                 r.data,
-                { kind: 'ORG_UNIT' }));
+                { kind: "ORG_UNIT" }));
 
         serviceBroker
             .loadViewData(
@@ -63,33 +70,36 @@ function controller(serviceBroker) {
                 [ selector ])
             .then(r => vm.applications = r.data);
 
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ComplexityStore.findBySelector,
+                [ selector ])
+            .then(r => {
+                vm.complexitySummary = calcComplexitySummary(r.data);
+            });
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.AssetCostStore.findTotalCostForAppSelector,
+                [ selector ])
+            .then(r => vm.totalCost = r.data);
     };
 
-    vm.$onChanges = () => {
 
-        if (vm.parentEntityRef) {
-            const selector = mkSelectionOptions(vm.parentEntityRef);
+    vm.$onInit = () => {
+        loadAll();
+    };
 
-            serviceBroker
-                .loadViewData(
-                    CORE_API.ComplexityStore.findBySelector,
-                    [ selector ])
-                .then(r => {
-                    vm.complexitySummary = calcComplexitySummary(r.data);
-                });
-
-            serviceBroker
-                .loadViewData(
-                    CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                    [ selector ])
-                .then(r => vm.totalCost = r.data);
-
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadAll();
         }
     };
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 
 const component = {
@@ -101,5 +111,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPersonSummary'
+    id: "waltzPersonSummary"
 };

@@ -24,6 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
+    filters: {},
     availableSections: [],
     parentEntityRef: {},
     sections: []
@@ -61,6 +62,10 @@ function controller($stateParams,
 
     };
 
+
+    vm.filtersChanged = (filters) => {
+        vm.filters = filters;
+    };
 
     // -- DYNAMIC SECTIONS
 

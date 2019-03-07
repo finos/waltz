@@ -26,6 +26,7 @@ import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
@@ -265,8 +266,8 @@ public class WebUtilities {
     }
 
 
-    public static EntityIdSelectionOptions readEntityIdOptionsFromBody(Request request) throws java.io.IOException {
-        return readBody(request, EntityIdSelectionOptions.class);
+    public static ApplicationIdSelectionOptions readAppIdSelectionOptionsFromBody(Request request) throws java.io.IOException {
+        return readBody(request, ApplicationIdSelectionOptions.class);
     }
 
 

@@ -27,6 +27,7 @@ import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.tally.Tally;
@@ -71,8 +72,10 @@ public class DataTypeUsageService {
     }
 
 
-    public List<DataTypeUsage> findForAppIdSelector(EntityKind kind, IdSelectionOptions options) {
-        return dataTypeUsageDao.findForIdSelector(kind, appIdSelectorFactor.apply(options));
+    public List<DataTypeUsage> findForAppIdSelector(EntityKind kind, ApplicationIdSelectionOptions options) {
+        return dataTypeUsageDao.findForIdSelector(
+                kind,
+                appIdSelectorFactor.apply(options));
     }
 
 
@@ -92,9 +95,10 @@ public class DataTypeUsageService {
     }
 
 
-    public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions dataTypeIdSelectionOptions) {
-        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
-        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector);
+    public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions idSelectionOptions) {
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
+        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(idSelectionOptions);
+        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector, appOptions);
     }
 
 
@@ -104,16 +108,16 @@ public class DataTypeUsageService {
      *
      * (UsageKind, SelectionOptions) ->  { DataType.id -> [ EntityRef... ] }
      * @param usageKind
-     * @param dataTypeIdSelectionOptions
+     * @param options
      * @return
      */
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind usageKind,
-                                                                                       IdSelectionOptions dataTypeIdSelectionOptions) {
+                                                                                       ApplicationIdSelectionOptions options) {
         checkNotNull(usageKind, "usageKind cannot be null");
-        checkNotNull(dataTypeIdSelectionOptions, "dataTypeIdSelectionOptions cannot be null");
+        checkNotNull(options, "options cannot be null");
 
-        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(dataTypeIdSelectionOptions);
-        return dataTypeUsageDao.findForUsageKindByDataTypeIdSelector(usageKind, dataTypeIdSelector);
+        Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(options);
+        return dataTypeUsageDao.findForUsageKindByDataTypeIdSelector(usageKind, dataTypeIdSelector, options);
     }
 
 

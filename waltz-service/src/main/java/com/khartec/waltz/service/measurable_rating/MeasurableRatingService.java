@@ -27,6 +27,7 @@ import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
@@ -95,14 +96,14 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
+    public List<MeasurableRating> findByMeasurableIdSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
-        return measurableRatingDao.findByMeasurableIdSelector(selector, options.entityLifecycleStatuses());
+        return measurableRatingDao.findByMeasurableIdSelector(selector, options.entityLifecycleStatuses(), options.applicationKinds());
     }
 
 
-    public Collection<MeasurableRating> findByAppIdSelector(IdSelectionOptions options) {
+    public Collection<MeasurableRating> findByAppIdSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.findByApplicationIdSelector(selector);
@@ -188,7 +189,7 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRatingTally> statsByAppSelector(IdSelectionOptions options) {
+    public List<MeasurableRatingTally> statsByAppSelector(ApplicationIdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.statsByAppSelector(selector);

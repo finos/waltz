@@ -23,7 +23,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.data.server_information.search.ServerInformationSearchDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
@@ -83,7 +83,7 @@ public class ServerInformationService {
     }
 
 
-    public ServerSummaryStatistics calculateStatsForAppSelector(IdSelectionOptions options) {
+    public ServerSummaryStatistics calculateStatsForAppSelector(ApplicationIdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return serverInformationDao.calculateStatsForAppSelector(selector);
     }

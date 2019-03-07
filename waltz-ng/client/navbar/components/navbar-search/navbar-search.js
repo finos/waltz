@@ -17,18 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+import {initialiseData} from "../../../common";
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+import template from "./navbar-search.html";
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableEntityIdSelectionOptions.class)
-@JsonDeserialize(as = ImmutableEntityIdSelectionOptions.class)
-@Deprecated
-public abstract class EntityIdSelectionOptions {
-    public abstract EntityKind desiredKind();
-    public abstract EntityReference entityReference();
-    public abstract HierarchyQueryScope scope();
+const bindings = {
+};
+
+
+const initialState = {
+    query: "",
+    visibility: {
+        overlay: false
+    }
+};
+
+
+function controller($timeout) {
+
+    const vm = initialiseData(this, initialState);
+
+    const dismissResults = (e) => $timeout(
+        () => vm.visibility.overlay = false,
+        200);
+
+    vm.dismissResults = dismissResults;
+
+    vm.showSearch = () => vm.visibility.overlay = true;
 }
+
+
+controller.$inject = [
+    "$timeout"
+];
+
+
+const component = {
+    bindings,
+    controller,
+    template
+};
+
+
+export default {
+    component,
+    id: "waltzNavbarSearch"
+};

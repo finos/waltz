@@ -20,8 +20,9 @@
 package com.khartec.waltz.service.survey;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.data.IdSelectorFactoryProvider;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
@@ -54,7 +55,7 @@ import static java.util.stream.Collectors.toList;
 public class SurveyRunService {
 
     private final ChangeLogService changeLogService;
-    private final IdSelectorFactoryProvider idSelectorFactoryProvider;
+    private final GenericSelectorFactory genericSelectorFactory;
     private final InvolvementDao involvementDao;
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
@@ -67,7 +68,7 @@ public class SurveyRunService {
 
     @Autowired
     public SurveyRunService(ChangeLogService changeLogService,
-                            IdSelectorFactoryProvider idSelectorFactoryProvider,
+                            GenericSelectorFactory genericSelectorFactory,
                             InvolvementDao involvementDao,
                             PersonDao personDao,
                             SurveyInstanceDao surveyInstanceDao,
@@ -76,7 +77,7 @@ public class SurveyRunService {
                             SurveyTemplateDao surveyTemplateDao,
                             SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(idSelectorFactoryProvider, "idSelectorFactoryProvider cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
@@ -86,7 +87,7 @@ public class SurveyRunService {
         checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
-        this.idSelectorFactoryProvider = idSelectorFactoryProvider;
+        this.genericSelectorFactory = genericSelectorFactory;
         this.involvementDao = involvementDao;
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
@@ -197,12 +198,10 @@ public class SurveyRunService {
         SurveyTemplate surveyTemplate = surveyTemplateDao.getById(surveyRun.surveyTemplateId());
         checkNotNull(surveyTemplate, "surveyTemplate " + surveyRun.surveyTemplateId() + " not found");
 
-        IdSelectorFactory idSelectorFactory = idSelectorFactoryProvider.getForKind(surveyTemplate.targetEntityKind());
-
-        Select<Record1<Long>> idSelector = idSelectorFactory.apply(surveyRun.selectionOptions());
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(surveyTemplate.targetEntityKind(), surveyRun.selectionOptions());
         Map<EntityReference, List<Person>> entityRefToPeople = involvementDao.findPeopleByEntitySelectorAndInvolvement(
                 surveyTemplate.targetEntityKind(),
-                idSelector,
+                genericSelector.selector(),
                 surveyRun.involvementKindIds());
 
         return entityRefToPeople.entrySet()

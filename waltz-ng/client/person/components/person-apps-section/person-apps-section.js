@@ -17,19 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-
+import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
 import {downloadTextFile} from "../../../common/file-utils";
-import {checkIsEntityRef} from "../../../common/checks";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {lifecycleStatus} from "../../../common/services/enums/lifecycle-status";
 
+import template from "./person-apps-section.html";
 
-import template from './person-apps-section.html';
 
 const bindings = {
-    parentEntityRef: '<'
+    filters: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -41,28 +42,18 @@ const initialState = {
 };
 
 
-//TODO: use the version in /common/selector-utils as part of #3006
-function mkSelectionOptions(entityReference, scope = 'CHILDREN') {
-    checkIsEntityRef(entityReference);
-
-    return {
-        entityReference,
-        scope
-    };
-}
-
 
 function buildAppInvolvementSummary(apps = [], involvements = [], involvementKinds = []) {
-    const appsById = _.keyBy(apps, 'id');
-    const involvementKindsById = _.keyBy(involvementKinds, 'id');
+    const appsById = _.keyBy(apps, "id");
+    const involvementKindsById = _.keyBy(involvementKinds, "id");
 
-    const directlyInvolvedAppIds = _.chain(involvements).map('entityReference.id').uniq().value();
+    const directlyInvolvedAppIds = _.chain(involvements).map("entityReference.id").uniq().value();
 
-    const allAppIds = _.map(apps, 'id');
+    const allAppIds = _.map(apps, "id");
     const indirectlyInvolvedAppIds = _.difference(allAppIds, directlyInvolvedAppIds);
 
     const directAppInvolvements = _.chain(involvements)
-        .groupBy('entityReference.id')
+        .groupBy("entityReference.id")
         .map((grp, key) => {
             let app = appsById[key];
             app = _.assign(app, {roles: _.map(grp, g => involvementKindsById[g.kindId].name )});
@@ -93,12 +84,12 @@ function controller(serviceBroker) {
                     CORE_API.InvolvementStore.findByEmployeeId,
                     [ person.employeeId ]))
             .then(r => {
-                const involvementsByKind = _.groupBy(r.data, 'entityReference.kind');
+                const involvementsByKind = _.groupBy(r.data, "entityReference.kind");
                 const summary = buildAppInvolvementSummary(
                     allApps,
                     _.concat(
-                        involvementsByKind['APPLICATION'] || [],
-                        involvementsByKind['END_USER_APPLICATION'] || []
+                        involvementsByKind["APPLICATION"] || [],
+                        involvementsByKind["END_USER_APPLICATION"] || []
                     ),
                     vm.involvementKinds);
 
@@ -107,31 +98,41 @@ function controller(serviceBroker) {
             });
     }
 
-    function loadITManagedApps(person) {
+    function loadITManagedApps(entityReference) {
+        const selector = mkApplicationSelectionOptions(
+            entityReference,
+            hierarchyQueryScope.CHILDREN.key,
+            [lifecycleStatus.ACTIVE.key],
+            vm.filters);
+
         return serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findAppsForEmployeeId,
-                [person.employeeId])
+                CORE_API.ApplicationStore.findBySelector,
+                [selector])
             .then(r => vm.itApps =
-                _.map(r.data, d => Object.assign({}, d, {management: 'IT'})));
+                _.map(r.data, d => Object.assign({}, d, {management: "IT"})));
     }
 
     function loadEndUserManagedApps(entityReference) {
-        const selector = Object.assign({}, mkSelectionOptions(entityReference), { desiredKind: 'END_USER_APPLICATION'});
+        const selector = mkApplicationSelectionOptions(
+            entityReference,
+            undefined,
+            undefined,
+            vm.filters);
 
         return serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findEndUserAppsByIdSelector,
+                CORE_API.EndUserAppStore.findBySelector,
                 [ selector ])
             .then(r => {
                 const enrichApp = d => Object.assign(
                     {},
                     d,
                     {
-                        management: 'End User',
+                        management: "End User",
                         platform: d.kind,
-                        kind: 'EUC',
-                        overallRating: 'Z'
+                        kind: "EUC",
+                        overallRating: "Z"
                     });
 
                 vm.endUserApps = _.map(
@@ -141,14 +142,13 @@ function controller(serviceBroker) {
     }
 
 
-    vm.$onInit = () => {
-
+    const loadAll = () => {
         const endUserPromise = loadEndUserManagedApps(vm.parentEntityRef);
         const appPromise = serviceBroker
             .loadViewData(CORE_API.PersonStore.getById, [ vm.parentEntityRef.id ])
             .then(r => {
                 vm.person = r.data;
-                return loadITManagedApps(vm.person);
+                return loadITManagedApps(vm.parentEntityRef);
             });
 
         endUserPromise
@@ -157,7 +157,17 @@ function controller(serviceBroker) {
                 vm.allApps = _.union(vm.itApps, vm.endUserApps);
                 buildInvolvementSummaries(vm.person, vm.allApps);
             });
+    };
 
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            console.log("filters changed");
+            loadAll();
+        }
     };
 
     // -- INTERACT
@@ -180,12 +190,12 @@ function controller(serviceBroker) {
             .map(app => {
                 return [
                     app.name,
-                    app.assetCode || '',
-                    app.kind || '',
-                    app.overallRating || '',
-                    app.riskRating || '',
-                    app.businessCriticality || '',
-                    app.lifecyclePhase || '',
+                    app.assetCode || "",
+                    app.kind || "",
+                    app.overallRating || "",
+                    app.riskRating || "",
+                    app.businessCriticality || "",
+                    app.lifecyclePhase || "",
                     _.join(app.roles, ", ")
                 ];
             })
@@ -200,7 +210,7 @@ function controller(serviceBroker) {
 }
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -211,7 +221,7 @@ const component = {
 };
 
 
-const id = 'waltzPersonAppsSection';
+const id = "waltzPersonAppsSection";
 
 
 export default {
