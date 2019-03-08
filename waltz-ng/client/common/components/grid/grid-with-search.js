@@ -28,7 +28,8 @@ const bindings = {
     scopeProvider: "<?",
     onInitialise: "<",
     onChange: "<",
-    onRowSelect: "<?"
+    onRowSelect: "<?",
+    localStorageKey: "@?"
 };
 
 

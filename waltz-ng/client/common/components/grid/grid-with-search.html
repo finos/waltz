@@ -5,6 +5,7 @@
             <waltz-search-control min-characters="3"
                                   delay="250"
                                   on-query="$ctrl.filterEntries"
+                                  local-storage-key="{{ $ctrl.localStorageKey }}"
                                   placeholder-text="{{ $ctrl.searchPlaceholderText }}">
             </waltz-search-control>
         </div>
