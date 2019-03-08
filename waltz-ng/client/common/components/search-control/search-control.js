@@ -26,7 +26,8 @@ const bindings = {
     onQuery: '<',
     minCharacters: '<',
     delay: '<',
-    placeholderText: '@'
+    placeholderText: '@',
+    localStorageKey: '@?'
 };
 
 
@@ -38,24 +39,43 @@ const initialState = {
 };
 
 
-function controller($scope) {
+function mkStorageKey(localStorageKeyStem = "") {
+    return localStorageKeyStem + ".search";
+}
+
+
+function controller($scope, localStorageService) {
     const vm = initialiseData(this, initialState);
 
     vm.options = {
         debounce: vm.delay
     };
 
+    vm.$onInit = () => {
+        if (vm.localStorageKey) {
+            const key = mkStorageKey(vm.localStorageKey);
+            vm.query = localStorageService.get(key) || "";
+            invokeFunction(vm.onQuery, vm.query);
+        }
+    };
 
     $scope.$watch('$ctrl.query', q => {
         if(_.isString(q) && (q.length >= vm.minCharacters || q === "")) {
             invokeFunction(vm.onQuery, q);
+            if (vm.localStorageKey) {
+                const key = mkStorageKey(vm.localStorageKey);
+                localStorageService.set(key, q);
+            }
         }
     });
 
 }
 
 
-controller.$inject = ["$scope"];
+controller.$inject = [
+    "$scope",
+    "localStorageService"
+];
 
 
 const component = {

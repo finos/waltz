@@ -113,6 +113,10 @@ export function perhaps(fn, dflt) {
  * @returns {Array}
  */
 export function termSearch(items = [], searchStr = "", searchFields = []) {
+    if (_.isEmpty(searchStr)) {
+        return items;
+    }
+
     const terms = searchStr.toLowerCase().split(/\W/);
 
     return _.filter(items, item => {
