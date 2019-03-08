@@ -27,7 +27,8 @@ function run($http, settingsService) {
         .then(devModeEnabled => {
             if (devModeEnabled) {
 
-                settingsService.findAll()
+                settingsService
+                    .findAll()
                     .then(settings => {
 
                         console.log('Dev Extensions enabled');
