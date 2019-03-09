@@ -162,6 +162,10 @@ function controller(serviceBroker) {
             _.isEmpty(vm.ratingTallies) ||
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
+
+            if (_.isEmpty(vm.ratingTallies)) {
+                vm.ratingsMap = {};
+            }
         } else {
             const tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
             const tab = findFirstNonEmptyTab(tabs);

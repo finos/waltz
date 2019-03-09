@@ -21,6 +21,7 @@ import _ from "lodash";
 import {select} from "d3-selection";
 import {scaleLinear} from "d3-scale";
 import "d3-selection-multi";
+import { initialiseData } from "../../../common";
 
 const bindings = {
     scores: "<",
@@ -28,15 +29,23 @@ const bindings = {
     ratingSchemeItems: "<"
 };
 
+const emptyScores = {R: 0, A: 0, G: 0, total: 0};
+
+
+const initialState = {
+    scores: Object.assign({}, emptyScores)
+};
+
 
 const template = "<svg class=\"rag-line\"></svg>";
+
 
 function controller($element) {
 
     const width = 250;
     const height = 3;
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const svg = select($element[0])
         .select("svg")
@@ -73,11 +82,18 @@ function controller($element) {
         newRects.merge(rects)
             .attr("x", d => xScale(d.start))
             .attr("width", d => xScale(d.width));
+
+        rects.exit()
+            .remove();
     };
 
 
     vm.$onChanges = () => {
-        if (vm.scores && vm.range && vm.ratingSchemeItems) {
+        if (!vm.scores) {
+            vm.scores = Object.assign({}, emptyScores);
+        }
+
+        if (vm.range && vm.ratingSchemeItems) {
             update(vm.scores, vm.range, vm.ratingSchemeItems);
         }
     };

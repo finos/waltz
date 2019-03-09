@@ -36,7 +36,6 @@ const bindings = {
 const initialState = {
     apps: [],
     endUserApps: [],
-    // filters: {}
 };
 
 
@@ -63,7 +62,7 @@ function controller($scope,
     const loadAll = () => {
         const selectorOptions = mkApplicationSelectionOptions(
             vm.parentEntityRef,
-            hierarchyQueryScope.EXACT.key,
+            undefined,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
