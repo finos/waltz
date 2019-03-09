@@ -89,7 +89,7 @@ function controller($element) {
 
 
     vm.$onChanges = () => {
-        if(!vm.scores) {
+        if (!vm.scores) {
             vm.scores = Object.assign({}, emptyScores);
         }
 
