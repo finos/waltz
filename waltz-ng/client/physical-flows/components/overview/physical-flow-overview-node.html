@@ -1,0 +1,18 @@
+<div class="waltz-physical-flow-overview-node"
+     ng-class="{
+        'wpfon-entity-application' : $ctrl.node.kind == 'APPLICATION',
+        'wpfon-entity-actor' : $ctrl.node.kind == 'ACTOR'
+    }">
+
+    <waltz-entity-link entity-ref="$ctrl.node">
+    </waltz-entity-link>
+    <div style="padding: 4px 0 0 12px"
+         ng-if="$ctrl.participants">
+        <ul class="list-unstyled small">
+            <li ng-repeat="p in $ctrl.participants">
+                <waltz-entity-link entity-ref="p">
+                </waltz-entity-link>
+            </li>
+        </ul>
+    </div>
+</div>

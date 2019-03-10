@@ -21,6 +21,7 @@ package com.khartec.waltz.jobs.generators;
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -47,10 +48,25 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 
 public class PhysicalFlowGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
+    private static List<Criticality> criticalityDistribution = newArrayList(
+            Criticality.NONE,
+            Criticality.UNKNOWN,
+            Criticality.LOW,
+            Criticality.LOW,
+            Criticality.LOW,
+            Criticality.MEDIUM,
+            Criticality.MEDIUM,
+            Criticality.HIGH,
+            Criticality.HIGH,
+            Criticality.HIGH,
+            Criticality.VERY_HIGH,
+            Criticality.VERY_HIGH);
 
 
-    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec, List<Long> logicalFlowIds, List<String> transportKinds) {
+    private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec,
+                                                                  List<Long> logicalFlowIds,
+                                                                  List<String> transportKinds) {
+
 
         return IntStream.range(0, logicalFlowIds.size() - 1)
                 .mapToObj(i -> {
@@ -65,6 +81,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setTransport(ListUtilities.randomPick(transportKinds));
                     record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
                     record.setLastUpdatedBy("admin");
+                    record.setCriticality(randomPick(criticalityDistribution).name());
                     return record;
                 })
                 .collect(Collectors.toList());
@@ -75,7 +92,8 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
     public Map<String, Integer> create(ApplicationContext ctx) {
         DSLContext dsl = getDsl(ctx);
 
-        List<PhysicalSpecification> specifications = dsl.select(PHYSICAL_SPECIFICATION.fields())
+        List<PhysicalSpecification> specifications = dsl
+                .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .fetch(PhysicalSpecificationDao.TO_DOMAIN_MAPPER);
@@ -86,7 +104,8 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                 .where(ENUM_VALUE.TYPE.eq(EnumValueKind.TRANSPORT_KIND.dbValue()))
                 .fetch(ENUM_VALUE.KEY);
 
-        List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl.select(
+        List<Tuple3<Long, Long, Long>> allLogicalFLows = dsl
+                .select(
                     LOGICAL_FLOW.ID,
                     LOGICAL_FLOW.SOURCE_ENTITY_ID,
                     LOGICAL_FLOW.TARGET_ENTITY_ID)
@@ -96,7 +115,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                         r.getValue(LOGICAL_FLOW.SOURCE_ENTITY_ID),
                         r.getValue(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        Map<Long, Collection<Long>> flowIdsBySourceApp = groupBy(
+        Map<Long, Collection<Long>> logicalFlowIdsBySourceApp = groupBy(
                 t -> t.v2(),
                 t -> t.v1(),
                 allLogicalFLows);
@@ -106,9 +125,9 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
         List<PhysicalFlowRecord> flowBatch = new ArrayList<PhysicalFlowRecord>((int) (flowBatchSize * 1.2));
 
         for (PhysicalSpecification spec : specifications) {
-            Collection<Long> flowIds = flowIdsBySourceApp.get(spec.owningEntity().id());
-            if (!isEmpty(flowIds)) {
-                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(flowIds), transportKinds);
+            Collection<Long> relatedLogicalFlowsIds = logicalFlowIdsBySourceApp.get(spec.owningEntity().id());
+            if (!isEmpty(relatedLogicalFlowsIds)) {
+                List<PhysicalFlowRecord> physicalFlowRecords = mkPhysicalFlowRecords(spec, new LinkedList<>(relatedLogicalFlowsIds), transportKinds);
                 flowBatch.addAll(physicalFlowRecords);
             }
 

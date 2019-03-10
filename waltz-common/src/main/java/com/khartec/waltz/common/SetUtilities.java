@@ -115,4 +115,12 @@ public class SetUtilities {
                 })
                 .collect(Collectors.toSet());
     }
+
+
+    public static <T> Collection<T> unionAll(Collection<? extends Collection<T>> values) {
+        checkNotNull(values, "Cannot union all a null collection of collections");
+        Set<T> result = new HashSet<>();
+        values.forEach(result::addAll);
+        return result;
+    }
 }

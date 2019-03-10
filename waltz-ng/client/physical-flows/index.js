@@ -29,6 +29,7 @@ import * as PhysicalFlowParticipantStore from "./services/physical-flow-particip
 import PhysicalFlowEditor from "./components/flow-editor/physical-flow-editor";
 import PhysicalFlowCloneSelector from "./components/register/clone/physical-flow-clone-selector";
 import PhysicalFlowOverview from "./components/overview/physical-flow-overview";
+import PhysicalFlowOverviewNode from "./components/overview/physical-flow-overview-node";
 import PhysicalFlowEditOverview from "./components/register/overview/physical-flow-edit-overview";
 import PhysicalFlowEditTargetLogicalFlow from "./components/register/edit-target-logical-flow/physical-flow-edit-target-logical-flow";
 import PhysicalFlowEditSpecification from "./components/register/edit-specification/physical-flow-edit-specification";
@@ -41,7 +42,7 @@ import PhysicalFlowParticipantSection from "./components/participants-section/ph
 import Routes from "./routes";
 
 function setup() {
-    const module = angular.module('waltz.physical.flows', []);
+    const module = angular.module("waltz.physical.flows", []);
 
     module
         .config(Routes);
@@ -52,8 +53,8 @@ function setup() {
     ]);
 
     module
-        .component('waltzPhysicalFlowTable', PhysicalFlowTable)
-        .component('waltzPhysicalFlowExportButtons', PhysicalFlowExportButtons);
+        .component("waltzPhysicalFlowTable", PhysicalFlowTable)
+        .component("waltzPhysicalFlowExportButtons", PhysicalFlowExportButtons);
 
     registerComponents(module, [
         BulkPhysicalFlowLoaderWizard,
@@ -62,6 +63,7 @@ function setup() {
         PhysicalFlowCloneSelector,
         PhysicalFlowEditor,
         PhysicalFlowOverview,
+        PhysicalFlowOverviewNode,
         PhysicalFlowEditOverview,
         PhysicalFlowEditTargetLogicalFlow,
         PhysicalFlowEditSpecification,

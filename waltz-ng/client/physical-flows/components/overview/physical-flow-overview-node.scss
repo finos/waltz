@@ -1,0 +1,18 @@
+@import "../../../../style/variables";
+
+
+.waltz-physical-flow-overview-node {
+    background-color: #fafafa;
+    border-radius: 12px;
+    padding: 12px;
+    border: 2px solid #ddd;
+
+    &.wpfon-entity-actor {
+        background: $waltz-actor-background;
+    }
+
+    &.wpfon-entity-application {
+        background: $waltz-green-background;
+    }
+
+}

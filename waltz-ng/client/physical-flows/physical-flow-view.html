@@ -6,8 +6,14 @@
                        icon="qrcode">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
+            <li>Logical Flow</li>
             <li ng-if="ctrl.logicalFlow">
-                <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
+                <waltz-entity-link entity-ref="ctrl.logicalFlow.source">
+                </waltz-entity-link>
+            </li>
+            <li ng-if="ctrl.logicalFlow">
+                <waltz-entity-link entity-ref="ctrl.logicalFlow.target">
+                </waltz-entity-link>
             </li>
             <li ng-if="!ctrl.logicalFlow">physical Flow</li>
             <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
@@ -52,8 +58,9 @@
 
                             </div>
                             <div class="waltz-sub-section-controls"
-                                 waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
-                                <span>
+                                 >
+
+                                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
                                     <a ng-click="ctrl.visibility.overviewEditor = true"
                                        ng-if="! ctrl.visibility.overviewEditor"
                                        class="clickable">
@@ -65,6 +72,14 @@
                                        class="clickable">
                                         Done
                                     </a>
+                                </span>
+                                <span>|</span>
+                                <span>
+                                    <waltz-entity-link entity-ref="{
+                                        kind: 'LOGICAL_DATA_FLOW',
+                                        id: ctrl.logicalFlow.id,
+                                        name: 'Go to logical flow'}">
+                                    </waltz-entity-link>
                                 </span>
                             </div>
 
@@ -82,6 +97,7 @@
 
 
             <div class="small text-muted"
+                 style="padding-top: 8px"
                  ng-if="ctrl.physicalFlow.lastUpdatedBy && ctrl.physicalFlow.lastUpdatedAt">
                 Last updated by
                 <span ng-bind="ctrl.physicalFlow.lastUpdatedBy"></span>
