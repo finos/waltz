@@ -163,7 +163,7 @@ function controller(serviceBroker) {
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
 
-            if(_.isEmpty(vm.ratingTallies)) {
+            if (_.isEmpty(vm.ratingTallies)) {
                 vm.ratingsMap = {};
             }
         } else {
