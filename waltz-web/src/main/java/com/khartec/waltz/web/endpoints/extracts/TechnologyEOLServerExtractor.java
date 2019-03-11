@@ -50,7 +50,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
             String data = dsl
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
-                    .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("NAR ID"))
+                    .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("ASSET CODE"))
                     .select(SERVER_INFORMATION.HOSTNAME.as("Host Name"),
                             SERVER_USAGE.ENVIRONMENT.as("Environment"),
                             SERVER_INFORMATION.OPERATING_SYSTEM.as("Operating System"),
