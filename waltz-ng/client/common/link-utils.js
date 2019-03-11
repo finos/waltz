@@ -56,8 +56,10 @@ const kindsToViewStateMap = toMap(
 
 
 const viewStateToKindMap = _.assign(
-    toMap(stateKindTuples, t => t.state, t => t.kind),
-    {"main.person.view": "PERSON"});
+    toMap(stateKindTuples, 
+          t => t.state, 
+          t => t.kind),
+    { "main.person.view": "PERSON" });
 
 
 /**
