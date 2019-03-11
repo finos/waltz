@@ -31,6 +31,7 @@ public class LoadAll {
             new LogicalFlowGenerator(),
             new LogicalFlowDecorationGenerator(),
             new PhysicalSpecificationGenerator(),
+            new PhysicalFlowGenerator(),
             new PhysicalFlowParticipantGenerator(),
             new InvolvementGenerator(),
             new DatabaseGenerator(),

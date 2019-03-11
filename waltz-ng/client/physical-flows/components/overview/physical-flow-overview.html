@@ -1,23 +1,20 @@
 <div class="waltz-physical-flow-overview">
     <div class="row">
-        <div class="col-md-4">
-            <div style="padding-top: 6px">
+        <div class="col-sm-4">
+            <div style="padding-top: 12px">
                 <waltz-physical-flow-overview-node node="$ctrl.logicalFlow.source"
+                                                   criticality-mismatch="$ctrl.hasCriticalityMismatch"
                                                    participants="$ctrl.participants.SOURCE">
                 </waltz-physical-flow-overview-node>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <div class="wpfo-flow-arrow">
                 &rarr;
             </div>
             <div class="wpfo-flow-detail">
                 <table class="waltz-field-table small">
-                    <tr ng-class="{
-                                'wft-danger' : $ctrl.hasCriticalityMismatch
-                            }"
-                        uib-popover="{{$ctrl.criticalityMismatchMessage }}"
-                        popover-trigger="mouseenter">
+                    <tr>
                         <td class="wft-label">
                                 <span>
                                     Criticality:
@@ -29,9 +26,6 @@
                                               show-icon="false"
                                               show-popover="false">
                             </waltz-enum-value>
-                            <span ng-show="$ctrl.hasCriticalityMismatch">
-                                <waltz-icon name="warning"></waltz-icon>
-                            </span>
                         </td>
                     </tr>
                     <tr>
@@ -63,8 +57,8 @@
                 </table>
             </div>
         </div>
-        <div class="col-md-4">
-            <div style="padding-top: 6px">
+        <div class="col-sm-4">
+            <div style="padding-top: 12px">
                 <waltz-physical-flow-overview-node node="$ctrl.logicalFlow.target"
                                                    participants="$ctrl.participants.TARGET">
                 </waltz-physical-flow-overview-node>

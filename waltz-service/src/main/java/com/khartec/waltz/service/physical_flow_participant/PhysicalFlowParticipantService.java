@@ -20,6 +20,8 @@
 package com.khartec.waltz.service.physical_flow_participant;
 
 import com.khartec.waltz.data.physical_flow_participant.PhysicalFlowParticipantDao;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
 import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,4 +48,33 @@ public class PhysicalFlowParticipantService {
         return dao.findByPhysicalFlowId(id);
     }
 
+
+    public Boolean remove(long physicalFlowId,
+                          ParticipationKind participationKind,
+                          EntityReference participant,
+                          String username) {
+
+        checkNotNull(participationKind, "participationKind cannot be null");
+
+        boolean result = dao.remove(physicalFlowId, participationKind, participant);
+        if (result) {
+            // write changelog entry to physical flow
+        }
+        return result;
+    }
+
+
+    public Boolean add(long physicalFlowId,
+                          ParticipationKind participationKind,
+                          EntityReference participant,
+                          String username) {
+
+        checkNotNull(participationKind, "participationKind cannot be null");
+
+        boolean result = dao.add(physicalFlowId, participationKind, participant, username);
+        if (result) {
+            // write changelog entry to physical flow
+        }
+        return result;
+    }
 }

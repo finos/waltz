@@ -30,26 +30,50 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const remove = (physicalFlowId, kind, participant) => {
+        return $http
+            .delete(`${base}/physical-flow/${physicalFlowId}/${kind}/${participant.kind}/${participant.id}`)
+            .then(r => r.data);
+    };
+
+    const add = (physicalFlowId, kind, participant) => {
+        return $http
+            .post(`${base}/physical-flow/${physicalFlowId}/${kind}/${participant.kind}/${participant.id}`)
+            .then(r => r.data);
+    };
+
     return {
-        findByPhysicalFlowId
+        findByPhysicalFlowId,
+        remove,
+        add
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'PhysicalFlowParticipantStore';
+export const serviceName = "PhysicalFlowParticipantStore";
 
 
 
 export const PhysicalFlowParticipantStore_API = {
     findByPhysicalFlowId: {
         serviceName,
-        serviceFnName: 'findByPhysicalFlowId',
-        description: 'executes findByPhysicalFlowId'
+        serviceFnName: "findByPhysicalFlowId",
+        description: "executes findByPhysicalFlowId"
+    },
+    remove: {
+        serviceName,
+        serviceFnName: "remove",
+        description: "executes remove (physical flow id, kind:SOURCE|TARGET, participantRef)"
+    },
+    add: {
+        serviceName,
+        serviceFnName: "add",
+        description: "executes add (physical flow id, kind:SOURCE|TARGET, participantRef)"
     }
 };

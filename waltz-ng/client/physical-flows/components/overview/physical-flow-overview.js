@@ -91,7 +91,6 @@ function controller(serviceBroker) {
 
                         if (criticalityComparison === -1) {
                             vm.hasCriticalityMismatch = true;
-                            vm.criticalityMismatchMessage = "Criticality mismatch: this flow has a higher criticality rating than the source"
                         } else {
                             vm.hasCriticalityMismatch = false;
                         }

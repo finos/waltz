@@ -38,6 +38,7 @@ import PhysicalFlowTable from "./components/flow-table/physical-flow-table";
 import PhysicalFlowExportButtons from "./components/export-buttons/physical-flow-export-buttons";
 import PhysicalFlowSection from "./components/physical-flow-section/physical-flow-section";
 import PhysicalFlowParticipantSection from "./components/participants-section/physical-flow-participants-section";
+import PhysicalFlowParticipantSubSection from "./components/participants-sub-section/physical-flow-participants-sub-section";
 
 import Routes from "./routes";
 
@@ -69,7 +70,8 @@ function setup() {
         PhysicalFlowEditSpecification,
         PhysicalFlowAttributeEditor,
         PhysicalFlowSection,
-        PhysicalFlowParticipantSection
+        PhysicalFlowParticipantSection,
+        PhysicalFlowParticipantSubSection
     ]);
     return module.name;
 }

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { mkEntityLinkGridCell } from "../../../common/grid-utils";
 import { initialiseData } from "../../../common";
@@ -31,36 +32,70 @@ const bindings = {
 
 
 const initialState = {
-    columnDefs: [],
-    tableData: [],
 };
 
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
-    vm.columnDefs = [
-        Object.assign(mkEntityLinkGridCell("Name", "participant"), { width: "20%"} ),
-        { field: "kind", displayName: "Participation Kind", width: "15%", cellFilter: "toDisplayName:'participantKind'" },
-        { field: "description", displayName: "Description" }
-    ];
-
-    vm.$onInit = () => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.PhysicalFlowParticipantStore.findByPhysicalFlowId,
-                [ vm.parentEntityRef.id ])
-            .then(r => {
-                vm.tableData = r.data
+    const onAddParticipant = (s, kind) => {
+        return serviceBroker
+            .execute(
+                CORE_API.PhysicalFlowParticipantStore.add,
+                [ vm.physicalFlow.id, kind, { kind: "SERVER", id: s.id } ])
+            .then(() => {
+                notification.success("Participant added");
+                reloadParticipants();
             });
     };
 
+
+    function reloadParticipants() {
+        serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowParticipantStore.findByPhysicalFlowId,
+                [vm.parentEntityRef.id],
+                { force: true })
+            .then(r => vm.currentParticipantsByKind = _.groupBy(r.data, "kind"));
+    }
+
+    vm.$onInit = () => {
+        const physicalFlowPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.getById,
+                [vm.parentEntityRef.id])
+            .then(r => vm.physicalFlow = r.data);
+
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.getById,
+                    [ vm.physicalFlow.logicalFlowId ]))
+            .then(r => vm.logicalFlow = r.data);
+
+        reloadParticipants();
+    };
+
+    vm.onRemoveParticipant = p => {
+        return serviceBroker
+            .execute(
+                CORE_API.PhysicalFlowParticipantStore.remove,
+                [ vm.physicalFlow.id, p.kind, p.participant ])
+            .then(() => {
+                notification.success("Participant removed");
+                reloadParticipants();
+            });
+    };
+
+    vm.onAddSourceParticipant = s => onAddParticipant(s, "SOURCE");
+    vm.onAddTargetParticipant = s => onAddParticipant(s, "TARGET");
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "Notification"
 ];
 
 

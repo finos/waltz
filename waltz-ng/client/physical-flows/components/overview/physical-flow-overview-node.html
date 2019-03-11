@@ -6,8 +6,18 @@
 
     <waltz-entity-link entity-ref="$ctrl.node">
     </waltz-entity-link>
-    <div style="padding: 4px 0 0 12px"
-         ng-if="$ctrl.participants">
+
+    <span ng-show="$ctrl.criticalityMismatch"
+          style="color: red">
+        <span uib-popover="Criticality mismatch: this node has a lower criticality rating than the flow"
+              popover-trigger="mouseenter"
+              popover-popup-delay="300"
+              popover-append-to-body="true">
+            <waltz-icon name="warning"></waltz-icon>
+        </span>
+    </span>
+
+    <div style="padding: 4px 0 0 12px">
         <ul class="list-unstyled small">
             <li ng-repeat="p in $ctrl.participants">
                 <waltz-entity-link entity-ref="p">

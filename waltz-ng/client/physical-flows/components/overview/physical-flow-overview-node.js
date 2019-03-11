@@ -2,6 +2,7 @@ import template from "./physical-flow-overview-node.html";
 
 
 const bindings = {
+    criticalityMismatch: "<?",
     node: "<",
     participants: "<"
 };
