@@ -35,7 +35,6 @@ const initialState = {
 };
 
 
-
 function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 

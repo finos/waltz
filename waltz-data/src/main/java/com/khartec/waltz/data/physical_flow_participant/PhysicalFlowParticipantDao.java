@@ -28,15 +28,13 @@ import com.khartec.waltz.model.physical_flow_participant.ImmutablePhysicalFlowPa
 import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
 import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -80,12 +78,14 @@ public class PhysicalFlowParticipantDao {
     }
 
 
-    public List<PhysicalFlowParticipant> findByPhysicalFlowId(long id) {
-        return dsl.select(PHYSICAL_FLOW_PARTICIPANT.fields())
-                .select(PARTICIPANT_NAME_FIELD)
-                .from(PHYSICAL_FLOW_PARTICIPANT)
-                .where(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID.eq(id))
-                .fetch(TO_DOMAIN_MAPPER);
+    public Collection<PhysicalFlowParticipant> findByPhysicalFlowId(long id) {
+        return findByCondition(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID.eq(id));
+    }
+
+
+    public Collection<PhysicalFlowParticipant> findByParticipant(EntityReference entityReference) {
+        return findByCondition(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(entityReference.id())
+                .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(entityReference.kind().name())));
     }
 
 
@@ -112,5 +112,15 @@ public class PhysicalFlowParticipantDao {
                 .set(PHYSICAL_FLOW_PARTICIPANT.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(PHYSICAL_FLOW_PARTICIPANT.LAST_UPDATED_BY, username)
                 .execute() > 0;
+    }
+
+
+    private Collection<PhysicalFlowParticipant> findByCondition(Condition condition) {
+        return dsl
+                .select(PHYSICAL_FLOW_PARTICIPANT.fields())
+                .select(PARTICIPANT_NAME_FIELD)
+                .from(PHYSICAL_FLOW_PARTICIPANT)
+                .where(condition)
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

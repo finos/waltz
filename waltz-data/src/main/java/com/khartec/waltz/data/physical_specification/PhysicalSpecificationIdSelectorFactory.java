@@ -21,6 +21,8 @@ package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
@@ -64,10 +67,36 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForSpecification(options);
+            case SERVER:
+                return mkForServer(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
     }
+
+
+    private Select<Record1<Long>> mkForServer(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        long serverId = options.entityReference().id();
+
+        Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+                ? DSL.trueCondition()
+                : PHYSICAL_FLOW.IS_REMOVED.isFalse().and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
+
+        return DSL
+                .select(PHYSICAL_FLOW.SPECIFICATION_ID)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .innerJoin(PHYSICAL_FLOW_PARTICIPANT)
+                .on(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
+                .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
+                .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
+                .and(lifecycleCondition);
+
+    }
+
 
 
     private Select<Record1<Long>> mkForLogicalElement(IdSelectionOptions options) {

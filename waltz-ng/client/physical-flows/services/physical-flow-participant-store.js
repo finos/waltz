@@ -30,6 +30,13 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const findByParticipant = (ref) => {
+        return $http
+            .get(`${base}/participant/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
+
     const remove = (physicalFlowId, kind, participant) => {
         return $http
             .delete(`${base}/physical-flow/${physicalFlowId}/${kind}/${participant.kind}/${participant.id}`)
@@ -44,6 +51,7 @@ export function store($http, baseApiUrl) {
 
     return {
         findByPhysicalFlowId,
+        findByParticipant,
         remove,
         add
     };
@@ -65,6 +73,11 @@ export const PhysicalFlowParticipantStore_API = {
         serviceName,
         serviceFnName: "findByPhysicalFlowId",
         description: "executes findByPhysicalFlowId"
+    },
+    findByParticipant: {
+        serviceName,
+        serviceFnName: "findByParticipant",
+        description: "executes findByParticipant"
     },
     remove: {
         serviceName,

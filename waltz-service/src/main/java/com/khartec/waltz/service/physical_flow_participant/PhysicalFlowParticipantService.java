@@ -26,6 +26,7 @@ import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -44,10 +45,14 @@ public class PhysicalFlowParticipantService {
     }
 
 
-    public List<PhysicalFlowParticipant> findByPhysicalFlowId(long id) {
+    public Collection<PhysicalFlowParticipant> findByPhysicalFlowId(long id) {
         return dao.findByPhysicalFlowId(id);
     }
 
+    public Collection<PhysicalFlowParticipant> findByParticipant(EntityReference entityReference) {
+        checkNotNull(entityReference, "entityReference cannot be null");
+        return dao.findByParticipant(entityReference);
+    }
 
     public Boolean remove(long physicalFlowId,
                           ParticipationKind participationKind,
@@ -77,4 +82,6 @@ public class PhysicalFlowParticipantService {
         }
         return result;
     }
+
+
 }

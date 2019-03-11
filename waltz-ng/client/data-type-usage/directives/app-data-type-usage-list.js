@@ -57,7 +57,6 @@ function controller($scope) {
         "ctrl.usages",
         (usages = []) => {
             vm.consolidatedUsages = consolidateUsages(usages);
-            console.log({ usages, cu: vm.consolidatedUsages })
         }
     );
 

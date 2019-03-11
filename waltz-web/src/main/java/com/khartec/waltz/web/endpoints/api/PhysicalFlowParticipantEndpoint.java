@@ -53,11 +53,15 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByPhysicalFlowIdPath = mkPath(BASE_URL, "physical-flow", ":id");
+        String findByParticipantPath = mkPath(BASE_URL, "participant", ":kind", ":id");
         String removePath = mkPath(BASE_URL, "physical-flow", ":physicalFlowId", ":kind", ":participantKind", ":participantId");
         String addPath = mkPath(BASE_URL, "physical-flow", ":physicalFlowId", ":kind", ":participantKind", ":participantId");
 
         ListRoute<PhysicalFlowParticipant> findByPhysicalFlowIdRoute =
                 (request, response) -> service.findByPhysicalFlowId(getId(request));
+
+        ListRoute<PhysicalFlowParticipant> findByParticipantRoute =
+                (request, response) -> service.findByParticipant(getEntityReference(request));
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
             // TODO: check perms
@@ -78,6 +82,7 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
         };
 
         getForList(findByPhysicalFlowIdPath, findByPhysicalFlowIdRoute);
+        getForList(findByParticipantPath, findByParticipantRoute);
         deleteForDatum(removePath, removeRoute);
         postForDatum(addPath, addRoute);
     }
