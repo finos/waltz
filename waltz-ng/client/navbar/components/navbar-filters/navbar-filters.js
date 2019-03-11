@@ -63,16 +63,25 @@ function controller($timeout, $transitions) {
         () => vm.visibility.overlay = false,
         200);
 
-    vm.dismissOverlay = dismissOverlay;
-
-    vm.showOverlay = () => {
-        vm.visibility.overlay = true;
-    }
-
     $transitions.onSuccess({}, (transition) => {
         const {name} = transition.to();
         vm.visibility.filters = areFiltersVisible(name);
     });
+
+
+    // -- INIT
+    vm.$onInit = () => {
+        vm.visibility.filters = areFiltersVisible(name);
+    };
+
+
+    // -- INTERACT
+    vm.dismissOverlay = dismissOverlay;
+
+    vm.showOverlay = () => {
+        vm.visibility.overlay = true;
+    };
+
 }
 
 

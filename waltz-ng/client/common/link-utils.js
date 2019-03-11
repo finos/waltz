@@ -18,6 +18,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
+import { toMap } from "./map-utils";
+
+
+/***
+ * A list of tuples of {<entityKind>, <uiState>}.  Used for to help with mappings
+ * @type [ {<entityKind>, <uiState>}, ... ]
+ */
+const stateKindTuples = [
+    {kind: "APPLICATION", state: "main.app.view"},
+    {kind: "ACTOR", state: "main.actor.view"},
+    {kind: "APP_GROUP", state: "main.app-group.view"},
+    {kind: "DATA_TYPE", state: "main.data-type.view"},
+    {kind: "FLOW_DIAGRAM", state: "main.flow-diagram.view"},
+    {kind: "LOGICAL_DATA_ELEMENT", state: "main.logical-data-element.view"},
+    {kind: "LOGICAL_DATA_FLOW", state: "main.logical-flow.view"},
+    {kind: "MEASURABLE", state: "main.measurable.view"},
+    {kind: "MEASURABLE_CATEGORY", state: "main.measurable-category.view"},
+    {kind: "ORG_UNIT", state: "main.org-unit.view"},
+    {kind: "CHANGE_INITIATIVE", state: "main.change-initiative.view"},
+    {kind: "ENTITY_STATISTIC", state: "main.entity-statistic.view"},
+    {kind: "PERSON", state: "main.person.id"},
+    {kind: "PROCESS", state: "main.process.view"},
+    {kind: "PHYSICAL_SPECIFICATION", state: "main.physical-specification.view"},
+    {kind: "PHYSICAL_FLOW", state: "main.physical-flow.view"},
+    {kind: "ROADMAP", state: "main.roadmap.view"},
+    {kind: "SCENARIO", state: "main.scenario.view"},
+    {kind: "SERVER", state: "main.server.view"}
+];
+
+
+const kindsToViewStateMap = toMap(
+    stateKindTuples,
+    t => t.kind,
+    t => t.state);
+
+
+const viewStateToKindMap = _.assign(
+    toMap(stateKindTuples, 
+          t => t.state, 
+          t => t.kind),
+    { "main.person.view": "PERSON" });
+
+
 /**
  * Given an entity kind, this will return the matching
  * ui-router state name if available.  Otherwise it
@@ -26,64 +70,10 @@
  * @returns String state name
  */
 export function kindToViewState(kind) {
-    if (kind === "APPLICATION") {
-        return "main.app.view";
+    if(!_.has(kindsToViewStateMap, kind)) {
+        throw "Unable to convert kind: "+kind+ " to a ui-view state";
     }
-    if (kind === "ACTOR") {
-        return "main.actor.view";
-    }
-    if (kind === "APP_GROUP") {
-        return "main.app-group.view";
-    }
-    if (kind === "DATA_TYPE") {
-        return "main.data-type.view";
-    }
-    if (kind === "FLOW_DIAGRAM") {
-        return "main.flow-diagram.view";
-    }
-    if (kind === "LOGICAL_DATA_ELEMENT") {
-        return "main.logical-data-element.view";
-    }
-    if (kind === "LOGICAL_DATA_FLOW") {
-        return "main.logical-flow.view";
-    }
-    if (kind === "MEASURABLE") {
-        return "main.measurable.view";
-    }
-    if (kind === "MEASURABLE_CATEGORY") {
-        return "main.measurable-category.view";
-    }
-    if (kind === "ORG_UNIT") {
-        return "main.org-unit.view";
-    }
-    if (kind === "CHANGE_INITIATIVE") {
-        return "main.change-initiative.view";
-    }
-    if (kind === "ENTITY_STATISTIC") {
-        return "main.entity-statistic.view";
-    }
-    if (kind === "PERSON") {
-        return "main.person.id";
-    }
-    if (kind === "PROCESS") {
-        return "main.process.view";
-    }
-    if (kind === "PHYSICAL_SPECIFICATION") {
-        return "main.physical-specification.view";
-    }
-    if (kind === "PHYSICAL_FLOW") {
-        return "main.physical-flow.view";
-    }
-    if (kind === "ROADMAP") {
-        return "main.roadmap.view";
-    }
-    if (kind === "SCENARIO") {
-        return "main.scenario.view";
-    }
-    if (kind === "SERVER") {
-        return "main.server.view";
-    }
-    throw "Unable to convert kind: "+kind+ " to a ui-view state";
+    return _.get(kindsToViewStateMap, kind);
 }
 
 
@@ -95,62 +85,8 @@ export function kindToViewState(kind) {
  * @returns kind
  */
 export function viewStateToKind(viewState) {
-    if (viewState === "main.app.view") {
-        return "APPLICATION";
+    if(!_.has(viewStateToKindMap, viewState)) {
+        throw "Unable to convert view state: "+viewState+ " to an entity kind";
     }
-    if (viewState === "main.actor.view") {
-        return "ACTOR";
-    }
-    if (viewState === "main.app-group.view") {
-        return "APP_GROUP";
-    }
-    if (viewState === "main.data-type.view") {
-        return "DATA_TYPE";
-    }
-    if (viewState === "main.flow-diagram.view") {
-        return "FLOW_DIAGRAM";
-    }
-    if (viewState === "main.logical-data-element.view") {
-        return "LOGICAL_DATA_ELEMENT";
-    }
-    if (viewState === "main.logical-flow.view") {
-        return "LOGICAL_DATA_FLOW";
-    }
-    if (viewState === "main.measurable.view") {
-        return "MEASURABLE";
-    }
-    if (viewState === "main.measurable-category.view") {
-        return "MEASURABLE_CATEGORY";
-    }
-    if (viewState === "main.org-unit.view") {
-        return "ORG_UNIT";
-    }
-    if (viewState === "main.change-initiative.view") {
-        return "CHANGE_INITIATIVE";
-    }
-    if (viewState === "main.entity-statistic.view") {
-        return "ENTITY_STATISTIC";
-    }
-    if (viewState === "main.person.id") {
-        return "PERSON";
-    }
-    if (viewState === "main.process.view") {
-        return "PROCESS";
-    }
-    if (viewState === "main.physical-specification.view") {
-        return "PHYSICAL_SPECIFICATION";
-    }
-    if (viewState === "main.physical-flow.view") {
-        return "PHYSICAL_FLOW";
-    }
-    if (viewState === "main.roadmap.view") {
-        return "ROADMAP";
-    }
-    if (viewState === "main.scenario.view") {
-        return "SCENARIO";
-    }
-    if (viewState === "main.server.view") {
-        return "SERVER";
-    }
-    throw "Unable to convert view state: "+viewState+ " to an entity kind";
+    return _.get(viewStateToKindMap, viewState);
 }
