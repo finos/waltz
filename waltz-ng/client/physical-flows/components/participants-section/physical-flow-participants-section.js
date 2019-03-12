@@ -38,6 +38,12 @@ const initialState = {
 function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
+    function handleFailure(preamble = "", e) {
+        const msg = _.get(e, ["data", "message"], "Unknown");
+        notification.error(`${preamble}: ${msg}`);
+    }
+
+
     const onAddParticipant = (s, kind) => {
         return serviceBroker
             .execute(
@@ -46,9 +52,9 @@ function controller(serviceBroker, notification) {
             .then(() => {
                 notification.success("Participant added");
                 reloadParticipants();
-            });
+            })
+            .catch(e => handleFailure("Failed to add participant" , e));
     };
-
 
     function reloadParticipants() {
         serviceBroker
@@ -84,7 +90,8 @@ function controller(serviceBroker, notification) {
             .then(() => {
                 notification.success("Participant removed");
                 reloadParticipants();
-            });
+            })
+            .catch(e => handleFailure("Failed to add participant" , e));
     };
 
     vm.onAddSourceParticipant = s => onAddParticipant(s, "SOURCE");

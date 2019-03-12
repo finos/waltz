@@ -22,7 +22,9 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
 import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
+import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.service.physical_flow_participant.PhysicalFlowParticipantService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -42,11 +44,14 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "physical-flow-participant");
 
     private final PhysicalFlowParticipantService service;
+    private final UserRoleService userRoleService;
 
-
-    public PhysicalFlowParticipantEndpoint(PhysicalFlowParticipantService service) {
-        checkNotNull(service, "service cannot be null");
-        this.service = service;
+    public PhysicalFlowParticipantEndpoint(PhysicalFlowParticipantService participantService,
+                                           UserRoleService userRoleService) {
+        checkNotNull(participantService, "participantService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+        this.service = participantService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -64,7 +69,11 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
                 (request, response) -> service.findByParticipant(getEntityReference(request));
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
-            // TODO: check perms
+            requireRole(
+                    userRoleService,
+                    request,
+                    Role.LOGICAL_DATA_FLOW_EDITOR);
+
             return service.remove(
                     getLong(request, "physicalFlowId"),
                     readEnum(request, "kind", ParticipationKind.class, (s) -> null),
@@ -73,7 +82,11 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> addRoute = (request, response) -> {
-            // TODO: check perms
+            requireRole(
+                    userRoleService,
+                    request,
+                    Role.LOGICAL_DATA_FLOW_EDITOR);
+
             return service.add(
                     getLong(request, "physicalFlowId"),
                     readEnum(request, "kind", ParticipationKind.class, (s) -> null),
