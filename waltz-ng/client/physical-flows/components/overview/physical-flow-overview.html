@@ -1,5 +1,6 @@
 <div class="waltz-physical-flow-overview">
     <div class="row">
+        <!--SOURCE-->
         <div class="col-sm-4">
             <div style="padding-top: 12px">
                 <waltz-physical-flow-overview-node node="$ctrl.logicalFlow.source"
@@ -8,6 +9,7 @@
                 </waltz-physical-flow-overview-node>
             </div>
         </div>
+        <!--FLOW DETAIL-->
         <div class="col-sm-4">
             <div class="wpfo-flow-arrow">
                 &rarr;
@@ -38,25 +40,10 @@
                             <span ng-bind="$ctrl.physicalFlow.transport | toDisplayName:'TransportKind'"></span>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="wft-label">
-                            <span>Frequency:</span>
-                        </td>
-                        <td>
-                            <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="wft-label">
-                            <span>Basis Offset:</span>
-                        </td>
-                        <td>
-                            <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
-                        </td>
-                    </tr>
                 </table>
             </div>
         </div>
+        <!--TARGET-->
         <div class="col-sm-4">
             <div style="padding-top: 12px">
                 <waltz-physical-flow-overview-node node="$ctrl.logicalFlow.target"
@@ -68,32 +55,46 @@
 
     <br>
 
-    <div class="row" ng-if="$ctrl.physicalFlow.description">
-        <div class="col-md-12">
-            <table class="waltz-field-table small">
-                <colgroup>
-                    <col width="15%">
-                    <col width="85%">
-                </colgroup>
-                <tbody >
-                <tr>
-                    <td class="wft-label">
-                        <span>Description:</span>
-                    </td>
-                    <td>
-                        <waltz-markdown class=""
-                                        text="$ctrl.physicalFlow.description">
-                        </waltz-markdown>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+
+    <div class="small">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Frequency:
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Basis Offset:
+            </div>
+            <div class="col-sm-10">
+                <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+            </div>
+        </div>
+
+        <!-- Entity Enum -->
+        <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-enum>
+
+
+        <div class="row" ng-if="$ctrl.physicalFlow.description">
+            <div class="col-sm-2 waltz-display-field-label">
+                Description
+            </div>
+            <div class="col-sm-10">
+                <waltz-markdown text="$ctrl.physicalFlow.description">
+                </waltz-markdown>
+            </div>
         </div>
     </div>
 
+
     <hr>
 
-
+    <!--SPECIFICATION-->
     <div class="row">
         <div class="col-md-12">
             <table class="waltz-field-table small">
