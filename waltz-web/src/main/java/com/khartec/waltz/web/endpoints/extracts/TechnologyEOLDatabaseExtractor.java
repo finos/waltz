@@ -48,7 +48,7 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
 
             String data = dsl
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
-                    .select(APPLICATION.NAME.as("Application Name"))
+                    .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("ASSET CODE"))
                     .select(DATABASE_INFORMATION.DATABASE_NAME.as("Database Name"),
                             DATABASE_INFORMATION.INSTANCE_NAME.as("Instance Name"),
                             DATABASE_INFORMATION.ENVIRONMENT.as("DBMS Environment"),
