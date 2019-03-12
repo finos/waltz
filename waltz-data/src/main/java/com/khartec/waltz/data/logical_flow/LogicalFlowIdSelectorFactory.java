@@ -23,6 +23,7 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.tables.Application;
@@ -42,6 +43,8 @@ import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENT
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 @Service
@@ -85,11 +88,34 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForPhysicalSpecification(options);
+            case SERVER:
+                return mkForServer(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
 
+
+    private Select<Record1<Long>> mkForServer(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition lifecycleCondition = (options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+                    ? DSL.trueCondition()
+                    : PHYSICAL_FLOW.IS_REMOVED.isFalse())
+                .and(mkLifecycleStatusCondition(options));
+
+        long serverId = options.entityReference().id();
+        return DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(PHYSICAL_FLOW_PARTICIPANT)
+                .on(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
+                .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
+                .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
+                .and(lifecycleCondition);
+    }
 
 
     private Select<Record1<Long>> mkForPhysicalSpecification(IdSelectionOptions options) {
@@ -112,8 +138,9 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(LOGICAL_FLOW.ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()))
-                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.in(map(options.entityLifecycleStatuses(), e -> e.name())));
+                .and(mkLifecycleStatusCondition(options));
     }
+
 
 
     private Select<Record1<Long>> wrapAppIdSelector(ApplicationIdSelectionOptions options) {
@@ -166,6 +193,11 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .and(NOT_REMOVED)
                 .and(supplierNotRemoved)
                 .and(consumerNotRemoved);
+    }
+
+
+    private Condition mkLifecycleStatusCondition(IdSelectionOptions options) {
+        return LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.in(map(options.entityLifecycleStatuses(), Enum::name));
     }
 
 }

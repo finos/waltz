@@ -1,59 +1,30 @@
-@import "../../../../style/variables";
-
 .waltz-physical-flow-overview {
-    table {
-        width: 100%;
-        border: 0px;
-        vertical-align: middle;
-    }
-
-    .wpfo-entity-col {
-        width: 25%;
-        align: center;
-        font-size: larger;
-
-        div {
-            background-color: #fafafa;
-            border-radius: 12px;
-            padding: 12px;
-            border: 2px solid #ddd
-        }
-
-    }
 
     .wpfo-specification-col {
-        width: 40%;
-
         .wpfo-specification-title {
             font-size: larger;
         }
 
         >div {
             background-color: #f5f5f5;
-            border-radius: 12px;
-            padding: 12px;
-            border: 2px solid #ddd
+            border-radius: 4px;
+            padding: 6px;
+            border: 1px solid #ddd
         }
     }
 
-    .wpfo-arrow-col {
+    .wpfo-flow-arrow {
         text-align: center;
+        font-size: xx-large;
+    }
 
-        span {
-            font-size: xx-large;
+    .wpfo-flow-detail {
+        align: center;
+
+        table {
+            margin: 0 auto;
         }
     }
 
-    .wpfo-owning-entity div {
-        background: $waltz-blue-background;
-    }
-
-    .wpfo-entity-actor div {
-        background: $waltz-actor-background;
-    }
-
-    .wpfo-entity-application div {
-        background: $waltz-green-background;
-    }
 }
 

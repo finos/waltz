@@ -17,19 +17,22 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
-
-<div ng-if="$ctrl.tableData.length > 0">
-    <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                            entries="$ctrl.tableData"
-                            on-initialise="$ctrl.onGridInitialise">
-    </waltz-grid-with-search>
+<div class="row">
+    <div class="col-sm-6">
+        <waltz-physical-flow-participants-sub-section participant-kind="SOURCE"
+                                                      on-remove="$ctrl.onRemoveParticipant"
+                                                      on-add="$ctrl.onAddSourceParticipant"
+                                                      node-ref="$ctrl.logicalFlow.source"
+                                                      current-participants="$ctrl.currentParticipantsByKind.SOURCE">
+        </waltz-physical-flow-participants-sub-section>
+    </div>
+    <div class="col-sm-6">
+        <waltz-physical-flow-participants-sub-section participant-kind="TARGET"
+                                                      on-remove="$ctrl.onRemoveParticipant"
+                                                      on-add="$ctrl.onAddTargetParticipant"
+                                                      node-ref="$ctrl.logicalFlow.target"
+                                                      current-participants="$ctrl.currentParticipantsByKind.TARGET">
+        </waltz-physical-flow-participants-sub-section>
+    </div>
 </div>
 
-<waltz-no-data ng-if="$ctrl.tableData.length == 0">
-    <message>
-        <strong>No Participant</strong> detail available for this
-        <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'">
-        </span>
-    </message>
-</waltz-no-data>

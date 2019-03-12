@@ -16,16 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './physical-flow-overview.html';
+import template from "./physical-flow-overview.html";
 import {initialiseData} from "../../../common/index";
 import {resolveSourceAndTarget} from "../../../logical-flow/logical-flow-utils";
 import {compareCriticalities} from "../../../common/criticality-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
+import {truncate} from "../../../common/string-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -59,11 +60,29 @@ function controller(serviceBroker) {
                     [physicalFlow.specificationId]))
             .then(r => {
                 vm.specification = r.data;
-                vm.specificationReference = toEntityRef(r.data, 'PHYSICAL_SPECIFICATION');
+                vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
+            });
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowParticipantStore.findByPhysicalFlowId,
+                [ vm.parentEntityRef.id ])
+            .then(r => {
+                vm.participants = _
+                    .chain(r.data)
+                    .groupBy("kind")
+                    .mapValues(ps => _.map(ps, p => {
+                        return {
+                            id: p.participant.id,
+                            kind: p.participant.kind,
+                            name: truncate(p.participant.name, 24)
+                        };
+                    }))
+                    .value();
             });
 
         logicalFlowPromise.then(() => {
-            if (vm.logicalFlow.source.kind === 'APPLICATION') {
+            if (vm.logicalFlow.source.kind === "APPLICATION") {
                 resolveSourceAndTarget(serviceBroker, vm.logicalFlow)
                     .then(sourceAndTarget => {
                         const criticalityComparison = compareCriticalities(
@@ -72,7 +91,6 @@ function controller(serviceBroker) {
 
                         if (criticalityComparison === -1) {
                             vm.hasCriticalityMismatch = true;
-                            vm.criticalityMismatchMessage = "Criticality mismatch: this flow has a higher criticality rating than the source"
                         } else {
                             vm.hasCriticalityMismatch = false;
                         }
@@ -89,7 +107,7 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 
 const component = {
@@ -101,5 +119,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowOverview'
+    id: "waltzPhysicalFlowOverview"
 };

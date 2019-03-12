@@ -40,16 +40,61 @@ public class MapUtilities {
          return new HashMap<>();
     }
 
-    public static <K, V> HashMap<K, V> newHashMap(K key, V val) {
+
+    public static <K, V> Map<K, V> newHashMap(K key, V val) {
         HashMap<K, V> map = newHashMap();
         map.put(key, val);
         return map;
     }
 
 
-    public static <K, V> Map<K, V> newHashMap(K k1, V v1, K k2, V v2) {
-        HashMap<K, V> map = newHashMap(k1, v1);
+    public static <K, V> Map<K, V> newHashMap(K k1, V v1,
+                                              K k2, V v2) {
+        Map<K, V> map = newHashMap(k1, v1);
         map.put(k2, v2);
+        return map;
+    }
+
+
+    public static <K, V> Map<K, V> newHashMap(K k1, V v1,
+                                              K k2, V v2,
+                                              K k3, V v3) {
+        Map<K, V> map = newHashMap(k1, v1, k2, v2);
+        map.put(k3, v3);
+        return map;
+    }
+
+
+
+    public static <K, V> Map<K, V> newHashMap(K k1, V v1,
+                                              K k2, V v2,
+                                              K k3, V v3,
+                                              K k4, V v4) {
+        Map<K, V> map = newHashMap(k1, v1, k2, v2, k3, v3);
+        map.put(k4, v4);
+        return map;
+    }
+
+
+    public static <K, V> Map<K, V> newHashMap(K k1, V v1,
+                                              K k2, V v2,
+                                              K k3, V v3,
+                                              K k4, V v4,
+                                              K k5, V v5) {
+        Map<K, V> map = newHashMap(k1, v1, k2, v2, k3, v3, k4, v4);
+        map.put(k5, v5);
+        return map;
+    }
+
+
+    public static <K, V> Map<K, V> newHashMap(K k1, V v1,
+                                              K k2, V v2,
+                                              K k3, V v3,
+                                              K k4, V v4,
+                                              K k5, V v5,
+                                              K k6, V v6) {
+        Map<K, V> map = newHashMap(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+        map.put(k6, v6);
         return map;
     }
 

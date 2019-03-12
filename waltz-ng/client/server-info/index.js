@@ -27,6 +27,7 @@ import Routes from './routes';
 
 import ServerPies from "./components/server-pies/server-pies";
 import ServerOverview from "./components/overview/server-overview";
+import ServerUsagesSection from "./components/usages-section/server-usages-section";
 
 import ServerView from "./pages/view/server-view";
 
@@ -40,6 +41,7 @@ export default () => {
     registerComponents(module, [
         ServerPies,
         ServerOverview,
+        ServerUsagesSection,
         ServerView
     ]);
 

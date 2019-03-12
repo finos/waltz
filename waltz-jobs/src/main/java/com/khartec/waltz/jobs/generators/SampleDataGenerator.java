@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -31,7 +32,9 @@ import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING
 
 public interface SampleDataGenerator {
 
+    Random rnd = new Random();
     String SAMPLE_DATA_PROVENANCE = "waltz-sample";
+
     int NUM_APPS = 500;
     int NUM_CHANGE_INITIATIVES = 4;
     int NUM_PROCESS_GROUPS = 3;
@@ -44,8 +47,8 @@ public interface SampleDataGenerator {
     }
 
 
-    default void log(String msg) {
-        System.out.println(msg);
+    default void log(String msg, Object... args) {
+        System.out.println(String.format(msg, args));
     }
 
 

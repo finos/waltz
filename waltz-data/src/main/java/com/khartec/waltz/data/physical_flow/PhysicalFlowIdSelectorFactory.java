@@ -21,7 +21,9 @@ package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -31,6 +33,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 
 
 @Service
@@ -46,9 +49,30 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForLogicalFlow(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
+            case SERVER:
+                return mkForServer(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForServer(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long serverId = options.entityReference().id();
+
+        Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+            ? DSL.trueCondition()
+            : PHYSICAL_FLOW.IS_REMOVED.isFalse();
+
+        return DSL
+                .select(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID)
+                .from(PHYSICAL_FLOW_PARTICIPANT)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID))
+                .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
+                .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
+                .and(lifecycleCondition);
     }
 
 

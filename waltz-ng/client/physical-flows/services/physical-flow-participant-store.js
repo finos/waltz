@@ -30,26 +30,63 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const findByParticipant = (ref) => {
+        return $http
+            .get(`${base}/participant/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
+
+    const remove = (physicalFlowId, kind, participant) => {
+        return $http
+            .delete(`${base}/physical-flow/${physicalFlowId}/${kind}/${participant.kind}/${participant.id}`)
+            .then(r => r.data);
+    };
+
+    const add = (physicalFlowId, kind, participant) => {
+        return $http
+            .post(`${base}/physical-flow/${physicalFlowId}/${kind}/${participant.kind}/${participant.id}`)
+            .then(r => r.data);
+    };
+
     return {
-        findByPhysicalFlowId
+        findByPhysicalFlowId,
+        findByParticipant,
+        remove,
+        add
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'PhysicalFlowParticipantStore';
+export const serviceName = "PhysicalFlowParticipantStore";
 
 
 
 export const PhysicalFlowParticipantStore_API = {
     findByPhysicalFlowId: {
         serviceName,
-        serviceFnName: 'findByPhysicalFlowId',
-        description: 'executes findByPhysicalFlowId'
+        serviceFnName: "findByPhysicalFlowId",
+        description: "executes findByPhysicalFlowId"
+    },
+    findByParticipant: {
+        serviceName,
+        serviceFnName: "findByParticipant",
+        description: "executes findByParticipant"
+    },
+    remove: {
+        serviceName,
+        serviceFnName: "remove",
+        description: "executes remove (physical flow id, kind:SOURCE|TARGET, participantRef)"
+    },
+    add: {
+        serviceName,
+        serviceFnName: "add",
+        description: "executes add (physical flow id, kind:SOURCE|TARGET, participantRef)"
     }
 };

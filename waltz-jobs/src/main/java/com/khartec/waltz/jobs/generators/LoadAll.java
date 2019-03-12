@@ -4,6 +4,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 
 public class LoadAll {
@@ -26,13 +27,14 @@ public class LoadAll {
             new MeasurableRatingGenerator(),
             SKIP_SLOW ? null : new EntityStatisticGenerator(),
             new AuthSourceGenerator(),
+            new ServerGenerator(),
             new LogicalFlowGenerator(),
             new LogicalFlowDecorationGenerator(),
             new PhysicalSpecificationGenerator(),
             new PhysicalFlowGenerator(),
+            new PhysicalFlowParticipantGenerator(),
             new InvolvementGenerator(),
             new DatabaseGenerator(),
-            new ServerGenerator(),
             new AssetCostGenerator(),
             new ChangeLogGenerator(),
             new EndUserAppGenerator(),
@@ -46,9 +48,9 @@ public class LoadAll {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         Arrays.stream(loaders)
-                .filter(loader -> loader != null)
+                .filter(Objects::nonNull)
                 .forEach(loader -> {
-                    log("Starting loader: "+loader.getClass().getSimpleName());
+                    log("Starting loader: %s", loader.getClass().getSimpleName());
                     log("Cleanup");
                     loader.remove(ctx);
                     log("Generate");
@@ -57,7 +59,7 @@ public class LoadAll {
                 });
     }
 
-    private static void log(String s) {
-        System.out.println(s);
+    private static void log(String s, Object... args) {
+        System.out.println(String.format(s, args));
     }
 }

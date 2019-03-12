@@ -1,0 +1,59 @@
+<style>
+    .wsus-highlight {
+        padding: 2px;
+        border-bottom: 2px solid #b9ffcd;
+    }
+</style>
+
+<waltz-section name="Server Usage in Flows" icon="random">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <waltz-no-data ng-if="$ctrl.usages.length == 0">
+                <message>
+                    This server has <strong>not</strong> been associated with
+                    any physical flows.
+                </message>
+            </waltz-no-data>
+
+            <table ng-if="$ctrl.usages.length > 0"
+                   class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Physical Flow</th>
+                    <th>Criticality</th>
+                    <th>Source</th>
+                    <th>Target</th>
+                    <th>Transport</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="usage in $ctrl.usages">
+                    <td>
+                        <a ui-sref="main.physical-flow.view ({id: usage.physicalFlow.id })">
+                            <span ng-bind="usage.physicalSpecification.name"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="usage.physicalFlow.criticality | toDisplayName:'criticality'"></span>
+                    </td>
+                    <td>
+                        <div ng-class="{'wsus-highlight': usage.participation.kind == 'SOURCE' }">
+                            <waltz-entity-link entity-ref="usage.logicalFlow.source"></waltz-entity-link>
+                        </div>
+                    </td>
+                    <td>
+                        <div ng-class="{'wsus-highlight': usage.participation.kind == 'TARGET' }">
+                            <waltz-entity-link entity-ref="usage.logicalFlow.target"></waltz-entity-link>
+                        </div>
+                    </td>
+                    <td>
+                        <span ng-bind="usage.physicalFlow.transport"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</waltz-section>

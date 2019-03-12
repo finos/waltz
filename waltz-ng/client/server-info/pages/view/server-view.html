@@ -15,11 +15,8 @@
 
 <br>
 
-<!-- Entity Named Notes -->
-<waltz-dynamic-section-wrapper section="$ctrl.entityNamedNotesSection"
-                               parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-dynamic-section-wrapper>
-
+<waltz-server-usages-section parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-server-usages-section>
 
 <!-- APPS -->
 <waltz-dynamic-section-wrapper section="$ctrl.appsSection"
@@ -27,7 +24,19 @@
 </waltz-dynamic-section-wrapper>
 
 
+<!-- Entity Named Notes -->
+<waltz-dynamic-section-wrapper section="$ctrl.entityNamedNotesSection"
+                               parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-section-wrapper>
+
+
 <!-- Bookmarks -->
 <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
                                parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-section-wrapper>
+
+
+<!-- Changes -->
+<waltz-dynamic-section-wrapper parent-entity-ref="$ctrl.parentEntityRef"
+                               section="$ctrl.changeLogSection">
 </waltz-dynamic-section-wrapper>

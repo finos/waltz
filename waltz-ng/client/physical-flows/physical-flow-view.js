@@ -146,6 +146,7 @@ function controller($q,
             [ flowId ])
         .then(r => vm.physicalFlow = r.data);
 
+
     physicalFlowPromise
         .then(() => serviceBroker
             .loadViewData(

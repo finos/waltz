@@ -1,0 +1,150 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017  Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<waltz-sub-section name="{{$ctrl.name}}"
+                   small="{{$ctrl.nodeRef.name}}">
+    <content>
+        <div style="margin: 6px; padding-bottom: 4px;">
+
+            <!-- VIEWER -->
+            <div ng-if="$ctrl.visibility.editor === false">
+                <waltz-no-data ng-if="$ctrl.participants.length === 0">
+                    <message>
+                        <strong>No Participant</strong> detail available.
+                    </message>
+                </waltz-no-data>
+
+                <div ng-if="$ctrl.participants.length > 0">
+                    <table class="table table-condensed table-striped">
+                        <thead>
+                        <tr>
+                            <th>Server</th>
+                            <th>Operating System</th>
+                            <th>Location</th>
+                            <th>Country</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="d in $ctrl.participants">
+                            <td><waltz-entity-link entity-ref="d.participant.participant"></waltz-entity-link></td>
+                            <td><span ng-bind="d.server.operatingSystem"></span></td>
+                            <td><span ng-bind="d.server.location"></span></td>
+                            <td><span ng-bind="d.server.country"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- EDITOR -->
+            <div ng-if="$ctrl.visibility.editor">
+                <table class="table table-condensed table striped">
+                    <colgroup>
+                        <col width="70%">
+                        <col width="30%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Server</th>
+                        <th>Operation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="p in $ctrl.participants">
+                        <td><span ng-bind="p.participant.participant.name"></span></td>
+                        <td>
+                            <a ng-click="$ctrl.onRemove(p.participant)"
+                               class="clickable">
+                                <waltz-icon name="trash"></waltz-icon>
+                                Remove
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody ng-if="$ctrl.participants.length == 0">
+                        <tr>
+                            <td colspan="2">
+                                <i>No participants defined</i>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody ng-if="! $ctrl.visibility.serverPicker">
+                        <tr>
+                            <td/>
+                            <td>
+                                <a class="clickable"
+                                   ng-click="$ctrl.onShowServerPicker()">
+                                    <waltz-icon name="plus"></waltz-icon>
+                                    Add server
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody ng-if="$ctrl.visibility.serverPicker">
+                    <tr>
+                        <td>
+                            <input type="search"
+                                   class="form-control"
+                                   ng-model-options="{debounce: 300}"
+                                   placeholder="Search"
+                                   ng-model="$ctrl.qry">
+
+                            <div ng-class="{'waltz-scroll-region-200': $ctrl.availableServers.length > 20}">
+                                <ul class="list-unstyled">
+                                    <li ng-repeat="s in $ctrl.availableServers | orderBy:'hostname' | filter:$ctrl.qry">
+                                        <a class="clickable"
+                                           ng-click="$ctrl.onAddServer(s)"
+                                           ng-bind="s.hostname">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </td>
+                        <td>
+                            <a class="clickable"
+                               ng-click="$ctrl.onHideServerPicker()">
+                                Cancel
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="waltz-sub-section-controls">
+                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                    <a ng-click="$ctrl.visibility.editor = true"
+                       ng-if="! $ctrl.visibility.editor"
+                       class="clickable">
+                        Edit
+                    </a>
+
+                    <a ng-click="$ctrl.visibility.editor = false"
+                       ng-if="$ctrl.visibility.editor"
+                       class="clickable">
+                        Done
+                    </a>
+                </span>
+                </div>
+            </div>
+
+        </div>
+    </content>
+</waltz-sub-section>
