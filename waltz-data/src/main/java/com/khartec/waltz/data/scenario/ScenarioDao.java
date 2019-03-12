@@ -34,6 +34,7 @@ public class ScenarioDao {
         return ImmutableScenario.builder()
                 .id(record.getId())
                 .name(record.getName())
+                .position(record.getPosition())
                 .roadmapId(record.getRoadmapId())
                 .description(record.getDescription())
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getLifecycleStatus()))
@@ -58,6 +59,7 @@ public class ScenarioDao {
         record.setEffectiveDate(Date.valueOf(domainObj.effectiveDate()));
         record.setLastUpdatedBy(domainObj.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(domainObj.lastUpdatedAt()));
+        record.setPosition(domainObj.position());
 
         return record;
     };
@@ -88,6 +90,7 @@ public class ScenarioDao {
                 .from(SCENARIO)
                 .where(SCENARIO.ROADMAP_ID.eq(roadmapId))
                 .and(NOT_REMOVED)
+                .orderBy(SCENARIO.POSITION, SCENARIO.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -98,6 +101,7 @@ public class ScenarioDao {
                 .from(SCENARIO)
                 .where(SCENARIO.ROADMAP_ID.in(selector))
                 .and(NOT_REMOVED)
+                .orderBy(SCENARIO.POSITION, SCENARIO.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -196,6 +200,7 @@ public class ScenarioDao {
                 .effectiveDate(today())
                 .lastUpdatedAt(nowUtc())
                 .lastUpdatedBy(userId)
+                .position(0)
                 .build();
 
         ScenarioRecord record = TO_RECORD_MAPPER
