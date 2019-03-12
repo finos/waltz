@@ -34,6 +34,7 @@ const initialState = {
     appsSection: dynamicSections.appsSection,
     bookmarksSection: dynamicSections.bookmarksSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
+    changeLogSection: dynamicSections.changeLogSection
 };
 
 
