@@ -15,7 +15,8 @@ public abstract class Scenario implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider,
-        EntityLifecycleStatusProvider {
+        EntityLifecycleStatusProvider,
+        PositionProvider {
 
     public abstract long roadmapId();
     public abstract LocalDate effectiveDate();
