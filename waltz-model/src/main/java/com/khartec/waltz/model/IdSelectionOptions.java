@@ -58,7 +58,7 @@ public abstract class IdSelectionOptions {
     }
 
 
-    public static HierarchyQueryScope determineDefaultScope(EntityKind kind) {
+    protected static HierarchyQueryScope determineDefaultScope(EntityKind kind) {
         switch (kind) {
             case ACTOR:
             case APPLICATION:
