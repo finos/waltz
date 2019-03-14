@@ -28,6 +28,10 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById, hiddenAxes = [
         .filter(d => !_.includes(hiddenAxisIds, d.domainItem.id))
         .map(d => {
             const measurable = measurablesById[d.domainItem.id];
+            if (! measurable) {
+                console.log("Cannot draw column/row as it references an unknown measurable: ", { measurableId: d.domainItem.id, axisDefinition: d });
+                return null;
+            }
             return {
                 id: measurable.id,
                 name: measurable.name,
@@ -37,6 +41,7 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById, hiddenAxes = [
                 data: measurable
             };
         })
+        .compact()
         .orderBy(d => d.position)
         .groupBy(d => d.axisOrientation)
         .value();

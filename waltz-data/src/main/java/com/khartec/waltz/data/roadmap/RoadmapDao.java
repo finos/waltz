@@ -144,13 +144,14 @@ public class RoadmapDao {
 
 
     public Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosByRatedEntity(EntityReference ratedEntity) {
-        SelectConditionStep<Record1<Long>> scenarioSelector = DSL
-                .select(SCENARIO_RATING_ITEM.SCENARIO_ID)
+        SelectConditionStep<Record1<Long>> roadmapSelector = DSL
+                .select(SCENARIO.ROADMAP_ID)
                 .from(SCENARIO_RATING_ITEM)
+                .innerJoin(SCENARIO).on(SCENARIO.ID.eq(SCENARIO_RATING_ITEM.SCENARIO_ID))
                 .where(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(ratedEntity.kind().name()))
                 .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(ratedEntity.id()));
 
-        return findRoadmapsAndScenariosViaSelector(scenarioSelector);
+        return findRoadmapsAndScenariosViaRoadmapSelector(roadmapSelector);
     }
 
 
@@ -163,7 +164,7 @@ public class RoadmapDao {
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(relatedEntity.id()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.ROADMAP.name()));
 
-        return findRoadmapsAndScenariosViaSelector(roadmapIdSelector);
+        return findRoadmapsAndScenariosViaRoadmapSelector(roadmapIdSelector);
     }
 
 
@@ -193,8 +194,8 @@ public class RoadmapDao {
     // -- helpers
 
 
-    private Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaSelector(SelectConditionStep<Record1<Long>> scenarioSelector) {
-        Condition condition = SCENARIO.ID.in(scenarioSelector);
+    private Collection<RoadmapAndScenarioOverview> findRoadmapsAndScenariosViaRoadmapSelector(SelectConditionStep<Record1<Long>> roadmapIdSelector) {
+        Condition condition = ROADMAP.ID.in(roadmapIdSelector);
         return findRoadmapsAndScenariosViaCondition(condition);
     }
 
