@@ -49,7 +49,7 @@ function controller(notification) {
         } else {
             notification.warning("Please create a rating before you add any description");
         }
-    }
+    };
 
 }
 
