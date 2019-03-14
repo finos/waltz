@@ -20,10 +20,15 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.model.roadmap.Roadmap;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Collection;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 public class RoadmapHarness {
@@ -35,8 +40,11 @@ public class RoadmapHarness {
         RoadmapDao roadmapDao = ctx.getBean(RoadmapDao.class);
         RoadmapService roadmapService = ctx.getBean(RoadmapService.class);
 
-        Roadmap r = roadmapDao.getById(1L);
-        System.out.println(r);
+        Collection<RoadmapAndScenarioOverview> relns = roadmapService
+                .findRoadmapsAndScenariosByFormalRelationship(mkRef(EntityKind.ORG_UNIT, 2700));
+
+        System.out.println(relns);
+
 
     }
 

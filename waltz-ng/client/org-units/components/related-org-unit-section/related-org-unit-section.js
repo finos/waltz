@@ -90,7 +90,7 @@ function loadRelationshipData($q, serviceBroker, entityRef) {
                 })
                 .filter(rel => rel.counterpartRef.kind === "ORG_UNIT")
                 .map(rel => Object.assign({}, rel, { counterpart: groupsById[rel.counterpartRef.id] }))
-                .filter(rel => rel.counterpart !== null)
+                .filter(rel => !_.isNil(rel.counterpart))
                 .uniqBy(rel => rel.counterpart.id)
                 .orderBy("counterpart.name")
                 .value();
