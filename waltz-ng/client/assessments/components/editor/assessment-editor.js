@@ -23,7 +23,9 @@ import template from "./assessment-editor.html";
 
 const bindings = {
     onSave: "<",
-    assessment: "<"
+    assessment: "<",
+    onClose: "<",
+    onRemove: "<"
 };
 
 
@@ -35,19 +37,19 @@ const initialState = {
 function controller(notification) {
     const vm = initialiseData(this, initialState);
 
-    vm.onSaveRating = (value) => {
+    vm.onSaveRating = (ratingId) => {
         const comments = vm.assessment.rating ? vm.assessment.rating.description : "";
-        return vm.onSave(value, comments, vm.assessment);
+        return vm.onSave(ratingId, comments, vm.assessment);
     };
 
-    vm.onSaveDescription = (value, comments) => {
+    vm.onSaveDescription = (commentChange) => {
         const rating = vm.assessment.rating;
         if (rating){
-            return vm.onSave(rating.ratingId, comments.newVal, vm.assessment);
+            return vm.onSave(rating.ratingId, commentChange.newVal, vm.assessment);
         } else {
             notification.warning("Please create a rating before you add any description");
         }
-    }
+    };
 
 }
 

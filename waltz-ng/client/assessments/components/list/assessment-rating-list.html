@@ -23,7 +23,8 @@
                             <!-- definition name -->
                             <td class="wft-label">
                                 <span uib-popover-template="'arp-desc-popover.html'"
-                                      popover-placement="right"
+                                      popover-placement="left"
+                                      popover-enable="item.definition.description"
                                       popover-trigger="mouseenter"
                                       popover-popup-delay="300"
                                       popover-append-to-body="true">
@@ -42,13 +43,22 @@
                                        class="clickable">
                                         <waltz-rating-indicator-cell rating="item.ratingItem">
                                         </waltz-rating-indicator-cell>
+
                                         <span ng-bind="item.ratingItem.name">
+                                        </span>
+
+                                        <span ng-if="item.rating.description.length > 0">
+                                            &nbsp;
+                                            <waltz-icon name="sticky-note-o">
+                                            </waltz-icon>
                                         </span>
                                     </a>
                                 </span>
                                 <span ng-if="!item.rating">
                                     <a ng-click="$ctrl.onSelect(item)"
-                                       class="clickable">Not Provided</a>
+                                       class="clickable">
+                                        Not Provided
+                                    </a>
                                 </span>
                             </td>
                         </tr>
@@ -88,11 +98,11 @@
             <div>
                 <strong ng-bind="item.name"></strong>
                 <span class="small text-muted"
-                      ng-if="item.externalId">
-                    (<span ng-bind="item.externalId"> </span>)
+                      ng-if="item.definition.externalId">
+                    (<span ng-bind="item.definition.externalId"> </span>)
                 </span>
             </div>
-            <div ng-bind="item.description"
+            <div ng-bind="item.definition.description"
                   class="text-muted">
             </div>
         </div>
