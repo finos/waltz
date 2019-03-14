@@ -9,16 +9,11 @@
                 </div>
                 <div ng-switch-when="VIEW">
                     <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
-                                             on-save="$ctrl.onSave">
+                                             on-save="$ctrl.onSave"
+                                             on-close="$ctrl.onClose"
+                                             on-remove="$ctrl.onRemove">
                     </waltz-assessment-editor>
-                    <a ng-click="$ctrl.onClose()"
-                       class="clickable pull-right">
-                        <waltz-icon name="close"></waltz-icon>
-                    </a>
-                    <a ng-click="$ctrl.onRemove($ctrl.selectedAssessment)"
-                       class="clickable">
-                        <waltz-icon name="trash"></waltz-icon>
-                    </a>
+
                 </div>
             </div>
         </div>

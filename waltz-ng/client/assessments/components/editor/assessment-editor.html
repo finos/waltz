@@ -1,57 +1,64 @@
 <div class="waltz-assessment-editor">
     <div class="row">
-        <div class="col-md-12">
-            <table class="waltz-field-table waltz-field-table-border"
-                   style="width: 100%">
-                <colgroup>
-                    <col width="30%">
-                    <col width="70%">
-                </colgroup>
-                <tr>
-                    <td class="wft-label">
-                        <span ng-bind="$ctrl.assessment.definition.name"></span>
-                    </td>
-                    <td valign="top">
-                        <span ng-if="$ctrl.assessment.definition.isReadOnly === false">
-                            <waltz-editable-dropdown initial-val="$ctrl.assessment.rating.ratingId"
-                                                     entries="$ctrl.assessment.dropdownEntries"
-                                                     comments-allowed="false"
-                                                     on-save="$ctrl.onSaveRating"
-                                                     empty-label="No rating provided"
-                                                     edit-role="{{ $ctrl.assessment.definition.permittedRole }}"
-                                                     ctx="$ctrl.assessment">
-                            </waltz-editable-dropdown>
-                            <waltz-editable-field field-type="textarea"
-                                                  ng-if="$ctrl.assessment.rating"
-                                                  on-save="$ctrl.onSaveDescription"
-                                                  initial-val="$ctrl.assessment.rating.description"
-                                                  empty-label="No description provided"
-                                                  edit-role="{{ $ctrl.assessment.definition.permittedRole }}"
-                                                  ctx="$ctrl.assessment"
-                                                  class="text-muted">
-                            </waltz-editable-field>
-                        </span>
-                        <span ng-if="$ctrl.assessment.definition.isReadOnly">
-                             <span ng-bind="$ctrl.assessment.ratingItem.name">
-                             </span>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.assessment.definition.name"></span>
+        </div>
+        <div class="col-sm-8">
+          <span ng-if="$ctrl.assessment.definition.isReadOnly === false">
+                <waltz-editable-dropdown initial-val="$ctrl.assessment.rating.ratingId"
+                                         entries="$ctrl.assessment.dropdownEntries"
+                                         comments-allowed="false"
+                                         on-save="$ctrl.onSaveRating"
+                                         empty-label="No rating provided"
+                                         edit-role="{{ $ctrl.assessment.definition.permittedRole }}"
+                                         ctx="$ctrl.assessment">
+                </waltz-editable-dropdown>
+                <waltz-editable-field field-type="textarea"
+                                      ng-if="$ctrl.assessment.rating"
+                                      on-save="$ctrl.onSaveDescription"
+                                      initial-val="$ctrl.assessment.rating.description"
+                                      empty-label="No description provided"
+                                      edit-role="{{ $ctrl.assessment.definition.permittedRole }}"
+                                      ctx="$ctrl.assessment"
+                                      class="text-muted">
+                </waltz-editable-field>
+            </span>
+            <span ng-if="$ctrl.assessment.definition.isReadOnly">
+                 <span ng-bind="$ctrl.assessment.ratingItem.name">
+                 </span>
 
-                            <span class="text-muted small"
-                                  uib-popover="This assessment is read only and cannot be edited"
-                                  popover-trigger="mouseenter">
-                                (read only)
-                            </span>
+                <span class="text-muted small"
+                      uib-popover="This assessment is read only and cannot be edited"
+                      popover-trigger="mouseenter">
+                    (read only)
+                </span>
 
-                             <span ng-if="$ctrl.assessment.rating.description">
-                                    <br>
-                                    <span class="small text-muted"
-                                          ng-bind="$ctrl.assessment.rating.description">
-                                    </span>
-                                </span>
-                            </span>
+                 <span ng-if="$ctrl.assessment.rating.description">
+                        <br>
+                        <span class="small text-muted"
+                              ng-bind="$ctrl.assessment.rating.description">
                         </span>
-                    </td>
-                </tr>
-            </table>
+                    </span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-4 col-sm-6"
+             style="border-top: 1px solid #eee; padding-top: 3px; margin-top: 3px">
+            <a ng-click="$ctrl.onClose()"
+               class="clickable">
+                <waltz-icon name="close"></waltz-icon>
+                Close
+            </a>
+            <span waltz-has-role="{{ $ctrl.assessment.definition.permittedRole }}">
+                |
+                <a ng-click="$ctrl.onRemove($ctrl.selectedAssessment)"
+                   class="clickable">
+                    <waltz-icon name="trash"></waltz-icon>
+                    Remove
+                </a>
+            </span>
         </div>
     </div>
 </div>
