@@ -69,8 +69,8 @@ public class EntityHierarchyDao {
         checkNotNull(hierarchyItems, "hierarchyItems cannot be null");
 
         LOG.info("Replacing hierarchy items for kind: {}, deleting existing", kind);
-        dsl.deleteFrom(eh)
-                .where(eh.KIND.eq(kind.name()))
+        dsl.deleteFrom(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
                 .execute();
 
         LOG.info("Replacing hierarchy items for kind: {}, inserting new record (#{})", kind, hierarchyItems.size());

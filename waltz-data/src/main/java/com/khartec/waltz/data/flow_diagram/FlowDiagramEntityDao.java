@@ -134,9 +134,9 @@ public class FlowDiagramEntityDao {
      */
     public int deleteForDiagram(long diagramId) {
         return dsl
-                .deleteFrom(fde)
-                .where(fde.DIAGRAM_ID.eq(diagramId))
-                .and(fde.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
+                .deleteFrom(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
                 .execute();
     }
 
@@ -150,10 +150,10 @@ public class FlowDiagramEntityDao {
      */
     public boolean deleteEntityForDiagram(long diagramId, EntityReference entityReference) {
         return dsl
-                .deleteFrom(fde)
-                .where(fde.DIAGRAM_ID.eq(diagramId))
-                .and(fde.ENTITY_KIND.eq(entityReference.kind().name()))
-                .and(fde.ENTITY_ID.eq(entityReference.id()))
+                .deleteFrom(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(entityReference.id()))
                 .execute() == 1;
     }
 
@@ -166,9 +166,9 @@ public class FlowDiagramEntityDao {
      */
     public int deleteForGenericEntitySelector(GenericSelector selector) {
         return dsl
-                .deleteFrom(fde)
-                .where(fde.ENTITY_KIND.eq(selector.kind().name()))
-                .and(fde.ENTITY_ID.in(selector.selector()))
+                .deleteFrom(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(selector.kind().name()))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_ID.in(selector.selector()))
                 .execute();
     }
 
