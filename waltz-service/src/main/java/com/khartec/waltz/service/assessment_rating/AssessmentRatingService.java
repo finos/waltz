@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.CHANGE_INITIATIVE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service

@@ -19,7 +19,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker) {
+function controller($q, notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
@@ -64,8 +64,12 @@ function controller($q, serviceBroker) {
 
     vm.onRemove = (ctx) => {
         return serviceBroker
-            .execute(CORE_API.AssessmentRatingStore.remove, [vm.parentEntityRef, ctx.definition.id])
-            .then(() => vm.onClose());
+            .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
+            .then(() => {
+                vm.onClose();
+                notification.warning("Assessment removed");
+            })
+            .catch(e => notification.error("Failed to remove", e.message));
     };
 
 
@@ -75,7 +79,11 @@ function controller($q, serviceBroker) {
             : CORE_API.AssessmentRatingStore.create;
         return serviceBroker
             .execute(saveMethod, [vm.parentEntityRef, ctx.definition.id, value, comments])
-            .then(d => loadAll());
+            .then(d => {
+                loadAll();
+                notification.success("Assessment saved");
+            })
+            .catch(e => notification.error("Failed to save", e.message));
     };
 
 
@@ -84,6 +92,7 @@ function controller($q, serviceBroker) {
 
 controller.$inject = [
     "$q",
+    "Notification",
     "ServiceBroker"
 ];
 
