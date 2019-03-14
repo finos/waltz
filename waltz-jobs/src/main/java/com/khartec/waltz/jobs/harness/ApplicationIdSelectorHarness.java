@@ -70,8 +70,8 @@ public class ApplicationIdSelectorHarness {
         ApplicationIdSelectionOptions opt2= ApplicationIdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 20),
                 HierarchyQueryScope.CHILDREN,
-                SetUtilities.fromArray(ApplicationKind.EXTERNALLY_HOSTED, ApplicationKind.EUC)
-        );
+                null,
+                SetUtilities.fromArray(ApplicationKind.EXTERNALLY_HOSTED, ApplicationKind.EUC));
 
         List<Application> apps1 = applicationService.findByAppIdSelector(opt1);
         List<Application> apps2 = applicationService.findByAppIdSelector(opt2);

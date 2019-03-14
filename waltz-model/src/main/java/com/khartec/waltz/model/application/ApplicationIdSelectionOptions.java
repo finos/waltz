@@ -22,6 +22,7 @@ package com.khartec.waltz.model.application;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -41,29 +42,35 @@ public abstract class ApplicationIdSelectionOptions extends IdSelectionOptions {
                 determineDefaultScope(ref.kind()));
     }
 
+
     public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
                                                        HierarchyQueryScope scope) {
-        return ImmutableApplicationIdSelectionOptions.builder()
-                .entityReference(ref)
-                .scope(scope)
-                .build();
+        return mkOpts(ref, scope, null, null);
     }
 
 
     public static ApplicationIdSelectionOptions mkOpts(EntityReference ref,
                                                        HierarchyQueryScope scope,
+                                                       Set<EntityLifecycleStatus> entityLifecycleStatuses,
                                                        Set<ApplicationKind> applicationKinds) {
-        return ImmutableApplicationIdSelectionOptions.builder()
+        ImmutableApplicationIdSelectionOptions.Builder builder = ImmutableApplicationIdSelectionOptions.builder()
                 .entityReference(ref)
-                .scope(scope)
-                .applicationKinds(applicationKinds)
-                .build();
+                .scope(scope);
+
+        if(entityLifecycleStatuses != null) {
+            builder.entityLifecycleStatuses(entityLifecycleStatuses);
+        }
+
+        if(applicationKinds != null) {
+            builder.applicationKinds(applicationKinds);
+        }
+        return builder.build();
     }
 
 
     public static ApplicationIdSelectionOptions mkOpts(IdSelectionOptions options,
                                                        Set<ApplicationKind> applicationKinds) {
-        return mkOpts(options.entityReference(), options.scope(), applicationKinds);
+        return mkOpts(options.entityReference(), options.scope(), options.entityLifecycleStatuses(), applicationKinds);
     }
 
 
@@ -81,7 +88,7 @@ public abstract class ApplicationIdSelectionOptions extends IdSelectionOptions {
         if(options instanceof ApplicationIdSelectionOptions) {
             appOptions = (ApplicationIdSelectionOptions) options;
         } else {
-            appOptions = mkOpts(options);
+            appOptions = mkOpts(options, SetUtilities.fromArray(ApplicationKind.values()));
         }
         return appOptions;
     }
