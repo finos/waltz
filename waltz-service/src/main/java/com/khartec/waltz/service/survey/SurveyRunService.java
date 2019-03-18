@@ -22,7 +22,6 @@ package com.khartec.waltz.service.survey;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
@@ -106,7 +105,7 @@ public class SurveyRunService {
     public List<SurveyRun> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        Person person = personDao.getByUserName(userName);
+        Person person = personDao.getActiveByUserEmail(userName);
         checkNotNull(person, "userName " + userName + " cannot be resolved");
 
         return surveyRunDao.findForRecipient(person.id().get());
@@ -117,7 +116,7 @@ public class SurveyRunService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
 
-        Person owner = personDao.getByUserName(userName);
+        Person owner = personDao.getActiveByUserEmail(userName);
         checkNotNull(owner, "userName " + userName + " cannot be resolved");
 
         long surveyRunId = surveyRunDao.create(owner.id().get(), command);
@@ -287,7 +286,7 @@ public class SurveyRunService {
 
 
     private void validateSurveyRunUpdate(String userName, long surveyRunId) {
-        Person owner = personDao.getByUserName(userName);
+        Person owner = personDao.getActiveByUserEmail(userName);
         checkNotNull(owner, "userName " + userName + " cannot be resolved");
 
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);

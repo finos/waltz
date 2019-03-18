@@ -22,7 +22,6 @@ package com.khartec.waltz.service.user;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -42,6 +41,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.sort;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static java.lang.String.format;
+import static java.util.Comparator.comparing;
 
 /**
  * Created by dwatkins on 30/03/2016.
@@ -98,7 +101,7 @@ public class UserRoleService {
     }
 
 
-    public boolean updateRoles(String userName, String targetUserName, List<Role> newRoles) {
+    public boolean updateRoles(String userName, String targetUserName, Set<Role> newRoles) {
         LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, newRoles);
 
         Person person = personService.getPersonByUserId(targetUserName);
@@ -106,13 +109,13 @@ public class UserRoleService {
             LOG.warn("{} does not exist, cannot create audit log for role updates", targetUserName);
         } else {
             ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                    .parentReference(EntityReference.mkRef(EntityKind.PERSON, person.id().get()))
+                    .parentReference(mkRef(EntityKind.PERSON, person.id().get()))
                     .severity(Severity.INFORMATION)
                     .userId(userName)
-                    .message(String.format(
+                    .message(format(
                             "Roles for %s updated to %s",
                             targetUserName,
-                            newRoles
+                            sort(newRoles, comparing(Enum::name))
                     ))
                     .childKind(Optional.empty())
                     .operation(Operation.UPDATE)

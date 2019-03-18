@@ -84,7 +84,7 @@ public class SurveyInstanceService {
     public List<SurveyInstance> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        Person person = personDao.getByUserName(userName);
+        Person person = personDao.getActiveByUserEmail(userName);
         checkNotNull(person, "userName " + userName + " cannot be resolved");
 
         return surveyInstanceDao.findForRecipient(person.id().get());
@@ -113,7 +113,7 @@ public class SurveyInstanceService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(questionResponse, "questionResponse cannot be null");
 
-        Person person = personDao.getByUserName(userName);
+        Person person = personDao.getActiveByUserEmail(userName);
         checkNotNull(person, "userName " + userName + " cannot be resolved");
 
         boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(

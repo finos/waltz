@@ -100,7 +100,7 @@ public class PersonService {
 
 
     public Person getPersonByUserId(String userId) {
-        return personDao.getPersonByUserId(userId);
+        return personDao.getByUserEmail(userId);
     }
 
 
