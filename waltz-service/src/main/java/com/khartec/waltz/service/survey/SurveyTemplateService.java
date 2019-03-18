@@ -77,7 +77,7 @@ public class SurveyTemplateService {
     public List<SurveyTemplate> findAll(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        Person owner = personDao.getByUserName(userName);
+        Person owner = personDao.getActiveByUserEmail(userName);
         checkNotNull(owner, "userName " + userName + " cannot be resolved");
 
         return surveyTemplateDao.findAll(owner.id().get());
@@ -88,7 +88,7 @@ public class SurveyTemplateService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
-        Person owner = personDao.getByUserName(userName);
+        Person owner = personDao.getActiveByUserEmail(userName);
         checkNotNull(owner, "userName " + userName + " cannot be resolved");
 
         long surveyTemplateId = surveyTemplateDao.create(ImmutableSurveyTemplate.builder()

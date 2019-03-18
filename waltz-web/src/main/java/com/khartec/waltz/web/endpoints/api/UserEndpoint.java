@@ -29,9 +29,9 @@ import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 
-import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -83,7 +83,7 @@ public class UserEndpoint implements Endpoint {
 
             String userName = getUsername(request);
             String targetUserName = request.params("userName");
-            List<String> roles = (List<String>) readBody(request, List.class);
+            Set<String> roles = (Set<String>) readBody(request, Set.class);
             return userRoleService.updateRoles(userName, targetUserName, map(roles, Role::valueOf));
         };
 

@@ -69,7 +69,7 @@ public class UserContributionService {
     public List<Tally<String>> findScoresForDirectReports(String userId) {
         checkNotEmpty(userId, "userId cannot be empty");
 
-        Person person = personDao.getPersonByUserId(userId);
+        Person person = personDao.getByUserEmail(userId);
         if (person == null) {
             return Collections.emptyList();
         }

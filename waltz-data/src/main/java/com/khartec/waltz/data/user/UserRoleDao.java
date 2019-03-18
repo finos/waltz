@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.data.user;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
@@ -39,7 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.schema.tables.User.USER;
 import static com.khartec.waltz.schema.tables.UserRole.USER_ROLE;
 import static java.util.stream.Collectors.groupingBy;
@@ -68,7 +67,7 @@ public class UserRoleDao {
                 .where(USER_ROLE.USER_NAME.equalIgnoreCase(userName))
                 .fetch(USER_ROLE.ROLE);
 
-        return SetUtilities.map(roles, r -> Role.valueOf(r));
+        return map(roles, r -> Role.valueOf(r));
     }
 
 
@@ -96,7 +95,7 @@ public class UserRoleDao {
     }
 
 
-    public boolean updateRoles(String userName, List<Role> newRoles) {
+    public boolean updateRoles(String userName, Set<Role> newRoles) {
         try {
             dsl.transaction(config -> {
                 LOG.info("Removing existing roles for: " + userName);
@@ -107,7 +106,7 @@ public class UserRoleDao {
 
                 LOG.info("Inserting roles for " + userName + " / " + newRoles) ;
                 DSLContext batcher = DSL.using(config);
-                List<Query> inserts = map(newRoles, r -> batcher
+                Set<Query> inserts = map(newRoles, r -> batcher
                         .insertInto(USER_ROLE, USER_ROLE.USER_NAME, USER_ROLE.ROLE)
                         .values(userName, r.name()));
 

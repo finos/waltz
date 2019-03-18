@@ -135,7 +135,7 @@ public class UserService {
                     .map(roleNames -> Stream
                             .of(roleNames)
                             .map(name -> Role.valueOf(name.trim()))
-                            .collect(Collectors.toList()))
+                            .collect(Collectors.toSet()))
                     .ifPresent(roles -> userRoleDao.updateRoles(username, roles));
 
         }
