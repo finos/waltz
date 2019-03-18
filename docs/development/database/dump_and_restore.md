@@ -2,14 +2,16 @@
 
 Status: DRAFT
 
-## Creating Backups Example
+## MariaDB
+
+### Creating Backups Example
 ````
  mysqldump -u root demodb > dump.sql
 ````
 On linux you may need to modify `/usr/local/etc/my.cnf`. 
 
 
-## Restoring Backup Example
+### Restoring Backup Example
 
 ````
  mysql -u root demodb < dump.sql
