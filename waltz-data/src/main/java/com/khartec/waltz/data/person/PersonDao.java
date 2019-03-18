@@ -95,11 +95,27 @@ public class PersonDao {
     }
 
 
-    public Person getByUserName(String userName) {
-        checkNotEmpty(userName, "Cannot find person without a userName");
-        return dsl.select()
-                .from(PERSON)
-                .where(PERSON.EMAIL.eq(userName))
+    /**
+     * Finds Person by user email. If duplicates returns active one. Otherwise returns first.
+     * @param email
+     * @return
+     */
+    public Person getByUserEmail(String email) {
+        checkNotEmpty(email, "Cannot find person without a email");
+        return dsl
+                .selectFrom(PERSON)
+                .where(PERSON.EMAIL.eq(email)) // TODO: change as part of 247
+                .orderBy(PERSON.IS_REMOVED)
+                .limit(1)
+                .fetchOne(personMapper);
+    }
+
+
+    public Person getActiveByUserEmail(String email) {
+        checkNotEmpty(email, "Cannot find person without a email");
+        return dsl
+                .selectFrom(PERSON)
+                .where(PERSON.EMAIL.eq(email))
                 .andNot(PERSON.IS_REMOVED)
                 .fetchOne(personMapper);
     }
@@ -169,12 +185,6 @@ public class PersonDao {
     }
 
 
-    public Person getPersonByUserId(String userId) {
-        return dsl.select(PERSON.fields())
-                .from(PERSON)
-                .where(PERSON.EMAIL.eq(userId)) // TODO: change as part of 247
-                .fetchOne(personMapper);
-    }
 
 
     public List<Person> findPersonsByAttestationInstanceId(long instanceId) {
