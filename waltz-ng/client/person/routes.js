@@ -21,30 +21,27 @@ import PersonPage from './pages/view/person-view';
 import {CORE_API} from "../common/services/core-api-utils";
 
 
-function resolvePersonByEmpId($stateParams, serviceBroker) {
-    return serviceBroker
+function personEmployeeIdBouncer($state, $stateParams, serviceBroker) {
+    const empId = $stateParams.empId;
+    serviceBroker
         .loadViewData(
             CORE_API.PersonStore.getByEmployeeId,
-            [ $stateParams.empId ])
-        .then(r => r.data);
+            [ empId ])
+        .then(r => r.data)
+        .then(person => {
+            if (person) {
+                return $state.go("main.person.id", {id: person.id});
+            } else {
+                console.log(`Cannot find measure corresponding person: ${empId}`);
+            }
+        });
 }
 
-resolvePersonByEmpId.$inject = [
-    '$stateParams',
-    'ServiceBroker'
-];
 
-function resolvePersonById($stateParams, serviceBroker) {
-    return serviceBroker
-        .loadViewData(
-            CORE_API.PersonStore.getById,
-            [ $stateParams.id ])
-        .then(r => r.data);
-}
-
-resolvePersonById.$inject = [
-    '$stateParams',
-    'ServiceBroker'
+personEmployeeIdBouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
@@ -55,20 +52,17 @@ const personHome = {
     views: {'content@': HomePage }
 };
 
-const personView = {
+const personViewByEmployeeId = {
     url: '/:empId',
     views: {'content@': PersonPage },
     resolve: {
-        person: resolvePersonByEmpId
+        bouncer: personEmployeeIdBouncer
     }
 };
 
 const personViewByPersonId = {
     url: '/id/:id',
     views: {'content@': PersonPage },
-    resolve: {
-        person: resolvePersonById
-    }
 };
 
 
@@ -78,7 +72,7 @@ function setup($stateProvider) {
 
     $stateProvider
         .state('main.person', personHome)
-        .state('main.person.view', personView)
+        .state('main.person.view', personViewByEmployeeId)
         .state('main.person.id', personViewByPersonId);
 }
 

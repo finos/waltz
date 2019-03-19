@@ -59,6 +59,19 @@ export function toEntityRef(obj, kind = obj.kind) {
 }
 
 
+export function mkRef(kind, id, name, description) {
+    const ref = {
+        kind,
+        id,
+        name,
+        description
+    };
+
+    checkIsEntityRef(ref);
+    return ref;
+}
+
+
 function determineLoadByIdCall(kind) {
     switch (kind) {
         case "APPLICATION":

@@ -92,9 +92,7 @@ function controller(serviceBroker) {
     };
 
     vm.$onChanges = (changes) => {
-        if(changes.filters) {
-            loadAll();
-        }
+        loadAll();
     };
 }
 
