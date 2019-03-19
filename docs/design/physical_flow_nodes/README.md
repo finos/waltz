@@ -3,7 +3,7 @@
 [TOC levels=2-3]:  # "# Contents"
 
 # Contents
-- [Status: DRAFT](#status-draft)
+- [Status: RELEASED](#status-released)
 - [Terminology](#terminology)
 - [Motivation](#motivation)
 - [Proposal](#proposal)
@@ -17,10 +17,9 @@
     - [Resource Information](#resource-information)
 
 
-## Status: DRAFT
+## Status: RELEASED
 
-This feature is currently in planning stages. Therefore this document is
-liable to be modified as new information comes to light.
+This feature has been implemented and is part of the 1.16 release.
 
 
 ## Terminology
