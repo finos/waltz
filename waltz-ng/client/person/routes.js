@@ -32,7 +32,7 @@ function personEmployeeIdBouncer($state, $stateParams, serviceBroker) {
             if (person) {
                 return $state.go("main.person.id", {id: person.id});
             } else {
-                console.log(`Cannot find measure corresponding person: ${empId}`);
+                console.log(`Cannot find corresponding person: ${empId}`);
             }
         });
 }
