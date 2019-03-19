@@ -120,6 +120,16 @@ public class ApplicationDao {
                 IS_ACTIVE);
     }
 
+
+    public List<Tally<String>> countByApplicationKind(Select<Record1<Long>> selector) {
+        return JooqUtilities.calculateStringTallies(
+                dsl,
+                APPLICATION,
+                APPLICATION.KIND,
+                IS_ACTIVE.and(APPLICATION.ID.in(selector)));
+    }
+
+
     /**
      * Given an appId will find all app records with:
      * <ul>

@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common/index";
-import {toEntityRef} from "../../../common/entity-utils";
+import { initialiseData } from "../../../common/index";
+import { mkRef } from "../../../common/entity-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+
 import template from "./person-view.html";
 
 
@@ -29,25 +31,44 @@ const initialState = {
 };
 
 
-function controller(person,
+function controller($stateParams,
                     dynamicSectionManager,
-                    historyStore) {
+                    historyStore,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
+
+
+
     vm.$onInit = () => {
-        if (!person) {
-            return;
+        const id = $stateParams.id;
+
+        if (id) {
+            vm.entityRef = mkRef("PERSON",  _.parseInt(id));
+            serviceBroker
+                .loadViewData(
+                    CORE_API.PersonStore.getById,
+                    [ id ])
+                .then(r => r.data)
+                .then(person => {
+
+                    if (!person) {
+                        return;
+                    }
+                    vm.person = person;
+
+                    vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("PERSON");
+                    vm.sections = dynamicSectionManager.findUserSectionsForKind("PERSON");
+                    historyStore.put(
+                        person.displayName,
+                        "PERSON",
+                        "main.person.view",
+                        { empId: person.employeeId });
+
+                });
         }
-        vm.person = person;
-        vm.entityRef = toEntityRef(person, "PERSON");
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("PERSON");
-        vm.sections = dynamicSectionManager.findUserSectionsForKind("PERSON");
-        historyStore.put(
-            person.displayName,
-            "PERSON",
-            "main.person.view",
-            { empId: person.employeeId });
+
     };
 
     vm.filtersChanged = (filters) => {
@@ -61,9 +82,10 @@ function controller(person,
 
 
 controller.$inject = [
-    "person",
+    "$stateParams",
     "DynamicSectionManager",
-    "HistoryStore"
+    "HistoryStore",
+    "ServiceBroker"
 ];
 
 

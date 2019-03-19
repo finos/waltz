@@ -17,10 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
+import { areFiltersVisible } from "../../../facet/facet-utils";
+
 
 import template from "./navbar-filters.html";
-import { viewStateToKind } from '../../../common/link-utils';
+
 
 const bindings = {
 };
@@ -32,27 +34,6 @@ const initialState = {
         filters: true
     }
 };
-
-
-function areFiltersVisible(viewStateName) {
-    try {
-        const kind = viewStateToKind(viewStateName);
-        switch (kind) {
-            case "APP_GROUP":
-            case "DATA_TYPE":
-            case "MEASURABLE":
-            case "ORG_UNIT":
-            case "ENTITY_STATISTIC":
-            case "PERSON":
-                return true;
-            default:
-                return false;
-        }
-    } catch (e) {
-        // in case of an unknown viewstate
-        return false;
-    }
-}
 
 
 function controller($timeout, $transitions) {

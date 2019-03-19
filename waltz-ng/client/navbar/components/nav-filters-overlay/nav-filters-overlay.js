@@ -20,9 +20,14 @@
 import _ from "lodash";
 import { initialiseData, invokeFunction } from "../../../common";
 import { isDescendant } from "../../../common/browser-utils";
-import { applicationKind } from "../../../common/services/enums/application-kind";
 import { entity } from "../../../common/services/enums/entity";
 import { FILTER_CHANGED_EVENT } from "../../../common/constants";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+import { mkSelectionOptions } from "../../../common/selector-utils";
+import { viewStateToKind } from "../../../common/link-utils";
+import { mkRef } from "../../../common/entity-utils";
+import { areFiltersVisible } from "../../../facet/facet-utils";
 
 import template from "./nav-filters-overlay.html";
 
@@ -36,20 +41,21 @@ const bindings = {
 
 
 const initialState = {
-    filterSelections: mkFilterSelections(), // { ENTITY_KIND: { filterKind: { selections}, ... }, ... }
+    facetCounts: {},
+    filterSelections: {}, // { ENTITY_KIND: { filterKind: { selections}, ... }, ... }
 
     onDismiss: () => console.log("nav filter overlay - defailt dismiss handler")
 };
 
 
-function mkDefaultSelections(options) {
-    return _.transform(options, (result, value, key) => {
-        result[value.key] = true;
+function mkDefaultSelections(optionsWithCountsById) {
+    return _.transform(optionsWithCountsById, (result, value, key) => {
+        result[value.id] = true;
     }, {});
 }
 
 
-function mkFilterSelections() {
+function mkFilterSelections(appKindFacetCountsById) {
     /*
         {
             APPLICATION: {
@@ -61,9 +67,10 @@ function mkFilterSelections() {
             // other entity kinds for which filters are enabled
         }
     */
-    return {
-        [entity.APPLICATION.key]: { "applicationKind": mkDefaultSelections(applicationKind) }
+    const filterSelections = {
+        [entity.APPLICATION.key]: { "applicationKind": mkDefaultSelections(appKindFacetCountsById) }
     };
+    return filterSelections;
 }
 
 
@@ -71,7 +78,9 @@ function controller($element,
                     $document,
                     $rootScope,
                     $timeout,
-                    $transitions) {
+                    $transitions,
+                    $stateParams,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const documentClick = (e) => {
@@ -81,6 +90,7 @@ function controller($element,
         }
     };
 
+
     const onOverlayKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
             vm.dismiss();
@@ -88,12 +98,32 @@ function controller($element,
     };
 
 
+    const loadFacets = (kind, id) => {
+        const ref = mkRef(kind, id);
+        const selector = mkSelectionOptions(
+            ref,
+            hierarchyQueryScope.CHILDREN.key);
+
+        return serviceBroker
+            .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
+            .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
+            .then(() => vm.filterSelections = mkFilterSelections(vm.facetCounts));
+    };
+
+
     vm.$onInit = () => {
         $transitions.onSuccess({ }, (transition) => {
             // reissue the event for any watchers to prevent default load
-            vm.filterChanged();
+            const {name} = transition.to();
+            if(areFiltersVisible(name)) {
+                const kind = viewStateToKind(name);
+                const id = _.parseInt($stateParams.id);
+                loadFacets(kind, id)
+                    .then(() => vm.filterChanged());
+            }
         });
     };
+
 
     vm.$onChanges = (changes) => {
         if(vm.visible) {
@@ -105,16 +135,19 @@ function controller($element,
         }
     };
 
+
     vm.dismiss = () => {
         invokeFunction(vm.onDismiss);
     };
+
 
     vm.filterChanged = () => {
         $rootScope.$broadcast(FILTER_CHANGED_EVENT, vm.filterSelections);
     };
 
+
     vm.resetFilters = () => {
-        vm.filterSelections = mkFilterSelections();
+        vm.filterSelections = mkFilterSelections(vm.facetCounts);
         vm.filterChanged();
     };
 }
@@ -125,7 +158,9 @@ controller.$inject = [
     "$document",
     "$rootScope",
     "$timeout",
-    "$transitions"
+    "$transitions",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 

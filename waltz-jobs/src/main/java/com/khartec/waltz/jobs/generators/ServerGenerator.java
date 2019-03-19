@@ -38,6 +38,7 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 
 public class ServerGenerator implements SampleDataGenerator {
@@ -132,6 +133,12 @@ public class ServerGenerator implements SampleDataGenerator {
                 .delete(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
                 .execute();
+
+        getDsl(ctx)
+                .delete(SERVER_USAGE)
+                .where(SERVER_USAGE.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
+                .execute();
+
         return true;
     }
 
@@ -143,7 +150,7 @@ public class ServerGenerator implements SampleDataGenerator {
         r.setEntityId(appId);
         r.setEnvironment(randomPick(SampleData.environments));
         r.setLastUpdatedBy("admin");
-        r.setProvenance("waltz");
+        r.setProvenance(SAMPLE_DATA_PROVENANCE);
         return r;
     }
 }
