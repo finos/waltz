@@ -79,6 +79,7 @@ function controller($element,
                     $rootScope,
                     $timeout,
                     $transitions,
+                    $state,
                     $stateParams,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -98,30 +99,42 @@ function controller($element,
     };
 
 
-    const loadFacets = (kind, id) => {
-        const ref = mkRef(kind, id);
-        const selector = mkSelectionOptions(
-            ref,
-            hierarchyQueryScope.CHILDREN.key);
+    const loadFacets = (stateName, id) => {
+        if(areFiltersVisible(stateName)) {
+            const kind = viewStateToKind(stateName);
 
-        return serviceBroker
-            .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
-            .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
-            .then(() => vm.filterSelections = mkFilterSelections(vm.facetCounts));
+            const ref = mkRef(kind, id);
+            const selector = mkSelectionOptions(
+                ref,
+                hierarchyQueryScope.CHILDREN.key);
+
+            return serviceBroker
+                .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
+                .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
+                .then(() => vm.filterSelections = mkFilterSelections(vm.facetCounts));
+        } else {
+            return Promise.resolv\e();
+        }
+    };
+
+
+    const setupTransitionHandler = () => {
+        $transitions.onSuccess({ }, (transition) => {
+            const name = $state.current.name;
+            const id = _.parseInt($stateParams.id);
+            loadFacets(name, id)
+                .then(() => vm.filterChanged());
+        });
     };
 
 
     vm.$onInit = () => {
-        $transitions.onSuccess({ }, (transition) => {
-            // reissue the event for any watchers to prevent default load
-            const {name} = transition.to();
-            if(areFiltersVisible(name)) {
-                const kind = viewStateToKind(name);
-                const id = _.parseInt($stateParams.id);
-                loadFacets(kind, id)
-                    .then(() => vm.filterChanged());
-            }
-        });
+        // set up transition handler
+        setupTransitionHandler();
+
+        // initial load of facets
+        const id = _.parseInt($stateParams.id);
+        loadFacets($state.current.name, id);
     };
 
 
@@ -159,6 +172,7 @@ controller.$inject = [
     "$rootScope",
     "$timeout",
     "$transitions",
+    "$state",
     "$stateParams",
     "ServiceBroker"
 ];

@@ -32,9 +32,11 @@ import {
 } from "../../../common/hierarchy-utils";
 import {kindToViewState} from "../../../common/link-utils";
 import {entityLifecycleStatus as EntityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
 
 
 const bindings = {
+    filters: "<",
     parentEntityRef: "<"
 };
 
@@ -58,11 +60,13 @@ function prepareRelationshipStats(stats = []) {
 function controller(serviceBroker, $state) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        const selector = {
-            entityReference: vm.parentEntityRef,
-            scope: "CHILDREN"
-        };
+    const loadAll = () => {
+
+        const selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
 
         serviceBroker
             .loadViewData(
@@ -125,7 +129,16 @@ function controller(serviceBroker, $state) {
                 CORE_API.MeasurableRelationshipStore.tallyByEntityReference,
                 [ vm.parentEntityRef ])
             .then(r => vm.relationshipStats = prepareRelationshipStats(r.data));
+    };
 
+
+    vm.$onInit = () => {
+        loadAll();
+    };
+
+
+    vm.$onChanges = () => {
+        loadAll();
     };
 
 
