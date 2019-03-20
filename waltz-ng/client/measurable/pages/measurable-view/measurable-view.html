@@ -26,9 +26,11 @@
     </waltz-filter-change-watcher>
 
 
-    <waltz-measurable-summary parent-entity-ref='ctrl.entityReference'>
+    <waltz-measurable-summary parent-entity-ref="ctrl.entityReference"
+                              filters="ctrl.filters">
     </waltz-measurable-summary>
 
+    
     <div ng-if="ctrl.measurable">
         <!-- NAVIGATION -->
         <div class="waltz-page-summary waltz-page-summary-attach">

@@ -36,7 +36,7 @@ const initialState = {
 };
 
 
-function controller($timeout, $transitions) {
+function controller($timeout, $transitions, $state) {
 
     const vm = initialiseData(this, initialState);
 
@@ -52,7 +52,7 @@ function controller($timeout, $transitions) {
 
     // -- INIT
     vm.$onInit = () => {
-        vm.visibility.filters = areFiltersVisible(name);
+        vm.visibility.filters = areFiltersVisible($state.current.name);
     };
 
 
@@ -68,7 +68,8 @@ function controller($timeout, $transitions) {
 
 controller.$inject = [
     "$timeout",
-    "$transitions"
+    "$transitions",
+    "$state"
 ];
 
 
