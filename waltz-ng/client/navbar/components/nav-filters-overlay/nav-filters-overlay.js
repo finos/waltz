@@ -113,7 +113,7 @@ function controller($element,
                 .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
                 .then(() => vm.filterSelections = mkFilterSelections(vm.facetCounts));
         } else {
-            return Promise.resolv\e();
+            return Promise.resolve();
         }
     };
 
