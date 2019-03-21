@@ -50,7 +50,7 @@ Org | Notes
 - Bootstrap 3
 - D3 
 
-(see [package.json](https://github.com/khartec/waltz/blob/master/waltz-ng/package.json) for full list)
+See [package.json](https://github.com/khartec/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
 
 ## Contact
 
