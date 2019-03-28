@@ -84,6 +84,7 @@ import {SurveyTemplateStore_API as SurveyTemplateStore} from "../../survey/servi
 import {SvgDiagramStore_API as SvgDiagramStore} from "../../svg-diagram/services/svg-diagram-store";
 import {TaxonomyManagementStore_API as TaxonomyManagementStore} from "../../taxonomy-management/services/taxonomy-management-store";
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
+import {ThumbnailStore_API as ThumbnailStore} from "../../thumbnail/services/thumbnail-store";
 import {UserStore_API as UserStore} from "../../user/services/user-store";
 
 
@@ -155,6 +156,7 @@ export const CORE_API = {
     SvgDiagramStore,
     TaxonomyManagementStore,
     TechnologyStatisticsService,
+    ThumbnailStore,
     UserStore
 };
 

@@ -300,6 +300,10 @@ function controller($q,
     };
 
     vm.doSave = () => {
+
+        console.log('save diagram');
+
+
         flowDiagramStateService.save()
             .then(r => vm.id = r)
             .then(() => notification.success("Saved"))
