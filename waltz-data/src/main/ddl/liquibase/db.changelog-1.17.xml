@@ -71,5 +71,32 @@
                        tableName="thumbnail" />
     </changeSet>
 
+    <!--3931: Create Allocation Scheme Table-->
+    <changeSet id="20190329-3931-1"
+               author="davidwatkins73">
+        <comment>3931: Allocation Scheme</comment>
+        <createTable tableName="allocation_scheme">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="alloc_scheme_definition_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="measurable_category_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>
