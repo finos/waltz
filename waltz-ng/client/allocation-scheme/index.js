@@ -17,41 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../common/index";
-import template from "./playpen3.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 
+import angular from "angular";
+import AllocationSchemeStore from "./services/allocation-scheme-store";
+import {registerStores} from "../common/module-utils";
 
-const initialState = {
-    parentEntityRef: {
-        id: 100,
-        kind: "ORG_UNIT"
-    },
+export default () => {
+    const module = angular.module("waltz.allocation-scheme", []);
+
+    registerStores(module, [ AllocationSchemeStore ]);
+
+    return module.name;
 };
-
-function controller($stateParams, serviceBroker) {
-    const vm = initialiseData(this, initialState);
-
-    serviceBroker
-        .loadViewData(
-            CORE_API.AllocationSchemeStore.findAll)
-        .then( r => console.log(r.data))
-}
-
-
-controller.$inject = [
-    "$stateParams",
-    "ServiceBroker"
-];
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
