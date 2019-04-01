@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.web.endpoints.Endpoint;
 import org.eclipse.jetty.http.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ import static com.khartec.waltz.common.StringUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.getMimeType;
 import static java.lang.String.format;
 
-public class StaticResourcesEndpoint {
+public class StaticResourcesEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(StaticResourcesEndpoint.class);
     private static final String CACHE_MAX_AGE_VALUE = "max-age=" + TimeUnit.DAYS.toSeconds(30);
@@ -48,6 +49,7 @@ public class StaticResourcesEndpoint {
             .getClassLoader();
 
 
+    @Override
     public void register() {
         LOG.debug("Registering static resources");
 

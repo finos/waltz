@@ -35,7 +35,12 @@ function controller($stateParams, serviceBroker) {
     serviceBroker
         .loadViewData(
             CORE_API.AllocationSchemeStore.findAll)
-        .then( r => console.log(r.data))
+        .then( r => console.log({ schemes: r.data }));
+    serviceBroker
+        .loadViewData(
+            CORE_API.AllocationStore.findByEntityAndScheme,
+            [ {id: 27, kind: "APPLICATION"}, 1])
+        .then( r => console.log({ allocs: r.data}));
 }
 
 
