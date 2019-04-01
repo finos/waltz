@@ -39,6 +39,7 @@ import AngularFormlyTemplates from "angular-formly-templates-bootstrap";
 import AccessLog from "./access-log";
 import Actor from "./actor";
 import Alias from "./alias";
+import AllocationSchemes from "./allocation-scheme";
 import Applications from "./applications";
 import AppGroups from "./app-groups";
 import Assessments from "./assessments";
@@ -137,6 +138,7 @@ const dependencies = [
     AccessLog(),
     Actor(),
     Alias(),
+    AllocationSchemes(),
     Applications(),
     AppGroups(),
     Assessments(),

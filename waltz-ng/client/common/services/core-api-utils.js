@@ -19,6 +19,7 @@
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
 import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
+import {AllocationSchemeStore_API as AllocationSchemeStore} from "../../allocation-scheme/services/allocation-scheme-store";
 import {AppGroupStore_API as AppGroupStore} from "../../app-groups/services/app-group-store";
 import {ApplicationStore_API as ApplicationStore} from "../../applications/services/application-store";
 import {AssessmentDefinitionStore_API as AssessmentDefinitionStore} from "../../assessments/services/assessment-definition-store";
@@ -91,6 +92,7 @@ import {UserStore_API as UserStore} from "../../user/services/user-store";
 export const CORE_API = {
     ActorStore,
     AliasStore,
+    AllocationSchemeStore,
     AppGroupStore,
     ApplicationStore,
     AttestationInstanceStore,
