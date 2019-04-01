@@ -12,6 +12,6 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAllocationScheme.class)
 public abstract class AllocationScheme implements IdProvider, NameProvider, DescriptionProvider {
 
-    public abstract Long measurableCategoryId();
+    public abstract long measurableCategoryId();
 
 }

@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.web.endpoints.Endpoint;
 import org.eclipse.jetty.http.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ import static com.khartec.waltz.common.StringUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.getMimeType;
 import static java.lang.String.format;
 
-public class StaticResourcesEndpoint implements Endpoint {
+public class StaticResourcesEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(StaticResourcesEndpoint.class);
     private static final String CACHE_MAX_AGE_VALUE = "max-age=" + TimeUnit.DAYS.toSeconds(30);
@@ -49,7 +48,6 @@ public class StaticResourcesEndpoint implements Endpoint {
             .getClassLoader();
 
 
-    @Override
     public void register() {
         LOG.debug("Registering static resources");
 
@@ -104,9 +102,14 @@ public class StaticResourcesEndpoint implements Endpoint {
      * @param resolvedPath - the resolved path to the resource we are serving
      */
     private void addCacheHeadersIfNeeded(Response response, String resolvedPath) {
-        if (! resolvedPath.endsWith(".html")) {
+        if (!isHtml(resolvedPath)) {
             response.header(HttpHeader.CACHE_CONTROL.toString(), CACHE_MAX_AGE_VALUE);
         }
+    }
+
+
+    private boolean isHtml(String path) {
+        return lower(path).endsWith(".html");
     }
 
 
@@ -171,18 +174,20 @@ public class StaticResourcesEndpoint implements Endpoint {
         URL resource = classLoader.getResource(resourcePath);
 
         if (resource == null) {
-            // 404: return index.html
-            resource = classLoader.getResource(indexPath);
-            resourcePath = indexPath;
+            return isHtml(path)
+                ? indexPath
+                : null;
+        } else {
+            String resolvedPath = resource
+                    .getPath();
+
+            boolean isDirectory = resolvedPath
+                    .endsWith("/");
+
+            return isDirectory
+                    ? resolvedPath + "/index.html"
+                    : resolvedPath;
         }
-
-        boolean isDirectory = resource
-                .getPath()
-                .endsWith("/");
-
-        return isDirectory
-                ? resourcePath + "/index.html"
-                : resourcePath;
     }
 
 }
