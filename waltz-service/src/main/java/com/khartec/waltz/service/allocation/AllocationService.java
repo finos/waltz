@@ -52,4 +52,11 @@ public class AllocationService {
         return allocationDao.findByMeasurableIdAndScheme(measurableId, schemeId);
     }
 
+    public Boolean makeFixed(EntityReference entityReference,
+                             long scheme,
+                             long measurable,
+                             String username) {
+        //TODO: security
+        return allocationDao.makeFixed(entityReference, scheme, measurable);
+    }
 }

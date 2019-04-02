@@ -1,0 +1,96 @@
+<!-- BLURB -->
+<div class="row">
+    <div class="col-sm-12">
+        <h3 ng-bind="$ctrl.scheme.name"></h3>
+        <waltz-markdown text="$ctrl.scheme.description"></waltz-markdown>
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h4>
+            <waltz-icon name="thumb-tack"></waltz-icon>
+            Fixed Allocations
+            <small>
+                <span ng-bind="$ctrl.fixedTotal | number:1"></span>%
+            </small>
+        </h4>
+
+        <waltz-no-data ng-if="$ctrl.fixedAllocations.length == 0">
+            <message>No fixed allocations</message>
+        </waltz-no-data>
+
+        <div ng-if="$ctrl.fixedAllocations.length > 0">
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="40%">
+                    <col width="20%">
+                    <col width="40%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Measurable</th>
+                    <th>Allocation</th>
+                    <th>Operations</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="d in $ctrl.fixedAllocations">
+                    <td>
+                        <span ng-bind="d.measurable.name"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="d.allocation.percentage | number:1 "></span>%
+                    </td>
+                    <td>
+                        To Float | Modify percentage
+                    </td>
+                </tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h4>
+            Floating Allocations
+            <small>
+                <span ng-bind="$ctrl.floatingTotal | number:1"></span>%
+            </small>
+        </h4>
+
+
+        <waltz-no-data ng-if="$ctrl.floatingAllocations.length == 0">
+            <message>No floating allocations</message>
+        </waltz-no-data>
+
+        <div ng-if="$ctrl.floatingAllocations.length > 0">
+            <table class="table table-condensed">
+                <colgroup>
+                    <col width="40%">
+                    <col width="20%">
+                    <col width="40%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Measurable</th>
+                    <th><i>Allocation</i></th>
+                    <th>Operations</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="d in $ctrl.floatingAllocations">
+                    <td><span ng-bind="d.measurable.name"></span></td>
+                    <td><i><span ng-bind="d.allocation.percentage | number:1 "></span>%</i></td>
+                    <td><a ng-click="$ctrl.onMakeFixed(d)" class="clickable">To Fixed</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
