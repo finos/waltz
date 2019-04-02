@@ -30,8 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -60,6 +59,13 @@ public class AllocationEndpoint implements Endpoint {
                 ":measurable",
                 ":scheme");
 
+        String makeFixedPath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id",
+                ":scheme",
+                ":measurable");
+
         ListRoute<Allocation> findByEntityAndSchemeRoute = (request, response)
                 -> allocationService.findByEntityAndScheme(
                         getEntityReference(request),
@@ -70,8 +76,16 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request, "measurable"),
                         getLong(request,"scheme"));
 
+        DatumRoute<Boolean> makeFixedRoute = (request, response)
+               -> allocationService.makeFixed(
+                    getEntityReference(request),
+                    getLong(request,"scheme"),
+                    getLong(request, "measurable"),
+                    getUsername(request));
+
         getForList(findByEntityAndSchemePath, findByEntityAndSchemeRoute);
         getForList(findByMeasurableAndSchemePath, findByMeasurableAndSchemeRoute);
+        postForDatum(makeFixedPath, makeFixedRoute);
 
     }
 

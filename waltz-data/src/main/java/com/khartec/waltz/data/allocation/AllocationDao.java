@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.Tables.ALLOCATION;
 
@@ -65,6 +66,20 @@ public class AllocationDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+    public Boolean makeFixed(EntityReference ref,
+                             long scheme,
+                             long measurable) {
+        checkNotNull(ref, "ref cannot be null");
+        int updateCount = dsl
+                .update(ALLOCATION).set(ALLOCATION.IS_FIXED, true)
+                .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(scheme))
+                .and(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
+                .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
+                .and(ALLOCATION.MEASURABLE_ID.eq(measurable))
+                .and(ALLOCATION.IS_FIXED.isFalse())
+                .execute();
+        return updateCount == 1;
+    }
 }
 
 

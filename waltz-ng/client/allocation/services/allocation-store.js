@@ -29,9 +29,14 @@ function store($http, baseApiUrl) {
             .get(`${baseUrl}/measurable/${measurableId}/${schemeId}`)
             .then(d => d.data);
 
+    const makeFixed = (ref, schemeId, measurableId) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/${measurableId}`)
+        .then(d => d.data);
+
     return {
         findByEntityAndScheme,
-        findByMeasurableAndScheme
+        findByMeasurableAndScheme,
+        makeFixed
     };
 
 }
@@ -55,6 +60,11 @@ export const AllocationStore_API = {
     findByMeasurableAndScheme: {
         serviceName,
         serviceFnName: "findByMeasurableAndScheme",
-        description: "findByMeasurableAndScheme [mesurableId, schemeId]"
+        description: "findByMeasurableAndScheme [measurableId, schemeId]"
+    },
+    makeFixed: {
+        serviceName,
+        serviceFnName: "makeFixed",
+        description: "makeFixed [ref, schemeId, measurableId]"
     }
 };
