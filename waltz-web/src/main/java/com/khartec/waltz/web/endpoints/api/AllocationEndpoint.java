@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.allocation.Allocation;
+import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
 import com.khartec.waltz.service.allocation.AllocationService;
 import com.khartec.waltz.service.allocation_schemes.AllocationSchemesService;
@@ -28,6 +29,9 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+
+import java.math.BigDecimal;
 
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
@@ -59,12 +63,21 @@ public class AllocationEndpoint implements Endpoint {
                 ":measurable",
                 ":scheme");
 
-        String makeFixedPath = mkPath(BASE_URL,
+        String updateTypePath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
                 ":id",
                 ":scheme",
-                ":measurable");
+                ":measurable",
+                "type");
+
+        String updatePercentagePath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id",
+                ":scheme",
+                ":measurable",
+                "percentage");
 
         ListRoute<Allocation> findByEntityAndSchemeRoute = (request, response)
                 -> allocationService.findByEntityAndScheme(
@@ -76,16 +89,25 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request, "measurable"),
                         getLong(request,"scheme"));
 
-        DatumRoute<Boolean> makeFixedRoute = (request, response)
-               -> allocationService.makeFixed(
+        DatumRoute<Boolean> updateTypeRoute = (request, response)
+               -> allocationService.updateType(
                     getEntityReference(request),
                     getLong(request,"scheme"),
                     getLong(request, "measurable"),
+                    AllocationType.valueOf(request.body()),
+                    getUsername(request));
+
+        DatumRoute<Boolean> updatePercentageRoute = (request, response)
+                -> allocationService.updatePercentage(getEntityReference(request),
+                    getLong(request,"scheme"),
+                    getLong(request, "measurable"),
+                    BigDecimal.valueOf(Integer.parseInt(request.body())),
                     getUsername(request));
 
         getForList(findByEntityAndSchemePath, findByEntityAndSchemeRoute);
         getForList(findByMeasurableAndSchemePath, findByMeasurableAndSchemeRoute);
-        postForDatum(makeFixedPath, makeFixedRoute);
+        postForDatum(updateTypePath, updateTypeRoute);
+        postForDatum(updatePercentagePath, updatePercentageRoute);
 
     }
 

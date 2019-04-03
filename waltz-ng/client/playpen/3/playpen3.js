@@ -24,10 +24,10 @@ import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
     parentEntityRef: {
-        id: 215,
+        id: 517,
         kind: "APPLICATION"
     },
-    schemeId: 2
+    schemeId: 1
 };
 
 function controller($stateParams, serviceBroker) {

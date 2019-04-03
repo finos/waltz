@@ -54,14 +54,18 @@ function controller($q, notification, serviceBroker) {
     }
 
     function prepareData() {
-        [vm.fixedAllocations, vm.floatingAllocations] = _
+        const allocationsByType  = _
             .chain(vm.rawAllocations)
             .map(allocation => {
                 const measurable = vm.measurablesById[allocation.measurableId];
-                return Object.assign({}, {allocation, measurable});
+                const working = { editing: false, percentage: allocation.percentage };
+                return Object.assign({}, {allocation, measurable, working});
             })
-            .partition(d => d.allocation.isFixed)
+            .groupBy(d => d.allocation.type)
             .value();
+
+        vm.fixedAllocations = _.get(allocationsByType, "FIXED", []);
+        vm.floatingAllocations = _.get(allocationsByType, "FLOATING", []);
 
         vm.fixedTotal = calcTotal(vm.fixedAllocations);
         vm.floatingTotal = calcTotal(vm.floatingAllocations);
@@ -87,23 +91,52 @@ function controller($q, notification, serviceBroker) {
 
     // -- INTERACT
 
-    vm.onMakeFixed = (d) => {
+    vm.onUpdateType = (d, type) => {
+        const niceType = type === 'FIXED'
+            ? "fixed"
+            : "floating";
+
         serviceBroker
             .execute(
-                CORE_API.AllocationStore.makeFixed,
-                [vm.entityReference, vm.schemeId, d.measurable.id])
+                CORE_API.AllocationStore.updateType,
+                [vm.entityReference, vm.schemeId, d.measurable.id, type])
             .then(r => {
                 console.log(r);
                 if (r.data === true) {
-                    notification.success(`Converted ${d.measurable.name} to fixed`);
+                    notification.success(`Converted ${d.measurable.name} to ${niceType}`);
                 } else {
-                    notification.warning(`Could not convert ${d.measurable.name} to fixed, it may have been removed or already converted`);
+                    notification.warning(`Could not convert ${d.measurable.name} to ${niceType}, it may have been removed or already converted`);
                 }
                 reload();
             })
-            .catch(e => notification.error(`Could not convert ${d.measurable.name} to fixed`));
-        console.log("Make fixed:", d);
-    }
+            .catch(e => notification.error(`Could not convert ${d.measurable.name} to ${niceType}`));
+    };
+
+    vm.onUpdatePercentage = (d) => {
+        const percentage = d.working.percentage;
+        serviceBroker
+            .execute(CORE_API.AllocationStore.updatePercentage,
+                [vm.entityReference, vm.schemeId, d.measurable.id, percentage])
+            .then(r => { console.log(r);
+                if (r.data === true) {
+                    notification.success(`Set ${d.measurable.name} percentage allocation to ${percentage}`);
+                } else {
+                    notification.warning(`Could not set ${percentage} for ${d.measurable.name}`);
+                }
+                reload();
+            })
+            .catch(e => notification.error(`Could not set ${percentage} for ${d.measurable.name}`));
+    };
+
+    vm.setEditable = (d, targetState) => {
+        vm.fixedAllocations = _.map(
+            vm.fixedAllocations,
+            fa => {
+                const updated = Object.assign({}, fa);
+                updated.working.editing = d.measurable.id === fa.measurable.id && targetState;
+                return updated;
+            });
+    };
 }
 
 

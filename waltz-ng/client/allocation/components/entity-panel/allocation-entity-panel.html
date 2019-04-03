@@ -42,10 +42,36 @@
                         <span ng-bind="d.measurable.name"></span>
                     </td>
                     <td>
-                        <span ng-bind="d.allocation.percentage | number:1 "></span>%
+                        <span ng-if="!d.working.editing">
+                            <span ng-bind="d.allocation.percentage | number:1 "></span>%
+                        </span>
+                        <span ng-if="d.working.editing">
+                            <input type="number"
+                                   min="0"
+                                   max="100"
+                                   ng-model="d.working.percentage">
+                        </span>
                     </td>
                     <td>
-                        To Float | Modify percentage
+                        <span ng-if="d.working.editing">
+                            <a ng-click="$ctrl.setEditable(d, false)">Cancel</a>
+                            |
+                            <span ng-if="d.working.percentage != d.allocation.percentage">
+                                <a ng-click="$ctrl.onUpdatePercentage(d)"
+                                   class="clickable">
+                                    Save percentage
+                                </a>
+                            </span>
+                            <span ng-if="d.working.percentage == d.allocation.percentage">
+                                <span class="text-muted">Save percentage</span>
+                            </span>
+                        </span>
+                        <span ng-if="!d.working.editing">
+                            <a ng-click="$ctrl.setEditable(d, true)">Edit percentage</a>
+                        </span>
+                        |
+                        <a ng-click="$ctrl.onUpdateType(d, 'FLOATING')" class="clickable">To Float </a>
+
                     </td>
                 </tr></tbody>
             </table>
@@ -85,7 +111,7 @@
                 <tr ng-repeat="d in $ctrl.floatingAllocations">
                     <td><span ng-bind="d.measurable.name"></span></td>
                     <td><i><span ng-bind="d.allocation.percentage | number:1 "></span>%</i></td>
-                    <td><a ng-click="$ctrl.onMakeFixed(d)" class="clickable">To Fixed</a></td>
+                    <td><a ng-click="$ctrl.onUpdateType(d, 'FIXED')" class="clickable">To Fixed</a></td>
                 </tr>
                 </tbody>
             </table>
