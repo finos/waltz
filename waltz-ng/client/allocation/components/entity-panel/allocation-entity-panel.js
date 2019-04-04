@@ -15,7 +15,8 @@ const initialState = {
     scheme: null,
     rawAllocations: [],
     fixedAllocations: [],
-    floatingAllocations: []
+    floatingAllocations: [],
+    editing: false
 };
 
 
@@ -61,6 +62,7 @@ function controller($q, notification, serviceBroker) {
                 const working = { editing: false, percentage: allocation.percentage };
                 return Object.assign({}, {allocation, measurable, working});
             })
+            .orderBy(d => d.measurable.name)
             .groupBy(d => d.allocation.type)
             .value();
 
@@ -112,30 +114,33 @@ function controller($q, notification, serviceBroker) {
             .catch(e => notification.error(`Could not convert ${d.measurable.name} to ${niceType}`));
     };
 
-    vm.onUpdatePercentage = (d) => {
-        const percentage = d.working.percentage;
+    vm.onUpdatePercentages = () => {
+        const percentages = _.map(
+                vm.fixedAllocations,
+                fa => {
+                    return {
+                        measurableId: fa.measurable.id,
+                        percentage: fa.working.percentage
+                    };
+                });
+
         serviceBroker
-            .execute(CORE_API.AllocationStore.updatePercentage,
-                [vm.entityReference, vm.schemeId, d.measurable.id, percentage])
-            .then(r => { console.log(r);
+            .execute(CORE_API.AllocationStore.updatePercentages,
+                [vm.entityReference, vm.schemeId, percentages])
+            .then(r => {
                 if (r.data === true) {
-                    notification.success(`Set ${d.measurable.name} percentage allocation to ${percentage}`);
+                    notification.success(`Updated percentage allocations`);
                 } else {
-                    notification.warning(`Could not set ${percentage} for ${d.measurable.name}`);
+                    notification.warning(`Could not update percentages`);
                 }
                 reload();
+                vm.setEditable(false);
             })
-            .catch(e => notification.error(`Could not set ${percentage} for ${d.measurable.name}`));
+            .catch(e => notification.error(`Could not update percentages`));
     };
 
-    vm.setEditable = (d, targetState) => {
-        vm.fixedAllocations = _.map(
-            vm.fixedAllocations,
-            fa => {
-                const updated = Object.assign({}, fa);
-                updated.working.editing = d.measurable.id === fa.measurable.id && targetState;
-                return updated;
-            });
+    vm.setEditable = (targetState) => {
+        vm.editing = targetState;
     };
 }
 

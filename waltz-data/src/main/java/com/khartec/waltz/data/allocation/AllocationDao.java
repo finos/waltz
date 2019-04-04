@@ -1,13 +1,13 @@
 package com.khartec.waltz.data.allocation;
 
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation.ImmutableAllocation;
+import com.khartec.waltz.model.allocation.MeasurablePercentage;
 import com.khartec.waltz.schema.tables.records.AllocationRecord;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,7 +112,34 @@ public class AllocationDao {
                 .and(ALLOCATION.IS_FIXED.isTrue())
                 .execute();
         return updateCount == 1;
+    }
 
+
+    public Boolean updatePercentages(EntityReference ref,
+                                     long scheme,
+                                     Collection<MeasurablePercentage> measurablePercentages,
+                                     String username) {
+        checkNotNull(ref, "Entity reference cannot be null");
+
+        Collection<AllocationRecord> updates = CollectionUtilities.map(measurablePercentages, mp -> {
+            AllocationRecord record = dsl.newRecord(ALLOCATION);
+
+            // set the PK
+            record.setEntityId(ref.id());
+            record.setEntityKind(ref.kind().name());
+            record.setAllocationSchemeId(scheme);
+            record.setMeasurableId(mp.measurableId());
+
+            // things that change
+            record.setAllocationPercentage(mp.percentage());
+            record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+            record.setLastUpdatedBy(username);
+
+            return record;
+        });
+
+        dsl.batchUpdate(updates).execute();
+        return true;
 
     }
 }

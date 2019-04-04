@@ -38,10 +38,7 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -227,7 +224,6 @@ public class WebUtilities {
     }
 
 
-
     /**
      * Reads the body of the request and attempts to convert it into an instance of
      * the given class.
@@ -244,6 +240,12 @@ public class WebUtilities {
                 request.bodyAsBytes(),
                 objClass);
     }
+
+
+    public static <T> List<T> readList(Request request, Class<T> itemClass) throws IOException {
+        return (List<T>) readBody(request, List.class);
+    }
+
 
 
     public static List<Long> readIdsFromBody(Request req) throws IOException {

@@ -55,9 +55,9 @@ public class CollectionUtilities {
      * given a collection and a predicate will (eagerly) evaluate the items in the
      * collection to see if any satisfy the predicate.
      *
-     * @param ts collection of items
+     * @param ts   collection of items
      * @param pred predicate to test if an item in the collection satisfies the 'find' condition
-     * @param <T> type of the items
+     * @param <T>  type of the items
      * @return true if any item in the collection satisfies the given predicate
      */
     public static <T> boolean any(Collection<T> ts, Predicate<T> pred) {
@@ -69,8 +69,8 @@ public class CollectionUtilities {
      * Returns the first item in a collections (as given by an iterator) or null if the
      * collection is empty.  A null collection will throw an exception.
      *
-     * @param ts collection of items
-     * @param <T> type of the items
+     * @param ts   collection of items
+     * @param <T>  type of the items
      * @return the first element or an exception if the collection is empty
      */
     public static <T> T first(Collection<T> ts) {
@@ -82,8 +82,9 @@ public class CollectionUtilities {
 
     /**
      * convert the given collection into another using a transformation function
-     * @param xs starting collection
-     * @param fn function to transform elements of the starting collection
+     *
+     * @param xs  starting collection
+     * @param fn  function to transform elements of the starting collection
      * @param <X> type of starting collection
      * @param <Y> type of resultant collection
      * @return new collection containing elements of the starting collection transformed by the given function
@@ -111,8 +112,8 @@ public class CollectionUtilities {
     /**
      * If the given collection is not empty then run a function over the entire collection
      *
-     * @param xs collection of items
-     * @param fn consumer function which accepts the items
+     * @param xs  collection of items
+     * @param fn  consumer function which accepts the items
      * @param <X> type of the items
      */
     public static <X> void maybe(Collection<X> xs, Consumer<Collection<X>> fn) {
@@ -125,14 +126,14 @@ public class CollectionUtilities {
      * and return the result.  If the collection is null then return the supplied default
      * argument.
      *
-     * @param xs - collection
-     * @param fn - transformation for the collection
-     * @param dflt  default value to return if the collection is empty
-     * @param <X> type of the items in the collection
-     * @param <Y> resultant type of the transformation
+     * @param xs   - collection
+     * @param fn   - transformation for the collection
+     * @param dflt default value to return if the collection is empty
+     * @param <X>  type of the items in the collection
+     * @param <Y>  resultant type of the transformation
      * @return the result of `fn(xs)` or `dflt` if xs is empty
      */
-    public static <X,Y> Y maybe(Collection<X> xs, Function<Collection<X>, Y> fn, Y dflt) {
+    public static <X, Y> Y maybe(Collection<X> xs, Function<Collection<X>, Y> fn, Y dflt) {
         if (notEmpty(xs)) return fn.apply(xs);
         else return dflt;
     }
@@ -142,12 +143,12 @@ public class CollectionUtilities {
      * `notEmpty` is intended as a null-safe way to determine if a collection
      * is not empty.  Null and empty collections are both treated as empty.
      *
-     * @param ts collection or null
+     * @param ts  collection or null
      * @param <T> type of items in collection
      * @return true if the collection is not null and not empty
      */
-    public static  <T> boolean notEmpty(Collection<T> ts) {
-        return ts != null && ! ts.isEmpty();
+    public static <T> boolean notEmpty(Collection<T> ts) {
+        return ts != null && !ts.isEmpty();
     }
 
 
@@ -169,9 +170,10 @@ public class CollectionUtilities {
 
     /**
      * Returns a sorted collection (list).  The input collection is unchanged.
-     * @param xs collection to be sorted (will be unchanged)
+     *
+     * @param xs         collection to be sorted (will be unchanged)
      * @param comparator used to determine order
-     * @param <X> type of elements in `xs
+     * @param <X>        type of elements in `xs
      * @return new list with members of `xs` sorted by `comparator`.
      */
     public static <X> List<X> sort(Collection<X> xs, Comparator<? super X> comparator) {
@@ -189,7 +191,7 @@ public class CollectionUtilities {
      * The random choice is via `java.util.Random` with the default
      * constructor.
      *
-     * @param xs items to pick from
+     * @param xs  items to pick from
      * @param <X> type of items in collection
      * @return an item
      * @throws IllegalArgumentException if the collection is empty (or null)
@@ -206,7 +208,7 @@ public class CollectionUtilities {
     /**
      * Intended as a null-safe test for empty collections.
      *
-     * @param xs collection of items (or null)
+     * @param xs  collection of items (or null)
      * @param <X> type of items in collection
      * @return true if the collection is empty or null
      */
@@ -220,4 +222,15 @@ public class CollectionUtilities {
                 ? Optional.empty()
                 : Optional.of(first(xs));
     }
+
+
+    public static <T> long countWhere(Collection<T> set, Predicate<T> pred) {
+        checkNotNull(set, "cannot sum over an empty set");
+        checkNotNull(pred, "cannot sum over an empty set");
+        return set
+                .stream()
+                .filter(pred)
+                .count();
+    }
+
 }

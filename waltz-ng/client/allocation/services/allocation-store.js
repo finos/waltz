@@ -33,15 +33,15 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/${measurableId}/type`, type)
         .then(d => d.data);
 
-    const updatePercentage = (ref, schemeId, measurableId, percentage) => $http
-        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/${measurableId}/percentage`, percentage)
+    const updatePercentages = (ref, schemeId, percentageList) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/percentages`, percentageList)
         .then(d => d.data);
 
     return {
         findByEntityAndScheme,
         findByMeasurableAndScheme,
         updateType,
-        updatePercentage
+        updatePercentages
     };
 
 }
@@ -72,9 +72,9 @@ export const AllocationStore_API = {
         serviceFnName: "updateType",
         description: "updateType [ref, schemeId, measurableId, type(FIXED|FLOATING)]"
     },
-    updatePercentage: {
+    updatePercentages: {
         serviceName,
-        serviceFnName: "updatePercentage",
-        description: "updatePercentage [ref, schemeId, measurableId, percentage]"
+        serviceFnName: "updatePercentages",
+        description: "updatePercentages [ref, schemeId, measurableId, percentageList[measurableId, percentage]]"
     }
 };

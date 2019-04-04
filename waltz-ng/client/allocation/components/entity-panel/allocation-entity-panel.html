@@ -26,8 +26,8 @@
             <table class="table table-condensed">
                 <colgroup>
                     <col width="40%">
-                    <col width="20%">
-                    <col width="40%">
+                    <col width="30%">
+                    <col width="30%">
                 </colgroup>
                 <thead>
                 <tr>
@@ -42,10 +42,10 @@
                         <span ng-bind="d.measurable.name"></span>
                     </td>
                     <td>
-                        <span ng-if="!d.working.editing">
+                        <span ng-if="!$ctrl.editing">
                             <span ng-bind="d.allocation.percentage | number:1 "></span>%
                         </span>
-                        <span ng-if="d.working.editing">
+                        <span ng-if="$ctrl.editing">
                             <input type="number"
                                    min="0"
                                    max="100"
@@ -53,27 +53,26 @@
                         </span>
                     </td>
                     <td>
-                        <span ng-if="d.working.editing">
-                            <a ng-click="$ctrl.setEditable(d, false)">Cancel</a>
-                            |
-                            <span ng-if="d.working.percentage != d.allocation.percentage">
-                                <a ng-click="$ctrl.onUpdatePercentage(d)"
-                                   class="clickable">
-                                    Save percentage
-                                </a>
-                            </span>
-                            <span ng-if="d.working.percentage == d.allocation.percentage">
-                                <span class="text-muted">Save percentage</span>
-                            </span>
-                        </span>
-                        <span ng-if="!d.working.editing">
-                            <a ng-click="$ctrl.setEditable(d, true)">Edit percentage</a>
-                        </span>
-                        |
                         <a ng-click="$ctrl.onUpdateType(d, 'FLOATING')" class="clickable">To Float </a>
-
                     </td>
                 </tr></tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td>
+                        <span ng-if="!$ctrl.editing">
+                            <a ng-click="$ctrl.setEditable(true)">Edit percentages</a>
+                        </span>
+
+                        <span ng-if="$ctrl.editing">
+                            <a ng-click="$ctrl.setEditable(false)">Cancel</a>
+                            |
+                            <a ng-click="$ctrl.onUpdatePercentages()" class="clickable">Save percentages</a>
+                        </span>
+                    </td>
+                    <td></td>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -116,7 +115,6 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 </div>
 
