@@ -20,13 +20,15 @@
 package com.khartec.waltz.service.allocation;
 
 import com.khartec.waltz.data.allocation.AllocationDao;
-import com.khartec.waltz.data.allocation_scheme.AllocationSchemeDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
+import com.khartec.waltz.model.allocation.AllocationType;
+import com.khartec.waltz.model.allocation.MeasurablePercentage;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -52,11 +54,20 @@ public class AllocationService {
         return allocationDao.findByMeasurableIdAndScheme(measurableId, schemeId);
     }
 
-    public Boolean makeFixed(EntityReference entityReference,
+    public Boolean updateType(EntityReference entityReference,
                              long scheme,
                              long measurable,
+                             AllocationType type,
                              String username) {
         //TODO: security
-        return allocationDao.makeFixed(entityReference, scheme, measurable);
+        return allocationDao.updateType(entityReference, scheme, measurable, type, username);
+    }
+
+    public Boolean updatePercentages(EntityReference entityReference,
+                                     long scheme,
+                                     Collection<MeasurablePercentage> measurablePercentage,
+                                     String username){
+
+        return allocationDao.updatePercentages(entityReference, scheme, measurablePercentage, username);
     }
 }

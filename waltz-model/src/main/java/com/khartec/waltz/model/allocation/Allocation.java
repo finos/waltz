@@ -22,6 +22,6 @@ public abstract class Allocation implements
     public abstract long measurableId();
     public abstract EntityReference entityReference();
     public abstract BigDecimal percentage();
-    public abstract boolean isFixed();
+    public abstract AllocationType type();
 
 }

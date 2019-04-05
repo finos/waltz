@@ -54,6 +54,11 @@ public class ListUtilities {
     }
 
 
+    public static <T> List<T> asList(T... ts){
+        return newArrayList(ts);
+    }
+
+
     /**
      * Given a collection of elements will return a list containing only non-null elements
      *

@@ -29,14 +29,19 @@ function store($http, baseApiUrl) {
             .get(`${baseUrl}/measurable/${measurableId}/${schemeId}`)
             .then(d => d.data);
 
-    const makeFixed = (ref, schemeId, measurableId) => $http
-        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/${measurableId}`)
+    const updateType = (ref, schemeId, measurableId, type) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/${measurableId}/type`, type)
+        .then(d => d.data);
+
+    const updatePercentages = (ref, schemeId, percentageList) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/percentages`, percentageList)
         .then(d => d.data);
 
     return {
         findByEntityAndScheme,
         findByMeasurableAndScheme,
-        makeFixed
+        updateType,
+        updatePercentages
     };
 
 }
@@ -62,9 +67,14 @@ export const AllocationStore_API = {
         serviceFnName: "findByMeasurableAndScheme",
         description: "findByMeasurableAndScheme [measurableId, schemeId]"
     },
-    makeFixed: {
+    updateType: {
         serviceName,
-        serviceFnName: "makeFixed",
-        description: "makeFixed [ref, schemeId, measurableId]"
+        serviceFnName: "updateType",
+        description: "updateType [ref, schemeId, measurableId, type(FIXED|FLOATING)]"
+    },
+    updatePercentages: {
+        serviceName,
+        serviceFnName: "updatePercentages",
+        description: "updatePercentages [ref, schemeId, measurableId, percentageList[measurableId, percentage]]"
     }
 };
