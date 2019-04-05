@@ -1,25 +1,18 @@
 package com.khartec.waltz.service.allocation;
 
-import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation.MeasurablePercentage;
-import com.sun.tools.classfile.Opcode;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple3;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.CollectionUtilities.any;
 import static com.khartec.waltz.common.CollectionUtilities.countWhere;
 import static com.khartec.waltz.model.allocation.MeasurablePercentage.mkMeasurablePercentage;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.reducing;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class AllocationUtilities {
