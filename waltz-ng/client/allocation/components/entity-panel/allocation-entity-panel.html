@@ -32,7 +32,8 @@
                 <div class="col-sm-4">
                     Allocation
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-3"
+                     ng-if="$ctrl.editing">
                     Operations
                 </div>
             </div>
@@ -47,16 +48,20 @@
                         <span ng-bind="d.allocation.percentage | number:1 "></span>%
                     </span>
                     <span ng-if="$ctrl.editing">
-                        <div class="form-group xhas-feedback"
+                        <div class="form-group"
+                             uib-popover="{{d.working.message}}"
+                             popover-enable="d.working.status !== 'OK'"
+                             popover-trigger="mouseenter"
+                             popover-popup-delay="400"
+                             popover-append-to-body="true"
                              ng-class="{
                                 'has-success': d.working.status === 'OK',
                                 'has-warning': d.working.status === 'WARN',
                                 'has-error': d.working.status === 'FAIL'
                              }">
                             <input type="number"
-                                   min="0"
                                    class="form-control input-sm"
-                                   ng-change="$ctrl.validateAllocations()"
+                                   ng-change="$ctrl.onPercentageChange()"
                                    ng-model="d.working.percentage">
                             <span class="glyphicon form-control-feedback"
                                   ng-class="{
@@ -68,11 +73,40 @@
                         </div>
                     </span>
                 </div>
-                <div class="col-sm-3">
-                    <a ng-click="$ctrl.onUpdateType(d, 'FLOATING')"
-                       class="clickable">
-                        To Float
-                    </a>
+                <div class="col-sm-3 waep-op-cell"
+                     ng-if="$ctrl.editing">
+
+                    <!-- Split button -->
+                    <div class="btn-group" uib-dropdown>
+                        <button id="split-button"
+                                type="button"
+                                ng-click="$ctrl.onUpdateType(d, 'FLOATING')"
+                                class="btn btn-default btn-xs">
+                            To float
+                        </button>
+                        <button type="button"
+                                class="btn btn-default btn-xs"
+                                uib-dropdown-toggle>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu"
+                            uib-dropdown-menu
+                            role="menu">
+                            <li role="menuitem">
+                                <a class="clickable"
+                                   ng-click="$ctrl.onGrabFloat(d)"
+                                   ng-if="$ctrl.floatingTotal !== 0">
+                                    Grab float
+                                </a>
+                                <div ng-if="$ctrl.floatingTotal === 0"
+                                      class="waep-disabled-action">
+                                    Grab float
+                                </div>
+                            </li>
+                            <li role="menuitem"><a href="#">Zero and distribute</a></li>
+                            <li role="menuitem"><a href="#">Grab enough</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="row waep-footer">
@@ -122,9 +156,16 @@
         <div ng-if="$ctrl.floatingAllocations.length > 0"
              class="waep-table">
             <div class="row waep-header">
-                <div class="col-sm-5"><b>Measurable</b></div>
-                <div class="col-sm-4"><b><i>Allocation</i></b></div>
-                <div class="col-sm-3"><b>Operations</b></div>
+                <div class="col-sm-5">
+                    Measurable
+                </div>
+                <div class="col-sm-4">
+                    <i>Allocation</i>
+                </div>
+                <div class="col-sm-3"
+                     ng-if="$ctrl.editing">
+                    Operations
+                </div>
             </div>
             <div class="row"
                  ng-repeat="d in $ctrl.floatingAllocations">
@@ -132,10 +173,11 @@
                     <span ng-bind="d.measurable.name"></span>
                 </div>
                 <div class="col-sm-4">
-                    <i><span ng-bind="d.allocation.percentage | number:1"></span></i>
+                    <i><span ng-bind="d.working.percentage | number:1"></span></i>
                     %
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-3"
+                     ng-if="$ctrl.editing">
                     <a ng-click="$ctrl.onUpdateType(d, 'FIXED')"
                        class="clickable">
                         To Fixed

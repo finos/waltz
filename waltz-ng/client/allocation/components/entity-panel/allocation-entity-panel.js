@@ -1,8 +1,9 @@
 import template from "./allocation-entity-panel.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
+import {calcWorkingTotal, updateDirtyFlags, validateAllocations} from "../../allocation-utilities";
 import _ from "lodash";
+
 
 
 const bindings = {
@@ -17,15 +18,17 @@ const initialState = {
     fixedAllocations: [],
     floatingAllocations: [],
     editing: true,
-    saveEnabled: true,
+    saveEnabled: false,
     dirty: false
 };
 
 
-function calcTotal(enrichedAllocations = []) {
-    return _.sumBy(
-        enrichedAllocations,
-        d => d.allocation.percentage);
+function updateFloatingValues(floatingTotal = 0, floatingAllocations = []) {
+    const total = Math.max(0, floatingTotal);
+    const perAllocation = floatingAllocations.length > 0
+        ? total / floatingAllocations.length
+        : 0;
+    _.each(floatingAllocations, fa => fa.working.percentage = perAllocation);
 }
 
 
@@ -36,7 +39,7 @@ function controller($q, notification, serviceBroker) {
     function loadData() {
         const measurablePromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => _.keyBy(r.data, "id"));
+            .then(r => r.data);
 
         const schemePromise = serviceBroker
             .loadViewData(
@@ -53,7 +56,8 @@ function controller($q, notification, serviceBroker) {
 
         return $q
             .all([measurablePromise, schemePromise, allocationPromise])
-            .then(([measurablesById, scheme, rawAllocations]) => {
+            .then(([measurables, scheme, rawAllocations]) => {
+                const measurablesById = _.keyBy(measurables, "id");
                 vm.scheme = scheme;
                 vm.enrichedAllocations = _
                     .chain(rawAllocations)
@@ -71,6 +75,7 @@ function controller($q, notification, serviceBroker) {
     }
 
 
+
     function recalcData() {
         const allocationsByType = _
             .chain(vm.enrichedAllocations)
@@ -81,15 +86,19 @@ function controller($q, notification, serviceBroker) {
         vm.fixedAllocations = _.get(allocationsByType, "FIXED", []);
         vm.floatingAllocations = _.get(allocationsByType, "FLOATING", []);
 
-        vm.fixedTotal = calcTotal(vm.fixedAllocations);
-        vm.floatingTotal = calcTotal(vm.floatingAllocations);
+        vm.fixedTotal = calcWorkingTotal(vm.fixedAllocations);
         vm.total = vm.fixedTotal + vm.floatingTotal;
+        vm.floatingTotal = 100 - vm.fixedTotal;
 
-        _.forEach(vm.enrichedAllocations, ea => {
-            const percentageChanged = ea.working.percentage !== ea.allocation.percentage;
-            const typeChanged = ea.working.type !== ea.allocation.type;
-            ea.working.dirty = percentageChanged || typeChanged
-        });
+        updateFloatingValues(vm.floatingTotal, vm.floatingAllocations);
+
+        const hasDirtyData = updateDirtyFlags(vm.enrichedAllocations);
+
+        const validAllocations = validateAllocations(
+            vm.fixedAllocations,
+            vm.floatingAllocations);
+
+        vm.saveEnabled = validAllocations && hasDirtyData;
     }
 
 
@@ -112,28 +121,17 @@ function controller($q, notification, serviceBroker) {
 
     // -- INTERACT
 
-    vm.onUpdateTypeOld = (d, type) => {
-        const niceType = type === "FIXED"
-            ? "fixed"
-            : "floating";
-
-        serviceBroker
-            .execute(
-                CORE_API.AllocationStore.updateType,
-                [vm.entityReference, vm.schemeId, d.measurable.id, type])
-            .then(r => {
-                if (r.data === true) {
-                    notification.success(`Converted ${d.measurable.name} to ${niceType}`);
-                } else {
-                    notification.warning(`Could not convert ${d.measurable.name} to ${niceType}, it may have been removed or already converted`);
-                }
-                reload();
-            })
-            .catch(e => notification.error(`Could not convert ${d.measurable.name} to ${niceType}`));
-    };
 
     vm.onUpdateType = (d, type) => {
         d.working.type = type;
+        if (type === "FIXED") {
+            d.working.percentage = Math.floor(d.working.percentage);
+        }
+        recalcData();
+    };
+
+    vm.onGrabFloat = (d) => {
+        d.working.percentage = d.working.percentage + vm.floatingTotal;
         recalcData();
     };
 
@@ -166,36 +164,8 @@ function controller($q, notification, serviceBroker) {
         vm.editing = targetState;
     };
 
-    vm.validateAllocations = () => {
-        const hasFloats = vm.floatingAllocations.length > 0;
-        vm.saveEnabled = true;
+    vm.onPercentageChange = () => recalcData();
 
-        vm.fixedAllocations = _.each(vm.fixedAllocations, (fa,i) => {
-            const totalFixed = _.sumBy(vm.fixedAllocations, fa => fa.working.percentage);
-
-            if (fa.working.percentage > 100) {
-                fa.working.status = "FAIL";
-                fa.working.message = "Cannot exceed 100%";
-                vm.saveEnabled = false;
-            } else if (totalFixed > 100) {
-                fa.working.status = "WARN";
-                fa.working.message = "Total exceeds 100%";
-                vm.saveEnabled = false;
-            } else if (totalFixed < 100 && ! hasFloats) {
-                fa.working.status = "WARN";
-                fa.working.message = "Total does make 100%";
-                vm.saveEnabled = false;
-            }else {
-                fa.working.status = "OK";
-                fa.working.message = "";
-            }
-
-            //fa.working.status = ["FAIL","OK","WARN"][i%3];
-        })
-
-
-
-    }
 }
 
 

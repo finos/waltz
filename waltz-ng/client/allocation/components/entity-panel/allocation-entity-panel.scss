@@ -19,5 +19,19 @@ waltz-allocation-entity-panel {
         .waep-footer {
             background-color: #fcfcfc;
         }
+
+        .waep-op-cell {
+            padding-right: 0;
+        }
+
+        .waep-disabled-action {
+            @extend .text-muted;
+            padding-left: 20px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            padding-right: 3px;
+        }
+
+
     }
 }
