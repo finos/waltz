@@ -91,12 +91,12 @@ describe("HierarchyUtils/treeSearching", () => {
 
         it("no hits gives empty array as result", () => {
             const hits = doSearch("FOO", searchNodes);
-            assert(hits.length === 0);
+            assert.equal(hits.length, 0);
         });
 
         it("no search nodes gives back empty array", () => {
             const hits = doSearch("FOO", []);
-            assert(hits.length === 0);
+            assert.equal(hits.length, 0);
         });
     });
 });
