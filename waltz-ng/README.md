@@ -28,3 +28,7 @@ shell with:
 
     $> cd ./waltz-ng/
     $> mocha --recursive --watch
+
+See the [JS Unit Test](test) documentation for more detail on running
+Javascript unit tests.
+ 

@@ -26,11 +26,11 @@ import {applicationKind} from "../../common/services/enums/application-kind";
 import {criticality} from "../../common/services/enums/criticality";
 import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
 import {getEnumName} from "../../common/services/enums";
-import template from './app-summary.html';
+import template from "./app-summary.html";
 
 const bindings = {
-    apps: '<',
-    endUserApps: '<'
+    apps: "<",
+    endUserApps: "<"
 };
 
 
@@ -78,13 +78,13 @@ function mkCharts(apps = [], endUserApps = []) {
         apps: {
             byLifecyclePhase: mkChartData(
                 apps,
-                'lifecyclePhase',
+                "lifecyclePhase",
                 PIE_SIZE,
                 lifecycleColorProvider,
                 lifecycleLabelProvider),
             byKind: mkChartData(
                 apps,
-                'applicationKind',
+                "applicationKind",
                 PIE_SIZE,
                 randomColorProvider,
                 applicationKindLabelProvider)
@@ -92,17 +92,17 @@ function mkCharts(apps = [], endUserApps = []) {
         endUserApps: {
             byLifecyclePhase: mkChartData(
                 endUserApps,
-                'lifecyclePhase',
+                "lifecyclePhase",
                 PIE_SIZE,
                 lifecycleColorProvider,
                 lifecycleLabelProvider),
             byKind: mkChartData(
                 endUserApps,
-                'platform',
+                "platform",
                 PIE_SIZE),
             byRiskRating: mkChartData(
                 endUserApps,
-                'riskRating',
+                "riskRating",
                 PIE_SIZE,
                 criticalityColorProvider,
                 criticalityLabelProvider())

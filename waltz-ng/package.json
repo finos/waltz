@@ -67,6 +67,7 @@
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "chai": "4.2.0",
     "css-loader": "^1.0.0",
     "eslint": "^2.3.0",
     "eslint-config-airbnb": "^6.1.0",

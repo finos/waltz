@@ -93,7 +93,7 @@ export function randomPick(xs) {
  * will be returned
  *
  * @param fn
- * @param dflt
+ * @param dflt  value to return if fn throws an exception
  * @returns {*}
  */
 export function perhaps(fn, dflt) {
@@ -153,10 +153,10 @@ function toCountData(data = []) {
 }
 
 
-export function toKeyCounts(items = [], fn = x => x) {
+export function toKeyCounts(items = [], keyFn = x => x) {
     if (! items) return [];
     return toCountData(nest()
-        .key(fn)
+        .key(keyFn)
         .rollup(d => d.length)
         .entries(items));
 }

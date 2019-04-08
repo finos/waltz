@@ -11,8 +11,8 @@
  */
 
 
-import assert from "assert";
-import { buildHierarchies } from "../../client/common/hierarchy-utils";
+import {assert} from "chai";
+import { buildHierarchies } from "../../../client/common/hierarchy-utils";
 
 
 const ouA = {
@@ -48,7 +48,7 @@ const ouCycleB = {
     parentId: 4
 };
 
-describe("buildHierarchies", () => {
+describe("HierarchyUtils/buildHierarchies", () => {
     it("should give empty array when given no data", () => {
         assert.equal(0, buildHierarchies().length);
     });

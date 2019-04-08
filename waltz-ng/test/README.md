@@ -1,6 +1,9 @@
-# Tests
+# JS Unit Tests
 
 Tests are written using [Mocha](https://mochajs.org/) in a BDD style.
+We use the [Chai Assertion library](https://www.chaijs.com/api/assert/) for verifying
+behaviour.
+
 
 ## Running Tests
 

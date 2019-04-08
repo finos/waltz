@@ -20,34 +20,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ViewPage from './pages/view/app-group-view';
-import EditPage from './pages/edit/app-group-edit';
+import ViewPage from "./pages/view/app-group-view";
+import EditPage from "./pages/edit/app-group-edit";
 
 const baseState = {
-    url: 'app-group'
+    url: "app-group"
 };
 
 
 const viewState = {
-    url: '/{id:int}',
-    views: { 'content@': ViewPage }
+    url: "/{id:int}",
+    views: { "content@": ViewPage }
 };
 
 
 const editState = {
-    url: '/{id:int}/edit',
-    views: { 'content@': EditPage }
+    url: "/{id:int}/edit",
+    views: { "content@": EditPage }
 };
 
 
 function setupRoutes($stateProvider) {
     $stateProvider
-        .state('main.app-group', baseState)
-        .state('main.app-group.view', viewState)
-        .state('main.app-group.edit', editState);
+        .state("main.app-group", baseState)
+        .state("main.app-group.view", viewState)
+        .state("main.app-group.edit", editState);
 }
 
-setupRoutes.$inject = ['$stateProvider'];
+setupRoutes.$inject = ["$stateProvider"];
 
 
 export default setupRoutes;
