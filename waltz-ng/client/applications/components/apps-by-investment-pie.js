@@ -20,12 +20,12 @@
 
 import {ragColorScale} from "../../common/colors";
 import {toKeyCounts} from "../../common";
-import template from './apps-by-investment-pie.html';
+import template from "./apps-by-investment-pie.html";
 
 
 const bindings = {
-    applications: '<',
-    size: '<'
+    applications: "<",
+    size: "<"
 };
 
 
@@ -35,16 +35,16 @@ const DEFAULT_SIZE = 80;
 
 
 const investmentLabels = {
-    'R' : 'Disinvest',
-    'A' : 'Maintain',
-    'G' : 'Invest'
+    "R" : "Disinvest",
+    "A" : "Maintain",
+    "G" : "Invest"
 };
 
 
 const config = {
     colorProvider: (d) => ragColorScale(d.data.key),
     size: DEFAULT_SIZE,
-    labelProvider: (d) => investmentLabels[d.key] || 'Unknown'
+    labelProvider: (d) => investmentLabels[d.key] || "Unknown"
 };
 
 

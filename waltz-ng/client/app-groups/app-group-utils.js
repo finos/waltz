@@ -20,7 +20,7 @@
 
 
 import {CORE_API} from "../common/services/core-api-utils";
-import _ from 'lodash';
+import _ from "lodash";
 
 
 /**
@@ -32,7 +32,7 @@ import _ from 'lodash';
  */
 export function isGroupOwner(serviceBroker, entityRef) {
     return determineGroupRoles(serviceBroker, entityRef)
-        .then(roles => _.includes(roles, 'OWNER'));
+        .then(roles => _.includes(roles, "OWNER"));
 }
 
 
@@ -55,6 +55,6 @@ export function determineGroupRoles(serviceBroker, entityRef) {
         .then(() => _
                 .chain(members)
                 .filter(m => m.userId === user.userName)
-                .map('role')
+                .map("role")
                 .value());
 }

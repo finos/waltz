@@ -1,4 +1,4 @@
-import assert from "assert";
+import {assert} from "chai";
 import {buildPropertySummer} from "../../../client/common/tally-utils";
 
 
@@ -38,7 +38,7 @@ const a = {
 
 const summer = buildPropertySummer();
 
-describe("basicSumming", () => {
+describe("TallyUtils: basicSumming", () => {
     it("can sum leaf nodes", () => {
         const aTotal = summer(a);
         const b21Total = summer(b21);

@@ -18,11 +18,11 @@
  */
 import _ from "lodash";
 import {mapToDisplayNames} from "../application-utils";
-import template from  './app-table.html';
+import template from  "./app-table.html";
 
 const bindings = {
-    applications: '<',
-    onInitialise: '<'
+    applications: "<",
+    onInitialise: "<"
 };
 
 
@@ -37,7 +37,7 @@ function mkGridData(apps = []) {
 
 const columnDefs = [
     {
-        field: 'name',
+        field: "name",
         cellTemplate: `<div class="ui-grid-cell-contents" 
                             ng-switch="row.entity['management']">
                          <span ng-switch-when="End User" 
@@ -48,12 +48,12 @@ const columnDefs = [
                          </a>
                        </div>`
     },
-    { field: 'assetCode'},
-    { field: 'kindDisplay', name: 'Kind'},
-    { field: 'overallRatingDisplay', name: 'Overall Rating'},
-    { field: 'riskRatingDisplay', name: 'Risk Rating'},
-    { field: 'businessCriticalityDisplay', name: 'Business Criticality'},
-    { field: 'lifecyclePhaseDisplay', name: 'Lifecycle Phase'}
+    { field: "assetCode"},
+    { field: "kindDisplay", name: "Kind"},
+    { field: "overallRatingDisplay", name: "Overall Rating"},
+    { field: "riskRatingDisplay", name: "Risk Rating"},
+    { field: "businessCriticalityDisplay", name: "Business Criticality"},
+    { field: "lifecyclePhaseDisplay", name: "Lifecycle Phase"}
 ];
 
 
