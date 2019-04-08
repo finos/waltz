@@ -29,7 +29,6 @@ describe("ListUtils", () => {
             () => assert.isFalse(lu.containsAll(abc, abcd)));
     });
 
-
     describe("cumulativeCounts", () => {
         it ("returns [] if given counts of [0]",
             () => assert.deepEqual(lu.toCumulativeCounts([]), []));
