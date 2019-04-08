@@ -7,3 +7,4 @@ dist
 *.iws
 *.ids
 npm-debug.log
+*.log

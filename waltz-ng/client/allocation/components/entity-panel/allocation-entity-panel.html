@@ -9,7 +9,7 @@
 <br>
 
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-md-6">
         <h4>
             <waltz-icon name="thumb-tack"></waltz-icon>
             Fixed Allocations
@@ -22,64 +22,91 @@
             <message>No fixed allocations</message>
         </waltz-no-data>
 
-        <div ng-if="$ctrl.fixedAllocations.length > 0">
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="40%">
-                    <col width="30%">
-                    <col width="30%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Measurable</th>
-                    <th>Allocation</th>
-                    <th>Operations</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="d in $ctrl.fixedAllocations">
-                    <td>
-                        <span ng-bind="d.measurable.name"></span>
-                    </td>
-                    <td>
-                        <span ng-if="!$ctrl.editing">
-                            <span ng-bind="d.allocation.percentage | number:1 "></span>%
-                        </span>
-                        <span ng-if="$ctrl.editing">
+        <!-- FIXEDs -->
+        <div ng-if="$ctrl.fixedAllocations.length > 0"
+             class="waep-table">
+            <div class="row waep-header">
+                <div class="col-sm-5">
+                    Measurable
+                </div>
+                <div class="col-sm-4">
+                    Allocation
+                </div>
+                <div class="col-sm-3">
+                    Operations
+                </div>
+            </div>
+            <div class="row waep-body"
+                 ng-repeat="d in $ctrl.fixedAllocations">
+                <div class="col-sm-5">
+                    <span ng-bind="d.measurable.name"></span>
+                    <span ng-if="d.working.dirty">*</span>
+                </div>
+                <div class="col-sm-4">
+                    <span ng-if="!$ctrl.editing">
+                        <span ng-bind="d.allocation.percentage | number:1 "></span>%
+                    </span>
+                    <span ng-if="$ctrl.editing">
+                        <div class="form-group xhas-feedback"
+                             ng-class="{
+                                'has-success': d.working.status === 'OK',
+                                'has-warning': d.working.status === 'WARN',
+                                'has-error': d.working.status === 'FAIL'
+                             }">
                             <input type="number"
                                    min="0"
-                                   max="100"
+                                   class="form-control input-sm"
+                                   ng-change="$ctrl.validateAllocations()"
                                    ng-model="d.working.percentage">
-                        </span>
-                    </td>
-                    <td>
-                        <a ng-click="$ctrl.onUpdateType(d, 'FLOATING')" class="clickable">To Float </a>
-                    </td>
-                </tr></tbody>
-                <tfoot>
-                <tr>
-                    <td></td>
-                    <td>
-                        <span ng-if="!$ctrl.editing">
-                            <a ng-click="$ctrl.setEditable(true)">Edit percentages</a>
-                        </span>
+                            <span class="glyphicon form-control-feedback"
+                                  ng-class="{
+                                    'glyphicon-ok': d.working.status === 'OK',
+                                    'glyphicon-warning-sign': d.working.status === 'WARN',
+                                    'glyphicon-remove': d.working.status === 'FAIL',
+                                  }"
+                                  aria-hidden="true"/>
+                        </div>
+                    </span>
+                </div>
+                <div class="col-sm-3">
+                    <a ng-click="$ctrl.onUpdateType(d, 'FLOATING')"
+                       class="clickable">
+                        To Float
+                    </a>
+                </div>
+            </div>
+            <div class="row waep-footer">
+                <div class="col-sm-offset-5 col-sm-7">
+                    <span ng-if="!$ctrl.editing">
+                        <a ng-click="$ctrl.setEditable(true)"
+                           class="clickable">
+                            Edit percentages
+                        </a>
+                    </span>
 
-                        <span ng-if="$ctrl.editing">
-                            <a ng-click="$ctrl.setEditable(false)">Cancel</a>
-                            |
-                            <a ng-click="$ctrl.onUpdatePercentages()" class="clickable">Save percentages</a>
+                    <span ng-if="$ctrl.editing"
+                          class="clickable">
+                        <a ng-click="$ctrl.setEditable(false)">
+                            Cancel
+                        </a>
+                        |
+
+                        <a ng-if="$ctrl.saveEnabled"
+                           ng-click="$ctrl.onUpdatePercentages()"
+                           class="clickable">
+                            Save percentages
+                        </a>
+
+                        <span ng-if="!$ctrl.saveEnabled">
+                            Nope
                         </span>
-                    </td>
-                    <td></td>
-                </tr>
-                </tfoot>
-            </table>
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-sm-12">
+    <div class="col-md-6">
         <h4>
             Floating Allocations
             <small>
@@ -87,33 +114,34 @@
             </small>
         </h4>
 
-
         <waltz-no-data ng-if="$ctrl.floatingAllocations.length == 0">
             <message>No floating allocations</message>
         </waltz-no-data>
 
-        <div ng-if="$ctrl.floatingAllocations.length > 0">
-            <table class="table table-condensed">
-                <colgroup>
-                    <col width="40%">
-                    <col width="20%">
-                    <col width="40%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Measurable</th>
-                    <th><i>Allocation</i></th>
-                    <th>Operations</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="d in $ctrl.floatingAllocations">
-                    <td><span ng-bind="d.measurable.name"></span></td>
-                    <td><i><span ng-bind="d.allocation.percentage | number:1 "></span>%</i></td>
-                    <td><a ng-click="$ctrl.onUpdateType(d, 'FIXED')" class="clickable">To Fixed</a></td>
-                </tr>
-                </tbody>
-            </table>
+        <!-- FLOATs -->
+        <div ng-if="$ctrl.floatingAllocations.length > 0"
+             class="waep-table">
+            <div class="row waep-header">
+                <div class="col-sm-5"><b>Measurable</b></div>
+                <div class="col-sm-4"><b><i>Allocation</i></b></div>
+                <div class="col-sm-3"><b>Operations</b></div>
+            </div>
+            <div class="row"
+                 ng-repeat="d in $ctrl.floatingAllocations">
+                <div class="col-sm-5">
+                    <span ng-bind="d.measurable.name"></span>
+                </div>
+                <div class="col-sm-4">
+                    <i><span ng-bind="d.allocation.percentage | number:1"></span></i>
+                    %
+                </div>
+                <div class="col-sm-3">
+                    <a ng-click="$ctrl.onUpdateType(d, 'FIXED')"
+                       class="clickable">
+                        To Fixed
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
