@@ -21,8 +21,9 @@ const initialState = {
     rawAllocations: [],
     fixedAllocations: [],
     floatingAllocations: [],
-    editing: true,
+    editing: false,
     saveEnabled: false,
+    showingHelp: false,
     dirty: false
 };
 
@@ -155,8 +156,9 @@ function controller($q, notification, serviceBroker) {
             .catch(e => notification.error("Could not update percentages"));
     };
 
-    vm.setEditable = (targetState) => {
+    vm.setEditable = (targetState, cancelChanges) => {
         vm.editing = targetState;
+        reload();
     };
 
     vm.onPercentageChange = () => recalcData();

@@ -28,7 +28,7 @@ export function validateAllocations(fixedAllocations = [],
             saveEnabled = false;
         } else if (totalFixed < 100 && ! hasFloats) {
             fa.working.status = "WARN";
-            fa.working.message = "Total does make 100%";
+            fa.working.message = "Total does not make 100%";
             saveEnabled = false;
         } else {
             fa.working.status = "OK";
@@ -45,7 +45,7 @@ export function updateDirtyFlags(enrichedAllocations = []) {
     _.forEach(enrichedAllocations, ea => {
         const percentageChanged = ea.working.percentage !== ea.allocation.percentage;
         const typeChanged = ea.working.type !== ea.allocation.type;
-        const isDirty =  percentageChanged || typeChanged
+        const isDirty =  percentageChanged || typeChanged;
         ea.working.dirty = isDirty;
         dirtyFound = dirtyFound || isDirty;
     });

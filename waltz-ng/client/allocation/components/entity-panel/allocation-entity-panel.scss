@@ -1,7 +1,6 @@
 waltz-allocation-entity-panel {
     .waep-table {
         margin: 6px;
-        border: 1px solid #fafafa;
 
         .row {
             padding-top: 2px;
@@ -13,12 +12,9 @@ waltz-allocation-entity-panel {
         }
 
         .waep-body {
-            border-bottom: 1px solid #f5f5f5;
+            border-top: 1px solid #f5f5f5;
         }
 
-        .waep-footer {
-            background-color: #fcfcfc;
-        }
 
         .waep-op-cell {
             padding-right: 0;
@@ -34,4 +30,10 @@ waltz-allocation-entity-panel {
 
 
     }
+
+    .waep-edit-bar {
+        padding-top: 6px;
+        text-align: center;
+    }
+
 }
