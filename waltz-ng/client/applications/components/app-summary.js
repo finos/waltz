@@ -22,10 +22,6 @@ import {tallyBy} from "../../common/tally-utils";
 import {notEmpty} from "../../common";
 import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
 
-import {applicationKind} from "../../common/services/enums/application-kind";
-import {criticality} from "../../common/services/enums/criticality";
-import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
-import {getEnumName} from "../../common/services/enums";
 import template from "./app-summary.html";
 
 const bindings = {
@@ -48,9 +44,9 @@ const PIE_SIZE = 70;
 
 
 const defaultLabelProvider = (d) => d.key;
-const lifecycleLabelProvider = d => getEnumName(lifecyclePhase, d.key);
-const criticalityLabelProvider = d => d ? getEnumName(criticality, d.key) : d;
-const applicationKindLabelProvider = d => getEnumName(applicationKind, d.key);
+const lifecycleLabelProvider = (displayNameService, d) => displayNameService.lookup("lifecyclePhase", d.key, d.key);
+const criticalityLabelProvider = (displayNameService, d) => d ? displayNameService.lookup("criticality", d.key, d.key) : d;
+const applicationKindLabelProvider = (displayNameService, d) => displayNameService.lookup("applicationKind", d.key, d.key);
 
 const randomColorProvider = d => variableScale(d.data.key);
 const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);
@@ -73,7 +69,7 @@ function mkChartData(data,
 }
 
 
-function mkCharts(apps = [], endUserApps = []) {
+function mkCharts(apps = [], endUserApps = [], displayNameService) {
     return {
         apps: {
             byLifecyclePhase: mkChartData(
@@ -81,13 +77,13 @@ function mkCharts(apps = [], endUserApps = []) {
                 "lifecyclePhase",
                 PIE_SIZE,
                 lifecycleColorProvider,
-                lifecycleLabelProvider),
+                (k) => lifecycleLabelProvider(displayNameService, k)),
             byKind: mkChartData(
                 apps,
                 "applicationKind",
                 PIE_SIZE,
                 randomColorProvider,
-                applicationKindLabelProvider)
+                (k) => applicationKindLabelProvider(displayNameService, k))
         },
         endUserApps: {
             byLifecyclePhase: mkChartData(
@@ -95,7 +91,7 @@ function mkCharts(apps = [], endUserApps = []) {
                 "lifecyclePhase",
                 PIE_SIZE,
                 lifecycleColorProvider,
-                lifecycleLabelProvider),
+                (k) => lifecycleLabelProvider(displayNameService, k)),
             byKind: mkChartData(
                 endUserApps,
                 "platform",
@@ -105,7 +101,7 @@ function mkCharts(apps = [], endUserApps = []) {
                 "riskRating",
                 PIE_SIZE,
                 criticalityColorProvider,
-                criticalityLabelProvider())
+                (k) => criticalityLabelProvider(displayNameService, k))
         }
     };
 }
@@ -119,15 +115,18 @@ function calcVisibility(apps = [], endUserApps = []) {
 }
 
 
-function controller() {
+function controller(displayNameService) {
 
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onChanges = () => {
-        vm.charts = mkCharts(vm.apps, vm.endUserApps);
+        vm.charts = mkCharts(vm.apps, vm.endUserApps, displayNameService);
         vm.visibility = calcVisibility(vm.apps, vm.endUserApps);
     };
 }
+
+
+controller.$inject = ["DisplayNameService"];
 
 
 const component = {
