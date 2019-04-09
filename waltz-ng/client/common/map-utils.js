@@ -75,3 +75,24 @@ export function toMap(xs, keyFn, valFn = _.identity) {
     };
     return _.reduce(xs, reducer, {});
 }
+
+/**
+ * Takes an array and groups by a key extraction function, processing values
+ * with a value transformation function.
+ * @param coll
+ * @param keyFn
+ * @param valFn
+ */
+export function groupAndMap(coll = [], keyFn = d => d.id, valFn = d => d) {
+    return _.reduce(
+        coll,
+        (acc, x) => {
+            const k = keyFn(x);
+            const bucket = acc[k] || [];
+            bucket.push(valFn(x));
+            acc[k] = bucket;
+            return acc;
+        },
+        {});
+}
+

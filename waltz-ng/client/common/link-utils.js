@@ -70,10 +70,10 @@ const viewStateToKindMap = _.assign(
  * @returns String state name
  */
 export function kindToViewState(kind) {
-    if(!_.has(kindsToViewStateMap, kind)) {
-        throw "Unable to convert kind: "+kind+ " to a ui-view state";
-    }
-    return _.get(kindsToViewStateMap, kind);
+    return _.result(
+        kindsToViewStateMap,
+        kind,
+        () => { throw `Unable to convert kind: ${kind} to a ui-view state`; });
 }
 
 
@@ -81,12 +81,12 @@ export function kindToViewState(kind) {
  * Given an view state, this will return the matching
  * entity kind if available.  Otherwise it
  * will throw an error.
- * @param String state name
+ * @param viewState  state name
  * @returns kind
  */
 export function viewStateToKind(viewState) {
-    if(!_.has(viewStateToKindMap, viewState)) {
-        throw "Unable to convert view state: "+viewState+ " to an entity kind";
-    }
-    return _.get(viewStateToKindMap, viewState);
+    return _.result(
+        viewStateToKindMap,
+        viewState,
+        () => { throw "Unable to convert view state: "+viewState+ " to an entity kind"; });
 }

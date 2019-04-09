@@ -1,5 +1,6 @@
 import {assert} from "chai";
 import * as lu from "../../client/common/list-utils";
+import {move} from "../../client/common/list-utils";
 
 
 const abc = ["a", "b", "c"];
@@ -62,5 +63,40 @@ describe("ListUtils", () => {
         it ("gives an empty map if given -null-",
             () => assert.deepEqual(lu.toOffsetMap(null), {}));
     });
+
+
+    describe("move", () => {
+        const arr = ["a", "b", "c"];
+
+        it("will leave an item in place if delta == 0", () => {
+            assert.deepEqual(move(arr, 1, 0), ["a", "b", "c"]);
+        });
+
+        it("can move an element up (delta = +1)", () => {
+            assert.deepEqual(move(arr, 0, 1), ["b", "a", "c"]);
+            assert.deepEqual(move(arr, 1, 1), ["a", "c", "b"]);
+        });
+
+        it("can move an element down (delta = -1)", () => {
+            assert.deepEqual(move(arr, 1, -1), ["b", "a", "c"]);
+            assert.deepEqual(move(arr, 2, -1), ["a", "c", "b"]);
+        });
+
+        it("can move an element several places", () => {
+            assert.deepEqual(move(arr, 2, -2), ["c", "a", "b"]);
+            assert.deepEqual(move(arr, 0, 2), ["b", "c", "a"]);
+        });
+
+        it("clamps to end", () => {
+            assert.deepEqual(move(arr, 2, 10), ["a", "b", "c"]);
+            assert.deepEqual(move(arr, 1, 10), ["a", "c", "b"]);
+        });
+
+        it("clamps to beginning", () => {
+            assert.deepEqual(move(arr, 0, -10), ["a", "b", "c"]);
+            assert.deepEqual(move(arr, 1, -10), ["b", "a", "c"]);
+            assert.deepEqual(move(arr, 2, -10), ["c", "a", "b"]);
+        });
+    })
 });
 
