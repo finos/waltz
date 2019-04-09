@@ -27,8 +27,8 @@ import roles from "../user/roles";
  * `com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind(...)`
  *
  * @param kind
- * @param secondaryKind (Optional) secondary kind
- * @returns role
+ * @param secondaryKind  (Optional) secondary kind
+ * @returns string  key of role
  */
 export function getEditRoleForEntityKind(kind, secondaryKind) {
     switch (kind) {

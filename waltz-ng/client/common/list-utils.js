@@ -66,21 +66,31 @@ export function toOffsetMap(arr = [], keyFn = d => d.id) {
     }, {});
 }
 
+
 /**
- * Adapted from:
- * https://gist.github.com/albertein/4496103
- *
+ * Moves the item at offset `idx` by `delta` positions in the given `array`.
+ * Clamps to the start and end of the array.
  * @param array
  * @param idx
  * @param delta
  * @returns {*}
  */
 export function move(array, idx, delta) {
-    const arrayClone = array.slice();
-    const newIndex = idx + delta;
-    if (newIndex < 0  || newIndex == arrayClone.length) return; //Already at the top or bottom.
-    const indexes = [idx, newIndex].sort((a, b) => a - b); //Sort the indexes
-    arrayClone.splice(indexes[0], 2, arrayClone[indexes[1]], arrayClone[indexes[0]]); //Replace from lowest index, two elements, reverting the order
-    return arrayClone;
+    const copy = array.slice();
+
+    if (delta === 0) {
+        return copy;
+    }
+
+    const targetIdx = _.clamp(
+        idx + delta,
+        0,
+         array.length);
+
+    const itemToMove = array[idx];
+    copy.splice(idx , 1);
+    copy.splice(targetIdx, 0, itemToMove);
+
+    return copy;
 }
 
