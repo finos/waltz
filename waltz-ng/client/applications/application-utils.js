@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {investmentRating} from "../common/services/enums/investment-rating";
-
 
 export function mapToDisplayNames(displayNameService, app) {
     const maybeGetDisplayName = (type, value) => displayNameService.lookup(type, value, value);
