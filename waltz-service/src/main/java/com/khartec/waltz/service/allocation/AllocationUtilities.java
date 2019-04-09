@@ -1,84 +1,109 @@
 package com.khartec.waltz.service.allocation;
 
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.AllocationType;
+import com.khartec.waltz.model.allocation.ImmutableAllocation;
 import com.khartec.waltz.model.allocation.MeasurablePercentage;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.CollectionUtilities.any;
-import static com.khartec.waltz.common.CollectionUtilities.countWhere;
-import static com.khartec.waltz.model.allocation.MeasurablePercentage.mkMeasurablePercentage;
-import static java.util.stream.Collectors.reducing;
-import static org.jooq.lambda.tuple.Tuple.tuple;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.common.SetUtilities.map;
 
 public class AllocationUtilities {
 
     private static final BigDecimal ONE_HUNDRED_PERCENT = BigDecimal.valueOf(100);
 
 
-    public static Tuple2<AllocationType, MeasurablePercentage> fromAllocation(Allocation allocation) {
-        return tuple(
-                allocation.type(),
-                mkMeasurablePercentage(allocation.measurableId(), allocation.percentage()));
+    public static Collection<Allocation> calcAllocations(Collection<Allocation> currentAllocations,
+                                                         Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
+
+        validateUpdate(currentAllocations, fixedPercentagesToUpdate);
+
+        BigDecimal perFloatPercentage = calculatePerFloatingPercentage(
+                currentAllocations,
+                fixedPercentagesToUpdate);
+
+        Map<Long, MeasurablePercentage> fixedPercentagesByMeasurable = indexBy(
+                d -> d.measurableId(),
+                fixedPercentagesToUpdate);
+
+        return CollectionUtilities.map(
+                currentAllocations,
+                d -> {
+                    MeasurablePercentage updateFixedPercentage = fixedPercentagesByMeasurable.get(d.measurableId());
+                    if (updateFixedPercentage != null) {
+                        return ImmutableAllocation
+                                .copyOf(d)
+                                .withPercentage(updateFixedPercentage.percentage())
+                                .withType(AllocationType.FIXED);
+                    } else {
+                        return ImmutableAllocation
+                                .copyOf(d)
+                                .withPercentage(perFloatPercentage)
+                                .withType(AllocationType.FLOATING);
+                    }
+                });
     }
 
 
-    public static boolean validateAllocationTuples(List<Tuple2<AllocationType, BigDecimal>> tuples) {
+    private static BigDecimal calculatePerFloatingPercentage(Collection<Allocation> currentAllocations, Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
+        BigDecimal fixedTotal = calculateTotal(fixedPercentagesToUpdate);
+        int numFloats = currentAllocations.size() - fixedPercentagesToUpdate.size();
+        BigDecimal floatingTotal = BigDecimal.valueOf(100).subtract(fixedTotal);
 
-        if (anyNegatives(tuples)) {
-            return false;
+        return (numFloats == 0)
+            ? BigDecimal.ZERO
+            : floatingTotal.divide(BigDecimal.valueOf(numFloats));
+    }
+
+
+    private static void validateUpdate(Collection<Allocation> currentAllocations, Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
+
+        if (currentAllocations.size() < fixedPercentagesToUpdate.size()) {
+            throw new IllegalArgumentException();
         }
 
-        BigDecimal fixedTotal = calculateFixedTotal(tuples);
-
-        if (hasFloats(tuples)) {
-            return fixedTotal.compareTo(ONE_HUNDRED_PERCENT) <= 0;
-        } else {
-            return fixedTotal.equals(ONE_HUNDRED_PERCENT);
+        if (currentAllocations.isEmpty()) {
+            // no point checking anything else
+            return;
         }
+
+        Set<Long> allMeasurableIds = map(currentAllocations, Allocation::measurableId);
+        Set<Long> allFixedIds = map(fixedPercentagesToUpdate, MeasurablePercentage::measurableId);
+
+        if (! allMeasurableIds.containsAll(allFixedIds)) {
+            throw new IllegalArgumentException("Not all fixed Ids contained within current allocations");
+        }
+
+        if (any(fixedPercentagesToUpdate, d -> d.percentage().signum() == -1)) {
+            throw new IllegalArgumentException("cannot have negative fixed percentages");
+        }
+
+        int cmpTotalTo100 = calculateTotal(fixedPercentagesToUpdate).compareTo(ONE_HUNDRED_PERCENT);
+        boolean hasFloats = currentAllocations.size() != fixedPercentagesToUpdate.size();
+
+        if (cmpTotalTo100 > 0) {
+            throw new IllegalArgumentException("cannot exceed fixed total greater than 100");
+        }
+
+        if (! hasFloats && cmpTotalTo100 != 0) {
+            throw new IllegalArgumentException("if no float then fixed total should equal 100");
+        }
+
     }
 
 
-    public static BigDecimal calculateFloatingPercentage(List<Tuple2<AllocationType, BigDecimal>> allocations) {
-        checkTrue(validateAllocationTuples(allocations), "Allocations failed validation");
-
-        long numFloats = countFloats(allocations);
-
-        BigDecimal floatingPoolPercentage = ONE_HUNDRED_PERCENT.subtract(calculateFixedTotal(allocations));
-        BigDecimal floatPercentage = floatingPoolPercentage.divide(BigDecimal.valueOf(numFloats));
-
-        return floatPercentage;
-    }
-
-
-    private static BigDecimal calculateFixedTotal(List<Tuple2<AllocationType, BigDecimal>> allocations){
-        return allocations
+    private static BigDecimal calculateTotal(Collection<MeasurablePercentage> measurablePercentages){
+        return measurablePercentages
                 .stream()
-                .filter(t -> t.v1 == AllocationType.FIXED)
-                .map(t -> t.v2)
-                .collect(reducing(BigDecimal.ZERO, (acc, d) -> acc.add(d)));
+                .map(MeasurablePercentage::percentage)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
-
-
-    private static boolean anyNegatives(List<Tuple2<AllocationType, BigDecimal>> tuples) {
-        return any(tuples, t -> t.v2.signum() == -1);
-    }
-
-
-    private static boolean hasFloats(List<Tuple2<AllocationType, BigDecimal>> tuples) {
-        return any(tuples, t -> t.v1 == AllocationType.FLOATING);
-    }
-
-
-    private static long countFloats(List<Tuple2<AllocationType, BigDecimal>> allocations) {
-        return countWhere(allocations, t -> t.v1 == AllocationType.FLOATING);
-    }
-
-
 
 }

@@ -10,7 +10,6 @@ import {
 import _ from "lodash";
 
 
-
 const bindings = {
     entityReference: "<",
     schemeId: "<"
@@ -132,7 +131,7 @@ function controller($q, notification, serviceBroker) {
     };
 
     vm.onUpdatePercentages = () => {
-        const percentages = _.map(
+        const allocationsToSave = _.map(
                 vm.fixedAllocations,
                 fa => {
                     return {
@@ -142,8 +141,8 @@ function controller($q, notification, serviceBroker) {
                 });
 
         serviceBroker
-            .execute(CORE_API.AllocationStore.updatePercentages,
-                [vm.entityReference, vm.schemeId, percentages])
+            .execute(CORE_API.AllocationStore.updateFixedAllocations,
+                [vm.entityReference, vm.schemeId, allocationsToSave])
             .then(r => {
                 if (r.data === true) {
                     notification.success("Updated percentage allocations");

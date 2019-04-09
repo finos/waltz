@@ -6,7 +6,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation.ImmutableAllocation;
-import com.khartec.waltz.model.allocation.MeasurablePercentage;
 import com.khartec.waltz.schema.tables.records.AllocationRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -115,23 +114,21 @@ public class AllocationDao {
     }
 
 
-    public Boolean updatePercentages(EntityReference ref,
-                                     long scheme,
-                                     Collection<MeasurablePercentage> measurablePercentages,
-                                     String username) {
-        checkNotNull(ref, "Entity reference cannot be null");
+    public Boolean updateAllocations(Collection<Allocation> allocations,
+                                          String username) {
 
-        Collection<AllocationRecord> updates = CollectionUtilities.map(measurablePercentages, mp -> {
+        Collection<AllocationRecord> updates = CollectionUtilities.map(allocations, alloc -> {
             AllocationRecord record = dsl.newRecord(ALLOCATION);
 
             // set the PK
-            record.setEntityId(ref.id());
-            record.setEntityKind(ref.kind().name());
-            record.setAllocationSchemeId(scheme);
-            record.setMeasurableId(mp.measurableId());
+            record.setEntityId(alloc.entityReference().id());
+            record.setEntityKind(alloc.entityReference().kind().name());
+            record.setAllocationSchemeId(alloc.schemeId());
+            record.setMeasurableId(alloc.measurableId());
 
             // things that change
-            record.setAllocationPercentage(mp.percentage());
+            record.setAllocationPercentage(alloc.percentage());
+            record.setIsFixed(alloc.type().equals(AllocationType.FIXED));
             record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
             record.setLastUpdatedBy(username);
 

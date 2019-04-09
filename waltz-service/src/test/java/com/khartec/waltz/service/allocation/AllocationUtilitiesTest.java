@@ -1,93 +1,122 @@
 package com.khartec.waltz.service.allocation;
 
-import com.khartec.waltz.model.allocation.AllocationType;
-import org.jooq.lambda.tuple.Tuple2;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.allocation.*;
+import org.jooq.lambda.function.Consumer3;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.model.allocation.AllocationType.FIXED;
 import static com.khartec.waltz.model.allocation.AllocationType.FLOATING;
-import static junit.framework.TestCase.*;
-import static org.jooq.lambda.tuple.Tuple.tuple;
+import static java.util.Collections.emptyList;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 public class AllocationUtilitiesTest {
 
-    final Tuple2<AllocationType, BigDecimal> fx110 = tuple(FIXED, BigDecimal.valueOf(110));
-    final Tuple2<AllocationType, BigDecimal> fx100 = tuple(FIXED, BigDecimal.valueOf(100));
-    final Tuple2<AllocationType, BigDecimal> fx50 = tuple(FIXED, BigDecimal.valueOf(50));
-    final Tuple2<AllocationType, BigDecimal> fx25 = tuple(FIXED, BigDecimal.valueOf(25));
-    final Tuple2<AllocationType, BigDecimal> fx0 = tuple(FIXED, BigDecimal.ZERO);
-    final Tuple2<AllocationType, BigDecimal> fxNeg100 = tuple(FIXED, BigDecimal.valueOf(-100));
-    final Tuple2<AllocationType, BigDecimal> fxNeg10 = tuple(FIXED, BigDecimal.valueOf(-10));
-    final Tuple2<AllocationType, BigDecimal> anyFloat = tuple(FLOATING, BigDecimal.valueOf(25));
 
-    @Test
-    public void allocationsCannotBeEmpty(){
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList()));
+    private static final BigDecimal _100 = BigDecimal.valueOf(100) ;
+    private static final BigDecimal _neg100 = BigDecimal.valueOf(-100) ;
+    private static final BigDecimal _150 = BigDecimal.valueOf(150) ;
+    private static final BigDecimal _50 = BigDecimal.valueOf(50) ;
+    private static final BigDecimal _20 = BigDecimal.valueOf(20) ;
+    private static final BigDecimal _10 = BigDecimal.valueOf(10) ;
+    private static final BigDecimal _0 = BigDecimal.ZERO ;
+
+    static Allocation mkAlloc(AllocationType type, Long measurableId, BigDecimal percentage) {
+        return ImmutableAllocation.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.APPLICATION, 1))
+                .percentage(percentage)
+                .type(type)
+                .measurableId(measurableId)
+                .schemeId(1)
+                .lastUpdatedBy("test")
+                .build();
+    }
+
+    static MeasurablePercentage mkMeasurablePercentage(Long measurableId, BigDecimal percentage) {
+        return ImmutableMeasurablePercentage.builder()
+                .percentage(percentage)
+                .measurableId(measurableId)
+                .build();
     }
 
     @Test
-    public void fixedAllocationsCannotExceed100Percent(){
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList(fx110)));
+    public void emptyAllocationsGivesEmptyListToSave(){
+        Collection<Allocation> allocationsToSave = AllocationUtilities.calcAllocations(
+                emptyList(),
+                emptyList());
+        assertTrue(allocationsToSave.isEmpty());
+    }
+
+
+
+    Consumer3<Runnable, String, String> assertThrows = (runnable, message, matchingText) -> {
+        try {
+            runnable.run();
+            fail(message);
+        } catch (Exception e) {
+            if (matchingText != null) {
+                assertTrue(
+                        "Exception message should have contained: " + matchingText + " but was: "+e.getMessage(),
+                        e.getMessage().contains(matchingText));
+            }
+        }
+    };
+
+
+    @Test
+    public void cannotIntroduceNewMeasurable() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                        asList(mkAlloc(FLOATING, 1L, _100)),
+                        asList(mkMeasurablePercentage(2L, _100))),
+                "Should have reported that measurable 2 is not in the current list",
+                null);
+
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                        emptyList(),
+                        asList(mkMeasurablePercentage(2L, _100))),
+                "Should have reported that there are more measurables to save than exist",
+                null);
     }
 
     @Test
-    public void fixedAllocationsCannotBeNegative(){
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList(fx110, fxNeg10)));
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList(fxNeg100)));
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList(fxNeg10, anyFloat)));
+    public void cannotHaveNegativeFixedPercentages() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                        asList(mkAlloc(FLOATING, 1L, _100)),
+                        asList(mkMeasurablePercentage(1L, _neg100))),
+                "Should have reported that fixed percentage is negative",
+                "negative");
+
     }
 
     @Test
-    public void fixedAllocationsCanEqual100Percent(){
-        assertTrue("1 fixed at 100 should be ok", AllocationUtilities.validateAllocationTuples(asList(fx100)));
-        assertTrue("2 fixed at 50 each should be okay", AllocationUtilities.validateAllocationTuples(asList(fx50, fx50)));
-        assertTrue("2 fixed at 50 each and a float should be okay", AllocationUtilities.validateAllocationTuples(asList(fx50, fx50, anyFloat)));
+    public void totalOfFixedCannotExceed100() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                        asList(mkAlloc(FLOATING, 1L, _100),
+                                mkAlloc(FIXED, 2L, _0)),
+                        asList(mkMeasurablePercentage(1L, _50),
+                                mkMeasurablePercentage(2L, _100))),
+                "Should have reported that fixed total exceeds 100",
+                "exceed");
     }
 
     @Test
-    public void fixedAllocationsMustTotal100PercentIfNoFloatsGiven(){
-        assertFalse(AllocationUtilities.validateAllocationTuples(asList(fx50, fx25)));
-    }
-
-    @Test
-    public void fixedAllocationsCanTotalLessThan100PercentIfFloatsGiven(){
-        assertTrue(AllocationUtilities.validateAllocationTuples(asList(fx50, fx25, anyFloat)));
-    }
-
-    @Test
-    public void calcFloat() {
-        assertEquals(BigDecimal.valueOf(100), AllocationUtilities.calculateFloatingPercentage(asList(anyFloat)));
-        assertEquals(BigDecimal.valueOf(100), AllocationUtilities.calculateFloatingPercentage(asList(fx0, anyFloat)));
-        assertEquals(BigDecimal.valueOf(50), AllocationUtilities.calculateFloatingPercentage(asList(fx50, anyFloat)));
-        assertEquals(BigDecimal.valueOf(25), AllocationUtilities.calculateFloatingPercentage(asList(fx50, anyFloat, anyFloat)));
-        assertEquals(BigDecimal.valueOf(0), AllocationUtilities.calculateFloatingPercentage(asList(fx100, anyFloat)));
-    }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCalculateFloatForNoAllocations() {
-        AllocationUtilities.calculateFloatingPercentage(asList());
-    }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCalculateFloatForAllocationsWithNoFloatWhereFixedIsLessThan100() {
-        AllocationUtilities.calculateFloatingPercentage(asList(fx50));
-    }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCalculateFloatForFixedAllocationsGreaterThan100() {
-        AllocationUtilities.calculateFloatingPercentage(asList(fx50, fx100));
-    }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotCalculateFloatForFixedAllocationsGreaterThan100EvenIfYouHaveAFloat() {
-        AllocationUtilities.calculateFloatingPercentage(asList(anyFloat, fx50, fx100));
+    public void mustTotal100IfNoFloats() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                        asList(mkAlloc(FIXED, 1L, _0)),
+                        asList(mkMeasurablePercentage(1L, _50))),
+                "Should have reported that fixed total does not sum to 100 as there are no floats to mop up the shortfall",
+                "no float");
     }
 
 }
