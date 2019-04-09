@@ -52,3 +52,12 @@ export function updateDirtyFlags(enrichedAllocations = []) {
     return dirtyFound;
 }
 
+
+export function updateFloatingValues(floatingTotal = 0, floatingAllocations = []) {
+    const total = _.clamp(floatingTotal, 0, 100);
+    const perAllocation = floatingAllocations.length > 0
+        ? total / floatingAllocations.length
+        : 0;
+    _.each(floatingAllocations, fa => fa.working.percentage = perAllocation);
+    return floatingAllocations;
+}

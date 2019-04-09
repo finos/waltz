@@ -1,7 +1,12 @@
 import template from "./allocation-entity-panel.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {calcWorkingTotal, updateDirtyFlags, validateAllocations} from "../../allocation-utilities";
+import {
+    calcWorkingTotal,
+    updateDirtyFlags,
+    updateFloatingValues,
+    validateAllocations
+} from "../../allocation-utilities";
 import _ from "lodash";
 
 
@@ -21,15 +26,6 @@ const initialState = {
     saveEnabled: false,
     dirty: false
 };
-
-
-function updateFloatingValues(floatingTotal = 0, floatingAllocations = []) {
-    const total = Math.max(0, floatingTotal);
-    const perAllocation = floatingAllocations.length > 0
-        ? total / floatingAllocations.length
-        : 0;
-    _.each(floatingAllocations, fa => fa.working.percentage = perAllocation);
-}
 
 
 function controller($q, notification, serviceBroker) {
