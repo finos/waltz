@@ -66,6 +66,22 @@ public class CollectionUtilities {
 
 
     /**
+     * given a collection and a predicate will (eagerly) evaluate the items in the
+     * collection to see if all items satisfy the predicate.
+     *
+     * @param ts   collection of items
+     * @param pred predicate to test each item agains
+     * @param <T>  type of the items
+     * @return true if all items in the collection satisfy the given predicate
+     */
+    public static <T> boolean all(Collection<T> ts, Predicate<T> pred) {
+        return ts
+                .stream()
+                .allMatch(pred);
+    }
+
+
+    /**
      * Returns the first item in a collections (as given by an iterator) or null if the
      * collection is empty.  A null collection will throw an exception.
      *

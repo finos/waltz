@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.model.allocation.AllocationType.FIXED;
 import static com.khartec.waltz.model.allocation.AllocationType.FLOATING;
 import static java.util.Collections.emptyList;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.*;
 
 public class AllocationUtilitiesTest {
 
@@ -36,6 +36,14 @@ public class AllocationUtilitiesTest {
                 .schemeId(1)
                 .lastUpdatedBy("test")
                 .build();
+    }
+
+    static Allocation mkFloat(Long measurableId) {
+        return mkAlloc(FLOATING, measurableId, _0);
+    }
+
+    static Allocation mkFixed(Long measurableId, BigDecimal percentage) {
+        return mkAlloc(FIXED, measurableId, percentage);
     }
 
     static MeasurablePercentage mkMeasurablePercentage(Long measurableId, BigDecimal percentage) {
@@ -63,7 +71,7 @@ public class AllocationUtilitiesTest {
             if (matchingText != null) {
                 assertTrue(
                         "Exception message should have contained: " + matchingText + " but was: "+e.getMessage(),
-                        e.getMessage().contains(matchingText));
+                        lower(e.getMessage()).contains(lower(matchingText)));
             }
         }
     };
@@ -113,10 +121,62 @@ public class AllocationUtilitiesTest {
     public void mustTotal100IfNoFloats() {
         assertThrows.accept(
                 () -> AllocationUtilities.calcAllocations(
-                        asList(mkAlloc(FIXED, 1L, _0)),
+                        asList(mkFixed(1L, _0)),
                         asList(mkMeasurablePercentage(1L, _50))),
                 "Should have reported that fixed total does not sum to 100 as there are no floats to mop up the shortfall",
                 "no float");
     }
 
+    @Test
+    public void canDealWithRecurringFractionsRoundingUp() {
+        Collection<Allocation> allocations = AllocationUtilities.calcAllocations(
+                asList(mkFloat(1L),
+                        mkFloat(2L),
+                        mkFloat(3L),
+                        mkFloat(4L)),
+                asList(mkMeasurablePercentage(3L, _50)));
+        allocations.forEach(a -> {
+            if (a.type() == FLOATING) {
+                assertEquals(BigDecimal.valueOf(16.667), a.percentage());
+            } else {
+                assertEquals(BigDecimal.valueOf(50), a.percentage());
+            }
+        });
+    }
+
+
+    @Test
+    public void canDealWithRecurringFractionsRoundingDown() {
+        Collection<Allocation> allocations = AllocationUtilities.calcAllocations(
+                asList(mkFloat(1L),
+                        mkFloat(2L),
+                        mkFloat(3L)),
+                emptyList());
+        allocations.forEach(a -> assertEquals(BigDecimal.valueOf(33.333), a.percentage()));
+    }
+
+
+    @Test
+    public void duplicateMeasurableIdsNotAllowedInCurrentState() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                    asList(mkFloat(1L),
+                            mkFloat(1L)),
+                    emptyList()),
+                "Should have thrown duplicate error",
+                "Duplicate");
+    }
+
+
+    @Test
+    public void duplicatesNotAllowedInTargetState() {
+        assertThrows.accept(
+                () -> AllocationUtilities.calcAllocations(
+                    asList(mkFloat(1L),
+                            mkFloat(2L)),
+                    asList(mkMeasurablePercentage(1L, _50),
+                            mkMeasurablePercentage(1L, _20))),
+                "Should have thrown duplicate error for fixed",
+                "duplicate");
+    }
 }
