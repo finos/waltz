@@ -156,9 +156,14 @@ function controller($q, notification, serviceBroker) {
             .catch(e => notification.error("Could not update percentages"));
     };
 
-    vm.setEditable = (targetState, cancelChanges) => {
+    vm.setEditable = (targetState) => {
         vm.editing = targetState;
-        reload();
+    };
+
+    vm.onCancel = () => {
+        vm.setEditable(false);
+        return reload()
+            .then(() => notification.info("Edit cancelled: reverting to last saved"));
     };
 
     vm.onPercentageChange = () => recalcData();
