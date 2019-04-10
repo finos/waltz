@@ -8,7 +8,7 @@
 
 <br>
 
-<div class="row">
+<div class="row" style="border-bottom: 2px solid #fafafa">
     <div class="col-md-6">
         <h4>
             <waltz-icon name="thumb-tack"></waltz-icon>
@@ -109,34 +109,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row waep-footer">
-                <div class="col-sm-offset-5 col-sm-7">
-                    <span ng-if="!$ctrl.editing">
-                        <a ng-click="$ctrl.setEditable(true)"
-                           class="clickable">
-                            Edit percentages
-                        </a>
-                    </span>
-
-                    <span ng-if="$ctrl.editing"
-                          class="clickable">
-                        <a ng-click="$ctrl.setEditable(false)">
-                            Cancel
-                        </a>
-                        |
-
-                        <a ng-if="$ctrl.saveEnabled"
-                           ng-click="$ctrl.onUpdatePercentages()"
-                           class="clickable">
-                            Save percentages
-                        </a>
-
-                        <span ng-if="!$ctrl.saveEnabled">
-                            Nope
-                        </span>
-                    </span>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -167,7 +139,7 @@
                     Operations
                 </div>
             </div>
-            <div class="row"
+            <div class="row waep-body"
                  ng-repeat="d in $ctrl.floatingAllocations">
                 <div class="col-sm-5">
                     <span ng-bind="d.measurable.name"></span>
@@ -187,4 +159,68 @@
         </div>
     </div>
 </div>
+<div class="waep-edit-bar">
+    <div class="row">
+        <div class="col-sm-12">
+            <span ng-if="!$ctrl.editing">
+                <a ng-click="$ctrl.setEditable(true)"
+                   class="clickable">
+                    Edit percentages
+                </a>
+            </span>
 
+            <span ng-if="$ctrl.editing"
+                  class="clickable">
+                <a ng-click="$ctrl.onCancel()">
+                    Cancel
+                </a>
+                |
+
+                <a ng-if="$ctrl.saveEnabled"
+                   ng-click="$ctrl.onUpdatePercentages()"
+                   class="clickable">
+                    Save percentages
+                </a>
+
+                <span ng-if="!$ctrl.saveEnabled" class="text-muted">
+                    Save percentages
+                </span>
+
+                |
+
+                <a ng-click="$ctrl.showingHelp = ! $ctrl.showingHelp"
+                   class="clickable">
+                    Help
+                </a>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="row"
+     ng-if="$ctrl.editing && $ctrl.showingHelp">
+    <div class="col-md-12">
+        <p>How to use this editor</p>
+        <table class="table table-condensed small">
+            <thead>
+            <tr>
+                <th>Operation</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>To Float</td>
+                <td>To float does some stuff</td>
+            </tr>
+            <tr>
+                <td>To Fixed</td>
+                <td>To fixed does some other stuff</td>
+            </tr>
+            <tr>
+                <td>Grab float</td>
+                <td>Takes unallocated stuff</td>
+            </tr>
+        </table>
+
+    </div>
+</div>

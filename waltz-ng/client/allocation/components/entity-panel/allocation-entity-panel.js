@@ -21,8 +21,9 @@ const initialState = {
     rawAllocations: [],
     fixedAllocations: [],
     floatingAllocations: [],
-    editing: true,
+    editing: false,
     saveEnabled: false,
+    showingHelp: false,
     dirty: false
 };
 
@@ -157,6 +158,12 @@ function controller($q, notification, serviceBroker) {
 
     vm.setEditable = (targetState) => {
         vm.editing = targetState;
+    };
+
+    vm.onCancel = () => {
+        vm.setEditable(false);
+        return reload()
+            .then(() => notification.info("Edit cancelled: reverting to last saved"));
     };
 
     vm.onPercentageChange = () => recalcData();
