@@ -30,7 +30,7 @@ export default class BaseLookupService {
         const paramsOkay = _.isString(type) && _.isObject(lookupMap);
 
         if (!paramsOkay) {
-            throw Error('Cannot register type and lookupMap unless they are a string and a map', type, lookupMap);
+            throw Error("Cannot register type and lookupMap unless they are a string and a map", type, lookupMap);
         }
 
         const existing = this.lookupsByType[type] || {};
@@ -41,13 +41,13 @@ export default class BaseLookupService {
     }
 
 
-    lookup(type, value) {
+    lookup(type, value, defaultValue = "") {
         const lookupMap = this.lookupsByType[type];
         if (!lookupMap) {
-            console.warn('No lookupMap registered for type', type);
-            return '??' + value + '??';
+            console.warn("No lookupMap registered for type", type);
+            return "??" + value + "??";
         }
-        return lookupMap[value] || '';
+        return lookupMap[value] || defaultValue;
     }
 
 

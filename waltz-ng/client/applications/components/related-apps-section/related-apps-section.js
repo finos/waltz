@@ -82,6 +82,7 @@ function mkChangeCommand(operation, entityRef, relKind) {
 
 
 function controller($q,
+                    displayNameService,
                     notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -112,7 +113,7 @@ function controller($q,
                 ["ACTIVE", "PENDING", "REMOVED"])
             ],
             { force })
-            .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(a))));
+            .then(r => _.map(r.data, a => Object.assign({}, a, mapToDisplayNames(displayNameService, a))));
 
         return $q.all([appsPromise, relationsPromise])
             .then(([apps, relations]) => {
@@ -179,6 +180,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
+    "DisplayNameService",
     "Notification",
     "ServiceBroker"
 ];

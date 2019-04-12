@@ -18,6 +18,7 @@
  */
 import _ from "lodash";
 import {mapToDisplayNames} from "../application-utils";
+
 import template from  "./app-table.html";
 
 const bindings = {
@@ -26,11 +27,11 @@ const bindings = {
 };
 
 
-function mkGridData(apps = []) {
+function mkGridData(displayNameService, apps = []) {
     return _.map(apps || [], a => Object.assign(
             {},
             a,
-            mapToDisplayNames(a))
+            mapToDisplayNames(displayNameService, a))
     );
 }
 
@@ -57,18 +58,17 @@ const columnDefs = [
 ];
 
 
-function controller() {
+function controller(displayNameService) {
 
     const vm = this;
 
     vm.columnDefs = columnDefs;
 
-    vm.$onChanges= () => vm.gridData = mkGridData(vm.applications);
+    vm.$onChanges= () => vm.gridData = mkGridData(displayNameService, vm.applications);
 }
 
 
-controller.$inject = [
-];
+controller.$inject = ["DisplayNameService"];
 
 
 const component = {

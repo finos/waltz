@@ -17,19 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {applicationKind} from "../common/services/enums/application-kind";
-import {criticality} from "../common/services/enums/criticality";
-import {investmentRating} from "../common/services/enums/investment-rating";
-import {lifecyclePhase} from "../common/services/enums/lifecycle-phase";
-import {getEnumName} from "../common/services/enums"
 
+export function mapToDisplayNames(displayNameService, app) {
+    const maybeGetDisplayName = (type, value) => displayNameService.lookup(type, value, value);
 
-export function mapToDisplayNames(app) {
     return {
-        kindDisplay: getEnumName(applicationKind, app.applicationKind),
-        overallRatingDisplay: getEnumName(investmentRating, app.overallRating),
-        businessCriticalityDisplay: getEnumName(criticality, app.businessCriticality),
-        riskRatingDisplay: getEnumName(criticality, app.riskRating),
-        lifecyclePhaseDisplay: getEnumName(lifecyclePhase, app.lifecyclePhase)
+        kindDisplay: maybeGetDisplayName("applicationKind", app.applicationKind),
+        overallRatingDisplay: maybeGetDisplayName("investmentRating", app.overallRating),
+        businessCriticalityDisplay: maybeGetDisplayName("criticality", app.businessCriticality),
+        riskRatingDisplay: maybeGetDisplayName("criticality", app.riskRating),
+        lifecyclePhaseDisplay: maybeGetDisplayName("lifecyclePhase", app.lifecyclePhase)
     }
 }
