@@ -70,7 +70,7 @@ public class ServerComplexityDao {
         return dsl.select(SERVER_USAGE.ENTITY_ID, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
                 .innerJoin(SERVER_USAGE)
-                        .on(SERVER_USAGE.ENTITY_ID.eq(SERVER_INFORMATION.ID))
+                        .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .where(SERVER_USAGE.ENTITY_ID.in(appIdSelector))
                 .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .groupBy(SERVER_USAGE.ENTITY_ID)
@@ -87,7 +87,7 @@ public class ServerComplexityDao {
         return dsl.select(APPLICATION.ASSET_CODE, SERVER_COUNT_FIELD)
                 .from(SERVER_INFORMATION)
                 .innerJoin(SERVER_USAGE)
-                    .on(SERVER_USAGE.ENTITY_ID.eq(SERVER_INFORMATION.ID))
+                    .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(SERVER_USAGE.ENTITY_ID))
                     .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
@@ -109,7 +109,7 @@ public class ServerComplexityDao {
                         .where(condition)
                         .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .groupBy(SERVER_USAGE.ENTITY_ID))
-                .fetchOne(r -> r.value1());
+                .fetchOne(Record1::value1);
     }
 
 }
