@@ -104,14 +104,9 @@ public class StaticResourcesEndpoint implements Endpoint {
      * @param resolvedPath - the resolved path to the resource we are serving
      */
     private void addCacheHeadersIfNeeded(Response response, String resolvedPath) {
-        if (!isHtml(resolvedPath)) {
+        if (! resolvedPath.endsWith(".html")) {
             response.header(HttpHeader.CACHE_CONTROL.toString(), CACHE_MAX_AGE_VALUE);
         }
-    }
-
-
-    private boolean isHtml(String path) {
-        return lower(path).endsWith(".html");
     }
 
 
@@ -176,20 +171,18 @@ public class StaticResourcesEndpoint implements Endpoint {
         URL resource = classLoader.getResource(resourcePath);
 
         if (resource == null) {
-            return isHtml(path)
-                ? indexPath
-                : null;
-        } else {
-            String resolvedPath = resource
-                    .getPath();
-
-            boolean isDirectory = resolvedPath
-                    .endsWith("/");
-
-            return isDirectory
-                    ? resolvedPath + "/index.html"
-                    : resolvedPath;
+            // 404: return index.html
+            resource = classLoader.getResource(indexPath);
+            resourcePath = indexPath;
         }
+
+        boolean isDirectory = resource
+                .getPath()
+                .endsWith("/");
+
+        return isDirectory
+                ? resourcePath + "/index.html"
+                : resourcePath;
     }
 
 }
