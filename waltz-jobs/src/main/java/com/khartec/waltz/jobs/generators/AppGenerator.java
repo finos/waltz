@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.ApplicationKind;
@@ -44,7 +45,7 @@ import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_
 
 public class AppGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {

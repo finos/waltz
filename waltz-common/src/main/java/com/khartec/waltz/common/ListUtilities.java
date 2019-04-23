@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.toList;
 
 public class ListUtilities {
 
-    private static final Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
 
 
     /**

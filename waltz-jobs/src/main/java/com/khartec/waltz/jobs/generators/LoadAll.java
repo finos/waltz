@@ -27,6 +27,7 @@ public class LoadAll {
             new MeasurableRatingGenerator(),
             SKIP_SLOW ? null : new EntityStatisticGenerator(),
             new AuthSourceGenerator(),
+            new AssessmentGenerator(),
             new ServerGenerator(),
             new LogicalFlowGenerator(),
             new LogicalFlowDecorationGenerator(),
