@@ -163,6 +163,20 @@ public class LogicalFlowDecoratorDao {
         return findByCondition(condition);
     }
 
+    public List<LogicalFlowDecorator> findAll() {
+        return dsl
+                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
+    public Collection<LogicalFlowDecorator> findByLogicalFlowSelector(Select<Record1<Long>> flowSelector) {
+        return dsl.select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW_DECORATOR)
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowSelector))
+                .fetch(TO_DECORATOR_MAPPER);
+    }
 
     public Collection<LogicalFlowDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
@@ -310,4 +324,7 @@ public class LogicalFlowDecoratorDao {
                 .where(condition)
                 .execute();
     }
+
+
+
 }

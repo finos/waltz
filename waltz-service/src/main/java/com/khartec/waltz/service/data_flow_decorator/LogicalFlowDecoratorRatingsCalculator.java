@@ -88,7 +88,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
         if (isEmpty(appToAppFlows)) return Collections.emptyList();
 
         List<Application> targetApps = loadTargetApplications(appToAppFlows);
-        List<DataType> dataTypes = dataTypeDao.getAll();
+        List<DataType> dataTypes = dataTypeDao.findAll();
 
         Map<Long, DataType> typesById = indexById(dataTypes);
         Map<Long, LogicalFlow> flowsById = indexById(appToAppFlows);

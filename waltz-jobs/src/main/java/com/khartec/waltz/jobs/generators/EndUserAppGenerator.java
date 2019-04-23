@@ -26,9 +26,9 @@ import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import static com.khartec.waltz.common.ArrayUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -47,7 +47,7 @@ public class EndUserAppGenerator implements SampleDataGenerator {
         OrganisationalUnitDao organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<Long> ids = IdUtilities.toIds(organisationalUnitDao.findAll());
+        Set<Long> ids = IdUtilities.toIds(organisationalUnitDao.findAll());
 
         String[] subjects = {
                 "Trade", "Risk" ,"Balance",

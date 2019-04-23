@@ -51,8 +51,8 @@ public class DataTypeService {
     }
 
 
-    public List<DataType> getAll() {
-        return dataTypeDao.getAll();
+    public List<DataType> findAll() {
+        return dataTypeDao.findAll();
     }
 
 
@@ -66,7 +66,7 @@ public class DataTypeService {
      */
     public Optional<DataType> getUnknownDataType() {
         return dataTypeDao
-                .getAll()
+                .findAll()
                 .stream()
                 .filter(DataType::unknown)
                 .findFirst();

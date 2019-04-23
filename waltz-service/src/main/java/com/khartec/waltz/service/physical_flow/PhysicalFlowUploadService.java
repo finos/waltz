@@ -324,7 +324,7 @@ public class PhysicalFlowUploadService {
     private Map<String, Application> loadApplicationsByAssetCode() {
         return MapUtilities.indexBy(
                 a -> lower(a.assetCode().get()),
-                applicationDao.getAll());
+                applicationDao.findAll());
     }
 
 
@@ -336,7 +336,7 @@ public class PhysicalFlowUploadService {
 
 
     private Map<String, DataType> loadDataTypesByNameOrCode() {
-        List<DataType> allDataTypes = dataTypeDao.getAll();
+        List<DataType> allDataTypes = dataTypeDao.findAll();
         Map<String, DataType> dataTypesByName = MapUtilities.indexBy(dt -> lower(dt.name()), identity(), allDataTypes, (d1, d2) -> d2);
         Map<String, DataType> dataTypesByCode = MapUtilities.indexBy(dt -> lower(dt.code()), identity(), allDataTypes, (d1, d2) -> d2);
         dataTypesByName.putAll(dataTypesByCode);
