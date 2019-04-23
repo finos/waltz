@@ -96,7 +96,7 @@ public class ApplicationDao {
     }
 
 
-    public List<Application> getAll() {
+    public List<Application> findAll() {
         return dsl.select()
                 .from(APPLICATION)
                 .where(IS_ACTIVE)

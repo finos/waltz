@@ -110,6 +110,13 @@ public class StringUtilities {
     }
 
 
+    public static <T> String joinUsing(Collection<T> values, Function<T, String> toStringFn, String separator) {
+        return values.stream()
+                .map(toStringFn)
+                .collect(Collectors.joining(separator));
+    }
+
+
     public static <T> List<T> splitThenMap(String str, String separator, Function<String, T> itemTransformer) {
         if (isEmpty(str) || isEmpty(separator)) { return Collections.emptyList(); }
         if (itemTransformer == null) {

@@ -58,7 +58,7 @@ public class DataTypeSearchDao {
         }
 
         List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
-        return dataTypeDao.getAll()
+        return dataTypeDao.findAll()
                 .stream()
                 .filter(dataType -> {
                     String s = (dataType.name() + " " + dataType.description()).toLowerCase();

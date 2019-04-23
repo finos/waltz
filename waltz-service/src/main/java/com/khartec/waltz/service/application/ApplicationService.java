@@ -84,7 +84,7 @@ public class ApplicationService {
 
 
     public List<Application> findAll() {
-        return applicationDao.getAll();
+        return applicationDao.findAll();
     }
 
 

@@ -21,10 +21,7 @@ package com.khartec.waltz.model.utils;
 
 import com.khartec.waltz.model.IdProvider;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -36,17 +33,17 @@ public class IdUtilities {
 
     /**
      * Convert the given collection of idProviders to their id values.
-     * Empty ids are skipped in the resulting list.
+     * Empty ids are skipped in the resulting set.
      * @param xs collection of idProvider objects
-     * @return list of ids
+     * @return set of ids
      */
-    public static List<Long> toIds(Collection<? extends IdProvider> xs) {
-        checkNotNull(xs, "Cannot convert a null collection to a list of ids");
+    public static Set<Long> toIds(Collection<? extends IdProvider> xs) {
+        checkNotNull(xs, "Cannot convert a null collection to a set of ids");
         return xs
                 .stream()
                 .map(x -> x.id().orElse(null))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
 
@@ -80,7 +77,13 @@ public class IdUtilities {
     }
 
 
-    public static <T extends IdProvider> Map<Long, T> indexById(List<T> ts) {
+    public static <T extends IdProvider> Map<Optional<Long>, T> indexByOptId(Collection<T> ts) {
+        return indexBy(IdProvider::id, ts);
+    }
+
+
+    public static <T extends IdProvider> Map<Long, T> indexById(Collection<T> ts) {
         return indexBy(t -> t.id().get(), ts);
     }
+
 }
