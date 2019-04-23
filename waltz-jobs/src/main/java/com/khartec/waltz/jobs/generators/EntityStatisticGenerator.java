@@ -161,7 +161,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
         EntityStatisticDefinitionDao definitionDao = context.getBean(EntityStatisticDefinitionDao.class);
         EntityHierarchyService entityHierarchyService = context.getBean(EntityHierarchyService.class);
 
-        Application[] applications = applicationDao.getAll().toArray(new Application[0]);
+        Application[] applications = applicationDao.findAll().toArray(new Application[0]);
         OrganisationalUnit[] orgUnits = organisationalUnitDao.findAll().toArray(new OrganisationalUnit[0]);
 
         dsl.deleteFrom(ENTITY_STATISTIC_DEFINITION)

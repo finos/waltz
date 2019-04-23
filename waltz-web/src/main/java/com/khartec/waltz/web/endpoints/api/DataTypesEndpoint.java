@@ -53,7 +53,7 @@ public class DataTypesEndpoint implements Endpoint {
         ListRoute<DataType> searchRoute = (request, response) ->
                 service.search(request.params("query"));
 
-        getForList(BASE_URL, (request, response) -> service.getAll());
+        getForList(BASE_URL, (request, response) -> service.findAll());
         getForList(searchPath, searchRoute);
     }
 

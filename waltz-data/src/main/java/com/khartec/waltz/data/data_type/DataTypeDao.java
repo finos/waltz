@@ -67,7 +67,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public List<DataType> getAll() {
+    public List<DataType> findAll() {
         return dsl
                 .selectFrom(DATA_TYPE)
                 .fetch(TO_DOMAIN);
