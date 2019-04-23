@@ -198,13 +198,13 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
         CsvListWriter csvWriter = new CsvListWriter(new OutputStreamWriter(new FileOutputStream("/temp/flows.csv")), CsvPreference.EXCEL_PREFERENCE);
         csvWriter.write(
                 "Source App",
-                "Source Nar",
+                "Source Asset Code",
                 "Source App Kind",
                 "Source App Status",
                 "Source App Org Unit", // src OU
                 "Source In Scope",
                 "Target App",
-                "Target Nar",
+                "Target Asset Code",
                 "Target App Kind",
                 "Target App Status",
                 "Target App Org Unit", // src OU
