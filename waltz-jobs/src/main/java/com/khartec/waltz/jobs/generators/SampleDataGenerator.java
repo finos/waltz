@@ -34,6 +34,7 @@ public interface SampleDataGenerator {
 
     Random rnd = new Random();
     String SAMPLE_DATA_PROVENANCE = "waltz-sample";
+    String SAMPLE_DATA_USER = "admin";
 
     int NUM_APPS = 500;
     int NUM_CHANGE_INITIATIVES = 4;

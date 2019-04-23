@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.cost.ImmutableAssetCost;
 import com.khartec.waltz.model.cost.ImmutableAssetCost;
 import com.khartec.waltz.model.cost.ImmutableCost;
@@ -38,7 +39,7 @@ import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 
 public class AssetCostGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
 
     private static final int year = 2017;
 
