@@ -28,6 +28,7 @@ import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionServi
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,16 +84,14 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private boolean updateRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);
-        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
-        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
+        verifyCanWrite(request, command.assessmentDefinitionId());
         return assessmentRatingService.update(command, getUsername(request));
     }
 
 
     private boolean createRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);
-        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
-        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
+        verifyCanWrite(request, command.assessmentDefinitionId());
         return assessmentRatingService.create(command, getUsername(request));
     }
 
@@ -107,8 +106,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
 
-        AssessmentDefinition def = assessmentDefinitionService.getById(command.assessmentDefinitionId());
-        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
+        verifyCanWrite(request, command.assessmentDefinitionId());
         return assessmentRatingService.remove(command, getUsername(request));
     }
 
@@ -129,5 +127,15 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .provenance("waltz")
                 .build();
     }
+
+
+    private void verifyCanWrite(Request request, long defId) {
+        AssessmentDefinition def = assessmentDefinitionService.getById(defId);
+        def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));
+        if (def.isReadOnly()) {
+            throw new NotAuthorizedException("Assessment is read-only");
+        }
+    }
+
 }
 

@@ -69,7 +69,10 @@ function controller($q, notification, serviceBroker) {
                 vm.onClose();
                 notification.warning("Assessment removed");
             })
-            .catch(e => notification.error("Failed to remove", e.message));
+            .catch(e => {
+                const reason = _.get(e, ["data", "message"], "Unknown reason");
+                notification.error(`Failed to remove: ${reason}`);
+            });
     };
 
 

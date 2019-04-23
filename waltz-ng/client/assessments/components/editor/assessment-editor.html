@@ -51,13 +51,15 @@
                 <waltz-icon name="close"></waltz-icon>
                 Close
             </a>
-            <span waltz-has-role="{{ $ctrl.assessment.definition.permittedRole }}">
-                |
-                <a ng-click="$ctrl.onRemove($ctrl.assessment)"
-                   class="clickable">
-                    <waltz-icon name="trash"></waltz-icon>
-                    Remove
-                </a>
+            <span ng-if="$ctrl.assessment.definition.isReadOnly === false">
+                <span waltz-has-role="{{ $ctrl.assessment.definition.permittedRole }}">
+                    |
+                    <a ng-click="$ctrl.onRemove($ctrl.assessment)"
+                       class="clickable">
+                        <waltz-icon name="trash"></waltz-icon>
+                        Remove
+                    </a>
+                </span>
             </span>
         </div>
     </div>
