@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.khartec.waltz.common.ArrayUtilities.all;
-
 public class Checks {
 
     /**
@@ -54,7 +52,24 @@ public class Checks {
         checkNotNull(ts, message + ": Array was null");
         checkNotNull(check, message + ": Predicate was null");
 
-        checkTrue(all(ts, check), message);
+        checkTrue(ArrayUtilities.all(ts, check), message);
+        return ts;
+    }
+
+/**
+     * Verifies all elements of an collection comply to a given predicate.
+     * @param ts Collections of elements
+     * @param check Predicate function used to check each element
+     * @param message Text to use in any exception message
+     * @param <T> Type of the elements
+     * @return The given collection
+     * @throws IllegalArgumentException If any of the elements fail the predicate
+     */
+    public static <T> Collection<T> checkAll(Collection<T> ts, Predicate<T> check, String message) {
+        checkNotNull(ts, message + ": Array was null");
+        checkNotNull(check, message + ": Predicate was null");
+
+        checkTrue(CollectionUtilities.all(ts, check), message);
         return ts;
     }
 

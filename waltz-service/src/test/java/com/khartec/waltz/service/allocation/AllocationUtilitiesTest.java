@@ -3,18 +3,18 @@ package com.khartec.waltz.service.allocation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.*;
-import org.jooq.lambda.function.Consumer3;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.Collection;
 
 import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.model.allocation.AllocationType.FIXED;
 import static com.khartec.waltz.model.allocation.AllocationType.FLOATING;
+import static com.khartec.waltz.service.TestingUtilities.assertThrows;
 import static java.util.Collections.emptyList;
-import static junit.framework.TestCase.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 public class AllocationUtilitiesTest {
 
@@ -60,21 +60,6 @@ public class AllocationUtilitiesTest {
                 emptyList());
         assertTrue(allocationsToSave.isEmpty());
     }
-
-
-
-    Consumer3<Runnable, String, String> assertThrows = (runnable, message, matchingText) -> {
-        try {
-            runnable.run();
-            fail(message);
-        } catch (Exception e) {
-            if (matchingText != null) {
-                assertTrue(
-                        "Exception message should have contained: " + matchingText + " but was: "+e.getMessage(),
-                        lower(e.getMessage()).contains(lower(matchingText)));
-            }
-        }
-    };
 
 
     @Test

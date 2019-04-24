@@ -21,11 +21,18 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
+import java.util.Collection;
+
 public class Checks_checkAll {
 
     @Test(expected = IllegalArgumentException.class)
     public void mustBeGivenAnArray() {
-        Checks.checkAll(null, x -> true, "test");
+        Checks.checkAll((Object[]) null, x -> true, "test");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+        public void mustBeGivenACollection() {
+            Checks.checkAll((Collection<?>) null, x -> true, "test");
     }
 
     @Test(expected = IllegalArgumentException.class)
