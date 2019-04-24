@@ -104,14 +104,13 @@ public class AllocationDao {
         return allocationsToRemove
                 .stream()
                 .flatMap(r ->
-                        dsl
-                                .selectFrom(ALLOCATION)
-                                .where(ALLOCATION.MEASURABLE_ID.eq(r.value1()))
-                                .and(ALLOCATION.ENTITY_ID.eq(r.value2()))
-                                .and(ALLOCATION.ENTITY_KIND.eq(r.value3()))
-                                .and(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
-                                .fetch(TO_DOMAIN_MAPPER)
-                                .stream())
+                        dsl.selectFrom(ALLOCATION)
+                            .where(ALLOCATION.MEASURABLE_ID.eq(r.value1()))
+                            .and(ALLOCATION.ENTITY_ID.eq(r.value2()))
+                            .and(ALLOCATION.ENTITY_KIND.eq(r.value3()))
+                            .and(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
+                            .fetch(TO_DOMAIN_MAPPER)
+                            .stream())
 
                 .collect(Collectors.toSet());
     }
