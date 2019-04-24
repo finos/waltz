@@ -24,7 +24,9 @@ import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.tally.ImmutableOrderedTally;
 import com.khartec.waltz.model.tally.ImmutableTally;
+import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -72,6 +74,13 @@ public class JooqUtilities {
             ImmutableTally.<String>builder()
                     .count(r.value2())
                     .id(r.value1())
+                    .build();
+
+    public static final RecordMapper<Record3<String, Integer, Integer>, OrderedTally<String>> TO_ORDERED_STRING_TALLY = r ->
+            ImmutableOrderedTally.<String>builder()
+                    .count(r.value2())
+                    .id(r.value1())
+                    .index(r.value3())
                     .build();
 
 
@@ -220,6 +229,21 @@ public class JooqUtilities {
         return dsl.select(
                 fieldToTally,
                 DSL.count(fieldToTally).as(TALLY_COUNT_FIELD))
+                .from(table)
+                .where(dsl.renderInlined(recordsInScopeCondition))
+                .groupBy(fieldToTally);
+    }
+
+
+    public static <T> SelectHavingStep<Record3<T, Integer, Integer>> makeOrderedTallyQuery(
+            DSLContext dsl,
+            Table table,
+            Field<T> fieldToTally,
+            Condition recordsInScopeCondition) {
+        return dsl.select(
+                fieldToTally,
+                DSL.count(fieldToTally).as(TALLY_COUNT_FIELD),
+                DSL.rowNumber().over(DSL.orderBy(DSL.count(fieldToTally).desc())))
                 .from(table)
                 .where(dsl.renderInlined(recordsInScopeCondition))
                 .groupBy(fieldToTally);

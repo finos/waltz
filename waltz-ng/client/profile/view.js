@@ -19,6 +19,7 @@
 
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from './view.html';
+import moment from "moment";
 
 
 const initialState = {
@@ -26,13 +27,17 @@ const initialState = {
     contribution: {
         score: 0,
         directScores: [],
-        leaderBoard: []
+        leaderBoard: [],
+        monthlyLeaderBoard: [],
+        positionedLeaderBoard: []
     },
     directs: [],
     managers: [],
     person: null,
     roles: [],
     user: null,
+    date: null,
+    showMore: false,
     passwordResetEnabled: false
 };
 
@@ -98,6 +103,15 @@ function controller($q,
         .getLeaderBoard()
         .then(leaderBoard => vm.contribution.leaderBoard = leaderBoard);
 
+    userContributionStore
+        .getLeaderBoardLastMonth()
+        .then(monthlyLeaderBoard => vm.contribution.monthlyLeaderBoard = monthlyLeaderBoard);
+
+    userContributionStore
+        .getRankedLeaderBoard(userId)
+        .then(positionedLeaderBoard => vm.contribution.positionedLeaderBoard = positionedLeaderBoard);
+
+
     $q.all([userService.whoami(), settingsService.findOrDefault('web.authentication', null)])
         .then(([who, how]) => vm.passwordResetEnabled = who.userName === userId && how === 'waltz');
 
@@ -118,6 +132,12 @@ function controller($q,
                 if (!r) alert("Password reset failed");
                 else alert("Password updated")
             });
+    };
+
+    vm.date = moment().format('MMMM YYYY');
+
+    vm.toggleRankings = () => {
+        return vm.showMore = !vm.showMore;
     };
 
 }
