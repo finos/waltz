@@ -164,15 +164,22 @@
                            ng-if="ctrl.person">
                 <!-- User score -->
                 <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-3">
                         <table class="table">
                             <thead>
                             <tr>
+                                <th>#</th>
                                 <th>User</th>
                                 <th>Score</th>
                             </tr>
                             </thead>
                             <tr>
+                                <td>
+                                    <span ng-if="user.id == ctrl.person.email"
+                                          ng-repeat="user in ctrl.contribution.positionedLeaderBoard"
+                                          ng-bind="user.index">
+                                    </span>
+                                </td>
                                 <td>
                                     <span ng-bind="ctrl.person.displayName">
                                     </span>
@@ -187,7 +194,7 @@
                     </div>
 
                     <!-- Directs score -->
-                    <div class="col-sm-4" ng-if="ctrl.contribution.directScores.length > 0">
+                    <div class="col-sm-3" ng-if="ctrl.contribution.directScores.length > 0">
                         <table class="table">
                             <thead>
                             <tr>
@@ -209,16 +216,48 @@
                         </table>
                     </div>
 
-                    <!-- Leader Board -->
-                    <div class="col-sm-4">
+                    <!-- Monthly Leader Board -->
+                    <div class="col-sm-3">
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>Leader Board</th>
+                                <th>#</th>
+                                <th>Monthly Leader Board (<span ng-bind="ctrl.date"></span>)</th>
+                                <th>Score</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="user in ctrl.contribution.monthlyLeaderBoard">
+                                <td>
+                                    <span ng-bind="user.index"></span>
+                                </td>
+                                <td>
+                                    <a ui-sref="main.profile.view ({userId: user.id})"
+                                       ng-bind="user.id">
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="label label-info"
+                                          ng-bind="user.count">
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Leader Board -->
+                    <div class="col-sm-3">
+                        <table ng-if="!ctrl.showMore" class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>All-Time Leader Board</th>
                                 <th>Score</th>
                             </tr>
                             </thead>
                             <tr ng-repeat="user in ctrl.contribution.leaderBoard">
+                                <td>
+                                    <span ng-bind="user.index"></span>
+                                </td>
                                 <td>
                                     <a ui-sref="main.profile.view ({userId: user.id})"
                                        ng-bind="user.id">
@@ -230,6 +269,50 @@
                                 </td>
                             </tr>
                         </table>
+                        <table ng-if="ctrl.showMore" class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>All-Time Leader Board</th>
+                                <th>Score</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="user in ctrl.contribution.positionedLeaderBoard">
+                                <td>
+                                    <span
+                                        ng-if="user.id != ctrl.person.email"
+                                        ng-bind="user.index">
+                                    </span>
+                                    <b ng-if ="user.id == ctrl.person.email"
+                                       ng-bind="user.index">
+                                    </b>
+                                </td>
+                                <td>
+                                    <b ui-sref="main.profile.view ({userId: user.id})"
+                                       ng-if ="user.id == ctrl.person.email"
+                                       ng-bind="user.id">
+                                    </b>
+                                    <a ui-sref="main.profile.view ({userId: user.id})"
+                                       ng-if ="user.id != ctrl.person.email"
+                                       ng-bind="user.id">
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="label label-info"
+                                          ng-bind="user.count"></span>
+                                </td>
+                            </tr>
+                        </table>
+                        <a ng-if="ctrl.contribution.score != 0 && !ctrl.showMore"
+                           ng-click="ctrl.toggleRankings()"
+                           class="clickable">
+                            View My Position
+                        </a>
+                        <a ng-if="ctrl.contribution.score != 0 && ctrl.showMore"
+                           ng-click="ctrl.toggleRankings()"
+                           class="clickable">
+                            View Top 10
+                        </a>
                     </div>
                 </div>
             </waltz-section>

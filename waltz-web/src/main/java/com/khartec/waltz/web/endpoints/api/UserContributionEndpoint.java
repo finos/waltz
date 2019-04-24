@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.user_contribution.UserContributionService;
 import com.khartec.waltz.web.DatumRoute;
@@ -56,13 +57,25 @@ public class UserContributionEndpoint implements Endpoint {
         String getLeaderBoardPath = mkPath(BASE_URL, "leader-board");
         String getScoreForUserPath = mkPath(BASE_URL, "user", ":userId", "score");
         String findScoresForDirectReportsPath = mkPath(BASE_URL, "user", ":userId", "directs", "score");
+        String getLeaderBoardLastMonthPath = mkPath(BASE_URL, "monthly-leader-board");
+        String getRankedLeaderBoardPath = mkPath(BASE_URL, "user", ":userId", "ordered-leader-board");
 
-        ListRoute<Tally<String>> getLeaderBoardRoute = (request, response) -> {
+        ListRoute<OrderedTally<String>> getLeaderBoardRoute = (request, response) -> {
             String limitStr = request.queryParams("limit");
             int limit = parseInteger(limitStr, DEFAULT_LIMIT);
 
             return userContributionService.getLeaderBoard(limit);
         };
+
+        ListRoute<OrderedTally<String>> getLeaderBoardLastMonthRoute = (request, response) -> {
+            String limitStr = request.queryParams("limit");
+            int limit = parseInteger(limitStr, DEFAULT_LIMIT);
+
+            return userContributionService.getLeaderBoardLastMonth(limit);
+        };
+
+        ListRoute<OrderedTally<String>> getRankedLeaderBoardRoute = (request, response) ->
+                userContributionService.getRankedLeaderBoard(request.params("userId"));
 
         DatumRoute<Double> getScoreForUserRoute = (request, response) ->
                 userContributionService.getScoreForUser(request.params("userId"));
@@ -71,7 +84,9 @@ public class UserContributionEndpoint implements Endpoint {
                 userContributionService.findScoresForDirectReports(request.params("userId"));
 
         getForList(getLeaderBoardPath, getLeaderBoardRoute);
+        getForList(getLeaderBoardLastMonthPath, getLeaderBoardLastMonthRoute);
         getForDatum(getScoreForUserPath, getScoreForUserRoute);
         getForList(findScoresForDirectReportsPath, findScoresForDirectReportsRoute);
+        getForList(getRankedLeaderBoardPath, getRankedLeaderBoardRoute);
     }
 }

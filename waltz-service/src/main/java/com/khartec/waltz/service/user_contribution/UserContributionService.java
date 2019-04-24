@@ -23,6 +23,7 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.service.user_contribution.UserContributionUtilities.getOrderedListOf10;
 
 @Service
 public class UserContributionService {
@@ -52,8 +54,20 @@ public class UserContributionService {
     }
 
 
-    public List<Tally<String>> getLeaderBoard(int limit) {
+    public List<OrderedTally<String>> getLeaderBoard(int limit) {
         return changeLogDao.getContributionLeaderBoard(limit);
+    }
+
+    public List<OrderedTally<String>> getLeaderBoardLastMonth(int limit) {
+        return changeLogDao.getContributionLeaderBoardLastMonth(limit);
+    }
+
+    public List<OrderedTally<String>> getRankedLeaderBoard(String userId) {
+
+        List<OrderedTally<String>> contributors = changeLogDao.getRankingOfContributors();
+        List<OrderedTally<String>> orderedListContributors = getOrderedListOf10(contributors, userId);
+
+        return orderedListContributors;
     }
 
 

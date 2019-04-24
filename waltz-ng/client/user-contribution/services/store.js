@@ -31,10 +31,20 @@ function service($http, base) {
         $http.get(`${base}/user-contribution/leader-board`)
             .then(r => r.data);
 
+    const getLeaderBoardLastMonth = () =>
+        $http.get(`${base}/user-contribution/monthly-leader-board`)
+            .then(r => r.data);
+
+    const getRankedLeaderBoard = (userId) =>
+        $http.get(`${base}/user-contribution/user/${userId}/ordered-leader-board`)
+            .then(r => r.data);
+
     return {
         findForUserId,
         findForDirects,
-        getLeaderBoard
+        getLeaderBoard,
+        getLeaderBoardLastMonth,
+        getRankedLeaderBoard
     };
 }
 

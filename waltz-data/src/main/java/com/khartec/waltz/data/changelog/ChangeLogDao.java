@@ -22,6 +22,7 @@ package com.khartec.waltz.data.changelog;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.*;
@@ -30,11 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.schema.Tables.PERSON;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -124,15 +127,43 @@ public class ChangeLogDao {
     }
 
 
-    public List<Tally<String>> getContributionLeaderBoard(int limit) {
-        return makeTallyQuery(
+    public List<OrderedTally<String>> getContributionLeaderBoard(int limit) {
+        return makeOrderedTallyQuery(
                     dsl,
                     CHANGE_LOG,
                     CHANGE_LOG.USER_ID,
                     DSL.trueCondition())
                 .orderBy(TALLY_COUNT_FIELD.desc())
                 .limit(limit)
-                .fetch(TO_STRING_TALLY);
+                .fetch(TO_ORDERED_STRING_TALLY);
+
+    }
+
+
+    public List<OrderedTally<String>> getContributionLeaderBoardLastMonth(int limit) {
+
+        LocalDateTime monthStart = LocalDateTime.of(nowUtc().getYear(), nowUtc().getMonth(), 1, 0, 0);
+        Condition condition = CHANGE_LOG.CREATED_AT.greaterThan(Timestamp.valueOf(monthStart));
+
+        return makeOrderedTallyQuery(
+                    dsl,
+                    CHANGE_LOG,
+                    CHANGE_LOG.USER_ID,
+                    condition)
+                .orderBy(TALLY_COUNT_FIELD.desc())
+                .limit(limit)
+                .fetch(TO_ORDERED_STRING_TALLY);
+    }
+
+
+    public List<OrderedTally<String>> getRankingOfContributors() {
+
+        return makeOrderedTallyQuery(
+                dsl,
+                CHANGE_LOG,
+                CHANGE_LOG.USER_ID,
+                DSL.trueCondition())
+                .fetch(TO_ORDERED_STRING_TALLY);
     }
 
 
