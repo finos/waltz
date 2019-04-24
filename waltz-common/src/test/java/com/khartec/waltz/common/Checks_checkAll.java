@@ -21,13 +21,22 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
+import java.util.Collection;
+
 public class Checks_checkAll {
 
     @Test(expected = IllegalArgumentException.class)
     public void mustBeGivenAnArray() {
-        Checks.checkAll(null, x -> true, "test");
+        Checks.checkAll((Object[]) null, x -> true, "test");
     }
 
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void mustBeGivenACollection() {
+        Checks.checkAll((Collection<?>) null, x -> true, "test");
+    }
+
+    
     @Test(expected = IllegalArgumentException.class)
     public void mustBeGivenAPredicate() {
         Checks.checkAll(new String[]{}, null, "test");
@@ -39,6 +48,7 @@ public class Checks_checkAll {
         Checks.checkAll(new Integer[]{1, 3, 5}, x -> (x.intValue() % 2) == 1, "test");
     }
 
+    
     @Test(expected = IllegalArgumentException.class)
     public void throwsIfPredicateIsFalseForAny() {
         Checks.checkAll(new Integer[]{1, 4, 5}, x -> (x.intValue() % 2) == 1, "test");
