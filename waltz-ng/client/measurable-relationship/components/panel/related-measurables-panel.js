@@ -26,6 +26,7 @@ import {getEnumName} from "../../../common/services/enums";
 import {sanitizeRelationships} from "../../measurable-relationship-utils";
 
 import template from "./related-measurables-panel.html";
+import {displayError} from "../../../common/error-utils";
 
 
 /**
@@ -202,7 +203,7 @@ function controller($q, $timeout, serviceBroker, notification) {
                     loadRelationships();
                 })
                 .catch(e => {
-                    notification.error("Relationship could not be removed", e)
+                    displayError(notification, "Relationship could not be removed", e)
                 });
         }
     };

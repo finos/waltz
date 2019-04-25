@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -99,7 +99,7 @@ public class PersonEndpoint implements Endpoint {
     }
 
     private boolean rebuildHierarchyRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
         personHierarchyService.build();
         return true;
     }

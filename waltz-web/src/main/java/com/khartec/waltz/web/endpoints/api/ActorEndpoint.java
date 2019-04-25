@@ -24,7 +24,7 @@ import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
 import com.khartec.waltz.model.actor.ActorCreateCommand;
 import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -130,7 +130,7 @@ public class ActorEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 }

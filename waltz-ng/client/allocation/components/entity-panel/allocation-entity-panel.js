@@ -8,6 +8,7 @@ import {
     validateAllocations
 } from "../../allocation-utilities";
 import _ from "lodash";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -153,7 +154,7 @@ function controller($q, notification, serviceBroker) {
                 reload();
                 vm.setEditable(false);
             })
-            .catch(e => notification.error("Could not update percentages"));
+            .catch(e => displayError(notification, "Could not update percentages", e));
     };
 
     vm.setEditable = (targetState) => {

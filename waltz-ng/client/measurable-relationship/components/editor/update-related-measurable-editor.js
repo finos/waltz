@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./update-related-measurable-editor.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -72,7 +73,7 @@ function controller(notification, serviceBroker) {
                     vm.onRefresh();
                 })
                 .catch(e => {
-                    notification.error("Could not save because: "+e.message);
+                    displayError(notification, "Could not save because: ", e);
                 });
         }
     };

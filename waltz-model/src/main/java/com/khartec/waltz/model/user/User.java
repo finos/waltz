@@ -32,9 +32,9 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableUser.class)
 public abstract class User implements UserNameProvider {
 
-    public abstract Set<Role> roles();
+    public abstract Set<String> roles();
 
-    public boolean hasRole(Role role) {
+    public boolean hasRole(String role) {
         if (role == null) { return false; }
 
         return roles().contains(role);

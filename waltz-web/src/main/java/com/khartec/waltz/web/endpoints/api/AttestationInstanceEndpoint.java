@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -112,7 +112,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
 
     private int cleanupOrphansRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
 

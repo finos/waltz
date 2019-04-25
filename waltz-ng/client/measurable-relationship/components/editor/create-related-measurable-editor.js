@@ -24,6 +24,7 @@ import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hi
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -212,7 +213,7 @@ function controller(notification, serviceBroker) {
                     vm.onRefresh();
                 })
                 .catch(e => {
-                    notification.error("Could not save because: "+e.message);
+                    displayError(notification, "Could not save because: ", e);
                 });
         }
     };

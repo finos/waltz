@@ -23,7 +23,6 @@ package com.khartec.waltz.data.assessment_definition;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -36,7 +35,6 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 
@@ -53,7 +51,7 @@ public class AssessmentDefinitionDao {
                 .ratingSchemeId(record.getRatingSchemeId())
                 .entityKind(EntityKind.valueOf(record.getEntityKind()))
                 .description(mkSafe(record.getDescription()))
-                .permittedRole(Optional.ofNullable(readEnum(record.getPermittedRole(), Role.class, s -> null)))
+                .permittedRole(Optional.ofNullable(record.getPermittedRole()))
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadOnly(record.getIsReadonly())

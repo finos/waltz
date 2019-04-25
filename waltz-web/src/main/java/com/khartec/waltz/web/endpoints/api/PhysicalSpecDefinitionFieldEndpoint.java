@@ -23,7 +23,7 @@ import com.khartec.waltz.model.UpdateDescriptionCommand;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -77,7 +77,7 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
                 (req, res) -> specDefinitionFieldService.findBySelector(readIdSelectionOptionsFromBody(req));
 
         ListRoute<Long> createFieldsRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             String userName = getUsername(req);
             long specDefinitionId = getId(req);
@@ -91,7 +91,7 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> updateDescriptionRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             res.type(WebUtilities.TYPE_JSON);
             UpdateDescriptionCommand command = readBody(req, UpdateDescriptionCommand.class);
@@ -103,7 +103,7 @@ public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> updateLogicalElementRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             res.type(WebUtilities.TYPE_JSON);
             LogicalDataElementChangeCommand command = readBody(req, LogicalDataElementChangeCommand.class);

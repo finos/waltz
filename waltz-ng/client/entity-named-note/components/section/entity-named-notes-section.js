@@ -23,6 +23,7 @@ import {initialiseData} from '../../../common/index';
 import {getEditRoleForEntityKind} from '../../../common/role-utils';
 
 import template from './entity-named-notes-section.html';
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -86,7 +87,7 @@ function controller($q, notification, serviceBroker, userService) {
         return serviceBroker
             .loadViewData(CORE_API.EntityNamedNoteStore.findByEntityReference, [vm.parentEntityRef], options)
             .then(result => vm.notes = result.data)
-            .catch(error => notification.error('Failed to load data: ', error));
+            .catch(e => displayError(notification, "Failed to load data", e));
     };
 
     const loadNoteTypes = () => {

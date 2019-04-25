@@ -34,7 +34,7 @@ import spark.Request;
 import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.user.Role.ADMIN;
+import static com.khartec.waltz.model.user.SystemRole.ADMIN;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;

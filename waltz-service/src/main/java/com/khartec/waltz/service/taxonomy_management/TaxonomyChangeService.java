@@ -7,7 +7,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.exceptions.NotAuthorizedException;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.taxonomy_management.*;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.client_cache_key.ClientCacheKeyService;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -124,7 +124,7 @@ public class TaxonomyChangeService {
 
 
     private void verifyUserHasPermissions(String userId) {
-        if (! userRoleService.hasRole(userId, Role.TAXONOMY_EDITOR)) {
+        if (! userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
             throw new NotAuthorizedException();
         }
     }

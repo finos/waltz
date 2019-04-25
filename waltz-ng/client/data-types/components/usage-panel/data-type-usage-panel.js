@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-panel.html";
-import roles from "../../../user/roles";
+import roles from "../../../user/system-roles";
 
 
 const bindings = {

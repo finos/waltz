@@ -201,6 +201,21 @@ public class CollectionUtilities {
         return sorted;
     }
 
+    /**
+     * Returns a sorted collection (list).  The input collection is unchanged.
+     *
+     * @param xs         collection to be sorted (will be unchanged)
+     * @param <X>        type of elements in `xs
+     * @return new list with members of `xs` sorted by `comparator`.
+     */
+    public static <X extends Comparable> List<X> sort(Collection<X> xs) {
+        checkNotNull(xs, "xs cannot be null");
+
+        List<X> sorted = new ArrayList<>(xs);
+        Collections.sort(sorted);
+        return sorted;
+    }
+
 
     /**
      * Given a collection of items this will randomly pick an item.

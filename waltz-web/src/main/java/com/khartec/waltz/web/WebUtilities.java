@@ -24,10 +24,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.eclipse.jetty.http.MimeTypes;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 import static java.util.stream.Collectors.toList;
@@ -144,14 +146,27 @@ public class WebUtilities {
 
     public static void requireRole(UserRoleService userRoleService,
                                    Request request,
-                                   Role... requiredRoles) {
+                                   SystemRole... requiredRoles) {
+        requireRole(userRoleService, request, SetUtilities.map(asSet(requiredRoles), Enum::name));
+    }
+
+
+    public static void requireRole(UserRoleService userRoleService,
+                                   Request request,
+                                   String... requiredRoles) {
+        requireRole(userRoleService, request, asSet(requiredRoles));
+    }
+
+    public static void requireRole(UserRoleService userRoleService,
+                                   Request request,
+                                   Set<String> requiredRoles) {
         String user = getUsername(request);
         if (StringUtilities.isEmpty(user)) {
-            LOG.warn("Required role check failed as no user, roles needed: " + Arrays.toString(requiredRoles));
+            LOG.warn("Required role check failed as no user, roles needed: " + requiredRoles);
             throw new IllegalArgumentException("Not logged in");
         }
         if (! userRoleService.hasRole(user, requiredRoles)) {
-            LOG.warn("Required role check failed as user: " + user + ", did not have required roles: " + Arrays.toString(requiredRoles));
+            LOG.warn("Required role check failed as user: " + user + ", did not have required roles: " + requiredRoles);
             throw new NotAuthorizedException();
         }
     }
@@ -159,7 +174,7 @@ public class WebUtilities {
 
     public static void requireAnyRole(UserRoleService userRoleService,
                                       Request request,
-                                      Role... requiredRoles) {
+                                      SystemRole... requiredRoles) {
         String user = getUsername(request);
         if (StringUtilities.isEmpty(user)) {
             LOG.warn("Required role check failed as no user, roles needed: " + Arrays.toString(requiredRoles));

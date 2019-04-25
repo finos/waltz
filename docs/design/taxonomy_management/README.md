@@ -149,7 +149,7 @@ Security is a broad topic and a comprehensive solution is out of scope of the in
 feature.  
 
 Currently the Waltz security model is extremely coarse grained.  Simple roles are associated to users 
-via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.Role`.
+via the `user_role` table.  The set of roles is determined by the enum `com.khartec.waltz.model.user.SystemRole`.
 
 ### Phase 1 - interim design
 We propose to add a new type of Role: `TAXONOMY_EDITOR` which would cover both measurables and data type 

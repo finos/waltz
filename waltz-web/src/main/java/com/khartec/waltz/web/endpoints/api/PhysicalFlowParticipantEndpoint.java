@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
 import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_flow_participant.PhysicalFlowParticipantService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -72,7 +72,7 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
             requireRole(
                     userRoleService,
                     request,
-                    Role.LOGICAL_DATA_FLOW_EDITOR);
+                    SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return service.remove(
                     getLong(request, "physicalFlowId"),
@@ -85,7 +85,7 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
             requireRole(
                     userRoleService,
                     request,
-                    Role.LOGICAL_DATA_FLOW_EDITOR);
+                    SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return service.add(
                     getLong(request, "physicalFlowId"),

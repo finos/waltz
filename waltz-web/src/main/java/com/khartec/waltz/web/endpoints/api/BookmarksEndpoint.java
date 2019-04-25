@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -74,7 +74,7 @@ public class BookmarksEndpoint implements Endpoint {
 
         post(mkPath(BASE_URL),
                 (request, response) -> {
-                    requireRole(userRoleService, request, Role.BOOKMARK_EDITOR);
+                    requireRole(userRoleService, request, SystemRole.BOOKMARK_EDITOR);
 
                     response.type(TYPE_JSON);
                     Bookmark bookmark = readBody(request, Bookmark.class);
@@ -90,7 +90,7 @@ public class BookmarksEndpoint implements Endpoint {
 
 
         delete(mkPath(BASE_URL, ":id"), (request, response) -> {
-            requireRole(userRoleService, request, Role.BOOKMARK_EDITOR);
+            requireRole(userRoleService, request, SystemRole.BOOKMARK_EDITOR);
 
             response.type(TYPE_JSON);
 

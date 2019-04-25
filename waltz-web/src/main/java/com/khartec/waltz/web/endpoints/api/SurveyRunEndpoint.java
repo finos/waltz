@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.DateChangeCommand;
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -178,7 +178,7 @@ public class SurveyRunEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.SURVEY_ADMIN);
+        requireRole(userRoleService, request, SystemRole.SURVEY_ADMIN);
     }
 
 }

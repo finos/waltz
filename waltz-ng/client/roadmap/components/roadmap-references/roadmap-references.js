@@ -1,6 +1,6 @@
 import template from "./roadmap-references.html";
 import {initialiseData} from "../../../common";
-import roles from "../../../user/roles";
+import roles from "../../../user/system-roles";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 

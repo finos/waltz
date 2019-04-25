@@ -66,7 +66,7 @@ public class AuthenticationEndpoint implements Endpoint {
 
         this.filter = settingsService
                 .getValue(NamedSettings.authenticationFilter)
-                .flatMap(className -> instantiateFilter(className))
+                .flatMap(this::instantiateFilter)
                 .orElseGet(createDefaultFilter());
     }
 
@@ -106,9 +106,8 @@ public class AuthenticationEndpoint implements Endpoint {
                 Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
 
                 String[] roles = userRoleService
-                        .getUserRoles(login.userName()).stream()
-                        .map(r -> r.name())
-                        .toArray(size -> new String[size]);
+                        .getUserRoles(login.userName())
+                        .toArray(new String[0]);
 
                 String token = JWT.create()
                         .withIssuer(JWTUtilities.ISSUER)

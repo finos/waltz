@@ -20,7 +20,6 @@
 package com.khartec.waltz.data.user;
 
 import com.khartec.waltz.model.user.ImmutableUser;
-import com.khartec.waltz.model.user.Role;
 import com.khartec.waltz.model.user.User;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -32,9 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -61,13 +58,13 @@ public class UserRoleDao {
     }
 
 
-    public Set<Role> getUserRoles(String userName) {
+    public Set<String> getUserRoles(String userName) {
         List<String> roles = dsl.select(USER_ROLE.ROLE)
                 .from(USER_ROLE)
                 .where(USER_ROLE.USER_NAME.equalIgnoreCase(userName))
                 .fetch(USER_ROLE.ROLE);
 
-        return map(roles, r -> Role.valueOf(r));
+        return new HashSet<String>(roles);
     }
 
 
@@ -87,15 +84,14 @@ public class UserRoleDao {
                         .roles(entry.getValue()
                                 .stream()
                                 .map(record -> record.getValue(USER_ROLE.ROLE))
-                                .filter(roleName -> roleName != null)
-                                .map(roleName -> Role.valueOf(roleName))
+                                .filter(Objects::nonNull)
                                 .collect(Collectors.toList()))
                         .build())
                 .collect(toList());
     }
 
 
-    public boolean updateRoles(String userName, Set<Role> newRoles) {
+    public boolean updateRoles(String userName, Set<String> newRoles) {
         try {
             dsl.transaction(config -> {
                 LOG.info("Removing existing roles for: " + userName);
@@ -108,7 +104,7 @@ public class UserRoleDao {
                 DSLContext batcher = DSL.using(config);
                 Set<Query> inserts = map(newRoles, r -> batcher
                         .insertInto(USER_ROLE, USER_ROLE.USER_NAME, USER_ROLE.ROLE)
-                        .values(userName, r.name()));
+                        .values(userName, r));
 
                 batcher.batch(inserts)
                         .execute();

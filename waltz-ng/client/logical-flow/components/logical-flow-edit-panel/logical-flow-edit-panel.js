@@ -23,6 +23,7 @@ import {initialiseData} from "../../../common";
 import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
 
 import template from "./logical-flow-edit-panel.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -249,9 +250,9 @@ function controller($q,
                     [flow.id])
                 .then(reload)
                 .then(() => notification.warning('Data flow removed'))
-                .catch(e => notification.error(_.split(e.data.message, '/')[0] || "System error, please contact support"));
+                .catch(e => displayError(notification, "System error, please contact support", e));
         } else {
-            notification.warning(`This data flow has associated physical flows, please check and remove those first`)
+            notification.warning("This data flow has associated physical flows, please check and remove those first")
         }
     };
 

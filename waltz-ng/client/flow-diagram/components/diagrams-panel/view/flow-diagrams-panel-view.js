@@ -27,6 +27,7 @@ import {CORE_API} from "../../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../../common/selector-utils";
 import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
+import {displayError} from "../../../../common/error-utils";
 
 const bindings = {
     parentEntityRef: '<',
@@ -132,7 +133,7 @@ function controller($element,
                         notification.success("Diagram cloned");
                         reload(newId.data);
                     })
-                    .catch(e => notification.error(`Failed to clone diagram: ${e.data.message}`));
+                    .catch(e => displayError(notification, "Failed to clone diagram", e));
 
             }}
     ];

@@ -3,7 +3,7 @@ import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event, select, selectAll} from "d3-selection";
-import roles from "../../../user/roles";
+import roles from "../../../user/system-roles";
 
 import template from "./roadmap-scenario-diagram.html";
 import {getDefaultRating} from "../../../ratings/rating-utils";

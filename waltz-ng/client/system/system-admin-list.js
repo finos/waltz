@@ -19,7 +19,7 @@
 import {initialiseData} from "../common";
 
 import template from "./system-admin-list.html";
-import roles from "../user/roles";
+import roles from "../user/system-roles";
 
 const initialState = {
     showUserAdminItems: false

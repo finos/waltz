@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.settings.ImmutableSetting;
 import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -81,7 +81,7 @@ public class SettingsEndpoint implements Endpoint {
 
 
     private boolean isAdmin(Request request) {
-        return userRoleService.hasRole(getUsername(request), Role.ADMIN);
+        return userRoleService.hasRole(getUsername(request), SystemRole.ADMIN);
     }
 
 

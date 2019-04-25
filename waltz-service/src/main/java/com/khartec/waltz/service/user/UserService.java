@@ -20,10 +20,15 @@
 package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.user.UserDao;
 import com.khartec.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.user.*;
+import com.khartec.waltz.model.user.ImmutableLoginRequest;
+import com.khartec.waltz.model.user.LoginRequest;
+import com.khartec.waltz.model.user.PasswordResetRequest;
+import com.khartec.waltz.model.user.UserRegistrationRequest;
 import com.khartec.waltz.service.settings.SettingsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -131,12 +134,8 @@ public class UserService {
         Setting setting = settingsService.getByName(SettingsService.DEFAULT_ROLES_KEY);
         if (setting != null ) {
             setting.value()
-                    .map(s -> s.split(","))
-                    .map(roleNames -> Stream
-                            .of(roleNames)
-                            .map(name -> Role.valueOf(name.trim()))
-                            .collect(Collectors.toSet()))
-                    .ifPresent(roles -> userRoleDao.updateRoles(username, roles));
+                    .map(s -> StringUtilities.tokenise(s, ","))
+                    .ifPresent(roles -> userRoleDao.updateRoles(username, SetUtilities.fromCollection(roles)));
 
         }
     }

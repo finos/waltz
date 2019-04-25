@@ -22,6 +22,7 @@ import _ from "lodash";
 import template from "./entity-diagrams-section.html";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -121,7 +122,7 @@ function controller($q,
                         notification.success("Diagram cloned");
                         reload();
                     })
-                    .catch(e => notification.error(`Failed to clone diagram: ${e.data.message}`));
+                    .catch(e => displayError(notification, "Failed to clone diagram", e));
 
             }}
     ];
@@ -189,7 +190,7 @@ function controller($q,
                 const newDiagram = _.find(diagrams, { id:  newDiagramId });
                 vm.onDiagramSelect(newDiagram);
             })
-            .catch(e => notification.error(`Failed to create new diagram: ${e.data.message}`));
+            .catch(e => displayError(notification, "Failed to create new diagram", e));
     };
 }
 

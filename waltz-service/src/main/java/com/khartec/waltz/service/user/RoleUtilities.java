@@ -21,7 +21,7 @@ package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +29,12 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.khartec.waltz.common.FunctionUtilities.alwaysBi;
-import static com.khartec.waltz.model.user.Role.*;
+import static com.khartec.waltz.model.user.SystemRole.*;
 
 public class RoleUtilities {
 
-    private static final BiFunction<Operation, EntityKind, Role> REQUIRE_ADMIN = alwaysBi(ADMIN);
-    private static final Map<EntityKind, BiFunction<Operation, EntityKind, Role>> REQUIRED_ROLES = new HashMap<>();
+    private static final BiFunction<Operation, EntityKind, SystemRole> REQUIRE_ADMIN = alwaysBi(ADMIN);
+    private static final Map<EntityKind, BiFunction<Operation, EntityKind, SystemRole>> REQUIRED_ROLES = new HashMap<>();
 
 
     static {
@@ -52,7 +52,7 @@ public class RoleUtilities {
      * @param kind Primary entity kind
      * @return required role
      */
-    public static Role getRequiredRoleForEntityKind(EntityKind kind) {
+    public static SystemRole getRequiredRoleForEntityKind(EntityKind kind) {
         return getRequiredRoleForEntityKind(kind, null, null);
     }
 
@@ -64,9 +64,9 @@ public class RoleUtilities {
      * @param kind Primary entity kind involved in this request
      * @param op Operation to perform (ignored)
      * @param additionalKind Secondary entity kind involved in request
-     * @return Role - required role for this
+     * @return SystemRole - required role for this
      */
-    public static Role getRequiredRoleForEntityKind(EntityKind kind, Operation op, EntityKind additionalKind) {
+    public static SystemRole getRequiredRoleForEntityKind(EntityKind kind, Operation op, EntityKind additionalKind) {
         return REQUIRED_ROLES
                 .getOrDefault(kind, REQUIRE_ADMIN)
                 .apply(op, additionalKind);
@@ -75,12 +75,12 @@ public class RoleUtilities {
 
     // -- helpers
 
-    private static Role getRequiredRoleForApplication(Operation op, EntityKind additionalKind) {
+    private static SystemRole getRequiredRoleForApplication(Operation op, EntityKind additionalKind) {
         return APP_EDITOR;
     }
 
 
-    private static Role getRequiredRoleForChangeInitiative(Operation op, EntityKind additionalKind) {
+    private static SystemRole getRequiredRoleForChangeInitiative(Operation op, EntityKind additionalKind) {
         return CHANGE_INITIATIVE_EDITOR;
     }
 
@@ -90,24 +90,24 @@ public class RoleUtilities {
      * a relationship or a bookmark.  If it is not given it is a direct edit on the measurable and
      * is restricted to those with the `TAXONOMY_EDITOR` role.
      */
-    private static Role getRequiredRoleForMeasurable(Operation op, EntityKind additionalKind) {
+    private static SystemRole getRequiredRoleForMeasurable(Operation op, EntityKind additionalKind) {
         return Optional
                 .ofNullable(additionalKind)
-                .map(k -> Role.CAPABILITY_EDITOR)
-                .orElse(Role.TAXONOMY_EDITOR);
+                .map(k -> SystemRole.CAPABILITY_EDITOR)
+                .orElse(SystemRole.TAXONOMY_EDITOR);
     }
 
 
-    private static Role getRequiredRoleForMeasurableCategory(Operation op, EntityKind additionalKind) {
+    private static SystemRole getRequiredRoleForMeasurableCategory(Operation op, EntityKind additionalKind) {
         return Optional
                 .ofNullable(additionalKind)
-                .map(k -> Role.CAPABILITY_EDITOR)
-                .orElse(Role.TAXONOMY_EDITOR);
+                .map(k -> SystemRole.CAPABILITY_EDITOR)
+                .orElse(SystemRole.TAXONOMY_EDITOR);
     }
 
 
-    private static Role getRequiredRoleForOrgUnit(Operation op, EntityKind additionalKind) {
-        return Role.ORG_UNIT_EDITOR;
+    private static SystemRole getRequiredRoleForOrgUnit(Operation op, EntityKind additionalKind) {
+        return SystemRole.ORG_UNIT_EDITOR;
     }
 
 }

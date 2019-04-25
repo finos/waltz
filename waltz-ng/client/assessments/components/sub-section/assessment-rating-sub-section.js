@@ -3,6 +3,7 @@ import {initialiseData} from "../../../common";
 import template from "./assessment-rating-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -70,8 +71,7 @@ function controller($q, notification, serviceBroker) {
                 notification.warning("Assessment removed");
             })
             .catch(e => {
-                const reason = _.get(e, ["data", "message"], "Unknown reason");
-                notification.error(`Failed to remove: ${reason}`);
+                displayError(notification, "Failed to remove", e);
             });
     };
 
@@ -86,7 +86,7 @@ function controller($q, notification, serviceBroker) {
                 loadAll();
                 notification.success("Assessment saved");
             })
-            .catch(e => notification.error("Failed to save", e.message));
+            .catch(e => displayError(notification, "Failed to save", e));
     };
 
 

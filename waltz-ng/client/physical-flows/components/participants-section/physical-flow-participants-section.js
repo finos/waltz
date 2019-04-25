@@ -23,6 +23,7 @@ import { mkEntityLinkGridCell } from "../../../common/grid-utils";
 import { initialiseData } from "../../../common";
 
 import template from "./physical-flow-participants-section.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -38,12 +39,6 @@ const initialState = {
 function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
-    function handleFailure(preamble = "", e) {
-        const msg = _.get(e, ["data", "message"], "Unknown");
-        notification.error(`${preamble}: ${msg}`);
-    }
-
-
     const onAddParticipant = (s, kind) => {
         return serviceBroker
             .execute(
@@ -53,7 +48,7 @@ function controller(serviceBroker, notification) {
                 notification.success("Participant added");
                 reloadParticipants();
             })
-            .catch(e => handleFailure("Failed to add participant" , e));
+            .catch(e => displayError(notification, "Failed to add participant" , e));
     };
 
     function reloadParticipants() {
@@ -91,7 +86,7 @@ function controller(serviceBroker, notification) {
                 notification.success("Participant removed");
                 reloadParticipants();
             })
-            .catch(e => handleFailure("Failed to add participant" , e));
+            .catch(e => displayError(notification, "Failed to add participant" , e));
     };
 
     vm.onAddSourceParticipant = s => onAddParticipant(s, "SOURCE");

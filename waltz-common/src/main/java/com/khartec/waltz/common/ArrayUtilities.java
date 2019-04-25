@@ -21,7 +21,9 @@ package com.khartec.waltz.common;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -78,7 +80,18 @@ public class ArrayUtilities {
         return arr[arr.length - 1];
     }
 
+
     public static <T> T[] initial(T[] bits) {
         return Arrays.copyOf(bits, bits.length - 1);
     }
+
+
+    @SuppressWarnings("unchecked")
+    public static <A, B> B[] map(A[] arr, Function<A, B> mapper) {
+        return (B[]) Stream
+                .of(arr)
+                .map(mapper)
+                .toArray();
+    }
+
 }

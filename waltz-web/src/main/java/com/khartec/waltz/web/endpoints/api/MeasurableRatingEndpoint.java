@@ -24,7 +24,7 @@ import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.measurable_rating.*;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -113,7 +113,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
     private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
-        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
 
         EntityReference ref = getEntityReference(request);
         long category = getLong(request, "categoryId");
@@ -123,14 +123,14 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private Collection<MeasurableRating> updateRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
         SaveMeasurableRatingCommand command = mkCommand(request);
         return measurableRatingService.update(command);
     }
 
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
         String username = getUsername(request);
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
@@ -142,7 +142,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private Collection<MeasurableRating> createRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, Role.RATING_EDITOR);
+        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
         SaveMeasurableRatingCommand command = mkCommand(request);
         return measurableRatingService.create(command);
     }

@@ -23,7 +23,7 @@ import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
 import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
 import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.WebUtilities;
@@ -122,7 +122,7 @@ public class InvolvementKindEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 }

@@ -1,6 +1,6 @@
 import template from "./scenario-list.html";
 import {initialiseData} from "../../../common";
-import roles from "../../../user/roles";
+import roles from "../../../user/system-roles";
 import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
 
 
