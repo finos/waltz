@@ -163,7 +163,7 @@
         <comment>3994: Role Table Creation</comment>
         <createTable tableName="role">
             <column name="key"
-                    type="${enum.type}">
+                    type="${role.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="is_custom"
@@ -195,133 +195,133 @@
             <column name="name" value="Admin"/>
             <column name="key" value="ADMIN"/>
             <column name="description" value="Administrative capabilities"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Anonymous"/>
             <column name="key" value="ANONYMOUS"/>
             <column name="description" value="Anonymous user role"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="App editor"/>
             <column name="key" value="APP_EDITOR"/>
             <column name="description" value="Can modify application information"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Attestation Admin"/>
             <column name="key" value="ATTESTATION_ADMIN"/>
             <column name="description" value="Can manage attestation runs"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Auth Source editor"/>
             <column name="key" value="AUTHORITATIVE_SOURCE_EDITOR"/>
             <column name="description" value="Can modify authoritative sources"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Beta Tester"/>
             <column name="key" value="BETA_TESTER"/>
             <column name="description" value="Can use new features before general release"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Bookmark Editor"/>
             <column name="key" value="BOOKMARK_EDITOR"/>
             <column name="description" value="Can modify bookmarks"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Capability editor"/>
             <column name="key" value="CAPABILITY_EDITOR"/>
             <column name="description" value="Can modify measurable relationships"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Change Initiative editor"/>
             <column name="key" value="CHANGE_INITIATIVE_EDITOR"/>
             <column name="description" value="Can modify change initiatives"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Lineage editor"/>
             <column name="key" value="LINEAGE_EDITOR"/>
             <column name="description" value="Can create logical flow diagrams"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Logical flow editor"/>
             <column name="key" value="LOGICAL_DATA_FLOW_EDITOR"/>
             <column name="description" value="Can update logical flows"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Org Unit editor"/>
             <column name="key" value="ORG_UNIT_EDITOR"/>
             <column name="description" value="Can modify org units"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Rating edit"/>
             <column name="key" value="RATING_EDITOR"/>
             <column name="description" value="Can assign ratings to applications"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Scenario Admin"/>
             <column name="key" value="SCENARIO_ADMIN"/>
             <column name="description" value="Can create roadmaps and scenarios"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Scenario edit"/>
             <column name="key" value="SCENARIO_EDITOR"/>
             <column name="description" value="Can modify the contents of roadmap scenarios"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Survey Admin"/>
             <column name="key" value="SURVEY_ADMIN"/>
             <column name="description" value="Can administer survey runs"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Survey Template Admin"/>
             <column name="key" value="SURVEY_TEMPLATE_ADMIN"/>
             <column name="description" value="Can create and modify survey templates"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="Taxonomy Editor"/>
             <column name="key" value="TAXONOMY_EDITOR"/>
             <column name="description" value="Can modify taxonomies that are flagged as editable"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
 
         <insert tableName="role">
             <column name="name" value="User Admin"/>
             <column name="key" value="USER_ADMIN"/>
             <column name="description" value="Can modify user roles and permissions"/>
-            <column name="is_custom" value="false"/>
+            <column name="is_custom" valueBoolean="false"/>
         </insert>
     </changeSet>
 
