@@ -131,9 +131,14 @@ public class StringUtilities {
 
 
     public static List<String> tokenise(String value) {
+        return tokenise(value, " ");
+    }
+
+
+    public static List<String> tokenise(String value, String regex) {
         checkNotNull(value, "value cannot be null");
 
-        String[] split = value.split(" ");
+        String[] split = value.split(regex);
 
         return Stream.of(split)
                 .filter(s -> !s.isEmpty())

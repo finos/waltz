@@ -25,7 +25,7 @@ import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.attestation.AttestationRunResponseSummary;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -114,6 +114,6 @@ public class AttestationRunEndpoint implements Endpoint {
 
 
     private void ensureUserHasAttestationAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ATTESTATION_ADMIN);
+        requireRole(userRoleService, request, SystemRole.ATTESTATION_ADMIN);
     }
 }

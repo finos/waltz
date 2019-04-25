@@ -27,7 +27,7 @@ import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.ImmutableUser;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.model.user.User;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.person.PersonService;
@@ -42,9 +42,9 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.sort;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
-import static java.util.Comparator.comparing;
 
 /**
  * Created by dwatkins on 30/03/2016.
@@ -73,17 +73,34 @@ public class UserRoleService {
 
 
 
-    public boolean hasRole(String userName, Role... requiredRoles) {
-        Set<Role> userRoles = userRoleDao.getUserRoles(userName);
-        return userRoles.containsAll(SetUtilities.fromArray(requiredRoles));
+    public boolean hasRole(String userName, SystemRole... requiredRoles) {
+        return hasRole(userName, SetUtilities.map(asSet(requiredRoles), Enum::name));
     }
 
 
-    public boolean hasAnyRole(String userName, Role... requiredRoles) {
-        Set<Role> userRoles = userRoleDao.getUserRoles(userName);
-        Set<Role> requiredRolesSet = SetUtilities.fromArray(requiredRoles);
+    public boolean hasRole(String userName, String... requiredRoles) {
+        return hasRole(userName, SetUtilities.fromArray(requiredRoles));
+    }
 
-        return ! SetUtilities.intersection(userRoles, requiredRolesSet)
+
+    public boolean hasRole(String userName, Set<String> requiredRoles) {
+        Set<String> userRoles = userRoleDao.getUserRoles(userName);
+        return userRoles.containsAll(requiredRoles);
+    }
+
+
+    public boolean hasAnyRole(String userName, SystemRole... requiredRoles) {
+        return hasAnyRole(userName, SetUtilities.map(asSet(requiredRoles), Enum::name));
+    }
+
+
+    public boolean hasAnyRole(String userName, String... requiredRoles) {
+        return hasAnyRole(userName, SetUtilities.fromArray(requiredRoles));
+    }
+
+    public boolean hasAnyRole(String userName, Set<String> requiredRoles) {
+        Set<String> userRoles = userRoleDao.getUserRoles(userName);
+        return ! SetUtilities.intersection(userRoles, requiredRoles)
                     .isEmpty();
     }
 
@@ -101,7 +118,7 @@ public class UserRoleService {
     }
 
 
-    public boolean updateRoles(String userName, String targetUserName, Set<Role> newRoles) {
+    public boolean updateRoles(String userName, String targetUserName, Set<String> newRoles) {
         LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, newRoles);
 
         Person person = personService.getPersonByUserId(targetUserName);
@@ -115,7 +132,7 @@ public class UserRoleService {
                     .message(format(
                             "Roles for %s updated to %s",
                             targetUserName,
-                            sort(newRoles, comparing(Enum::name))
+                            sort(newRoles)
                     ))
                     .childKind(Optional.empty())
                     .operation(Operation.UPDATE)
@@ -127,7 +144,7 @@ public class UserRoleService {
     }
 
 
-    public Set<Role> getUserRoles(String userName) {
+    public Set<String> getUserRoles(String userName) {
         return userRoleDao.getUserRoles(userName);
     }
 

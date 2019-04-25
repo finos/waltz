@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-list.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
-import roles from "../../../user/roles";
+import roles from "../../../user/system-roles";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 

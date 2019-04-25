@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -64,7 +64,7 @@ public class PhysicalSpecDefinitionSampleFileEndpoint implements Endpoint {
                 (req, res) -> specDefinitionSampleFileService.findForSpecDefinition(getId(req)).orElse(null);
 
         DatumRoute<Long> createRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return specDefinitionSampleFileService.create(
                     getId(req),

@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -141,7 +141,7 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
 
     private Collection<LogicalFlowDecorator> updateDecoratorsRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String user = getUsername(request);
         UpdateDataFlowDecoratorsAction action = readBody(request, UpdateDataFlowDecoratorsAction.class);
@@ -161,7 +161,7 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
 
     private Collection<LogicalFlowDecorator> updateDecoratorsBatchRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String user = getUsername(request);
         List<UpdateDataFlowDecoratorsAction> actions = Arrays.asList(readBody(request, UpdateDataFlowDecoratorsAction[].class));

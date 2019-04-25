@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.SetAttributeCommand;
 import com.khartec.waltz.model.physical_flow.*;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowUploadService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -199,7 +199,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private PhysicalFlowCreateCommandResponse createFlow(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         String username = getUsername(request);
 
         PhysicalFlowCreateCommand command = readBody(request, PhysicalFlowCreateCommand.class);
@@ -208,7 +208,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private int updateSpecDefinitionId(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         String username = getUsername(request);
         long flowId = getId(request);
 
@@ -220,7 +220,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private int updateAttribute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         String username = getUsername(request);
         SetAttributeCommand command
                 = readBody(request, SetAttributeCommand.class);
@@ -230,7 +230,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private PhysicalFlowDeleteCommandResponse deleteFlow(Request request, Response response) {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         long flowId = getId(request);
         String username = getUsername(request);
@@ -244,7 +244,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private List<PhysicalFlowUploadCommandResponse> validateUpload(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         try {
             List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
             return physicalFlowUploadService.validate(commands);
@@ -259,7 +259,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
         String username = getUsername(request);
 
@@ -268,7 +268,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
 

@@ -7,7 +7,7 @@ import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioType;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
 import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
@@ -310,11 +310,11 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.SCENARIO_ADMIN);
+        requireRole(userRoleService, request, SystemRole.SCENARIO_ADMIN);
     }
 
 
     private void ensureUserHasEditRights(Request request) {
-        requireAnyRole(userRoleService, request, Role.SCENARIO_EDITOR, Role.SCENARIO_ADMIN);
+        requireAnyRole(userRoleService, request, SystemRole.SCENARIO_EDITOR, SystemRole.SCENARIO_ADMIN);
     }
 }

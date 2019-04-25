@@ -20,7 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.staticpanel.StaticPanel;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.static_panel.StaticPanelService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -77,7 +77,7 @@ public class StaticPanelEndpoint implements Endpoint {
 
 
     private boolean saveRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
         StaticPanel panel = readBody(request, StaticPanel.class);
         return staticPanelService.save(panel);
     }

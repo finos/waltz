@@ -20,6 +20,7 @@ import template from "./physical-flow-editor.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -66,7 +67,7 @@ function controller(notification, serviceBroker) {
                 notification.success('Updated');
                 return load();
             })
-            .catch(e => notification.error('Could not update value'))
+            .catch(e => displayError(notification, "Could not update value", e))
     };
 
     vm.onSaveCriticality = (value, ctx) => doSave('criticality', value);

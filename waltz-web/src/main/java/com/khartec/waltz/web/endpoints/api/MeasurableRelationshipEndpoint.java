@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_relationship.*;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_relationship.MeasurableRelationshipService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -79,13 +79,13 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
                 -> measurableRelationshipService.tallyForEntityReference(getEntityReference(request));
 
         DatumRoute<Boolean> removeRelationshipRoute = (request, response) ->{
-            requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
+            requireRole(userRoleService, request, SystemRole.CAPABILITY_EDITOR);
             EntityRelationshipKey key = readRelationshipKeyFromRequest(request);
             return measurableRelationshipService.remove(key, getUsername(request));
         };
 
         DatumRoute<Boolean> createRelationshipRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
+            requireRole(userRoleService, request, SystemRole.CAPABILITY_EDITOR);
 
             String userName = getUsername(request);
             EntityReference entityRefA = getEntityReferenceA(request);
@@ -102,7 +102,7 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> updateRelationshipRoute = (request, response) -> {
-            requireRole(userRoleService, request, Role.CAPABILITY_EDITOR);
+            requireRole(userRoleService, request, SystemRole.CAPABILITY_EDITOR);
             EntityRelationshipKey key = readRelationshipKeyFromRequest(request);
             UpdateEntityRelationshipParams params = readBody(request, UpdateEntityRelationshipParams.class);
             return measurableRelationshipService.update(key, params, getUsername(request));

@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.user.Role.ADMIN;
+import static com.khartec.waltz.model.user.SystemRole.ADMIN;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.requireRole;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;

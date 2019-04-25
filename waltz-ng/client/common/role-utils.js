@@ -18,7 +18,7 @@
  */
 
 
-import roles from "../user/roles";
+import systemRoles from "../user/system-roles";
 
 /**
  * Given an entity kind, returns the user roles required for editing
@@ -33,26 +33,26 @@ import roles from "../user/roles";
 export function getEditRoleForEntityKind(kind, secondaryKind) {
     switch (kind) {
         case "APPLICATION":
-            return roles.APP_EDITOR.key;
+            return systemRoles.APP_EDITOR.key;
         case "CHANGE_INITIATIVE":
-            return roles.CHANGE_INITIATIVE_EDITOR.key;
+            return systemRoles.CHANGE_INITIATIVE_EDITOR.key;
         case "MEASURABLE":
             return secondaryKind
-                ? roles.CAPABILITY_EDITOR.key
-                : roles.TAXONOMY_EDITOR.key;
+                ? systemRoles.CAPABILITY_EDITOR.key
+                : systemRoles.TAXONOMY_EDITOR.key;
         case "ORG_UNIT":
-            return roles.ORG_UNIT_EDITOR.key;
+            return systemRoles.ORG_UNIT_EDITOR.key;
         case "MEASURABLE_CATEGORY":
             return secondaryKind
-                ? roles.CAPABILITY_EDITOR.key
-                : roles.TAXONOMY_EDITOR.key;
+                ? systemRoles.CAPABILITY_EDITOR.key
+                : systemRoles.TAXONOMY_EDITOR.key;
         case "DATA_TYPE":
-            return roles.AUTHORITATIVE_SOURCE_EDITOR.key;
+            return systemRoles.AUTHORITATIVE_SOURCE_EDITOR.key;
         case "SCENARIO":
-            return roles.SCENARIO_EDITOR.key;
+            return systemRoles.SCENARIO_EDITOR.key;
         case "ROADMAP":
-            return roles.SCENARIO_ADMIN.key;
+            return systemRoles.SCENARIO_ADMIN.key;
         default:
-            return roles.ADMIN.key;
+            return systemRoles.ADMIN.key;
     }
 }

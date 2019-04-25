@@ -28,6 +28,7 @@ import {sameRef} from "../../../common/entity-utils";
 import {isGroupOwner} from "../../app-group-utils";
 import {getEditRoleForEntityKind} from "../../../common/role-utils";
 import {mkRel} from "../../../common/relationship-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -135,7 +136,7 @@ function controller($q, notification, serviceBroker, UserService) {
                 notification.info("Relationship removed");
                 reload();
             })
-            .catch(e => notification.error("Failed to remove! " + e.message))
+            .catch(e => displayError(notification, "Failed to remove", e))
     };
 
 
@@ -153,7 +154,7 @@ function controller($q, notification, serviceBroker, UserService) {
                 vm.currentlySelectedGroup = null;
                 reload();
             })
-            .catch(e => notification.error("Failed to add! " + e.message))
+            .catch(e => displayError(notification, "Failed to add", e))
     };
 
 

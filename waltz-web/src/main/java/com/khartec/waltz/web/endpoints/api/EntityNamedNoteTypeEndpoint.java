@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.entity_named_note.EntityNamedNoteTypeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -91,7 +91,7 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 }

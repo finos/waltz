@@ -22,7 +22,6 @@ package com.khartec.waltz.model.assessment_definition;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.user.Role;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -43,7 +42,7 @@ public abstract class AssessmentDefinition implements
 
     public abstract long ratingSchemeId();
 
-    public abstract Optional<Role> permittedRole();
+    public abstract Optional<String> permittedRole();
 
     public abstract boolean isReadOnly();
 }

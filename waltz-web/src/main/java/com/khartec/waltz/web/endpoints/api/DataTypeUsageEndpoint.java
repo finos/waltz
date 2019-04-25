@@ -29,7 +29,7 @@ import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -122,14 +122,14 @@ public class DataTypeUsageEndpoint implements Endpoint {
 
     private Boolean calculateForAllApplicationsRoute(Request request,
                                                      Response response) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
         return dataTypeUsageService.recalculateForAllApplications();
     }
 
 
     private List<DataTypeUsage> saveRoute(Request request,
                                           Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String user = getUsername(request);
         EntityReference ref = getEntityReference(request);

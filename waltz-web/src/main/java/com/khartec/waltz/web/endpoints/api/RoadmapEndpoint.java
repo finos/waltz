@@ -3,7 +3,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -137,7 +137,7 @@ public class RoadmapEndpoint implements Endpoint {
     // -- helpers --
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.SCENARIO_ADMIN);
+        requireRole(userRoleService, request, SystemRole.SCENARIO_ADMIN);
     }
 
 }

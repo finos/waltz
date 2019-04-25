@@ -21,7 +21,7 @@ import {initialiseData} from "../common/index";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
 
 import template from "./survey-instance-list-user-view.html";
-import roles from "../user/roles";
+import roles from "../user/system-roles";
 
 
 const initialState = {

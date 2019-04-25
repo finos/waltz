@@ -72,28 +72,28 @@ public class UserEndpoint implements Endpoint {
         // -- routes
 
         DatumRoute<Boolean> newUserRoute = (request, response) -> {
-            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
+            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
 
             UserRegistrationRequest userRegRequest = readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
         };
 
         DatumRoute<Boolean> updateRolesRoute = (request, response) -> {
-            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
+            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
 
             String userName = getUsername(request);
             String targetUserName = request.params("userName");
             Set<String> roles = (Set<String>) readBody(request, Set.class);
-            return userRoleService.updateRoles(userName, targetUserName, map(roles, Role::valueOf));
+            return userRoleService.updateRoles(userName, targetUserName, roles);
         };
 
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
-            boolean validate = !userRoleService.hasAnyRole(getUsername(request), Role.USER_ADMIN, Role.ADMIN);
+            boolean validate = !userRoleService.hasAnyRole(getUsername(request), SystemRole.USER_ADMIN, SystemRole.ADMIN);
             return userService.resetPassword(readBody(request, PasswordResetRequest.class), validate);
         };
 
         DatumRoute<Boolean> deleteUserRoute = (request, response) -> {
-            requireAnyRole(userRoleService, request, Role.USER_ADMIN, Role.ADMIN);
+            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
 
             String userName = request.params("userName");
             return userService.deleteUser(userName);

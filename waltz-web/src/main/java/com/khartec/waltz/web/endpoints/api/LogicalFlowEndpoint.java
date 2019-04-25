@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -193,12 +193,12 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
     }
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 }

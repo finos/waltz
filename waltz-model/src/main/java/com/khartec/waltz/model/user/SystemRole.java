@@ -24,7 +24,7 @@ import com.khartec.waltz.common.EnumUtilities;
 import java.util.Set;
 
 
-public enum Role {
+public enum SystemRole {
     ADMIN,
     APP_EDITOR,
     ANONYMOUS,
@@ -48,6 +48,6 @@ public enum Role {
 
 
     public static Set<String> allNames() {
-        return EnumUtilities.names(Role.values());
+        return EnumUtilities.names(SystemRole.values());
     }
 }

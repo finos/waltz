@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -72,7 +72,7 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
 
 
         DatumRoute<Long> createRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return specDefinitionService.create(
                     getUsername(req),
@@ -81,7 +81,7 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> updateStatusRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return specDefinitionService.updateStatus(
                     getUsername(req),
@@ -90,7 +90,7 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> deleteRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LOGICAL_DATA_FLOW_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             return specDefinitionService.delete(
                     getUsername(req),

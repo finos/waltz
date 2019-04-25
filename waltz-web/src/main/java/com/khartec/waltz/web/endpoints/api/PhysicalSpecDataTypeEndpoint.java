@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -78,7 +78,7 @@ public class PhysicalSpecDataTypeEndpoint implements Endpoint {
 
 
     private boolean updateDataTypesRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String userName = getUsername(request);
         UpdatePhysicalSpecDataTypesAction action = readBody(request, UpdatePhysicalSpecDataTypesAction.class);

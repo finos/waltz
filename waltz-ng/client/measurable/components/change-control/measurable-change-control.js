@@ -4,6 +4,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 import {determineColorOfSubmitButton} from "../../../common/severity-utils";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
+import {displayError} from "../../../common/error-utils";
 
 const modes = {
     MENU: "MENU",
@@ -284,11 +285,7 @@ function controller(notification,
         const cmd = mkUpdCmd();
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
-            .catch(e => {
-                const message = `Error when submitting command: ${_.get(e, ["data", "message"], "Unknown")}`;
-                console.log(message, e);
-                notification.error(message)
-            });
+            .catch(e => displayError(notification, "Error when submitting command", e));
     };
 }
 

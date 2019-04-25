@@ -20,7 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -65,7 +65,7 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
                 -> flowDiagramEntityService.findByEntityReference(getEntityReference(req));
 
         ListRoute<FlowDiagramEntity> addRelationshipRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LINEAGE_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LINEAGE_EDITOR);
             long diagramId = getId(req);
             flowDiagramEntityService.addRelationship(
                     diagramId,
@@ -74,7 +74,7 @@ public class FlowDiagramEntityEndpoint implements Endpoint {
         };
 
         ListRoute<FlowDiagramEntity> removeRelationshipRoute = (req, res) -> {
-            requireRole(userRoleService, req, Role.LINEAGE_EDITOR);
+            requireRole(userRoleService, req, SystemRole.LINEAGE_EDITOR);
             long diagramId = getId(req);
             flowDiagramEntityService.removeRelationship(
                     diagramId,

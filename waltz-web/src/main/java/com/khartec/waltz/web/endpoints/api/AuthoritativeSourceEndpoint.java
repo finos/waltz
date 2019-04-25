@@ -27,7 +27,7 @@ import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
 import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -118,7 +118,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
     private Integer cleanupOrphansRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
 
@@ -128,7 +128,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
     private String insertRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
         AuthoritativeSourceCreateCommand command = readBody(request, AuthoritativeSourceCreateCommand.class);
         authoritativeSourceService.insert(command, getUsername(request));
         return "done";
@@ -136,7 +136,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
     private String deleteRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
         long id = getId(request);
         authoritativeSourceService.remove(id, getUsername(request));
 
@@ -145,7 +145,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
     private String updateRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, Role.AUTHORITATIVE_SOURCE_EDITOR);
+        requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
         AuthoritativeSourceUpdateCommand command = readBody(request, AuthoritativeSourceUpdateCommand.class);
         authoritativeSourceService.update(command, getUsername(request));
         return "done";
@@ -153,7 +153,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
 
     private boolean recalculateFlowRatingsRoute(Request request, Response response) {
-        requireRole(userRoleService, request, Role.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
         LOG.info("Recalculating all flow ratings (requested by: {})", username);

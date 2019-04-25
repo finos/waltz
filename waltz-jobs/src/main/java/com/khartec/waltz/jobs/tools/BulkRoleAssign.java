@@ -2,7 +2,7 @@ package com.khartec.waltz.jobs.tools;
 
 import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.user.UserRoleService;
 import org.jooq.DSLContext;
@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.SetUtilities.union;
+
 public class BulkRoleAssign {
 
     public static void main(String[] args) {
@@ -21,22 +23,22 @@ public class BulkRoleAssign {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         UserRoleService userRoleService = ctx.getBean(UserRoleService.class);
 
-        Set<Role> defaultRoles = SetUtilities.asSet(
-                Role.BOOKMARK_EDITOR,
-                Role.LOGICAL_DATA_FLOW_EDITOR,
-                Role.LINEAGE_EDITOR);
+        Set<String> defaultRoles = SetUtilities.asSet(
+                SystemRole.BOOKMARK_EDITOR.name(),
+                SystemRole.LOGICAL_DATA_FLOW_EDITOR.name(),
+                SystemRole.LINEAGE_EDITOR.name());
 
-        Set<Role> mustHaveRoles = SetUtilities.asSet(
-                Role.TAXONOMY_EDITOR,
-                Role.CAPABILITY_EDITOR,
-                Role.RATING_EDITOR);
+        Set<String> mustHaveRoles = SetUtilities.asSet(
+                SystemRole.TAXONOMY_EDITOR.name(),
+                SystemRole.CAPABILITY_EDITOR.name(),
+                SystemRole.RATING_EDITOR.name());
 
         InputStream inputStream = BulkRoleAssign.class.getClassLoader().getResourceAsStream("bulk-role-assign-example.txt");
-        Set<Tuple2<String, Set<Role>>> updates = IOUtilities
+        Set<Tuple2<String, Set<String>>> updates = IOUtilities
                 .streamLines(inputStream)
                 .map(d -> d.toLowerCase().trim())
                 .map(d -> Tuple.tuple(d, userRoleService.getUserRoles(d)))
-                .map(t -> t.map2(existingRoles -> SetUtilities.union(existingRoles, defaultRoles, mustHaveRoles)))
+                .map(t -> t.map2(existingRoles -> union(existingRoles, defaultRoles, mustHaveRoles)))
                 .collect(Collectors.toSet());
 
         System.out.printf("About to update: %d user-role mappings\n", updates.size());

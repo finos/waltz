@@ -19,13 +19,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
-import com.khartec.waltz.model.user.Role;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -111,7 +110,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
 
     private CommandResponse<PhysicalSpecificationDeleteCommand> deleteSpecification(Request request, Response response) {
-        requireRole(userRoleService, request, Role.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         long specId = getId(request);
         String username = getUsername(request);
