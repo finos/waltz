@@ -140,7 +140,6 @@ Captures the modification of attributes to a subject.
 | `new_value`       | string    | n         | new value (nullable)                                 |
 | `old_value`       | string    | n         | old value (nullable)                                 |
 | `name`            | string    | **y**     | name of the attribute being modified                 |
-| `is_immediate`    | boolean   | **y**     | whether this change is scheduled immediate execution |
 | `last_updated_by` | string    | **y**     | user id of last editor or creator if new             |
 | `last_updated_at` | timestamp | **y**     | when this record was created                         |
 | `provenance`      | string    | **y**     | the provenance of the record                         |
