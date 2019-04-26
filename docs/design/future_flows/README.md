@@ -88,8 +88,7 @@ as an 'atomic' set.
 | `id`                      | long      | **y**     | id of this change set                                            |
 | `parent_entity_kind`      | enum      | n         | the kind of the parent of this change set i.e. CHANGE_INITIATIVE |
 | `parent_entity_id`        | long      | n         | the id of the parent of this change set                          |
-| `start_date`              | date      | n         | the planned start date of this change set                        |
-| `end_date`                | date      | n         | the planned end date of this change set                          |
+| `planned_date             | date      | n         | the planned date of this change set                              |
 | `entity_lifecycle_status` | enum      | **y**     | lifecycle status of this change set                              |
 | `name`                    | string    | n         | name                                                             |
 | `description`             | string    | n         | description                                                      |
