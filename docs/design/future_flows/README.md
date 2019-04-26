@@ -110,7 +110,7 @@ of the subject being changed.
 | Column                   | Type      | Mandatory | Description                                                             |
 |:-------------------------|:----------|:----------|:------------------------------------------------------------------------|
 | `id`                     | long      | **y**     | id of this change unit                                                  |
-| `change_set_id`          | long      | **y**     | id of the parent change set                                             |
+| `change_set_id`          | long      | n         | id of the parent change set, if null, indicates and immediate change    |
 | `subject_entity_kind`    | enum      | **y**     | the kind of the entity being effected by this change                    |
 | `subject_entity_id`      | long      | **y**     | the id of the entity being effected by this change                      |
 | `subject_initial_status` | enum      | **y**     | initial entity lifecycle status of the subject                          |
