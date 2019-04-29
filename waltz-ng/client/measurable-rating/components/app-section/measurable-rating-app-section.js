@@ -49,7 +49,7 @@ const initialState = {
         tab: null
     },
     byCategory: {},
-    activeAllocationScheme: 2 // TODO: remove - naughty!
+    activeAllocationScheme: null
 };
 
 
@@ -59,6 +59,11 @@ function controller($q, serviceBroker) {
     vm.viewMode = () => {
         loadData(true);
         vm.visibility.editor = false;
+    };
+
+    vm.onEditRatings = () => {
+        vm.visibility.editor = true;
+        onHideAllocationScheme();
     };
 
     const loadData = (force = false) => {
