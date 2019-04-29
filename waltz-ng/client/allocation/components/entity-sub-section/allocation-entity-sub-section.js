@@ -1,4 +1,4 @@
-import template from "./allocation-entity-panel.html";
+import template from "./allocation-entity-sub-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {
@@ -13,7 +13,8 @@ import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     entityReference: "<",
-    schemeId: "<"
+    schemeId: "<",
+    onDismiss: "<"
 };
 
 
@@ -220,5 +221,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzAllocationEntityPanel"
+    id: "waltzAllocationEntitySubSection"
 };

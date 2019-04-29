@@ -48,7 +48,8 @@ const initialState = {
         overlay: false,
         tab: null
     },
-    byCategory: {}
+    byCategory: {},
+    activeAllocationScheme: 2 // TODO: remove - naughty!
 };
 
 
@@ -98,6 +99,21 @@ function controller($q, serviceBroker) {
     };
 
     vm.$onInit = () => loadData();
+
+
+    // -- INTERACT ---
+
+    const onHideAllocationScheme = () => vm.activeAllocationScheme = null;
+
+    vm.onShowAllocationScheme = (scheme) => {
+        if (vm.activeAllocationScheme === scheme) {
+            onHideAllocationScheme();
+        } else {
+            vm.activeAllocationScheme = scheme;
+        }
+    };
+
+    vm.onDismissAllocations = () => onHideAllocationScheme();
 
 }
 

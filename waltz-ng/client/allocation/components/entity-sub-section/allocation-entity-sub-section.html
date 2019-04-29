@@ -1,0 +1,279 @@
+<waltz-sub-section small="{{$ctrl.scheme.name}}" name="Allocations">
+    <content>
+        <div style="padding: 18px;">
+            <div class="row">
+                <div class="col-sm-12">
+                    <waltz-markdown text="$ctrl.scheme.description"></waltz-markdown>
+                </div>
+            </div>
+
+            <br>
+
+            <!-- ALLOCATED -->
+            <div class="row" >
+                <div class="col-sm-2"
+                     style="top: -6px">
+                    <h4>
+                        Allocated
+                    </h4>
+                    <h3>
+                        <span ng-bind="$ctrl.allocatedTotal"></span>%
+                    </h3>
+                </div>
+                <div class="col-sm-10">
+
+                    <waltz-no-data ng-if="$ctrl.allocated.length == 0">
+                        <message>No explicit allocations</message>
+                    </waltz-no-data>
+
+                    <div ng-if="$ctrl.allocated.length > 0"
+                         ng-include="'waess-allocated-table'">
+                    </div>
+
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- UNALLOCATED -->
+            <div class="row">
+                <div class="col-sm-2"
+                     style="top: -6px">
+                    <h4>
+                        Unallocated
+                    </h4>
+                    <h3>
+                        <span ng-bind="$ctrl.remainder"></span>%
+                    </h3>
+                </div>
+                <div class="col-sm-10">
+                    <waltz-no-data ng-if="$ctrl.unallocated.length == 0">
+                        <message>No Unallocated items</message>
+                    </waltz-no-data>
+
+                    <div ng-if="$ctrl.unallocated.length > 0"
+                         ng-include="'waess-unallocated-table'">
+                    </div>
+                </div>
+            </div>
+
+            <!-- HELP -->
+            <div class="row"
+                 ng-if="$ctrl.editing && $ctrl.showingHelp">
+                <div class="col-md-12">
+                    <p>How to use this editor</p>
+                    <table class="table table-condensed small">
+                        <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <td>Allocate</td>
+                            <td>To float does some stuff</td>
+                        </tr>
+                        <tr>
+                            <td>Unallocate</td>
+                            <td>To fixed does some other stuff</td>
+                        </tr>
+                        <tr>
+                            <td>Grab unallocated</td>
+                            <td>Takes unallocated stuff</td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <span waltz-has-role="RATING_EDITOR">
+            <div class="waltz-sub-section-controls">
+
+                <span ng-if="!$ctrl.editing">
+                    <!-- EDIT BTN -->
+                    <a ng-click="$ctrl.setEditable(true)"
+                       class="clickable">
+                        Edit percentages
+                    </a>
+                    <span ng-if="$ctrl.onDismiss">
+                        |
+                        <a ng-click="$ctrl.onDismiss()"
+                           class="clickable">
+                            Dismiss
+                        </a>
+                    </span>
+                </span>
+
+                <span ng-if="$ctrl.editing"
+                      class="clickable">
+                    <!-- CANCEL -->
+                    <a ng-click="$ctrl.onCancel()">
+                        Cancel
+                    </a>
+                    |
+                    <!-- SAVE -->
+                    <a ng-if="$ctrl.saveEnabled"
+                       ng-click="$ctrl.onSavePercentages()"
+                       class="clickable">
+                        Save percentages
+                    </a>
+                    <span ng-if="!$ctrl.saveEnabled" class="text-muted">
+                        Save percentages
+                    </span>
+                    |
+                    <!-- HELP -->
+                    <a ng-click="$ctrl.showingHelp = ! $ctrl.showingHelp"
+                       class="clickable">
+                        Help
+                    </a>
+                </span>
+            </div>
+        </span>
+    </content>
+</waltz-sub-section>
+
+
+<!-- TEMPLATES -->
+
+
+<!-- UNALLOCATED TABLE -->
+<script type="text/ng-template"
+        id="waess-unallocated-table">
+    <div ng-if="$ctrl.unallocated.length > 0"
+         class="waess-table">
+        <div class="row waess-header">
+            <div class="col-sm-8">
+                Measurable
+            </div>
+            <div class="col-sm-4"
+                 ng-if="$ctrl.editing">
+                Operations
+            </div>
+        </div>
+        <div class="row waess-body"
+             ng-repeat="d in $ctrl.unallocated">
+            <div class="col-sm-8">
+                <span ng-bind="d.measurable.name"></span>
+            </div>
+            <div class="col-sm-4"
+                 ng-if="$ctrl.editing">
+                <a ng-click="$ctrl.onMoveToAllocated(d)"
+                   class="clickable">
+                    Allocate
+                </a>
+            </div>
+        </div>
+    </div>
+</script>
+
+<!-- ALLOCATED TABLE -->
+<script type="text/ng-template"
+        id="waess-allocated-table">
+    <div ng-if="$ctrl.allocated.length > 0"
+         class="waess-table">
+
+        <!-- HEADER -->
+        <div class="row waess-header">
+            <div class="col-sm-5">
+                Measurable
+            </div>
+            <div class="col-sm-3">
+                Allocation
+            </div>
+            <div class="col-sm-4"
+                 ng-if="$ctrl.editing">
+                Operations
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="row waess-body"
+             ng-repeat="d in $ctrl.allocated">
+
+            <!-- NAME CELL -->
+            <div class="col-sm-5">
+                <span ng-bind="d.measurable.name"></span>
+                <span ng-if="d.working.dirty">*</span>
+            </div>
+
+            <!-- PERCENT CELL -->
+            <div class="col-sm-3">
+                <span ng-if="!$ctrl.editing">
+                    <span ng-bind="d.allocation.percentage"></span>%
+                </span>
+                <span ng-if="$ctrl.editing">
+                    <div class="form-group"
+                         uib-popover="{{d.working.message}}"
+                         popover-enable="d.working.status !== 'OK'"
+                         popover-trigger="mouseenter"
+                         popover-popup-delay="400"
+                         popover-append-to-body="true"
+                         ng-class="{
+                            'has-success': d.working.status === 'OK',
+                            'has-warning': d.working.status === 'WARN',
+                            'has-error': d.working.status === 'FAIL'
+                         }">
+                        <input type="number"
+                               class="form-control input-sm"
+                               ng-change="$ctrl.onPercentageChange()"
+                               ng-blur="$ctrl.onPercentageFocusLost()"
+                               ng-model="d.working.percentage">
+                        <span class="glyphicon form-control-feedback"
+                              ng-class="{
+                                'glyphicon-ok': d.working.status === 'OK',
+                                'glyphicon-warning-sign': d.working.status === 'WARN',
+                                'glyphicon-remove': d.working.status === 'FAIL',
+                              }"
+                              aria-hidden="true"/>
+                    </div>
+                </span>
+            </div>
+
+            <!-- OP CELL -->
+            <div class="col-sm-4 waess-op-cell"
+                 ng-if="$ctrl.editing">
+
+                <!-- Split button -->
+                <div class="btn-group"
+                     style="padding-top: 3px"
+                     uib-dropdown>
+                    <button id="split-button"
+                            type="button"
+                            ng-click="$ctrl.onMoveToUnallocated(d)"
+                            class="btn btn-default btn-xs">
+                        Unallocate
+                    </button>
+                    <button type="button"
+                            class="btn btn-default btn-xs"
+                            uib-dropdown-toggle>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu"
+                        uib-dropdown-menu
+                        role="menu">
+                        <li role="menuitem">
+                            <a class="clickable"
+                               ng-click="$ctrl.onGrabUnallocated(d)"
+                               ng-if="$ctrl.remainder !== 0">
+                                Grab unallocated
+                                <span class="small" ng-bind="'(' + $ctrl.remainder + '%)'"/>
+                            </a>
+                            <div ng-if="$ctrl.remainder === 0"
+                                 class="waess-disabled-action">
+                                Grab unallocated
+                            </div>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#">TBC: Zero and distribute</a>
+                        </li>
+                        <li role="menuitem">
+                            <a href="#">TBC: Grab enough</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
