@@ -338,10 +338,24 @@
 
     <!-- 4000: simplify allocations -->
 
+    <changeSet id="20190426-4000-0"
+               author="davidwatkins73"
+               dbms="mssql">
+        <dropDefaultValue tableName="allocation"
+                          columnName="is_fixed"/>
+    </changeSet>
+
     <changeSet id="20190426-4000-1"
                author="davidwatkins73">
         <dropColumn tableName="allocation"
                     columnName="is_fixed"/>
+    </changeSet>
+
+    <changeSet id="20190426-4000-2a"
+               author="davidwatkins73"
+               dbms="mssql">
+        <dropDefaultValue tableName="allocation"
+                          columnName="allocation_percentage"/>
     </changeSet>
 
     <changeSet id="20190426-4000-2"
@@ -351,13 +365,21 @@
                         tableName="allocation"/>
     </changeSet>
 
+    <changeSet id="20190426-4000-2b"
+               author="davidwatkins73"
+               dbms="mssql">
+        <addDefaultValue tableName="allocation"
+                         columnName="allocation_percentage"
+                         defaultValueNumeric="0"/>
+    </changeSet>
+
     <changeSet id="20190426-4000-3"
                author="davidwatkins73">
         <addForeignKeyConstraint baseTableName="allocation"
-                                 baseColumnNames="entity_kind,entity_id,measurable_id"
+                                 baseColumnNames="entity_id,entity_kind,measurable_id"
                                  constraintName="allocation_measurable_rating_fk"
                                  referencedTableName="measurable_rating"
-                                 referencedColumnNames="entity_kind,entity_id,measurable_id"
+                                 referencedColumnNames="entity_id,entity_kind,measurable_id"
                                  onDelete="CASCADE"/>
     </changeSet>
 
