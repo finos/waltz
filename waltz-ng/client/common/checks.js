@@ -229,6 +229,7 @@ export const checkIsServiceDefinition = (def) => {
 };
 
 export const checkIsServiceBrokerTarget = (target) => {
+    checkNotEmpty(target, "Service broker target resolves to null");
     check(myApiCheck.shape(serviceBrokerTargetShape), target);
 };
 

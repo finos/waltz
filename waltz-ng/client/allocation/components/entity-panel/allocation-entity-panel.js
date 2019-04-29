@@ -3,9 +3,9 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {
     calcWorkingTotal,
+    determineChangeType,
     updateDirtyFlags,
-    updateFloatingValues,
-    validateAllocations
+    validateItems
 } from "../../allocation-utilities";
 import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
@@ -19,23 +19,28 @@ const bindings = {
 
 const initialState = {
     scheme: null,
-    rawAllocations: [],
-    fixedAllocations: [],
-    floatingAllocations: [],
+    allocated: [],
+    unallocated: [],
     editing: false,
     saveEnabled: false,
-    showingHelp: false,
-    dirty: false
+    showingHelp: false
 };
 
 
 function controller($q, notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
+    let items = [];
 
     // -- UTILS --
     function loadData() {
         const measurablePromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => r.data);
+
+        const ratingsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingStore.findForEntityReference,
+                [vm.entityReference])
             .then(r => r.data);
 
         const schemePromise = serviceBroker
@@ -52,50 +57,51 @@ function controller($q, notification, serviceBroker) {
             .then(r => r.data);
 
         return $q
-            .all([measurablePromise, schemePromise, allocationPromise])
-            .then(([measurables, scheme, rawAllocations]) => {
-                const measurablesById = _.keyBy(measurables, "id");
+            .all([measurablePromise, ratingsPromise, schemePromise, allocationPromise])
+            .then(([allMeasurables, ratings, scheme, allocations]) => {
                 vm.scheme = scheme;
-                vm.enrichedAllocations = _
-                    .chain(rawAllocations)
-                    .map(allocation => {
-                        const measurable = measurablesById[allocation.measurableId];
+
+                const measurablesById = _.keyBy(allMeasurables, "id");
+                const availableMeasurables = _
+                    .chain(ratings)
+                    .map(r => measurablesById[r.measurableId])
+                    .filter(m => m.categoryId === scheme.measurableCategoryId)
+                    .value();
+
+                const allocationsByMeasurableId = _.keyBy(allocations, a => a.measurableId);
+
+                items = _
+                    .chain(availableMeasurables)
+                    .map(measurable => {
+                        const allocation = allocationsByMeasurableId[measurable.id];
                         const working = {
+                            isAllocated: !_.isNil(allocation),
                             dirty: false,
-                            type: allocation.type,
-                            percentage: allocation.percentage
+                            percentage: _.get(allocation, "percentage", 0)
                         };
                         return Object.assign({}, {allocation, measurable, working});
                     })
                     .value();
-            })
+            });
     }
 
 
-
     function recalcData() {
-        const allocationsByType = _
-            .chain(vm.enrichedAllocations)
+        const [allocated, unallocated] = _
+            .chain(items)
             .orderBy(d => d.measurable.name)
-            .groupBy(d => d.working.type)
+            .partition(d => d.working.isAllocated)
             .value();
 
-        vm.fixedAllocations = _.get(allocationsByType, "FIXED", []);
-        vm.floatingAllocations = _.get(allocationsByType, "FLOATING", []);
-
-        vm.fixedTotal = calcWorkingTotal(vm.fixedAllocations);
-        vm.total = vm.fixedTotal + vm.floatingTotal;
-        vm.floatingTotal = 100 - vm.fixedTotal;
-
-        updateFloatingValues(vm.floatingTotal, vm.floatingAllocations);
-
-        const hasDirtyData = updateDirtyFlags(vm.enrichedAllocations);
-
-        const validAllocations = validateAllocations(
-            vm.fixedAllocations,
-            vm.floatingAllocations);
+        const hasDirtyData = updateDirtyFlags(items);
+        const validAllocations = validateItems(items);
 
         vm.saveEnabled = validAllocations && hasDirtyData;
+
+        vm.allocatedTotal = calcWorkingTotal(allocated);
+        vm.remainder = 100 - vm.allocatedTotal;
+        vm.allocated = allocated;
+        vm.unallocated = unallocated;
     }
 
 
@@ -103,6 +109,7 @@ function controller($q, notification, serviceBroker) {
         return loadData()
             .then(recalcData);
     }
+
 
     // -- LIFECYCLE
 
@@ -116,45 +123,72 @@ function controller($q, notification, serviceBroker) {
     vm.$onDestroy = () => {
     };
 
+
     // -- INTERACT
 
-
-    vm.onUpdateType = (d, type) => {
-        d.working.type = type;
-        if (type === "FIXED") {
-            d.working.percentage = Math.floor(d.working.percentage);
-        }
+    vm.onMoveToAllocated = (d) => {
+        d.working = {
+            isAllocated: true,
+            percentage: 0
+        };
         recalcData();
     };
 
-    vm.onGrabFloat = (d) => {
-        d.working.percentage = d.working.percentage + vm.floatingTotal;
+    vm.onMoveToUnallocated = (d) => {
+        d.working = {
+            isAllocated: false,
+            percentage: 0
+        };
         recalcData();
     };
 
-    vm.onUpdatePercentages = () => {
-        const allocationsToSave = _.map(
-                vm.fixedAllocations,
-                fa => {
-                    return {
-                        measurableId: fa.measurable.id,
-                        percentage: fa.working.percentage
-                    };
-                });
+    vm.onGrabUnallocated = (d) => {
+        d.working.percentage = d.working.percentage + vm.remainder;
+        recalcData();
+    };
+
+    vm.onPercentageChange = () => recalcData();
+
+    vm.onPercentageFocusLost = () => {
+        _.each(items, d => {
+            if (_.isNil(d.working.percentage)) {
+                d.working.percentage = 0;
+            }
+            if (!_.isInteger(d.working.percentage)) {
+                const rounded = Math.round(d.working.percentage);
+                notification.warning(`Allocations must be whole numbers, therefore rounding: ${d.working.percentage} to: ${rounded}`);
+                d.working.percentage = rounded;
+            }
+        });
+        recalcData();
+    };
+
+    vm.onSavePercentages = () => {
+        const changes = _
+            .chain(items)
+            .filter(d => d.working.dirty)
+            .map(d => ({
+                operation: determineChangeType(d),
+                measurablePercentage: {
+                    measurableId: d.measurable.id,
+                    percentage: d.working.percentage
+                }
+            }))
+            .value();
 
         serviceBroker
-            .execute(CORE_API.AllocationStore.updateFixedAllocations,
-                [vm.entityReference, vm.schemeId, allocationsToSave])
+            .execute(CORE_API.AllocationStore.updateAllocations,
+                [vm.entityReference, vm.schemeId, changes])
             .then(r => {
                 if (r.data === true) {
-                    notification.success("Updated percentage allocations");
+                    notification.success("Updated allocations");
                 } else {
-                    notification.warning("Could not update percentages");
+                    notification.warning("Could not update allocations");
                 }
                 reload();
                 vm.setEditable(false);
             })
-            .catch(e => displayError(notification, "Could not update percentages", e));
+            .catch(e => displayError(notification, "Could not update allocations", e));
     };
 
     vm.setEditable = (targetState) => {
@@ -166,8 +200,6 @@ function controller($q, notification, serviceBroker) {
         return reload()
             .then(() => notification.info("Edit cancelled: reverting to last saved"));
     };
-
-    vm.onPercentageChange = () => recalcData();
 
 }
 

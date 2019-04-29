@@ -41,6 +41,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -180,7 +181,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.EXTERNAL_PARENT_ID, measurable.externalParentId().orElse(null))
                 .set(MEASURABLE.NAME, measurable.name())
                 .set(MEASURABLE.CONCRETE, measurable.concrete())
-                .set(MEASURABLE.DESCRIPTION, measurable.description())
+                .set(MEASURABLE.DESCRIPTION, mkSafe(measurable.description()))
                 .set(MEASURABLE.PROVENANCE, "waltz")
                 .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
                 .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
@@ -229,6 +230,15 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.LAST_UPDATED_BY, userId)
                 .where(MEASURABLE.ID.eq(measurableId))
                 .execute() == 1;
+    }
+
+
+    public List<Measurable> findByCategoryId(Long categoryId) {
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 }

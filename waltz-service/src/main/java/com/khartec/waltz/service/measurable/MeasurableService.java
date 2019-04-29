@@ -98,6 +98,10 @@ public class MeasurableService {
     }
 
 
+    public List<Measurable> findByCategoryId(Long categoryId) {
+        return measurableDao.findByCategoryId(categoryId);
+    }
+
     public Collection<Measurable> search(String query) {
         return search(query, EntitySearchOptions.mkForEntity(EntityKind.MEASURABLE));
     }
@@ -217,7 +221,6 @@ public class MeasurableService {
                 .message(msg)
                 .build());
     }
-
 
 
 }

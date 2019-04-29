@@ -30,14 +30,14 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
 
 
-    const updateFixedAllocations = (ref, schemeId, fixedAllocations) => $http
-        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/fixed-allocations`, fixedAllocations)
+    const updateAllocations = (ref, schemeId, updatedAllocations = []) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/allocations`, updatedAllocations)
         .then(d => d.data);
 
     return {
         findByEntityAndScheme,
         findByMeasurableAndScheme,
-        updateFixedAllocations
+        updateAllocations
     };
 
 }
@@ -63,9 +63,9 @@ export const AllocationStore_API = {
         serviceFnName: "findByMeasurableAndScheme",
         description: "findByMeasurableAndScheme [measurableId, schemeId]"
     },
-    updateFixedAllocations: {
+    updateAllocations: {
         serviceName,
-        serviceFnName: "updateFixedAllocations",
-        description: "updateFixedAllocations [ref, schemeId, measurableId, fixedAllocationList[{measurableId, percentage}]]"
+        serviceFnName: "updateAllocations",
+        description: "updateAllocations [ref, schemeId, measurableId, updatedAllocations[{measurableId, percentage, operation}]]"
     }
 };

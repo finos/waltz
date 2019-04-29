@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 @JsonDeserialize(as = ImmutableMeasurablePercentage.class)
 public abstract class MeasurablePercentage {
 
-    public abstract BigDecimal percentage();
+    public abstract int percentage();
     public abstract long measurableId();
 
 
-    public static MeasurablePercentage mkMeasurablePercentage(long measurableId, BigDecimal percentage) {
+    public static MeasurablePercentage mkMeasurablePercentage(long measurableId, int percentage) {
         return ImmutableMeasurablePercentage
                 .builder()
                 .percentage(percentage)
@@ -24,7 +24,4 @@ public abstract class MeasurablePercentage {
                 .build();
     }
 
-    public static MeasurablePercentage mkMeasurablePercentage(long measurableId, long percentage) {
-        return mkMeasurablePercentage(measurableId, BigDecimal.valueOf(percentage));
-    }
 }

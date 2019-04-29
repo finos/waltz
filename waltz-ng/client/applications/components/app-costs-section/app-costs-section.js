@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common/index";
-import template from './app-costs-section.html';
+import template from "./app-costs-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -39,7 +39,7 @@ const initialState = {
 function getCurrentYear(costs = []) {
     const defaultYear = new Date().getFullYear();
     const foundYear = _.chain(costs)
-            .map('cost.year')
+            .map("cost.year")
             .max()
             .value();
     return foundYear || defaultYear;
@@ -47,12 +47,15 @@ function getCurrentYear(costs = []) {
 
 
 function calcTotalCost(costs = []) {
-    return _.sumBy(costs, 'cost.amount').toFixed(2);
+    return _.sumBy(costs, "cost.amount").toFixed(2);
 }
 
 
 function filterCostsForYear(year, costs = []) {
-    return _.filter(costs, c => c.cost.year === year);
+    return _.chain(costs)
+        .filter(c => c.cost.year === year)
+        .sortBy(c => c.cost.costKind)
+        .value();
 }
 
 
@@ -87,7 +90,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker',
+    "ServiceBroker",
 ];
 
 
@@ -99,5 +102,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAppCostsSection'
+    id: "waltzAppCostsSection"
 };
