@@ -47,16 +47,18 @@ function updateValidationForItem(d, totalFixed) {
     }
 }
 
+function updateDirtyFlag(item) {
+    const changeType = determineChangeType(item);
+    item.working.dirty = ! _.isEqual("NONE", changeType);
+    return item;
+}
+
 
 export function updateDirtyFlags(items = []) {
-    let dirtyFound = false;
     _.forEach(items, d => {
-        const changeType = determineChangeType(d);
-        const isDirty =  ! _.isEqual("NONE", changeType);
-        d.working.dirty = isDirty;
-        dirtyFound = dirtyFound || isDirty;
+        updateDirtyFlag(d);
     });
-    return dirtyFound;
+    return _.some(items, d => d.working.dirty);
 }
 
 

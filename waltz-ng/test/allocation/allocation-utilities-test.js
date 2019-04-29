@@ -1,4 +1,4 @@
-import {updateDirtyFlags } from "../../client/allocation/allocation-utilities";
+import {updateDirtyFlag, updateDirtyFlags} from "../../client/allocation/allocation-utilities";
 import {calcWorkingTotal } from "../../client/allocation/allocation-utilities";
 import {updateFloatingValues } from "../../client/allocation/allocation-utilities";
 import {assert} from "chai"
@@ -9,12 +9,12 @@ describe("AllocationUtils", () => {
     describe("updateDirtyFlags", () => {
         it("if percentages differ then item is dirty", () => {
             const hasDiff = { allocation: { percentage: 20}, working: { percentage: 10, }};
-            const noDiff = { allocation: { percentage: 20}, working: { percentage: 20, }};
+            const noDiff = { allocation: { percentage: 20}, working: { isAllocated: true, percentage: 20 }};
 
             updateDirtyFlags([hasDiff, noDiff]);
 
-            assert(hasDiff.working.dirty);
-            assert(!noDiff.working.dirty);
+            assert.isTrue(hasDiff.working.dirty, "difference in percentage should have been detected");
+            assert.isFalse(noDiff.working.dirty, "no differences should have been detected");
         });
 
         it("if item newly allocated then item is dirty", () => {
