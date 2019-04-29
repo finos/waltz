@@ -4,9 +4,9 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation.ImmutableAllocation;
 import com.khartec.waltz.model.allocation.MeasurablePercentage;
+import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 
@@ -23,15 +23,94 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class AllocationUtilities {
 
-    private static final BigDecimal ONE_HUNDRED_PERCENT = BigDecimal.valueOf(100);
+    private static final int ONE_HUNDRED_PERCENT = 100;
 
+    public static class ValidationResult {
+        private boolean failed = false;
+        private String message= "";
+
+        public boolean failed() {
+            return failed;
+        }
+
+        public String message() {
+            return message;
+        }
+
+        private ValidationResult addToMessage(String m) {
+            message = message + " " + m;
+            return this;
+        }
+
+        private void markAsFailed() {
+            this.failed = true;
+        }
+
+    }
+
+    public static ValidationResult validateAllocationChanges(Collection<Allocation> currentAllocations, Collection<MeasurablePercentageChange> changes) {
+
+        ValidationResult result = new ValidationResult();
+
+        Set<Long> currentMeasurableIds = map(currentAllocations, Allocation::measurableId);
+        Set<Long> changedMeasurableIds = map(changes, c -> c.measurablePercentage().measurableId());
+
+        int changeTotal = changes
+                .stream()
+                .mapToInt(c -> c.measurablePercentage().percentage())
+                .sum();
+
+        int residualTotal = currentAllocations
+                .stream()
+                .filter(a -> !changedMeasurableIds.contains(a.measurableId()))
+                .mapToInt(Allocation::percentage)
+                .sum();
+
+        int updatedTotal = residualTotal + changeTotal;
+
+        boolean hasNegatives = changes
+                .stream()
+                .anyMatch(c -> c.measurablePercentage().percentage() < 0);
+
+        boolean operationsAreValid = changes
+                .stream()
+                .allMatch(c -> {
+                    long changeMeasurableId = c.measurablePercentage().measurableId();
+                    switch (c.operation()) {
+                        case UPDATE:
+                        case REMOVE:
+                            return currentMeasurableIds.contains(changeMeasurableId);
+                        case ADD:
+                            return !currentMeasurableIds.contains(changeMeasurableId);
+                        default:
+                            return false;
+                    }
+                });
+
+        if (updatedTotal > 100) {
+            result.markAsFailed();
+            result.addToMessage("Total cannot exceed 100%");
+        }
+
+        if (hasNegatives) {
+            result.markAsFailed();
+            result.addToMessage("Cannot contain percentages less than 0%");
+        }
+
+        if (!operationsAreValid) {
+            result.markAsFailed();
+            result.addToMessage("Operations do not match up with current state");
+        }
+
+        return result;
+    }
 
     public static Collection<Allocation> calcAllocations(Collection<Allocation> currentAllocations,
                                                          Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
 
         validateUpdate(currentAllocations, fixedPercentagesToUpdate);
 
-        BigDecimal perFloatPercentage = calculatePerFloatingPercentage(
+        int perFloatPercentage = calculatePerFloatingPercentage(
                 currentAllocations,
                 fixedPercentagesToUpdate);
 
@@ -46,26 +125,24 @@ public class AllocationUtilities {
                     if (updateFixedPercentage != null) {
                         return ImmutableAllocation
                                 .copyOf(d)
-                                .withPercentage(updateFixedPercentage.percentage())
-                                .withType(AllocationType.FIXED);
+                                .withPercentage(updateFixedPercentage.percentage());
                     } else {
                         return ImmutableAllocation
                                 .copyOf(d)
-                                .withPercentage(perFloatPercentage)
-                                .withType(AllocationType.FLOATING);
+                                .withPercentage(perFloatPercentage);
                     }
                 });
     }
 
 
-    private static BigDecimal calculatePerFloatingPercentage(Collection<Allocation> currentAllocations, Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
-        BigDecimal fixedTotal = calculateTotal(fixedPercentagesToUpdate);
+    private static int calculatePerFloatingPercentage(Collection<Allocation> currentAllocations, Collection<MeasurablePercentage> fixedPercentagesToUpdate) {
+        int fixedTotal = calculateTotal(fixedPercentagesToUpdate);
         int numFloats = currentAllocations.size() - fixedPercentagesToUpdate.size();
-        BigDecimal floatingTotal = BigDecimal.valueOf(100).subtract(fixedTotal);
+        int floatingTotal = ONE_HUNDRED_PERCENT - fixedTotal;
 
         return (numFloats == 0)
-            ? BigDecimal.ZERO
-            : floatingTotal.divide(BigDecimal.valueOf(numFloats), 3, RoundingMode.HALF_EVEN);
+            ? 0
+            : floatingTotal / numFloats;
     }
 
 
@@ -95,11 +172,11 @@ public class AllocationUtilities {
             throw new IllegalArgumentException("Not all fixed Ids contained within current allocations");
         }
 
-        if (any(fixedPercentagesToUpdate, d -> d.percentage().signum() == -1)) {
+        if (any(fixedPercentagesToUpdate, d -> Math.signum(d.percentage()) == -1)) {
             throw new IllegalArgumentException("Cannot have negative fixed percentages");
         }
 
-        int cmpTotalTo100 = calculateTotal(fixedPercentagesToUpdate).compareTo(ONE_HUNDRED_PERCENT);
+        int cmpTotalTo100 = Integer.compare(calculateTotal(fixedPercentagesToUpdate), ONE_HUNDRED_PERCENT);
         boolean hasFloats = currentAllocations.size() != fixedPercentagesToUpdate.size();
 
         if (cmpTotalTo100 > 0) {
@@ -113,11 +190,10 @@ public class AllocationUtilities {
     }
 
 
-    private static BigDecimal calculateTotal(Collection<MeasurablePercentage> measurablePercentages){
+    private static Integer calculateTotal(Collection<MeasurablePercentage> measurablePercentages){
         return measurablePercentages
                 .stream()
-                .map(MeasurablePercentage::percentage)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .collect(Collectors.summingInt(MeasurablePercentage::percentage));
     }
 
     public static List<BigDecimal> balance(List<BigDecimal> decimals, boolean allowIncomplete) {

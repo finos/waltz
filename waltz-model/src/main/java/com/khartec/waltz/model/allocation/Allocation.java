@@ -21,7 +21,6 @@ public abstract class Allocation implements
     public abstract long schemeId();
     public abstract long measurableId();
     public abstract EntityReference entityReference();
-    public abstract BigDecimal percentage();
-    public abstract AllocationType type();
+    public abstract int percentage();
 
 }

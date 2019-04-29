@@ -18,6 +18,7 @@ public class AllocationSchemeDao {
 
     private final DSLContext dsl;
 
+
     public static final RecordMapper<Record, AllocationScheme> TO_DOMAIN_MAPPER = record -> {
         AllocationSchemeRecord allocationSchemeRecord = record.into(ALLOCATION_SCHEME);
         return ImmutableAllocationScheme.builder()
@@ -29,10 +30,12 @@ public class AllocationSchemeDao {
 
     };
 
+
     @Autowired
     public AllocationSchemeDao(DSLContext dsl) {
         this.dsl = dsl;
     }
+
 
     public AllocationScheme getById(long id){
         return dsl
@@ -41,11 +44,13 @@ public class AllocationSchemeDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
     public List<AllocationScheme> findAll(){
         return dsl
                 .selectFrom(ALLOCATION_SCHEME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 
     public List<AllocationScheme> findByCategoryId(long categoryId){
         return dsl
@@ -54,4 +59,13 @@ public class AllocationSchemeDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public Long create(AllocationScheme scheme) {
+        AllocationSchemeRecord record = dsl.newRecord(ALLOCATION_SCHEME);
+        record.setDescription(scheme.description());
+        record.setMeasurableCategoryId(scheme.measurableCategoryId());
+        record.setName(scheme.name());
+        record.insert();
+        return record.getId();
+    }
 }

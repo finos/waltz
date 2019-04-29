@@ -2,22 +2,25 @@ package com.khartec.waltz.data.allocation;
 
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.AllocationType;
 import com.khartec.waltz.model.allocation.ImmutableAllocation;
+import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
 import com.khartec.waltz.schema.tables.records.AllocationRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.Tables.*;
 
@@ -34,9 +37,6 @@ public class AllocationDao {
                 .measurableId(allocationRecord.getMeasurableId())
                 .entityReference(readRef(allocationRecord, ALLOCATION.ENTITY_KIND, ALLOCATION.ENTITY_ID))
                 .percentage(allocationRecord.getAllocationPercentage())
-                .type(allocationRecord.getIsFixed()
-                        ? AllocationType.FIXED
-                        : AllocationType.FLOATING)
                 .lastUpdatedAt(allocationRecord.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(allocationRecord.getLastUpdatedBy())
                 .externalId(Optional.ofNullable(allocationRecord.getExternalId()))
@@ -157,8 +157,7 @@ public class AllocationDao {
             record.setMeasurableId(mr.value1());
             record.setAllocationSchemeId(schemeId);
 
-            record.setAllocationPercentage(BigDecimal.ZERO);
-            record.setIsFixed(false);
+            record.setAllocationPercentage(0);
             record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
             record.setLastUpdatedBy("admin");
             record.setProvenance("WALTZ");
@@ -173,31 +172,10 @@ public class AllocationDao {
     }
 
 
-    public Boolean updateType(EntityReference ref,
-                              long scheme,
-                              long measurable,
-                              AllocationType type,
-                              String username) {
-        checkNotNull(ref, "ref cannot be null");
-
-        int updateCount = dsl
-                .update(ALLOCATION)
-                .set(ALLOCATION.IS_FIXED, type == AllocationType.FIXED)
-                .set(ALLOCATION.LAST_UPDATED_BY, username)
-                .set(ALLOCATION.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(scheme))
-                .and(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
-                .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
-                .and(ALLOCATION.MEASURABLE_ID.eq(measurable))
-                .and(ALLOCATION.IS_FIXED.eq(type != AllocationType.FIXED))
-                .execute();
-        return updateCount == 1;
-    }
-
     public Boolean updatePercentage(EntityReference ref,
                                     long scheme,
                                     long measurable,
-                                    BigDecimal percentage,
+                                    int percentage,
                                     String username) {
         checkNotNull(ref, "Entity reference cannot be null");
 
@@ -209,7 +187,6 @@ public class AllocationDao {
                 .and(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
                 .and(ALLOCATION.MEASURABLE_ID.eq(measurable))
-                .and(ALLOCATION.IS_FIXED.isTrue())
                 .execute();
         return updateCount == 1;
     }
@@ -229,7 +206,6 @@ public class AllocationDao {
 
             // things that change
             record.setAllocationPercentage(alloc.percentage());
-            record.setIsFixed(alloc.type().equals(AllocationType.FIXED));
             record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
             record.setLastUpdatedBy(username);
 
@@ -239,6 +215,73 @@ public class AllocationDao {
         dsl.batchUpdate(updates).execute();
         return true;
 
+    }
+
+    public Boolean updateAllocations(EntityReference ref,
+                                     long scheme,
+                                     Collection<MeasurablePercentageChange> changes,
+                                     String username) {
+
+        Map<Operation, Collection<MeasurablePercentageChange>> changesByOp = groupBy(
+                MeasurablePercentageChange::operation,
+                changes);
+
+        dsl.transaction(tx -> {
+            DSLContext txDsl = tx.dsl();
+
+            Collection<AllocationRecord> recordsToDelete = mkRecordsFromChanges(
+                    ref,
+                    scheme,
+                    changesByOp.get(Operation.REMOVE),
+                    username);
+
+            Collection<AllocationRecord> recordsToUpdate = mkRecordsFromChanges(
+                    ref,
+                    scheme,
+                    changesByOp.get(Operation.UPDATE),
+                    username);
+
+            Collection<AllocationRecord> recordsToInsert = mkRecordsFromChanges(
+                    ref,
+                    scheme,
+                    changesByOp.get(Operation.ADD),
+                    username);
+
+            txDsl.batchDelete(recordsToDelete)
+                    .execute();
+            txDsl.batchUpdate(recordsToUpdate)
+                    .execute();
+            txDsl.batchInsert(recordsToInsert)
+                    .execute();
+        });
+
+        return true;
+    }
+
+
+
+
+    private static Collection<AllocationRecord> mkRecordsFromChanges(EntityReference ref,
+                                                                                 long scheme,
+                                                                                 Collection<MeasurablePercentageChange> changes,
+                                                                                 String username) {
+        return CollectionUtilities.map(
+                ListUtilities.ensureNotNull(changes),
+                c -> mkRecordFromChange(ref, scheme, c, username));
+    }
+
+
+    private static AllocationRecord mkRecordFromChange(EntityReference ref, long scheme, MeasurablePercentageChange c, String username) {
+        AllocationRecord record = new AllocationRecord();
+        record.setAllocationSchemeId(scheme);
+        record.setEntityId(ref.id());
+        record.setEntityKind(ref.kind().name());
+        record.setMeasurableId(c.measurablePercentage().measurableId());
+        record.setAllocationPercentage(c.measurablePercentage().percentage());
+        record.setLastUpdatedBy(username);
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setProvenance("waltz");
+        return record;
     }
 }
 

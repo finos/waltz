@@ -1,8 +1,18 @@
 
+const fallbackReasons = {
+    404: "Not found",
+    500: "Server error",
+    501: "Disallowed"
+};
+
+
 function mkErrorMessage(message, e) {
+    const fallbackReason = fallbackReasons[e.status] || "Unknown reason";
+
     const reason = e
-        ? ": " + _.get(e, ["data", "message"], "Unknown reason")
+        ? ": " + _.get(e, ["data", "message"], fallbackReason)
         : "";
+
     return `${message}${reason}`;
 }
 

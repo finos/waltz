@@ -27,13 +27,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AllocationSchemesService {
+public class AllocationSchemeService {
 
     private final AllocationSchemeDao allocationSchemeDao;
 
 
     @Autowired
-    public AllocationSchemesService(AllocationSchemeDao allocationSchemeDao) {
+    public AllocationSchemeService(AllocationSchemeDao allocationSchemeDao) {
         this.allocationSchemeDao = allocationSchemeDao;
     }
 
@@ -50,6 +50,11 @@ public class AllocationSchemesService {
 
     public AllocationScheme getById(long id) {
         return allocationSchemeDao.getById(id);
+    }
+
+
+    public long create(AllocationScheme scheme) {
+        return allocationSchemeDao.create(scheme);
     }
 
 }

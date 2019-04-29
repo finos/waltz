@@ -20,7 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
-import com.khartec.waltz.service.allocation_schemes.AllocationSchemesService;
+import com.khartec.waltz.service.allocation_schemes.AllocationSchemeService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -38,11 +38,11 @@ public class AllocationSchemeEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "allocation-scheme");
 
-    private final AllocationSchemesService allocationSchemesService;
+    private final AllocationSchemeService allocationSchemesService;
 
 
     @Autowired
-    public AllocationSchemeEndpoint(AllocationSchemesService allocationSchemesService) {
+    public AllocationSchemeEndpoint(AllocationSchemeService allocationSchemesService) {
         this.allocationSchemesService = allocationSchemesService;
     }
 

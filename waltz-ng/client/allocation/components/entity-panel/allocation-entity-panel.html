@@ -6,24 +6,26 @@
     </div>
 </div>
 
+
 <br>
+
 
 <div class="row" style="border-bottom: 2px solid #fafafa">
     <div class="col-md-6">
         <h4>
             <waltz-icon name="thumb-tack"></waltz-icon>
-            Fixed Allocations
+            Allocated
             <small>
-                <span ng-bind="$ctrl.fixedTotal | number:1"></span>%
+                <span ng-bind="$ctrl.allocatedTotal | number:1"></span>%
             </small>
         </h4>
 
-        <waltz-no-data ng-if="$ctrl.fixedAllocations.length == 0">
+        <waltz-no-data ng-if="$ctrl.allocated.length == 0">
             <message>No fixed allocations</message>
         </waltz-no-data>
 
         <!-- FIXEDs -->
-        <div ng-if="$ctrl.fixedAllocations.length > 0"
+        <div ng-if="$ctrl.allocated.length > 0"
              class="waep-table">
             <div class="row waep-header">
                 <div class="col-sm-5">
@@ -38,7 +40,7 @@
                 </div>
             </div>
             <div class="row waep-body"
-                 ng-repeat="d in $ctrl.fixedAllocations">
+                 ng-repeat="d in $ctrl.allocated">
                 <div class="col-sm-5">
                     <span ng-bind="d.measurable.name"></span>
                     <span ng-if="d.working.dirty">*</span>
@@ -62,6 +64,7 @@
                             <input type="number"
                                    class="form-control input-sm"
                                    ng-change="$ctrl.onPercentageChange()"
+                                   ng-blur="$ctrl.onPercentageFocusLost()"
                                    ng-model="d.working.percentage">
                             <span class="glyphicon form-control-feedback"
                                   ng-class="{
@@ -77,12 +80,14 @@
                      ng-if="$ctrl.editing">
 
                     <!-- Split button -->
-                    <div class="btn-group" uib-dropdown>
+                    <div class="btn-group"
+                         style="padding-top: 3px"
+                         uib-dropdown>
                         <button id="split-button"
                                 type="button"
-                                ng-click="$ctrl.onUpdateType(d, 'FLOATING')"
+                                ng-click="$ctrl.onMoveToUnallocated(d)"
                                 class="btn btn-default btn-xs">
-                            To float
+                            Unallocate
                         </button>
                         <button type="button"
                                 class="btn btn-default btn-xs"
@@ -94,17 +99,22 @@
                             role="menu">
                             <li role="menuitem">
                                 <a class="clickable"
-                                   ng-click="$ctrl.onGrabFloat(d)"
-                                   ng-if="$ctrl.floatingTotal !== 0">
-                                    Grab float
+                                   ng-click="$ctrl.onGrabUnallocated(d)"
+                                   ng-if="$ctrl.remainder !== 0">
+                                    Grab unallocated
+                                    <span class="small" ng-bind="'(' + $ctrl.remainder + '%)'"/>
                                 </a>
-                                <div ng-if="$ctrl.floatingTotal === 0"
+                                <div ng-if="$ctrl.remainder === 0"
                                       class="waep-disabled-action">
-                                    Grab float
+                                    Grab unallocated
                                 </div>
                             </li>
-                            <li role="menuitem"><a href="#">Zero and distribute</a></li>
-                            <li role="menuitem"><a href="#">Grab enough</a></li>
+                            <li role="menuitem">
+                                <a href="#">TBC: Zero and distribute</a>
+                            </li>
+                            <li role="menuitem">
+                                <a href="#">TBC: Grab enough</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -114,25 +124,22 @@
 
     <div class="col-md-6">
         <h4>
-            Floating Allocations
+            Unallocated
             <small>
-                <span ng-bind="$ctrl.floatingTotal | number:1"></span>%
+                <span ng-bind="$ctrl.remainder"></span>%
             </small>
         </h4>
 
-        <waltz-no-data ng-if="$ctrl.floatingAllocations.length == 0">
-            <message>No floating allocations</message>
+        <waltz-no-data ng-if="$ctrl.unallocated.length == 0">
+            <message>No Unallocated items</message>
         </waltz-no-data>
 
-        <!-- FLOATs -->
-        <div ng-if="$ctrl.floatingAllocations.length > 0"
+        <!-- UNALLOCATED -->
+        <div ng-if="$ctrl.unallocated.length > 0"
              class="waep-table">
             <div class="row waep-header">
-                <div class="col-sm-5">
+                <div class="col-sm-9">
                     Measurable
-                </div>
-                <div class="col-sm-4">
-                    <i>Allocation</i>
                 </div>
                 <div class="col-sm-3"
                      ng-if="$ctrl.editing">
@@ -140,29 +147,28 @@
                 </div>
             </div>
             <div class="row waep-body"
-                 ng-repeat="d in $ctrl.floatingAllocations">
-                <div class="col-sm-5">
+                 ng-repeat="d in $ctrl.unallocated">
+                <div class="col-sm-9">
                     <span ng-bind="d.measurable.name"></span>
-                </div>
-                <div class="col-sm-4">
-                    <i><span ng-bind="d.working.percentage | number:1"></span></i>
-                    %
                 </div>
                 <div class="col-sm-3"
                      ng-if="$ctrl.editing">
-                    <a ng-click="$ctrl.onUpdateType(d, 'FIXED')"
+                    <a ng-click="$ctrl.onMoveToAllocated(d)"
                        class="clickable">
-                        To Fixed
+                        Allocate
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- EDIT BAR -->
 <div class="waep-edit-bar">
     <div class="row">
         <div class="col-sm-12">
             <span ng-if="!$ctrl.editing">
+                <!-- EDIT BTN -->
                 <a ng-click="$ctrl.setEditable(true)"
                    class="clickable">
                     Edit percentages
@@ -171,23 +177,22 @@
 
             <span ng-if="$ctrl.editing"
                   class="clickable">
+                <!-- CANCEL -->
                 <a ng-click="$ctrl.onCancel()">
                     Cancel
                 </a>
                 |
-
+                <!-- SAVE -->
                 <a ng-if="$ctrl.saveEnabled"
-                   ng-click="$ctrl.onUpdatePercentages()"
+                   ng-click="$ctrl.onSavePercentages()"
                    class="clickable">
                     Save percentages
                 </a>
-
                 <span ng-if="!$ctrl.saveEnabled" class="text-muted">
                     Save percentages
                 </span>
-
                 |
-
+                <!-- HELP -->
                 <a ng-click="$ctrl.showingHelp = ! $ctrl.showingHelp"
                    class="clickable">
                     Help
@@ -196,6 +201,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="row"
      ng-if="$ctrl.editing && $ctrl.showingHelp">
@@ -209,15 +215,15 @@
             </tr>
             </thead>
             <tr>
-                <td>To Float</td>
+                <td>Allocate</td>
                 <td>To float does some stuff</td>
             </tr>
             <tr>
-                <td>To Fixed</td>
+                <td>Unallocate</td>
                 <td>To fixed does some other stuff</td>
             </tr>
             <tr>
-                <td>Grab float</td>
+                <td>Grab unallocated</td>
                 <td>Takes unallocated stuff</td>
             </tr>
         </table>
