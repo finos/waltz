@@ -19,7 +19,11 @@
                     <h4>
                         Allocated
                     </h4>
-                    <h3>
+                    <h3 ng-class="{
+                            'waess-allocated-total-zero': $ctrl.allocatedTotal === 0,
+                            'waess-allocated-total-under': $ctrl.allocatedTotal < 100 && $ctrl.allocatedTotal > 0,
+                            'waess-allocated-total-exact': $ctrl.allocatedTotal == 100
+                        }">
                         <span ng-bind="$ctrl.allocatedTotal"></span>%
                     </h3>
                 </div>
@@ -45,7 +49,10 @@
                     <h4>
                         Unallocated
                     </h4>
-                    <h3>
+                    <h3 ng-class="{
+                        'waess-unallocated-total-zero': $ctrl.remainder === 0,
+                        'waess-unallocated-total-under': $ctrl.remainder < 100 && $ctrl.remainder > 0,
+                        'waess-unallocated-total-exact': $ctrl.remainder == 100}">
                         <span ng-bind="$ctrl.remainder"></span>%
                     </h3>
                 </div>
