@@ -1,3 +1,7 @@
+@import "../../../../style/variables";
+
+
+
 waltz-allocation-entity-sub-section {
     .waess-table {
         .row {
@@ -33,5 +37,29 @@ waltz-allocation-entity-sub-section {
         border-bottom: 1px dotted #f5f5f5;
         padding-bottom: 16px;
         margin-bottom: 16px;
+    }
+
+    .waess-allocated-total-zero {
+        color: $waltz-grey;
+    }
+
+    .waess-allocated-total-exact {
+        color: $waltz-green;
+    }
+
+    .waess-allocated-total-under {
+        color: $waltz-dark-grey;
+    }
+
+    .waess-unallocated-total-zero {
+        color: $waltz-green;
+    }
+
+    .waess-unallocated-total-exact {
+        color: $waltz-grey;
+    }
+
+    .waess-unallocated-total-under {
+        color: $waltz-dark-grey;
     }
 }
