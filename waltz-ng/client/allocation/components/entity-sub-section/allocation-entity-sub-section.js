@@ -1,4 +1,4 @@
-import template from "./allocation-entity-panel.html";
+import template from "./allocation-entity-sub-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {
@@ -13,7 +13,8 @@ import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     entityReference: "<",
-    schemeId: "<"
+    schemeId: "<",
+    onDismiss: "<"
 };
 
 
@@ -25,6 +26,15 @@ const initialState = {
     saveEnabled: false,
     showingHelp: false
 };
+
+
+function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, scheme) {
+    return _
+        .chain(ratings)
+        .map(r => measurablesById[r.measurableId])
+        .filter(m => m.categoryId === scheme.measurableCategoryId)
+        .value();
+}
 
 
 function controller($q, notification, serviceBroker) {
@@ -59,15 +69,8 @@ function controller($q, notification, serviceBroker) {
         return $q
             .all([measurablePromise, ratingsPromise, schemePromise, allocationPromise])
             .then(([allMeasurables, ratings, scheme, allocations]) => {
-                vm.scheme = scheme;
-
                 const measurablesById = _.keyBy(allMeasurables, "id");
-                const availableMeasurables = _
-                    .chain(ratings)
-                    .map(r => measurablesById[r.measurableId])
-                    .filter(m => m.categoryId === scheme.measurableCategoryId)
-                    .value();
-
+                const availableMeasurables = findMeasurablesRelatedToScheme(ratings, measurablesById, scheme);
                 const allocationsByMeasurableId = _.keyBy(allocations, a => a.measurableId);
 
                 items = _
@@ -79,9 +82,15 @@ function controller($q, notification, serviceBroker) {
                             dirty: false,
                             percentage: _.get(allocation, "percentage", 0)
                         };
-                        return Object.assign({}, {allocation, measurable, working});
+                        return {
+                            allocation,
+                            measurable,
+                            working
+                        };
                     })
                     .value();
+
+                vm.scheme = scheme;
             });
     }
 
@@ -114,10 +123,10 @@ function controller($q, notification, serviceBroker) {
     // -- LIFECYCLE
 
     vm.$onInit = () => {
-        reload();
     };
 
     vm.$onChanges = (c) => {
+        reload();
     };
 
     vm.$onDestroy = () => {
@@ -220,5 +229,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzAllocationEntityPanel"
+    id: "waltzAllocationEntitySubSection"
 };

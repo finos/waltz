@@ -1,26 +1,23 @@
-waltz-allocation-entity-panel {
-    .waep-table {
-        margin: 6px;
-
+waltz-allocation-entity-sub-section {
+    .waess-table {
         .row {
             padding-top: 2px;
             padding-bottom: 2px;
         }
-        .waep-header {
-            background-color: #fafafa;
+
+        .waess-header {
             font-weight: bolder;
         }
 
-        .waep-body {
+        .waess-body {
             border-top: 1px solid #f5f5f5;
         }
 
-
-        .waep-op-cell {
+        .waess-op-cell {
             padding-right: 0;
         }
 
-        .waep-disabled-action {
+        .waess-disabled-action {
             @extend .text-muted;
             padding-left: 20px;
             padding-top: 3px;
@@ -31,9 +28,10 @@ waltz-allocation-entity-panel {
 
     }
 
-    .waep-edit-bar {
-        padding-top: 6px;
-        text-align: center;
+    .waess-bottom-divider {
+        width: 100%;
+        border-bottom: 1px dotted #f5f5f5;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
     }
-
 }

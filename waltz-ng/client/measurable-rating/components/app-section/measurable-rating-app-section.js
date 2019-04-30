@@ -48,17 +48,14 @@ const initialState = {
         overlay: false,
         tab: null
     },
-    byCategory: {}
+    byCategory: {},
+    activeAllocationScheme: null
 };
 
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.viewMode = () => {
-        loadData(true);
-        vm.visibility.editor = false;
-    };
 
     const loadData = (force = false) => {
 
@@ -84,13 +81,18 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
             .then(r => vm.measurables = r.data);
 
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
+        const allocationSchemesPromise = serviceBroker
+            .loadViewData(CORE_API.AllocationSchemeStore.findAll)
+            .then(r => vm.allocationSchemes = r.data);
+
+        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise, allocationSchemesPromise])
             .then(() => {
                 vm.tabs = mkTabs(
                     vm.categories,
                     vm.ratingSchemesById,
                     vm.measurables,
                     vm.ratings,
+                    vm.allocationSchemes,
                     false /*include empty */);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
@@ -98,6 +100,36 @@ function controller($q, serviceBroker) {
     };
 
     vm.$onInit = () => loadData();
+
+
+    // -- INTERACT ---
+
+    const hideAllocationScheme = () => vm.activeAllocationScheme = null;
+
+    vm.onShowAllocationScheme = (scheme) => {
+        if (vm.activeAllocationScheme === scheme) {
+            hideAllocationScheme();
+        } else {
+            vm.activeAllocationScheme = scheme;
+        }
+    };
+
+    vm.onDismissAllocations = () => hideAllocationScheme();
+
+    vm.viewMode = () => {
+        loadData(true);
+        vm.visibility.editor = false;
+    };
+
+    vm.onEditRatings = () => {
+        vm.visibility.editor = true;
+        hideAllocationScheme();
+    };
+
+    vm.onTabChange = (tab) => {
+        console.log({tab});
+        hideAllocationScheme();
+    }
 
 }
 
