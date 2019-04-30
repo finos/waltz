@@ -28,6 +28,15 @@ const initialState = {
 };
 
 
+function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, scheme) {
+    return _
+        .chain(ratings)
+        .map(r => measurablesById[r.measurableId])
+        .filter(m => m.categoryId === scheme.measurableCategoryId)
+        .value();
+}
+
+
 function controller($q, notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
     let items = [];
@@ -60,15 +69,8 @@ function controller($q, notification, serviceBroker) {
         return $q
             .all([measurablePromise, ratingsPromise, schemePromise, allocationPromise])
             .then(([allMeasurables, ratings, scheme, allocations]) => {
-                vm.scheme = scheme;
-
                 const measurablesById = _.keyBy(allMeasurables, "id");
-                const availableMeasurables = _
-                    .chain(ratings)
-                    .map(r => measurablesById[r.measurableId])
-                    .filter(m => m.categoryId === scheme.measurableCategoryId)
-                    .value();
-
+                const availableMeasurables = findMeasurablesRelatedToScheme(ratings, measurablesById, scheme);
                 const allocationsByMeasurableId = _.keyBy(allocations, a => a.measurableId);
 
                 items = _
@@ -80,9 +82,15 @@ function controller($q, notification, serviceBroker) {
                             dirty: false,
                             percentage: _.get(allocation, "percentage", 0)
                         };
-                        return Object.assign({}, {allocation, measurable, working});
+                        return {
+                            allocation,
+                            measurable,
+                            working
+                        };
                     })
                     .value();
+
+                vm.scheme = scheme;
             });
     }
 
@@ -115,10 +123,10 @@ function controller($q, notification, serviceBroker) {
     // -- LIFECYCLE
 
     vm.$onInit = () => {
-        reload();
     };
 
     vm.$onChanges = (c) => {
+        reload();
     };
 
     vm.$onDestroy = () => {

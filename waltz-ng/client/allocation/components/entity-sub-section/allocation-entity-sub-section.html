@@ -1,16 +1,19 @@
 <waltz-sub-section small="{{$ctrl.scheme.name}}" name="Allocations">
     <content>
-        <div style="padding: 18px;">
+        <div class="container"
+             style="padding: 18px;">
+
             <div class="row">
                 <div class="col-sm-12">
-                    <waltz-markdown text="$ctrl.scheme.description"></waltz-markdown>
+                    <waltz-markdown text="$ctrl.scheme.description">
+                    </waltz-markdown>
                 </div>
             </div>
 
             <br>
 
             <!-- ALLOCATED -->
-            <div class="row" >
+            <div class="row">
                 <div class="col-sm-2"
                      style="top: -6px">
                     <h4>
@@ -33,7 +36,7 @@
                 </div>
             </div>
 
-            <hr>
+            <br>
 
             <!-- UNALLOCATED -->
             <div class="row">
@@ -137,7 +140,6 @@
 
 <!-- TEMPLATES -->
 
-
 <!-- UNALLOCATED TABLE -->
 <script type="text/ng-template"
         id="waess-unallocated-table">
@@ -167,6 +169,7 @@
         </div>
     </div>
 </script>
+
 
 <!-- ALLOCATED TABLE -->
 <script type="text/ng-template"

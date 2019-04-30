@@ -23,9 +23,11 @@ export function mkTabs(categories = [],
                        ratingSchemesById = {},
                        measurables = [],
                        ratings = [],
+                       allocationSchemes = [],
                        includeEmpty = true) {
 
-    const measurablesByCategory = _.groupBy(measurables, "categoryId");
+    const measurablesByCategory = _.groupBy(measurables, d => d.categoryId);
+    const allocationSchemesByCategory = _.groupBy(allocationSchemes, d => d.measurableCategoryId);
 
     return _.chain(categories)
         .map(category => {
@@ -39,7 +41,8 @@ export function mkTabs(categories = [],
                 category,
                 ratingScheme,
                 measurables: measurablesForCategory,
-                ratings: ratingsForCategory
+                ratings: ratingsForCategory,
+                allocationSchemes: allocationSchemesByCategory[category.id] || []
             };
         })
         .filter(t => t.ratings.length > 0 || includeEmpty)

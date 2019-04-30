@@ -1,20 +1,17 @@
 waltz-allocation-entity-sub-section {
     .waess-table {
-        xxmargin: 6px;
-
         .row {
             padding-top: 2px;
             padding-bottom: 2px;
         }
+
         .waess-header {
-            //background-color: #fafafa;
             font-weight: bolder;
         }
 
         .waess-body {
             border-top: 1px solid #f5f5f5;
         }
-
 
         .waess-op-cell {
             padding-right: 0;
@@ -31,9 +28,10 @@ waltz-allocation-entity-sub-section {
 
     }
 
-    .waess-edit-bar {
-        padding-top: 6px;
-        text-align: center;
+    .waess-bottom-divider {
+        width: 100%;
+        border-bottom: 1px dotted #f5f5f5;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
     }
-
 }

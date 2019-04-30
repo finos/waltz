@@ -57,6 +57,7 @@
                                            ng-model="$ctrl.visibility.tab"
                                            ng-value="tab.category.id"
                                            ng-disabled="tab.ratings.length === 0"
+                                           ng-change="$ctrl.onTabChange(tab)"
                                            name="measurable_rating"
                                            id="{{ tab.category.id + '_' +$id}}">
                                     <label for="{{ tab.category.id + '_' +$id}}"
@@ -100,11 +101,11 @@
 
 
     <div class="row"
-         ng-if="$ctrl.activeAllocationScheme > 0">
+         ng-if="$ctrl.activeAllocationScheme">
         <br>
         <div class="col-lg-12">
             <waltz-allocation-entity-sub-section entity-reference="$ctrl.parentEntityRef"
-                                                 scheme-id="$ctrl.activeAllocationScheme"
+                                                 scheme-id="$ctrl.activeAllocationScheme.id"
                                                  on-dismiss="$ctrl.onDismissAllocations">
             </waltz-allocation-entity-sub-section>
         </div>
@@ -143,19 +144,25 @@
         </div>
     </div>
 
-    <br>
 
-    <div class="row">
+    <div class="row"
+         ng-if="tab.allocationSchemes.length > 0">
+        <br>
         <div class="col-sm-12">
             <strong>Allocations: </strong>
-            <a class="clickable"
-               ng-click="$ctrl.onShowAllocationScheme(2)">
-                Product - Cost Alloc
-                (30%)
-                <waltz-icon name="warning"></waltz-icon>
-                |
-            </a>
-            <a>FTE Alloc</a>
+            <span ng-repeat="scheme in tab.allocationSchemes">
+                <a class="clickable"
+                   ng-click="$ctrl.onShowAllocationScheme(scheme)">
+                    <span ng-bind="scheme.name"
+                          uib-popover-template="'wmras-scheme-popover.html'"
+                          popover-trigger="mouseenter"
+                          popover-popup-delay="300"
+                          popover-append-to-body="true"
+                          popover-placement="bottom">
+                    </span>
+                </a>
+                <span ng-if="!$last">|</span>
+            </span>
         </div>
     </div>
 
@@ -170,6 +177,19 @@
         <div>
             <hr>
             <waltz-markdown text="tab.category.description">
+            </waltz-markdown>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template"
+        id="wmras-scheme-popover.html">
+    <div class="small">
+        <strong ng-bind="scheme.name">
+        </strong>
+        <div>
+            <hr>
+            <waltz-markdown text="scheme.description">
             </waltz-markdown>
         </div>
     </div>
