@@ -45,22 +45,6 @@ public class AllocationSchemeHarness {
 
             AllocationDao allocationDao = new AllocationDao(dsl);
 
-            Collection<Allocation> allocationsToRemove = allocationDao.findAllocationsToRemove(1);
-            System.out.println("done");
-            System.out.println(allocationsToRemove);
-
-            Collection<Record3<Long, Long, String>> findMeasurableRatingsToAdd = allocationDao.addMissingAllocations(1);
-            System.out.println("done");
-            System.out.println(findMeasurableRatingsToAdd.size());
-
-            boolean removed = allocationDao.removeAllocations(allocationsToRemove);
-            System.out.println(removed);
-            System.out.print(allocationDao.findAllocationsToRemove(1));
-
-            Collection<AllocationRecord> newAllocationRecords = allocationDao.addAllocations(findMeasurableRatingsToAdd, 1);
-            System.out.println(newAllocationRecords.size());
-            System.out.println(allocationDao.addMissingAllocations(1));
-
 
             throw new IllegalArgumentException("Aborting, comment this line if you really mean to execute this removal");
         });

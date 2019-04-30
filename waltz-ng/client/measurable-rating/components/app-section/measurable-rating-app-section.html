@@ -160,7 +160,13 @@
                           popover-append-to-body="true"
                           popover-placement="bottom">
                     </span>
+
                 </a>
+
+                <span class="small text-muted">
+                    <span ng-bind="$ctrl.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
+                </span>
+
                 <span ng-if="!$last">|</span>
             </span>
         </div>

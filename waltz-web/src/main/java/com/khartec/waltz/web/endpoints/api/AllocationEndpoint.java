@@ -51,6 +51,11 @@ public class AllocationEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String findByEntityPath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id");
+
         String findByEntityAndSchemePath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
@@ -68,6 +73,10 @@ public class AllocationEndpoint implements Endpoint {
                 ":id",
                 ":scheme",
                 "allocations");
+
+        ListRoute<Allocation> findByEntityRoute = (request, response)
+                -> allocationService.findByEntity(
+                        getEntityReference(request));
 
         ListRoute<Allocation> findByEntityAndSchemeRoute = (request, response)
                 -> allocationService.findByEntityAndScheme(
@@ -89,6 +98,7 @@ public class AllocationEndpoint implements Endpoint {
                         getUsername(request));
         };
 
+        getForList(findByEntityPath, findByEntityRoute);
         getForList(findByEntityAndSchemePath, findByEntityAndSchemeRoute);
         getForList(findByMeasurableAndSchemePath, findByMeasurableAndSchemeRoute);
         postForDatum(updateAllocationsPath, updateAllocationsRoute);

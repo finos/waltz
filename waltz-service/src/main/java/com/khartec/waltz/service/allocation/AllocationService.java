@@ -48,6 +48,11 @@ public class AllocationService {
     }
 
 
+    public Collection<Allocation> findByEntity(EntityReference ref) {
+        return allocationDao.findByEntity(ref);
+    }
+
+
     public List<Allocation> findByEntityAndScheme(EntityReference ref,
                                                   long schemeId) {
         return allocationDao.findByEntityAndScheme(ref, schemeId);
