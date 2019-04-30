@@ -46,6 +46,7 @@ import AppGroups from "./app-groups";
 import Assessments from "./assessments";
 import AssetCost from "./asset-cost";
 import Attestation from "./attestation";
+import AttributeChange from "./attribute-change";
 import AuthSources from "./auth-sources";
 import Bookmarks from "./bookmarks";
 import ChangeInitiative from "./change-initiative";
@@ -53,6 +54,8 @@ import ClientCacheKey from "./client_cache_key";
 import Complexity from "./complexity";
 import Common_Module from "./common/module";
 import ChangeLog from "./change-log";
+import ChangeSet from "./change-set";
+import ChangeUnit from "./change-unit";
 import DataFlow from "./data-flow";
 import DataTypeUsage from "./data-type-usage";
 import DataTypes from "./data-types";
@@ -146,6 +149,7 @@ const dependencies = [
     Assessments(),
     AssetCost(),
     Attestation(),
+    AttributeChange(),
     AuthSources(),
     Bookmarks(),
     ChangeInitiative(),
@@ -153,6 +157,8 @@ const dependencies = [
     Complexity(),
     Common_Module(),
     ChangeLog(),
+    ChangeSet(),
+    ChangeUnit(),
     DataFlow(),
     DataTypeUsage(),
     DataTypes(),
