@@ -61,7 +61,7 @@ public class AssetCostGenerator implements SampleDataGenerator {
                         AssetCostRecord record = new AssetCostRecord();
                         record.setAssetCode(c.assetCode());
                         record.setAmount(c.cost().amount());
-                        record.setKind(c.cost().kind().name());
+                        record.setKind(c.cost().costKind());
                         record.setYear(c.cost().year());
                         record.setProvenance(SAMPLE_DATA_PROVENANCE);
                         return record;

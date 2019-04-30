@@ -1,5 +1,6 @@
 import _ from "lodash";
 
+
 export function calcWorkingTotal(enrichedAllocations = []) {
     return _.sumBy(
         enrichedAllocations,
@@ -7,57 +8,72 @@ export function calcWorkingTotal(enrichedAllocations = []) {
 }
 
 
-export function validateAllocations(fixedAllocations = [],
-                                    floatingAllocations = []) {
-    let saveEnabled = true;
-    const hasFloats = floatingAllocations.length > 0;
-    const totalFixed = _.sumBy(fixedAllocations, fa => fa.working.percentage);
+export function validateItems(items = []) {
+    const dirtyItems =  _.filter(items, d => d.working.dirty);
+    if (_.isEmpty(items) && !_.isEmpty(dirtyItems)) {
+        // nothing to check
+        return true;
+    }
 
-    _.each(fixedAllocations, (fa) => {
-        if (fa.working.percentage > 100) {
-            fa.working.status = "FAIL";
-            fa.working.message = "Cannot exceed 100%";
-            saveEnabled = false;
-        } else if (fa.working.percentage < 0) {
-            fa.working.status = "FAIL";
-            fa.working.message = "Cannot be less than 0%";
-            saveEnabled = false;
-        } else if (totalFixed > 100) {
-            fa.working.status = "WARN";
-            fa.working.message = "Total exceeds 100%";
-            saveEnabled = false;
-        } else if (totalFixed < 100 && ! hasFloats) {
-            fa.working.status = "WARN";
-            fa.working.message = "Total does not make 100%";
-            saveEnabled = false;
-        } else {
-            fa.working.status = "OK";
-            fa.working.message = "";
-        }
-    });
+    updateValidations(items);
 
+    const saveEnabled = _.every(items, d => d.working.status !== "FAIL");
     return saveEnabled;
 }
 
 
-export function updateDirtyFlags(enrichedAllocations = []) {
-    let dirtyFound = false;
-    _.forEach(enrichedAllocations, ea => {
-        const percentageChanged = ea.working.percentage !== ea.allocation.percentage;
-        const typeChanged = ea.working.type !== ea.allocation.type;
-        const isDirty =  percentageChanged || typeChanged;
-        ea.working.dirty = isDirty;
-        dirtyFound = dirtyFound || isDirty;
-    });
-    return dirtyFound;
+function updateValidations(items = []) {
+    const totalFixed = _.sumBy(items, fa => fa.working.percentage);
+    _.each(items, d => updateValidationForItem(d, totalFixed));
 }
 
 
-export function updateFloatingValues(floatingTotal = 0, floatingAllocations = []) {
-    const total = _.clamp(floatingTotal, 0, 100);
-    const perAllocation = floatingAllocations.length > 0
-        ? total / floatingAllocations.length
-        : 0;
-    _.each(floatingAllocations, fa => fa.working.percentage = perAllocation);
-    return floatingAllocations;
+function updateValidationForItem(d, totalFixed) {
+    if (d.working.percentage > 100) {
+        d.working.status = "FAIL";
+        d.working.message = "Cannot exceed 100%";
+    } else if (d.working.percentage < 0) {
+        d.working.status = "FAIL";
+        d.working.message = "Cannot be less than 0%";
+    } else if (totalFixed > 100) {
+        d.working.status = "FAIL";
+        d.working.message = "Total exceeds 100%";
+    } else if (totalFixed < 100) {
+        d.working.status = "WARN";
+        d.working.message = "Total does not make 100%";
+    } else {
+        d.working.status = "OK";
+        d.working.message = "";
+    }
+}
+
+function updateDirtyFlag(item) {
+    const changeType = determineChangeType(item);
+    item.working.dirty = ! _.isEqual("NONE", changeType);
+    return item;
+}
+
+
+export function updateDirtyFlags(items = []) {
+    _.forEach(items, d => {
+        updateDirtyFlag(d);
+    });
+    return _.some(items, d => d.working.dirty);
+}
+
+
+export function determineChangeType(d) {
+    const currentlyAllocated = !_.isNil(d.allocation);
+    const workingPercentage = _.get(d, ["working", "percentage"], 0);
+    const currentPercentage = _.get(d, ["allocation", "percentage"], 0);
+
+    if (!currentlyAllocated && d.working.isAllocated) {
+        return "ADD";
+    } else if (currentlyAllocated && !d.working.isAllocated) {
+        return "REMOVE";
+    } else if (workingPercentage !== currentPercentage) {
+        return "UPDATE";
+    } else {
+        return "NONE";
+    }
 }

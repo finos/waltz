@@ -22,18 +22,22 @@ package com.khartec.waltz.service.allocation;
 import com.khartec.waltz.data.allocation.AllocationDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.AllocationType;
-import com.khartec.waltz.model.allocation.MeasurablePercentage;
+import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
+import com.khartec.waltz.service.allocation.AllocationUtilities.ValidationResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.service.allocation.AllocationUtilities.calcAllocations;
+import static com.khartec.waltz.service.allocation.AllocationUtilities.validateAllocationChanges;
 
 @Service
 public class AllocationService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AllocationService.class);
 
     private final AllocationDao allocationDao;
 
@@ -41,6 +45,11 @@ public class AllocationService {
     @Autowired
     public AllocationService(AllocationDao allocationDao) {
         this.allocationDao = allocationDao;
+    }
+
+
+    public Collection<Allocation> findByEntity(EntityReference ref) {
+        return allocationDao.findByEntity(ref);
     }
 
 
@@ -56,25 +65,26 @@ public class AllocationService {
     }
 
 
-    public Boolean updateType(EntityReference entityReference,
-                             long scheme,
-                             long measurable,
-                             AllocationType type,
-                             String username) {
-        //TODO: security
-        return allocationDao.updateType(entityReference, scheme, measurable, type, username);
-    }
-
-
-    public Boolean updateFixedAllocations(EntityReference ref,
-                                          long scheme,
-                                          Collection<MeasurablePercentage> fixedPercentagesToUpdate,
-                                          String username){
+    public Boolean updateAllocations(EntityReference ref,
+                                     long scheme,
+                                     Collection<MeasurablePercentageChange> changes,
+                                     String username){
 
         List<Allocation> currentAllocations = findByEntityAndScheme(ref, scheme);
-        Collection<Allocation> updatedAllocations = calcAllocations(currentAllocations, fixedPercentagesToUpdate);
+        ValidationResult validationResult = validateAllocationChanges(currentAllocations, changes);
+        if (validationResult.failed()) {
 
-        return allocationDao.updateAllocations(updatedAllocations, username);
+            String reason = String.format("Cannot update allocations because: %s", validationResult.message());
+            LOG.error("Cannot update allocations for entity: {}, scheme: {}, changes:{}, for user: {}, because: {}",
+                    ref,
+                    scheme,
+                    changes,
+                    username,
+                    reason);
+
+            throw new IllegalArgumentException(reason);
+        }
+        return allocationDao.updateAllocations(ref, scheme, changes, username);
     }
 
 }

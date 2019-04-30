@@ -9,10 +9,10 @@
 - [Persistence](#persistence)
     - [Change Set table](#change-set-table)
     - [Change Unit table](#change-unit-table)
+    - [Attribute Change table](#attribute-change-table)
     - [Data flow tables](#data-flow-tables)
     - [Entity Lifecycle Status enum](#entity-lifecycle-status-enum)
     - [Impact / Risks](#impact--risks)
-    - [Limitations](#limitations)
 - [UI Requirements](#ui-requirements)
 - [Possible future enhancements](#possible-future-enhancements)
 - [Potential Reporting views](#potential-reporting-views)
@@ -33,6 +33,8 @@ In the following section we will use the following terminology:
 - **Change Set**: represents a group of change units to be executed
   together. The change set can be associated with a Change Initiative
   and has a start / end dates.
+- **Attribute Change**: represents change to one or more attributes of
+  an entity
 - **Change Initiative**: This is a representation of the over-arching
   change driver. A change initiative may be associated with several
   change sets, which may / may not be in-flight simultaneously.
@@ -54,16 +56,17 @@ the decommission of another flow.
 
 ## Proposal
 
-1. Capture proposed changes to logical data flows data flows, an
-   effective date and the associated initiative driving the change.
-2. As above for physical data flows data flows.
-3. Provide the ability to plan a change into a data flows data types,
+1. Capture proposed changes to physical data flows (Activation,
+   Retirement and Modification), an effective date and the associated
+   initiative driving the change.
+2. Propagate implied physical flow changes to the logical level.
+3. Provide the ability to plan a change on the data types of a flow,
    i.e. Decommission the consumption of a specific data type from a
-   logical flow (**TBC**)
+   physical flow (**TBC**)
 4. View a summary of changes (as above) from the perspective of a change
    initiative / organisational unit
 5. Provide the ability to view changes along with current state in
-   exiting views.
+   existing views.
    - Logical flows: Allow overlaying of future state on the existing
      current state views/visualisations i.e. Source Target graph, Flow
      Diagrams, Boingy Graph
@@ -85,8 +88,7 @@ as an 'atomic' set.
 | `id`                      | long      | **y**     | id of this change set                                            |
 | `parent_entity_kind`      | enum      | n         | the kind of the parent of this change set i.e. CHANGE_INITIATIVE |
 | `parent_entity_id`        | long      | n         | the id of the parent of this change set                          |
-| `start_date`              | date      | n         | the planned start date of this change set                        |
-| `end_date`                | date      | n         | the planned end date of this change set                          |
+| `planned_date             | date      | n         | the planned date of this change set                              |
 | `entity_lifecycle_status` | enum      | **y**     | lifecycle status of this change set                              |
 | `name`                    | string    | n         | name                                                             |
 | `description`             | string    | n         | description                                                      |
@@ -107,11 +109,11 @@ of the subject being changed.
 | Column                   | Type      | Mandatory | Description                                                             |
 |:-------------------------|:----------|:----------|:------------------------------------------------------------------------|
 | `id`                     | long      | **y**     | id of this change unit                                                  |
-| `change_set_id`          | long      | **y**     | id of the parent change set                                             |
+| `change_set_id`          | long      | n         | id of the parent change set, if null, indicates and immediate change    |
 | `subject_entity_kind`    | enum      | **y**     | the kind of the entity being effected by this change                    |
 | `subject_entity_id`      | long      | **y**     | the id of the entity being effected by this change                      |
 | `subject_initial_status` | enum      | **y**     | initial entity lifecycle status of the subject                          |
-| `action`                 | enum      | **y**     | the change action taking place: `ACTIVATE`, `RETIRE`                    |
+| `action`                 | enum      | **y**     | the change action taking place: `ACTIVATE`, `RETIRE`, `MODIFY`          |
 | `execution_status`       | enum      | **y**     | execution state of this change unit: `PENDING`, `COMPLETE`, `DISCARDED` |
 | `name`                   | string    | n         | name                                                                    |
 | `description`            | string    | n         | description                                                             |
@@ -123,6 +125,24 @@ of the subject being changed.
 - Primary key on (`id`)
 - Non unique index on (`change_set_id`)
 - Non unique index on (`subject_entity_id`, `subject_entity_kind`)
+
+
+### Attribute Change table
+
+Captures the modification of attributes to a subject.
+
+| Column            | Type      | Mandatory | Description                                          |
+|:------------------|:----------|:----------|:-----------------------------------------------------|
+| `id`              | long      | **y**     | id of the attribute change                           |
+| `change_unit_id`  | long      | **y**     | id of the parent change unit                         |
+| `type`            | enum      | **y**     | the type of new / old value                          |
+| `new_value`       | string    | n         | new value (nullable)                                 |
+| `old_value`       | string    | n         | old value (nullable)                                 |
+| `name`            | string    | **y**     | name of the attribute being modified                 |
+| `last_updated_by` | string    | **y**     | user id of last editor or creator if new             |
+| `last_updated_at` | timestamp | **y**     | when this record was created                         |
+| `provenance`      | string    | **y**     | the provenance of the record                         |
+
 
 ### Data flow tables
 
@@ -136,6 +156,7 @@ Add the values: `DRAFT` and `RETIRING` resulting in the enum:
 - **DRAFT** (New)
 - PENDING
 - ACTIVE
+- **MODIFYING** (New)
 - **RETIRING** (New)
 - REMOVED
 
@@ -150,13 +171,6 @@ on `entity_lifecycle_status` being a definition of the records
 Outside of the Waltz core any reporting that is driven off the above
 table will be effected, including entity statistics or management
 reports driven by these tables.
-
-
-### Limitations
-
-This proposal does not deal with modifications to a subjects attributes
-i.e. A Physical Flow's transport, frequency or criticality. This will
-only deal with activation and decommissioning of subjects.
 
 
 ## UI Requirements
@@ -185,7 +199,7 @@ only deal with activation and decommissioning of subjects.
 - Boingy Graphy: Optionally show / hide future flows from visualisation
 
 
-See [Future Flow mockups](TBD)
+See [Future Flows mockups](Future_Flows.pdf)
 
 
 ## Possible future enhancements

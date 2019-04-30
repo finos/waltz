@@ -21,6 +21,10 @@
 function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/allocation`;
 
+    const findByEntity = (ref) => $http
+            .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
+            .then(d => d.data);
+
     const findByEntityAndScheme = (ref, schemeId) => $http
             .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}`)
             .then(d => d.data);
@@ -29,20 +33,23 @@ function store($http, baseApiUrl) {
             .get(`${baseUrl}/measurable/${measurableId}/${schemeId}`)
             .then(d => d.data);
 
-
-    const updateFixedAllocations = (ref, schemeId, fixedAllocations) => $http
-        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/fixed-allocations`, fixedAllocations)
+    const updateAllocations = (ref, schemeId, updatedAllocations = []) => $http
+        .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/allocations`, updatedAllocations)
         .then(d => d.data);
 
     return {
+        findByEntity,
         findByEntityAndScheme,
         findByMeasurableAndScheme,
-        updateFixedAllocations
+        updateAllocations
     };
-
 }
 
-store.$inject = ["$http", "BaseApiUrl"];
+
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
+];
 
 
 const serviceName = "AllocationStore";
@@ -53,6 +60,11 @@ export default {
 };
 
 export const AllocationStore_API = {
+    findByEntity: {
+        serviceName,
+        serviceFnName: "findByEntity",
+        description: "findByEntity [ref]"
+    },
     findByEntityAndScheme: {
         serviceName,
         serviceFnName: "findByEntityAndScheme",
@@ -63,9 +75,9 @@ export const AllocationStore_API = {
         serviceFnName: "findByMeasurableAndScheme",
         description: "findByMeasurableAndScheme [measurableId, schemeId]"
     },
-    updateFixedAllocations: {
+    updateAllocations: {
         serviceName,
-        serviceFnName: "updateFixedAllocations",
-        description: "updateFixedAllocations [ref, schemeId, measurableId, fixedAllocationList[{measurableId, percentage}]]"
+        serviceFnName: "updateAllocations",
+        description: "updateAllocations [ref, schemeId, measurableId, updatedAllocations[{measurableId, percentage, operation}]]"
     }
 };

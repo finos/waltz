@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import {CORE_API, getApiReference} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
@@ -48,17 +48,30 @@ const initialState = {
         overlay: false,
         tab: null
     },
-    byCategory: {}
+    byCategory: {},
+    activeAllocationScheme: null
 };
 
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.viewMode = () => {
-        loadData(true);
-        vm.visibility.editor = false;
-    };
+    function loadAllocations() {
+        const allocationsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AllocationStore.findByEntity,
+                [vm.parentEntityRef],
+                { force: true})
+            .then(r => vm.allocations = r.data);
+
+        allocationsPromise
+            .then(() => vm.allocationTotalsByScheme = _
+                .chain(vm.allocations)
+                .groupBy(d => d.schemeId)
+                .mapValues(xs => _.sumBy(xs, x => x.percentage))
+                .value());
+    }
+
 
     const loadData = (force = false) => {
 
@@ -84,13 +97,20 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
             .then(r => vm.measurables = r.data);
 
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
+        const allocationSchemesPromise = serviceBroker
+            .loadViewData(CORE_API.AllocationSchemeStore.findAll)
+            .then(r => vm.allocationSchemes = r.data);
+
+        loadAllocations();
+
+        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise, allocationSchemesPromise])
             .then(() => {
                 vm.tabs = mkTabs(
                     vm.categories,
                     vm.ratingSchemesById,
                     vm.measurables,
                     vm.ratings,
+                    vm.allocationSchemes,
                     false /*include empty */);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
@@ -98,6 +118,35 @@ function controller($q, serviceBroker) {
     };
 
     vm.$onInit = () => loadData();
+
+
+    // -- INTERACT ---
+
+    const hideAllocationScheme = () => vm.activeAllocationScheme = null;
+
+    vm.onShowAllocationScheme = (scheme) => {
+        if (vm.activeAllocationScheme === scheme) {
+            hideAllocationScheme();
+        } else {
+            vm.activeAllocationScheme = scheme;
+        }
+    };
+
+    vm.onDismissAllocations = () => hideAllocationScheme();
+
+    vm.viewMode = () => {
+        loadData(true);
+        vm.visibility.editor = false;
+    };
+
+    vm.onEditRatings = () => {
+        vm.visibility.editor = true;
+        hideAllocationScheme();
+    };
+
+    vm.onTabChange = (tab) => {
+        hideAllocationScheme();
+    };
 
 }
 

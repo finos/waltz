@@ -20,14 +20,14 @@
 
 import angular from "angular";
 import AllocationStore from "./services/allocation-store";
-import AllocationEntityPanel from "./components/entity-panel/allocation-entity-panel";
+import AllocationEntitySubSection from "./components/entity-sub-section/allocation-entity-sub-section";
 import {registerComponents, registerStores} from "../common/module-utils";
 
 export default () => {
     const module = angular.module("waltz.allocation", []);
 
     registerStores(module, [ AllocationStore ]);
-    registerComponents(module, [ AllocationEntityPanel ]);
+    registerComponents(module, [ AllocationEntitySubSection ]);
 
     return module.name;
 };

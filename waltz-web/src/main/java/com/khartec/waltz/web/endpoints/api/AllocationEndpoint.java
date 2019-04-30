@@ -22,6 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.MeasurablePercentage;
+import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
 import com.khartec.waltz.service.allocation.AllocationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -50,6 +51,11 @@ public class AllocationEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String findByEntityPath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id");
+
         String findByEntityAndSchemePath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
@@ -61,12 +67,16 @@ public class AllocationEndpoint implements Endpoint {
                 ":measurable",
                 ":scheme");
 
-        String updateFixedAllocationsPath = mkPath(BASE_URL,
+        String updateAllocationsPath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
                 ":id",
                 ":scheme",
-                "fixed-allocations");
+                "allocations");
+
+        ListRoute<Allocation> findByEntityRoute = (request, response)
+                -> allocationService.findByEntity(
+                        getEntityReference(request));
 
         ListRoute<Allocation> findByEntityAndSchemeRoute = (request, response)
                 -> allocationService.findByEntityAndScheme(
@@ -78,19 +88,20 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request, "measurable"),
                         getLong(request,"scheme"));
 
-        DatumRoute<Boolean> updateFixedAllocationsRoute = (request, response) -> {
-            MeasurablePercentage[] percentages = readBody(request, MeasurablePercentage[].class);
+        DatumRoute<Boolean> updateAllocationsRoute = (request, response) -> {
+            MeasurablePercentageChange[] percentages = readBody(request, MeasurablePercentageChange[].class);
             return allocationService
-                    .updateFixedAllocations(
+                    .updateAllocations(
                         getEntityReference(request),
                         getLong(request,"scheme"),
                         newArrayList(percentages),
                         getUsername(request));
         };
 
+        getForList(findByEntityPath, findByEntityRoute);
         getForList(findByEntityAndSchemePath, findByEntityAndSchemeRoute);
         getForList(findByMeasurableAndSchemePath, findByMeasurableAndSchemeRoute);
-        postForDatum(updateFixedAllocationsPath, updateFixedAllocationsRoute);
+        postForDatum(updateAllocationsPath, updateAllocationsRoute);
 
     }
 

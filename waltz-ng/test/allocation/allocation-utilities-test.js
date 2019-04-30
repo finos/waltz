@@ -1,4 +1,4 @@
-import {updateDirtyFlags } from "../../client/allocation/allocation-utilities";
+import {updateDirtyFlag, updateDirtyFlags} from "../../client/allocation/allocation-utilities";
 import {calcWorkingTotal } from "../../client/allocation/allocation-utilities";
 import {updateFloatingValues } from "../../client/allocation/allocation-utilities";
 import {assert} from "chai"
@@ -8,23 +8,33 @@ describe("AllocationUtils", () => {
 
     describe("updateDirtyFlags", () => {
         it("if percentages differ then item is dirty", () => {
-
             const hasDiff = { allocation: { percentage: 20}, working: { percentage: 10, }};
-            const noDiff = { allocation: { percentage: 20}, working: { percentage: 20, }};
+            const noDiff = { allocation: { percentage: 20}, working: { isAllocated: true, percentage: 20 }};
+
             updateDirtyFlags([hasDiff, noDiff]);
 
-            assert(hasDiff.working.dirty);
-            assert(!noDiff.working.dirty);
+            assert.isTrue(hasDiff.working.dirty, "difference in percentage should have been detected");
+            assert.isFalse(noDiff.working.dirty, "no differences should have been detected");
         });
 
-        it("if types differ then item is dirty", () => {
+        it("if item newly allocated then item is dirty", () => {
+            const newAlloc = { allocation: null, working: { isAllocated: true, }};
+            const existingAlloc = { allocation: { foo: "baa "}, working: { isAllocated: true }};
 
-            const hasDiff = { allocation: { type: "FIXED"}, working: { type: "FLOATING", }};
-            const noDiff = { allocation: { type: "FIXED"}, working: { type: "FIXED", }};
-            updateDirtyFlags([hasDiff, noDiff]);
+            updateDirtyFlags([newAlloc, existingAlloc]);
 
-            assert.isTrue(hasDiff.working.dirty);
-            assert.isFalse(noDiff.working.dirty);
+            assert.isTrue(newAlloc.working.dirty);
+            assert.isFalse(existingAlloc.working.dirty);
+        });
+
+        it("if item newly unallocated then item is dirty", () => {
+            const newUnalloc = { allocation: {foo: "baa" }, working: { isAllocated: false, }};
+            const existingAlloc = { allocation: { foo: "baa "}, working: { isAllocated: true }};
+
+            updateDirtyFlags([newUnalloc, existingAlloc]);
+
+            assert.isTrue(newUnalloc.working.dirty);
+            assert.isFalse(existingAlloc.working.dirty);
         });
     });
 
@@ -54,61 +64,7 @@ describe("AllocationUtils", () => {
             assert.equal(20, calcWorkingTotal([ p10, p10, p0 ]));
             assert.equal(0,  calcWorkingTotal([ p0 ]));
             assert.equal(10, calcWorkingTotal([ p0, p10 ]));
-
         });
     });
-
-
-    describe("updateFloatingValues", () => {
-
-        const assertAllocation = (allocs = [], idx = 0, percentage = 0) => {
-            assert.equal(_.get(allocs[idx], ["working", "percentage"]), percentage);
-        };
-
-        it("when given zero floating allocations, zero are returned", () => {
-            assert.deepEqual([], updateFloatingValues(0, []));
-        });
-
-        it("when given an allocation and no floatTotal allocation will be zero", () => {
-            const updatedAllocations = updateFloatingValues(0, [ { working: { percentage: 50 }}]);
-            assertAllocation(updatedAllocations, 0, 0);
-        });
-
-        it("when given several allocations and no floatTotal allocations will all be zero", () => {
-            const updatedAllocations = updateFloatingValues(0, [ { working: { percentage: 30 }}, { working: { percentage: 30 }}]);
-            assertAllocation(updatedAllocations, 0, 0);
-            assertAllocation(updatedAllocations, 1, 0);
-        });
-
-        it("float should be equal to 50 if floating total equals 100 and 2 floats", () => {
-             const fl1 = { working: { type: "FLOATING" }};
-             const fl2 = { working: { type: "FLOATING" }};
-             const updatedAllocations = updateFloatingValues(100, [fl1, fl2]);
-             assertAllocation(updatedAllocations, 0, 50);
-             assertAllocation(updatedAllocations, 1, 50);
-         });
-
-        it("cannot update a null array of floating values", () => {
-            assert.throws(() => updateFloatingValues(0, null), /null/);
-        });
-
-        it("floating totals are clamped between 0 and 100 (low)", () => {
-            const updatedAllocations = updateFloatingValues(-10, [{ working: {}}]);
-            assertAllocation(updatedAllocations, 0, 0);
-        });
-
-        it("floating totals are clamped between 0 and 100 (high)", () => {
-            const updatedAllocations = updateFloatingValues(110, [{ working: {}}]);
-            assertAllocation(updatedAllocations, 0, 100);
-        });
-
-        it("decimals are okay", () => {
-            const updatedAllocations = updateFloatingValues(3, [{ working: {}}, { working: {}}]);
-            assertAllocation(updatedAllocations, 0, 1.5);
-            assertAllocation(updatedAllocations, 1, 1.5);
-        });
-
-    });
-
 
 });
