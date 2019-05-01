@@ -23,6 +23,7 @@
                         <!-- EDITOR -->
                         <div ng-if="$ctrl.visibility.editor">
                             <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                                allocations="$ctrl.allocations"
                                                                 starting-category-id="$ctrl.visibility.tab">
                             </waltz-measurable-rating-edit-panel>
                         </div>
@@ -83,6 +84,7 @@
 
 <!-- TEMPLATES -->
 
+<!-- RATINGS TABS -->
 <script type="text/ng-template"
         id="wmras-ratings-view">
     <!-- NO DATA -->
@@ -136,10 +138,11 @@
 </script>
 
 
+<!-- TAB CONTENT -->
 <script type="text/ng-template"
         id="wmras-tab-content">
-
     <br>
+    <!-- RATING TREE -->
     <div class="row">
         <div class="col-sm-12">
             <waltz-measurable-rating-panel category="tab.category"
@@ -153,12 +156,14 @@
         </div>
     </div>
 
-
+    <!-- ALLOCATION SCHEMES -->
     <div class="row"
          ng-if="tab.allocationSchemes.length > 0">
         <br>
-        <div class="col-sm-12">
-            <strong>Allocations: </strong>
+        <div class="col-sm-1  waltz-display-field-label">
+            Allocations:
+        </div>
+        <div class="col-sm-11">
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
@@ -171,11 +176,13 @@
                     </span>
                 </a>
 
+                :
+
                 <span class="small text-muted">
                     <span ng-bind="$ctrl.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
                 </span>
 
-                <span ng-if="!$last">|</span>
+                <span ng-if="!$last">&nbsp;|&nbsp;</span>
             </span>
         </div>
     </div>
@@ -183,6 +190,7 @@
 </script>
 
 
+<!-- CATEGORY POPOVER -->
 <script type="text/ng-template"
         id="wmras-tab-popover.html">
     <div class="small">
@@ -196,6 +204,8 @@
     </div>
 </script>
 
+
+<!-- ALLOCATION SCHEME POPOVER -->
 <script type="text/ng-template"
         id="wmras-scheme-popover.html">
     <div class="small">

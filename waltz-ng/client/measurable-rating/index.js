@@ -41,20 +41,17 @@ export default () => {
 
     registerStores(module, [measurableRatingStore]);
 
-    module
-        .component("waltzMeasurableRatingAppSection", MeasurableRatingAppSection)
-        .component("waltzMeasurableRatingExplorerSection", MeasurableRatingExplorerSection)
-        .component("waltzMeasurableRatingPanel", MeasurableRatingPanel)
-        .component("waltzMeasurableRatingTree", MeasurableRatingTree) // vanilla tree
-        .component("waltzMeasurableRatingsBrowser", MeasurableRatingsBrowser)
-        .component("waltzRelatedMeasurablesSection", RelatedMeasurablesSection);
-
     registerComponents(module, [
+        MeasurableRatingAppSection,
+        MeasurableRatingEditPanel,
+        MeasurableRatingExplorerSection,
+        MeasurableRatingPanel,
+        MeasurableRatingTree,
+        MeasurableRatingsBrowser,
         MeasurableRatingsBrowserSection,
         MeasurableRatingsBrowserTreePanel,
-        MeasurableRatingEditPanel
+        RelatedMeasurablesSection
     ]);
-
 
     return module.name;
 };

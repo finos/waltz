@@ -28,6 +28,7 @@ import template from "./measurable-rating-edit-panel.html";
 
 
 const bindings = {
+    allocations: "<",
     parentEntityRef: "<",
     startingCategoryId: "<?"
 };
@@ -39,8 +40,10 @@ function determineSaveFn(selected, store) {
         : store.update;
 }
 
+
 const initialState = {
     selected: null,
+    allocations: [],
     measurables: [],
     categories: [],
     ratings: [],
