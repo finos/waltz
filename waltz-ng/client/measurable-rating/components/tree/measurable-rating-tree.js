@@ -132,4 +132,8 @@ const component = {
     controller
 };
 
-export default component;
+
+export default {
+    component,
+    id: "waltzMeasurableRatingTree"
+};
