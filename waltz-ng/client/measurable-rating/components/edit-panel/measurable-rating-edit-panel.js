@@ -29,6 +29,7 @@ import template from "./measurable-rating-edit-panel.html";
 
 const bindings = {
     allocations: "<",
+    allocationSchemes: "<",
     parentEntityRef: "<",
     startingCategoryId: "<?"
 };
@@ -44,6 +45,7 @@ function determineSaveFn(selected, store) {
 const initialState = {
     selected: null,
     allocations: [],
+    allocationSchemes: [],
     measurables: [],
     categories: [],
     ratings: [],
@@ -70,9 +72,8 @@ function controller($q,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = (force) => {
-        // -- LOAD ---
 
+    const loadData = (force) => {
         const ratingSchemePromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
             .then(r => {
@@ -178,7 +179,14 @@ function controller($q,
 
     const selectMeasurable = (measurable, rating) => {
         const category = _.find(vm.categories, ({ id: measurable.categoryId }));
-        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category });
+        const allocations = _.chain(vm.allocationsByMeasurableId)
+            .get(measurable.id, [])
+            .map(a => Object.assign({}, a, { scheme: vm.allocationSchemesById[a.schemeId] }))
+            .value();
+
+        const hasWarnings = !_.isEmpty(allocations);
+
+        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category, allocations, hasWarnings });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
     };
 
@@ -187,16 +195,18 @@ function controller($q,
 
     vm.$onInit = () => {
         loadData(true);
+
+        vm.backUrl = $state
+            .href(
+                kindToViewState(vm.parentEntityRef.kind),
+                { id: vm.parentEntityRef.id });
+
+        vm.allocationsByMeasurableId = _.groupBy(vm.allocations, a => a.measurableId);
+        vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
 
 
     // -- INTERACT ---
-
-    vm.backUrl = $state
-        .href(
-            kindToViewState(vm.parentEntityRef.kind),
-            { id: vm.parentEntityRef.id });
-
 
     vm.onMeasurableSelect = (measurable, rating) => {
         selectMeasurable(measurable, rating);
@@ -221,9 +231,7 @@ function controller($q,
 
     vm.doCancel = () => {
         deselectMeasurable();
-
     };
-
 
     vm.onRemoveAll = (categoryId) => {
         if (confirm("Do you really want to remove all ratings in this category ?")) {
