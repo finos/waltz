@@ -14,7 +14,13 @@ waltz-allocation-entity-sub-section {
         }
 
         .waess-body {
-            border-top: 1px solid #f5f5f5;
+            div {
+                border-top: 1px solid #f5f5f5;
+
+            }
+            &:hover{
+                background-color: #fafafa;
+            }
         }
 
         .waess-op-cell {

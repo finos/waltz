@@ -72,9 +72,7 @@ function controller($q, serviceBroker) {
                 .value());
     }
 
-
     const loadData = (force = false) => {
-
         serviceBroker
             .loadViewData(
                 CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
@@ -134,9 +132,17 @@ function controller($q, serviceBroker) {
 
     vm.onDismissAllocations = () => hideAllocationScheme();
 
-    vm.viewMode = () => {
-        loadData(true);
+    vm.onSaveAllocations = (changes) => {
+        return serviceBroker
+            .execute(
+                CORE_API.AllocationStore.updateAllocations,
+                [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
+            .then(r => { loadAllocations(); return r; });
+    };
+
+    vm.onViewRatings = () => {
         vm.visibility.editor = false;
+        loadData(true);
     };
 
     vm.onEditRatings = () => {
