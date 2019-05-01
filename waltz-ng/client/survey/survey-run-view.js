@@ -19,6 +19,7 @@
 
 import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
+import {downloadTextFile} from "../common/file-utils";
 
 
 function controller($stateParams,
@@ -66,6 +67,31 @@ function controller($stateParams,
                     );
             }
         }
+    };
+
+    vm.exportInstances = () => {
+        console.log('==> calling export function');
+        const header = [
+            "Entity",
+            "Status",
+            "Due Date"
+        ];
+
+        const dataRows = _
+            .chain(vm.surveyInstances)
+            .map(app => {
+                return [
+                    app.surveyEntity.name,
+                    app.status || "",
+                    app.dueDate
+                ];
+            })
+            .value();
+
+        const rows = [header]
+            .concat(dataRows);
+
+        downloadTextFile(rows, ",", `surveyInstances.csv`);
     };
 }
 

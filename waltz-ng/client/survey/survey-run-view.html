@@ -1,4 +1,4 @@
-<div>
+<div> TOP
     <waltz-page-header icon="wpforms"
                        name="{{ ctrl.surveyRun.name }}"
                        small="Survey Run">
@@ -24,6 +24,16 @@
     <br>
 
     <waltz-section name="Instances">
+        <waltz-section-actions>
+            <button ng-click="ctrl.exportInstances()"
+                    class="btn btn-xs btn-primary"
+                    ng-if="ctrl.surveyInstances.length > 0">
+                <waltz-icon name="cloud-download"></waltz-icon>
+                Export
+            </button>
+
+        </waltz-section-actions>
+
         <table class="table">
             <thead>
             <tr>
