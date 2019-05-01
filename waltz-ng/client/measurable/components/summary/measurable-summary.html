@@ -84,27 +84,28 @@
                                             <span ng-bind="$ctrl.enrichedServerStats.total"></span>
                                         </div>
                                     </waltz-basic-info-tile>
+
+                                    <div ng-if="$ctrl.relationshipStats.length > 0">
+                                        <waltz-basic-info-tile name="Relationships"
+                                                               waltz-jump-to="related-measurables"
+                                                               icon="link">
+                                            <div ng-repeat="category in $ctrl.relationshipStats"
+                                                 style="font-size: large;">
+                                                <span ng-bind="category.name"></span>:
+                                                <span ng-bind="category.count"></span>
+                                            </div>
+                                        </waltz-basic-info-tile>
+
+                                    </div>
                                 </div>
 
-                                <div class="col-sm-4"
+                                <div class="col-sm-8"
                                      ng-if="$ctrl.applications.length > 0">
                                     <waltz-apps-by-investment-pie applications="$ctrl.applications"
                                                                   size="70">
                                     </waltz-apps-by-investment-pie>
                                 </div>
 
-                                <div class="col-sm-4"
-                                     ng-if="$ctrl.relationshipStats.length > 0">
-                                    <waltz-basic-info-tile name="Relationships"
-                                                           waltz-jump-to="related-measurables"
-                                                           icon="link">
-                                        <div ng-repeat="category in $ctrl.relationshipStats"
-                                             style="font-size: large;">
-                                            <span ng-bind="category.name"></span>:
-                                            <span ng-bind="category.count"></span>
-                                        </div>
-                                    </waltz-basic-info-tile>
-                                </div>
                             </div>
                         </content>
                     </waltz-sub-section>

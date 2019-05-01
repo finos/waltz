@@ -33,15 +33,19 @@ import template from "./measurable-rating-panel.html";
 
 
 const bindings = {
+    allocations: "<",
+    allocationSchemes: "<",
     category: "<",
     entityReference: "<",
-    ratings: "<",
-    ratingScheme: "<",
     measurables: "<",
+    ratings: "<",
+    ratingScheme: "<"
 };
 
 
 const initialState = {
+    allocations: [],
+    allocationSchemes: [],
     measurables: [],
     ratings: [],
     selected: null
@@ -54,14 +58,30 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = () => {
-        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
+        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), r => r.rating);
+        vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
 
-    vm.onSelect = (measurable, rating) =>
+    vm.onSelect = (measurable, rating) => {
+        const relevantAllocations = _
+            .chain(vm.allocations)
+            .filter(a => a.measurableId === measurable.id)
+            .map(allocation => {
+                const scheme = vm.allocationSchemesById[allocation.schemeId];
+                return scheme
+                    ? Object.assign(allocation, {scheme})
+                    : null;
+            })
+            .compact()
+            .sortBy(a => a.scheme.name)
+            .value();
+
         vm.selected = {
+            allocations: relevantAllocations,
             measurable,
             rating,
         };
+    }
 }
 
 
