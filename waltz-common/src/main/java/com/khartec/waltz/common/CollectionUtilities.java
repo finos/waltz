@@ -173,9 +173,9 @@ public class CollectionUtilities {
      * the collection is null or empty.   The first element is derived by taking the first element offered up
      * by <code>ts.iterator()</code>
      *
-     * @param xs
-     * @param <X>
-     * @return
+     * @param xs  collection to take the head from
+     * @param <X>  type of items in the collection
+     * @return  optionally, the first item in the collection (or `Optional.empty`)
      */
     public static <X> Optional<X> head(Collection<X> xs) {
         return isEmpty(xs)
@@ -196,7 +196,7 @@ public class CollectionUtilities {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(comparator, "comparator cannot be null");
 
-        List<X> sorted = new ArrayList<X>(xs);
+        List<X> sorted = new ArrayList<>(xs);
         sorted.sort(comparator);
         return sorted;
     }
@@ -205,8 +205,8 @@ public class CollectionUtilities {
      * Returns a sorted collection (list).  The input collection is unchanged.
      *
      * @param xs         collection to be sorted (will be unchanged)
-     * @param <X>        type of elements in `xs
-     * @return new list with members of `xs` sorted by `comparator`.
+     * @param <X>        type of elements in `xs`, should implement `Comparable`
+     * @return new list with members of `xs` sorted by the items comparator
      */
     public static <X extends Comparable> List<X> sort(Collection<X> xs) {
         checkNotNull(xs, "xs cannot be null");
@@ -231,7 +231,7 @@ public class CollectionUtilities {
         checkNotEmpty(xs, "xs cannot be null");
         List<X> asList = xs instanceof List
                 ? (List<X>) xs
-                : new ArrayList<X>(xs);
+                : new ArrayList<>(xs);
         return ListUtilities.randomPick(asList);
     }
 
@@ -252,16 +252,6 @@ public class CollectionUtilities {
         return isEmpty(xs)
                 ? Optional.empty()
                 : Optional.of(first(xs));
-    }
-
-
-    public static <T> long countWhere(Collection<T> set, Predicate<T> pred) {
-        checkNotNull(set, "cannot sum over an empty set");
-        checkNotNull(pred, "cannot sum over an empty set");
-        return set
-                .stream()
-                .filter(pred)
-                .count();
     }
 
 }

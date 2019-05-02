@@ -9,7 +9,7 @@ public class Aliases<T> {
 
     private final HashMap<String, T> mappings = new HashMap<>();
 
-    public Aliases register(T val, String... aliases) {
+    public Aliases<T> register(T val, String... aliases) {
         mappings.put(sanitise(val.toString()), val);
         Arrays.stream(aliases)
                 .map(this::sanitise)

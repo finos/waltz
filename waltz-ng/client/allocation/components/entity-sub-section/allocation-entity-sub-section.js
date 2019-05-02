@@ -34,6 +34,7 @@ function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, sche
     return _
         .chain(ratings)
         .map(r => measurablesById[r.measurableId])
+        .compact()
         .filter(m => m.categoryId === scheme.measurableCategoryId)
         .value();
 }
@@ -116,7 +117,7 @@ function controller($q, notification, serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.scheme && vm.allocations) {
             reload();
         }
