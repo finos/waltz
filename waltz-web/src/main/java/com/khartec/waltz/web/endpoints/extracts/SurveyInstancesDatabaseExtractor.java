@@ -39,7 +39,8 @@ public class SurveyInstancesDatabaseExtractor extends BaseDataExtractor {
                             SURVEY_INSTANCE.DUE_DATE.as("Due Date"))
                     .from(SURVEY_INSTANCE)
                     .join(APPLICATION)
-                    .on(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(APPLICATION.ID.eq(SURVEY_INSTANCE.ENTITY_ID)))
+                    .on(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                            .and(APPLICATION.ID.eq(SURVEY_INSTANCE.ENTITY_ID)))
                     .join(SURVEY_RUN)
                     .on(SURVEY_RUN.ID.eq(SURVEY_INSTANCE.SURVEY_RUN_ID))
                     .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(surveyTemplateId))
@@ -55,8 +56,6 @@ public class SurveyInstancesDatabaseExtractor extends BaseDataExtractor {
     }
 
     private String mkFilename(long id) {
-        return "survey-instances-"
-                + id
-                + ".csv";
+        return "survey-instances-" + id  + ".csv";
     }
 }
