@@ -19,18 +19,17 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 
-import measurableRatingStore from "./services/measurable-rating-store";
-
+import MeasurableRatingStore from "./services/measurable-rating-store";
 import MeasurableRatingsBrowserSection from "./components/browser-section/measurable-ratings-browser-section";
 import MeasurableRatingsBrowserTreePanel from "./components/browser-tree-panel/measurable-ratings-browser-tree-panel";
 import MeasurableRatingEditPanel from "./components/edit-panel/measurable-rating-edit-panel";
-import Routes from "./routes";
 import MeasurableRatingAppSection from "./components/app-section/measurable-rating-app-section";
 import MeasurableRatingExplorerSection from "./components/explorer-section/measurable-rating-explorer-section";
 import MeasurableRatingPanel from "./components/panel/measurable-rating-panel";
 import MeasurableRatingTree from "./components/tree/measurable-rating-tree";
 import MeasurableRatingsBrowser from "./components/browser/measurable-ratings-browser";
 import RelatedMeasurablesSection from "./components/related-measurables-section/related-measurables-section";
+import Routes from "./routes";
 
 
 export default () => {
@@ -39,22 +38,19 @@ export default () => {
     module
         .config(Routes);
 
-    registerStores(module, [measurableRatingStore]);
-
-    module
-        .component("waltzMeasurableRatingAppSection", MeasurableRatingAppSection)
-        .component("waltzMeasurableRatingExplorerSection", MeasurableRatingExplorerSection)
-        .component("waltzMeasurableRatingPanel", MeasurableRatingPanel)
-        .component("waltzMeasurableRatingTree", MeasurableRatingTree) // vanilla tree
-        .component("waltzMeasurableRatingsBrowser", MeasurableRatingsBrowser)
-        .component("waltzRelatedMeasurablesSection", RelatedMeasurablesSection);
+    registerStores(module, [MeasurableRatingStore]);
 
     registerComponents(module, [
+        MeasurableRatingAppSection,
+        MeasurableRatingEditPanel,
+        MeasurableRatingExplorerSection,
+        MeasurableRatingPanel,
+        MeasurableRatingTree,
+        MeasurableRatingsBrowser,
         MeasurableRatingsBrowserSection,
         MeasurableRatingsBrowserTreePanel,
-        MeasurableRatingEditPanel
+        RelatedMeasurablesSection
     ]);
-
 
     return module.name;
 };

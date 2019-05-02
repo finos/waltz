@@ -1,6 +1,6 @@
 <waltz-sub-section small="{{$ctrl.scheme.name}}" name="Allocations">
     <content>
-        <div class="container"
+        <div class="container-fluid"
              style="padding: 18px;">
 
             <div class="row">
@@ -19,7 +19,11 @@
                     <h4>
                         Allocated
                     </h4>
-                    <h3>
+                    <h3 ng-class="{
+                            'waess-allocated-total-zero': $ctrl.allocatedTotal === 0,
+                            'waess-allocated-total-under': $ctrl.allocatedTotal < 100 && $ctrl.allocatedTotal > 0,
+                            'waess-allocated-total-exact': $ctrl.allocatedTotal == 100
+                        }">
                         <span ng-bind="$ctrl.allocatedTotal"></span>%
                     </h3>
                 </div>
@@ -45,7 +49,10 @@
                     <h4>
                         Unallocated
                     </h4>
-                    <h3>
+                    <h3 ng-class="{
+                        'waess-unallocated-total-zero': $ctrl.remainder === 0,
+                        'waess-unallocated-total-under': $ctrl.remainder < 100 && $ctrl.remainder > 0,
+                        'waess-unallocated-total-exact': $ctrl.remainder == 100}">
                         <span ng-bind="$ctrl.remainder"></span>%
                     </h3>
                 </div>
@@ -96,12 +103,14 @@
 
                 <span ng-if="!$ctrl.editing">
                     <!-- EDIT BTN -->
-                    <a ng-click="$ctrl.setEditable(true)"
-                       class="clickable">
-                        Edit percentages
-                    </a>
-                    <span ng-if="$ctrl.onDismiss">
+                    <span waltz-has-role="CAPABILITY_EDITOR">
+                        <a ng-click="$ctrl.setEditable(true)"
+                           class="clickable">
+                            Edit percentages
+                        </a>
                         |
+                    </span>
+                    <span ng-if="$ctrl.onDismiss">
                         <a ng-click="$ctrl.onDismiss()"
                            class="clickable">
                             Dismiss
@@ -235,47 +244,50 @@
             </div>
 
             <!-- OP CELL -->
-            <div class="col-sm-4 waess-op-cell"
-                 ng-if="$ctrl.editing">
+            <div class="col-sm-4 waess-op-cell">
 
-                <!-- Split button -->
-                <div class="btn-group"
-                     style="padding-top: 3px"
-                     uib-dropdown>
-                    <button id="split-button"
-                            type="button"
-                            ng-click="$ctrl.onMoveToUnallocated(d)"
-                            class="btn btn-default btn-xs">
-                        Unallocate
-                    </button>
-                    <button type="button"
-                            class="btn btn-default btn-xs"
-                            uib-dropdown-toggle>
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu"
-                        uib-dropdown-menu
-                        role="menu">
-                        <li role="menuitem">
-                            <a class="clickable"
-                               ng-click="$ctrl.onGrabUnallocated(d)"
-                               ng-if="$ctrl.remainder !== 0">
-                                Grab unallocated
-                                <span class="small" ng-bind="'(' + $ctrl.remainder + '%)'"/>
-                            </a>
-                            <div ng-if="$ctrl.remainder === 0"
-                                 class="waess-disabled-action">
-                                Grab unallocated
-                            </div>
-                        </li>
-                        <li role="menuitem">
-                            <a href="#">TBC: Zero and distribute</a>
-                        </li>
-                        <li role="menuitem">
-                            <a href="#">TBC: Grab enough</a>
-                        </li>
-                    </ul>
+                <div ng-if="$ctrl.editing">
+                    <!-- Split button -->
+                    <div class="btn-group"
+                         style="padding-top: 3px"
+                         uib-dropdown>
+                        <button id="split-button"
+                                type="button"
+                                ng-click="$ctrl.onMoveToUnallocated(d)"
+                                class="btn btn-default btn-xs">
+                            Unallocate
+                        </button>
+                        <button type="button"
+                                class="btn btn-default btn-xs"
+                                uib-dropdown-toggle>
+                            <span class="caret"></span>
+                        </button>
+                        <!-- button dropdown -->
+                        <ul class="dropdown-menu"
+                            uib-dropdown-menu
+                            role="menu">
+                            <li role="menuitem">
+                                <a class="clickable"
+                                   ng-click="$ctrl.onGrabUnallocated(d)"
+                                   ng-if="$ctrl.remainder !== 0">
+                                    Grab unallocated
+                                    <span class="small" ng-bind="'(' + $ctrl.remainder + '%)'"/>
+                                </a>
+                                <div ng-if="$ctrl.remainder === 0"
+                                     class="waess-disabled-action">
+                                    Grab unallocated
+                                </div>
+                            </li>
+                            <li role="menuitem">
+                                <a href="#">TBC: Zero and distribute</a>
+                            </li>
+                            <li role="menuitem">
+                                <a href="#">TBC: Grab enough</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

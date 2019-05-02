@@ -41,7 +41,9 @@
             <span uib-popover-template="'wmrt-popover.html'"
                   popover-trigger="mouseenter"
                   popover-append-to-body="true"
+                  popover-delay="300"
                   popover-placement="right"
+                  style="display: inline-block;top: -1px;position: relative;"
                   ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
                   class="no-overflow">
                 <span ng-bind="node.displayName"

@@ -21,15 +21,17 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.MeasurablePercentage;
 import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.allocation.AllocationService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -42,15 +44,26 @@ public class AllocationEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "allocation");
 
     private final AllocationService allocationService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AllocationEndpoint(AllocationService allocationService) {
+    public AllocationEndpoint(AllocationService allocationService,
+                              UserRoleService userRoleService) {
+        checkNotNull(allocationService, "allocationService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
+
         this.allocationService = allocationService;
+        this.userRoleService = userRoleService;
     }
 
     @Override
     public void register() {
+        String findByEntityPath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id");
+
         String findByEntityAndSchemePath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
@@ -69,6 +82,10 @@ public class AllocationEndpoint implements Endpoint {
                 ":scheme",
                 "allocations");
 
+        ListRoute<Allocation> findByEntityRoute = (request, response)
+                -> allocationService.findByEntity(
+                        getEntityReference(request));
+
         ListRoute<Allocation> findByEntityAndSchemeRoute = (request, response)
                 -> allocationService.findByEntityAndScheme(
                         getEntityReference(request),
@@ -80,6 +97,7 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request,"scheme"));
 
         DatumRoute<Boolean> updateAllocationsRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.CAPABILITY_EDITOR);
             MeasurablePercentageChange[] percentages = readBody(request, MeasurablePercentageChange[].class);
             return allocationService
                     .updateAllocations(
@@ -89,6 +107,7 @@ public class AllocationEndpoint implements Endpoint {
                         getUsername(request));
         };
 
+        getForList(findByEntityPath, findByEntityRoute);
         getForList(findByEntityAndSchemePath, findByEntityAndSchemeRoute);
         getForList(findByMeasurableAndSchemePath, findByMeasurableAndSchemeRoute);
         postForDatum(updateAllocationsPath, updateAllocationsRoute);

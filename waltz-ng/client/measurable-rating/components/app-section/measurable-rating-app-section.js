@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import {CORE_API, getApiReference} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
@@ -56,9 +56,23 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    function loadAllocations() {
+        const allocationsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AllocationStore.findByEntity,
+                [vm.parentEntityRef],
+                { force: true})
+            .then(r => vm.allocations = r.data);
+
+        allocationsPromise
+            .then(() => vm.allocationTotalsByScheme = _
+                .chain(vm.allocations)
+                .groupBy(d => d.schemeId)
+                .mapValues(xs => _.sumBy(xs, x => x.percentage))
+                .value());
+    }
 
     const loadData = (force = false) => {
-
         serviceBroker
             .loadViewData(
                 CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
@@ -84,6 +98,8 @@ function controller($q, serviceBroker) {
         const allocationSchemesPromise = serviceBroker
             .loadViewData(CORE_API.AllocationSchemeStore.findAll)
             .then(r => vm.allocationSchemes = r.data);
+
+        loadAllocations();
 
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise, allocationSchemesPromise])
             .then(() => {
@@ -116,9 +132,17 @@ function controller($q, serviceBroker) {
 
     vm.onDismissAllocations = () => hideAllocationScheme();
 
-    vm.viewMode = () => {
-        loadData(true);
+    vm.onSaveAllocations = (changes) => {
+        return serviceBroker
+            .execute(
+                CORE_API.AllocationStore.updateAllocations,
+                [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
+            .then(r => { loadAllocations(); return r; });
+    };
+
+    vm.onViewRatings = () => {
         vm.visibility.editor = false;
+        loadData(true);
     };
 
     vm.onEditRatings = () => {
@@ -127,9 +151,8 @@ function controller($q, serviceBroker) {
     };
 
     vm.onTabChange = (tab) => {
-        console.log({tab});
         hideAllocationScheme();
-    }
+    };
 
 }
 
@@ -147,4 +170,8 @@ const component = {
 };
 
 
-export default component;
+
+export default {
+    component,
+    id: "waltzMeasurableRatingAppSection"
+};

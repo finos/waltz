@@ -13,7 +13,9 @@ import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     entityReference: "<",
-    schemeId: "<",
+    scheme: "<",
+    allocations: "<",
+    onSave: "<",
     onDismiss: "<"
 };
 
@@ -32,6 +34,7 @@ function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, sche
     return _
         .chain(ratings)
         .map(r => measurablesById[r.measurableId])
+        .compact()
         .filter(m => m.categoryId === scheme.measurableCategoryId)
         .value();
 }
@@ -53,25 +56,16 @@ function controller($q, notification, serviceBroker) {
                 [vm.entityReference])
             .then(r => r.data);
 
-        const schemePromise = serviceBroker
-            .loadViewData(
-                CORE_API.AllocationSchemeStore.getById,
-                [vm.schemeId])
-            .then(r => r.data);
-
-        const allocationPromise = serviceBroker
-            .loadViewData(
-                CORE_API.AllocationStore.findByEntityAndScheme,
-                [vm.entityReference, vm.schemeId],
-                { force: true })
-            .then(r => r.data);
-
         return $q
-            .all([measurablePromise, ratingsPromise, schemePromise, allocationPromise])
-            .then(([allMeasurables, ratings, scheme, allocations]) => {
+            .all([measurablePromise, ratingsPromise])
+            .then(([allMeasurables, ratings]) => {
                 const measurablesById = _.keyBy(allMeasurables, "id");
-                const availableMeasurables = findMeasurablesRelatedToScheme(ratings, measurablesById, scheme);
-                const allocationsByMeasurableId = _.keyBy(allocations, a => a.measurableId);
+                const availableMeasurables = findMeasurablesRelatedToScheme(ratings, measurablesById, vm.scheme);
+                const allocationsByMeasurableId = _
+                    .chain(vm.allocations)
+                    .filter(a => a.schemeId === vm.scheme.id)
+                    .keyBy(a => a.measurableId)
+                    .value();
 
                 items = _
                     .chain(availableMeasurables)
@@ -89,8 +83,6 @@ function controller($q, notification, serviceBroker) {
                         };
                     })
                     .value();
-
-                vm.scheme = scheme;
             });
     }
 
@@ -125,8 +117,10 @@ function controller($q, notification, serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = (c) => {
-        reload();
+    vm.$onChanges = () => {
+        if (vm.scheme && vm.allocations) {
+            reload();
+        }
     };
 
     vm.$onDestroy = () => {
@@ -185,9 +179,8 @@ function controller($q, notification, serviceBroker) {
             }))
             .value();
 
-        serviceBroker
-            .execute(CORE_API.AllocationStore.updateAllocations,
-                [vm.entityReference, vm.schemeId, changes])
+
+        vm.onSave(changes)
             .then(r => {
                 if (r.data === true) {
                     notification.success("Updated allocations");
