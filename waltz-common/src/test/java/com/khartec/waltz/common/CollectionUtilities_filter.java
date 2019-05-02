@@ -22,14 +22,10 @@ package com.khartec.waltz.common;
 import org.junit.Test;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.CollectionUtilities.filter;
-import static com.khartec.waltz.common.CollectionUtilities.head;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.OptionalUtilities.maybe;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 

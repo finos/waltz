@@ -103,12 +103,14 @@
 
                 <span ng-if="!$ctrl.editing">
                     <!-- EDIT BTN -->
-                    <a ng-click="$ctrl.setEditable(true)"
-                       class="clickable">
-                        Edit percentages
-                    </a>
-                    <span ng-if="$ctrl.onDismiss">
+                    <span waltz-has-role="CAPABILITY_EDITOR">
+                        <a ng-click="$ctrl.setEditable(true)"
+                           class="clickable">
+                            Edit percentages
+                        </a>
                         |
+                    </span>
+                    <span ng-if="$ctrl.onDismiss">
                         <a ng-click="$ctrl.onDismiss()"
                            class="clickable">
                             Dismiss

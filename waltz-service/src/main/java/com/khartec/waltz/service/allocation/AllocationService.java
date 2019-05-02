@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.allocation.AllocationUtilities.validateAllocationChanges;
 
 @Service
@@ -44,6 +45,7 @@ public class AllocationService {
 
     @Autowired
     public AllocationService(AllocationDao allocationDao) {
+        checkNotNull(allocationDao, "allocationDao cannot be null");
         this.allocationDao = allocationDao;
     }
 
@@ -69,6 +71,7 @@ public class AllocationService {
                                      long scheme,
                                      Collection<MeasurablePercentageChange> changes,
                                      String username){
+
 
         List<Allocation> currentAllocations = findByEntityAndScheme(ref, scheme);
         ValidationResult validationResult = validateAllocationChanges(currentAllocations, changes);
