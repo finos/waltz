@@ -4,37 +4,38 @@
     <div class="col-sm-4">
         <!-- SCHEME OVERVIEW -->
         <div ng-if="$ctrl.visibility.schemeOverview"
-             ng-include="'wmrep-scheme-overview.html'">
+             ng-include="'wmrep-rating-scheme-overview'">
         </div>
 
         <!-- EDIT SECTION -->
         <div ng-if="$ctrl.visibility.ratingPicker"
-             ng-include="'wmrep-rating-picker.html'">
+             ng-include="'wmrep-rating-picker'">
         </div>
 
         <!-- INSTRUCTIONS -->
         <div class="help-block"
              ng-if="$ctrl.visibility.instructions"
-             ng-include="'wmrep-instructions.html'">
+             ng-include="'wmrep-instructions'">
         </div>
 
     </div>
 
     <!-- TABS & TREES -->
     <div class="col-sm-8">
-         <div ng-include="'wmrep-main-tabs.html'">
+         <div ng-include="'wmrep-main-tabs'">
          </div>
     </div>
 
 </div>
 
 
+<!-- TEMPLATES -->
+
 <!-- MAIN SECTION -->
 <script type="text/ng-template"
-        id="wmrep-main-tabs.html">
+        id="wmrep-main-tabs">
     <div class="waltz-tabs">
         <!-- TAB HEADERS -->
-        <!-- CATEGORIES -->
         <input type="radio"
                ng-change="$ctrl.onTabChange(tab.category.id)"
                ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
@@ -74,42 +75,47 @@
         <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"
              ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
              class="wt-tab">
-
-            <div style="padding-top: 6px">
-                <waltz-measurable-rating-tree ratings="tab.ratings"
-                                              rating-scheme="tab.ratingScheme"
-                                              measurables="tab.measurables"
-                                              on-keypress="$ctrl.onKeypress"
-                                              scroll-height="600"
-                                              on-select="$ctrl.onMeasurableSelect">
-                </waltz-measurable-rating-tree>
-            </div>
-
-            <br>
-            <p class="text-muted small"
-               ng-bind="tab.category.description">
-            </p>
-
-
-            <div ng-if="tab.ratings.length > 0">
-                <a ng-click="$ctrl.onRemoveAll(tab.category.id)"
-                   class="clickable text-danger">
-                    <waltz-icon name="trash"></waltz-icon>
-                    Remove all mappings
-                </a>
-                for this category
-                (<span ng-bind="tab.category.name"></span>)
-            </div>
+            <div ng-include="'wmrep-tab-content'"></div>
         </div>
 
+    </div>
+</script>
 
+
+<!-- TAB CONTENT -->
+<script type="text/ng-template"
+        id="wmrep-tab-content">
+    <div style="padding-top: 6px">
+        <waltz-measurable-rating-tree ratings="tab.ratings"
+                                      rating-scheme="tab.ratingScheme"
+                                      measurables="tab.measurables"
+                                      on-keypress="$ctrl.onKeypress"
+                                      scroll-height="600"
+                                      on-select="$ctrl.onMeasurableSelect">
+        </waltz-measurable-rating-tree>
+    </div>
+
+    <br>
+    <p class="text-muted small"
+       ng-bind="tab.category.description">
+    </p>
+
+
+    <div ng-if="tab.ratings.length > 0">
+        <a ng-click="$ctrl.onRemoveAll(tab.category.id)"
+           class="clickable text-danger">
+            <waltz-icon name="trash"></waltz-icon>
+            Remove all mappings
+        </a>
+        for this category
+        (<span ng-bind="tab.category.name"></span>)
     </div>
 </script>
 
 
 <!-- PICKER -->
 <script type="text/ng-template"
-        id="wmrep-rating-picker.html">
+        id="wmrep-rating-picker">
     <hr>
     <b style="font-weight: bolder"
        ng-bind="$ctrl.selected.measurable.name">
@@ -134,11 +140,6 @@
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
-        <div ng-if="$ctrl.selected.rating">
-            <waltz-icon name="warning"></waltz-icon>
-            This entity already exhibits this characteristic.  You may change
-            the rating, comment or remove this characteristic.
-        </div>
 
         <!-- NEW -->
         <div ng-if="! $ctrl.selected.rating">
@@ -178,6 +179,32 @@
             </div>
         </div>
 
+        <!-- WARNINGS -->
+        <div ng-if="$ctrl.selected.hasWarnings"
+             class="alert alert-warning">
+            <div ng-if="$ctrl.selected.allocations.length > 0">
+                <waltz-icon name="warning"></waltz-icon>
+                This item is used in allocations. Namely:
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Allocation Scheme</th>
+                        <th>Percentage</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="allocation in $ctrl.selected.allocations">
+                        <td><span ng-bind="allocation.scheme.name"></span></td>
+                        <td><span ng-bind="allocation.percentage"></span>%</td>
+                    </tr>
+                    </tbody>
+                </table>
+                Removing this item will cause it's allocation to be deleted and the percentage would be
+                returned to the unallocated pool.
+            </div>
+        </div>
+
+
         <!-- CANCEL -->
         <div class="row">
             <div class="col-sm-12">
@@ -192,9 +219,9 @@
 </script>
 
 
-<!-- SCHEME OVERVIEW -->
+<!-- RATING SCHEME OVERVIEW -->
 <script type="text/ng-template"
-        id="wmrep-scheme-overview.html">
+        id="wmrep-rating-scheme-overview">
     <b>Rating Scheme</b>
     <table class="table table-condensed">
         <thead>
@@ -234,7 +261,7 @@
 
 <!-- INSTRUCTIONS -->
 <script type="text/ng-template"
-        id="wmrep-instructions.html">
+        id="wmrep-instructions">
     <hr>
     <b>
         <waltz-icon name="info-circle"></waltz-icon>

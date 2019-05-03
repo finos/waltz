@@ -44,7 +44,8 @@ function controller() {
         {
             field: 'message',
             name: 'Message',
-            width: '70%'
+            width: '70%',
+            cellTemplate: '<div class="ui-grid-cell-contents"><span title="{{COL_FIELD}}" ng-bind="COL_FIELD"></span></div>'
         },
         {
             field: 'userId',

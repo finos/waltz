@@ -4,11 +4,16 @@
 .wric-cell {
     display: inline-block;
     position: relative;
-    top: 3px;
     width: 1.3em;
     height: 1.3em;
     border: 1px solid;
     border-radius: 6px;
+    top: -2px;
+}
+
+.wric-name {
+    position: relative;
+    top: -5px;
 }
 
 .wric-R,.wric-DISCOURAGED {

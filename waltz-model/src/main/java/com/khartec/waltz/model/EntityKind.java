@@ -21,6 +21,8 @@ package com.khartec.waltz.model;
 
 public enum EntityKind {
 
+    ACTOR,
+    ALLOCATION_SCHEME,
     APPLICATION,
     APP_GROUP,
     ASSET_COST,
@@ -43,7 +45,6 @@ public enum EntityKind {
     FLOW_ANNOTATION,
     INVOLVEMENT,
     INVOLVEMENT_KIND,
-    ACTOR,
     LOGICAL_DATA_ELEMENT,
     LOGICAL_DATA_FLOW,
     MEASURABLE,
@@ -67,4 +68,5 @@ public enum EntityKind {
 
     @Deprecated
     CAPABILITY  // TO BE REMOVED IN 1.5
+    ;
 }

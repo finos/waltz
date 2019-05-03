@@ -36,9 +36,9 @@ public class ArrayUtilities {
     /**
      * @throws IllegalArgumentException If either <code>ts</code>
      * or <code>check</code> is null
-     * @param ts - array of elements of type <code>T</code>
-     * @param check - predicate function
-     * @param <T>
+     * @param ts  array of elements of type <code>T</code>
+     * @param check  predicate function
+     * @param <T>  type if the elements being checked
      * @return <code>true</code> iff all elements in <code>ts</code> pass
      * predicate function <code>check</code>
      */
@@ -53,6 +53,7 @@ public class ArrayUtilities {
     }
 
 
+    @SafeVarargs
     public static <T> T randomPick(T... ts) {
         Checks.checkNotEmpty(ts, "Cannot take random pick from an empty array");
         int idx = rnd.nextInt(ts.length);
@@ -62,16 +63,15 @@ public class ArrayUtilities {
 
     public static <T> boolean isEmpty(T[] arr) {
         if (arr == null) return true;
-        if (arr.length == 0) return true;
-        return false;
+        return arr.length == 0;
     }
 
 
     public static int sum(int[] arr) {
         checkNotNull(arr, "arr cannot be null");
         int total = 0;
-        for (int i = 0; i < arr.length; i++) {
-            total += arr[i];
+        for (int value : arr) {
+            total += value;
         }
         return total;
     }

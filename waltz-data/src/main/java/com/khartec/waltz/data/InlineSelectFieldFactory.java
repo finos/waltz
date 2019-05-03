@@ -98,6 +98,7 @@ public class InlineSelectFieldFactory {
     private static Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mkNameFieldMappings() {
         Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
         mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, ACTOR.NAME));
+        mappings.put(EntityKind.ALLOCATION_SCHEME, tuple(ALLOCATION_SCHEME, ALLOCATION_SCHEME.ID, ALLOCATION_SCHEME.NAME));
         mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.NAME));
         mappings.put(EntityKind.APP_GROUP, tuple(APPLICATION_GROUP, APPLICATION_GROUP.ID, APPLICATION_GROUP.NAME));
         mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.NAME));

@@ -33,33 +33,61 @@
 
                 <hr>
 
-                <div>
+                <div class="waltz-visibility-parent">
                     <div class="row">
-                        <div class="col-sm-3 waltz-display-field-label">
-                            Rating
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Rating:
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-10">
                             <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.selected.rating.rating]"
                                                          show-name="true">
                             </waltz-rating-indicator-cell>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-3 waltz-display-field-label">
-                            Description
+                        <div class="col-sm-2 waltz-display-field-label">
+                            Description:
                         </div>
-                        <div class="col-sm-9">
+                        <div class="col-sm-10">
                             <waltz-markdown style="font-weight: lighter"
                                             text="$ctrl.selected.rating.description || 'No comment given'">
                             </waltz-markdown>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-offset-7 col-sm-5">
+                                <div class="small waltz-visibility-child-30">
+                                <waltz-last-updated entity="$ctrl.selected.rating">
+                                </waltz-last-updated>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <hr>
-                <div class="pull-right small">
-                    <waltz-last-updated entity="$ctrl.selected.rating">
-                    </waltz-last-updated>
+
+                <div ng-if="$ctrl.selected.allocations.length > 0">
+                    <hr>
+                    <div class="row waltz-visibility-parent"
+                         ng-repeat="allocation in $ctrl.selected.allocations">
+                        <div class="col-sm-2 waltz-display-field-label">
+                            <div ng-if="$first">
+                                Allocations:
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <span ng-bind="allocation.scheme.name"></span>
+                        </div>
+                        <div class="col-sm-2">
+                            <span ng-bind="allocation.percentage"></span>%
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="small waltz-visibility-child-30">
+                                <waltz-last-updated entity="allocation">
+                                </waltz-last-updated>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

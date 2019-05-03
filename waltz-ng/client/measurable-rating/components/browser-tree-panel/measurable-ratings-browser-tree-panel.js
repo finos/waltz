@@ -38,7 +38,8 @@ import template from "./measurable-ratings-browser-tree-panel.html";
 
 const bindings = {
     filters: "<",
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+    onMeasurableCategorySelect: "<"
 };
 
 
@@ -272,6 +273,7 @@ function controller($q, serviceBroker) {
         vm.visibility.ratingDetail = false;
         clearDetail();
         vm.activeCategory = c;
+        vm.onMeasurableCategorySelect(c);
     };
 }
 

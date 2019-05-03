@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {CORE_API, getApiReference} from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import { determineStartingTab, mkTabs } from "../../measurable-rating-utils";
+import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
 
 
 /**
@@ -170,4 +170,8 @@ const component = {
 };
 
 
-export default component;
+
+export default {
+    component,
+    id: "waltzMeasurableRatingAppSection"
+};

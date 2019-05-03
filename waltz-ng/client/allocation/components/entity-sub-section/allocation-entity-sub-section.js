@@ -1,14 +1,11 @@
 import template from "./allocation-entity-sub-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {
-    calcWorkingTotal,
-    determineChangeType,
-    updateDirtyFlags,
-    validateItems
-} from "../../allocation-utilities";
+import {calcWorkingTotal, determineChangeType, updateDirtyFlags, validateItems} from "../../allocation-utilities";
 import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 
 const bindings = {
@@ -16,7 +13,8 @@ const bindings = {
     scheme: "<",
     allocations: "<",
     onSave: "<",
-    onDismiss: "<"
+    onDismiss: "<",
+    filters: "<"
 };
 
 
@@ -34,6 +32,7 @@ function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, sche
     return _
         .chain(ratings)
         .map(r => measurablesById[r.measurableId])
+        .compact()
         .filter(m => m.categoryId === scheme.measurableCategoryId)
         .value();
 }
@@ -116,9 +115,16 @@ function controller($q, notification, serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.scheme && vm.allocations) {
             reload();
+        }
+        if(vm.entityReference){
+            vm.selector = mkApplicationSelectionOptions(
+                vm.entityReference,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
         }
     };
 

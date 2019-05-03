@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.CollectionUtilities.filter;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static junit.framework.TestCase.assertTrue;
@@ -48,7 +47,7 @@ public class CollectionUtilities_map {
 
     @Test
     public void mappingWorks() {
-        Collection<String> uppercased = map(words, w -> w.toUpperCase());
+        Collection<String> uppercased = map(words, String::toUpperCase);
         assertEquals(2, uppercased.size());
         assertTrue(uppercased.contains("HELLO"));
         assertTrue(uppercased.contains("WORLD"));
