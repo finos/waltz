@@ -30,7 +30,7 @@
                 <div class="col-sm-10">
 
                     <waltz-no-data ng-if="$ctrl.allocated.length == 0">
-                        <message>No explicit allocations</message>
+                        <message>No explicit allocations </message>
                     </waltz-no-data>
 
                     <div ng-if="$ctrl.allocated.length > 0"
@@ -103,9 +103,16 @@
 
                 <span ng-if="!$ctrl.editing">
                     <!-- EDIT BTN -->
+                    <waltz-data-extract-link name="Download {{$ctrl.activeCategory.name}} allocations"
+                                                styling="link"
+                                                filename="Allocations.csv"
+                                                extract="allocations/allocation-scheme/{{$ctrl.scheme.id}}"
+                                                method="POST"
+                                                request-body="$ctrl.selector">
+                    </waltz-data-extract-link>
                     <a ng-click="$ctrl.setEditable(true)"
                        class="clickable">
-                        Edit percentages
+                        | Edit percentages
                     </a>
                     <span ng-if="$ctrl.onDismiss">
                         |

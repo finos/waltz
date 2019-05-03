@@ -24,6 +24,16 @@
                 </waltz-data-extract-link>
                 <hr>
             </div>
+            <div>
+                <waltz-data-extract-link name="Download all {{$ctrl.activeCategory.name}} allocations"
+                                         styling="link"
+                                         filename="Allocations.csv"
+                                         extract="allocations/measurable-category/{{$ctrl.activeCategory.id}}"
+                                         method="POST"
+                                         request-body="$ctrl.selector">
+                </waltz-data-extract-link>
+                <hr>
+            </div>
             <waltz-loading-notification show="$ctrl.visibility.loading"
                                         style="padding-top: 54px;"
                                         name="Loading">

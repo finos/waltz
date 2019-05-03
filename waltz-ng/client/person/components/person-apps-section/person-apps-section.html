@@ -10,6 +10,18 @@
     </waltz-source-data-section-addon>
 
 
+    <div>
+        <waltz-data-extract-link name="Download all allocations"
+                                 styling="link"
+                                 filename="Allocations.csv"
+                                 extract="allocations/all"
+                                 method="POST"
+                                 request-body="$ctrl.selector">
+        </waltz-data-extract-link>
+        <hr>
+    </div>
+
+
     <waltz-no-data ng-if="$ctrl.allApps.length === 0">
         <message>
             <strong>No applications</strong> for this person
