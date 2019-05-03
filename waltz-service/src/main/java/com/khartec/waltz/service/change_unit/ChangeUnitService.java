@@ -20,24 +20,38 @@
 package com.khartec.waltz.service.change_unit;
 
 import com.khartec.waltz.data.change_unit.ChangeUnitDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
+import com.khartec.waltz.model.change_unit.ImmutableUpdateExecutionStatusCommand;
+import com.khartec.waltz.model.change_unit.UpdateExecutionStatusCommand;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.command.ImmutableCommandResponse;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ChangeUnitService {
 
+    private final ChangeLogService changeLogService;
     private final ChangeUnitDao dao;
 
 
     @Autowired
-    public ChangeUnitService(ChangeUnitDao dao) {
+    public ChangeUnitService(ChangeLogService changeLogService, ChangeUnitDao dao) {
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "dao cannot be null");
+        this.changeLogService = changeLogService;
         this.dao = dao;
     }
 
@@ -54,5 +68,35 @@ public class ChangeUnitService {
 
     public List<ChangeUnit> findByChangeSetId(long id) {
         return dao.findByChangeSetId(id);
+    }
+
+
+    public CommandResponse<UpdateExecutionStatusCommand>updateExecutionStatus(UpdateExecutionStatusCommand command,
+                                                                               String userName) {
+        checkNotNull(command, "command cannot be null");
+        checkNotNull(userName, "userName cannot be null");
+
+        ImmutableUpdateExecutionStatusCommand updateCommand = ImmutableUpdateExecutionStatusCommand
+                .copyOf(command)
+                .withLastUpdate(LastUpdate.mkForUser(userName));
+
+        boolean success = dao.updateExecutionStatus(updateCommand);
+
+        if(success) {
+            changeLogService.write(
+                    ImmutableChangeLog.builder()
+                            .operation(Operation.UPDATE)
+                            .userId(userName)
+                            .parentReference(mkRef(EntityKind.CHANGE_UNIT, command.id()))
+                            .message("Change Unit Id: " + command.id()
+                                    + " execution status changed to " + command.executionStatus())
+                            .build());
+        }
+
+        return ImmutableCommandResponse.<UpdateExecutionStatusCommand>builder()
+                .originalCommand(command)
+                .entityReference(mkRef(EntityKind.CHANGE_UNIT, command.id()))
+                .outcome(success ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
+                .build();
     }
 }

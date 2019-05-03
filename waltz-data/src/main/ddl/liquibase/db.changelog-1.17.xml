@@ -638,4 +638,15 @@
         </sql>
     </changeSet>
 
+
+    <changeSet id="20190503-4015-1"
+               author="kamransaleem">
+        <insert tableName="role">
+            <column name="name" value="Admin"/>
+            <column name="key" value="CHANGE_SET_EDITOR"/>
+            <column name="description" value="Change Set Editor"/>
+            <column name="is_custom" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

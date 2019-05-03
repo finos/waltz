@@ -39,10 +39,17 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const updateExecutionStatus = (cmd) => {
+        return $http
+            .post(`${BASE}/update/execution-status`, cmd)
+            .then(result => result.data);
+    };
+
     return {
         getById,
         findBySubjectRef,
-        findByChangeSetId
+        findByChangeSetId,
+        updateExecutionStatus
     };
 }
 
@@ -71,6 +78,11 @@ export const ChangeUnitStore_API = {
         serviceName,
         serviceFnName: "findByChangeSetId",
         description: "find change units for an associated change set"
+    },
+    updateExecutionStatus: {
+        serviceName,
+        serviceFnName: "updateExecutionStatus",
+        description: "updates the execution status of a change unit"
     }
 };
 

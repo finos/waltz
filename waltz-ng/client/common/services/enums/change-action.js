@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,38 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.user;
-
-import com.khartec.waltz.common.EnumUtilities;
-
-import java.util.Set;
-
-
-public enum SystemRole {
-    ADMIN,
-    APP_EDITOR,
-    ANONYMOUS,
-    ATTESTATION_ADMIN,
-    AUTHORITATIVE_SOURCE_EDITOR,
-    BETA_TESTER,
-    BOOKMARK_EDITOR,
-    CAPABILITY_EDITOR,
-    CHANGE_INITIATIVE_EDITOR,
-    CHANGE_SET_EDITOR,
-    LINEAGE_EDITOR,
-    LOGICAL_DATA_FLOW_EDITOR,
-    ORG_UNIT_EDITOR,
-    RATING_EDITOR,
-    SCENARIO_ADMIN,
-    SCENARIO_EDITOR,
-    SURVEY_ADMIN,
-    SURVEY_TEMPLATE_ADMIN,
-    TAXONOMY_EDITOR,
-    USER_ADMIN
-    ;
-
-
-    public static Set<String> allNames() {
-        return EnumUtilities.names(SystemRole.values());
-    }
-}
+export const changeAction = {
+    ACTIVATE: {
+        key: "ACTIVATE",
+        name: "Activate",
+        icon: null,
+        description: null,
+        position: 10
+    },
+    RETIRE: {
+        key: "RETIRE",
+        name: "Retire",
+        icon: null,
+        description: null,
+        position: 10
+    },
+    MODIFY: {
+        key: "MODIFY",
+        name: "Modify",
+        icon: null,
+        description: null,
+        position: 10
+    },
+};

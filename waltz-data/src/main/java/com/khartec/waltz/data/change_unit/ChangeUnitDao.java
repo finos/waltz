@@ -22,11 +22,9 @@ package com.khartec.waltz.data.change_unit;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.LastUpdate;
 import com.khartec.waltz.model.change_set.ChangeSet;
-import com.khartec.waltz.model.change_unit.ChangeAction;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.ExecutionStatus;
-import com.khartec.waltz.model.change_unit.ImmutableChangeUnit;
+import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
 import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
 import org.jooq.DSLContext;
@@ -41,6 +39,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
@@ -124,4 +123,21 @@ public class ChangeUnitDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public boolean updateExecutionStatus(UpdateExecutionStatusCommand command) {
+        checkNotNull(command, "command cannot be null");
+        checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
+
+        ChangeUnitRecord record = new ChangeUnitRecord();
+        record.setId(command.id());
+        record.changed(CHANGE_UNIT.ID, false);
+
+        record.setExecutionStatus(command.executionStatus().newVal().name());
+
+        LastUpdate lastUpdate = command.lastUpdate().get();
+        record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
+        record.setLastUpdatedBy(lastUpdate.by());
+
+        return dsl.executeUpdate(record) == 1;
+    }
 }

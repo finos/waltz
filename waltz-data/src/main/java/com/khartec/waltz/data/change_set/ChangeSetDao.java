@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.change_set;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
@@ -26,6 +27,7 @@ import com.khartec.waltz.model.change_set.ChangeSet;
 import com.khartec.waltz.model.change_set.ImmutableChangeSet;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.Tables.CHANGE_SET;
 
 
@@ -46,6 +49,12 @@ import static com.khartec.waltz.schema.Tables.CHANGE_SET;
 public class ChangeSetDao {
 
     private final DSLContext dsl;
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            CHANGE_SET.PARENT_ENTITY_ID,
+            CHANGE_SET.PARENT_ENTITY_KIND,
+            newArrayList(EntityKind.values()))
+            .as("entity_name");
 
     public static final RecordMapper<Record, ChangeSet> TO_DOMAIN_MAPPER = r -> {
         ChangeSetRecord record = r.into(ChangeSetRecord.class);
@@ -56,7 +65,7 @@ public class ChangeSetDao {
 
         return ImmutableChangeSet.builder()
                 .id(record.getId())
-                .parentEntity(mkParentRef(record))
+                .parentEntity(mkParentRef(r))
                 .plannedDate(plannedDate)
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .name(record.getName())
@@ -97,25 +106,31 @@ public class ChangeSetDao {
 
     public ChangeSet getById(long id) {
         return dsl
-                .selectFrom(CHANGE_SET)
+                .select(CHANGE_SET.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(CHANGE_SET)
                 .where(CHANGE_SET.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<ChangeSet> findByParentRef(EntityReference ref) {
-        return dsl.selectFrom(CHANGE_SET)
+        return dsl.select(CHANGE_SET.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(CHANGE_SET)
                 .where(CHANGE_SET.PARENT_ENTITY_ID.eq(ref.id()))
                 .and(CHANGE_SET.PARENT_ENTITY_KIND.eq(ref.kind().name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    private static Optional<EntityReference> mkParentRef(ChangeSetRecord record) {
+    private static Optional<EntityReference> mkParentRef(Record r) {
+        ChangeSetRecord record = r.into(ChangeSetRecord.class);
         if(record.getParentEntityKind() != null && record.getParentEntityId() != null) {
             return Optional.of(EntityReference.mkRef(
                     EntityKind.valueOf(record.getParentEntityKind()),
-                    record.getParentEntityId()));
+                    record.getParentEntityId(),
+                    r.getValue(ENTITY_NAME_FIELD)));
         } else {
             return Optional.empty();
         }

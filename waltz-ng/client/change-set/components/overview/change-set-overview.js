@@ -17,26 +17,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import services from "./services";
-import Routes from "./routes";
-import { registerComponents } from "../common/module-utils";
-import ChangeSetView from "./pages/view/change-set-view";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
 
-import ChangeSetOverview from "./components/overview/change-set-overview";
+import template from "./change-set-overview.html";
 
 
-export default () => {
+const bindings = {
+    parentEntityRef: "<",
+};
 
-    const module = angular.module("waltz.change.set", []);
 
-    services(module);
+const initialState = {};
 
-    module.config(Routes);
 
-    registerComponents(module, [
-        ChangeSetView,
-        ChangeSetOverview
-    ]);
+function controller(serviceBroker) {
+    const vm = initialiseData(this, initialState);
 
-    return module.name;
+    const loadChangeSet = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.ChangeSetStore.getById,
+                [vm.parentEntityRef.id])
+            .then(r => vm.changeSet = r.data);
+    };
+
+
+    vm.$onInit = () => {
+        loadChangeSet();
+    };
+}
+
+
+controller.$inject = [
+    "ServiceBroker"
+];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default {
+    component,
+    id: "waltzChangeSetOverview"
 };
