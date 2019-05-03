@@ -20,6 +20,7 @@
 import {initialiseData} from "../../../common";
 import template from "./measurable-ratings-browser-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -36,6 +37,7 @@ const bindings = {
 
 
 const initialState = {
+    hasAllocations: true,
     visibility: {
         treeView: true,
         gridView: false,
@@ -52,6 +54,15 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
             .then(r => vm.visibility.gridAvailable = r.data.length > 0);
+
+        serviceBroker
+            .loadAppData(CORE_API.AllocationSchemeStore.findAll)
+            .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
+
+        vm.selector = mkApplicationSelectionOptions(vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
     };
 
     vm.showGridView = () => {
@@ -62,6 +73,11 @@ function controller(serviceBroker) {
     vm.showTreeView = () => {
         vm.visibility.gridView = false;
         vm.visibility.treeView = true;
+    };
+
+    vm.onCategorySelect = (category) => {
+        vm.activeCategory = category;
+        vm.hasAllocations = _.has(vm.schemesByCategoryId, category.id);
     };
 }
 

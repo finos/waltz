@@ -44,8 +44,7 @@ div.waltz-tabs {
     label {
         color: desaturate($link-color, 10);
         font-weight: lighter;
-        display: block;
-        float: left;
+        display: inline-block;
         padding: 5px 10px;
         cursor: pointer;
         border: 1px solid #ddd;
@@ -53,6 +52,7 @@ div.waltz-tabs {
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
         margin-bottom: 0;
+        margin-top: 2px;
     }
 
     div.wt-tab {

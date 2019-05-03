@@ -35,8 +35,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.Tables.SCENARIO_AXIS_ITEM;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
@@ -63,6 +62,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case PERSON:
+                return mkForPerson(ApplicationIdSelectionOptions.mkOpts(options));
             case MEASURABLE_CATEGORY:
                 return mkForMeasurableCategory(options);
             case MEASURABLE:
@@ -85,6 +86,43 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+
+    private Select<Record1<Long>> mkForPerson(ApplicationIdSelectionOptions options) {
+        switch (options.scope()) {
+            case CHILDREN:
+                return mkForPersonReportees(options);
+            default:
+                throw new UnsupportedOperationException(
+                        "Querying for measurable ids of person using (scope: '"
+                                + options.scope()
+                                + "') not supported");
+        }
+    }
+
+
+    private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
+
+        Select<Record1<String>> emp = dsl.select(PERSON.EMPLOYEE_ID)
+                .from(PERSON)
+                .where(PERSON.ID.eq(options.entityReference().id()));
+
+        SelectConditionStep<Record1<String>> reporteeIds = DSL.selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
+                .from(PERSON_HIERARCHY)
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(emp));
+
+        Condition applicationConditions = mkApplicationConditions(options);
+
+        Condition condition = applicationConditions
+                .and(INVOLVEMENT.EMPLOYEE_ID.eq(emp)
+                        .or(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)));
+
+        return mkBaseRatingBasedSelector()
+                .innerJoin(APPLICATION).on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                .innerJoin(INVOLVEMENT).on(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID)
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(condition);
     }
 
 
