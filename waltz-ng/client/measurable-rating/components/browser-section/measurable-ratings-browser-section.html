@@ -19,12 +19,40 @@
 
     <div ng-if="$ctrl.visibility.treeView"
          class="waltz-fade-if">
-        <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                     filters="$ctrl.filters">
-        </waltz-measurable-ratings-browser-tree-panel>
-
+         <waltz-sub-section name="Ratings">
+            <content>
+                <div style="padding:18px">
+                    <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                                 filters="$ctrl.filters"
+                                                                 on-measurable-category-select="$ctrl.onCategorySelect">
+                    </waltz-measurable-ratings-browser-tree-panel>
+                </div>
+                <div class="waltz-sub-section-controls">
+                    <waltz-data-extract-link name="Ratings"
+                                             method="POST"
+                                             request-body="$ctrl.selector"
+                                             extract="measurable-rating/{{$ctrl.activeCategory.id}}"
+                                             styling="link">
+                    </waltz-data-extract-link>
+                    <span ng-if="$ctrl.hasAllocations">
+                        <waltz-data-extract-link name="Allocations"
+                                                 styling="link"
+                                                 filename="Allocations.csv"
+                                                 extract="allocations/measurable-category/{{$ctrl.activeCategory.id}}"
+                                                 method="POST"
+                                                 request-body="$ctrl.selector">
+                        </waltz-data-extract-link>
+                        <span>|</span>
+                    </span>
+                    <span class="text-muted">
+                        Download
+                        <span ng-bind="$ctrl.activeCategory.name"></span>
+                        :
+                    </span>
+                </div>
+            </content>
+        </waltz-sub-section>
         <br>
-
         <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-roadmap-references>
     </div>
