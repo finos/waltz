@@ -86,7 +86,7 @@ public class ListUtilities {
     }
 
 
-    public static <A, B> List<B> map(List<A> as, Function<A, B> mapper) {
+    public static <A, B> List<B> map(Collection<A> as, Function<A, B> mapper) {
         return as.stream()
                 .map(mapper)
                 .collect(toList());
