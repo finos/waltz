@@ -112,6 +112,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .select(APPLICATION.NAME.as("Application"),
                         APPLICATION.ID.as("Waltz Application Id"),
                         APPLICATION.ASSET_CODE.as("Asset Code"))
+                .select(ORGANISATIONAL_UNIT.NAME.as("Organisational Unit"))
                 .select(ALLOCATION_SCHEME.NAME.as("Allocation Scheme"))
                 .select(MEASURABLE.NAME.as("Measurable"))
                 .select(ALLOCATION.ALLOCATION_PERCENTAGE.as("Allocation Percentage"),
@@ -129,6 +130,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .innerJoin(MEASURABLE).on(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE.ID))
                 .innerJoin(ALLOCATION_SCHEME).on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID))
                 .innerJoin(APPLICATION).on(ALLOCATION.ENTITY_ID.eq(APPLICATION.ID))
+                .innerJoin(ORGANISATIONAL_UNIT).on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
                 .where(condition);
 
         return qry.fetch().formatCSV();
