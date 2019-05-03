@@ -23,60 +23,15 @@
                         <!-- EDITOR -->
                         <div ng-if="$ctrl.visibility.editor">
                             <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                                allocations="$ctrl.allocations"
+                                                                allocation-schemes="$ctrl.allocationSchemes"
                                                                 starting-category-id="$ctrl.visibility.tab">
                             </waltz-measurable-rating-edit-panel>
                         </div>
 
                         <!-- VIEW -->
                         <div ng-if="$ctrl.visibility.editor === false">
-                            <!-- NO DATA -->
-                            <div ng-if="$ctrl.measurables.length == 0">
-                                <waltz-no-data>
-                                    <message>
-                                        <p>
-                                            <strong>No ratings</strong>
-                                            available for this entity.
-                                        </p>
-                                        <p waltz-has-role="RATING_EDITOR">
-                                            <a class="clickable"
-                                               ng-if="$ctrl.visibility.editor === false"
-                                               ng-click="$ctrl.visibility.editor = true">
-                                                <waltz-icon name="plus"></waltz-icon>
-                                                Add some ratings.
-                                            </a>
-                                        </p>
-                                    </message>
-                                </waltz-no-data>
-                            </div>
-
-                            <!-- VIEW w/ DATA -->
-                            <div ng-if="$ctrl.measurables.length > 0">
-                                <div class="waltz-tabs">
-                                    <input type="radio"
-                                           ng-repeat-start="tab in $ctrl.tabs"
-                                           ng-model="$ctrl.visibility.tab"
-                                           ng-value="tab.category.id"
-                                           ng-disabled="tab.ratings.length === 0"
-                                           ng-change="$ctrl.onTabChange(tab)"
-                                           name="measurable_rating"
-                                           id="{{ tab.category.id + '_' +$id}}">
-                                    <label for="{{ tab.category.id + '_' +$id}}"
-                                           uib-popover-template="'wmras-tab-popover.html'"
-                                           popover-trigger="mouseenter"
-                                           popover-append-to-body="true"
-                                           popover-placement="top"
-                                           popover-popup-delay="200"
-                                           ng-repeat-end
-                                           ng-bind="tab.category.name">
-                                    </label>
-
-                                    <div ng-repeat="tab in $ctrl.tabs"
-                                         ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
-                                         class="wt-tab">
-                                        <div ng-include="'wmras-tab-content'"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div ng-include="'wmras-ratings-view'"></div>
                         </div>
                     </div>
 
@@ -100,7 +55,7 @@
     </div>
 
 
-    <div class="row"
+    <div class="row waltz-fade-if"
          ng-if="$ctrl.activeAllocationScheme">
         <br>
         <div class="col-lg-12">
@@ -130,28 +85,86 @@
 
 <!-- TEMPLATES -->
 
+<!-- RATINGS TABS -->
+<script type="text/ng-template"
+        id="wmras-ratings-view">
+    <!-- NO DATA -->
+    <div ng-if="$ctrl.measurables.length == 0">
+        <waltz-no-data>
+            <message>
+                <p>
+                    <strong>No ratings</strong>
+                    available for this entity.
+                </p>
+                <p waltz-has-role="RATING_EDITOR">
+                    <a class="clickable"
+                       ng-if="$ctrl.visibility.editor === false"
+                       ng-click="$ctrl.visibility.editor = true">
+                        <waltz-icon name="plus"></waltz-icon>
+                        Add some ratings.
+                    </a>
+                </p>
+            </message>
+        </waltz-no-data>
+    </div>
 
+    <!-- SOME DATA -->
+    <div ng-if="$ctrl.measurables.length > 0">
+        <div class="waltz-tabs">
+            <input type="radio"
+                   ng-repeat-start="tab in $ctrl.tabs"
+                   ng-model="$ctrl.visibility.tab"
+                   ng-value="tab.category.id"
+                   ng-disabled="tab.ratings.length === 0"
+                   ng-change="$ctrl.onTabChange(tab)"
+                   name="measurable_rating"
+                   id="{{ tab.category.id + '_' +$id}}">
+            <label for="{{ tab.category.id + '_' +$id}}"
+                   uib-popover-template="'wmras-tab-popover.html'"
+                   popover-trigger="mouseenter"
+                   popover-append-to-body="true"
+                   popover-placement="top"
+                   popover-popup-delay="200"
+                   ng-repeat-end
+                   ng-bind="tab.category.name">
+            </label>
+
+            <div ng-repeat="tab in $ctrl.tabs"
+                 ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
+                 class="wt-tab">
+                <div ng-include="'wmras-tab-content'"></div>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<!-- TAB CONTENT -->
 <script type="text/ng-template"
         id="wmras-tab-content">
-
     <br>
+    <!-- RATING TREE -->
     <div class="row">
         <div class="col-sm-12">
             <waltz-measurable-rating-panel category="tab.category"
                                            entity-reference="$ctrl.parentEntityRef"
                                            measurables="tab.measurables"
                                            ratings="tab.ratings"
-                                           rating-scheme="tab.ratingScheme">
+                                           rating-scheme="tab.ratingScheme"
+                                           allocations="$ctrl.allocations"
+                                           allocation-schemes="tab.allocationSchemes">
             </waltz-measurable-rating-panel>
         </div>
     </div>
 
-
+    <!-- ALLOCATION SCHEMES -->
     <div class="row"
          ng-if="tab.allocationSchemes.length > 0">
         <br>
-        <div class="col-sm-12">
-            <strong>Allocations: </strong>
+        <div class="col-sm-1  waltz-display-field-label">
+            Allocations:
+        </div>
+        <div class="col-sm-11">
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
@@ -162,14 +175,15 @@
                           popover-append-to-body="true"
                           popover-placement="bottom">
                     </span>
-
                 </a>
+
+                :
 
                 <span class="small text-muted">
                     <span ng-bind="$ctrl.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
                 </span>
 
-                <span ng-if="!$last">|</span>
+                <span ng-if="!$last">&nbsp;|&nbsp;</span>
             </span>
         </div>
     </div>
@@ -177,6 +191,7 @@
 </script>
 
 
+<!-- CATEGORY POPOVER -->
 <script type="text/ng-template"
         id="wmras-tab-popover.html">
     <div class="small">
@@ -190,6 +205,8 @@
     </div>
 </script>
 
+
+<!-- ALLOCATION SCHEME POPOVER -->
 <script type="text/ng-template"
         id="wmras-scheme-popover.html">
     <div class="small">

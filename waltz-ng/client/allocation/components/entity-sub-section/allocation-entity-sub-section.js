@@ -115,7 +115,7 @@ function controller($q, notification, serviceBroker) {
     vm.$onInit = () => {
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.scheme && vm.allocations) {
             reload();
         }

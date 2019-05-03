@@ -21,18 +21,13 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.khartec.waltz.common.CollectionUtilities.any;
-import static com.khartec.waltz.common.CollectionUtilities.filter;
-import static com.khartec.waltz.common.FunctionUtilities.always;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class CollectionUtilities_any {
