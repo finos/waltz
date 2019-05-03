@@ -48,12 +48,13 @@ public class MeasurableHarness {
         MeasurableService measurableService = ctx.getBean(MeasurableService.class);
 
         EntityReference ref = mkRef(
-                EntityKind.FLOW_DIAGRAM,
-                2);
+                EntityKind.PERSON,
+                172272
+        );
 
         IdSelectionOptions options = mkOpts(
                 ref,
-                HierarchyQueryScope.EXACT);
+                HierarchyQueryScope.CHILDREN);
 
         Select<Record1<Long>> selector = factory.apply(options);
 
@@ -72,7 +73,7 @@ public class MeasurableHarness {
                 .filter(m -> OptionalUtilities.contentsEqual(m.id(), 486L))
                 .forEach(System.out::println);
 
-        System.out.println("-----");
+        System.out.println(measurables.size());
     }
 
 }

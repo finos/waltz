@@ -103,14 +103,21 @@
 
                 <span ng-if="!$ctrl.editing">
                     <!-- EDIT BTN -->
+                    <waltz-data-extract-link name="Download {{$ctrl.activeCategory.name}} allocations"
+                                                styling="link"
+                                                filename="Allocations.csv"
+                                                extract="allocations/allocation-scheme/{{$ctrl.scheme.id}}"
+                                                method="POST"
+                                                request-body="$ctrl.selector">
+                    </waltz-data-extract-link>
                     <span waltz-has-role="CAPABILITY_EDITOR">
                         <a ng-click="$ctrl.setEditable(true)"
                            class="clickable">
-                            Edit percentages
+                            | Edit percentages
                         </a>
-                        |
                     </span>
                     <span ng-if="$ctrl.onDismiss">
+                        |
                         <a ng-click="$ctrl.onDismiss()"
                            class="clickable">
                             Dismiss

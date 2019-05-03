@@ -22,7 +22,6 @@ package com.khartec.waltz.service.allocation;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.allocation.AllocationDao;
-import com.khartec.waltz.data.allocation_scheme.AllocationSchemeDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.allocation.Allocation;
 import com.khartec.waltz.model.allocation.MeasurablePercentageChange;

@@ -168,6 +168,11 @@ function controller(serviceBroker) {
             console.log("filters changed");
             loadAll();
         }
+        vm.selector = mkApplicationSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
     };
 
     // -- INTERACT
