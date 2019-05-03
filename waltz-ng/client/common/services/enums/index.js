@@ -19,37 +19,39 @@
 
 import _ from "lodash";
 
-import {action} from "./action";
-import {applicationKind} from "./application-kind";
-import {appGroupKind} from "./app-group-kind";
-import {attestationType} from "./attestation-type";
-import {BOOLEAN} from "./boolean";
-import {criticality} from "./criticality";
-import {changeInitiative} from "./change-initiative";
-import {dataFormatKind} from "./data-format-kind";
-import {endOfLifeStatus} from "./end-of-life-status";
-import {entity} from "./entity";
-import {entityStatistic} from "./entity-statistic";
-import {entityLifecycleStatus} from "./entity-lifecycle-status";
-import {frequencyKind} from "./frequency-kind";
-import {hierarchyQueryScope} from "./hierarchy-query-scope";
-import {investmentRating} from "./investment-rating";
-import {issuance} from "./issuance";
-import {lifecyclePhase} from "./lifecycle-phase";
-import {lifecycleStatus} from "./lifecycle-status";
-import {usageKind} from "./usage-kind";
-import {orgUnitKind} from "./org-unit-kind";
-import {participantKind} from "./participation-kind";
-import {rag} from "./rag";
-import {relationshipKind} from "./relationship-kind";
-import {releaseLifecycleStatus} from "./release-lifecycle-status";
-import {rollupKind} from "./rollup-kind";
-import {severity} from "./severity";
-import {surveyInstanceStatus} from "./survey-instance-status";
-import {surveyQuestionFieldType} from "./survey-question-field-type";
-import {surveyRunStatus} from "./survey-run-status";
-import {fieldDataType} from "./field-data-type";
-import {physicalSpecDefinitionType} from "./physical-spec-definition-type";
+import { action } from "./action";
+import { applicationKind } from "./application-kind";
+import { appGroupKind } from "./app-group-kind";
+import { attestationType } from "./attestation-type";
+import { BOOLEAN } from "./boolean";
+import { criticality } from "./criticality";
+import { changeInitiative } from "./change-initiative";
+import { changeAction } from "./change-action";
+import { dataFormatKind } from "./data-format-kind";
+import { endOfLifeStatus } from "./end-of-life-status";
+import { entity } from "./entity";
+import { entityStatistic } from "./entity-statistic";
+import { entityLifecycleStatus } from "./entity-lifecycle-status";
+import { executionStatus } from "./execution-status";
+import { frequencyKind } from "./frequency-kind";
+import { hierarchyQueryScope } from "./hierarchy-query-scope";
+import { investmentRating } from "./investment-rating";
+import { issuance } from "./issuance";
+import { lifecyclePhase } from "./lifecycle-phase";
+import { lifecycleStatus } from "./lifecycle-status";
+import { usageKind } from "./usage-kind";
+import { orgUnitKind } from "./org-unit-kind";
+import { participantKind } from "./participation-kind";
+import { rag } from "./rag";
+import { relationshipKind } from "./relationship-kind";
+import { releaseLifecycleStatus } from "./release-lifecycle-status";
+import { rollupKind } from "./rollup-kind";
+import { severity } from "./severity";
+import { surveyInstanceStatus } from "./survey-instance-status";
+import { surveyQuestionFieldType } from "./survey-question-field-type";
+import { surveyRunStatus } from "./survey-run-status";
+import { fieldDataType } from "./field-data-type";
+import { physicalSpecDefinitionType } from "./physical-spec-definition-type";
 
 export const capabilityRating = investmentRating;
 
@@ -63,7 +65,9 @@ export const enums = {
     attestationType,
     BOOLEAN,
     capabilityRating,
+    changeAction,
     entityLifecycleStatus,
+    executionStatus,
     investmentRating,
     lifecyclePhase,
     orgUnitKind,

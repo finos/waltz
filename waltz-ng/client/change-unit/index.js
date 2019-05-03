@@ -18,6 +18,9 @@
  */
 
 import services from "./services";
+import { registerComponents } from '../common/module-utils';
+
+import ChangeUnitSection from "./components/section/change-unit-section";
 
 
 export default () => {
@@ -25,6 +28,10 @@ export default () => {
     const module = angular.module("waltz.change.unit", []);
 
     services(module);
+
+    registerComponents(module, [
+        ChangeUnitSection
+    ]);
 
     return module.name;
 };
