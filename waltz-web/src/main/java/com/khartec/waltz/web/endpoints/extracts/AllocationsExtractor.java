@@ -111,10 +111,15 @@ public class AllocationsExtractor extends BaseDataExtractor{
         SelectSelectStep<Record> reportColumns = dsl
                 .select(APPLICATION.NAME.as("Application"),
                         APPLICATION.ID.as("Waltz Application Id"),
-                        APPLICATION.ASSET_CODE.as("Asset Code"))
+                        APPLICATION.ASSET_CODE.as("Asset Code"),
+                        APPLICATION.OVERALL_RATING.as("Application Rating"))
                 .select(ORGANISATIONAL_UNIT.NAME.as("Organisational Unit"))
                 .select(ALLOCATION_SCHEME.NAME.as("Allocation Scheme"))
-                .select(MEASURABLE.NAME.as("Measurable"))
+                .select(MEASURABLE.NAME.as("Taxonomy Item"),
+                        MEASURABLE.ID.as("Waltz Taxonomy Item Id"),
+                        MEASURABLE.EXTERNAL_ID.as("Taxonomy Item External Id"))
+                .select(MEASURABLE_RATING.RATING.as("Taxonomy Item Rating"))
+                .select(ENTITY_HIERARCHY.LEVEL.as("Hierarchy Level"))
                 .select(ALLOCATION.ALLOCATION_PERCENTAGE.as("Allocation Percentage"),
                         ALLOCATION.LAST_UPDATED_AT.as("Last Updated"),
                         ALLOCATION.LAST_UPDATED_BY.as("Last Updated By"),
@@ -123,11 +128,19 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
         Condition condition = ALLOCATION.ENTITY_ID.in(appSelector)
                 .and(ALLOCATION.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(ENTITY_HIERARCHY.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
+                .and(ENTITY_HIERARCHY.ID.eq(ALLOCATION.MEASURABLE_ID))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ALLOCATION.ENTITY_ID))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(ALLOCATION.MEASURABLE_ID))
                 .and(additionalCondition);
 
         SelectConditionStep<Record> qry = reportColumns
                 .from(ALLOCATION)
                 .innerJoin(MEASURABLE).on(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .innerJoin(ENTITY_HIERARCHY).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ID))
                 .innerJoin(ALLOCATION_SCHEME).on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID))
                 .innerJoin(APPLICATION).on(ALLOCATION.ENTITY_ID.eq(APPLICATION.ID))
                 .innerJoin(ORGANISATIONAL_UNIT).on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
