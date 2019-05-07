@@ -21,6 +21,6 @@ package com.khartec.waltz.model;
 
 public interface OrganisationalUnitIdProvider {
 
-    public Long organisationalUnitId();
+    Long organisationalUnitId();
 
 }

@@ -199,11 +199,4 @@ public class ApplicationEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), findByAssetCodeRoute);
     }
 
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("ApplicationEndpoint{");
-        sb.append('}');
-        return sb.toString();
-    }
 }

@@ -87,7 +87,7 @@ public class InvolvementGenerator implements SampleDataGenerator {
         List<String> analysts = getEmployeeIdsByTitle(dsl, "%Analyst%");
         List<String> administrators = getEmployeeIdsByTitle(dsl, "%Administrator%");
         List<String> qa = getEmployeeIdsByTitle(dsl, "%QA%");
-        List<String> directors = getEmployeeIdsByTitle(dsl, "%Director%");;
+        List<String> directors = getEmployeeIdsByTitle(dsl, "%Director%");
 
         List<Long> orgUnitIds = dsl.select(ORGANISATIONAL_UNIT.ID)
                 .from(ORGANISATIONAL_UNIT)
