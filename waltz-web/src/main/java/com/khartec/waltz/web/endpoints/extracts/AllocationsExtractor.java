@@ -109,18 +109,18 @@ public class AllocationsExtractor extends BaseDataExtractor{
     private String doExtract(Condition additionalCondition, ApplicationIdSelectionOptions applicationIdSelectionOptions) {
         Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
         SelectSelectStep<Record> reportColumns = dsl
-                .select(APPLICATION.NAME.as("Application"),
-                        APPLICATION.ID.as("Waltz Application Id"),
-                        APPLICATION.ASSET_CODE.as("Asset Code"),
+                .select(APPLICATION.NAME.as("Application Name"),
+                        APPLICATION.ID.as("Application Waltz Id"),
+                        APPLICATION.ASSET_CODE.as("Application Asset Code"),
                         APPLICATION.OVERALL_RATING.as("Application Rating"))
                 .select(ORGANISATIONAL_UNIT.NAME.as("Organisational Unit"))
                 .select(ALLOCATION_SCHEME.NAME.as("Allocation Scheme"))
-                .select(MEASURABLE.NAME.as("Taxonomy Item"),
-                        MEASURABLE.ID.as("Waltz Taxonomy Item Id"),
+                .select(MEASURABLE.NAME.as("Taxonomy Item Name"),
+                        MEASURABLE.ID.as("Taxonomy Item Waltz Id"),
                         MEASURABLE.EXTERNAL_ID.as("Taxonomy Item External Id"))
-                .select(MEASURABLE_RATING.RATING.as("Taxonomy Item Rating"))
-                .select(RATING_SCHEME_ITEM.NAME.as("Rating Name"))
-                .select(ENTITY_HIERARCHY.LEVEL.as("Hierarchy Level"))
+                .select(MEASURABLE_RATING.RATING.as("Taxonomy Item RAG Rating"))
+                .select(RATING_SCHEME_ITEM.NAME.as("Taxonomy Item Rating Name"))
+                .select(ENTITY_HIERARCHY.LEVEL.as("Taxonomy Item Hierarchy Level"))
                 .select(ALLOCATION.ALLOCATION_PERCENTAGE.as("Allocation Percentage"),
                         ALLOCATION.LAST_UPDATED_AT.as("Last Updated"),
                         ALLOCATION.LAST_UPDATED_BY.as("Last Updated By"),
