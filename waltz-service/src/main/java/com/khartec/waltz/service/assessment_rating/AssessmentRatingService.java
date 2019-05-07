@@ -77,7 +77,8 @@ public class AssessmentRatingService {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
-                        "Updated " + assessmentDefinition.name() + " as [%s - %s]",
+                        "Updated %s as [%s - %s]",
+                        assessmentDefinition.name(),
                         ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
@@ -96,7 +97,8 @@ public class AssessmentRatingService {
     public boolean create(SaveAssessmentRatingCommand command, String username) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
-                        "Created " + assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name() + " as [%s - %s]",
+                        "Created %s as [%s - %s]",
+                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name(),
                         ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
