@@ -155,6 +155,34 @@ function controller($q, notification, serviceBroker) {
         recalcData();
     };
 
+    vm.onZeroAndDistribute = (d) => {
+        const amountToDistribute = d.working.percentage;
+
+        const validRecipients = _
+            .chain(vm.allocated)
+            .filter(a => a.measurable.id !== d.measurable.id)
+            .filter(a => a.working.percentage !== 0)
+            .orderBy(a => a.working.percentage, "desc")
+            .value();
+
+        const currentTotal = _.sumBy(validRecipients, d => d.working.percentage);
+
+        if (currentTotal > 0) {
+            let amountGiven = 0;
+            validRecipients.forEach((d, idx) => {
+                const amountToGive = Math.floor((amountToDistribute / currentTotal) * d.working.percentage);
+                amountGiven = amountGiven += amountToGive;
+                d.working.percentage += amountToGive;
+            });
+
+            const remainder = amountToDistribute - amountGiven;
+            validRecipients[0].working.percentage += remainder;
+        }
+
+        d.working.percentage = 0;
+        recalcData();
+    };
+
     vm.onPercentageChange = () => recalcData();
 
     vm.onPercentageFocusLost = () => {
