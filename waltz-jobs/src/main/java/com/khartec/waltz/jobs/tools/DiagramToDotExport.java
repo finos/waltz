@@ -63,13 +63,12 @@ public class DiagramToDotExport {
         Map<Long, Application> appsById = indexBy(a -> a.id().get(), apps);
 
         System.out.println("------");
-        StringBuilder sb = new StringBuilder()
-            .append("digraph G {")
-            .append(renderApplications(apps))
-            .append(renderFlows(flows, appsById))
-            .append("}");
+        String digraph = String.format(
+                "digraph G { %s %s}",
+                renderApplications(apps),
+                renderFlows(flows, appsById));
 
-        System.out.println(sb);
+        System.out.println(digraph);
         System.out.println("-----");
         /*
         digraph G {

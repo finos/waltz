@@ -56,6 +56,10 @@
                        ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
                      <waltz-icon name="sticky-note-o"></waltz-icon>
                 </span>
+                <waltz-icon name="pie-chart"
+                            class="waltz-visibility-child-30"
+                            ng-if="$ctrl.allocationsByMeasurable[node.id]">
+                </waltz-icon>
             </span>
         </span>
 
@@ -81,6 +85,14 @@
         <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
             <hr>
             <div ng-bind="$ctrl.ratingsByMeasurable[node.id].description"></div>
+        </div>
+
+        <div ng-if="$ctrl.allocationsByMeasurable[node.id]"
+             class="text-muted">
+            <hr>
+            <waltz-icon name="pie-chart">
+            </waltz-icon>
+            This item has <i>allocations</i>, select it for more information
         </div>
     </div>
 </script>

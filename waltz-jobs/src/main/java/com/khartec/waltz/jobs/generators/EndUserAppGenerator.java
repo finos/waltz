@@ -75,15 +75,12 @@ public class EndUserAppGenerator implements SampleDataGenerator {
         ids.forEach(ouId -> {
             for (int i = 0; i < new Random().nextInt(3); i++) {
                 EndUserApplicationRecord record = dsl.newRecord(END_USER_APPLICATION);
-                String name = new StringBuilder()
-                        .append(randomPick(subjects))
-                        .append(" ")
-                        .append(randomPick(subjects))
-                        .append(" ")
-                        .append(randomPick(types))
-                        .append(" ")
-                        .append(randomPick(types))
-                        .toString();
+                String name = String.format(
+                        "%s %s %s %s",
+                        randomPick(subjects),
+                        randomPick(subjects),
+                        randomPick(types),
+                        randomPick(types));
 
                 record.setName(name);
                 record.setDescription("About the " + name + " End user app");

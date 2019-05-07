@@ -99,7 +99,7 @@ public class InvolvementHarness {
     private static void viaJdbc(DataSource dataSource) {
 
         try (
-            Connection conn = dataSource.getConnection();
+            Connection conn = dataSource.getConnection()
         ){
 
             System.out.println("-- jdbc start");

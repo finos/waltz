@@ -39,6 +39,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static java.lang.String.format;
 
 @Service
 public class AssessmentRatingService {
@@ -75,8 +76,9 @@ public class AssessmentRatingService {
     public boolean update(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(String.format(
-                        "Updated " + assessmentDefinition.name() + " as [%s - %s]",
+                .message(format(
+                        "Updated %s as [%s - %s]",
+                        assessmentDefinition.name(),
                         ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
@@ -94,8 +96,9 @@ public class AssessmentRatingService {
 
     public boolean create(SaveAssessmentRatingCommand command, String username) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(String.format(
-                        "Created " + assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name() + " as [%s - %s]",
+                .message(format(
+                        "Created %s as [%s - %s]",
+                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name(),
                         ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
                         command.description()))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
@@ -113,9 +116,12 @@ public class AssessmentRatingService {
 
     public boolean remove(RemoveAssessmentRatingCommand command, String username) {
         ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(String.format(
-                 "Removed " + assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name()))
-                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
+                .message(format(
+                        "Removed %s",
+                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name()))
+                .parentReference(mkRef(
+                        command.entityReference().kind(),
+                        command.entityReference().id()))
                 .userId(username)
                 .childKind(command.entityReference().kind())
                 .severity(Severity.INFORMATION)

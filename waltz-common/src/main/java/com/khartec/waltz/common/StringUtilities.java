@@ -52,9 +52,10 @@ public class StringUtilities {
 
 
     public static boolean isEmpty(Optional<String> maybeString) {
-        if (maybeString == null) return true;
-        if (! maybeString.isPresent()) return true;
-        return isEmpty(maybeString.get());
+        return OptionalUtilities
+                .ofNullableOptional(maybeString)
+                .map(StringUtilities::isEmpty)
+                .orElse(true);
     }
 
 

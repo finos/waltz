@@ -61,11 +61,26 @@ public class OptionalUtilities {
 
 
     /**
-        Returns true iff, `a` is empty and b `is` null, or, `a.get` equals `b`
+     * Returns true iff, `opt` is empty and val `is` null, or, `opt.get` equals `val`
      */
-    public static <T> boolean contentsEqual(Optional<T> a, T b) {
-        checkNotNull(a, "'a' cannot be null");
-        return a.map(aVal -> aVal.equals(b))
-                .orElse(b == null);
+    public static <T> boolean contentsEqual(Optional<T> opt, T val) {
+        checkNotNull(opt, "'opt' cannot be null");
+        return opt
+                .map(v -> v.equals(val))
+                .orElse(val == null);
     }
+
+
+    /**
+     * Takes an optional value (that may itself be null) and makes it a non-null optional
+     * @param nullable  an Optional value that may, itself, be null
+     * @param <T>  type of the optional value
+     * @return  an Optional
+     */
+    public static <T> Optional<T> ofNullableOptional(Optional<T> nullable) {
+        return nullable == null
+                ? Optional.empty()
+                : nullable;
+    }
+
 }
