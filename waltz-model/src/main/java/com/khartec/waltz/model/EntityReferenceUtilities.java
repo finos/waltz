@@ -38,6 +38,14 @@ public class EntityReferenceUtilities {
     }
 
 
+    public static String basicFmt(EntityReference ref) {
+        return String.format(
+                "%s/%d",
+                ref.kind().name(),
+                ref.id());
+    }
+
+
     public static String safeName(EntityReference ref) {
         String idStr = "[" + ref.id() + "]";
         return ref
