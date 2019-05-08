@@ -43,15 +43,13 @@
                                 </div>
 
                                 <div class="col-md-7">
-                                    <waltz-sub-section name="Details">
-                                        <content>
-                                            <div class="waltz-sub-section-content">
-                                                <waltz-physical-flow-overview parent-entity-ref="cu.subjectEntity"
-                                                                              class="waltz-highlight-if">
-                                                </waltz-physical-flow-overview>
-                                            </div>
-                                        </content>
-                                    </waltz-sub-section>
+                                    <div ng-if="cu.subjectEntity.kind === 'PHYSICAL_FLOW' && cu.action !== 'MODIFY'"
+                                         ng-include="'cus-physical-flow-overview'">
+                                    </div>
+
+                                    <div ng-if="cu.action === 'MODIFY'"
+                                         ng-include="'cus-attribute-change'">
+                                    </div>
                                 </div>
                             </div>
 
@@ -101,3 +99,58 @@
     </waltz-section>
 
 </div>
+
+
+<!-- TEMPLATES -->
+
+<!-- PHYSICAL FLOW OVERVIEW -->
+<script type="text/ng-template"
+        id="cus-physical-flow-overview">
+    <waltz-sub-section name="Details">
+        <content>
+            <div class="waltz-sub-section-content">
+                <waltz-physical-flow-overview parent-entity-ref="cu.subjectEntity"
+                                              class="waltz-highlight-if">
+                </waltz-physical-flow-overview>
+            </div>
+
+            <div class="waltz-sub-section-controls">
+                <span>
+                    <waltz-entity-link entity-ref="{
+                        kind: 'PHYSICAL_FLOW',
+                        id: cu.subjectEntity.id,
+                        name: 'Go to physical flow'}">
+                    </waltz-entity-link>
+                </span>
+            </div>
+
+        </content>
+    </waltz-sub-section>
+</script>
+
+
+<!-- PHYSICAL FLOW ATTRIBUTE CHANGES -->
+<script type="text/ng-template"
+        id="cus-attribute-change">
+    <waltz-sub-section name="Details">
+        <content>
+            <div class="waltz-sub-section-content">
+                <waltz-attribute-change-panel change-unit="cu"
+                                              class="waltz-highlight-if">
+                </waltz-attribute-change-panel>
+            </div>
+
+            <div class="waltz-sub-section-controls">
+                <span>
+                    <waltz-entity-link entity-ref="{
+                        kind: cu.subjectEntity.kind,
+                        id: cu.subjectEntity.id,
+                        name: 'Go to physical flow'
+                      }">
+                    </waltz-entity-link>
+                </span>
+            </div>
+
+        </content>
+    </waltz-sub-section>
+</script>

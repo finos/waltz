@@ -17,25 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import services from "./services";
-import { registerComponents } from '../common/module-utils';
+import { initialiseData } from "../../../common";
 
-import AttributeChangePanel from "./components/attribute-change/attribute-change-panel";
-import ChangeUnitSection from "./components/section/change-unit-section";
-import DataTypeChangePanel from "./components/data-type-change-panel/data-type-change-panel";
+import template from "./data-type-change-panel.html";
 
 
-export default () => {
+const bindings = {
+    typeIds: "<",
+};
 
-    const module = angular.module("waltz.change.unit", []);
 
-    services(module);
+const initialState = {
+};
 
-    registerComponents(module, [
-        AttributeChangePanel,
-        ChangeUnitSection,
-        DataTypeChangePanel
-    ]);
 
-    return module.name;
+function controller() {
+    const vm = initialiseData(this, initialState);
+}
+
+
+controller.$inject = [
+];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default {
+    component,
+    id: "waltzDataTypeChangePanel"
 };

@@ -48,19 +48,19 @@ function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadData = (force = false) => {
-        let promise = null;
+        let cuPromise = null;
         if(vm.parentEntityRef.kind === "CHANGE_SET") {
             //load for change set id
-            promise = serviceBroker
+            cuPromise = serviceBroker
                 .loadViewData(CORE_API.ChangeUnitStore.findByChangeSetId, [vm.parentEntityRef.id], {force})
                 .then(r => r.data);
         } else {
             // load by subject ref
-            promise = serviceBroker
+            cuPromise = serviceBroker
                 .loadViewData(CORE_API.ChangeUnitStore.findBySubjectRef, [vm.parentEntityRef], {force})
                 .then(r => r.data);
         }
-        return promise
+        return cuPromise
             .then(changeUnits => vm.changeUnits = changeUnits);
     };
 
