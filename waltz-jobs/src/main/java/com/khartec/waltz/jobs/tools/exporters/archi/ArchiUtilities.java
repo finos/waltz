@@ -1,13 +1,17 @@
 package com.khartec.waltz.jobs.tools.exporters.archi;
 
 import com.khartec.waltz.job.tools.exporters.archi.*;
+import com.khartec.waltz.model.EntityKindProvider;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 public class ArchiUtilities {
 
@@ -57,7 +61,7 @@ public class ArchiUtilities {
                                Map<EntityReference, ? extends RealElementType> appComponentsByRef) {
         Flow archi = new Flow();
         archi.setIdentifier(fmt(flow.entityReference()));
-        archi.getNameGroup().add(mkStr(flow.entityReference().toString()));
+        archi.getNameGroup().add(mkStr(fmt(flow.entityReference())));
         archi.setSource(appComponentsByRef.get(flow.source()));
         archi.setTarget(appComponentsByRef.get(flow.target()));
         return archi;
@@ -113,7 +117,6 @@ public class ArchiUtilities {
     public static String fmt(EntityReference entityReference) {
         return String.format("%s.%d", entityReference.kind().name(), entityReference.id());
     }
-
 
 
     public static PropertyDefinitionsType mkPropDefinitions() {
