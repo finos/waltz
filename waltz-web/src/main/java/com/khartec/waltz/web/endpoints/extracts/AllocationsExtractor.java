@@ -118,7 +118,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .select(MEASURABLE.NAME.as("Taxonomy Item Name"),
                         MEASURABLE.ID.as("Taxonomy Item Waltz Id"),
                         MEASURABLE.EXTERNAL_ID.as("Taxonomy Item External Id"))
-                .select(MEASURABLE_RATING.RATING.as("Taxonomy Item RAG Rating"))
+                .select(MEASURABLE_RATING.RATING.as("Taxonomy Item Rating"))
                 .select(RATING_SCHEME_ITEM.NAME.as("Taxonomy Item Rating Name"))
                 .select(ENTITY_HIERARCHY.LEVEL.as("Taxonomy Item Hierarchy Level"))
                 .select(ALLOCATION.ALLOCATION_PERCENTAGE.as("Allocation Percentage"),
