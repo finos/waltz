@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 public class XmlUtilities {
@@ -69,8 +70,9 @@ public class XmlUtilities {
         }
 
         transformer.transform(new DOMSource(doc),
-                new StreamResult(new OutputStreamWriter(out, "UTF-8")));
+                new StreamResult(new OutputStreamWriter(out, StandardCharsets.UTF_8)));
     }
+
 
     public static DocumentBuilderFactory createNonValidatingDocumentBuilderFactory() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

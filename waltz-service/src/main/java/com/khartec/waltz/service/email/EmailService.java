@@ -135,7 +135,7 @@ public class EmailService {
 
     private void sendEmailNotification(String subject, String body, Collection<String> recipients) {
         int count = recipients.stream().collect(batchProcessingCollector(batchSize, batch -> {
-            String[] to = batch.toArray(new String[batch.size()]);
+            String[] to = batch.toArray(new String[0]);
             waltzEmailer.sendEmail(subject, body, to);
         }));
         LOG.info(String.format("Sent email notification: %s to %s users", subject, count));

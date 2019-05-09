@@ -11,7 +11,7 @@ public class LoadAll {
 
     private static final boolean SKIP_SLOW = false;
 
-    private static final SampleDataGenerator loaders[] = new SampleDataGenerator[] {
+    private static final SampleDataGenerator[] loaders = new SampleDataGenerator[] {
             new DataTypeGenerator(),
             new OrgUnitGenerator(),
             SKIP_SLOW ? null : new PersonDataGenerator(),

@@ -31,6 +31,7 @@ import {truncateMiddle} from "../../../common/string-utils";
  * Intended only for use with a single application and a single measurable kind.
  */
 const bindings = {
+    allocations: "<?",
     ratings: "<",
     ratingScheme: "<",
     measurables: "<",
@@ -41,6 +42,7 @@ const bindings = {
 
 
 const initialState = {
+    allocations: [],
     containerClass: "",
     hierarchy: [],
     measurables: [],
@@ -102,6 +104,7 @@ function controller() {
         vm.hierarchy = prepareTree(measurables);
         vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
         vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
+        vm.allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
 
         if (_.isEmpty(vm.expandedNodes)) {
             vm.expandedNodes = calculateExpandedNodes(measurables, vm.ratingsByMeasurable);

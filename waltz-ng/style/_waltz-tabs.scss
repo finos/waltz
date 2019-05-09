@@ -30,7 +30,8 @@ div.waltz-tabs {
             font-weight: bolder;
 
             cursor:default;
-            border-top: 3px solid #e36209
+            border-top: 3px solid #e36209;
+            margin-top: 0;
         }
 
         &:disabled + label {
@@ -53,6 +54,7 @@ div.waltz-tabs {
         border-top-right-radius: 4px;
         margin-bottom: 0;
         margin-top: 2px;
+        margin-right: -4px;
     }
 
     div.wt-tab {

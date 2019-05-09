@@ -62,7 +62,7 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
             return preview.build();
         }
 
-        if (newValue == false) {
+        if (!newValue) {
             addToPreview(
                     preview,
                     findCurrentRatingMappings(measurableRatingService, cmd),

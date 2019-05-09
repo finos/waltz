@@ -61,7 +61,7 @@ public abstract class BaseDataExtractor {
         StringWriter bodyWriter = new StringWriter();
         CsvPreference csvPreference = CsvPreference.EXCEL_PREFERENCE;
         CsvListWriter csvWriter = new CsvListWriter(bodyWriter, csvPreference);
-        csvWriter.write("sep=" + Character.toString((char) csvPreference.getDelimiterChar()));
+        csvWriter.write("sep=" + ((char) csvPreference.getDelimiterChar()));
         extractor.accept(csvWriter);
         csvWriter.flush();
         return writeFile(suggestedFilename, bodyWriter.toString(), response);

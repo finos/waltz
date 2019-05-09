@@ -56,12 +56,4 @@ public class AppViewEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
     }
 
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("AppViewEndpoint{");
-        sb.append("appViewService=").append(appViewService);
-        sb.append('}');
-        return sb.toString();
-    }
 }
