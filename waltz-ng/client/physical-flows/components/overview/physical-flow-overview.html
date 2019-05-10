@@ -1,4 +1,8 @@
-<div class="waltz-physical-flow-overview">
+<div class="waltz-physical-flow-overview"
+     ng-class="{
+        'ws-inactive': $ctrl.physicalFlow.entityLifecycleStatus ==='REMOVED',
+        'ws-draft': $ctrl.physicalFlow.entityLifecycleStatus ==='PENDING',
+     }">
     <div class="row">
         <!--SOURCE-->
         <div class="col-sm-4">

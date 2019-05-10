@@ -1,4 +1,4 @@
-<!--
+ <!--
   ~ Waltz - Enterprise Architecture
   ~ Copyright (C) 2016, 2017  Waltz open source project
   ~ See README.md for more information
@@ -614,6 +614,7 @@
         </createIndex>
     </changeSet>
 
+
     <!-- 3937 - add is_removed to logical_flow -->
     <changeSet id="20190426-3937-8"
                author="kamransaleem">
@@ -647,6 +648,31 @@
             <column name="description" value="Change Set Editor"/>
             <column name="is_custom" valueBoolean="false"/>
         </insert>
+    </changeSet>
+
+
+    <!-- 4030 - add entity_lifecycle_status to physical_flow -->
+    <changeSet id="20190509-4030-1"
+               author="kamransaleem">
+        <comment>4030: Add entity_lifecycle_status field to physical_flow</comment>
+        <addColumn tableName="physical_flow">
+            <column name="entity_lifecycle_status"
+                type="${enum.type}"
+                defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190509-4030-2"
+               author="kamransaleem">
+        <comment>4030: Add entity_lifecycle_status field to physical_flow</comment>
+
+        <sql>
+            UPDATE physical_flow
+            SET entity_lifecycle_status = 'REMOVED'
+            WHERE is_removed = ${true.value}
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

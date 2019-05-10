@@ -21,9 +21,13 @@ package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.data.enum_value.EnumValueDao;
 import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
-import com.khartec.waltz.model.physical_flow.*;
+import com.khartec.waltz.model.physical_flow.FrequencyKind;
+import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
+import com.khartec.waltz.model.physical_flow.PhysicalFlow;
+import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -72,6 +76,7 @@ public class PhysicalFlowDao {
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(Timestamp::toLocalDateTime))
                 .isRemoved(record.getIsRemoved())
                 .externalId(Optional.ofNullable(record.getExternalId()))
+                .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .build();
     };
 
@@ -383,6 +388,15 @@ public class PhysicalFlowDao {
         return dsl
                 .update(PHYSICAL_FLOW)
                 .set(PHYSICAL_FLOW.DESCRIPTION, description)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
+
+
+    public int updateEntityLifecycleStatus(long flowId, String entityLifecycleStatus) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS, entityLifecycleStatus)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .execute();
     }

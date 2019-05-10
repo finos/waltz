@@ -38,8 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
+import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
@@ -127,17 +126,18 @@ public class ChangeUnitDao {
     public boolean updateExecutionStatus(UpdateExecutionStatusCommand command) {
         checkNotNull(command, "command cannot be null");
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
-
-        ChangeUnitRecord record = new ChangeUnitRecord();
-        record.setId(command.id());
-        record.changed(CHANGE_UNIT.ID, false);
-
-        record.setExecutionStatus(command.executionStatus().newVal().name());
+        checkTrue(command.executionStatus().oldVal().equals(ExecutionStatus.PENDING), "Current status should be PENDING");
 
         LastUpdate lastUpdate = command.lastUpdate().get();
-        record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
-        record.setLastUpdatedBy(lastUpdate.by());
 
-        return dsl.executeUpdate(record) == 1;
+        int count = dsl.update(CHANGE_UNIT)
+                .set(CHANGE_UNIT.EXECUTION_STATUS, command.executionStatus().newVal().name())
+                .set(CHANGE_UNIT.LAST_UPDATED_AT, Timestamp.valueOf(lastUpdate.at()))
+                .set(CHANGE_UNIT.LAST_UPDATED_BY, lastUpdate.by())
+                .where(CHANGE_UNIT.EXECUTION_STATUS.eq(command.executionStatus().oldVal().name()))
+                    .and(CHANGE_UNIT.ID.eq(command.id()))
+                .execute();
+
+        return count == 1;
     }
 }
