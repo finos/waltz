@@ -62,19 +62,19 @@
 
                         </div>
 
-                        <div class="waltz-sub-section-controls"
-                             xxng-if="cu.executionStatus === 'PENDING'">
+                        <div class="waltz-sub-section-controls">
 
-                            <span xxwaltz-has-role="CHANGE_SET_EDITOR"
-                                  ng-click="$ctrl.completeChangeUnit(cu)"
+                            <span waltz-has-role="CHANGE_SET_EDITOR"
                                   ng-if="cu.executionStatus === 'PENDING'">
                                 <span>|</span>
-                                <a class="clickable">
+                                <a ng-click="$ctrl.completeChangeUnit(cu)"
+                                   class="clickable">
                                     Complete
                                 </a>
                             </span>
 
-                            <span ng-if="cu.executionStatus === 'PENDING'">
+                            <span waltz-has-role="CHANGE_SET_EDITOR"
+                                  ng-if="cu.executionStatus === 'PENDING'">
                                 <a ng-click="$ctrl.discardChangeUnit(cu)"
                                    class="clickable">
                                     Discard
