@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.CollectionUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
@@ -47,6 +48,8 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPE
 
 
 public class PhysicalFlowGenerator implements SampleDataGenerator {
+
+    private static final Random rnd = RandomUtilities.getRandom();
 
     private static List<Criticality> criticalityDistribution = newArrayList(
             Criticality.NONE,
@@ -78,8 +81,8 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setDescription("Description: " + spec + " - " + logicalFlowId.toString());
                     record.setProvenance(SAMPLE_DATA_PROVENANCE);
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
-                    record.setTransport(ListUtilities.randomPick(transportKinds));
-                    record.setFrequency(ArrayUtilities.randomPick(FrequencyKind.values()).name());
+                    record.setTransport(randomPick(transportKinds));
+                    record.setFrequency(randomPick(FrequencyKind.values()).name());
                     record.setLastUpdatedBy("admin");
                     record.setCriticality(randomPick(criticalityDistribution).name());
                     return record;

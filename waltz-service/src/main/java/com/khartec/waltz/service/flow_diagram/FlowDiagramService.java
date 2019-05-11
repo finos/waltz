@@ -21,6 +21,7 @@ package com.khartec.waltz.service.flow_diagram;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
@@ -82,7 +83,7 @@ public class FlowDiagramService {
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ActorDao actorDao;
-    private final Random rnd = new Random(System.currentTimeMillis());
+    private final Random rnd = RandomUtilities.getRandom();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final MeasurableDao measurableDao;
     private final ChangeInitiativeDao changeInitiativeDao;

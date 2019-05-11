@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ArrayUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
@@ -32,13 +32,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 
 public class DatabaseGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
+
+    private final Random rnd = RandomUtilities.getRandom();
 
 
     @Override
@@ -56,19 +57,19 @@ public class DatabaseGenerator implements SampleDataGenerator {
             int num = rnd.nextInt(10);
 
             for (int j = 0 ; j < num; j++) {
-                SoftwarePackage pkg = ArrayUtilities.randomPick(DatabaseSoftwarePackages.dbs);
+                SoftwarePackage pkg = randomPick(DatabaseSoftwarePackages.dbs);
 
                 DatabaseInformationRecord databaseRecord = dsl.newRecord(DATABASE_INFORMATION);
                 databaseRecord.setDatabaseName("DB_LON_" + i + "_" + j);
                 databaseRecord.setInstanceName("DB_INST_" + i);
-                databaseRecord.setEnvironment(ArrayUtilities.randomPick("PROD", "PROD", "QA", "DEV", "DEV"));
+                databaseRecord.setEnvironment(randomPick("PROD", "PROD", "QA", "DEV", "DEV"));
                 databaseRecord.setDbmsVendor(pkg.vendor());
                 databaseRecord.setDbmsName(pkg.name());
                 databaseRecord.setDbmsVersion(pkg.version());
                 databaseRecord.setExternalId("ext_" + i + "_" +j);
                 databaseRecord.setProvenance("RANDOM_GENERATOR");
                 databaseRecord.setAssetCode(randomPick(codes));
-                databaseRecord.setLifecycleStatus(ArrayUtilities.randomPick(LifecycleStatus.values()).toString());
+                databaseRecord.setLifecycleStatus(randomPick(LifecycleStatus.values()).toString());
                 databaseRecord.setEndOfLifeDate(
                         rnd.nextInt(10) > 5
                                 ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
@@ -79,8 +80,8 @@ public class DatabaseGenerator implements SampleDataGenerator {
         }
 
         // insert duplicate database instance records (more than one app using the same database)
-        SoftwarePackage dupDbPackage = ArrayUtilities.randomPick(DatabaseSoftwarePackages.dbs);
-        String dupDbEnvironment = ArrayUtilities.randomPick("PROD", "PROD", "QA", "DEV", "DEV");
+        SoftwarePackage dupDbPackage = randomPick(DatabaseSoftwarePackages.dbs);
+        String dupDbEnvironment = randomPick("PROD", "PROD", "QA", "DEV", "DEV");
         Date dupDbEolDate = rnd.nextInt(10) > 5
                 ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
                 : null;
@@ -95,7 +96,7 @@ public class DatabaseGenerator implements SampleDataGenerator {
             databaseRecord.setExternalId("ext_ref_data");
             databaseRecord.setProvenance("RANDOM_GENERATOR");
             databaseRecord.setAssetCode(randomPick(codes));
-            databaseRecord.setLifecycleStatus(ArrayUtilities.randomPick(LifecycleStatus.values()).toString());
+            databaseRecord.setLifecycleStatus(randomPick(LifecycleStatus.values()).toString());
             databaseRecord.setEndOfLifeDate(
                     dupDbEolDate);
 

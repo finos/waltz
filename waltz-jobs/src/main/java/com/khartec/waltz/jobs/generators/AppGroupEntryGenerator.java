@@ -6,18 +6,15 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomlySizedIntStream;
 import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 
 public class AppGroupEntryGenerator implements SampleDataGenerator {
 
-
-    Random rnd = new Random();
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
@@ -32,8 +29,7 @@ public class AppGroupEntryGenerator implements SampleDataGenerator {
 
         List<ApplicationGroupEntryRecord> records = groupIds
                 .stream()
-                .flatMap(id -> IntStream
-                        .range(0, rnd.nextInt(20) + 5)
+                .flatMap(id -> randomlySizedIntStream(0, 25)
                         .mapToLong(idx -> randomPick(appIds))
                         .distinct()
                         .mapToObj(appId -> {

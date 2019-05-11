@@ -38,9 +38,9 @@ import org.springframework.context.ApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomlySizedIntStream;
 import static com.khartec.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
@@ -48,8 +48,6 @@ import static java.util.stream.Collectors.toSet;
 
 
 public class LogicalFlowGenerator implements SampleDataGenerator {
-
-    private static final Random rnd = new Random();
 
 
     @Override
@@ -69,8 +67,7 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                 .flatMap(a -> {
                     long orgUnitId = a.parentReference().id();
 
-                    return IntStream
-                            .range(0, rnd.nextInt(40))
+                    return randomlySizedIntStream(0, 40)
                             .mapToObj(i ->
                                     randomAppPick(apps, orgUnitId)
                                         .map(target -> ImmutableLogicalFlow.builder()
@@ -82,12 +79,12 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                                                 .build())
                                         .orElse(null));
                 })
-                .filter(f -> f != null)
+                .filter(Objects::nonNull)
                 .collect(toSet());
 
 
         Set<LogicalFlow> probableFlows = authSources.stream()
-                .flatMap(a -> IntStream.range(0, rnd.nextInt(30))
+                .flatMap(a -> randomlySizedIntStream(0, 30)
                         .mapToObj(i -> randomAppPick(apps, randomPick(orgUnits).id().get())
                                 .map(target -> ImmutableLogicalFlow.builder()
                                         .source(a.applicationReference())
@@ -97,13 +94,12 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                                         .lastUpdatedAt(now)
                                         .build())
                                 .orElse(null)))
-                .filter(f -> f != null)
+                .filter(Objects::nonNull)
                 .collect(toSet());
 
 
         Set<LogicalFlow> randomFlows = apps.stream()
-                .flatMap(a -> IntStream
-                        .range(0, rnd.nextInt(5))
+                .flatMap(a -> randomlySizedIntStream(0, 5)
                         .mapToObj(i ->
                             randomAppPick(apps, randomPick(orgUnits).id().get())
                                     .map(target -> ImmutableLogicalFlow.builder()
@@ -114,7 +110,7 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                                         .lastUpdatedAt(now)
                                         .build())
                                     .orElse(null)))
-                .filter(f -> f != null)
+                .filter(Objects::nonNull)
                 .collect(toSet());
 
 

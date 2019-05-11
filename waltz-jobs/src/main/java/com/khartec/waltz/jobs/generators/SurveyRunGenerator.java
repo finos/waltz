@@ -1,8 +1,8 @@
 package com.khartec.waltz.jobs.generators;
 
 
-import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
 import com.khartec.waltz.data.person.PersonDao;
@@ -13,7 +13,6 @@ import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.schema.tables.DataTypeUsage;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
@@ -30,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,9 +36,8 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.CollectionUtilities.randomPick;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.DateTimeUtilities.today;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
@@ -62,7 +59,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
 
     private static final String ID_SEPARATOR = ";";
 
-    private static final Random random = new Random();
+    private static final Random random = RandomUtilities.getRandom();
 
     private static final String[] SURVEY_RUN_PREFIXES = {"ANNUAL", "Q1", "Q2", "Q3", "Q4"};
     private static final String SURVEY_RUN_SUFFIX = "(GENERATOR)"; // so we can delete previous generated data before rerun
@@ -88,7 +85,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
         surveyRunRecord.setContactEmail(owner.email());
         surveyRunRecord.setSurveyTemplateId(surveyTemplate.id().get());
         surveyRunRecord.setName(String.format("%s %s %s",
-                ArrayUtilities.randomPick(SURVEY_RUN_PREFIXES),
+                randomPick(SURVEY_RUN_PREFIXES),
                 surveyTemplate.name(),
                 SURVEY_RUN_SUFFIX));
         surveyRunRecord.setDescription(surveyTemplate.description());
@@ -102,11 +99,11 @@ public class SurveyRunGenerator implements SampleDataGenerator {
                 .map(kind -> kind.id().get().toString())
                 .collect(joining(ID_SEPARATOR)));
 
-        surveyRunRecord.setIssuanceKind(ArrayUtilities.randomPick(SurveyIssuanceKind.values()).name());
+        surveyRunRecord.setIssuanceKind(randomPick(SurveyIssuanceKind.values()).name());
         LocalDate issuedOn = LocalDate.now().minusDays(random.nextInt(MAX_SURVEY_AGE_IN_DAYS));
         surveyRunRecord.setIssuedOn(java.sql.Date.valueOf(issuedOn));
         surveyRunRecord.setDueDate(java.sql.Date.valueOf(issuedOn.plusDays(random.nextInt(MAX_SURVEY_LIFESPAN_IN_DAYS))));
-        surveyRunRecord.setStatus(ArrayUtilities.randomPick(SurveyRunStatus.ISSUED.name(), SurveyRunStatus.COMPLETED.name()));
+        surveyRunRecord.setStatus(randomPick(SurveyRunStatus.ISSUED.name(), SurveyRunStatus.COMPLETED.name()));
 
         return surveyRunRecord;
     }
@@ -157,10 +154,10 @@ public class SurveyRunGenerator implements SampleDataGenerator {
                         ? Optional.of(Double.valueOf(random.nextInt()))
                         : Optional.empty())
                 .stringResponse((fieldType == SurveyQuestionFieldType.TEXT || fieldType == SurveyQuestionFieldType.TEXTAREA)
-                        ? Optional.of(ArrayUtilities.randomPick(SURVEY_QUESTION_STRING_RESPONSES))
+                        ? Optional.of(randomPick(SURVEY_QUESTION_STRING_RESPONSES))
                         : Optional.empty())
                 .comment(random.nextBoolean()
-                        ? Optional.of(ArrayUtilities.randomPick(SURVEY_QUESTION_RESPONSE_COMMENTS))
+                        ? Optional.of(randomPick(SURVEY_QUESTION_RESPONSE_COMMENTS))
                         : Optional.empty())
                 .build();
     }
@@ -211,7 +208,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
             Map<SurveyInstanceStatus, Set<Long>> surveyInstanceStatusMap = surveyInstanceQuestionResponses.stream()
                     .mapToLong(response -> response.surveyInstanceId())
                     .distinct()
-                    .mapToObj(id -> Tuple.tuple(ArrayUtilities.randomPick(
+                    .mapToObj(id -> Tuple.tuple(randomPick(
                             SurveyInstanceStatus.NOT_STARTED, SurveyInstanceStatus.IN_PROGRESS, SurveyInstanceStatus.COMPLETED), id))
                     .collect(groupingBy(t -> t.v1, mapping(t -> t.v2, toSet())));
 

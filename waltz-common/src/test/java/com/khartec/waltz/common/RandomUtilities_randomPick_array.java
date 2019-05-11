@@ -21,11 +21,11 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class ArrayUtilities_randomPick {
+public class RandomUtilities_randomPick_array {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotRandomPickFromNothing() {

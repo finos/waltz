@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.Tables.DATA_TYPE;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;

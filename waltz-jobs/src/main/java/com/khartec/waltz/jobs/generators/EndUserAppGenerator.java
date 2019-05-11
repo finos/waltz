@@ -27,18 +27,16 @@ import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.getRandom;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 
 /**
  * Created by dwatkins on 14/12/2015.
  */
 public class EndUserAppGenerator implements SampleDataGenerator {
-
-    private static final Random rnd = new Random();
 
 
     @Override
@@ -73,7 +71,7 @@ public class EndUserAppGenerator implements SampleDataGenerator {
 
         final Long[] idCounter = {1L};
         ids.forEach(ouId -> {
-            for (int i = 0; i < new Random().nextInt(3); i++) {
+            for (int i = 0; i < getRandom().nextInt(3); i++) {
                 EndUserApplicationRecord record = dsl.newRecord(END_USER_APPLICATION);
                 String name = String.format(
                         "%s %s %s %s",
