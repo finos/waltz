@@ -1,6 +1,5 @@
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.DSLContext;
@@ -9,22 +8,17 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomlySizedIntStream;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
 
-/**
- * Created by dwatkins on 04/03/2017.
- */
-public class MeasurableRatingGenerator implements SampleDataGenerator {
 
-    private final Random rnd = new Random();
+public class MeasurableRatingGenerator implements SampleDataGenerator {
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
@@ -43,14 +37,13 @@ public class MeasurableRatingGenerator implements SampleDataGenerator {
 
 
         List<MeasurableRatingRecord> records = appIds.stream()
-                .flatMap(appId ->
-                        IntStream.range(0, rnd.nextInt(MAX_RATINGS_PER_APP))
+                .flatMap(appId -> randomlySizedIntStream(0, MAX_RATINGS_PER_APP)
                                 .mapToObj(idx -> Tuple.tuple(appId, randomPick(mIds))))
                 .map(t -> {
                     MeasurableRatingRecord record = dsl.newRecord(MEASURABLE_RATING);
                     record.setEntityId(t.v1);
                     record.setEntityKind(EntityKind.APPLICATION.name());
-                    record.setRating(ArrayUtilities.randomPick("R", "A", "G"));
+                    record.setRating(randomPick("R", "A", "G"));
                     record.setMeasurableId(t.v2);
                     record.setLastUpdatedBy("admin");
                     record.setProvenance(SAMPLE_DATA_PROVENANCE);

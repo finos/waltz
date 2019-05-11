@@ -23,4 +23,15 @@ public abstract class Scenario implements
     public abstract ScenarioType scenarioType();
     public abstract ReleaseLifecycleStatus releaseStatus();
 
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.SCENARIO)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .entityLifecycleStatus(entityLifecycleStatus())
+                .build();
+    }
+
 }

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
@@ -40,7 +40,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.model.EntityKind.APP_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
@@ -49,8 +49,7 @@ import static java.util.stream.Collectors.toList;
 
 public class ChangeInitiativeGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
-
+    private static final Random rnd = RandomUtilities.getRandom();
 
     private static final String[] p1 = new String[] {
             "Change", "Enhance", "Deliver", "Adapt to", "Meet",
@@ -86,7 +85,7 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
                     record.setProvenance("dummy");
                     record.setEntityId(r.getId());
                     record.setEntityKind(EntityKind.CHANGE_INITIATIVE.name());
-                    record.setEmployeeId(ListUtilities.randomPick(employeeIds));
+                    record.setEmployeeId(randomPick(employeeIds));
                     return record;
                 });
     }
@@ -95,7 +94,7 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
         if (rnd.nextInt(100) < 5 && groupIds.size() > 0) {
             EntityRelationshipRecord record = new EntityRelationshipRecord();
             record.setKindA(APP_GROUP.name());
-            record.setIdA(ListUtilities.randomPick(groupIds));
+            record.setIdA(randomPick(groupIds));
             record.setKindB(EntityKind.CHANGE_INITIATIVE.name());
             record.setIdB(r.getId());
             record.setRelationship(RelationshipKind.RELATES_TO.name());
