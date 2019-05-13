@@ -160,8 +160,8 @@ public class RoadmapGenerator implements SampleDataGenerator {
                              Roadmap roadmap) {
         scenario.id()
             .ifPresent(scenarioId -> {
-                List<Measurable> rowCategories = pickAxisItems(ctx, roadmap.columnType(), randomIntBetween(5, 10));
-                List<Measurable> colCategories = pickAxisItems(ctx, roadmap.rowType(), randomIntBetween(2, 7));
+                List<Measurable> rowCategories = pickAxisItems(ctx, roadmap.rowType(), randomIntBetween(5, 10));
+                List<Measurable> colCategories = pickAxisItems(ctx, roadmap.columnType(), randomIntBetween(2, 7));
                 addAxisItems(ctx, rowCategories, scenarioId, AxisOrientation.ROW);
                 addAxisItems(ctx, colCategories, scenarioId, AxisOrientation.COLUMN);
             });
