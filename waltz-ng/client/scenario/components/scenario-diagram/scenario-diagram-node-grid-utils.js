@@ -67,23 +67,23 @@ export function nodeGridLayout(data = [], coords, options = defaultOptions) {
     checkTrue(options.defaultColMaxWidth > 0, "gridLayout: Num cols must be greater than zero");
     // head is safe because the whole data array deals with the same domain coordinates
     const columnDomainId = _.get(_.head(data), ["domainCoordinates", "column", "id"]);
-    const maxColWidth = options.maxColWidths[columnDomainId] || options.defaultColMaxWidth;
+    const colWidth = _.get(options, ["colWidths", columnDomainId], 1);
 
     const dataWithLayout = _
         .chain(data)
         .orderBy(options.sortFn)
         .map((d, idx) => {
             const layout = {
-                col: idx % maxColWidth,
-                row: Math.floor(idx / maxColWidth)
+                col: idx % colWidth,
+                row: Math.floor(idx / colWidth)
             };
             return Object.assign({}, d, { layout });
         })
         .value();
 
     const layout = {
-        colCount: Math.min(maxColWidth, data.length) || EMPTY_CELL_WIDTH,
-        rowCount: Math.ceil(data.length / maxColWidth) || EMPTY_CELL_HEIGHT
+        colCount: Math.min(colWidth, data.length) || EMPTY_CELL_WIDTH,
+        rowCount: Math.ceil(data.length / colWidth) || EMPTY_CELL_HEIGHT
     };
 
     return {

@@ -41,7 +41,6 @@ const bindings = {
     handlers: "<?",
     hiddenAxes: "<?",
     layoutOptions: "<?",
-
     onUnhideAxis: "<?",
     onUnhideAllAxes: "<?",
 };

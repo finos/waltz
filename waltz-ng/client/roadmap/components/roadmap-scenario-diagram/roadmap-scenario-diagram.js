@@ -14,15 +14,35 @@ const bindings = {
     onCancel: "<"
 };
 
+
 const modes = {
     EDIT: "EDIT",
     VIEW: "VIEW"
 };
 
+
+const initialState = {
+    dialog: null,
+    handlers: {},
+    hiddenAxes: [],
+    lastRatings: {},
+    layoutOptions: {
+        defaultColMaxWidth: 1,
+        colWidths: {}, // { domainItemId: width }
+    },
+    mode: modes.VIEW,
+    permissions: {
+        admin: false,
+        edit: false
+    }
+};
+
+
 const dialogs = {
     ADD_APPLICATION: "ADD_APPLICATION",
     EDIT_CELL: "EDIT_CELL"
 };
+
 
 const styles = {
     INFOPOP: "wrsd-infopop",
@@ -37,20 +57,8 @@ const component = {
 };
 
 
-const initialState = {
-    dialog: null,
-    handlers: {},
-    hiddenAxes: [],
-    lastRatings: {},
-    layoutOptions: {
-        defaultColMaxWidth: 2,
-        maxColWidths: {}, // { domainItemId: width }
-    },
-    mode: modes.VIEW,
-    permissions: {
-        admin: false,
-        edit: false
-    }
+const divider = {
+    divider: true
 };
 
 
@@ -70,22 +78,95 @@ function determineApplicationPickList(applications = [], ratings = [], column, r
 }
 
 
+function hideInfoPopup() {
+    select(`.${styles.INFOPOP}`)
+        .style("display", "none");
+}
+
+
+function showInfoPopup(html) {
+    return select(`.${styles.INFOPOP}`)
+        .style("left", (event.pageX - 2) + "px")
+        .style("top", (event.pageY - 2) + "px")
+        .style("display", "block")
+        .html(html)
+        .select(`.${styles.INFOPOP_CLOSE}`)
+        .on("click", () => hideInfoPopup());
+}
+
+
+function mkAction(title, action) {
+    return {
+        title,
+        action
+    };
+}
+
+
+function mkDialogStyle() {
+    return {
+        display: "block",
+        position: "absolute",
+        left: `${event.pageX - 2}px`,
+        top: `${event.pageY - 100}px`
+    };
+}
+
+
+/**
+ * Calculates the key to use when saving col width information to local storage
+ *
+ * @param scenarioId
+ * @returns {string}  local storage key
+ */
+function mkColWidthStorageKey(scenarioId) {
+    return `waltz-scenario-col-widths-${scenarioId}`;
+}
+
+
+function mkLayoutOptions(domainCols = [], colWidths = {}) {
+    const comfortableColCount = 8;
+
+    const colsPerDomainCol = Math.floor(comfortableColCount / Math.max(_.size(domainCols), 1));
+
+    const defaultColWidths = _.reduce(
+        domainCols,
+        (acc, domainCol) => { acc[domainCol.id] = colsPerDomainCol; return acc; }, {});
+
+    colWidths = Object.assign({}, defaultColWidths, colWidths);
+
+    return {
+        defaultColMaxWidth: 1,
+        colWidths
+    };
+}
+
+
 function controller($q,
                     $timeout,
+                    localStorageService,
                     notification,
                     serviceBroker,
                     userService) {
 
     const vm = initialiseData(this, initialState);
 
-    const mkDialogStyle = () => ({
-        display: "block",
-        position: "absolute",
-        left: `${event.pageX - 2}px`,
-        top:`${event.pageY - 100}px`
-    });
+    function prepData() {
+        return prepareData(vm.scenarioDefn, vm.applications, vm.measurables, vm.hiddenAxes);
+    }
 
-    const addApplicationAction = (domainCoordinates) => {
+    function alterColWidth(domainId, delta) {
+        const path = ["layoutOptions", "colWidths", domainId];
+        const currentWidth = _.get(vm, path);
+        const newWidth = Math.max(1, currentWidth + delta);
+
+        _.set(vm, path, newWidth);
+
+        const localStorageKey = mkColWidthStorageKey(vm.scenarioId);
+        localStorageService.set(localStorageKey, vm.layoutOptions.colWidths);
+    }
+
+    function addApplicationAction(domainCoordinates) {
         const column = domainCoordinates.column;
         const row = domainCoordinates.row;
 
@@ -113,17 +194,47 @@ function controller($q,
                 style
             };
         });
-    };
+    }
 
     const switchToEditModeAction =  {
         title: "Switch to edit mode",
         action:  () => $timeout(() => vm.mode = modes.EDIT)
     };
 
+    const addAction = mkAction(
+        "Add another application",
+        (elm, d) => addApplicationAction(d.domainCoordinates));
 
-    function prepData() {
-        return prepareData(vm.scenarioDefn, vm.applications, vm.measurables, vm.hiddenAxes);
-    }
+    const editAction = mkAction(
+        "Edit",
+        (elm, d) => {
+            const style = mkDialogStyle();
+            $timeout(() => {
+                vm.dialog = {
+                    type: dialogs.EDIT_CELL,
+                    data: d,
+                    workingState: Object.assign({ rating: "G", comment: "" }, d.state),
+                    style
+                };
+            });
+        });
+
+    const removeAction = mkAction(
+        "Remove",
+        (elm, d) => {
+            const args = [
+                vm.scenarioDefn.scenario.id,
+                d.node.id,
+                d.domainCoordinates.column.id,
+                d.domainCoordinates.row.id
+            ];
+            serviceBroker
+                .execute(
+                    CORE_API.ScenarioStore.removeRating,
+                    args)
+                .then(() => notification.success("Item removed"))
+                .then(() => reload());
+        });
 
 
     function mkNodeMenu() {
@@ -134,46 +245,16 @@ function controller($q,
             }
 
             if (vm.mode === modes.VIEW) {
-                return [ switchToEditModeAction ];
+                return [
+                    switchToEditModeAction,
+                ];
             } else {
                 return [
-                    {
-                        title: "Add another application",
-                        action:  (elm, d) => addApplicationAction(d.domainCoordinates)
-                    }, {
-                        title: "Edit",
-                        action: (elm, d) => {
-                            const style = mkDialogStyle();
-                            $timeout(() => {
-                                vm.dialog = {
-                                    type: dialogs.EDIT_CELL,
-                                    data: d,
-                                    workingState: Object.assign({ rating: "G", comment: "" }, d.state),
-                                    style
-                                };
-                            });
-                        }
-                    },  {
-                        divider: true
-                    }, {
-                        title: "Remove",
-                        action: (elm, d) => {
-                            const args = [
-                                vm.scenarioDefn.scenario.id,
-                                d.node.id,
-                                d.domainCoordinates.column.id,
-                                d.domainCoordinates.row.id
-                            ];
-                            serviceBroker
-                                .execute(
-                                    CORE_API.ScenarioStore.removeRating,
-                                    args)
-                                .then(() => notification.success("Item removed"))
-                                .then(() => reload());
-                        }
-                    }
+                    addAction,
+                    editAction,
+                    divider,
+                    removeAction
                 ];
-
             }
         };
     }
@@ -198,14 +279,13 @@ function controller($q,
         };
     }
 
-
     function mkAxisItemMenu() {
         return (data) => {
             const hide = {
                 title: "Hide",
                 action: (elm, d) => $timeout(() => {
-                    if(vm.hiddenAxes.length === 0) {
-                        notification.info("Hid axis from grid, you can restore from the Hidden Axes menu in Diagram Controls");
+                    if (vm.hiddenAxes.length === 0) {
+                        notification.info("Axis has been removed from grid, you can restore from the 'Hidden Axes' menu in Diagram Controls");
                     }
                     vm.hiddenAxes.push(d);
                     vm.vizData = prepData();
@@ -215,8 +295,7 @@ function controller($q,
             const contract =  {
                 title: "Decrease width",
                 action: (elm, d) => $timeout(() => {
-                    const newMaxColWidth = (vm.layoutOptions.maxColWidths[d.id] || 0) - 1;
-                    vm.layoutOptions.maxColWidths[d.id] = Math.max(newMaxColWidth, vm.layoutOptions.defaultColMaxWidth);
+                    alterColWidth(d.id, -1);
                     vm.vizData = prepData();
                 })
             };
@@ -224,7 +303,7 @@ function controller($q,
             const expand = {
                 title: "Increase width",
                 action: (elm, d) => $timeout(() => {
-                    vm.layoutOptions.maxColWidths[d.id] = (vm.layoutOptions.maxColWidths[d.id] || vm.layoutOptions.defaultColMaxWidth) + 1;
+                    alterColWidth(d.id, 1);
                     vm.vizData = prepData();
                 })
             };
@@ -236,7 +315,6 @@ function controller($q,
             ]);
         };
     }
-
 
     function reload() {
         loadApplications(loadScenario())
@@ -271,24 +349,6 @@ function controller($q,
                 vm.measurables = _.filter(r.data, m => _.includes(requiredMeasurableIds, m.id));
             });
     }
-
-
-    function hideInfoPopup() {
-        select(`.${styles.INFOPOP}`)
-            .style("display", "none");
-    }
-
-
-    function showInfoPopup(html) {
-        return select(`.${styles.INFOPOP}`)
-            .style("left", (event.pageX - 2) + "px")
-            .style("top", (event.pageY - 2) + "px")
-            .style("display", "block")
-            .html(html)
-            .select(`.${styles.INFOPOP_CLOSE}`)
-            .on("click", () => hideInfoPopup());
-    }
-
 
     function setupHandlers() {
         // create the div element that will hold the context menu
@@ -350,7 +410,6 @@ function controller($q,
         };
     }
 
-
     vm.$onInit = () => {
         const scenarioPromise = loadScenario();
         const applicationPromise = loadApplications(scenarioPromise);
@@ -362,11 +421,17 @@ function controller($q,
                 [ vm.scenarioDefn.roadmap.ratingSchemeId ]))
             .then(r => vm.ratingsByCode = _.keyBy(r.data.ratings, "rating"));
 
-
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
-            .then(() => vm.vizData = prepData());
+            .then(() => {
+                vm.vizData = prepData();
+                const cols = vm.vizData.columnHeadings;
+                const colWidths = localStorageService.get(mkColWidthStorageKey(vm.scenarioId)) || {};
 
-        vm.handlers = setupHandlers();
+                vm.layoutOptions = mkLayoutOptions(
+                    cols,
+                    colWidths);
+
+            });
 
         userService
             .whoami()
@@ -374,8 +439,9 @@ function controller($q,
                 admin: userService.hasRole(u, roles.SCENARIO_ADMIN),
                 edit: userService.hasRole(u, roles.SCENARIO_EDITOR)
             });
-    };
 
+        vm.handlers = setupHandlers();
+    };
 
     const getLastOrDefaultRating = (app) => {
         return vm.lastRatings[app.id] || getDefaultRating(_.values(vm.ratingsByCode));
@@ -404,6 +470,7 @@ function controller($q,
             vm.selectedRow.id,
             lastOrDefaultRating
         ];
+
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.addRating,
@@ -456,6 +523,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$timeout",
+    "localStorageService",
     "Notification",
     "ServiceBroker",
     "UserService"
