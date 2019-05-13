@@ -217,24 +217,6 @@ public class CollectionUtilities {
     }
 
 
-    /**
-     * Given a collection of items this will randomly pick an item.
-     * The random choice is via `java.util.Random` with the default
-     * constructor.
-     *
-     * @param xs  items to pick from
-     * @param <X> type of items in collection
-     * @return an item
-     * @throws IllegalArgumentException if the collection is empty (or null)
-     */
-    public static <X> X randomPick(Collection<X> xs) {
-        checkNotEmpty(xs, "xs cannot be null");
-        List<X> asList = xs instanceof List
-                ? (List<X>) xs
-                : new ArrayList<>(xs);
-        return ListUtilities.randomPick(asList);
-    }
-
 
     /**
      * Intended as a null-safe test for empty collections.

@@ -29,9 +29,6 @@ import static java.util.stream.Collectors.toList;
 
 public class ListUtilities {
 
-    private static final Random rnd = RandomUtilities.getRandom();
-
-
     /**
      * Construct an <code>ArrayList</code> from a vararg of elements
      *
@@ -95,11 +92,6 @@ public class ListUtilities {
 
     public static <T> boolean isEmpty(List<T> ts) {
         return ts == null || ts.isEmpty();
-    }
-
-
-    public static <T> T randomPick(List<T> ts) {
-        return ts.get(rnd.nextInt(ts.size()));
     }
 
 
@@ -183,7 +175,7 @@ public class ListUtilities {
      * @param mapFn  function to transform an input element to desired output element
      * @param <X> type of input list
      * @param <Y> type of result
-     * @return
+     * @return  an optional result of applying the `mapFn` to the first element of `xs`
      */
     public static <X, Y> Optional<Y> applyToFirst(List<X> xs, Function<X, Y> mapFn) {
         if (isEmpty(xs)) return Optional.empty();

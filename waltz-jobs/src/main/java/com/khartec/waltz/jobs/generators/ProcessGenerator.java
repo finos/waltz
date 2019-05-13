@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;

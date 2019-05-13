@@ -2,6 +2,7 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
@@ -14,6 +15,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -24,7 +26,7 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 public class AuthSourceGenerator implements SampleDataGenerator {
 
 
-    Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
@@ -48,9 +50,9 @@ public class AuthSourceGenerator implements SampleDataGenerator {
                         .mapToObj(i -> {
                             AuthoritativeSourceRecord record = dsl.newRecord(AUTHORITATIVE_SOURCE);
                             record.setDataType(t);
-                            record.setRating(ArrayUtilities.randomPick(AuthoritativenessRating.PRIMARY, AuthoritativenessRating.SECONDARY).name());
-                            record.setApplicationId(ListUtilities.randomPick(appIds));
-                            record.setParentId(ListUtilities.randomPick(ouIds));
+                            record.setRating(randomPick(AuthoritativenessRating.PRIMARY, AuthoritativenessRating.SECONDARY).name());
+                            record.setApplicationId(randomPick(appIds));
+                            record.setParentId(randomPick(ouIds));
                             record.setParentKind(EntityKind.ORG_UNIT.name());
                             record.setProvenance(SAMPLE_DATA_PROVENANCE);
                             return record;

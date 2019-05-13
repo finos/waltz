@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.person.PersonService;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
@@ -45,8 +46,8 @@ public class PersonDataGenerator implements SampleDataGenerator {
     private static final List<ImmutablePerson> peeps = new ArrayList<>();
     private static final Fairy fairy = Fairy.create();
 
-    private static final Random rnd = new Random();
     private static int counter = 0;
+    private static final Random rnd = RandomUtilities.getRandom();
 
 
     @Override
@@ -82,7 +83,7 @@ public class PersonDataGenerator implements SampleDataGenerator {
 
         personService.bulkSave(peeps);
 
-        ImmutablePerson admin = ListUtilities.randomPick(peeps);
+        ImmutablePerson admin = randomPick(peeps);
 
         getDsl(ctx)
                 .update(PERSON)

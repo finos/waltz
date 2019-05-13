@@ -1,6 +1,7 @@
 package com.khartec.waltz.jobs.generators.stress;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
@@ -63,7 +64,7 @@ public class MeasurableStressGenerator {
     }
 
 
-    static Random rnd = new Random(System.currentTimeMillis());
+    static Random rnd = RandomUtilities.getRandom();
 
 
     private static List<Tuple2<String, String>> mkNodes(int level, String path) {

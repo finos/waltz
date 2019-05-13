@@ -3,17 +3,33 @@ import {isEmpty} from "../../../common/index";
 import {toOffsetMap} from "../../../common/list-utils";
 
 
-export function filterData(data, qry) {
+export function filterData(data, qry, excludedRatings = []) {
     const origData = _.cloneDeep(data);
 
-    if (isEmpty(qry)) {
+    if (isEmpty(qry) && isEmpty(excludedRatings)) {
         return origData;
     }
 
-    qry = qry.toLowerCase();
+    qry = _.toLower(qry);
+
+    const qryMatcher = _.isEmpty(qry)
+        ? () => true // no search string, therefore matches everything
+        : n => {
+            const searchStr = _.get(n, ["searchTargetStr"], "");
+            return searchStr.indexOf(qry) > -1;
+        };
+
+    const exclusionMatcher = _.isEmpty(excludedRatings)
+        ? () => false // no exclusions, therefore nothing excluded
+        : n => {
+            const rating = _.get(n, ["state", "rating"], null);
+            return _.includes(excludedRatings, rating);
+        };
 
     const nodeMatchFn = n => {
-        return _.get(n, ["searchTargetStr"], "").indexOf(qry) > -1;
+        const qryMatches = qryMatcher(n);
+        const isExcluded = exclusionMatcher(n);
+        return qryMatches && !isExcluded;
     };
 
     const filterNodeGridFn = nodeGrid => _.filter(nodeGrid, nodeMatchFn);

@@ -30,9 +30,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class ArrayUtilities {
 
 
-    private static final Random rnd = new Random();
-
-
     /**
      * @throws IllegalArgumentException If either <code>ts</code>
      * or <code>check</code> is null
@@ -50,14 +47,6 @@ public class ArrayUtilities {
             if (! check.test(t)) return false;
         }
         return true;
-    }
-
-
-    @SafeVarargs
-    public static <T> T randomPick(T... ts) {
-        Checks.checkNotEmpty(ts, "Cannot take random pick from an empty array");
-        int idx = rnd.nextInt(ts.length);
-        return ts[idx];
     }
 
 

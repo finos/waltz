@@ -1,5 +1,6 @@
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
@@ -12,9 +13,10 @@ import org.springframework.context.ApplicationContext;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.CollectionUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -26,6 +28,8 @@ import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PhysicalFlowParticipantGenerator implements SampleDataGenerator {
+
+    private static final Random rnd = RandomUtilities.getRandom();
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
