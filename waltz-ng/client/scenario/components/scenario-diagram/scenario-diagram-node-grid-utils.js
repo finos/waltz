@@ -64,7 +64,6 @@ export function drawNodeGrid(selection, options) {
  * @returns {{data: Array, layout: {colCount: number, rowCount: number}}}
  **/
 export function nodeGridLayout(data = [], coords, options = defaultOptions) {
-    checkTrue(options.defaultColMaxWidth > 0, "gridLayout: Num cols must be greater than zero");
     // head is safe because the whole data array deals with the same domain coordinates
     const columnDomainId = _.get(_.head(data), ["domainCoordinates", "column", "id"]);
     const colWidth = _.get(options, ["colWidths", columnDomainId], 1);

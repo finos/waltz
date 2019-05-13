@@ -67,7 +67,6 @@ const initialState = {
     },
     ratingScheme: null,
     layoutOptions: {
-        defaultColMaxWidth: 2,
         sortFn: d => d.node.name
     },
 

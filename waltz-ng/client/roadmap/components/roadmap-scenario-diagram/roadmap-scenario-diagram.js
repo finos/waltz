@@ -27,7 +27,6 @@ const initialState = {
     hiddenAxes: [],
     lastRatings: {},
     layoutOptions: {
-        defaultColMaxWidth: 1,
         colWidths: {}, // { domainItemId: width }
     },
     mode: modes.VIEW,
@@ -124,19 +123,18 @@ function mkColWidthStorageKey(scenarioId) {
 }
 
 
-function mkLayoutOptions(domainCols = [], colWidths = {}) {
+function mkLayoutOptions(domainCols = [], suppliedColWidths = {}) {
     const comfortableColCount = 8;
 
     const colsPerDomainCol = Math.floor(comfortableColCount / Math.max(_.size(domainCols), 1));
 
-    const defaultColWidths = _.reduce(
+    const computedColWidths = _.reduce(
         domainCols,
         (acc, domainCol) => { acc[domainCol.id] = colsPerDomainCol; return acc; }, {});
 
-    colWidths = Object.assign({}, defaultColWidths, colWidths);
+    const colWidths = Object.assign({}, computedColWidths, suppliedColWidths);
 
     return {
-        defaultColMaxWidth: 1,
         colWidths
     };
 }
