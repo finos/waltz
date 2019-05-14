@@ -17,36 +17,63 @@
 
         <br>
 
-        <div class="row">
-            <div class="col-sm-3">
-                <strong>Application Kind</strong>
-            </div>
+        <div ng-include="'wnfo-app-kind-filters'"></div>
 
-            <div class="col-sm-9">
-                <div ng-repeat="(appKind, val) in $ctrl.filterSelections.APPLICATION.applicationKind">
-                    <label class="small">
-                        <input type="checkbox"
-                               id="{{appKind}}"
-                               ng-model="$ctrl.filterSelections.APPLICATION.applicationKind[appKind]"
-                               ng-change="$ctrl.filterChanged()">
-                        <span ng-bind="appKind | toDisplayName:'applicationKind'">
-                        </span>
-                        <span class="text-muted">
-                            (<span ng-bind="$ctrl.facetCounts[appKind].count"></span>)
-                        </span>
-                    </label>
+    </div>
+</div>
+
+
+<!-- TEMPLATES -->
+
+<script type="text/ng-template"
+        id="wnfo-app-kind-filters">
+    <div class="row">
+        <div class="col-sm-3 waltz-visibility-parent">
+            <strong>Application Kind</strong>
+            <br>
+            <div class="waltz-visibility-child-30">
+                <a ng-click="$ctrl.selectAllAppKindFilters()"
+                   class="clickable small">
+                    Select All
+                </a>
+                <br>
+                <a ng-click="$ctrl.deselectAllAppKindFilters()"
+                   class="clickable small">
+                    Deselect All
+                </a>
+            </div>
+        </div>
+
+        <div class="col-sm-9">
+            <div class="row">
+                <div class="col-sm-6"
+                     ng-repeat="option in $ctrl.appKindFilterOptions">
+                    <div ng-include="'wnfo-app-kind-option'"></div>
                 </div>
             </div>
         </div>
-
-
-        <div>
-            <hr>
-            <a ng-click="$ctrl.resetFilters()"
-               class="clickable sma]l text-muted pull-right">
-                reset filters
-            </a>
-        </div>
     </div>
+</script>
 
-</div>
+
+<script type="text/ng-template"
+        id="wnfo-app-kind-option">
+    <div uib-popover="{{option.description}}"
+         popover-append-to-body="true"
+         popover-placement="left"
+         popover-popup-delay="300"
+         popover-trigger="mouseenter">
+        <label class="small"
+               for="{{option.kind}}-filter-option-2">
+            <input type="checkbox"
+                   id="{{option.kind}}-filter-option-2"
+                   ng-model="option.selected"
+                   ng-change="$ctrl.filterChanged()">
+            <span ng-bind="option.displayName">
+            </span>
+            <span class="text-muted">
+                (<span ng-bind="option.count"></span>)
+            </span>
+        </label>
+    </div>
+</script>

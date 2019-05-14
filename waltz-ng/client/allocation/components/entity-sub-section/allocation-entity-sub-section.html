@@ -71,28 +71,7 @@
             <div class="row"
                  ng-if="$ctrl.editing && $ctrl.showingHelp">
                 <div class="col-md-12">
-                    <p>How to use this editor</p>
-                    <table class="table table-condensed small">
-                        <thead>
-                        <tr>
-                            <th>Operation</th>
-                            <th>Description</th>
-                        </tr>
-                        </thead>
-                        <tr>
-                            <td>Allocate</td>
-                            <td>To float does some stuff</td>
-                        </tr>
-                        <tr>
-                            <td>Unallocate</td>
-                            <td>To fixed does some other stuff</td>
-                        </tr>
-                        <tr>
-                            <td>Grab unallocated</td>
-                            <td>Takes unallocated stuff</td>
-                        </tr>
-                    </table>
-
+                    <div ng-include="'waess-help'"></div>
                 </div>
             </div>
         </div>
@@ -110,7 +89,7 @@
                                                 method="POST"
                                                 request-body="$ctrl.selector">
                     </waltz-data-extract-link>
-                    <span waltz-has-role="CAPABILITY_EDITOR">
+                    <span waltz-has-role="RATING_EDITOR">
                         <a ng-click="$ctrl.setEditable(true)"
                            class="clickable">
                             | Edit percentages
@@ -311,4 +290,60 @@
             </li>
         </ul>
     </div>
+</script>
+
+<script type="text/ng-template"
+        id="waess-help">
+    <div class="help-block">
+        <p>
+            <b>How to use this editor</b>
+        </p>
+        <p>
+            This editor is used to assign a percentage based allocation to mapped items in this taxonomy.
+            The total of the allocated percentages <i>must</i> be less 100% and <i>should</i> ideally total 100%.
+            Each rating may be allocated a percentage which must be explicitly set to 0% or greater.  Items are
+            classified as unallocated if no percentage has been assigned to them.
+        </p>
+        <p>
+            The following table summarises the available actions:
+        </p>
+        <table class="table table-condensed small">
+            <thead>
+            <tr>
+                <th>Operation</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tr>
+                <td>Allocate</td>
+                <td>
+                    Takes an unallocated item and marks it as allocated,
+                    the initial allocation is set to 0% but may be changed.
+                </td>
+            </tr>
+            <tr>
+                <td>Unallocate</td>
+                <td>
+                    Takes an allocated item and marks it as unallocated.
+                    Any value associated to the allocation is freed for other allocated items to take.
+                </td>
+            </tr>
+            <tr>
+                <td>Grab unallocated</td>
+                <td>
+                    Takes the unallocated percentage and adds it to the selected item.
+                    If the remainder is negative (when the total is &gt; 100%) then the
+                    over-allocation is removed from this item.
+                </td>
+            </tr>
+            <tr>
+                <td>Zero and distribute</td>
+                <td>
+                    Proportionally distributes this items allocation to other allocated items.
+                    This will result in this items allocation becoming 0%.
+                </td>
+            </tr>
+        </table>
+    </div>
+
 </script>
