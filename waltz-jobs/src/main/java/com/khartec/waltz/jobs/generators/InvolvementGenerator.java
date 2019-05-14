@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -34,7 +35,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ListUtilities.concat;
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
@@ -46,7 +47,7 @@ import static java.util.stream.Collectors.toMap;
 public class InvolvementGenerator implements SampleDataGenerator {
 
 
-    private static final Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
 
 
     private static List<Long> getAppIdsByKind(DSLContext dsl, ApplicationKind kind) {

@@ -3,6 +3,7 @@ package com.khartec.waltz.jobs.generators;
 import com.khartec.waltz.common.ArrayUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
@@ -18,6 +19,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
@@ -27,7 +29,8 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 
 public class BookmarkGenerator implements SampleDataGenerator {
 
-    Random rnd = new Random();
+    private static final Random rnd = RandomUtilities.getRandom();
+
 
     String[] text = new String[] {
             "All about %s",
@@ -88,7 +91,7 @@ public class BookmarkGenerator implements SampleDataGenerator {
                             record.setParentId(r.id());
                             record.setTitle(mkText(r.name().get()));
                             record.setDescription(mkText(r.name().get()));
-                            record.setKind(ArrayUtilities.randomPick(bookmarkKinds));
+                            record.setKind(randomPick(bookmarkKinds));
                             record.setUrl(mkUrl(r.name().get()));
                             record.setProvenance(SAMPLE_DATA_PROVENANCE);
                             record.setLastUpdatedBy("admin");
@@ -103,11 +106,11 @@ public class BookmarkGenerator implements SampleDataGenerator {
     }
 
     private String mkText(String name) {
-        return String.format(ArrayUtilities.randomPick(text), name);
+        return String.format(randomPick(text), name);
     }
 
     private String mkUrl(String name) {
-        return String.format(ArrayUtilities.randomPick(urls), name);
+        return String.format(randomPick(urls), name);
     }
 
     @Override

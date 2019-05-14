@@ -41,7 +41,6 @@ const bindings = {
     handlers: "<?",
     hiddenAxes: "<?",
     layoutOptions: "<?",
-
     onUnhideAxis: "<?",
     onUnhideAllAxes: "<?",
 };
@@ -68,7 +67,6 @@ const initialState = {
     },
     ratingScheme: null,
     layoutOptions: {
-        defaultColMaxWidth: 2,
         sortFn: d => d.node.name
     },
 

@@ -97,7 +97,7 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request,"scheme"));
 
         DatumRoute<Boolean> updateAllocationsRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.CAPABILITY_EDITOR);
+            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
             MeasurablePercentageChange[] percentages = readBody(request, MeasurablePercentageChange[].class);
             return allocationService
                     .updateAllocations(

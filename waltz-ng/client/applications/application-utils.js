@@ -27,5 +27,5 @@ export function mapToDisplayNames(displayNameService, app) {
         businessCriticalityDisplay: maybeGetDisplayName("criticality", app.businessCriticality),
         riskRatingDisplay: maybeGetDisplayName("criticality", app.riskRating),
         lifecyclePhaseDisplay: maybeGetDisplayName("lifecyclePhase", app.lifecyclePhase)
-    }
+    };
 }

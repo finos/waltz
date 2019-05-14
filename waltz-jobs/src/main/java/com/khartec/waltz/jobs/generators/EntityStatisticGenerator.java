@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
@@ -44,12 +45,16 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.toList;
 
 public class EntityStatisticGenerator implements SampleDataGenerator {
+
+
+    private static final Random rnd = RandomUtilities.getRandom();
+
 
     private static final List<LocalDateTime> DATES = IntStream.range(0, 60)
                 .mapToObj(i -> LocalDateTime.now().minusDays(i))
@@ -213,7 +218,7 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                                    int bound,
                                    BiFunction<StatisticValueState, Integer, String> outcomeFn) {
 
-        Random rnd = new Random(System.currentTimeMillis());
+        Random rnd = RandomUtilities.getRandom();
 
         List<EntityStatisticValue> values = streamAppRefs(applications)
                 .map(appRef -> {
@@ -277,7 +282,6 @@ public class EntityStatisticGenerator implements SampleDataGenerator {
                                            OrganisationalUnit[] orgUnits,
                                            EntityStatisticValueDao valueDao) {
 
-        Random rnd = new Random(System.currentTimeMillis());
 
         List<EntityStatisticValue> values = streamOrgUnitRefs(orgUnits)
                 .map(appRef -> {

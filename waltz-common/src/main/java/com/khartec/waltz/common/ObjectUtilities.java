@@ -19,6 +19,9 @@
 
 package com.khartec.waltz.common;
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 public class ObjectUtilities {
 
     public static <T> T dump(T x) {
@@ -32,6 +35,12 @@ public class ObjectUtilities {
             if (t != null) { return t; }
         }
         return null;
+    }
+
+    public static <T> boolean any(Predicate<T> pred, T... ts) {
+        return Stream
+                .of(ts)
+                .anyMatch(pred);
     }
 
 }

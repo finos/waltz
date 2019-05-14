@@ -42,35 +42,22 @@ const bindings = {
 
 const initialState = {
     facetCounts: {},
-    filterSelections: {}, // { ENTITY_KIND: { filterKind: { selections}, ... }, ... }
-
-    onDismiss: () => console.log("nav filter overlay - defailt dismiss handler")
+    appKindFilterOptions: [], // [ { kind, selected, displayName, count } ]
+    onDismiss: () => console.log("nav filter overlay - default dismiss handler")
 };
 
 
-function mkDefaultSelections(optionsWithCountsById) {
-    return _.transform(optionsWithCountsById, (result, value, key) => {
-        result[value.id] = true;
-    }, {});
-}
-
-
-function mkFilterSelections(appKindFacetCountsById) {
-    /*
-        {
-            APPLICATION: {
-                applicationKind: { key1: true|false, key2: true|false },
-                lifecyclePhase: { key1: true|false, key2: true|false },
-                criticality: { key1: true|false, key2: true|false },
-
-            },
-            // other entity kinds for which filters are enabled
-        }
-    */
-    const filterSelections = {
-        [entity.APPLICATION.key]: { "applicationKind": mkDefaultSelections(appKindFacetCountsById) }
-    };
-    return filterSelections;
+function mkAppKindFilterOptions(countsByKind, displayNameService, descriptionService) {
+    return _.chain(countsByKind)
+        .map((val, kind) => ({
+            kind,
+            selected: true,
+            count: val.count,
+            displayName: displayNameService.lookup("applicationKind", kind, kind),
+            description: descriptionService.lookup("applicationKind", kind, null)
+        }))
+        .sortBy(d => d.displayName)
+        .value();
 }
 
 
@@ -81,6 +68,8 @@ function controller($element,
                     $transitions,
                     $state,
                     $stateParams,
+                    displayNameService,
+                    descriptionService,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -90,7 +79,6 @@ function controller($element,
             vm.dismiss();
         }
     };
-
 
     const onOverlayKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
@@ -111,7 +99,7 @@ function controller($element,
             return serviceBroker
                 .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
                 .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
-                .then(() => vm.filterSelections = mkFilterSelections(vm.facetCounts));
+                .then(() => vm.appKindFilterOptions = mkAppKindFilterOptions(vm.facetCounts, displayNameService, descriptionService));
         } else {
             return Promise.resolve();
         }
@@ -155,16 +143,39 @@ function controller($element,
 
 
     vm.filterChanged = () => {
-        $rootScope.$broadcast(FILTER_CHANGED_EVENT, vm.filterSelections);
+        // we need to convert the simple internal structures to the more complex filterOptions object structure
+        const appKindFilterOptions = _.reduce(
+            vm.appKindFilterOptions,
+            (acc, opt) => {
+                acc[opt.kind] = opt.selected;
+                return acc;
+            },
+            {});
+
+        const filterOptions = {
+            APPLICATION: {
+                applicationKind: appKindFilterOptions
+            }
+        };
+        $rootScope.$broadcast(FILTER_CHANGED_EVENT, filterOptions);
     };
 
 
-    vm.resetFilters = () => {
-        vm.filterSelections = mkFilterSelections(vm.facetCounts);
+    vm.selectAllAppKindFilters = () => {
+        vm.appKindFilterOptions = setSelectedOnAllTo(vm.appKindFilterOptions, true);
+        vm.filterChanged();
+    };
+
+    vm.deselectAllAppKindFilters = () => {
+        vm.appKindFilterOptions = setSelectedOnAllTo(vm.appKindFilterOptions, false);
         vm.filterChanged();
     };
 }
 
+
+function setSelectedOnAllTo(options = [], selected) {
+    return _.map(options, option => Object.assign({}, option, { selected }))
+}
 
 controller.$inject = [
     "$element",
@@ -174,6 +185,8 @@ controller.$inject = [
     "$transitions",
     "$state",
     "$stateParams",
+    "DisplayNameService",
+    "DescriptionService",
     "ServiceBroker"
 ];
 

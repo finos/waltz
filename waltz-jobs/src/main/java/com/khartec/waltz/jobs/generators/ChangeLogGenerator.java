@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.ListUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
@@ -49,7 +49,7 @@ public class ChangeLogGenerator implements SampleDataGenerator {
 
     private static ChangeLogRecord mkChangeLog(long appId, String email) {
         ChangeLogRecord record = new ChangeLogRecord();
-        record.setMessage(ArrayUtilities.randomPick(messages));
+        record.setMessage(randomPick(messages));
         record.setParentId(appId);
         record.setParentKind(EntityKind.APPLICATION.name());
         record.setUserId(email);

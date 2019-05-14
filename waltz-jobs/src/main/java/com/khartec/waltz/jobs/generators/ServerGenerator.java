@@ -19,6 +19,7 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
@@ -36,15 +37,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ArrayUtilities.randomPick;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 
 public class ServerGenerator implements SampleDataGenerator {
 
-    private static final Random rnd = new Random();
     private static final Set<String> commonHostNames = new HashSet<>();
+
+    private static final Random rnd = RandomUtilities.getRandom();
 
 
     private static String mkHostName(int i) {
@@ -113,7 +115,7 @@ public class ServerGenerator implements SampleDataGenerator {
 
         IntStream.range(0, 20_000)
                 .forEach(i -> {
-                    serverAppMappings.add(Tuple.tuple(ListUtilities.randomPick(serverIds), ListUtilities.randomPick(appIds)));
+                    serverAppMappings.add(Tuple.tuple(randomPick(serverIds), randomPick(appIds)));
                 });
 
         List<ServerUsageRecord> serverUsages = serverAppMappings
