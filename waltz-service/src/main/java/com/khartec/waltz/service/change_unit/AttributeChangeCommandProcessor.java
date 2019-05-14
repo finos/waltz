@@ -19,9 +19,8 @@
 
 package com.khartec.waltz.service.change_unit;
 
+import com.khartec.waltz.model.attribute_change.AttributeChange;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.UpdateExecutionStatusCommand;
-import com.khartec.waltz.model.command.CommandResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,28 +30,19 @@ public interface AttributeChangeCommandProcessor {
     Logger LOG = LoggerFactory.getLogger(AttributeChangeCommandProcessor.class);
 
 
-    default <T> boolean hasNoChange(T currentValue, T newValue, String fieldName) {
-        if (currentValue.equals(newValue)) {
-            LOG.info("Command will have no effect, '{}' is already '{}'", fieldName, newValue);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    default void doBasicValidation(UpdateExecutionStatusCommand command, ChangeUnit changeUnit, String userName) {
-        checkNotNull(command, "command cannot be null");
+    default void doBasicValidation(AttributeChange attributeChange, ChangeUnit changeUnit, String userName) {
+        checkNotNull(attributeChange, "attributeChange cannot be null");
         checkNotNull(changeUnit, "changeUnit cannot be null");
         checkNotEmpty(userName, "userName cannot be null or empty");
-        checkTrue(changeUnit.executionStatus().equals(command.executionStatus().oldVal()),
-                "changeUnits execution status does not match old status in command");
+        checkTrue(attributeChange.name().equals(this.supportedAttribute()),
+                "Attribute name does not match attribute support by command");
     }
 
 
     String supportedAttribute();
 
-    CommandResponse<UpdateExecutionStatusCommand> apply(UpdateExecutionStatusCommand command,
-                                                        ChangeUnit changeUnit,
-                                                        String userName);
+
+    boolean apply(AttributeChange attributeChange,
+                  ChangeUnit changeUnit,
+                  String userName);
 }

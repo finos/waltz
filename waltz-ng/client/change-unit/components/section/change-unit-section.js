@@ -73,26 +73,31 @@ function controller(notification, serviceBroker) {
 
 
     vm.completeChangeUnit = (cu) => {
-        const cmd = mkExecutionStatusUpdateCommand(cu, executionStatus.COMPLETE.key);
-        serviceBroker.execute(CORE_API.ChangeUnitStore.updateExecutionStatus, [cmd])
-            .then(r => r.data)
-            .then(() => {
-                loadData(true);
-                notification.success("Change Unit Completed");
-            })
-            .catch(e => displayError(notification, "Failed to complete change unit", e));
+        if (confirm("Are you sure you wish to complete this change?  Note: changes will be applied to Waltz current state")) {
+            const cmd = mkExecutionStatusUpdateCommand(cu, executionStatus.COMPLETE.key);
+            serviceBroker.execute(CORE_API.ChangeUnitStore.updateExecutionStatus, [cmd])
+                .then(r => r.data)
+                .then(() => {
+                    loadData(true);
+                    notification.success("Change Unit Completed");
+                })
+                .catch(e => displayError(notification, "Failed to complete change unit", e));
+        }
+
     };
 
 
     vm.discardChangeUnit = (cu) => {
-        const cmd = mkExecutionStatusUpdateCommand(cu, executionStatus.DISCARDED.key);
-        serviceBroker.execute(CORE_API.ChangeUnitStore.updateExecutionStatus, [cmd])
-            .then(r => r.data)
-            .then(() => {
-                loadData(true);
-                notification.success("Change Unit Discarded");
-            })
-            .catch(e => displayError(notification, "Failed to discard change unit", e));
+        if (confirm("Are you sure you wish to discard this change?")) {
+            const cmd = mkExecutionStatusUpdateCommand(cu, executionStatus.DISCARDED.key);
+            serviceBroker.execute(CORE_API.ChangeUnitStore.updateExecutionStatus, [cmd])
+                .then(r => r.data)
+                .then(() => {
+                    loadData(true);
+                    notification.success("Change Unit Discarded");
+                })
+                .catch(e => displayError(notification, "Failed to discard change unit", e));
+        }
     };
 }
 
