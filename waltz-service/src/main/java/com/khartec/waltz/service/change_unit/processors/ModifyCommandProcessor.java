@@ -23,9 +23,12 @@ import com.khartec.waltz.model.attribute_change.AttributeChange;
 import com.khartec.waltz.model.change_unit.ChangeAction;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
 import com.khartec.waltz.model.change_unit.UpdateExecutionStatusCommand;
+import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
+import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.attribute_change.AttributeChangeService;
+import com.khartec.waltz.service.change_unit.AttributeChangeCommandProcessor;
 import com.khartec.waltz.service.change_unit.ChangeUnitCommandProcessor;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
@@ -33,9 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static java.util.stream.Collectors.toMap;
 
 
 @Service
@@ -44,19 +49,25 @@ public class ModifyCommandProcessor implements ChangeUnitCommandProcessor {
     private final AttributeChangeService attributeChangeService;
     private final ChangeLogService changeLogService;
     private final PhysicalFlowService physicalFlowService;
+    private final Map<String, AttributeChangeCommandProcessor> processorsByAttribute;
 
 
     @Autowired
     public ModifyCommandProcessor(AttributeChangeService attributeChangeService,
                                   ChangeLogService changeLogService,
-                                  PhysicalFlowService physicalFlowService) {
+                                  PhysicalFlowService physicalFlowService,
+                                  List<AttributeChangeCommandProcessor> processors) {
         checkNotNull(attributeChangeService, "attributeChangeService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+        checkNotNull(processors, "processors cannot be null");
 
         this.attributeChangeService = attributeChangeService;
         this.changeLogService = changeLogService;
         this.physicalFlowService = physicalFlowService;
+        this.processorsByAttribute = processors
+                .stream()
+                .collect(toMap(t -> t.supportedAttribute(), t -> t));
     }
 
 
@@ -85,7 +96,6 @@ public class ModifyCommandProcessor implements ChangeUnitCommandProcessor {
     private CommandResponse<UpdateExecutionStatusCommand> modifyPhysicalFlow(UpdateExecutionStatusCommand command,
                                                                              ChangeUnit changeUnit,
                                                                              String userName) {
-
         doBasicValidation(command, changeUnit, userName);
 
         PhysicalFlow subject = physicalFlowService.getById(changeUnit.subjectEntity().id());
@@ -94,33 +104,33 @@ public class ModifyCommandProcessor implements ChangeUnitCommandProcessor {
         checkTrue(subject.entityLifecycleStatus().equals(changeUnit.subjectInitialStatus()),
                 "current subject status does not match initial change unit status: " + subject);
 
-
         // fetch attribute changes
         List<AttributeChange> attributeChanges = attributeChangeService.findByChangeUnitId(changeUnit.id().get());
 
+        boolean success = attributeChanges
+                .stream()
+                .map(a -> processAttributeChange(a, changeUnit, userName))
+                .allMatch(a -> a == true);
 
-        attributeChanges.forEach(a -> processAttributeChange(a));
-
-//        SetAttributeCommand setAttributeCommand = ImmutableSetAttributeCommand.builder()
-//                .entityReference(subject.entityReference())
-//                .name("entity_lifecycle_status")
-//                .value(EntityLifecycleStatus.ACTIVE.name())
-//                .build();
-//
-//        int i = physicalFlowService.updateAttribute(userName, setAttributeCommand);
-//        return ImmutableCommandResponse.<UpdateExecutionStatusCommand>builder()
-//                .entityReference(subject.entityReference())
-//                .originalCommand(command)
-//                .outcome(i == 1 ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
-//                .message("Updated status of physical flow: " + subject + " to " + EntityLifecycleStatus.ACTIVE)
-//                .build();
-
-        return null;
-    }
-
-
-    private void processAttributeChange(AttributeChange a) {
+        return ImmutableCommandResponse.<UpdateExecutionStatusCommand>builder()
+                .entityReference(subject.entityReference())
+                .originalCommand(command)
+                .outcome(success ? CommandOutcome.SUCCESS : CommandOutcome.FAILURE)
+                .message("Modified physical flow: " + subject + " attributes")
+                .build();
 
     }
 
+
+    private boolean processAttributeChange(AttributeChange attributeChange, ChangeUnit changeUnit, String userName) {
+        AttributeChangeCommandProcessor commandProcessor = getCommandProcessor(attributeChange.name());
+        return commandProcessor.apply(attributeChange, changeUnit, userName);
+    }
+
+
+    private AttributeChangeCommandProcessor getCommandProcessor(String attributeName) {
+        AttributeChangeCommandProcessor commandProcessor = processorsByAttribute.get(attributeName);
+        checkNotNull(commandProcessor, "Cannot find processor for attribute: " + attributeName);
+        return commandProcessor;
+    }
 }

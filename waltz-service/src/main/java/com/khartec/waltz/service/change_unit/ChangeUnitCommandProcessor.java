@@ -33,17 +33,6 @@ public interface ChangeUnitCommandProcessor {
 
     Logger LOG = LoggerFactory.getLogger(ChangeUnitCommandProcessor.class);
 
-
-    default <T> boolean hasNoChange(T currentValue, T newValue, String fieldName) {
-        if (currentValue.equals(newValue)) {
-            LOG.info("Command will have no effect, '{}' is already '{}'", fieldName, newValue);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     default void doBasicValidation(UpdateExecutionStatusCommand command, ChangeUnit changeUnit, String userName) {
         checkNotNull(command, "command cannot be null");
         checkNotNull(changeUnit, "changeUnit cannot be null");
@@ -56,6 +45,6 @@ public interface ChangeUnitCommandProcessor {
     ChangeAction supportedAction();
 
     CommandResponse<UpdateExecutionStatusCommand> apply(UpdateExecutionStatusCommand command,
-                          ChangeUnit changeUnit,
-                          String userName);
+                                                        ChangeUnit changeUnit,
+                                                        String userName);
 }
