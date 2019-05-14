@@ -32,9 +32,10 @@
                  on-selection="$ctrl.onSelect(node, $ctrl.ratingsByMeasurable[node.id])"
                  order-by="'-name'">
 
-        <span class="waltz-visibility-parent">
+        <span class="waltz-visibility-parent wmrt-node">
             <span ng-style="{ opacity: node.concrete ? 1 : 0.5 }">
-                <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]">
+                <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]"
+                                             show-name="false">
                 </waltz-rating-indicator-cell>
             </span>
 
@@ -43,9 +44,8 @@
                   popover-append-to-body="true"
                   popover-delay="300"
                   popover-placement="right"
-                  style="display: inline-block;top: -1px;position: relative;"
                   ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
-                  class="no-overflow">
+                  class="no-overflow wmrt-label">
                 <span ng-bind="node.displayName"
                       ng-class="{
                         'italics' : ! node.concrete,
