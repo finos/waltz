@@ -8,8 +8,19 @@
     </ol>
 </waltz-page-header>
 
+
+
 <div class="waltz-page-summary waltz-page-summary-attach">
-    <div class="waltz-display-section">
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="!$ctrl.changeSet">
+        <message>
+            <strong>No Change Set</strong> found.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-display-section"
+         ng-if="$ctrl.changeSet">
         <div class="row">
             <div class="col-sm-7">
                 <div class="row">
