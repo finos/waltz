@@ -72,8 +72,10 @@
             <div>
                 <strong ng-bind="item.ratingItem.name"></strong>
             </div>
-            <span ng-bind="item.rating.description"
-                   class="text-muted">
+
+            <span class="text-muted">
+                <waltz-markdown text="item.rating.description">
+                </waltz-markdown>
             </span>
         </div>
 
@@ -98,8 +100,9 @@
                     (<span ng-bind="item.definition.externalId"> </span>)
                 </span>
             </div>
-            <div ng-bind="item.definition.description"
-                  class="text-muted">
+            <div class="text-muted">
+                <waltz-markdown text="item.definition.description">
+                </waltz-markdown>
             </div>
         </div>
     </div>
