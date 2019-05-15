@@ -85,7 +85,7 @@ function controller(displayNameService, serviceBroker) {
                 .then(r => vm.entity = r.data)
                 .then(() => vm.props = loader.mkProps(vm.entity, displayNameService));
         }
-    }
+    };
 }
 
 
