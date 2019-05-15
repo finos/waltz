@@ -29,8 +29,9 @@
 <script type="text/ng-template"
         id="weil-popover-basic">
     <div>
-        <div ng-bind="$ctrl.entityRef.description"></div>
-        <div ng-if="$ctrl.entityRef.entityLifecycleStatus" class="small">
+        <waltz-markdown text="$ctrl.entityRef.description"></waltz-markdown>
+        <div ng-if="$ctrl.entityRef.entityLifecycleStatus"
+             class="small">
             <hr>
             <strong>Status:</strong>
             <span ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
@@ -43,8 +44,9 @@
 <!-- CUSTOM -->
 <script type="text/ng-template"
         id="weil-popover-custom">
-    <div ng-init="$ctrl.lazyLoad()" class="small">
-        <div ng-bind="$ctrl.entity.description"></div>
+    <div ng-init="$ctrl.lazyLoad()"
+         class="small">
+        <waltz-markdown text="$ctrl.entity.description"></waltz-markdown>
         <br>
         <table class="table small table-condensed">
             <tr ng-repeat="prop in $ctrl.props">
