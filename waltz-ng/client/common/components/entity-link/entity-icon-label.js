@@ -19,6 +19,7 @@
 
 import {initialiseData} from "../../../common";
 import template from './entity-icon-label.html';
+import {CORE_API} from "../../services/core-api-utils";
 
 
 const bindings = {
@@ -28,7 +29,6 @@ const bindings = {
 };
 
 
-
 const initialState = {
     iconPlacement: 'left', // can be left, right, none
     tooltipPlacement: 'top', // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
@@ -36,15 +36,63 @@ const initialState = {
 };
 
 
-function controller() {
+const entityLoaders = {
+    // custom loaders, add more entity types here with links to their CORE_API loader method and
+    // a post-processing step (mkProps) to generate a list of { name, value } pairs
+
+    "APPLICATION": {
+        method: CORE_API.ApplicationStore.getById,
+        mkProps: (app, displayNameService) => ([
+            {
+                name: "Asset Code",
+                value: app.assetCode || "?"
+            }, {
+                name: "Kind",
+                value: displayNameService.lookup("applicationKind", app.applicationKind, "?")
+            }, {
+                name: "Lifecycle",
+                value: displayNameService.lookup("lifecyclePhase", app.lifecyclePhase, "?")
+            }, {
+                name: "Criticality",
+                value: displayNameService.lookup("criticality", app.businessCriticality, "?")
+            }
+        ])
+    }
+};
+
+
+function controller(displayNameService, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChange = c => {
-        vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase
-            ? 'mouseenter'
-            : 'none';
+    vm.$onChanges = c => {
+        if (! vm.entityRef) return;
+        if (_.has(entityLoaders, vm.entityRef.kind)) {
+            vm.popoverTemplate = `weil-popover-custom`;
+            vm.trigger = "mouseenter";
+        } else {
+            vm.popoverTemplate = `weil-popover-basic`;
+            vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase
+                ? 'mouseenter'
+                : 'none';
+        }
     };
+
+    vm.lazyLoad = () => {
+        const loader = entityLoaders[vm.entityRef.kind];
+        if (loader) {
+            serviceBroker
+                .loadViewData(loader.method, [ vm.entityRef.id ])
+                .then(r => vm.entity = r.data)
+                .then(() => vm.props = loader.mkProps(vm.entity, displayNameService));
+        }
+    }
 }
+
+
+controller.$inject = [
+    "DisplayNameService",
+    "ServiceBroker"
+];
 
 
 const component = {
