@@ -1,6 +1,7 @@
 <span class="waltz-entity-icon-label"
-      uib-popover-template="'weil-popover.html'"
+      uib-popover-template="$ctrl.popoverTemplate"
       popover-trigger="{{$ctrl.trigger}}"
+      popover-popup-delay="200"
       popover-append-to-body="true"
       popover-placement="{{ $ctrl.tooltipPlacement }}" >
     <waltz-icon fixed-width="true"
@@ -26,7 +27,7 @@
 
 
 <script type="text/ng-template"
-        id="weil-popover.html">
+        id="weil-popover-basic">
     <div>
         <div ng-bind="$ctrl.entityRef.description"></div>
         <div ng-if="$ctrl.entityRef.entityLifecycleStatus" class="small">
@@ -35,5 +36,28 @@
             <span ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
             </span>
         </div>
+    </div>
+</script>
+
+
+<!-- CUSTOM -->
+<script type="text/ng-template"
+        id="weil-popover-custom">
+    <div ng-init="$ctrl.lazyLoad()" class="small">
+        <div ng-bind="$ctrl.entity.description"></div>
+        <br>
+        <table class="table small table-condensed">
+            <tr ng-repeat="prop in $ctrl.props">
+                <td>
+                    <span class="text-muted"
+                          ng-bind="prop.name">
+                    </span>
+                </td>
+                <td>
+                    <span ng-bind="prop.value">
+                    </span>
+                </td>
+            </tr>
+        </table>
     </div>
 </script>
