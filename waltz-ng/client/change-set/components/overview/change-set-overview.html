@@ -1,0 +1,91 @@
+<waltz-page-header icon="desktop"
+                   name="{{ $ctrl.changeSet.name }}"
+                   small="{{ $ctrl.changeSet.externalId }}">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li>Change Set</li>
+        <li><span ng-bind="$ctrl.changeSet.name"></span></li>
+    </ol>
+</waltz-page-header>
+
+
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="!$ctrl.changeSet">
+        <message>
+            <strong>No Change Set</strong> found.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-display-section"
+         ng-if="$ctrl.changeSet">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Name
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.changeSet.name"></span>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        External Id
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.changeSet.externalId"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-markdown text="$ctrl.changeSet.description">
+                        </waltz-markdown>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Planned
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-from-now ng-if="$ctrl.changeSet.plannedDate"
+                                        timestamp="$ctrl.changeSet.plannedDate">
+                        </waltz-from-now>
+                        <span ng-if="! $ctrl.changeSet.plannedDate">
+                            -
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Owning Entity
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-entity-link entity-ref="$ctrl.changeSet.parentEntity">
+                        </waltz-entity-link>
+                    </div>
+                    <div class="col-sm-6">
+                        <waltz-last-updated entity="$ctrl.changeSet">
+                        </waltz-last-updated>
+                    </div>
+                </div>
+
+
+                <!-- Entity Enum -->
+                <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-entity-enum>
+
+            </div>
+            <div class="col-sm-5">
+                <!-- Assessment Ratings -->
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-sub-section>
+            </div>
+        </div>
+    </div>
+</div>

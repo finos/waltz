@@ -21,6 +21,7 @@
 @import "bootstrap-styles";
 @import "grid";
 @import "waltz-field-table";
+@import "waltz-draft";
 @import "waltz-inactive";
 @import "waltz-popover-width";
 @import "waltz-scroll-region";
@@ -38,6 +39,7 @@
 @import "../client/auth-sources/components/table/auth-sources-table";
 @import "../client/bookmarks/components/bookmark-kinds/bookmark-kinds";
 @import "../client/change-initiative/directives/change-initiative-selector";
+@import "../client/change-unit/components/data-type-change-panel/data-type-change-panel";
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
 @import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";

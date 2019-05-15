@@ -39,6 +39,11 @@ export default {
         name: "Change Initiative editor",
         description: "Can modify change initiatives"
     },
+    "CHANGE_SET_EDITOR" : {
+        key: "CHANGE_SET_EDITOR",
+        name: "Change Set editor",
+        description: "Can modify change sets"
+    },
     "LINEAGE_EDITOR" : {
         key: "LINEAGE_EDITOR",
         name: "Lineage editor",

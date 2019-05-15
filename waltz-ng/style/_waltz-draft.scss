@@ -1,0 +1,22 @@
+.ws-draft:after {
+    content:"DRAFT";
+    z-index: 1000;
+
+    position:absolute;
+    top: 2em;
+    left: 40%;
+    transform: rotate(-45deg);
+
+    font-family:Arial,sans-serif;
+    font-size:60px;
+
+    color: #0b23ea;
+
+    border:solid 4px #0b23ea;
+    border-radius:5px;
+
+    opacity:0.1;
+
+    text-shadow: 0 0 2px #0b23ea;
+    box-shadow: 0 0 2px #0b23ea;
+}

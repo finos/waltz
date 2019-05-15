@@ -1,5 +1,6 @@
 .ws-inactive:after {
     content:"INACTIVE";
+    z-index: 1000;
 
     position:absolute;
     top: 2em;

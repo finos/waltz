@@ -91,6 +91,19 @@ public class SetUtilities {
         return working;
     }
 
+
+    public static <T> Set<T> minus(Set<T> xs, Set<T>... yss) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(yss, "yss cannot be null");
+
+        Set<T> working = new HashSet<>(xs);
+        ArrayList<Set<T>> sets = ListUtilities.newArrayList(yss);
+        sets.forEach(ys -> working.removeAll(ys));
+
+        return working;
+    }
+
+
     public static <T> Set<T> intersection(Set<T> xs, Set<T> ys) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(ys, "ys cannot be null");

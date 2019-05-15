@@ -1,0 +1,156 @@
+<div>
+    <waltz-section name="Change Units">
+
+        <div ng-if="$ctrl.changeUnits.length > 0"
+             style="padding: 20px;">
+            <div class="row"
+                 ng-repeat="cu in $ctrl.changeUnits">
+
+                <waltz-sub-section name="{{ cu.name }} ({{cu.externalId}})">
+                    <content>
+                        <div class="waltz-sub-section-content">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="row">
+                                        <div class="col-sm-2 waltz-display-field-label">
+                                            Description
+                                        </div>
+
+                                        <div class="col-sm-10">
+                                            <div ng-bind="cu.description"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-2 waltz-display-field-label">
+                                            Action
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <span ng-bind="cu.action | toDisplayName:'changeAction'"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-2 waltz-display-field-label">
+                                            Status
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <span ng-bind="cu.executionStatus | toDisplayName:'executionStatus'"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <div ng-if="cu.subjectEntity.kind === 'PHYSICAL_FLOW' && cu.action !== 'MODIFY'"
+                                         ng-include="'cus-physical-flow-overview'">
+                                    </div>
+
+                                    <div ng-if="cu.action === 'MODIFY'"
+                                         ng-include="'cus-attribute-change'">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <waltz-last-updated entity="cu" class="small text-muted">
+                                    </waltz-last-updated>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="waltz-sub-section-controls">
+
+                            <span waltz-has-role="CHANGE_SET_EDITOR"
+                                  ng-if="cu.executionStatus === 'PENDING'">
+                                <span>|</span>
+                                <a ng-click="$ctrl.completeChangeUnit(cu)"
+                                   class="clickable">
+                                    Complete
+                                </a>
+                            </span>
+
+                            <span waltz-has-role="CHANGE_SET_EDITOR"
+                                  ng-if="cu.executionStatus === 'PENDING'">
+                                <a ng-click="$ctrl.discardChangeUnit(cu)"
+                                   class="clickable">
+                                    Discard
+                                </a>
+                            </span>
+                        </div>
+
+                    </content>
+                </waltz-sub-section>
+
+                <br>
+            </div>
+
+
+        </div>
+        <waltz-no-data ng-if="$ctrl.changeUnits.length == 0">
+            <message>
+                <strong>No changes yet</strong>
+            </message>
+        </waltz-no-data>
+
+    </waltz-section>
+
+</div>
+
+
+<!-- TEMPLATES -->
+
+<!-- PHYSICAL FLOW OVERVIEW -->
+<script type="text/ng-template"
+        id="cus-physical-flow-overview">
+    <waltz-sub-section name="Details">
+        <content>
+            <div class="waltz-sub-section-content">
+                <waltz-physical-flow-overview parent-entity-ref="cu.subjectEntity"
+                                              class="waltz-highlight-if">
+                </waltz-physical-flow-overview>
+            </div>
+
+            <div class="waltz-sub-section-controls">
+                <span>
+                    <waltz-entity-link entity-ref="{
+                        kind: 'PHYSICAL_FLOW',
+                        id: cu.subjectEntity.id,
+                        name: 'Go to physical flow'}">
+                    </waltz-entity-link>
+                </span>
+            </div>
+
+        </content>
+    </waltz-sub-section>
+</script>
+
+
+<!-- PHYSICAL FLOW ATTRIBUTE CHANGES -->
+<script type="text/ng-template"
+        id="cus-attribute-change">
+    <waltz-sub-section name="Details">
+        <content>
+            <div class="waltz-sub-section-content">
+                <waltz-attribute-change-panel change-unit="cu"
+                                              class="waltz-highlight-if">
+                </waltz-attribute-change-panel>
+            </div>
+
+            <div class="waltz-sub-section-controls">
+                <span>
+                    <waltz-entity-link entity-ref="{
+                        kind: cu.subjectEntity.kind,
+                        id: cu.subjectEntity.id,
+                        name: 'Go to physical flow'
+                      }">
+                    </waltz-entity-link>
+                </span>
+            </div>
+
+        </content>
+    </waltz-sub-section>
+</script>

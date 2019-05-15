@@ -221,6 +221,12 @@ export const dynamicSections = {
         name: "Flow Participants",
         icon: "cubes",
         id: 70
+    },
+    changeSetSection: {
+        componentId: "change-set-section",
+        name: "Change Sets",
+        icon: "hourglass-2",
+        id: 80
     }
 
 };
@@ -257,6 +263,7 @@ export const dynamicSectionsByKind = {
     "CHANGE_INITIATIVE": [
         dynamicSections.bookmarksSection,
         dynamicSections.changeInitiativeNavigatorSection,
+        dynamicSections.changeSetSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.relatedMeasurablesSection,
