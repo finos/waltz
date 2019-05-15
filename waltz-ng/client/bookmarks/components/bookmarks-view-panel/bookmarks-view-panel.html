@@ -10,10 +10,13 @@
 
         <div class="col-sm-9">
             <div ng-if="$ctrl.bookmarks.length > 5">
-                <input class="form-control search"
-                       type="search"
-                       ng-model="$ctrl.qry"
-                       placeholder="search">
+
+                <waltz-search-control min-characters="1"
+                                      delay="250"
+                                      on-query="$ctrl.onQueryStrChange"
+                                      placeholder-text="Search bookmarks...">
+                </waltz-search-control>
+
                 <br>
             </div>
 
@@ -41,7 +44,7 @@
             <col width="20%">
         </colgroup>
 
-        <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'bookmarkKind' | filter:$ctrl.qry">
+        <tbody ng-repeat="bookmarksByKind in $ctrl.filteredBookmarks | orderBy:'bookmarkKind'">
         <tr ng-repeat="bookmark in bookmarksByKind.bookmarks"
             class="waltz-visibility-parent">
             <td style="vertical-align:middle; text-align: center; width: 10%">
