@@ -28,15 +28,24 @@ const bindings = {
 
 
 const initialState = {
+    qry: null,
     bookmarkKind: null,
     filteredBookmarks: []
 };
 
 
-function filterBookmarks(bookmarks = [], kind = null) {
+function filterBookmarks(bookmarks = [], kind = null, qry = null) {
     if (_.isEmpty(bookmarks)) return [];
 
-    const byKind = _.groupBy(bookmarks, 'bookmarkKind');
+    const qryStr = _.toLower(qry);
+
+    const byKind = _
+        .chain(bookmarks)
+        .filter(b => _.isEmpty(qryStr)
+            ? true
+            : b.searchStr.indexOf(qryStr) > -1)
+        .groupBy(b => b.bookmarkKind)
+        .value();
 
     const groupsToShow = kind
         ? { kind : byKind[kind] }
@@ -46,14 +55,25 @@ function filterBookmarks(bookmarks = [], kind = null) {
 }
 
 
+function enrichBookmarkWithSearchStr(bookmark) {
+    const searchStr = _.toLower(`${bookmark.description} ${bookmark.title} ${bookmark.url}`);
+    return Object.assign({}, bookmark, { searchStr });
+}
+
+
 function controller() {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        vm.filteredBookmarks = filterBookmarks(vm.bookmarks, vm.bookmarkKind);
+        vm.filteredBookmarks = filterBookmarks(vm.enrichedBookmarks, vm.bookmarkKind, vm.qry);
     };
 
     vm.$onChanges = () => {
+        if (vm.bookmarks) {
+            vm.enrichedBookmarks = _.map(
+                vm.bookmarks,
+                enrichBookmarkWithSearchStr);
+        }
         refresh();
     };
 
@@ -61,6 +81,12 @@ function controller() {
         vm.bookmarkKind = kind;
         refresh();
     };
+
+    vm.onQueryStrChange = (qry) => {
+        vm.qry = qry;
+        refresh();
+    };
+
 }
 
 
