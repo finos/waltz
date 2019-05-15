@@ -19,7 +19,6 @@
                     </colgroup>
                     <tbody>
                         <tr ng-repeat="item in $ctrl.assessments">
-
                             <!-- definition name -->
                             <td class="wft-label">
                                 <span uib-popover-template="'arp-desc-popover.html'"
@@ -41,14 +40,11 @@
                                       popover-append-to-body="true">
                                     <a ng-click="$ctrl.onSelect(item)"
                                        class="clickable">
-                                        <waltz-rating-indicator-cell rating="item.ratingItem">
+                                        <waltz-rating-indicator-cell rating="item.ratingItem"
+                                                                     show-name="true">
                                         </waltz-rating-indicator-cell>
-
-                                        <span ng-bind="item.ratingItem.name">
-                                        </span>
-
-                                        <span ng-if="item.rating.description.length > 0">
-                                            &nbsp;
+                                        <span style="position: relative; top: -4px;"
+                                              ng-if="item.rating.description.length > 0">
                                             <waltz-icon name="sticky-note-o">
                                             </waltz-icon>
                                         </span>

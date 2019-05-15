@@ -83,8 +83,8 @@ public class BookmarkGenerator implements SampleDataGenerator {
         List<EntityReference> refs = ListUtilities.concat(appRefs, measurableRefs, ouRefs, appGroupRefs);
 
         List<BookmarkRecord> bookmarks = refs.stream()
-                .flatMap(r -> IntStream
-                        .range(0, rnd.nextInt(5))
+                .flatMap(r -> RandomUtilities
+                        .randomlySizedIntStream(2, 15)
                         .mapToObj(idx -> {
                             BookmarkRecord record = dsl.newRecord(BOOKMARK);
                             record.setParentKind(r.kind().name());
