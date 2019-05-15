@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -30,6 +29,7 @@ const stateKindTuples = [
     {kind: "APPLICATION", state: "main.app.view"},
     {kind: "ACTOR", state: "main.actor.view"},
     {kind: "APP_GROUP", state: "main.app-group.view"},
+    {kind: "CHANGE_SET", state: "main.change-set.view"},
     {kind: "DATA_TYPE", state: "main.data-type.view"},
     {kind: "FLOW_DIAGRAM", state: "main.flow-diagram.view"},
     {kind: "LOGICAL_DATA_ELEMENT", state: "main.logical-data-element.view"},

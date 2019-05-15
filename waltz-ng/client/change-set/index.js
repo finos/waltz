@@ -20,9 +20,11 @@
 import services from "./services";
 import Routes from "./routes";
 import { registerComponents } from "../common/module-utils";
+
 import ChangeSetView from "./pages/view/change-set-view";
 
 import ChangeSetOverview from "./components/overview/change-set-overview";
+import ChangeSetSection from "./components/section/change-set-section";
 
 
 export default () => {
@@ -35,7 +37,8 @@ export default () => {
 
     registerComponents(module, [
         ChangeSetView,
-        ChangeSetOverview
+        ChangeSetOverview,
+        ChangeSetSection
     ]);
 
     return module.name;

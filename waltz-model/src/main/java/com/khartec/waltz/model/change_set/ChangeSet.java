@@ -33,14 +33,29 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableChangeSet.class)
 public abstract class ChangeSet implements
         IdProvider,
+        EntityKindProvider,
         EntityLifecycleStatusProvider,
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider,
         ExternalIdProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        WaltzEntity {
 
     public abstract Optional<EntityReference> parentEntity();
 
     public abstract Optional<LocalDateTime> plannedDate();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.CHANGE_SET; }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.CHANGE_SET)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .entityLifecycleStatus(entityLifecycleStatus())
+                .build();
+    }
 }

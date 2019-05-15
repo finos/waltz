@@ -1,0 +1,26 @@
+<div>
+    <waltz-source-data-section-addon ratings="$ctrl.sourceDataRatings"
+                                     entities="['CHANGE_SET']">
+    </waltz-source-data-section-addon>
+
+    <waltz-no-data ng-if="$ctrl.changeSets.length == 0">
+        <message>
+            <strong>No change sets</strong>
+        </message>
+    </waltz-no-data>
+
+
+    <waltz-grid-with-search entries="$ctrl.changeSets"
+                            column-defs="$ctrl.columnDefs"
+                            on-initialise="$ctrl.onGridInitialise">
+    </waltz-grid-with-search>
+
+    <div class="pull-right" style="margin-bottom: 4px">
+        <a class="clickable waltz-visibility-child-30"
+           ng-click="$ctrl.exportChangeSets()">
+            <waltz-icon name="download"></waltz-icon>
+            Export change sets
+        </a>
+    </div>
+
+</div>
