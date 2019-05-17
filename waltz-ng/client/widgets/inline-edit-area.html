@@ -2,7 +2,8 @@
     <div ng-if="$ctrl.mode == $ctrl.Modes.VIEWING"
          class="waltz-visibility-parent">
 
-        <span ng-bind="$ctrl.value"></span>
+        <waltz-markdown text="$ctrl.value">
+        </waltz-markdown>
 
         <span ng-bind="$ctrl.placeholder"
               class="text-muted"
