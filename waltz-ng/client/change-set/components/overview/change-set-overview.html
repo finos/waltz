@@ -52,9 +52,9 @@
                         Planned
                     </div>
                     <div class="col-sm-4">
-                        <waltz-from-now ng-if="$ctrl.changeSet.plannedDate"
-                                        timestamp="$ctrl.changeSet.plannedDate">
-                        </waltz-from-now>
+                        <span ng-if="$ctrl.changeSet.plannedDate"
+                              ng-bind="$ctrl.changeSet.plannedDate | date:'yyyy-MM-dd'">
+                        </span>
                         <span ng-if="! $ctrl.changeSet.plannedDate">
                             -
                         </span>
