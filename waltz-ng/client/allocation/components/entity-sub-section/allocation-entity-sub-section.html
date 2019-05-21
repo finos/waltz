@@ -104,10 +104,10 @@
                     </span>
                 </span>
 
-                <span ng-if="$ctrl.editing"
-                      class="clickable">
+                <span ng-if="$ctrl.editing">
                     <!-- CANCEL -->
-                    <a ng-click="$ctrl.onCancel()">
+                    <a ng-click="$ctrl.onCancel()"
+                       class="clickable">
                         Cancel
                     </a>
                     |
@@ -124,7 +124,8 @@
                     <!-- HELP -->
                     <a ng-click="$ctrl.showingHelp = ! $ctrl.showingHelp"
                        class="clickable">
-                        Help
+                        <span ng-if="$ctrl.showingHelp">Close Help</span>
+                        <span ng-if="!$ctrl.showingHelp">Help</span>
                     </a>
                 </span>
             </div>
@@ -295,6 +296,7 @@
 <script type="text/ng-template"
         id="waess-help">
     <div class="help-block">
+        <hr>
         <p>
             <b>How to use this editor</b>
         </p>
@@ -339,8 +341,8 @@
             <tr>
                 <td>Zero and distribute</td>
                 <td>
-                    Proportionally distributes this items allocation to other allocated items.
-                    This will result in this items allocation becoming 0%.
+                    Proportionally distributes this item's allocation to other allocated items.
+                    This will result in this item's allocation becoming 0%.
                 </td>
             </tr>
         </table>

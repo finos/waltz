@@ -161,13 +161,13 @@
     <div class="row"
          ng-if="tab.allocationSchemes.length > 0">
         <br>
-        <div class="col-sm-1  waltz-display-field-label">
-            Allocations:
-        </div>
-        <div class="col-sm-11">
+        <div class="col-sm-12">
+            <span class="waltz-display-field-label">Allocations:</span>
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
+                    &nbsp;
+                    &nbsp;
                     <span ng-bind="scheme.name"
                           uib-popover-template="'wmras-scheme-popover.html'"
                           popover-trigger="mouseenter"

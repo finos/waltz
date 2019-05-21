@@ -84,7 +84,7 @@
         <waltz-markdown text="node.description"></waltz-markdown>
         <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
             <hr>
-            <div ng-bind="$ctrl.ratingsByMeasurable[node.id].description"></div>
+            <waltz-markdown text="$ctrl.ratingsByMeasurable[node.id].description"></waltz-markdown>
         </div>
 
         <div ng-if="$ctrl.allocationsByMeasurable[node.id]"
