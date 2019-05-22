@@ -1,12 +1,31 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
     <waltz-section-actions>
-        <button ng-click="$ctrl.exportGrid()"
-                class="btn btn-xs btn-primary"
-                ng-show="$ctrl.visibility.detail"
-                ng-disabled="$ctrl.gridDataCount == 0">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
+        <waltz-data-extract-link name="Download"
+                                 styling="link"
+                                 filename="complexity.csv"
+                                 extract="complexity/all"
+                                 method="POST"
+                                 request-body="$ctrl.selector">
+        </waltz-data-extract-link>
     </waltz-section-actions>
 
     <div ng-if="$ctrl.complexity.length === 0">
@@ -119,9 +138,7 @@
                 <div ng-if="$ctrl.gridData.length > 0">
                     <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                             entries="$ctrl.gridData"
-                                            search-placeholder-text="Search application complexity..."
-                                            on-initialise="$ctrl.onGridInitialise"
-                                            on-change="$ctrl.onGridChange">
+                                            search-placeholder-text="Search application complexity...">
                     </waltz-grid-with-search>
                 </div>
             </div>

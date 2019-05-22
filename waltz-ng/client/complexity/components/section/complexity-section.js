@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,14 +36,11 @@ const bindings = {
 const initialState = {
     csvName: "complexity.csv",
     gridData: [],
-    gridDataCount: 0,
     summarySelection: null,
     visibility: {
         summary: true,
         detail: false
-    },
-
-    exportGrid: () => {}
+    }
 };
 
 
@@ -57,45 +54,49 @@ function mkGridData(complexity = [], apps = []) {
 
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
-        if (!vm.parentEntityRef) {
-            return;
-        }
-
-        const selector = mkApplicationSelectionOptions(
+        vm.selector = mkApplicationSelectionOptions(
             vm.parentEntityRef,
             undefined,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
-        serviceBroker
+        const appPromise = serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
-                [selector])
+                [ vm.selector ])
             .then(r => vm.apps = r.data);
 
-        serviceBroker
+        const complexityPromise = serviceBroker
             .loadViewData(
                 CORE_API.ComplexityStore.findBySelector,
-                [selector])
+                [ vm.selector ])
             .then(r => vm.complexity = r.data);
+
+        return $q.all([appPromise, complexityPromise]);
     };
 
     vm.$onInit = () => {
         loadAll();
     };
 
-    vm.$onChanges = (changes) => {
-        if(changes.filters) {
-            loadAll();
 
-            if(vm.visibility.detail === true) {
-                vm.gridData = mkGridData(vm.complexity, vm.apps);
-            }
+    vm.$onChanges = (changes) => {
+        if (! vm.parentEntityRef) {
+            return;
+        }
+
+        if (changes.filters) {
+            loadAll()
+                .then(() => {
+                    if(vm.visibility.detail === true) {
+                        vm.gridData = mkGridData(vm.complexity, vm.apps);
+                    }
+                });
         }
     };
 
@@ -115,19 +116,12 @@ function controller(serviceBroker) {
                 mkLinkGridCell("Application", "app.name", "app.id", "main.app.view"),
                 { sort: { direction: "asc" }, width: "30%" }
             ),
+            { field: "app.assetCode", displayName: "Asset Code"},
             { field: "connectionComplexity.score", displayName: "Connection Score", cellFilter: "toFixed:'2'" },
             { field: "measurableComplexity.score", displayName: "Viewpoints Score", cellFilter: "toFixed:'2'" },
             { field: "serverComplexity.score", displayName: "Server Score", cellFilter: "toFixed:'2'" },
             { field: "overallScore", displayName: "Overall Score", cellFilter: "toFixed:'2'" }
         ];
-
-        vm.onGridInitialise = (e) => {
-            vm.exportGrid = () => e.exportFn(vm.csvName);
-        };
-
-        vm.onGridChange = (e) => {
-            vm.gridDataCount = e.entriesCount;
-        };
 
         if (isEmpty(vm.gridData)) {
             vm.gridData = mkGridData(vm.complexity, vm.apps);
@@ -137,6 +131,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
