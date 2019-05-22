@@ -2,17 +2,38 @@
 
 Status: DRAFT
 
-## MariaDB
 
-### Creating Backups Example
+## Creating Backups
+
+### Maria 
+Maria data can be exported using the `mysqldump` utility.
+
+Example:
 ````
- mysqldump -u root demodb > dump.sql
+mysqldump -u {user} {database} > dump.sql
 ````
-On linux you may need to modify `/usr/local/etc/my.cnf`. 
+
+Note: on linux you may need to modify `/usr/local/etc/my.cnf`. 
+
+### Postgres
+Postgres data can be exported using the `pg_dump` utility.
+
+Example:
+```
+pg_dump -d {database} -U {user} > dump.sql
+```
 
 
-### Restoring Backup Example
+## Restoring Backups
 
+### Maria 
+Example
 ````
- mysql -u root demodb < dump.sql
+ mysql -u {user} {database} < dump.sql
 ````
+
+### Postgres
+Example:
+```
+psql -U {user} {database} < dump.sql
+```
