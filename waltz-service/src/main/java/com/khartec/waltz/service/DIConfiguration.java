@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ import static com.khartec.waltz.common.StringUtilities.mkSafe;
 
 
 @Configuration
-@EnableMBeanExport(defaultDomain = "${database.schema}_${database.user}_${database.schemata:schema}") // TODO: replace
+@EnableMBeanExport(defaultDomain = "waltz_${waltz.qualifier:}")
 @EnableScheduling
 @ComponentScan(value={"com.khartec.waltz"})
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)

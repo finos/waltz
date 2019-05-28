@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,17 +20,16 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
+import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ChangeInitiativeHarness {
@@ -39,38 +38,14 @@ public class ChangeInitiativeHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        DSLContext dsl = ctx.getBean(DSLContext.class);
         ChangeInitiativeDao dao = ctx.getBean(ChangeInitiativeDao.class);
+        ChangeInitiativeIdSelectorFactory selectorFactory = ctx.getBean(ChangeInitiativeIdSelectorFactory.class);
 
-        ChangeInitiative changeInitiative = dao.getById(1L);
-        System.out.println(changeInitiative);
+        IdSelectionOptions opts = mkOpts(
+                mkRef(EntityKind.APPLICATION, 40),
+                HierarchyQueryScope.EXACT);
 
-
-
-        SelectConditionStep<Record1<Long>> ouHier = dsl
-                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.ID.eq(210L)
-                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
-
-
-        SelectConditionStep<Record1<Long>> baseIdSelector = dsl
-                .selectDistinct(CHANGE_INITIATIVE.ID)
-                .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID.in(ouHier));
-
-
-        SelectConditionStep<Record1<Long>> ciHier = dsl
-                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.ID.in(baseIdSelector)
-                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
-
-
-        dsl.select(CHANGE_INITIATIVE.NAME)
-                .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ID.in(ciHier))
-                .forEach(System.out::println);
+        dao.findForSelector(selectorFactory.apply(opts));
 
     }
 
