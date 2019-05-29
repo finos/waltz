@@ -32,13 +32,37 @@ const initialState = {
 
 
 
+function filterUsers(users = [], qry = null) {
+    if (users.length <= 100 && qry === '') {
+        return users;
+    }
+
+    if (_.isEmpty(users) || qry === '') return [];
+
+    const qryStr = _.toLower(qry);
+    return users.filter(user => user.searchStr.indexOf(qryStr) > -1);
+}
+
+function enrichUsersWithSearchStr(user) {
+    const searchStr = _.toLower(user.userName);
+    return Object.assign({}, user, { searchStr });
+}
 
 function controller(serviceBroker) {
-
     const vm =  initialiseData(this, initialState);
 
     serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
-        .then(result => vm.users = result.data);
+        .then(result => vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d)));
+
+    const refresh = () => {
+        vm.filteredUsers=[] = filterUsers(vm.users, vm.qry);
+    };
+
+    vm.onQueryStrChange = (qry) => {
+        vm.qry = qry;
+        refresh();
+    };
+
 
     vm.dismiss = () => {
         vm.newUser = null;
