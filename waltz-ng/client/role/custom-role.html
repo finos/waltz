@@ -1,0 +1,83 @@
+<div>
+    <waltz-page-header icon="users"
+                       name="Custom Role">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>Custom Role</li>
+        </ol>
+    </waltz-page-header>
+    <div class='waltz-page-summary waltz-page-summary-attach'>
+        <form class="form-horizontal"
+              ng-submit="ctrl.createRole(ctrl.roleName, ctrl.roleDescription)">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    RoleName
+                </label>
+                <div class="col-sm-10">
+                    <input type="text"
+                           class="form-control"
+                           ng-model="ctrl.roleName"
+                           required="true"
+                           placeholder="Role Name">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    Role Description
+                </label>
+                <div class="col-sm-10">
+                    <input type="text"
+                           class="form-control"
+                           required="true"
+                           ng-model="ctrl.roleDescription"
+                           placeholder="Role Description">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit"
+                            class="btn btn-success">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <br>
+            <div class="text-danger"
+                 ng-bind="ctrl.errorMessage">
+            </div>
+            <div class="text-success"
+                 ng-bind="ctrl.successMessage">
+            </div>
+        </form>
+    </div>
+    <div class='waltz-page-summary waltz-page-summary-attach'>
+        <h3>
+            Roles
+        </h3>
+
+        <div class="waltz-field-table-border">
+
+            <table class="table small">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="role in ctrl.roles">
+                    <td ng-bind="role.name">
+                    </td>
+                    <td>
+                        <p class="help-block"
+                           ng-bind="role.description">
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

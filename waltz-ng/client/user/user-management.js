@@ -54,6 +54,9 @@ function controller(serviceBroker) {
     serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
         .then(result => vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d)));
 
+    serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
+        .then(result => vm.roles = result.data);
+
     const refresh = () => {
         vm.filteredUsers=[] = filterUsers(vm.users, vm.qry);
     };
