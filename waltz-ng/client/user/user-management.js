@@ -33,10 +33,6 @@ const initialState = {
 
 
 function filterUsers(users = [], qry = null) {
-    if (users.length <= 100 && qry === '') {
-        return users;
-    }
-
     if (_.isEmpty(users) || qry === '') return [];
 
     const qryStr = _.toLower(qry);
@@ -52,7 +48,13 @@ function controller(serviceBroker) {
     const vm =  initialiseData(this, initialState);
 
     serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
-        .then(result => vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d)));
+        .then(result => {
+            vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d));
+
+            if(vm.users.length <= vm.numAllowedWithoutFilter) {
+                vm.filteredUsers = vm.users;
+            }
+        });
 
     serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
         .then(result => vm.roles = result.data);
