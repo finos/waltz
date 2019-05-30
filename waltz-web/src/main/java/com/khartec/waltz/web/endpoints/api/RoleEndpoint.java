@@ -63,9 +63,10 @@ public class RoleEndpoint implements Endpoint {
         DatumRoute<Boolean> createCustomRoleRoute = (request, response) -> {
             requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             Map<String, String> body = (Map<String, String>) readBody(request, Map.class);
+            String key = body.get("key");
             String roleName = body.get("name");
             String description = body.get("description");
-            return roleService.create(roleName, description);
+            return roleService.create(key, roleName, description);
         };
 
 

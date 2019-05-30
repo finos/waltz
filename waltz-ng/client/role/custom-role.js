@@ -19,38 +19,46 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import template from "./custom-role.html";
+import {displayError} from "../../client/common/error-utils";
 
-
-function controller(serviceBroker) {
+function controller(serviceBroker, notification) {
     const vm = this;
 
-    serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
+    const reload = () =>
+        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
         .then(result => vm.roles = result.data);
+
+    reload();
+
+    vm.transformKey = () => {
+        vm.roleKey = vm.roleName
+            ? vm.roleName
+                .toUpperCase()
+                .replace(/\s+/g,'_') //replacing whitespaces with _
+                .replace(/\W/g, '') //Remove any non alphanumeric character
+            : '';
+    };
 
     vm.createRole = (roleName, description) => {
         vm.errorMessage = null;
         vm.successMessage = null;
-        console.log('create new role ' + roleName)
+
         let payload = {
             name: roleName,
-            description: description
+            description: description,
+            key: vm.roleKey
         };
         serviceBroker.execute(CORE_API.RoleStore.createCustomRole, [payload])
             .then(
                 () => {
-                    vm.successMessage = 'role has been created successfully'
-                },
-                err => {
-                    vm.errorMessage = 'Failed to create role';
-                }
-            );
-
-        console.log(vm.errorMessage);
-        console.log(vm.successMessage);
+                    notification.info("Role created successfully");
+                    reload();
+                })
+            .catch(e => displayError(notification, "Failed to create role! ", e))
     };
 }
 
-controller.$inject = ["ServiceBroker"];
+controller.$inject = ['ServiceBroker', 'Notification'];
 
 
 export default {

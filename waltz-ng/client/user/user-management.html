@@ -31,6 +31,11 @@
                                       on-query="ctrl.onQueryStrChange"
                                       placeholder-text="Search Users...">
                 </waltz-search-control>
+                <div class="text-danger"
+                     ng-if="ctrl.users.length > ctrl.numAllowedWithoutFilter && !ctrl.qry">
+                    <br>
+                    Too many results, please enter at least 3 characters to filter
+                </div>
             </div>
         </form>
         <hr>
@@ -75,7 +80,8 @@
 
                                 </th>
                                 <th>Role</th>
-                                <th>Desc</th>
+                                <th>Description</th>
+                                <th>Custom Role</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -91,6 +97,9 @@
                                     <p class="help-block"
                                        ng-bind="role.description">
                                     </p>
+                                </td>
+                                <td>
+                                    <input type="checkbox" disabled="true" ng-checked="role.isCustom">
                                 </td>
                             </tr>
                             </tbody>
@@ -203,10 +212,6 @@
         <thead>
         <tr>
             <th>User Name </th>
-            <th ng-repeat="role in ctrl.roles">
-                        <span ng-bind="role.name">
-                        </span>
-            </th>
         </tr>
         </thead>
         <tbody >
@@ -216,11 +221,6 @@
             <td>
                 <a class="clickable" ng-bind="user.userName">
                 </a>
-            </td>
-            <td align="left" ng-repeat="role in ctrl.roles">
-                        <span ng-if='ctrl.hasRole(user, role.key)'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
             </td>
         </tr>
         </tbody>

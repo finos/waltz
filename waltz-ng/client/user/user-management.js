@@ -159,7 +159,7 @@ function controller(serviceBroker) {
 
     function setAllSelectionsTo(b) {
         vm.roleSelections = _.reduce(
-            _.map(roles, "key"),
+            _.map(vm.roles, "key"),
             (acc, k) => {
                 acc[k] = b;
                 return acc;

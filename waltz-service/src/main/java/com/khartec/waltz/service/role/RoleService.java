@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.lang.String.format;
+import static com.khartec.waltz.common.Checks.checkNotEmpty;
 
 @Service
 public class RoleService {
@@ -46,15 +43,16 @@ public class RoleService {
         this.roleDao = roleDao;
     }
 
-    public boolean create(String roleName, String description) {
-        checkNotNull(roleName, "role name cannot be null");
+    public boolean create(String key, String roleName, String description) {
+        checkNotEmpty(roleName, "role name cannot be empty");
+        checkNotEmpty(key, "key cannot be empty");
         LOG.info("creating new role: {}", roleName);
 
         RoleRecord role = new RoleRecord();
+        role.setKey(key);
         role.setName(roleName);
         role.setDescription(description);
         role.setIsCustom(true);
-        role.setKey(roleName.toUpperCase().replaceAll(" ", "_"));
 
         return roleDao.create(role);
     }
