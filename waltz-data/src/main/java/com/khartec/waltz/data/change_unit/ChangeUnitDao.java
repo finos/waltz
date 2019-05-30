@@ -69,6 +69,7 @@ public class ChangeUnitDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .provenance(record.getProvenance())
+                .kind(EntityKind.CHANGE_UNIT)
                 .build();
     };
 

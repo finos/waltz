@@ -37,7 +37,8 @@ public abstract class ChangeUnit implements
         DescriptionProvider,
         LastUpdatedProvider,
         ExternalIdProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        EntityKindProvider {
 
     public abstract Optional<Long> changeSetId();
 
