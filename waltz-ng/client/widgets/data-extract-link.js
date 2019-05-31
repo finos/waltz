@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,11 +43,11 @@ const initialState = {
 
 
 function calcClasses(styling = "button") {
-    switch(styling) {
+    switch (styling) {
         case "link":
             return ["clickable"];
         default:
-            return ["btn", "btn-xs", "btn-primary"];
+            return ["btn", "btn-xs", "btn-default"];
     }
 }
 
@@ -70,20 +70,24 @@ function controller($http, BaseExtractUrl) {
         vm.classes = calcClasses(vm.styling);
     };
 
-    vm.export = () => {
+    const doExport = (format) => {
+        const params = { format };
         switch (vm.method) {
             case "GET":
                 return $http
-                    .get(vm.url)
+                    .get(vm.url, { params })
                     .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
             case "POST":
                 return $http
-                    .post(vm.url, vm.requestBody)
+                    .post(vm.url, vm.requestBody, { params })
                     .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
             default:
                 throw "Unrecognised method: " + vm.method;
         }
     };
+
+    vm.exportCsv = () => doExport("CSV");
+    vm.exportXlsx = () => doExport("XSLX");
 
 }
 
