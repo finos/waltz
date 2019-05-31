@@ -1,4 +1,8 @@
-<div class="waltz-page-summary waltz-page-summary-attach">
+<div class="waltz-page-summary waltz-page-summary-attach"
+     ng-class="{
+        'ws-inactive': $ctrl.app.entityLifecycleStatus ==='REMOVED',
+        'ws-draft': $ctrl.app.entityLifecycleStatus ==='PENDING',
+     }">
     <waltz-section-actions>
         <a waltz-has-role="APP_EDITOR"
            class="btn btn-xs btn-primary"

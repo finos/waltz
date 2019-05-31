@@ -66,8 +66,9 @@ public class ChangeUnitEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
-        String findBySubjectRefPath = mkPath(BASE_URL, "subject", ":kind", ":id");
         String findByChangeSetIdPath = mkPath(BASE_URL, "change-set", ":id");
+        String findBySubjectRefPath = mkPath(BASE_URL, "subject", ":kind", ":id");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String updateExecutionStatusPath = mkPath(BASE_URL, "update", "execution-status");
 
         DatumRoute<ChangeUnit> getByIdRoute = (request, response) -> {
@@ -85,6 +86,9 @@ public class ChangeUnitEndpoint implements Endpoint {
             return service.findByChangeSetId(parseLong(id));
         };
 
+        ListRoute<ChangeUnit> findBySelectorRoute = ((request, response)
+                -> service.findBySelector(readIdSelectionOptionsFromBody(request)));
+
         DatumRoute<CommandResponse<UpdateExecutionStatusCommand>> updateExecutionStatusRoute = (request, response) -> {
             ensureUserEditRights(request);
             String username = getUsername(request);
@@ -95,9 +99,11 @@ public class ChangeUnitEndpoint implements Endpoint {
         };
 
 
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findBySubjectRefPath, findBySubjectRefRoute);
         getForList(findByChangeSetIdPath, findByChangeSetIdRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
 
         postForDatum(updateExecutionStatusPath, updateExecutionStatusRoute);
     }

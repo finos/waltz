@@ -25,7 +25,8 @@ const iconCodes = {
     file: '\uf016',
     question: '\uf128',
     questionCircle: '\uf29c',
-    folder: '\uf115'
+    folder: '\uf115',
+    hourglass: '\uf252',
 };
 
 
@@ -59,13 +60,33 @@ function toIcon(count = 0) {
 }
 
 
+function toCUIcon(count = 0) {
+    switch (count) {
+        case 0:
+            return {
+                code: '',
+                description: '',
+                color: '#000'
+            };
+        default:
+            return {
+                code: iconCodes.hourglass,
+                description: 'Changes are associated with this flow',
+                color: '#FFA500'
+            };
+    }
+}
+
+
 export function mkTweakers(tweakers = {},
                     physicalFlows = [],
-                    logicalFlows = []) {
+                    logicalFlows = [],
+                    changeUnits = []) {
 
     const toIdentifier = (entRef) => `${entRef.kind}/${entRef.id}`;
 
     const logicalFlowsById = _.keyBy(logicalFlows, 'id');
+    const physicalFlowsById = _.keyBy(physicalFlows, 'id');
 
 
     const countPhysicalFlows = (direction) =>
@@ -79,9 +100,27 @@ export function mkTweakers(tweakers = {},
     const sourceCounts = countPhysicalFlows('source');
     const targetCounts = countPhysicalFlows('target');
 
+    const physicalFlowChangeUnits = _.filter(
+        changeUnits,
+        cu => cu.subjectEntity.kind = "PHYSICAL_FLOW");
+
+    // now count change units for apps
+    const countChangeUnits = (direction) => _.countBy(physicalFlowChangeUnits, (cu) => {
+        const physicalFlow = physicalFlowsById[cu.subjectEntity.id];
+        const logicalFlow = logicalFlowsById[physicalFlow.logicalFlowId];
+        return logicalFlow
+            ? toIdentifier(logicalFlow[direction])
+            : null;
+    });
+
+    const cuSourceCounts = countChangeUnits('source');
+    const cuTargetCounts = countChangeUnits('target');
 
     tweakers.source.icon = (appRef) => toIcon(sourceCounts[toIdentifier(appRef)]);
     tweakers.target.icon = (appRef) => toIcon(targetCounts[toIdentifier(appRef)]);
+
+    tweakers.source.cuIcon = (appRef) => toCUIcon(cuSourceCounts[toIdentifier(appRef)]);
+    tweakers.target.cuIcon = (appRef) => toCUIcon(cuTargetCounts[toIdentifier(appRef)]);
 
     return Object.assign({} , tweakers);
 }

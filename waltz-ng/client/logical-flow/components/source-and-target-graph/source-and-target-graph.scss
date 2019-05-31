@@ -1,8 +1,23 @@
+@import "../../../../style/variables";
+
 .waltz-source-and-target-graph {
+    @mixin wsat-arc($state, $dasharray: 0, $dashoffset: 0) {
+        .wsat-arc-#{$state} {
+            stroke-dasharray: $dasharray $dashoffset;
+        }
+    }
 
     .wsat-label {
         font-size: 9pt;
     }
+
+    .wsat-arc {
+        stroke-dasharray: 0;
+    }
+
+    @include wsat-arc("removed", 1, 4);
+    @include wsat-arc("pending", 4, 4);
+
 
     .wsat-hover.wsat-arc {
         stroke-width: 1.5;

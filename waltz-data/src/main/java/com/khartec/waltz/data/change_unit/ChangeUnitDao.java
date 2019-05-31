@@ -27,9 +27,7 @@ import com.khartec.waltz.model.change_set.ChangeSet;
 import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
 import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -120,6 +118,13 @@ public class ChangeUnitDao {
     public List<ChangeUnit> findByChangeSetId(long id) {
         return dsl.selectFrom(CHANGE_UNIT)
                 .where(CHANGE_UNIT.CHANGE_SET_ID.eq(id))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<ChangeUnit> findBySelector(Select<Record1<Long>> selector) {
+        return dsl.selectFrom(CHANGE_UNIT)
+                .where(CHANGE_UNIT.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

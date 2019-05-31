@@ -2,6 +2,7 @@ package com.khartec.waltz.data;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
+import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
@@ -24,6 +25,7 @@ public class GenericSelectorFactory {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory;
+    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
@@ -33,6 +35,7 @@ public class GenericSelectorFactory {
     @Autowired
     public GenericSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                   ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory,
+                                  ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory,
                                   DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                                   FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory,
                                   LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
@@ -41,6 +44,7 @@ public class GenericSelectorFactory {
 
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.changeInitiativeIdSelectorFactory = changeInitiativeIdSelectorFactory;
+        this.changeUnitIdSelectorFactory = changeUnitIdSelectorFactory;
         this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
@@ -102,6 +106,8 @@ public class GenericSelectorFactory {
                 return applicationIdSelectorFactory.apply(appSelectionOptions);
             case CHANGE_INITIATIVE:
                 return changeInitiativeIdSelectorFactory.apply(selectionOptions);
+            case CHANGE_UNIT:
+                return changeUnitIdSelectorFactory.apply(selectionOptions);
             case DATA_TYPE:
                 return dataTypeIdSelectorFactory.apply(selectionOptions);
             case FLOW_DIAGRAM:
