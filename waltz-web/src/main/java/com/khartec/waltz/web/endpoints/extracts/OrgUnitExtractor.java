@@ -20,16 +20,13 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.DSLContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jooq.Record4;
+import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
 
@@ -37,49 +34,32 @@ import static spark.Spark.get;
 @Service
 public class OrgUnitExtractor extends BaseDataExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OrgUnitExtractor.class);
-
-    private OrganisationalUnitService orgUnitService;
-
 
     @Autowired
-    public OrgUnitExtractor(DSLContext dsl,
-                            OrganisationalUnitService orgUnitService) {
+    public OrgUnitExtractor(DSLContext dsl) {
         super(dsl);
-        checkNotNull(orgUnitService, "orgUnitService cannot be null");
-
-        this.orgUnitService = orgUnitService;
     }
 
 
     @Override
     public void register() {
         get(mkPath("data-extract", "org-units"), (request, response) ->
-                writeFile("organisational-units.csv", extract(), response));
+                writeExtract(
+                        "organisational-units",
+                        prepareExtract(),
+                        request,
+                        response));
     }
 
 
-    private CSVSerializer extract() {
-        return csvWriter -> {
-            csvWriter.writeHeader(
-                    "id",
-                    "parentId",
-                    "name",
-                    "description");
-
-            orgUnitService.findAll()
-                    .forEach(ou -> {
-                        try {
-                            csvWriter.write(
-                                    ou.id().orElse(null),
-                                    ou.parentId().orElse(null),
-                                    ou.name(),
-                                    ou.description());
-                        } catch (IOException ioe) {
-                            LOG.warn("Failed to write ou: " + ou, ioe);
-                        }
-                    });
-        };
+    private SelectJoinStep<Record4<Long, Long, String, String>> prepareExtract() {
+        return dsl
+                .select(
+                    ORGANISATIONAL_UNIT.ID.as("id"),
+                    ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
+                    ORGANISATIONAL_UNIT.NAME.as("name"),
+                    ORGANISATIONAL_UNIT.DESCRIPTION.as("description"))
+                .from(ORGANISATIONAL_UNIT);
     }
 
 }

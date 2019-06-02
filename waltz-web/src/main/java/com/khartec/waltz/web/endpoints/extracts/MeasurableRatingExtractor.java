@@ -23,7 +23,6 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.*;
@@ -97,14 +96,13 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
                     .innerJoin(rsi).on(rsi.SCHEME_ID.eq(rs.ID))
                     .where(reportConditions);
 
-            String csv = qry.fetch().formatCSV();
-
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
-            String suggestedFilename = toCamelCase(categoryName)+".csv";
+            String suggestedFilename = toCamelCase(categoryName);
 
-            return writeFile(
+            return writeExtract(
                     suggestedFilename,
-                    csv,
+                    qry,
+                    request,
                     response);
         });
     }

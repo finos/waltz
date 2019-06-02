@@ -26,6 +26,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
+
     @Override
     public void register() {
         registerExtractForAll( mkPath("data-extract", "allocations", "all"));
@@ -36,16 +37,15 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
     private void registerExtractForAll(String path) {
         post(path, (request, response) -> {
-
             ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
-
-            String csv = doExtract(
+            SelectConditionStep<Record> qry = prepareQuery(
                     DSL.trueCondition(),
                     applicationIdSelectionOptions);
 
-            return writeFile(
-                    "allocations.csv",
-                    csv,
+            return writeExtract(
+                    "all_allocations",
+                    qry,
+                    request,
                     response);
         });
     }
@@ -63,15 +63,14 @@ public class AllocationsExtractor extends BaseDataExtractor{
                     .where(MEASURABLE_CATEGORY.ID.eq(measurableCategoryId))
                     .fetchOne();
 
-            String suggestedFilename = fileName.value1() + ".csv";
-
-            String csv = doExtract(
+            SelectConditionStep<Record> qry = prepareQuery(
                     MEASURABLE.MEASURABLE_CATEGORY_ID.eq(measurableCategoryId),
                     applicationIdSelectionOptions);
 
-            return writeFile(
-                    suggestedFilename,
-                    csv,
+            return writeExtract(
+                    fileName.value1(),
+                    qry,
+                    request,
                     response);
         });
     }
@@ -84,21 +83,22 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
             ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
 
-            Record2<String, String> fileName = dsl.select(MEASURABLE_CATEGORY.NAME, ALLOCATION_SCHEME.NAME)
+            Record2<String, String> fileNameInfoRow = dsl.select(MEASURABLE_CATEGORY.NAME, ALLOCATION_SCHEME.NAME)
                     .from(ALLOCATION_SCHEME)
                     .innerJoin(MEASURABLE_CATEGORY).on(ALLOCATION_SCHEME.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
                     .where(ALLOCATION_SCHEME.ID.eq(schemeId))
                     .fetchOne();
 
-            String suggestedFilename = fileName.value1() + "-" + fileName.value2() + ".csv";
-
-            String csv = doExtract(
+            SelectConditionStep<Record> qry = prepareQuery(
                     ALLOCATION_SCHEME.ID.eq(schemeId),
                     applicationIdSelectionOptions);
 
-            return writeFile(
-                    suggestedFilename,
-                    csv,
+            String filename = fileNameInfoRow.value1() + "_" + fileNameInfoRow.value2();
+
+            return writeExtract(
+                    filename,
+                    qry,
+                    request,
                     response);
         });
     }
@@ -106,7 +106,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
     // -- HELPER ----
 
-    private String doExtract(Condition additionalCondition, ApplicationIdSelectionOptions applicationIdSelectionOptions) {
+    private SelectConditionStep<Record> prepareQuery(Condition additionalCondition,
+                                                     ApplicationIdSelectionOptions applicationIdSelectionOptions) {
         Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
         SelectSelectStep<Record> reportColumns = dsl
                 .select(APPLICATION.NAME.as("Application Name"),
@@ -127,7 +128,6 @@ public class AllocationsExtractor extends BaseDataExtractor{
                         ALLOCATION.LAST_UPDATED_BY.as("Last Updated By"),
                         ALLOCATION.PROVENANCE.as("Provenance"));
 
-
         Condition condition = ALLOCATION.ENTITY_ID.in(appSelector)
                 .and(ALLOCATION.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(ENTITY_HIERARCHY.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
@@ -140,7 +140,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .and(RATING_SCHEME_ITEM.CODE.eq(MEASURABLE_RATING.RATING))
                 .and(additionalCondition);
 
-        SelectConditionStep<Record> qry = reportColumns
+        return reportColumns
                 .from(ALLOCATION)
                 .innerJoin(MEASURABLE).on(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE.ID))
                 .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
@@ -151,7 +151,5 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
                 .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_CATEGORY.RATING_SCHEME_ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
                 .where(condition);
-
-        return qry.fetch().formatCSV();
     }
 }

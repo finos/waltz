@@ -3,12 +3,10 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -32,7 +30,7 @@ public class AttestationExtractor extends BaseDataExtractor {
 
     @Override
     public void register() {
-        String path = mkPath("data-extract", "attestation", ":id");
+        String path = mkPath("data-prepareExtractQuery", "attestation", ":id");
         get(path, (request, response) -> {
             long runId = getId(request);
 
@@ -46,61 +44,37 @@ public class AttestationExtractor extends BaseDataExtractor {
             String suggestedFilename = runName
                     .replace(".", "-")
                     .replace(" ", "-")
-                    .replace(",", "-")
-                    + ".csv";
+                    .replace(",", "-");
 
-            return writeFile(
+            return writeExtract(
                     suggestedFilename,
-                    extract(runId),
+                    prepareExtractQuery(runId),
+                    request,
                     response);
         });
     }
 
 
-    private CSVSerializer extract(long runId) {
-        return csvWriter -> {
-            csvWriter.writeHeader(
-                    "Application",
-                    "External Id",
-                    "Attesting Kind",
-                    "Attesting Kind Id",
-                    "Attestation Id",
-                    "Attested By",
-                    "Attested At",
-                    "Recipient");
+    private SelectConditionStep<Record> prepareExtractQuery(long runId) {
+        return dsl
+                .select(APPLICATION.NAME.as("Application"),
+                        APPLICATION.ASSET_CODE.as("External Id"))
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.as("Attesting Kind"),
+                        ATTESTATION_RUN.ATTESTED_ENTITY_ID.as("Attesting Kind Id"))
+                .select(ATTESTATION_INSTANCE.ID.as("Attestation Id"),
+                        ATTESTATION_INSTANCE.ATTESTED_BY.as("Attested By"),
+                        ATTESTATION_INSTANCE.ATTESTED_AT.as("Attested At"))
+                .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.as("Recipient"))
+                .from(ATTESTATION_INSTANCE)
+                .join(ATTESTATION_INSTANCE_RECIPIENT)
+                    .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                .join(ATTESTATION_RUN)
+                    .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
+                .join(APPLICATION)
+                    .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
+                .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
+                    .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-            Select<Record> qry = dsl
-                    .select(ATTESTATION_INSTANCE.fields())
-                    .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
-                    .select(ATTESTATION_RUN.ATTESTED_ENTITY_KIND, ATTESTATION_RUN.ATTESTED_ENTITY_ID)
-                    .select(APPLICATION.NAME, APPLICATION.ASSET_CODE)
-                    .from(ATTESTATION_INSTANCE)
-                    .join(ATTESTATION_INSTANCE_RECIPIENT)
-                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
-                    .join(ATTESTATION_RUN)
-                        .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
-                    .join(APPLICATION)
-                        .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
-                    .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
-                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-            qry.fetch()
-                    .forEach(r -> {
-                        try {
-                            csvWriter.write(
-                                    r.get(APPLICATION.NAME),
-                                    r.get(APPLICATION.ASSET_CODE),
-                                    r.get(ATTESTATION_RUN.ATTESTED_ENTITY_KIND),
-                                    r.get(ATTESTATION_RUN.ATTESTED_ENTITY_ID),
-                                    r.get(ATTESTATION_INSTANCE.ID),
-                                    r.get(ATTESTATION_INSTANCE.ATTESTED_BY),
-                                    r.get(ATTESTATION_INSTANCE.ATTESTED_AT),
-                                    r.get(ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
-                            );
-                        } catch (IOException ioe) {
-                            LOG.warn("Failed to write row: " + r, ioe);
-                        }
-                    });
-        };
     }
 }
