@@ -17,21 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {event} from "d3-selection";
-import {initialiseData} from "../../../common";
-import {downloadTextFile} from "../../../common/file-utils";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
+import { event } from "d3-selection";
+import { initialiseData } from "../../../common";
+import { downloadTextFile } from "../../../common/file-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkTweakers } from "../source-and-target-graph/source-and-target-utilities";
 
 import template from "./source-and-target-panel.html";
 
 
 const bindings = {
-    entityRef: '<',
-    logicalFlows: '<',
-    decorators: '<',
-    physicalFlows: '<',
-    physicalSpecifications: '<'
+    entityRef: "<",
+    changeUnits: "<",
+    logicalFlows: "<",
+    decorators: "<",
+    physicalFlows: "<",
+    physicalSpecifications: "<"
 };
 
 
@@ -45,7 +46,7 @@ const initialState = {
 
 
 function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowId) {
-    const specsById = _.keyBy(specifications, 'id');
+    const specsById = _.keyBy(specifications, "id");
 
     return _.chain(physicalFlows)
         .filter(pf => pf.logicalFlowId === logicalFlowId)
@@ -78,7 +79,7 @@ function filterByType(typeId, flows = [], decorators = []) {
 // flowId -> [ { id (typeId), rating }... ]
 function mkTypeInfo(decorators = []) {
     return _.chain(decorators)
-        .filter({ decoratorEntity: { kind: 'DATA_TYPE' }})
+        .filter({ decoratorEntity: { kind: "DATA_TYPE" }})
         .groupBy(d => d.dataFlowId)
         .mapValues(xs => _.map(xs, x => {
             return {
@@ -132,22 +133,26 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             vm.entityRef,
             vm.logicalFlows);
 
-        const logicalFlowsById = _.keyBy(vm.logicalFlows, 'id');
+        const logicalFlowsById = _.keyBy(vm.logicalFlows, "id");
 
         function select(entity, type, logicalFlowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators);
             const types = typeInfoByFlowId[logicalFlowId] || [];
             const logicalFlow = logicalFlowsById[logicalFlowId];
+            const physicalFlows = calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, logicalFlowId);
+            const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
+                .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
+                .keyBy(cu => cu.subjectEntity.id)
+                .value();
+
             return {
                 type,
                 types,
-                physicalFlows: calcPhysicalFlows(
-                    vm.physicalFlows,
-                    vm.physicalSpecifications,
-                    logicalFlowId),
+                physicalFlows,
                 entity,
                 logicalFlowId,
                 logicalFlow,
+                changeUnitsByPhysicalFlowId,
                 y: evt.layerY
             };
         }
@@ -156,13 +161,13 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             source: {
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
-                    vm.selected = select(entity, 'source', flowId, evt);
+                    vm.selected = select(entity, "source", flowId, evt);
                 })
             },
             target: {
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
-                    vm.selected = select(entity, 'target', flowId, evt);
+                    vm.selected = select(entity, "target", flowId, evt);
                 })
             },
             type: {
@@ -194,7 +199,8 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
         vm.tweakers = mkTweakers(
             baseTweakers,
             vm.physicalFlows,
-            vm.logicalFlows);
+            vm.logicalFlows,
+            vm.changeUnits);
     };
 
 
@@ -209,9 +215,9 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
 
         const dataTypesByFlowId = _
             .chain(vm.decorators)
-            .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
+            .filter(d => d.decoratorEntity.kind === "DATA_TYPE")
             .map(d => ( { id: d.dataFlowId, code: d.decoratorEntity.id }))
-            .groupBy('id')
+            .groupBy("id")
             .value();
 
         const calcDataTypes = (fId) => {
@@ -219,15 +225,15 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
 
             return _.chain(dts)
                 .map(dt => dt.code)
-                .map(code => displayNameService.lookup('dataType', code))
+                .map(code => displayNameService.lookup("dataType", code))
                 .value()
-                .join('; ');
+                .join("; ");
         };
 
         const appIds = _
             .chain(vm.logicalFlows)
             .flatMap(f => ([ f.source, f.target ]))
-            .filter(r => r.kind === 'APPLICATION')
+            .filter(r => r.kind === "APPLICATION")
             .map(r => r.id)
             .uniq()
             .value();
@@ -235,12 +241,12 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findByIds, [appIds])
             .then(r => {
-                const appsById = _.keyBy(r.data, 'id');
+                const appsById = _.keyBy(r.data, "id");
 
                 const resolveCode = (ref) => {
-                    const pathToNameAttr = [ref.id, 'assetCode'];
-                    return ref.kind === 'APPLICATION'
-                        ? _.get(appsById, pathToNameAttr, '-')
+                    const pathToNameAttr = [ref.id, "assetCode"];
+                    return ref.kind === "APPLICATION"
+                        ? _.get(appsById, pathToNameAttr, "-")
                         : ref.kind;
                 };
 
@@ -258,18 +264,18 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                     [header],
                     dataRows);
 
-                downloadTextFile(rows, ',', 'logical_flows.csv');
+                downloadTextFile(rows, ",", "logical_flows.csv");
             })
     };
 }
 
 
 controller.$inject = [
-    '$element',
-    '$timeout',
-    '$window',
-    'DisplayNameService',
-    'ServiceBroker'
+    "$element",
+    "$timeout",
+    "$window",
+    "DisplayNameService",
+    "ServiceBroker"
 ];
 
 

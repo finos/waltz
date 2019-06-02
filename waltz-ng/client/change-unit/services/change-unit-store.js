@@ -39,6 +39,11 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const findBySelector = (options) => $http
+        .post(`${BASE}/selector`, options)
+        .then(result => result.data);
+
+
     const updateExecutionStatus = (cmd) => {
         return $http
             .post(`${BASE}/update/execution-status`, cmd)
@@ -48,6 +53,7 @@ export function store($http, BaseApiUrl) {
     return {
         getById,
         findBySubjectRef,
+        findBySelector,
         findByChangeSetId,
         updateExecutionStatus
     };
@@ -78,6 +84,11 @@ export const ChangeUnitStore_API = {
         serviceName,
         serviceFnName: "findByChangeSetId",
         description: "find change units for an associated change set"
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find change units by selector"
     },
     updateExecutionStatus: {
         serviceName,

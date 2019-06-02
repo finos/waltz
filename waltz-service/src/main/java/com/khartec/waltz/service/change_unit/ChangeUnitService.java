@@ -20,16 +20,16 @@
 package com.khartec.waltz.service.change_unit;
 
 import com.khartec.waltz.data.change_unit.ChangeUnitDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
-import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,18 +46,22 @@ public class ChangeUnitService {
 
     private final ChangeLogService changeLogService;
     private final ChangeUnitDao dao;
+    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory;
     private final Map<ChangeAction, ChangeUnitCommandProcessor> processorsByChangeAction;
 
 
     @Autowired
     public ChangeUnitService(ChangeLogService changeLogService,
                              ChangeUnitDao dao,
+                             ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory,
                              List<ChangeUnitCommandProcessor> processors) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(changeUnitIdSelectorFactory, "changeUnitIdSelectorFactory cannot be null");
         checkNotNull(dao, "dao cannot be null");
         checkNotNull(processors, "processors cannot be null");
 
         this.changeLogService = changeLogService;
+        this.changeUnitIdSelectorFactory = changeUnitIdSelectorFactory;
         this.dao = dao;
 
         processorsByChangeAction = processors
@@ -78,6 +82,13 @@ public class ChangeUnitService {
 
     public List<ChangeUnit> findByChangeSetId(long id) {
         return dao.findByChangeSetId(id);
+    }
+
+
+    public List<ChangeUnit> findBySelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = changeUnitIdSelectorFactory.apply(options);
+        return dao.findBySelector(selector);
     }
 
 

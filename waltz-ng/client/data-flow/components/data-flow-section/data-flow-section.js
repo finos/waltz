@@ -17,20 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
+import { mkSelectionOptions } from "../../../common/selector-utils";
 
-import template from './data-flow-section.html';
+import template from "./data-flow-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
 const initialState = {
+    changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
     logicalFlowDecorators: [],
@@ -56,8 +58,8 @@ function controller(serviceBroker) {
 
         const orgUnitIds = _
             .chain(vm.authSources)
-            .map('parentReference')
-            .filter({ kind: 'ORG_UNIT'})
+            .map("parentReference")
+            .filter({ kind: "ORG_UNIT"})
             .map("id")
             .uniq()
             .value();
@@ -68,7 +70,7 @@ function controller(serviceBroker) {
                 [orgUnitIds])
             .then(r => {
                 vm.orgUnits= r.data;
-                vm.orgUnitsById = _.keyBy(r.data, 'id');
+                vm.orgUnitsById = _.keyBy(r.data, "id");
             });
     }
 
@@ -76,7 +78,7 @@ function controller(serviceBroker) {
     function loadData() {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
+            scope: "EXACT"
         };
 
         serviceBroker
@@ -107,7 +109,7 @@ function controller(serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, 'DATA_TYPE'])
+                [selector, "DATA_TYPE"])
             .then(r => vm.logicalFlowDecorators = r.data);
 
         serviceBroker
@@ -117,6 +119,12 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.authSources = r.data;
             });
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ChangeUnitStore.findBySelector,
+                [mkSelectionOptions(vm.parentEntityRef)])
+            .then(r => vm.changeUnits = r.data);
     }
 
 
@@ -162,7 +170,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -175,5 +183,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzDataFlowSection'
+    id: "waltzDataFlowSection"
 };
