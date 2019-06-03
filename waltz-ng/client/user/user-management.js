@@ -32,13 +32,42 @@ const initialState = {
 
 
 
+function filterUsers(users = [], qry = null) {
+    if (_.isEmpty(users) || qry === '') return [];
+
+    const qryStr = _.toLower(qry);
+    return users.filter(user => user.searchStr.indexOf(qryStr) > -1);
+}
+
+function enrichUsersWithSearchStr(user) {
+    const searchStr = _.toLower(user.userName);
+    return Object.assign({}, user, { searchStr });
+}
 
 function controller(serviceBroker) {
-
     const vm =  initialiseData(this, initialState);
 
     serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
-        .then(result => vm.users = result.data);
+        .then(result => {
+            vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d));
+
+            if(vm.users.length <= vm.numAllowedWithoutFilter) {
+                vm.filteredUsers = vm.users;
+            }
+        });
+
+    serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
+        .then(result => vm.roles = result.data);
+
+    const refresh = () => {
+        vm.filteredUsers=[] = filterUsers(vm.users, vm.qry);
+    };
+
+    vm.onQueryStrChange = (qry) => {
+        vm.qry = qry;
+        refresh();
+    };
+
 
     vm.dismiss = () => {
         vm.newUser = null;
@@ -132,7 +161,7 @@ function controller(serviceBroker) {
 
     function setAllSelectionsTo(b) {
         vm.roleSelections = _.reduce(
-            _.map(roles, "key"),
+            _.map(vm.roles, "key"),
             (acc, k) => {
                 acc[k] = b;
                 return acc;

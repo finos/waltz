@@ -9,9 +9,6 @@
             padding: 8px;
         }
 
-        .waltz-user-admin-selected {
-            background-color: #eee;
-        }
     </style>
 
     <waltz-page-header icon="users"
@@ -27,49 +24,24 @@
     <div class='waltz-page-summary waltz-page-summary-attach'>
         <form class="form-inline">
             <div class="form-group">
-                <label>Search</label>
-                <input type="search"
-                       class="form-control"
-                       placeholder="Filter by username/role...."
-                       ng-model="userFilterQuery"
-                       ng-model-options="{debounce: 300}"
-                       ng-minlength="3">
+                <label>Search (Enter atleast 3 characters to search)</label>
+
+                <waltz-search-control min-characters="3"
+                                      delay="250"
+                                      on-query="ctrl.onQueryStrChange"
+                                      placeholder-text="Search Users...">
+                </waltz-search-control>
                 <div class="text-danger"
-                     ng-if="ctrl.users.length > ctrl.numAllowedWithoutFilter && !userFilterQuery">
+                     ng-if="ctrl.users.length > ctrl.numAllowedWithoutFilter && !ctrl.qry">
                     <br>
                     Too many results, please enter at least 3 characters to filter
                 </div>
             </div>
         </form>
         <hr>
-        <div class="waltz-user-admin-scroll">
-            <table class="table table-condensed table-striped table-hover small">
-                <thead>
-                <tr>
-                    <th>User Name</th>
-                    <th ng-repeat="role in ctrl.roles">
-                        <span ng-bind="role.name">
-                        </span>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="user in ctrl.users | orderBy:'userName' | filter:userFilterQuery"
-                    ng-if="ctrl.users.length <= ctrl.numAllowedWithoutFilter || userFilterQuery"
-                    ng-click="ctrl.userSelected(user)"
-                    ng-class="{ 'waltz-user-admin-selected' : user == ctrl.selectedUser }">
-                    <td>
-                        <a class="clickable" ng-bind="user.userName">
-                        </a>
-                    </td>
-                    <td align="left" ng-repeat="role in ctrl.roles">
-                        <span ng-if='ctrl.hasRole(user, role.key)'>
-                            <waltz-icon name='check'></waltz-icon>
-                        </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="waltz-user-admin-scroll"
+             ng-include="'wum-users-table'">
+
         </div>
         <div style="margin-top: 6px">
             Select a user from the above list
@@ -108,7 +80,8 @@
 
                                 </th>
                                 <th>Role</th>
-                                <th>Desc</th>
+                                <th>Description</th>
+                                <th>Custom Role</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -124,6 +97,9 @@
                                     <p class="help-block"
                                        ng-bind="role.description">
                                     </p>
+                                </td>
+                                <td>
+                                    <input type="checkbox" disabled="true" ng-checked="role.isCustom">
                                 </td>
                             </tr>
                             </tbody>
@@ -230,3 +206,23 @@
 </div>
 
 
+<script type="text/ng-template"
+        id="wum-users-table">
+    <table class="table table-condensed wbs-users-table">
+        <thead>
+        <tr>
+            <th>User Name </th>
+        </tr>
+        </thead>
+        <tbody >
+        <tr ng-repeat="user in ctrl.filteredUsers | orderBy:'userName'"
+            ng-click="ctrl.userSelected(user)"
+            ng-class="{ 'waltz-user-admin-selected' : user == ctrl.selectedUser }">
+            <td>
+                <a class="clickable" ng-bind="user.userName">
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</script>
