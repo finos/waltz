@@ -20,6 +20,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
 
+
     @Autowired
     public AllocationsExtractor(DSLContext dsl, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
         super(dsl);
@@ -115,7 +116,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
                         APPLICATION.ASSET_CODE.as("Application Asset Code"),
                         APPLICATION.OVERALL_RATING.as("Application Rating"))
                 .select(ORGANISATIONAL_UNIT.NAME.as("Organisational Unit"))
-                .select(ALLOCATION_SCHEME.NAME.as("Allocation Scheme"))
+                .select(MEASURABLE_CATEGORY.NAME.as("Taxonomy Category Name"))
                 .select(MEASURABLE.NAME.as("Taxonomy Item Name"),
                         MEASURABLE.ID.as("Taxonomy Item Waltz Id"),
                         MEASURABLE.EXTERNAL_ID.as("Taxonomy Item External Id"))
@@ -123,33 +124,37 @@ public class AllocationsExtractor extends BaseDataExtractor{
                         MEASURABLE_RATING.DESCRIPTION.as("Taxonomy Item Rating Description"))
                 .select(RATING_SCHEME_ITEM.NAME.as("Taxonomy Item Rating Name"))
                 .select(ENTITY_HIERARCHY.LEVEL.as("Taxonomy Item Hierarchy Level"))
-                .select(ALLOCATION.ALLOCATION_PERCENTAGE.as("Allocation Percentage"),
-                        ALLOCATION.LAST_UPDATED_AT.as("Last Updated"),
-                        ALLOCATION.LAST_UPDATED_BY.as("Last Updated By"),
-                        ALLOCATION.PROVENANCE.as("Provenance"));
+                .select(MEASURABLE_RATING.LAST_UPDATED_AT.as("Rating Last Updated"),
+                        MEASURABLE_RATING.LAST_UPDATED_BY.as("Rating Last Updated By"))
+                .select(DSL.coalesce(ALLOCATION_SCHEME.NAME, "").as("Allocation Scheme"))
+                .select(DSL.coalesce(ALLOCATION.ALLOCATION_PERCENTAGE, "").as("Allocation Percentage"),
+                        DSL.coalesce(ALLOCATION.LAST_UPDATED_AT, "").as("Allocation Last Updated"),
+                        DSL.coalesce(ALLOCATION.LAST_UPDATED_BY, "").as("Allocation Last Updated By"),
+                        DSL.coalesce(ALLOCATION.PROVENANCE, "").as("Allocation Provenance"));
 
-        Condition condition = ALLOCATION.ENTITY_ID.in(appSelector)
-                .and(ALLOCATION.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(appSelector)
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(ENTITY_HIERARCHY.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
-                .and(ENTITY_HIERARCHY.ID.eq(ALLOCATION.MEASURABLE_ID))
-                .and(MEASURABLE_RATING.ENTITY_ID.eq(ALLOCATION.ENTITY_ID))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(ALLOCATION.MEASURABLE_ID))
-                .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID))
-                .and(RATING_SCHEME_ITEM.CODE.eq(MEASURABLE_RATING.RATING))
+                .and(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID)) //
+                .and(RATING_SCHEME_ITEM.CODE.eq(MEASURABLE_RATING.RATING)) // y
                 .and(additionalCondition);
 
         return reportColumns
-                .from(ALLOCATION)
-                .innerJoin(MEASURABLE).on(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE.ID))
-                .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .from(MEASURABLE_RATING)
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
                 .innerJoin(ENTITY_HIERARCHY).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ID))
-                .innerJoin(ALLOCATION_SCHEME).on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID))
-                .innerJoin(APPLICATION).on(ALLOCATION.ENTITY_ID.eq(APPLICATION.ID))
+                .innerJoin(APPLICATION).on(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID))
                 .innerJoin(ORGANISATIONAL_UNIT).on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
                 .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_CATEGORY.RATING_SCHEME_ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
+                .leftJoin(ALLOCATION_SCHEME).on(ALLOCATION_SCHEME.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
+                .leftJoin(ALLOCATION).on(
+                        ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID)
+                                .and(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                                .and(ALLOCATION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                                .and(ALLOCATION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
                 .where(condition);
     }
 }

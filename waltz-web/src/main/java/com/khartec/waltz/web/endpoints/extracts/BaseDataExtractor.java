@@ -22,6 +22,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.eclipse.jetty.http.MimeTypes;
@@ -81,6 +82,9 @@ public abstract class BaseDataExtractor {
 
         writeExcelHeader(qry, sheet);
         writeExcelBody(qry, sheet);
+
+        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, qry.fields().length));
+        sheet.createFreezePane(0, 1);
 
         byte[] bytes = convertExcelToByteArray(workbook);
 
