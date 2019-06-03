@@ -3,9 +3,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +46,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
             EntityReference ref = getReference(request);
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref));
 
-            String data = dsl
+            SelectConditionStep<Record> qry = dsl
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(SERVER_INFORMATION.HOSTNAME.as("Host Name"),
@@ -65,13 +63,12 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
                     .join(ORGANISATIONAL_UNIT)
                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                     .where(APPLICATION.ID.in(appIdSelector))
-                    .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"))
-                    .fetch()
-                    .formatCSV();
+                    .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"));
 
-            return writeFile(
+            return writeExtract(
                     mkFilename(ref),
-                    data,
+                    qry,
+                    request,
                     response);
         });
     }
@@ -87,7 +84,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
     private String mkFilename(EntityReference ref) {
         return sanitizeName(ref.name().orElse(ref.kind().name()))
-                        + "-technology-server-eol.csv";
+                        + "-technology-server-eol";
     }
 
 

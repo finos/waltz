@@ -2,10 +2,14 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.model.EntityKind;
 import org.jooq.DSLContext;
+import org.jooq.Record4;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Date;
 
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
@@ -32,7 +36,7 @@ public class SurveyInstancesDatabaseExtractor extends BaseDataExtractor {
         get(path, (request, response) -> {
             long surveyTemplateId = getId(request);
 
-            String data = dsl
+            SelectConditionStep<Record4<String, String, String, Date>> qry = dsl
                     .select(APPLICATION.NAME.as("Application Name"),
                             APPLICATION.ASSET_CODE.as("Asset Code"),
                             SURVEY_INSTANCE.STATUS.as("Status"),
@@ -43,19 +47,18 @@ public class SurveyInstancesDatabaseExtractor extends BaseDataExtractor {
                             .and(APPLICATION.ID.eq(SURVEY_INSTANCE.ENTITY_ID)))
                     .join(SURVEY_RUN)
                     .on(SURVEY_RUN.ID.eq(SURVEY_INSTANCE.SURVEY_RUN_ID))
-                    .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(surveyTemplateId))
-                    .fetch()
-                    .formatCSV();
+                    .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(surveyTemplateId));
 
-            LOG.info("Survey Instances CSV has been exported successfully");
-            return writeFile(
+            LOG.debug("Survey Instances CSV are being exported");
+            return writeExtract(
                     mkFilename(surveyTemplateId),
-                    data,
+                    qry,
+                    request,
                     response);
         });
     }
 
     private String mkFilename(long id) {
-        return "survey-instances-" + id  + ".csv";
+        return "survey-instances-" + id;
     }
 }

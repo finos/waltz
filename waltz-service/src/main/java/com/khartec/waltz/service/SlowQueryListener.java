@@ -18,7 +18,6 @@ public class SlowQueryListener extends DefaultExecuteListener {
     private static final String PERFORMANCE_APPENDER = "WALTZ.PERFORMANCE";
     private static final Logger LOG = LoggerFactory.getLogger(PERFORMANCE_APPENDER);
 
-    private final int slowQueryThresholdSeconds;
     private StopWatch stopWatch;
     private long slowQueryThresholdInNanos;
 
@@ -32,8 +31,7 @@ public class SlowQueryListener extends DefaultExecuteListener {
 
 
     public SlowQueryListener(int slowQueryThresholdSeconds) {
-        LOG.info(String.format("Initialising with %s second threshold", slowQueryThresholdSeconds));
-        this.slowQueryThresholdSeconds = slowQueryThresholdSeconds;
+        LOG.info("Initialising with {} second threshold", slowQueryThresholdSeconds);
         this.slowQueryThresholdInNanos = TimeUnit.SECONDS.toNanos(slowQueryThresholdSeconds);
     }
 

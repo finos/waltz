@@ -46,7 +46,7 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
             EntityReference ref = getReference(request);
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref));
 
-            String data = dsl
+            SelectConditionStep<Record> qry = dsl
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(DATABASE_INFORMATION.DATABASE_NAME.as("Database Name"),
@@ -62,13 +62,12 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
                     .join(ORGANISATIONAL_UNIT)
                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                     .where(APPLICATION.ID.in(appIdSelector))
-                    .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"))
-                    .fetch()
-                    .formatCSV();
+                    .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"));
 
-            return writeFile(
+            return writeExtract(
                     mkFilename(ref),
-                    data,
+                    qry,
+                    request,
                     response);
         });
     }
@@ -84,8 +83,7 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
 
     private String mkFilename(EntityReference ref) {
         return sanitizeName(ref.name().orElse(ref.kind().name()))
-                + "-technology-database-eol"
-                + ".csv";
+                + "-technology-database-eol";
     }
 
 

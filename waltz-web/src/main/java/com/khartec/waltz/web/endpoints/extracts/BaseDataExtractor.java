@@ -20,16 +20,28 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import org.eclipse.jetty.http.HttpHeader;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
+import org.jooq.Field;
+import org.jooq.Select;
+import spark.Request;
 import spark.Response;
 
-import java.io.StringWriter;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 
 
 public abstract class BaseDataExtractor {
@@ -46,25 +58,106 @@ public abstract class BaseDataExtractor {
     public abstract void register();
 
 
-    protected Object writeFile(String suggestedFilename,
-                               String clob,
-                               Response response) throws Exception {
-        response.type(MimeTypes.Type.TEXT_PLAIN.name());
-        response.header("Content-disposition", "attachment; filename="+suggestedFilename);
-        return clob;
+    protected Object writeExtract(String suggestedFilenameStem,
+                                  Select<?> qry,
+                                  Request request,
+                                  Response response) throws IOException {
+        ExtractFormat format = parseExtractFormat(request);
+        switch (format) {
+            case XLSX:
+                return writeAsExcel(suggestedFilenameStem, qry, response);
+            case CSV:
+                return writeAsCSV(suggestedFilenameStem, qry, response);
+            default:
+                throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
+        }
     }
 
 
-    protected Object writeFile(String suggestedFilename,
-                               CSVSerializer extractor,
-                               Response response) throws Exception {
-        StringWriter bodyWriter = new StringWriter();
-        CsvPreference csvPreference = CsvPreference.EXCEL_PREFERENCE;
-        CsvListWriter csvWriter = new CsvListWriter(bodyWriter, csvPreference);
-        csvWriter.write("sep=" + ((char) csvPreference.getDelimiterChar()));
-        extractor.accept(csvWriter);
-        csvWriter.flush();
-        return writeFile(suggestedFilename, bodyWriter.toString(), response);
+    private Object writeAsExcel(String suggestedFilenameStem,
+                                Select<?> qry,
+                                Response response) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(suggestedFilenameStem));
+
+        writeExcelHeader(qry, sheet);
+        writeExcelBody(qry, sheet);
+
+        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, qry.fields().length));
+        sheet.createFreezePane(0, 1);
+
+        byte[] bytes = convertExcelToByteArray(workbook);
+
+        HttpServletResponse httpResponse = response.raw();
+
+        httpResponse.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        httpResponse.setHeader("Content-Disposition", "attachment; filename=" + suggestedFilenameStem + ".xlsx");
+        httpResponse.setHeader("Content-Transfer-Encoding", "7bit");
+
+        httpResponse.setContentLength(bytes.length);
+        httpResponse.getOutputStream().write(bytes);
+        httpResponse.getOutputStream().flush();
+        httpResponse.getOutputStream().close();
+
+        return httpResponse;
+    }
+
+
+    private String sanitizeSheetName(String suggestedFilenameStem) {
+        return mkSafe(suggestedFilenameStem).replaceAll("[:;*?/\\\\]", "");
+    }
+
+
+    private Object writeAsCSV(String suggestedFilenameStem,
+                              Select<?> qry,
+                              Response response) {
+        String csv = qry.fetch().formatCSV();
+        response.type(MimeTypes.Type.TEXT_PLAIN.name());
+        response.header("Content-disposition", "attachment; filename="+suggestedFilenameStem+".csv");
+        return csv;
+    }
+
+
+    private byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
+        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+        workbook.write(outByteStream);
+        workbook.close();
+        return outByteStream.toByteArray();
+    }
+
+
+    private void writeExcelBody(Select<?> qry, XSSFSheet sheet) {
+        AtomicInteger rowNum = new AtomicInteger(1);
+        qry.fetch().forEach(r -> {
+                Row row = sheet.createRow(rowNum.getAndIncrement());
+                AtomicInteger colNum = new AtomicInteger(0);
+                colNum.set(0);
+                for (Field<?> field : r.fields()) {
+                    Cell cell = row.createCell(colNum.getAndIncrement());
+                    cell.setCellValue(Optional
+                            .ofNullable(r.get(field))
+                            .map(Objects::toString)
+                            .orElse(""));
+                }
+            });
+    }
+
+
+    private void writeExcelHeader(Select<?> qry, XSSFSheet sheet) {
+        Row headerRow = sheet.createRow(0);
+        AtomicInteger colNum = new AtomicInteger();
+        qry.fieldStream().forEach(f -> {
+            Cell cell = headerRow.createCell(colNum.getAndIncrement());
+            cell.setCellValue(Objects.toString(f.getName()));
+        });
+    }
+
+
+    private ExtractFormat parseExtractFormat(Request request) {
+        return readEnum(
+                request.queryParams("format"),
+                ExtractFormat.class,
+                v -> ExtractFormat.CSV);
     }
 
 }

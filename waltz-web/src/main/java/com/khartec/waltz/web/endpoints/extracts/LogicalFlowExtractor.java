@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
@@ -75,13 +73,13 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
     public void register() {
         post(mkPath("data-extract", "logical-flows"), (request, response) -> {
             ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
-            CSVSerializer serializer = extract(options);
-            return writeFile("logical-flows.csv", serializer, response);
+            SelectConditionStep<Record> qry = prepareQuery(options);
+            return writeExtract("logical-flows", qry, request, response);
         });
     }
 
 
-    private CSVSerializer extract(ApplicationIdSelectionOptions options) {
+    private SelectConditionStep<Record> prepareQuery(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
@@ -130,14 +128,15 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        Result<Record> data = dsl
-                .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
-                .select(sourceAssetCodeField)
-                .select(targetAssetCodeField)
-                .select(sourceOrgUnitNameField)
-                .select(targetOrgUnitNameField)
-                .select(DATA_TYPE.NAME)
-                .select(ENUM_VALUE.DISPLAY_NAME)
+        SelectConditionStep<Record> qry = dsl
+                .select(SOURCE_NAME_FIELD.as("Source"),
+                        sourceAssetCodeField.as("Source Asset Code"),
+                        sourceOrgUnitNameField.as("Source Org Unit"))
+                .select(TARGET_NAME_FIELD.as("Target"),
+                        targetAssetCodeField.as("Target Asset Code"),
+                        targetOrgUnitNameField.as("Target Org Unit"))
+                .select(DATA_TYPE.NAME.as("Data Type"))
+                .select(ENUM_VALUE.DISPLAY_NAME.as("Authoritativeness"))
                 .from(LOGICAL_FLOW)
                 .leftJoin(sourceAppFlows)
                     .on(sourceFlowId.eq(LOGICAL_FLOW.ID))
@@ -154,38 +153,9 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                             .and(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")))
                 .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                 .and(sourceFlowId.isNotNull()
-                        .or(targetFlowId.isNotNull()))
-                .fetch();
+                        .or(targetFlowId.isNotNull()));
 
-        CSVSerializer serializer = csvWriter -> {
-            csvWriter.writeHeader(
-                    "Source",
-                    "Source Asset Code",
-                    "Source Org Unit",
-                    "Target",
-                    "Target Asset Code",
-                    "Target Org Unit",
-                    "Data Type",
-                    "Authoritativeness");
-
-            data.forEach(r -> {
-                try {
-                    csvWriter.write(
-                            r.get(SOURCE_NAME_FIELD),
-                            r.get(sourceAssetCodeField),
-                            r.get(sourceOrgUnitNameField),
-                            r.get(TARGET_NAME_FIELD),
-                            r.get(targetAssetCodeField),
-                            r.get(targetOrgUnitNameField),
-                            r.get(DATA_TYPE.NAME),
-                            r.get(ENUM_VALUE.DISPLAY_NAME));
-                } catch (IOException ioe) {
-                    LOG.warn("Failed to write logical flow: " + r, ioe);
-                }
-            });
-        };
-
-        return serializer;
+        return qry;
     }
 
 }

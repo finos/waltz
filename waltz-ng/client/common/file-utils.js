@@ -31,10 +31,23 @@ export function downloadTextFile(dataRows = [],
 }
 
 
-export function downloadFile(fileContent, fileName = 'download.csv') {
-    const D = document;
-    const a = D.createElement('a');
-    const strMimeType = 'application/octet-stream;charset=utf-8';
+function determineMimeType(format) {
+    switch (format) {
+        case "CSV":
+            return "application/octet-stream;charset=utf-8";
+        case "XLSX":
+            return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        default:
+            throw `Cannot determine mime type for format: ${format}`;
+    }
+}
+
+
+export function downloadFile(fileContent, fileName = 'download.csv', format = "CSV") {
+
+    const doc = document;
+    const a = doc.createElement("a");
+    const strMimeType = determineMimeType(format);
     let rawFile;
 
     // IE10+
@@ -48,7 +61,7 @@ export function downloadFile(fileContent, fileName = 'download.csv') {
     }
 
     if (isIE()) {
-        const frame = D.createElement('iframe');
+        const frame = doc.createElement('iframe');
         document.body.appendChild(frame);
 
         frame.contentWindow.document.open('text/html', 'replace');
@@ -76,7 +89,7 @@ export function downloadFile(fileContent, fileName = 'download.csv') {
 
     a.href = rawFile;
     a.setAttribute('style', 'display:none;');
-    D.body.appendChild(a);
+    doc.body.appendChild(a);
     setTimeout(function() {
         if (a.click) {
             a.click();
@@ -86,7 +99,8 @@ export function downloadFile(fileContent, fileName = 'download.csv') {
             eventObj.initEvent('click', true, true);
             a.dispatchEvent(eventObj);
         }
-        D.body.removeChild(a);
+        doc.body.removeChild(a);
 
     }, 100);
 }
+

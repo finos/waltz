@@ -23,13 +23,13 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
@@ -62,7 +62,7 @@ public class ComplexityExtractor extends BaseDataExtractor {
             ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
 
-            String data = dsl
+            SelectConditionStep<Record4<String, String, String, BigDecimal>> qry = dsl
                     .select(APPLICATION.NAME.as("Application Name"),
                             APPLICATION.ASSET_CODE.as("Asset Code"),
                             COMPLEXITY_SCORE.COMPLEXITY_KIND.as("Complexity Kind"),
@@ -71,13 +71,13 @@ public class ComplexityExtractor extends BaseDataExtractor {
                     .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(COMPLEXITY_SCORE.ENTITY_ID))
                     .where(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                    .and(COMPLEXITY_SCORE.ENTITY_ID.in(selector))
-                    .fetch()
-                    .formatCSV();
+                    .and(COMPLEXITY_SCORE.ENTITY_ID.in(selector));
 
-            return writeFile(
-                    "complexity.csv",
-                    data,
+
+            return writeExtract(
+                    "complexity",
+                    qry,
+                    request,
                     response);
         });
     }

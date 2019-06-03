@@ -23,6 +23,8 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +69,9 @@ public class MeasurableCategoryExtractor extends BaseDataExtractor {
             String suggestedFilename = categoryName
                     .replace(".", "-")
                     .replace(" ", "-")
-                    .replace(",", "-")
-                    + ".csv";
+                    .replace(",", "-");
 
-            String data = dsl
+            SelectConditionStep<Record> data = dsl
                     .select(
                             MEASURABLE.ID.as("Id"),
                             MEASURABLE.PARENT_ID.as("Parent Id"),
@@ -88,13 +89,12 @@ public class MeasurableCategoryExtractor extends BaseDataExtractor {
                     .leftJoin(PERSON)
                         .on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
                     .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
-                    .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
-                    .fetch()
-                    .formatCSV();
+                    .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()));
 
-            return writeFile(
+            return writeExtract(
                     suggestedFilename,
                     data,
+                    request,
                     response);
         });
     }
