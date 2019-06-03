@@ -100,6 +100,7 @@ import Playpen5 from "./playpen/5";
 import Profile from "./profile";
 import Ratings from "./ratings";
 import Roadmap from "./roadmap";
+import Role from "./role";
 import Scenario from "./scenario";
 import SharedPreference from "./shared-preference";
 import ServerInfo from "./server-info";
@@ -203,6 +204,7 @@ const dependencies = [
     Profile(),
     Ratings(),
     Roadmap(),
+    Role(),
     Scenario(),
     SharedPreference(),
     ServerInfo(),
