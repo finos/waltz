@@ -49,16 +49,6 @@
                                                   on-initialise="$ctrl.onTableInitialise">
                         </waltz-logical-flow-table>
                     </div>
-                    <div style="padding: 0.3em; border-top: 1px solid #eee"
-                         class="pull-right">
-                        <waltz-data-extract-link name="Export"
-                                                 styling="link"
-                                                 filename="logical-flows.csv"
-                                                 extract="logical-flows"
-                                                 method="POST"
-                                                 request-body="$ctrl.selector">
-                        </waltz-data-extract-link>
-                    </div>
                 </div>
 
                 <div ng-if="$ctrl.filteredFlowData.flows.length == 0 && $ctrl.flows.length > 0">

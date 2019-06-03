@@ -21,6 +21,7 @@ import {downloadFile} from "../common/file-utils";
 import {initialiseData} from "../common/index";
 
 import template from "./data-extract-link.html";
+import {displayError} from "../common/error-utils";
 
 
 const bindings = {
@@ -38,7 +39,8 @@ const initialState = {
     filename: "extract.csv",
     method: "GET",
     requestBody: null,
-    styling: "button"
+    styling: "button",
+    extracting: false
 };
 
 
@@ -53,47 +55,63 @@ function calcClasses(styling = "button") {
 
 
 function getFileNameFromHttpResponse(httpResponse) {
-    var contentDispositionHeader = httpResponse.headers("Content-Disposition");
+    const contentDispositionHeader = httpResponse.headers("Content-Disposition");
     if(!contentDispositionHeader) {
         return null;
     }
-    var result = contentDispositionHeader.split(";")[1].trim().split("=")[1];
+    const result = contentDispositionHeader.split(";")[1].trim().split("=")[1];
     return result.replace(/"/g, "");
 }
 
 
-function controller($http, BaseExtractUrl) {
+function controller($http, notification, baseExtractUrl) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        vm.url = `${BaseExtractUrl}/${vm.extract}`;
+        vm.url = `${baseExtractUrl}/${vm.extract}`;
         vm.classes = calcClasses(vm.styling);
     };
 
-    const doExport = (format) => {
-        const params = { format };
+
+    const invokeExport = (format) => {
+        const options = {
+            params : { format }
+        };
+        if (format === "XLSX") {
+            options.responseType = "arraybuffer";
+        }
+
         switch (vm.method) {
             case "GET":
                 return $http
-                    .get(vm.url, { params })
-                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
+                    .get(vm.url, options)
+                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename, format));
             case "POST":
                 return $http
-                    .post(vm.url, vm.requestBody, { params })
-                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename));
+                    .post(vm.url, vm.requestBody, options )
+                    .then(r => downloadFile(r.data, getFileNameFromHttpResponse(r) || vm.filename, format));
             default:
-                throw "Unrecognised method: " + vm.method;
+                return Promise.reject(`Unrecognised method: ${vm.method}`);
         }
     };
 
-    vm.exportCsv = () => doExport("CSV");
-    vm.exportXlsx = () => doExport("XSLX");
+    const doExport = (format) => {
+        notification.info("Exporting data");
+        vm.extracting = true;
+        invokeExport(format)
+            .then(() => notification.success("Data exported"))
+            .catch(e => displayError(notification, "Data export failure", e))
+            .finally(() => vm.extracting = false);
+    };
 
+    vm.exportCsv = () => doExport("CSV");
+    vm.exportXlsx = () => doExport("XLSX");
 }
 
 
 controller.$inject = [
     "$http",
+    "Notification",
     "BaseExtractUrl"
 ];
 

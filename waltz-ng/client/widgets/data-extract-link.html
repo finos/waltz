@@ -22,7 +22,8 @@
      dropdown-append-to-body>
     <a ng-class="$ctrl.classes"
        uib-dropdown-toggle>
-        <waltz-icon name="cloud-download"></waltz-icon>
+        <waltz-icon ng-if="! $ctrl.extracting" name="cloud-download"></waltz-icon>
+        <waltz-icon ng-if="$ctrl.extracting" name="refresh" spin="true"></waltz-icon>
         <span ng-bind="$ctrl.name"></span>
         <span class="caret"></span>
     </a>
