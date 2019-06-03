@@ -29,7 +29,7 @@ function store($http, BaseApiUrl) {
             : params;
 
         return $http
-            .post(`${BASE}/${state}/${paramStr}`, null)
+            .post(`${BASE}/${state}`, paramStr)
             .then(r => r.data);
     };
 
