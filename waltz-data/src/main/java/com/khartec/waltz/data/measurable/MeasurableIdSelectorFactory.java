@@ -156,13 +156,23 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
-        return mkBaseRatingBasedSelector()
-                .innerJoin(APPLICATION_GROUP_ENTRY)
-                    .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID))
+           SelectConditionStep<Record1<Long>> validAppIdsInGroup = DSL.select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
+                .from(APPLICATION_GROUP_ENTRY)
                 .innerJoin(APPLICATION)
-                    .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(APPLICATION.ID))
-                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()))
-                .and(mkApplicationConditions(options));
+                .on(APPLICATION.ID.eq(APPLICATION_GROUP_ENTRY.APPLICATION_ID))
+                .where(mkApplicationConditions(options)
+                        .and(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id())));
+
+        SelectConditionStep<Record1<Long>> measurableIdsUsedByGroup = DSL
+                .selectDistinct(MEASURABLE_RATING.MEASURABLE_ID)
+                .from(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_ID.in(validAppIdsInGroup));
+
+        return DSL
+                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
+                .and(ENTITY_HIERARCHY.ID.in(measurableIdsUsedByGroup));
     }
 
 
