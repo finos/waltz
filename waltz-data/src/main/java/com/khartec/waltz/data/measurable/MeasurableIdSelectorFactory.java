@@ -156,7 +156,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
-           SelectConditionStep<Record1<Long>> validAppIdsInGroup = DSL.select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
+        SelectConditionStep<Record1<Long>> validAppIdsInGroup = DSL
+                .select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
                 .from(APPLICATION_GROUP_ENTRY)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ID.eq(APPLICATION_GROUP_ENTRY.APPLICATION_ID))
