@@ -92,9 +92,7 @@ function controller($element,
             const kind = viewStateToKind(stateName);
 
             const ref = mkRef(kind, id);
-            const selector = mkSelectionOptions(
-                ref,
-                hierarchyQueryScope.CHILDREN.key);
+            const selector = mkSelectionOptions(ref);
 
             return serviceBroker
                 .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
