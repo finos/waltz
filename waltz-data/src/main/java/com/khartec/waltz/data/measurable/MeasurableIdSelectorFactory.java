@@ -160,7 +160,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(APPLICATION_GROUP_ENTRY)
                     .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(MEASURABLE_RATING.ENTITY_ID))
                 .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(APPLICATION_GROUP_ENTRY.APPLICATION_ID))
+                    .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(APPLICATION.ID))
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()))
                 .and(mkApplicationConditions(options));
     }
