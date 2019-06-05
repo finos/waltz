@@ -44,7 +44,7 @@
         <jackson-jsr310.version>2.9.0</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
         <jgrapht.version>1.2.0</jgrapht.version>
-        <jool.version>0.9.12</jool.version>
+        <jool.version>0.9.14</jool.version>
         <junit.version>4.12</junit.version>
         <jwt.version>3.2.0</jwt.version>
         <logback.version>1.2.3</logback.version>
