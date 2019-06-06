@@ -22,12 +22,12 @@ import _ from "lodash";
 
 import template from "./flow-diagrams-panel-view.html";
 
-import {initialiseData} from "../../../../common/index";
-import {CORE_API} from "../../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../../common/selector-utils";
-import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
-import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
-import {displayError} from "../../../../common/error-utils";
+import { initialiseData } from "../../../../common/index";
+import { CORE_API } from "../../../../common/services/core-api-utils";
+import { mkSelectionOptions } from "../../../../common/selector-utils";
+import { dyamicSectionNavigationDefaultOffset } from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import { pageHeaderDefaultOffset } from "../../../../widgets/page-header/page-header";
+import { displayError } from "../../../../common/error-utils";
 
 const bindings = {
     parentEntityRef: '<',
@@ -212,20 +212,35 @@ function controller($element,
                 [ diagramSelector ])
             .then(r => r.data);
 
-        $q.all([flowPromise, specPromise])
-            .then(([flows, specs]) => {
+        const changeUnitPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeUnitStore.findBySelector,
+                [diagramSelector])
+            .then(r => r.data);
+
+        $q.all([flowPromise, specPromise, changeUnitPromise])
+            .then(([flows, specs, changeUnits]) => {
                 const flowsById = _.keyBy(flows, 'id');
                 const specsById = _.keyBy(specs, 'id');
 
+                vm.changeUnits = changeUnits;
+                const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
+                    .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
+                    .keyBy(cu => cu.subjectEntity.id)
+                    .value();
+
+                console.log('change units: ', changeUnits);
                 const flowData = _
                     .chain(physicalFlowIds)
                     .map(flowId => {
                         const physicalFlow = flowsById[flowId];
                         const specId = physicalFlow.specificationId;
                         const physicalSpecification = specsById[specId];
+                        const changeUnit = changeUnitsByPhysicalFlowId[physicalFlow.id];
                         return {
                             physicalFlow,
-                            physicalSpecification
+                            physicalSpecification,
+                            changeUnit
                         };})
                     .orderBy('physicalSpecification.name')
                     .value();
