@@ -89,6 +89,12 @@
         <table class="table table-condesed small">
             <tr ng-repeat="flow in $ctrl.contextPopup.entity.physical">
                 <td>
+                    <span ng-if="flow.changeUnit">
+                        <waltz-icon name="hourglass-2"
+                                    uib-tooltip="Changes planned for this physical flow">
+                        </waltz-icon>
+                        &nbsp;
+                    </span>
                     <a ui-sref="main.physical-flow.view ({id: flow.physicalFlow.id })">
                         <span ng-bind="flow.physicalSpecification.name"></span>
                     </a>

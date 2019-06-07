@@ -72,7 +72,7 @@ function toCUIcon(count = 0) {
             return {
                 code: iconCodes.hourglass,
                 description: 'Changes are associated with this flow',
-                color: '#FFA500'
+                color: '#000'
             };
     }
 }
