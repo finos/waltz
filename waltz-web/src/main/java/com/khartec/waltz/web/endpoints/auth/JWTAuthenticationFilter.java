@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import java.io.UnsupportedEncodingException;
-
 
 /**
  * Authentication filter which verifies a jwt token.  We only care
@@ -53,9 +51,9 @@ public class JWTAuthenticationFilter extends WaltzFilter {
             verifier256 = mkVerifier(algorithm256);
             verifier512 = mkVerifier(algorithm512);
 
-        } catch (UnsupportedEncodingException uee) {
-            LOG.error("Cannot create JWT Verifier, this is bad", uee);
-            throw new UnsupportedOperationException(uee);
+        } catch (Exception e) {
+            LOG.error("Cannot create JWT Verifier, this is bad", e);
+            throw new UnsupportedOperationException(e);
         }
     }
 
