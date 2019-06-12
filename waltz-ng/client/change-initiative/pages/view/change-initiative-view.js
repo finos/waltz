@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,6 @@ const initialState = {
     related: {
         appGroupRelationships: []
     },
-    sections: [],
-    availableSections: [],
 };
 
 
@@ -61,13 +59,10 @@ function controller($stateParams,
                         { id: ci.id });
             });
 
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('CHANGE_INITIATIVE');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('CHANGE_INITIATIVE');
+        dynamicSectionManager.initialise("CHANGE_INITIATIVE");
+
     };
 
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'CHANGE_INITIATIVE');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'CHANGE_INITIATIVE');
 }
 
 

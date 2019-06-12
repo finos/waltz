@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,9 +26,7 @@ import {toEntityRef} from "../../../common/entity-utils";
 const initialState = {
     dataType: null,
     entityRef: null,
-    filters: {},
-    sections: [],
-    availableSections: []
+    filters: {}
 };
 
 
@@ -44,8 +42,7 @@ function controller(dataType,
 
         // -- BOOT ---
         vm.$onInit = () => {
-            vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("DATA_TYPE");
-            vm.sections = dynamicSectionManager.findUserSectionsForKind("DATA_TYPE");
+            dynamicSectionManager.initialise("DATA_TYPE");
             historyStore.put(
                 dataType.name,
                 "DATA_TYPE",
@@ -53,10 +50,8 @@ function controller(dataType,
                 {id: dataType.id});
         };
     }
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "DATA_TYPE");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "DATA_TYPE");
 
+    // -- INTERACT --
     vm.filtersChanged = (filters) => {
         vm.filters = filters;
     };

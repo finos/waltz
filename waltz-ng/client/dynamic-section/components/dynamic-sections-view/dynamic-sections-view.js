@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,23 +24,26 @@ import template from "./dynamic-sections-view.html";
 const bindings = {
     filters: "<",
     parentEntityRef: "<",
-    sections: "<",
-    onRemove: "<"
 };
 
 
 const initialState = {
     filters: {},
-    onRemove: (s) => console.log("wdsv: onRemove, default impl", s)
 };
 
 
-function controller() {
-    initialiseData(this, initialState);
+function controller(dynamicSectionManager) {
+    const vm = initialiseData(this, initialState);
+    vm.$onInit = () => {
+        vm.sections = dynamicSectionManager.getActive();
+    };
+
+    vm.onRemove = (section) => dynamicSectionManager.close(section);
 }
 
 
 controller.$inject = [
+    "DynamicSectionManager"
 ];
 
 const component = {

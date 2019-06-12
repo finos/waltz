@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,6 @@ import template from "./app-group-view.html";
 const initialState = {
     filters: {},
     groupDetail: null,
-    sections: [],
-    availableSections: []
 };
 
 
@@ -48,8 +46,8 @@ function controller($stateParams,
 
     // -- BOOT --
     vm.$onInit = () => {
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('APP_GROUP');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('APP_GROUP');
+
+        dynamicSectionManager.initialise("APP_GROUP");
 
         serviceBroker
             .loadViewData(CORE_API.AppGroupStore.getById, [id])
@@ -68,10 +66,6 @@ function controller($stateParams,
     vm.filtersChanged = (filters) => {
         vm.filters = filters;
     };
-
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'APP_GROUP');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'APP_GROUP');
 
 
     // -- INTERACT ---

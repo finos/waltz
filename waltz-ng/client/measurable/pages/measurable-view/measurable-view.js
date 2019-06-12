@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,6 @@ import {toEntityRef} from "../../../common/entity-utils";
 
 const initialState = {
     filters: {},
-    sections: [],
-    availableSections: []
 };
 
 
@@ -60,8 +58,8 @@ function controller($q,
     // -- BOOT ---
 
     vm.$onInit = () => {
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("MEASURABLE");
-        vm.sections = dynamicSectionManager.findUserSectionsForKind("MEASURABLE");
+
+        dynamicSectionManager.initialise("MEASURABLE");
 
         serviceBroker
             .loadViewData(CORE_API.MeasurableStore.getById, [ id ])
@@ -80,10 +78,6 @@ function controller($q,
         vm.filters = filters;
     };
 
-    // -- DYNAMIC SECTIONS
-
-    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, "MEASURABLE");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "MEASURABLE");
 }
 
 

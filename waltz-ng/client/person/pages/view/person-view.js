@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,6 @@ import template from "./person-view.html";
 
 const initialState = {
     filters: {},
-    availableSections: [],
-    sections: []
 };
 
 
@@ -58,8 +56,7 @@ function controller($stateParams,
                     }
                     vm.person = person;
 
-                    vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind("PERSON");
-                    vm.sections = dynamicSectionManager.findUserSectionsForKind("PERSON");
+                    dynamicSectionManager.initialise("PERSON");
                     historyStore.put(
                         person.displayName,
                         "PERSON",
@@ -71,13 +68,11 @@ function controller($stateParams,
 
     };
 
+    // -- INTERACT --
     vm.filtersChanged = (filters) => {
         vm.filters = filters;
     };
 
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "PERSON");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "PERSON");
 }
 
 
