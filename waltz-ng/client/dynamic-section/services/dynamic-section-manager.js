@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,138 +17,122 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {checkNotEmpty} from "../../common/checks";
-import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section-definitions";
+import _ from "lodash";
+import {dynamicSectionsByKind, dynamicSections} from "../dynamic-section-definitions";
 
-const SOFT_SECTION_LIMIT = 3;
+const sectionManagerSvc = {
+    serviceName: "DynamicSectionManager",
+    service: ($location, $stateParams, localStorageService) => {
+        let available = [];
+        let active = [];
+        let kind = null;
 
-export function service($location, $stateParams, localStorage) {
-
-    const sectionsById = _.keyBy(_.values(dynamicSections), 'id');
-
-    const mkStorageKey = (kind) => `waltz-user-section-ids-${kind}`;
-
-    const updateWindowLocation = (ids) => {
-        const sectionParamValue = _
-            .chain(ids)
-            .compact()
-            .take(3)
-            .join(';')
-            .value();
-        $location.search('sections', sectionParamValue);
-    };
-
-    const readFromLocalStorage = (kind) => {
-        return _.compact(localStorage.get(mkStorageKey(kind)) || []);
-    };
-
-    const writeToLocalStorage = (kind, sectionIds = []) => {
-        localStorage.set(mkStorageKey(kind), _.compact(sectionIds));
-    };
-
-    const getOpenSections = (kind, limit) => {
-        const sectionIds = readFromLocalStorage(kind);
-
-        updateWindowLocation(_.take(sectionIds, SOFT_SECTION_LIMIT));
-
-        const openSections = _
-            .chain(limit ? _.take(sectionIds, SOFT_SECTION_LIMIT) : sectionIds)
-            .map(sId => sectionsById[sId])
-            .value();
-
-        return openSections;
-    };
+        function mkStorageKey() {
+            return `waltz-user-section-ids-${kind}`;
+        }
 
 
-    // -- API ---
+        /* Sort list of sections, ensuring 'change log' is the last one */
+        function sortList(list) {
+            return _.orderBy(list,
+                    s => s === dynamicSections.changeLogSection
+                        ? "zzz"
+                        : _.toLower(s.name));
+        }
 
-    function findAvailableSectionsForKind(kind) {
-        checkNotEmpty(kind);
-        const sections = dynamicSectionsByKind[kind] || [];
-        const changeSection = _.filter(sections, { id: dynamicSections.changeLogSection.id });
-        return _.chain(sections)
-            .reject({ id: dynamicSections.changeLogSection.id })
-            .sortBy('name')
-            .union(changeSection)
-            .value();
-    }
 
-    function findUserSectionsForKind(kind) {
-        _.chain($stateParams.sections)
-            .split(';')
-            .map(id => Number(id))
-            .reverse()
-            .forEach(id => openSection(sectionsById[id], kind))
-            .value();
+        /* modifies a list (rather than replacing it) so watchers see changes */
+        function blat(list, replacement) {
+            list.splice(0, list.length, ...replacement);
+        }
 
-        const openSections = getOpenSections(kind, SOFT_SECTION_LIMIT);
 
-        // re-save to localStorage to eliminate 'working' ids
-        writeToLocalStorage(
-            kind,
-            _.chain(openSections)
+        function persistState() {
+            const top3SectionIds = _
+                .chain(active)
                 .compact()
-                .take(SOFT_SECTION_LIMIT)
-                .map('id')
-                .value());
+                .take(3)
+                .map(s => s.id)
+                .value();
 
-        return openSections;
-    }
+            localStorageService.set(
+                mkStorageKey(),
+                top3SectionIds);
 
-    function openSection(section, kind) {
-        if (section == null) {
-            return getOpenSections(kind)
+            $location.search("sections", _.join(top3SectionIds, ";"));
         }
 
-        const userSectionIds = readFromLocalStorage(kind);
 
-        // we toggle the section if it's the current top one...
-        const discardSection = userSectionIds.length > 0 && userSectionIds[0] === section.id;
+        function initialise(newKind) {
+            kind = newKind;
+            blat(available, sortList(dynamicSectionsByKind[kind]));
 
-        const workingIds =  _.reject(
-            userSectionIds,
-            activeSectionId => activeSectionId === section.id);
+            const previousViaParam = _.chain($location.search())
+                .get("sections", "")
+                .split(";")
+                .map(s => Number(s))
+                .value();
 
-        if (!discardSection) {
-            // push to front
-            workingIds.unshift(section.id);
+            const previousViaLocalHistory = localStorageService.get(mkStorageKey());
+
+            const toActivate = _
+                .chain(previousViaParam)
+                .concat(previousViaLocalHistory)
+                .map(sId => _.find(available, { id: sId }))
+                .uniq()
+                .compact()
+                .take(3)
+                .value();
+
+            localStorageService.set(
+                mkStorageKey(),
+                _.map(toActivate, s => s.id));
+
+            blat(active, toActivate);
         }
 
-        writeToLocalStorage(kind, workingIds);
 
-        return getOpenSections(kind);
-    }
-
-    function removeSection(section, kind) {
-        if (section == null) {
-            return getOpenSections(kind);
+        function getAvailable() {
+            return available;
         }
 
-        const sectionIds = readFromLocalStorage(kind);
-        const updatedSectionIds = _.without(sectionIds, section.id);
-        writeToLocalStorage(kind, updatedSectionIds);
+
+        function getActive() {
+            return active;
+        }
 
 
-        return getOpenSections(kind);
+        function activate(d) {
+            blat(
+                active,
+                _.concat([d], _.without(active, d)));
+
+            persistState();
+        }
+
+
+        function close(d) {
+            blat(
+                active,
+                _.without(active, d));
+
+            persistState();
+        }
+
+        return {
+            activate,
+            close,
+            getAvailable,
+            getActive,
+            initialise
+        };
     }
-
-    return {
-        findAvailableSectionsForKind,
-        findUserSectionsForKind,
-        openSection,
-        removeSection
-    };
-}
-
-service.$inject = [
-    '$location',
-    '$stateParams',
-    'localStorageService'];
-
-const serviceName = 'DynamicSectionManager';
-
-export default {
-    service,
-    serviceName
 };
+
+sectionManagerSvc.service.$inject = [
+    "$location",
+    "$stateParams",
+    "localStorageService"];
+
+
+export default sectionManagerSvc;

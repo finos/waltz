@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import template from "./dynamic-section-navigation.html";
 import {scaleLinear} from "d3-scale";
 import {rgb} from "d3-color";
 
-export const dyamicSectionNavigationDefaultOffset = 250;
+export const dynamicSectionNavigationDefaultOffset = 250;
 
 const bindings = {
     availableSections: "<",
@@ -35,19 +35,19 @@ const bindings = {
 
 
 const initialState = {
-    sections: [],
-    offset: dyamicSectionNavigationDefaultOffset,
+    offset: dynamicSectionNavigationDefaultOffset,
     stickyVisible: false,
-    onSelect: (w) => console.log("default on-select handler for dynamic-section-navigation: ", w),
 };
 
+const fadeFactor = 2.5;
+const colorScale = scaleLinear()
+    .range([rgb("#ffc46e"), rgb("#ffffff")]); // orange -> white
 
-function controller($scope,
+
+function controller(dynamicSectionManager,
+                    $scope,
                     $window) {
     const vm = initialiseData(this, initialState);
-
-    const colorScale = scaleLinear()
-        .range([rgb("#ffc46e"), rgb("#ffffff")]);
 
     const scrollListener = () => {
         $scope.$applyAsync(() => {
@@ -59,6 +59,15 @@ function controller($scope,
         angular
             .element($window)
             .on("scroll", _.throttle(scrollListener, 100));
+
+        vm.sections = dynamicSectionManager.getAvailable();
+
+        const numSections = _.get(vm, ["sections", "length"],  1);
+        colorScale
+            .domain([0, numSections / fadeFactor]);
+
+        vm.activeSections = dynamicSectionManager.getActive();
+
     };
 
     vm.$onDestroy = () => {
@@ -67,30 +76,21 @@ function controller($scope,
             .off("scroll", scrollListener);
     };
 
-    vm.$onChanges = () => {
-        const fadeFactor = 2.5;
-        colorScale
-            .domain([0, _.get(vm, ["availableSections", "length"],  1) / fadeFactor]);
+    vm.mkStyle = (section) => {
+        const sectionOffset = vm.activeSections.indexOf(section);
+        const color = sectionOffset > -1
+            ? rgb(colorScale(sectionOffset))
+            : rgb(255,255,255);
 
-        vm.sections = _.map(vm.availableSections, s => {
-            const openOffset = _.findIndex(vm.openSections, os => os.id === s.id);
-
-            const color = openOffset > -1
-                ? rgb(colorScale(openOffset))
-                : rgb(255,255,255);
-
-            const style = {
-                "border-bottom": `2px solid ${color.toString()}`
-            };
-
-            return Object.assign({}, s, { style })
-        });
+        return {
+            'border-bottom' : `2px solid ${color.toString()}`
+        };
     };
 
     // -- INTERACT --
 
-    vm.scrollAndSelectSection = (section) => {
-        invokeFunction(vm.onSelect, section);
+    vm.onSelect = (section) => {
+        dynamicSectionManager.activate(section);
         $window.scrollTo(0, vm.offset);
     };
 
@@ -98,6 +98,7 @@ function controller($scope,
 
 
 controller.$inject = [
+    "DynamicSectionManager",
     "$scope",
     "$window"
 ];

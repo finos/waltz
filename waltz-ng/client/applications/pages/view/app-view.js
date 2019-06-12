@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,9 +24,7 @@ import template from "./app-view.html";
 
 const initialState = {
     app: {},
-    availableSections: [],
-    parentEntityRef: {},
-    sections: []
+    parentEntityRef: {}
 };
 
 
@@ -64,8 +62,7 @@ function controller($stateParams,
     vm.$onInit = () => {
         const id = $stateParams.id;
         const entityReference = { id, kind: 'APPLICATION' };
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('APPLICATION');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('APPLICATION');
+        dynamicSectionManager.initialise("APPLICATION");
         vm.parentEntityRef = entityReference;
         loadAll(id);
     };

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 const initialState = {
     filters: {},
-    availableSections: [],
     parentEntityRef: {},
-    sections: []
 };
 
 
@@ -52,9 +50,7 @@ function controller($stateParams,
         const id = $stateParams.id;
         vm.parentEntityRef = { kind: "ORG_UNIT", id };
 
-
-        vm.availableSections = dynamicSectionManager.findAvailableSectionsForKind('ORG_UNIT');
-        vm.sections = dynamicSectionManager.findUserSectionsForKind('ORG_UNIT');
+        dynamicSectionManager.initialise("ORG_UNIT");
         serviceBroker
             .loadViewData(CORE_API.OrgUnitStore.getById, [ id ])
             .then(r => vm.orgUnit = r.data)
@@ -69,8 +65,6 @@ function controller($stateParams,
 
     // -- DYNAMIC SECTIONS
 
-    vm.addSection = s => vm.sections = dynamicSectionManager.openSection(s, 'ORG_UNIT');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'ORG_UNIT');
 }
 
 
