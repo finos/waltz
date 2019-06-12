@@ -18,14 +18,14 @@
  */
 
 import _ from "lodash";
-import { scalePoint } from "d3-scale";
-import { event, select } from "d3-selection";
+import {scalePoint} from "d3-scale";
+import {event, select} from "d3-selection";
 import "d3-selection-multi";
 
-import { initialiseData } from "../../../common";
-import { authoritativeRatingColorScale } from "../../../common/colors";
-import { mkLineWithArrowPath } from "../../../common/d3-utils";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {authoritativeRatingColorScale} from "../../../common/colors";
+import {mkLineWithArrowPath} from "../../../common/d3-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./source-and-target-graph.html";
 
@@ -449,13 +449,13 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
 
 function drawArcs(section, model, layoutFn) {
     const arcs = section
-        .selectAll(`${styles.ARC}`)
+        .selectAll(`.${styles.ARC}`)
         .data(model, d => d.from + "-" + d.to);
 
     const newArcs = arcs
         .enter()
         .append("path")
-        .classed(styles.ARC, true)
+        .classed(styles.ARC, d => d.entityLifecycleStatus === "ACTIVE")
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attrs({
