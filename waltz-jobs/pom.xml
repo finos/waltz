@@ -33,7 +33,7 @@
         <dependency>
             <groupId>io.codearte.jfairy</groupId>
             <artifactId>jfairy</artifactId>
-            <version>0.5.7</version>
+            <version>0.5.9</version>
         </dependency>
 
         <dependency>
