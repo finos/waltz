@@ -23,6 +23,7 @@ import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
 import com.khartec.waltz.model.WaltzVersionInfo;
 import com.khartec.waltz.model.settings.ImmutableSetting;
 import com.khartec.waltz.model.settings.Setting;
+import com.khartec.waltz.service.email.DummyJavaMailSender;
 import com.khartec.waltz.service.jmx.PersonMaintenance;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +123,7 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Bean
     public JavaMailSender mailSender() {
         if (smtpHost == null) {
-            return null;
+            return new DummyJavaMailSender();
         } else {
             JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
             mailSender.setHost(smtpHost);

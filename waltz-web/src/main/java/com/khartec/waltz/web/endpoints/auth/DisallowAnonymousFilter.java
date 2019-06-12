@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import java.io.UnsupportedEncodingException;
-
 import static spark.Spark.halt;
 
 public class DisallowAnonymousFilter extends WaltzFilter {
@@ -47,9 +45,9 @@ public class DisallowAnonymousFilter extends WaltzFilter {
             verifier = JWT.require(algorithm)
                     .withIssuer(JWTUtilities.ISSUER)
                     .build(); //Reusable verifier instance
-        } catch (UnsupportedEncodingException uee) {
-            LOG.error("Cannot create JWT Verifier, this is bad", uee);
-            throw new UnsupportedOperationException(uee);
+        } catch (Exception e) {
+            LOG.error("Cannot create JWT Verifier, this is bad", e);
+            throw new UnsupportedOperationException(e);
         }
     }
 
