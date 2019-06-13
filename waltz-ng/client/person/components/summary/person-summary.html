@@ -60,6 +60,8 @@
         <div class="row" style="border-top: 2px dotted #eee; padding: 6px; margin-top: 16px">
             <div class="col-sm-4">
                 <waltz-apps-by-investment-pie applications="$ctrl.applications"
+                                              waltz-jump-to="person-apps-section"
+                                              class="clickable"
                                               size="70">
                 </waltz-apps-by-investment-pie>
             </div>
@@ -67,7 +69,8 @@
             <div class="col-sm-4">
                 <waltz-basic-info-tile name="Portfolio Cost"
                                        description="Cumulative value of infra and app dev costs"
-                                       waltz-jump-to="costs-section"
+                                       waltz-jump-to="asset-costs-section"
+                                       class="clickable"
                                        icon="money">
                     <span style="font-size: x-large;">
                         <waltz-currency-amount amount="$ctrl.totalCost.amount"
