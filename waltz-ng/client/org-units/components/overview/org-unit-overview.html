@@ -26,18 +26,23 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <waltz-apps-by-investment-pie applications="$ctrl.apps"
+                                                          waltz-jump-to="apps-section"
+                                                          class="clickable"
                                                           size="70">
                             </waltz-apps-by-investment-pie>
                         </div>
 
                         <div class="col-sm-4">
                             <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
+                                                               waltz-jump-to="apps-section"
+                                                               class="clickable"
                                                                size="70">
                             </waltz-apps-by-lifecycle-phase-pie>
                         </div>
 
                         <div class="col-sm-4">
-                            <waltz-basic-info-tile waltz-jump-to="logical-flows-section"
+                            <waltz-basic-info-tile waltz-jump-to="logical-flows-tabgroup-section"
+                                                   class="clickable"
                                                    icon="random"
                                                    name="Logical Data Flows">
                                 <waltz-flow-cloud-diagram
@@ -53,7 +58,8 @@
                         <div class="col-sm-4">
                             <waltz-basic-info-tile name="Portfolio Cost"
                                                    description="Cumulative value of infra and app dev costs"
-                                                   waltz-jump-to="costs-section"
+                                                   class="clickable"
+                                                   waltz-jump-to="asset-costs-section"
                                                    icon="money">
                                 <span style="font-size: x-large;">
                                     <waltz-currency-amount amount="$ctrl.totalCost.amount"
@@ -83,6 +89,8 @@
                         </div>
                         <div class="col-sm-4">
                             <waltz-basic-info-tile name="Servers"
+                                                   class="clickable"
+                                                   waltz-jump-to="technology-summary-section"
                                                    description="Number of servers supporting this org unit"
                                                    icon="server">
                                 <div>

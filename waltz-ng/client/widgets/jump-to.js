@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import {dynamicSectionNavigationDefaultOffset} from "../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import * as _ from "lodash";
+
 /**
  * Additional scroll amount to compensate for navbar etc.
 */
@@ -27,12 +31,12 @@ const OFFSET = 160;
  * An attribute directive which allows
  * for create in page scroll to anchors.
  * Usage:  &lt;div waltz-jump-to='some-id'>&lt;/div>
- * @param $location
- * @param $anchorScroll
+ * @param $window
+ * @param dynamicSectionManager
  * @returns directive
  */
-const directive = function($anchorScroll,
-                           $location) {
+const directive = function($window,
+                           dynamicSectionManager) {
     return {
         restrict: 'A',
         link: (scope, elem, attrs) => {
@@ -40,10 +44,13 @@ const directive = function($anchorScroll,
             // then the attr name will also change
             const target = attrs.waltzJumpTo;
             elem.on('click', () => {
-                $anchorScroll.yOffset = OFFSET;
-                $location.hash(target);
-                $anchorScroll();
-                scope.$apply();
+                const section = _.find(dynamicSections, section => section.componentId === target);
+                if(section != null) {
+                    scope.$apply(() => (dynamicSectionManager.activate(section)));
+                    $window.scrollTo(0, dynamicSectionNavigationDefaultOffset);
+                } else {
+                    console.log("waltz-jump-to section is null")
+                }
             });
         }
     }
@@ -51,8 +58,8 @@ const directive = function($anchorScroll,
 
 
 directive.$inject=[
-    '$anchorScroll',
-    '$location'
+    '$window',
+    'DynamicSectionManager'
 ];
 
 

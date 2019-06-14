@@ -66,20 +66,23 @@
                                     <waltz-basic-info-tile name="App Stats"
                                                            icon="rocket">
                                         <div style="font-size: large;"
-                                             waltz-jump-to="costs-section">
+                                             class="clickable"
+                                             waltz-jump-to="asset-costs-section">
                                             Cost:
                                             <waltz-currency-amount amount="$ctrl.totalCost.amount"
                                                                    simplify="true">
                                             </waltz-currency-amount>
                                         </div>
                                         <div style="font-size: large;"
+                                             class="clickable"
                                              waltz-jump-to="complexity-section">
                                             Complexity:
                                             <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1"></span>
                                         </div>
                                         <div style="font-size: large;"
                                              ng-if="$ctrl.enrichedServerStats.total > 0"
-                                             waltz-jump-to="technologies-section">
+                                             class="clickable"
+                                             waltz-jump-to="technology-summary-section">
                                             Servers #:
                                             <span ng-bind="$ctrl.enrichedServerStats.total"></span>
                                         </div>
@@ -102,6 +105,8 @@
                                 <div class="col-sm-8"
                                      ng-if="$ctrl.applications.length > 0">
                                     <waltz-apps-by-investment-pie applications="$ctrl.applications"
+                                                                  waltz-jump-to="apps-section"
+                                                                  class="clickable"
                                                                   size="70">
                                     </waltz-apps-by-investment-pie>
                                 </div>
