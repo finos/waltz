@@ -1,10 +1,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
-import org.jooq.DSLContext;
-import org.jooq.Record4;
-import org.jooq.SelectConditionStep;
-import org.jooq.SelectSeekStep2;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,12 +69,17 @@ public class SurveyRunExtractor extends BaseDataExtractor {
 
     private SelectSeekStep2<Record4<String, String, String, String>, Integer, String> getSurveyInstanceResponses(
             long surveyInstanceId) {
+        Field<String> ENTITY_RESPONSE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
+                SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND);
+
         return dsl.select(SURVEY_QUESTION.SECTION_NAME.as("Section"),
                 SURVEY_QUESTION.QUESTION_TEXT.as("Question"),
                 DSL.concat(SURVEY_QUESTION_RESPONSE.STRING_RESPONSE.coalesce(""),
                         SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE.cast(String.class).coalesce(""),
                         SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.cast(String.class).coalesce(""),
-                        SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class).coalesce("")).as("Answer"),
+                        SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class).coalesce(""),
+                        ENTITY_RESPONSE_NAME_FIELD.coalesce("")).as("Answer"),
                 SURVEY_QUESTION_RESPONSE.COMMENT.as("Comment"))
                 .from(SURVEY_QUESTION)
                 .join(SURVEY_QUESTION_RESPONSE)
