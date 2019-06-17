@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,9 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -56,11 +58,15 @@ public class EntityStatisticSummaryDao {
 
     private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
-    private static final Field<BigDecimal> avgTotal = DSL.avg(cast(esv.VALUE, Long.class)).as("total");
-    private static final Field<BigDecimal> sumTotal = DSL.sum(cast(esv.VALUE, Long.class)).as("total");
+    private static final DataType<BigDecimal> decimalValueDataType = SQLDataType.DECIMAL(38, 12);
+    private static final DataType<BigDecimal> decimalTotalDataType = SQLDataType.DECIMAL(38, 2);
+
+    private static final Field<BigDecimal> avgTotal = DSL.cast(DSL.avg(cast(esv.VALUE, decimalValueDataType)), decimalTotalDataType).as("total");
+    private static final Field<BigDecimal> sumTotal = DSL.cast(DSL.sum(cast(esv.VALUE, decimalValueDataType)), decimalTotalDataType).as("total");
+
     private static final Field<Integer> countTotal = DSL.count();
-    private static final Function<BigDecimal, Double> toBigDecimalTally = v -> v.doubleValue();
-    private static final Function<Integer, Double> toIntegerTally = v -> v.doubleValue();
+    private static final Function<BigDecimal, Double> toBigDecimalTally = BigDecimal::doubleValue;
+    private static final Function<Integer, Double> toIntegerTally = Integer::doubleValue;
     private static final Field<Timestamp> maxCreatedAtField = DSL.field("max_created_at", Timestamp.class);
     private static final Field<Date> castDateField = cast(esv.CREATED_AT, Date.class);
     private static final Field<java.sql.Date> esvCreatedAtDateOnly = castDateField.as("esv_created_at_date_only");
@@ -145,7 +151,7 @@ public class EntityStatisticSummaryDao {
                 .collect(toList());
 
         return summaryFutures.stream()
-                .map(f -> Unchecked.supplier(() -> f.get())
+                .map(f -> Unchecked.supplier(f::get)
                         .get())
                 .collect(toList());
     }
@@ -213,7 +219,7 @@ public class EntityStatisticSummaryDao {
                                         .id(r.getValue(esv.OUTCOME))
                                         .build()))
                 .collect(groupingBy(t -> t.v1().toLocalDate(),
-                             mapping(t -> t.v2(),
+                             mapping(Tuple2::v2,
                                      toList())))
                 .entrySet()
                 .stream()
@@ -283,7 +289,7 @@ public class EntityStatisticSummaryDao {
                 .collect(toList());
 
         return summaryFutures.stream()
-                .map(f -> Unchecked.supplier(() -> f.get())
+                .map(f -> Unchecked.supplier(f::get)
                         .get())
                 .collect(toList());
     }
@@ -323,7 +329,7 @@ public class EntityStatisticSummaryDao {
                                         .id(r.getValue(esv.OUTCOME))
                                         .build()))
                 .collect(groupingBy(t -> t.v1().toLocalDate(),
-                             mapping(t -> t.v2(),
+                             mapping(Tuple2::v2,
                                      toList())))
                 .entrySet()
                 .stream()

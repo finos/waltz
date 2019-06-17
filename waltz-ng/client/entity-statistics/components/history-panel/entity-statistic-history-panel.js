@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,23 +21,24 @@ import _ from "lodash";
 import {timeFormat} from "d3-time-format";
 import {variableScale} from "../../../common/colors";
 import {initialiseData} from "../../../common";
-import template from './entity-statistic-history-panel.html';
+import template from "./entity-statistic-history-panel.html";
+import {numberFormatter} from "../../../common/string-utils";
 
 
 const bindings = {
-    history: '<',
-    definition: '<',
-    duration: '<',
-    onChangeDuration: '<'
+    history: "<",
+    definition: "<",
+    duration: "<",
+    onChangeDuration: "<"
 };
 
 
 const initialState = {
-    duration: 'MONTH'
+    duration: "MONTH"
 };
 
 
-const dateFormatter = timeFormat('%a %d %b %Y');
+const dateFormatter = timeFormat("%a %d %b %Y");
 
 
 function prepareData(data = []) {
@@ -57,8 +58,8 @@ function prepareData(data = []) {
 
 function getOutcomeIds(data = []) {
     return _.chain(data)
-        .flatMap('tallies')
-        .map('id')
+        .flatMap("tallies")
+        .map(d => d.id)
         .uniq()
         .value();
 }
@@ -88,13 +89,13 @@ function findRelevantStats(history = [], d) {
 
 function lookupStatColumnName(displayNameService, definition) {
     return definition
-        ? displayNameService.lookup('rollupKind', definition.rollupKind)
-        : 'Value';
+        ? displayNameService.lookup("rollupKind", definition.rollupKind)
+        : "Value";
 }
 
 
 function calcTotal(stats = { tallies: [] }) {
-    return _.sumBy(stats.tallies, 'count');
+    return _.sumBy(stats.tallies, d => d.count);
 }
 
 
@@ -107,7 +108,7 @@ function controller($scope, displayNameService) {
         if (relevantStats) {
             vm.selected = relevantStats;
             vm.selected.dateString = dateFormatter(d);
-            vm.total = calcTotal(relevantStats);
+            vm.totalStr = numberFormatter(calcTotal(relevantStats), 2, false);
         }
     };
 
@@ -124,8 +125,8 @@ function controller($scope, displayNameService) {
 
 
 controller.$inject = [
-    '$scope',
-    'DisplayNameService'
+    "$scope",
+    "DisplayNameService"
 ];
 
 
