@@ -193,6 +193,12 @@
 
     <waltz-section name="Survey Response"
                    ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
+        <waltz-section-actions>
+            <waltz-data-extract-link name="Export"
+                                     styling="button"
+                                     extract="survey-run-response/instance/{{ctrl.surveyInstance.id}}">
+            </waltz-data-extract-link>
+        </waltz-section-actions>
         <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
             <br ng-hide="$first">
 

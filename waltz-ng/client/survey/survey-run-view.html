@@ -25,9 +25,13 @@
 
     <waltz-section name="Instances">
         <waltz-section-actions>
-            <waltz-data-extract-link name="Export"
+            <waltz-data-extract-link name="Export Survey"
                                      styling="button"
-                                     extract="survey-instances/{{ctrl.surveyTemplate.id}}">
+                                     extract="survey-run/{{ctrl.surveyRun.id}}">
+            </waltz-data-extract-link>
+            <waltz-data-extract-link name="Export Survey Response"
+                                     styling="button"
+                                     extract="survey-run-response/{{ctrl.surveyRun.id}}">
             </waltz-data-extract-link>
         </waltz-section-actions>
 
