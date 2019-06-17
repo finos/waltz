@@ -147,8 +147,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .select(MEASURABLE_RATING.LAST_UPDATED_AT.as("Rating Last Updated"),
                         MEASURABLE_RATING.LAST_UPDATED_BY.as("Rating Last Updated By"))
                 .select(DSL.coalesce(ALLOCATION_SCHEME.NAME, "").as("Allocation Scheme"))
-                .select(DSL.coalesce(ALLOCATION.ALLOCATION_PERCENTAGE, "").as("Allocation Percentage"),
-                        DSL.coalesce(ALLOCATION.LAST_UPDATED_AT, "").as("Allocation Last Updated"),
+                .select(DSL.coalesce(ALLOCATION.ALLOCATION_PERCENTAGE, 0).as("Allocation Percentage"),
+                        ALLOCATION.LAST_UPDATED_AT.as("Allocation Last Updated"),
                         DSL.coalesce(ALLOCATION.LAST_UPDATED_BY, "").as("Allocation Last Updated By"),
                         DSL.coalesce(ALLOCATION.PROVENANCE, "").as("Allocation Provenance"));
 
