@@ -21,7 +21,7 @@ import _ from 'lodash';
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from "../../../common/index";
 import {color} from "d3-color";
-import {green, red} from "../../../common/colors";
+import {blue, green, red, lightGrey} from "../../../common/colors";
 import {findUnknownDataType} from '../../../data-types/data-type-utils';
 
 import template from './logical-flows-data-type-summary-pane.html';
@@ -42,15 +42,20 @@ const initialState = {
 function prepareSummary(counts = [], unknownId, direction) {
     return _
         .chain(counts)
-        .map(d => ({ typeId: d.dataType.id, count: d[direction] }))
+        .map(d => ({ typeId: d.dataType.id, name: d.dataType.name, parentId: d.dataType.parentId, count: d[direction] }))
         .reduce((acc, d) => {
+            console.log("prepareSummary->counts " + JSON.stringify(d))
             if (d.typeId === Number(unknownId)) {
                 acc.UNKNOWN  += d.count;
+            // } else if (d.parentId == null){
+            //     acc.LEVEL1 += d.count;
+            } else if (d.name.startsWith('DEPRECATED')){
+                acc.DEPRECATED += d.count;
             } else {
                 acc.KNOWN += d.count;
             }
             return acc;
-        }, { KNOWN: 0, UNKNOWN : 0 })
+        }, { KNOWN: 0, UNKNOWN : 0, DEPRECATED : 0, LEVEL1 : 0})
         .map((v, k) => ({ key: k, count: v }))
         .value();
 }
@@ -62,28 +67,48 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
     const loadUnknownDataType = () => {
         return serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
+            //.then(r=> console.log(" DATA " + JSON.stringify(r.data)))
             .then(r => findUnknownDataType(r.data));
     };
 
+    // const loadDeprecatedDataType = () => {
+    //     return serviceBroker
+    //         .loadAppData(CORE_API.DataTypeStore.findAll)
+    //         //.then(r=> console.log(" DATA " + JSON.stringify(r.data)))
+    //         .then(r => findDeprecatedDataType(r.data));
+    // };
+
     vm.$onChanges = () => {
+
+
+        console.log(" DATA " + JSON.stringify(loadUnknownDataType));
 
         if (! vm.stats) return;
 
         vm.enrichedDataTypeCounts = logicalFlowUtilityService.enrichDataTypeCounts(
             vm.stats.dataTypeCounts,
             displayNameService);
-
+        console.log(" enrichedDataTypeCounts " + JSON.stringify( vm.enrichedDataTypeCounts));
         loadUnknownDataType()
             .then(unknownDataType => {
+
                 const unknownId = unknownDataType ? unknownDataType.id : null;
                 if (unknownId) {
 
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
                         colorProvider: (d) => {
-                            return d.data.key === 'KNOWN'
-                                ? color(green)
-                                : color(red);
+                            // console.log(JSON.stringify(d))
+                            console.log(" datatype " + JSON.stringify(d))
+                            if(d.data.key === 'KNOWN') {
+                                return color(green);
+                            } else if (d.data.key.startsWith('LEVEL1')) {
+                                return color(lightGrey);
+                            } else if (d.data.key.startsWith('DEPRECATED')) {
+                                return color(blue);
+                            } else {
+                                return color(red);
+                            }
                         },
                         valueProvider: (d) => d.count,
                         idProvider: (d) => d.data.key,

@@ -85,10 +85,13 @@ export default [
         const enrichDataTypeCounts = (dataTypeCounts = [], displayNameService) => {
             return _.chain(dataTypeCounts)
                 .map(dc => {
+                    console.log(" DC " + JSON.stringify( dc));
                     const enriched = {
                         dataType: {
+
                             id: dc.entityReference.id,
-                            name: displayNameService.lookup('dataType', dc.entityReference.id)
+                            name: displayNameService.lookup('dataType', dc.entityReference.id),
+                            parentId: dc.parentId
                         },
                         inbound: 0,
                         outbound: 0,
