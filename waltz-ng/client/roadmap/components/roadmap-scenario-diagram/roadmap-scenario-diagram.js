@@ -126,7 +126,7 @@ function mkColWidthStorageKey(scenarioId) {
 function mkLayoutOptions(domainCols = [], suppliedColWidths = {}) {
     const comfortableColCount = 8;
 
-    const colsPerDomainCol = Math.floor(comfortableColCount / Math.max(_.size(domainCols), 1));
+    const colsPerDomainCol = Math.max(Math.floor(comfortableColCount / Math.max(_.size(domainCols), 1), 1);
 
     const computedColWidths = _.reduce(
         domainCols,
