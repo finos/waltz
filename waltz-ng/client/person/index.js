@@ -17,34 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerComponents, registerStore} from '../common/module-utils';
+import angular from "angular";
+import { registerComponents, registerStore } from "../common/module-utils";
 
-import PersonStore from './services/person-store';
-import PersonSummary from './components/summary/person-summary';
-import PersonAppsSection from './components/person-apps-section/person-apps-section';
-import PersonHierarchySection from './components/person-hierarchy-section/person-hierarchy-section';
-import Routes from './routes';
-import PersonLink from './directives/person-link';
-import ManagersList from './directives/manager-list';
-import PersonDirectsList from './directives/person-directs-list';
+import PersonStore from "./services/person-store";
+
+import PersonChangeSetSection from "./components/person-change-set-section/person-change-set-section"
+import PersonSummary from "./components/summary/person-summary";
+import PersonAppsSection from "./components/person-apps-section/person-apps-section";
+import PersonHierarchySection from "./components/person-hierarchy-section/person-hierarchy-section";
+
+
+import Routes from "./routes";
+import PersonLink from "./directives/person-link";
+import ManagersList from "./directives/manager-list";
+import PersonDirectsList from "./directives/person-directs-list";
 
 
 export default () => {
 
-    const module = angular.module('waltz.person', []);
+    const module = angular.module("waltz.person", []);
 
     module
-        .config(Routes)
+        .config(Routes);
 
     module
-        .directive('waltzPersonLink', PersonLink)
-        .directive('waltzManagerList', ManagersList)
-        .directive('waltzPersonDirectsList', PersonDirectsList);
+        .directive("waltzPersonLink", PersonLink)
+        .directive("waltzManagerList", ManagersList)
+        .directive("waltzPersonDirectsList", PersonDirectsList);
 
     registerStore(module, PersonStore);
     registerComponents(module, [
         PersonAppsSection,
+        PersonChangeSetSection,
         PersonHierarchySection,
         PersonSummary
     ]);

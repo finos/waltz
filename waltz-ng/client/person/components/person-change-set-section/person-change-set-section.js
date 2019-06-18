@@ -21,7 +21,7 @@ import { CORE_API } from "../../../common/services/core-api-utils";
 import { initialiseData } from "../../../common";
 import { mkSelectionOptions } from "../../../common/selector-utils";
 
-import template from "./change-set-section.html";
+import template from "./person-change-set-section.html";
 
 
 const bindings = {
@@ -30,21 +30,33 @@ const bindings = {
 
 
 const initialState = {
-    changeSets: [],
+    indirect: [],
 };
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const loadDirect = () => serviceBroker
+        .loadViewData(CORE_API.PersonStore.getById, [vm.parentEntityRef.id])
+        .then(r => {
+            vm.person = r.data;
+            return serviceBroker
+                .loadViewData(CORE_API.ChangeSetStore.findByPerson, [vm.person.employeeId])
+                .then(r => vm.direct = r.data)
+        });
+
+    const loadIndirect = () => serviceBroker
+        .loadViewData(CORE_API.ChangeSetStore.findBySelector, [mkSelectionOptions(vm.parentEntityRef)])
+        .then(r => vm.indirect = r.data);
+
+
     vm.$onChanges = (changes) => {
         if(changes.parentEntityRef) {
-            serviceBroker
-                .loadViewData(CORE_API.ChangeSetStore.findBySelector, [mkSelectionOptions(vm.parentEntityRef)])
-                .then(r => vm.changeSets = r.data)
+            loadDirect()
+                .then(() => loadIndirect());
         }
     };
-
 }
 
 
@@ -62,5 +74,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzChangeSetSection"
+    id: "waltzPersonChangeSetSection"
 };
