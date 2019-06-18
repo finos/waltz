@@ -109,6 +109,9 @@ public class SurveyRunExtractor extends BaseDataExtractor {
     }
 
     private SelectConditionStep<?> getSurveyRunWithResponses(long surveyRunId) {
+        Field<String> ENTITY_RESPONSE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
+                SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND);
         return dsl
                 .select(
                         APPLICATION.NAME.coalesce(CHANGE_INITIATIVE.NAME).as("Entity Name"),
@@ -119,7 +122,8 @@ public class SurveyRunExtractor extends BaseDataExtractor {
                         DSL.concat(SURVEY_QUESTION_RESPONSE.STRING_RESPONSE.coalesce(""),
                                 SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE.cast(String.class).coalesce(""),
                                 SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.cast(String.class).coalesce(""),
-                                SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class).coalesce("")).as("Answer"),
+                                SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class).coalesce(""),
+                                ENTITY_RESPONSE_NAME_FIELD.coalesce("")).as("Answer"),
                         SURVEY_QUESTION_RESPONSE.COMMENT.as("Comment"),
                         PERSON.EMAIL.as("Participant Email"),
                         SURVEY_INSTANCE.SUBMITTED_BY.as("Submitted By"),
