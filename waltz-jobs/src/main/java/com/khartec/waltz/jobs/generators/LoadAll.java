@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -38,7 +39,7 @@ public class LoadAll {
 //            new AppGroupGenerator(),
 //            new AppGroupEntryGenerator(),
 //            new BookmarkGenerator(),
-//            new ChangeInitiativeGenerator(),
+            new ChangeInitiativeGenerator(),
 //            new ProcessGenerator(),
 //            new MeasurableGenerator("PRODUCT"),
 //            new MeasurableGenerator("CAPABILITY"),
@@ -67,6 +68,8 @@ public class LoadAll {
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
+        LoggingUtilities.configureLogging();
 
         Arrays.stream(loaders)
                 .filter(Objects::nonNull)

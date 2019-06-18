@@ -48,6 +48,7 @@ import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -57,8 +58,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
@@ -151,15 +152,16 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
     }
 
 
-    private static ChangeInitiativeRecord buildChangeInitiativeRecord(Tuple2<Long, String> t, List<Long> ouIds) {
+    private static ChangeInitiativeRecord buildChangeInitiativeRecord(Tuple3<Long, Long, String> t, List<Long> ouIds) {
         ChangeInitiativeRecord record = new ChangeInitiativeRecord();
-        record.setDescription(t.v2);
-        record.setName(t.v2);
+        record.setDescription(t.v3);
+        record.setName(t.v3);
         record.setProvenance("dummy");
-        record.setExternalId("EXT" + t.v1);
+        record.setExternalId("EXT" + t.v1 + (t.v2 != null ? t.v2 : ""));
         record.setKind("PROGRAMME");
         record.setLifecyclePhase(randomPick(LifecyclePhase.values()).name());
         record.setId(t.v1);
+        record.setParentId(t.v2);
         record.setStartDate(new Date(Instant.now().toEpochMilli()));
         record.setEndDate(new Date(
                 Instant.now()
@@ -180,20 +182,10 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
         List<Long> groupIds = loadAllIds(dsl, APPLICATION_GROUP.ID);
         List<String> employeeIds = loadAllIds(dsl, PERSON.EMPLOYEE_ID);
 
-        List<TableRecord<?>> ciRecords = LongStream.range(0, NUM_CHANGE_INITIATIVES)
-                .mapToObj(i -> {
-                    String name = randomPick(p1)
-                            + " "
-                            + randomPick(p2)
-                            + " "
-                            + randomPick(p3);
-                    return tuple(i, name);
-                })
-                .map(t -> buildChangeInitiativeRecord(t, ouIds))
-                .collect(toList());
-
-
+        List<ChangeInitiativeRecord> ciRecords = createCiRecords(ouIds);
         dsl.batchInsert(ciRecords).execute();
+
+        LOG.info("Created: {} ci records", ciRecords.size());
 
         List<Long> ciIds = loadAllIds(dsl, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.PROVENANCE.eq(SampleDataGenerator.SAMPLE_DATA_PROVENANCE));
 
@@ -208,6 +200,34 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
         dsl.batchInsert(relationships).execute();
 
         return null;
+    }
+
+
+    private List<ChangeInitiativeRecord> createCiRecords(List<Long> ouIds) {
+        AtomicLong idCtr = new AtomicLong();
+        return IntStream.range(0, NUM_CHANGE_INITIATIVES)
+                .boxed()
+                .flatMap(i -> {
+                    long parentId = idCtr.incrementAndGet();
+                    Tuple3<Long, Long, String> parent = tuple(parentId, null, mkName());
+
+                    int numChildren = RND.nextInt(4);
+                    Stream<Tuple3<Long, Long, String>> children = IntStream.range(0, numChildren)
+                            .boxed()
+                            .map(x -> tuple(idCtr.incrementAndGet(), parentId, mkName()));
+
+                    return Stream.concat(Stream.of(parent), children);
+                })
+                .map(t -> buildChangeInitiativeRecord(t, ouIds))
+                .collect(toList());
+    }
+
+    private String mkName() {
+        return randomPick(p1)
+                                + " "
+                                + randomPick(p2)
+                                + " "
+                                + randomPick(p3);
     }
 
 
