@@ -30,10 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 
 
@@ -56,6 +54,8 @@ public class ChangeSetEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByParentRefPath = mkPath(BASE_URL, "parent", ":kind", ":id");
+        String findByPersonPath = mkPath(BASE_URL, "person", ":employeeId");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
 
 
         DatumRoute<ChangeSet> getByIdRoute = (req, res) -> {
@@ -69,9 +69,19 @@ public class ChangeSetEndpoint implements Endpoint {
             return changeSetService.findByParentRef(entityReference);
         };
 
+        ListRoute<ChangeSet> findBySelectorRoute = (request, response) ->
+                changeSetService.findBySelector(readIdSelectionOptionsFromBody(request));
+
+        ListRoute<ChangeSet> findByPersonRoute = (request, response) -> {
+            String employeeId = request.params("employeeId");
+            return changeSetService.findByPerson(employeeId);
+        };
+
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findByPersonPath, findByPersonRoute);
         getForList(findByParentRefPath, findByEntityRefRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
     }
 
 

@@ -1,0 +1,60 @@
+
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017  Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div>
+    <waltz-source-data-section-addon entities="['CHANGE_SET']">
+    </waltz-source-data-section-addon>
+
+
+    <waltz-no-data ng-if="$ctrl.direct.length === 0 && $ctrl.indirect.length === 0">
+        <message>
+            <strong>No change sets</strong> for this person
+        </message>
+    </waltz-no-data>
+
+
+    <div ng-if="$ctrl.direct.length > 0 || $ctrl.indirect.length > 0">
+        <uib-tabset>
+            <uib-tab select="showDirectTab = true"
+                     heading="Direct"
+                     ng-if="$ctrl.direct.length > 0">
+
+                <div ng-if="showDirectTab">
+                    <h4> Direct Involvements <small>(Through involvement with Change Set)</small></h4>
+                    <waltz-change-set-panel change-sets="$ctrl.direct">
+                    </waltz-change-set-panel>
+                </div>
+
+            </uib-tab>
+
+            <uib-tab select="showIndirectTab = true"
+                     heading="Indirect"
+                     ng-if="$ctrl.indirect.length > 0">
+
+                <div ng-if="showIndirectTab">
+                    <h4> Indirect Involvements <small>(Inferred via applications)</small></h4>
+                    <waltz-change-set-panel change-sets="$ctrl.indirect">
+                    </waltz-change-set-panel>
+                </div>
+
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>

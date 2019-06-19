@@ -34,10 +34,21 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findByPerson = (employeeId) => {
+        return $http
+            .get(`${BASE}/person/${employeeId}`)
+            .then(result => result.data);
+    };
+
+    const findBySelector = (options) => $http
+        .post(`${BASE}/selector`, options)
+        .then(result => result.data);
 
     return {
         getById,
-        findByParentRef
+        findByParentRef,
+        findByPerson,
+        findBySelector
     };
 }
 
@@ -61,6 +72,16 @@ export const ChangeSetStore_API = {
         serviceName,
         serviceFnName: "findByParentRef",
         description: "find change sets for an associated parent ref"
-    }
+    },
+    findByPerson: {
+        serviceName,
+        serviceFnName: "findByPerson",
+        description: "find change sets for a person by involvement"
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find change sets by selector"
+    },
 };
 

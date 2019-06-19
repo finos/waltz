@@ -1,3 +1,22 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.web.endpoints.extracts;
 
 
@@ -59,7 +78,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
             ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
 
-            Record1<String> fileName = dsl.select(MEASURABLE_CATEGORY.NAME)
+            Record1<String> fileName = dsl
+                    .select(DSL.concat(MEASURABLE_CATEGORY.NAME, "_all_allocations"))
                     .from(MEASURABLE_CATEGORY)
                     .where(MEASURABLE_CATEGORY.ID.eq(measurableCategoryId))
                     .fetchOne();
@@ -127,8 +147,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
                 .select(MEASURABLE_RATING.LAST_UPDATED_AT.as("Rating Last Updated"),
                         MEASURABLE_RATING.LAST_UPDATED_BY.as("Rating Last Updated By"))
                 .select(DSL.coalesce(ALLOCATION_SCHEME.NAME, "").as("Allocation Scheme"))
-                .select(DSL.coalesce(ALLOCATION.ALLOCATION_PERCENTAGE, "").as("Allocation Percentage"),
-                        DSL.coalesce(ALLOCATION.LAST_UPDATED_AT, "").as("Allocation Last Updated"),
+                .select(DSL.coalesce(ALLOCATION.ALLOCATION_PERCENTAGE, 0).as("Allocation Percentage"),
+                        ALLOCATION.LAST_UPDATED_AT.as("Allocation Last Updated"),
                         DSL.coalesce(ALLOCATION.LAST_UPDATED_BY, "").as("Allocation Last Updated By"),
                         DSL.coalesce(ALLOCATION.PROVENANCE, "").as("Allocation Provenance"));
 

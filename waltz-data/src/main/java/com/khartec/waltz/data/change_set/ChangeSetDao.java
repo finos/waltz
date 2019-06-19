@@ -26,10 +26,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.change_set.ChangeSet;
 import com.khartec.waltz.model.change_set.ImmutableChangeSet;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,6 +40,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.Tables.CHANGE_SET;
+import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 
 
 @Repository
@@ -120,6 +118,26 @@ public class ChangeSetDao {
                 .from(CHANGE_SET)
                 .where(CHANGE_SET.PARENT_ENTITY_ID.eq(ref.id()))
                 .and(CHANGE_SET.PARENT_ENTITY_KIND.eq(ref.kind().name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<ChangeSet> findBySelector(Select<Record1<Long>> selector) {
+        return dsl.select(CHANGE_SET.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(CHANGE_SET)
+                .where(CHANGE_SET.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<ChangeSet> findByPerson(String employeeId) {
+        return dsl.select(CHANGE_SET.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(CHANGE_SET)
+                .innerJoin(INVOLVEMENT).on(INVOLVEMENT.ENTITY_ID.eq(CHANGE_SET.ID))
+                    .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.CHANGE_SET.name()))
+                .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
