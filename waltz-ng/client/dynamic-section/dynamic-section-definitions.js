@@ -227,6 +227,12 @@ export const dynamicSections = {
         name: "Change Sets",
         icon: "hourglass-2",
         id: 80
+    },
+    personChangeSetSection: {
+        componentId: "person-change-set-section",
+        name: "Change Sets",
+        icon: "hourglass-2",
+        id: 90
     }
 
 };
@@ -238,8 +244,9 @@ export const dynamicSectionsByKind = {
         dynamicSections.measurableRatingAppSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.bookmarksSection,
-        dynamicSections.involvedPeopleSection,
         dynamicSections.changeInitiativeSection,
+        dynamicSections.changeSetSection,
+        dynamicSections.involvedPeopleSection,
         dynamicSections.entityDiagramsSection,
         dynamicSections.dataFlowSection,
         dynamicSections.technologySection,
@@ -282,6 +289,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.authSourcesSection,
         dynamicSections.changeInitiativeSection,
+        dynamicSections.changeSetSection,
         dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,
@@ -296,6 +304,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.measurableRatingExplorerSection,
         dynamicSections.relatedMeasurablesSection,
         dynamicSections.bookmarksSection,
+        dynamicSections.changeSetSection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.appsSection,
@@ -312,6 +321,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.personAppsSection,
         dynamicSections.bookmarksSection,
         dynamicSections.changeInitiativeSection,
+        dynamicSections.personChangeSetSection,
         dynamicSections.logicalFlowsTabgroupSection,
         dynamicSections.authSourcesSection,
         dynamicSections.entityStatisticSummarySection,
@@ -332,11 +342,12 @@ export const dynamicSectionsByKind = {
         dynamicSections.changeLogSection
     ],
     "APP_GROUP": [
-        dynamicSections.changeInitiativeSection,
-        dynamicSections.measurableRatingsBrowserSection,
-        dynamicSections.logicalFlowsTabgroupSection,
-        dynamicSections.authSourcesSection,
         dynamicSections.appsSection,
+        dynamicSections.authSourcesSection,
+        dynamicSections.changeInitiativeSection,
+        dynamicSections.changeSetSection,
+        dynamicSections.logicalFlowsTabgroupSection,
+        dynamicSections.measurableRatingsBrowserSection,
         dynamicSections.relatedAppGroupsSection,
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.complexitySection,

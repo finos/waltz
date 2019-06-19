@@ -18,12 +18,12 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {downloadTextFile} from "../../../common/file-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
-import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
-import {lifecycleStatus} from "../../../common/services/enums/lifecycle-status";
+import { initialiseData } from "../../../common/index";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { downloadTextFile } from "../../../common/file-utils";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+import { lifecycleStatus } from "../../../common/services/enums/lifecycle-status";
 
 import template from "./person-apps-section.html";
 
@@ -165,7 +165,6 @@ function controller(serviceBroker) {
 
     vm.$onChanges = (changes) => {
         if(changes.filters) {
-            console.log("filters changed");
             loadAll();
         }
         vm.selector = mkApplicationSelectionOptions(

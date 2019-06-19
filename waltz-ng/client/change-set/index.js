@@ -24,6 +24,7 @@ import { registerComponents } from "../common/module-utils";
 import ChangeSetView from "./pages/view/change-set-view";
 
 import ChangeSetOverview from "./components/overview/change-set-overview";
+import ChangeSetPanel from "./components/panel/change-set-panel";
 import ChangeSetSection from "./components/section/change-set-section";
 
 
@@ -38,6 +39,7 @@ export default () => {
     registerComponents(module, [
         ChangeSetView,
         ChangeSetOverview,
+        ChangeSetPanel,
         ChangeSetSection
     ]);
 
