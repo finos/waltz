@@ -51,6 +51,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .name(record.getName())
                 .id(Optional.ofNullable(record.getId()))
                 .parentId(Optional.ofNullable(record.getParentId()))
+                .deprecated(record.getDeprecated())
                 .concrete(record.getConcrete())
                 .unknown(record.getUnknown())
                 .build();

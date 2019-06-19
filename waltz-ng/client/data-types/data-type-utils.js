@@ -21,21 +21,9 @@ import _ from "lodash";
 
 
 export function findUnknownDataType(dataTypes = []) {
-    // console.log(" datatype " + JSON.stringify(dt))
     const unknownDataType = _.find(dataTypes, dt => dt.unknown);
     if (! unknownDataType) {
         throw 'Unknown data type not found!'
     }
-    console.log(" unknownDataType " + JSON.stringify(unknownDataType))
     return unknownDataType;
-}
-
-
-export function findDeprecatedDataType(dataTypes = []) {
-    const deprecatedDataType = _.find(dataTypes, dt => dt.name.startsWith('DEPRECATED'));
-    if (! deprecatedDataType) {
-        throw 'deprecated data type not found!'
-    }
-    console.log(" deprecatedDataType " + JSON.stringify(deprecatedDataType))
-    return deprecatedDataType;
 }

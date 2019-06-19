@@ -65,11 +65,6 @@ export default [
                                 const rating = calcRating(d);
                                 return authoritativeRatingColorScale(rating).brighter();
                             });
-                            //
-                            // .attr('marker-end', d => {
-                            //     const rating = calcRating(d);
-                            //     return `url(#arrowhead-${rating})`;
-                            // })
                     },
                     enter: (selection) => {
                         return selection
@@ -85,13 +80,12 @@ export default [
         const enrichDataTypeCounts = (dataTypeCounts = [], displayNameService) => {
             return _.chain(dataTypeCounts)
                 .map(dc => {
-                    console.log(" DC " + JSON.stringify( dc));
                     const enriched = {
                         dataType: {
-
                             id: dc.entityReference.id,
                             name: displayNameService.lookup('dataType', dc.entityReference.id),
-                            parentId: dc.parentId
+                            deprecated: dc.deprecated,
+                            concrete: dc.concrete
                         },
                         inbound: 0,
                         outbound: 0,
