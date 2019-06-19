@@ -74,7 +74,7 @@ function preparePie(ratings = [],
         config: {
             size: 130,
             onSelect,
-            colorProvider: (d) => colorScale(d.data.key),
+            colorProvider: (d) => colorScale(d.key),
             labelProvider: (d) => _.get(schemeItemsByCode, [d.key, "name"], d.key),
             descriptionProvider: (d) => _.get(schemeItemsByCode, [d.key, "description"], d.key)
         }

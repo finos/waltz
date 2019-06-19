@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common/index";
 import {color} from "d3-color";
 import {green, red} from "../../../common/colors";
-import {findUnknownDataType} from '../../../data-types/data-type-utils';
+import {findUnknownDataType} from "../../../data-types/data-type-utils";
 
-import template from './logical-flows-data-type-summary-pane.html';
+import template from "./logical-flows-data-type-summary-pane.html";
 
 
 const bindings = {
-    stats: '<'
+    stats: "<"
 };
 
 
@@ -81,7 +81,7 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
                         colorProvider: (d) => {
-                            return d.data.key === 'KNOWN'
+                            return d.key === "KNOWN"
                                 ? color(green)
                                 : color(red);
                         },
@@ -94,10 +94,10 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                     vm.overviewConfig =  Object.assign({}, vm.summaryConfig, { size: 80 });
 
                     const summaries = [
-                        { title: 'Intra', prop: 'intra'} ,
-                        { title: 'Inbound', prop: 'inbound'} ,
-                        { title: 'Outbound', prop: 'outbound'} ,
-                        { title: 'All', prop: 'total'}
+                        { title: "Intra", prop: "intra"} ,
+                        { title: "Inbound", prop: "inbound"} ,
+                        { title: "Outbound", prop: "outbound"} ,
+                        { title: "All", prop: "total"}
                     ];
 
                     vm.summaries= _.map(summaries, d => {
@@ -114,9 +114,9 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
 
 
 controller.$inject = [
-    'DisplayNameService',
-    'LogicalFlowUtilityService',
-    'ServiceBroker',
+    "DisplayNameService",
+    "LogicalFlowUtilityService",
+    "ServiceBroker",
 ];
 
 
@@ -131,5 +131,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzLogicalFlowsDataTypeSummaryPane'
+    id: "waltzLogicalFlowsDataTypeSummaryPane"
 }

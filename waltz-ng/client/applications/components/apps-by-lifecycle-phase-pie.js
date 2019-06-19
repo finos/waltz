@@ -19,14 +19,14 @@
  */
 
 import {lifecyclePhaseColorScale} from "../../common/colors";
-import {lifecyclePhase} from '../../common/services/enums/lifecycle-phase';
+import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
 import {toKeyCounts} from "../../common";
-import template from './apps-by-lifecycle-phase-pie.html';
+import template from "./apps-by-lifecycle-phase-pie.html";
 
 
 const bindings = {
-    applications: '<',
-    size: '<'
+    applications: "<",
+    size: "<"
 };
 
 
@@ -36,9 +36,9 @@ const DEFAULT_SIZE = 80;
 
 
 const config = {
-    colorProvider: (d) => lifecyclePhaseColorScale(d.data.key),
+    colorProvider: (d) => lifecyclePhaseColorScale(d.key),
     size: DEFAULT_SIZE,
-    labelProvider: d => lifecyclePhase[d.key] ? lifecyclePhase[d.key].name : 'Unknown'
+    labelProvider: d => lifecyclePhase[d.key] ? lifecyclePhase[d.key].name : "Unknown"
 };
 
 

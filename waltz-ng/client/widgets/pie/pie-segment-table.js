@@ -39,7 +39,7 @@ const initialState = {
 const defaultConfig = {
     labelProvider: (d) => d.key,
     valueProvider: (d) => d.count,
-    colorProvider: (d) => variableScale(d),
+    colorProvider: (d) => variableScale(d.key),
     descriptionProvider: (d) => null
 };
 

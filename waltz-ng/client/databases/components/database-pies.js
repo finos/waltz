@@ -20,11 +20,11 @@
 import {environmentColorScale, variableScale} from "../../common/colors";
 import {toKeyCounts, notEmpty} from "../../common";
 import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
-import template from './database-pies.html';
+import template from "./database-pies.html";
 
 
 const bindings = {
-    databases: '<'
+    databases: "<"
 };
 
 
@@ -54,15 +54,15 @@ function controller($scope) {
     vm.pieConfig = {
         environment: {
             size: PIE_SIZE,
-            colorProvider: (d) => environmentColorScale(d.data.key)
+            colorProvider: (d) => environmentColorScale(d.key)
         },
         vendor: {
             size: PIE_SIZE,
-            colorProvider: (d) => variableScale(d.data.key)
+            colorProvider: (d) => variableScale(d.key)
         },
         endOfLifeStatus: {
             size: PIE_SIZE,
-            colorProvider: (d) => variableScale(d.data.key),
+            colorProvider: (d) => variableScale(d.key),
             labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
         }
     };
@@ -82,7 +82,7 @@ function controller($scope) {
 
 }
 
-controller.$inject = [ '$scope' ];
+controller.$inject = [ "$scope" ];
 
 
 const component = {

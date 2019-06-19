@@ -42,7 +42,7 @@ const investmentLabels = {
 
 
 const config = {
-    colorProvider: (d) => ragColorScale(d.data.key),
+    colorProvider: (d) => ragColorScale(d.key),
     size: DEFAULT_SIZE,
     labelProvider: (d) => investmentLabels[d.key] || "Unknown"
 };

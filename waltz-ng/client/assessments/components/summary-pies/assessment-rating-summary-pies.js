@@ -32,7 +32,7 @@ const initialState = {
     config: {
         labelProvider: d => d.rating.name,
         valueProvider: d => d.count,
-        colorProvider: d => color(d.data.rating.color)
+        colorProvider: d => color(d.rating.color)
     }
 };
 

@@ -19,15 +19,15 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings} from "../utilities";
-import template from './entity-statistic-detail-panel.html';
+import template from "./entity-statistic-detail-panel.html";
 
 
 const bindings = {
-    applications: '<',
-    definition: '<',
-    orgUnits: '<',
-    summary: '<',
-    values: '<'
+    applications: "<",
+    definition: "<",
+    orgUnits: "<",
+    summary: "<",
+    values: "<"
 };
 
 
@@ -37,7 +37,7 @@ const PIE_SIZE = 140;
 function mkStatChartData(counts = [], onSelect) {
     return {
         config: {
-            colorProvider: (d) => variableScale(d.data.key),
+            colorProvider: (d) => variableScale(d.key),
             labelProvider: d => d.key,
             onSelect,
             size: PIE_SIZE
@@ -62,7 +62,7 @@ function controller() {
             pieClickHandler);
 
         vm.tableHeadings = mkSummaryTableHeadings(vm.definition);
-        vm.lastUpdatedAt = vm.summary ? vm.summary.lastUpdatedAt : '';
+        vm.lastUpdatedAt = vm.summary ? vm.summary.lastUpdatedAt : "";
     }
 }
 

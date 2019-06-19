@@ -48,9 +48,9 @@ const lifecycleLabelProvider = (displayNameService, d) => displayNameService.loo
 const criticalityLabelProvider = (displayNameService, d) => d ? displayNameService.lookup("criticality", d.key, d.key) : d;
 const applicationKindLabelProvider = (displayNameService, d) => displayNameService.lookup("applicationKind", d.key, d.key);
 
-const randomColorProvider = d => variableScale(d.data.key);
-const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);
-const criticalityColorProvider = d => criticalityColorScale(d.data.key);
+const randomColorProvider = d => variableScale(d.key);
+const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.key);
+const criticalityColorProvider = d => criticalityColorScale(d.key);
 
 
 function mkChartData(data,

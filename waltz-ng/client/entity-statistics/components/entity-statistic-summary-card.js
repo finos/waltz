@@ -20,13 +20,13 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {mkSummaryTableHeadings, navigateToStatistic} from "../utilities";
-import template from './entity-statistic-summary-card.html';
+import template from "./entity-statistic-summary-card.html";
 
 const bindings = {
-    definition: '<',
-    parentRef: '<',
-    subTitle: '@',
-    summary: '<'
+    definition: "<",
+    parentRef: "<",
+    subTitle: "@",
+    summary: "<"
 };
 
 
@@ -36,7 +36,7 @@ const PIE_SIZE = 100;
 function mkStatChartData(counts = []) {
     return {
         config: {
-            colorProvider: (d) => variableScale(d.data.key),
+            colorProvider: (d) => variableScale(d.key),
             labelProvider: d => d.key,
             size: PIE_SIZE
         },
@@ -69,7 +69,7 @@ function controller($state) {
 
 
 controller.$inject = [
-    '$state'
+    "$state"
 ];
 
 
