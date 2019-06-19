@@ -17,66 +17,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from "./pie-table.html";
-
-import {limitSegments} from "./pie-utils";
-import {initialiseData} from "../../common/index";
+import template from "./assessment-rating-summary-pies.html";
+import {initialiseData} from "../../../common";
+import {color} from "d3-color";
 
 
 const bindings = {
-    data: "<",
-    config: "<",
-    title: "@",
-    subTitle: "@",
-    icon: "@",
-    description: "@",
-    selectedSegmentKey: "<"
+    summaries: "<"
 };
 
 
 const initialState = {
+    summaries: [],
+    config: {
+        labelProvider: d => d.rating.name,
+        valueProvider: d => d.count,
+        colorProvider: d => color(d.data.rating.color)
+    }
 };
-
-
-const MAX_PIE_SEGMENTS = 5;
 
 
 function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    const defaultOnSelect = (d) => {
-        vm.selectedSegmentKey = d
-            ? d.key
-            : null;
+    vm.$onInit = () => {
+        console.log("init", vm.summaries);
     };
 
-    const dataChanged = (data = []) => {
-        vm.pieData = limitSegments(data, MAX_PIE_SEGMENTS);
-    };
-
-    vm.$onChanges = (changes) => {
-        dataChanged(vm.data);
-
-        if (changes.config) {
-            vm.config = Object.assign(
-                {},
-                { onSelect: defaultOnSelect },
-                vm.config);
-        }
-    };
-
-    vm.toDisplayName = (k) => vm.config.labelProvider
-        ? vm.config.labelProvider(k)
-        : k;
 }
+
+controller.$inject = [];
 
 
 const component = {
     template,
-    bindings,
-    controller
+    controller,
+    bindings
 };
 
 
-export default component;
+export default {
+    id: "waltzAssessmentRatingSummaryPies",
+    component
+}

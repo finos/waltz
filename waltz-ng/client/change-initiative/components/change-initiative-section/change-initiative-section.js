@@ -26,7 +26,9 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./change-initiative-section.html";
 import {changeInitiative} from "../../../common/services/enums/change-initiative";
 import {getEnumName} from "../../../common/services/enums";
-
+import {sameRef} from "../../../common/entity-utils";
+import {nest} from "d3-collection"
+import {mkAssessmentSummaries} from "../../../assessments/assessment-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -74,8 +76,34 @@ const initialState = {
 
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    function init() {
+        const enumPromise = serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {
+                vm.changeInitiativeLifecyclePhaseByKey = _
+                    .chain(r.data)
+                    .filter({ type: "changeInitiativeLifecyclePhase"})
+                    .map(c => ({ key: c.key, name: c.name }))
+                    .keyBy("key")
+                    .value();
+            });
+
+        const schemePromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemes = r.data);
+
+        const assessmentDefinitionPromise = serviceBroker
+            .loadAppData(
+                CORE_API.AssessmentDefinitionStore.findByKind,
+                [ "CHANGE_INITIATIVE" ])
+            .then(r => vm.assessmentDefinitions = r.data);
+
+        return $q.all([enumPromise, schemePromise, assessmentDefinitionPromise]);
+    }
+
 
     const processChangeInitiativeHierarchy = (changeInitiatives) => {
         const cisByParentId = _.groupBy(changeInitiatives, "parentId");
@@ -108,33 +136,42 @@ function controller(serviceBroker) {
     vm.onClearSelection = () => vm.selectedChange = null;
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => {
-                vm.changeInitiativeLifecyclePhaseByKey = _
-                    .chain(r.data)
-                    .filter({ type: "changeInitiativeLifecyclePhase"})
-                    .map(c => ({ key: c.key, name: c.name }))
-                    .keyBy("key")
-                    .value();
-            });
+        init();
     };
 
     vm.$onChanges = (changes) => {
-        if(vm.parentEntityRef && changes.parentEntityRef.previousValue.id !== changes.parentEntityRef.currentValue.id) {
-            serviceBroker
+        if (vm.parentEntityRef && !sameRef(changes.parentEntityRef.previousValue, changes.parentEntityRef.currentValue, { skipChecks: true })) {
+            const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+            const ciPromise = serviceBroker
                 .loadViewData(
                     CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
-                    [ mkSelectionOptions(vm.parentEntityRef) ])
+                    [ selectionOptions ])
                 .then(r => processChangeInitiativeHierarchy(r.data));
-        }
-    };
 
+            const assessmentRatingsPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+                    [ "CHANGE_INITIATIVE", selectionOptions ])
+                .then(r => vm.assessmentRatings = r.data);
+
+            $q.all([init(), ciPromise, assessmentRatingsPromise])
+                .then(() => {
+                    vm.assessmentSummaries = mkAssessmentSummaries(
+                        vm.assessmentDefinitions,
+                        vm.ratingSchemes,
+                        vm.assessmentRatings);
+                });
+
+        }
+
+
+    };
 
 }
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
