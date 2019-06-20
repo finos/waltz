@@ -83,9 +83,7 @@ export default [
                     const enriched = {
                         dataType: {
                             id: dc.entityReference.id,
-                            name: displayNameService.lookup('dataType', dc.entityReference.id),
-                            deprecated: dc.deprecated,
-                            concrete: dc.concrete
+                            name: displayNameService.lookup('dataType', dc.entityReference.id)
                         },
                         inbound: 0,
                         outbound: 0,
