@@ -29,19 +29,11 @@ export function findUnknownDataTypeId(dataTypes = []) {
 }
 
 export function findDeprecatedDataTypeIds(dataTypes = []) {
-    const deprecatedDataTypes = _.filter(dataTypes, dt => dt.deprecated)
-                                    .map(dt => dt.id);
-    if (! deprecatedDataTypes) {
-        throw 'No deprecated data type not found!'
-    }
-    return deprecatedDataTypes;
+    return _.filter(dataTypes, dt => dt.deprecated)
+          .map(dt => dt.id);
 }
 
 export function findNonConcreteDataTypeIds(dataTypes = []) {
-    const nonConcreteDataTypes = _.filter(dataTypes, dt => !dt.concrete)
-                                    .map(dt => dt.id);
-    if (! nonConcreteDataTypes) {
-        throw 'no non-concrete data type not found!'
-    }
-    return nonConcreteDataTypes;
+    return _.filter(dataTypes, dt => !dt.concrete)
+            .map(dt => dt.id);
 }
