@@ -53,7 +53,6 @@ public class RatingSchemeDAO {
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
                 .rating(firstChar(r.getCode(), 'X'))
-                .needsPlannedDate(r.getNeedsPlannedDate())
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
