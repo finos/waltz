@@ -22,19 +22,21 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.18.xml">
 
-    <changeSet id="20190611-4030-1"
+    <changeSet id="20190620-1110-1"
                author="muzammilali">
         <comment>11:00: Add deprecated flag in datatype table</comment>
-
-        <sql>
-            ALTER TABLE data_type
-            ADD deprecated bit constraint DF_data_type_deprecated default 0 not null
-        </sql>
-        <sql>
-            UPDATE data_type
-            SET deprecated = 1
-            WHERE name like 'DEPRECATED%'
-        </sql>
+            <addColumn tableName="data_type">
+                <column name="deprecated"
+                        type="boolean"
+                        defaultValueBoolean="false">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+            <update tableName="data_type">
+                <column name="deprecated"
+                        valueBoolean="true"/>
+                <where>name like 'DEPRECATED%'</where>
+            </update>
     </changeSet>
 
 </databaseChangeLog>
