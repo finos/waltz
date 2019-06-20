@@ -37,16 +37,6 @@ public abstract class TallyPack<T> {
     public abstract List<Tally<T>> tallies();
 
     @Value.Default
-    public Boolean deprecated() {
-        return false;
-    }
-
-    @Value.Default
-    public Boolean concrete() {
-        return true;
-    }
-
-    @Value.Default
     public LocalDateTime lastUpdatedAt() {
         return DateTimeUtilities.nowUtc();
     }

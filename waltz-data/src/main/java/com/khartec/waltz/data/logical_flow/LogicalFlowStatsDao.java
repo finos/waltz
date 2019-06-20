@@ -116,9 +116,7 @@ public class LogicalFlowStatsDao {
     }
 
 
-    public List<TallyPack<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector,
-                                                                 List<EntityReference> deprecatedDataTypeIds,
-                                                                 List<EntityReference> concreteDataTypeIds) {
+    public List<TallyPack<String>> tallyDataTypesByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
@@ -171,8 +169,6 @@ public class LogicalFlowStatsDao {
                 .map(e -> ImmutableTallyPack.<String>builder()
                         .entityReference(e.getKey())
                         .tallies(e.getValue())
-                        .deprecated(deprecatedDataTypeIds.contains(e.getKey()))
-                        .concrete(concreteDataTypeIds.contains(e.getKey()))
                         .build())
                 .collect(toList());
     }

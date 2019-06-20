@@ -24,7 +24,6 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
-import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
@@ -37,7 +36,6 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
-import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -83,7 +81,6 @@ public class LogicalFlowService {
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
-    private final DataTypeDao dataTypeDao;
 
 
     @Autowired
@@ -95,7 +92,7 @@ public class LogicalFlowService {
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                              LogicalFlowStatsDao logicalFlowStatsDao, DataTypeDao dataTypeDao) {
+                              LogicalFlowStatsDao logicalFlowStatsDao) {
         checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
@@ -115,7 +112,6 @@ public class LogicalFlowService {
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
-        this.dataTypeDao = dataTypeDao;
     }
 
 
@@ -307,23 +303,9 @@ public class LogicalFlowService {
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
 
-        List<DataType> dataTypes = dataTypeDao.findAll();
-
-        List<EntityReference> deprecatedDataTypeIds = dataTypes.stream()
-                .filter(DataType::deprecated)
-                .map(DataType::entityReference)
-                .collect(toList());
-
-        List<EntityReference> concreteDataTypeIds = dataTypes.stream()
-                .filter(DataType::concrete)
-                .map(DataType::entityReference)
-                .collect(toList());
-
         Future<List<TallyPack<String>>> dataTypeCounts = dbExecutorPool.submit(() ->
                 FunctionUtilities.time("DFS.dataTypes",
-                    () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector,
-                            deprecatedDataTypeIds,
-                            concreteDataTypeIds)));
+                    () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector)));
 
         Future<LogicalFlowMeasures> appCounts = dbExecutorPool.submit(() ->
                 FunctionUtilities.time("DFS.appCounts",

@@ -20,10 +20,28 @@
 import _ from "lodash";
 
 
-export function findUnknownDataType(dataTypes = []) {
+export function findUnknownDataTypeId(dataTypes = []) {
     const unknownDataType = _.find(dataTypes, dt => dt.unknown);
     if (! unknownDataType) {
         throw 'Unknown data type not found!'
     }
-    return unknownDataType;
+    return unknownDataType.id;
+}
+
+export function findDeprecatedDataTypeIds(dataTypes = []) {
+    const deprecatedDataTypes = _.filter(dataTypes, dt => dt.deprecated)
+                                    .map(dt => dt.id);
+    if (! deprecatedDataTypes) {
+        throw 'No deprecated data type not found!'
+    }
+    return deprecatedDataTypes;
+}
+
+export function findNonConcreteDataTypeIds(dataTypes = []) {
+    const nonConcreteDataTypes = _.filter(dataTypes, dt => !dt.concrete)
+                                    .map(dt => dt.id);
+    if (! nonConcreteDataTypes) {
+        throw 'no non-concrete data type not found!'
+    }
+    return nonConcreteDataTypes;
 }

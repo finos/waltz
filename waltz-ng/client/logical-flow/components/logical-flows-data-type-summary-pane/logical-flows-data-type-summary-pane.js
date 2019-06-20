@@ -22,7 +22,7 @@ import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from "../../../common/index";
 import {color} from "d3-color";
 import {amber, green, red, grey} from "../../../common/colors";
-import {findUnknownDataType} from '../../../data-types/data-type-utils';
+import {findNonConcreteDataTypeIds, findDeprecatedDataTypeIds, findUnknownDataTypeId} from '../../../data-types/data-type-utils';
 
 import template from './logical-flows-data-type-summary-pane.html';
 
@@ -38,40 +38,38 @@ const initialState = {
     }
 };
 
-
-function prepareSummary(counts = [], unknownId, direction) {
+function prepareSummary(counts = [], unknownId, direction, deprecatedDataTypeIds, nonConcreteDataTypeIds) {
     return _
         .chain(counts)
         .map(d => ({
                 typeId: d.dataType.id,
                 name: d.dataType.name,
-                deprecated: d.dataType.deprecated,
-                concrete: d.dataType.concrete,
                 count: d[direction] }))
         .reduce((acc, d) => {
             if (d.typeId === Number(unknownId)) {
                 acc.UNKNOWN  += d.count;
-            } else if (d.deprecated){
+            } else if (deprecatedDataTypeIds.includes(d.typeId)){
                 acc.DEPRECATED += d.count;
-            } else if (!d.concrete){
+            } else if (nonConcreteDataTypeIds.includes(d.typeId)){
                 acc.NON_CONCRETE += d.count;
             } else {
-                acc.KNOWN += d.count;
+                acc.VALID += d.count;
             }
             return acc;
-        }, { KNOWN: 0, UNKNOWN : 0, DEPRECATED : 0, NON_CONCRETE : 0})
-        .map((v, k) => ({ key: k, count: v }))
+        }, { VALID: 0, UNKNOWN : 0, DEPRECATED : 0, NON_CONCRETE : 0})
+        .map((v, k) => ({ key: friendlyName(k), count: v }))
         .value();
 }
 
+function friendlyName(name) {
+    return name.replace('_', ' ');
+}
 
 function controller(displayNameService, logicalFlowUtilityService, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadUnknownDataType = () => {
-        return serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => findUnknownDataType(r.data));
+    const loadDataTypes = () => {
+        return serviceBroker.loadAppData(CORE_API.DataTypeStore.findAll);
     };
 
     vm.$onChanges = () => {
@@ -82,19 +80,22 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
             vm.stats.dataTypeCounts,
             displayNameService);
 
-        loadUnknownDataType()
-            .then(unknownDataType => {
-                const unknownId = unknownDataType ? unknownDataType.id : null;
-                if (unknownId) {
+        loadDataTypes()
+            .then(dt => {
+                const dataTypes = dt.data;
+                const unknownDataTypeId = findUnknownDataTypeId(dataTypes);
+                const deprecatedDataTypeIds = findDeprecatedDataTypeIds(dataTypes);
+                const nonConcreteDataTypeIds = findNonConcreteDataTypeIds(dataTypes);
 
+                if (unknownDataTypeId) {
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
                         colorProvider: (d) => {
-                            if(d.data.key === 'KNOWN') {
+                            if(d.data.key === 'VALID') {
                                 return color(green);
                             } else if (d.data.key === 'DEPRECATED') {
                                 return color(amber);
-                            } else if (d.data.key === 'NON_CONCRETE') {
+                            } else if (d.data.key === 'NON CONCRETE') {
                                 return color(grey);
                             } else {
                                 return color(red);
@@ -117,7 +118,11 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
 
                     vm.summaries= _.map(summaries, d => {
                         return {
-                            summary: prepareSummary(vm.enrichedDataTypeCounts, unknownId, d.prop),
+                            summary: prepareSummary(vm.enrichedDataTypeCounts,
+                                unknownDataTypeId,
+                                d.prop,
+                                deprecatedDataTypeIds,
+                                nonConcreteDataTypeIds),
                             title: d.title
                         }
                     });
