@@ -64,6 +64,12 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
             Criticality.VERY_HIGH,
             Criticality.VERY_HIGH);
 
+    private static List<EntityLifecycleStatus> lifecycleStatusDistribution = newArrayList(
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.PENDING);
+
 
     private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec,
                                                                   List<Long> logicalFlowIds,
@@ -84,7 +90,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setFrequency(randomPick(FrequencyKind.values()).name());
                     record.setLastUpdatedBy("admin");
                     record.setCriticality(randomPick(criticalityDistribution).name());
-                    record.setEntityLifecycleStatus(randomPick(EntityLifecycleStatus.ACTIVE, EntityLifecycleStatus.PENDING).name());
+                    record.setEntityLifecycleStatus(randomPick(lifecycleStatusDistribution).name());
                     return record;
                 })
                 .collect(Collectors.toList());
