@@ -34,7 +34,9 @@
          ng-if="$ctrl.changeInitiatives.length > 0">
 
         <div class="col-sm-3">
-            <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"></waltz-assessment-rating-summary-pies>
+            <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"
+                                                  help-text="{{$ctrl.filterHelpText}}">
+            </waltz-assessment-rating-summary-pies>
         </div>
         <div class="col-sm-6">
             <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"

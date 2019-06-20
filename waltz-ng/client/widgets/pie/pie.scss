@@ -3,8 +3,8 @@
 
     .arc {
         opacity: 0.75;
-        transition: opacity 0.4s;
-        transition: stroke 0.4s;
+        transition: opacity 0.4s, stroke 0.4s;
+
 
         &:hover {
             opacity: 1;

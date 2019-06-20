@@ -49,11 +49,14 @@ public class AssessmentGenerator implements SampleDataGenerator {
         RatingScheme confidentialityRatingScheme = getOrCreateConfidentialityRatingScheme(ctx);
         Long appDefnId = createAppAssessmentDefinition(ctx, confidentialityRatingScheme);
 
-        RatingScheme archImpactRatingScheme = getOrCreateArchImpactRatingScheme(ctx);
-        Long ciDefnId = createArchImpactAssessmentDefinition(ctx, archImpactRatingScheme);
+        RatingScheme impactRatingScheme = getOrCreateImpactRatingScheme(ctx);
+        Long archAssessmentRating = createArchImpactAssessmentDefinition(ctx, impactRatingScheme);
+        Long regAssessmentRating = createRegulatoryImpactAssessmentDefinition(ctx, impactRatingScheme);
 
-        createAssessmentRecords(getDsl(ctx), confidentialityRatingScheme, appDefnId, EntityKind.APPLICATION, APPLICATION.ID);
-        createAssessmentRecords(getDsl(ctx), archImpactRatingScheme, ciDefnId, EntityKind.CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID);
+        createAssessmentRecords(getDsl(ctx), confidentialityRatingScheme, appDefnId, EntityKind.APPLICATION, APPLICATION.ID, 0.9);
+        createAssessmentRecords(getDsl(ctx), impactRatingScheme, archAssessmentRating, EntityKind.CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, 0.9);
+        createAssessmentRecords(getDsl(ctx), impactRatingScheme, regAssessmentRating, EntityKind.CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, 0.5);
+
 
         return null;
     }
@@ -63,12 +66,13 @@ public class AssessmentGenerator implements SampleDataGenerator {
                                          RatingScheme ratingScheme,
                                          Long assessmentDefnId,
                                          EntityKind targetKind,
-                                         TableField<? extends Record, Long> targetIdField) {
+                                         TableField<? extends Record, Long> targetIdField,
+                                         double density) {
         List<Long> targetIds = loadAllIds(dsl, targetIdField);
 
         List<AssessmentRatingRecord> records = targetIds
                 .stream()
-                .filter(d -> RandomUtilities.getRandom().nextFloat() < 0.9)
+                .filter(d -> RandomUtilities.getRandom().nextDouble() < density)
                 .map(id -> tuple(id, randomPick(ratingScheme.ratings())))
                 .filter(t -> t.v2.id().isPresent())
                 .map(t -> {
@@ -110,11 +114,20 @@ public class AssessmentGenerator implements SampleDataGenerator {
                 ratingScheme);
     }
 
+    private Long createRegulatoryImpactAssessmentDefinition(ApplicationContext ctx, RatingScheme ratingScheme) {
+        return createAssessmentDefinition(
+                getDsl(ctx),
+                "Regulatory Impact Assessment",
+                "Indicates what impact a change initiative will have on the organizations regulatory obligations",
+                EntityKind.CHANGE_INITIATIVE,
+                ratingScheme);
+    }
 
-    private RatingScheme getOrCreateArchImpactRatingScheme(ApplicationContext ctx) {
+
+    private RatingScheme getOrCreateImpactRatingScheme(ApplicationContext ctx) {
         return getOrCreateRatingScheme(
                 ctx,
-                "Architectural Impact",
+                "Impact",
                 tuple("Z", "No Impact", ColorUtilities.HexStrings.BLUE),
                 tuple("S", "Small Impact", ColorUtilities.HexStrings.GREEN),
                 tuple("L", "Large Impact", ColorUtilities.HexStrings.AMBER));

@@ -27,7 +27,6 @@ import template from "./change-initiative-section.html";
 import {changeInitiative} from "../../../common/services/enums/change-initiative";
 import {getEnumName} from "../../../common/services/enums";
 import {sameRef} from "../../../common/entity-utils";
-import {nest} from "d3-collection"
 import {mkAssessmentSummaries} from "../../../assessments/assessment-utils";
 
 const bindings = {
@@ -55,6 +54,8 @@ const nameCellTemplate = `
     </div>
 `;
 
+const filterHelpText = "";
+
 
 const initialState = {
     changeInitiatives: [],
@@ -63,6 +64,7 @@ const initialState = {
     visibility: {
         sourcesOverlay: false
     },
+    filterHelpText: "Select an assessment category to filter the change initiatives",
     gridOptions: {
         columnDefs: [
             { field: "externalId", name: "id", cellTemplate: externalIdCellTemplate },
@@ -86,8 +88,8 @@ function controller($q, serviceBroker) {
                 vm.changeInitiativeLifecyclePhaseByKey = _
                     .chain(r.data)
                     .filter({ type: "changeInitiativeLifecyclePhase"})
-                    .map(c => ({ key: c.key, name: c.name }))
-                    .keyBy("key")
+                    .map(d => ({ key: d.key, name: d.name }))
+                    .keyBy( d => d.key)
                     .value();
             });
 
@@ -144,9 +146,9 @@ function controller($q, serviceBroker) {
             const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             const ciPromise = serviceBroker
                 .loadViewData(
-                    CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
+                    CORE_API.ChangeInitiativeStore.findBySelector,
                     [ selectionOptions ])
-                .then(r => processChangeInitiativeHierarchy(r.data));
+                .then(r => vm.changeInitiatives = r.data);
 
             const assessmentRatingsPromise = serviceBroker
                 .loadViewData(
@@ -159,7 +161,8 @@ function controller($q, serviceBroker) {
                     vm.assessmentSummaries = mkAssessmentSummaries(
                         vm.assessmentDefinitions,
                         vm.ratingSchemes,
-                        vm.assessmentRatings);
+                        vm.assessmentRatings,
+                        vm.changeInitiatives.length);
                 });
 
         }

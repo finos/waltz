@@ -23,17 +23,21 @@ import {color} from "d3-color";
 
 
 const bindings = {
-    summaries: "<"
+    summaries: "<",
+    helpText: "@?"
 };
 
+const basePieConfig = {
+    labelProvider: d => d.rating.name,
+    valueProvider: d => d.count,
+    colorProvider: d => color(d.rating.color),
+    descriptionProvider: d => d.rating.description
+};
 
 const initialState = {
     summaries: [],
-    config: {
-        labelProvider: d => d.rating.name,
-        valueProvider: d => d.count,
-        colorProvider: d => color(d.rating.color)
-    }
+    helpText: "Relevant assessments",
+    selectedSummary: null
 };
 
 
@@ -43,8 +47,22 @@ function controller() {
 
     vm.$onInit = () => {
         console.log("init", vm.summaries);
+        vm.listConfig = Object.assign({}, basePieConfig, { size: 24, onSelect: vm.onSelectRating });
+        vm.selectedConfig = Object.assign({}, basePieConfig, { size: 48, onSelect: vm.onSelectRating });
     };
 
+    vm.onSelectSummary = (s) => {
+        vm.selectedSummary = s;
+    };
+
+    vm.onCloseSummary = () => {
+        vm.selectedSummary = null;
+        vm.selectedSegment = null;
+    };
+
+    vm.onSelectRating = (d) => {
+        vm.selectedSegment = d;
+    };
 }
 
 controller.$inject = [];

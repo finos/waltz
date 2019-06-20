@@ -30,7 +30,8 @@ const bindings = {
     subTitle: "@",
     icon: "@",
     description: "@",
-    selectedSegmentKey: "<"
+    selectedSegmentKey: "<",
+    renderMode: "@?"
 };
 
 

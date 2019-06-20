@@ -45,16 +45,16 @@
                 <td>
                     <span ng-bind="row.dataType.name"></span>
                 </td>
-                <td align="right" style="padding-right: 1.5em">
+                <td align="right" style="padding-right: 0.2em">
                     <span ng-bind="row.intra"></span>
                 </td>
-                <td align="right" style="padding-right: 1.5em">
+                <td align="right" style="padding-right: 0.2em">
                     <span ng-bind="row.inbound"></span>
                 </td>
-                <td align="right" style="padding-right: 1.5em">
+                <td align="right" style="padding-right: 0.2em">
                     <span ng-bind="row.outbound"></span>
                 </td>
-                <td align="right" style="padding-right: 1.5em">
+                <td align="right" style="padding-right: 0.2em">
                     <span ng-bind="row.total"></span>
                 </td>
             </tr>
@@ -66,14 +66,14 @@
                 </td>
                 <td align="right"
                     ng-repeat="summary in $ctrl.summaries">
-                    <div uib-popover-template="'wlft-summary-popup.html'"
+                    <span uib-popover-template="'wlft-summary-popup.html'"
                          popover-placement="bottom"
                          popver-append-to-body="true"
                          popover-trigger="mouseenter">
                         <waltz-pie data="summary.summary"
                                    config="$ctrl.summaryConfig">
                         </waltz-pie>
-                    </div>
+                    </span>
                 </td>
             </tr>
             </tbody>

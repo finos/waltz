@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {indexRatingSchemes} from "../ratings/rating-utils";
 import {nest} from "d3-collection";
+import {grey} from "../common/colors";
 
 /**
  * Creates an enriched assessment definition which adds fields for
@@ -62,10 +63,11 @@ export function mkEnrichedAssessmentDefinitions(definitions = [],
 }
 
 
-export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = []) {
+export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = [], total = 0) {
     const indexedRatingSchemes = indexRatingSchemes(schemes);
     const definitionsById = _.keyBy(definitions, d => d.id);
 
+    console.log({ total })
     const nestedRatings = nest()
         .key(d => d.assessmentDefinitionId)
         .key(d => d.ratingId)
@@ -76,12 +78,25 @@ export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = 
         .chain(nestedRatings)
         .map(d => {
             const definition = definitionsById[Number(d.key)];
+            const assignedTotal = _.sumBy(d.values, v => v.value);
             const values = _
-                .map(d.values, v => {
+                .chain(d.values)
+                .map(v => {
                     const propPath = [definition.ratingSchemeId, "ratingsById", v.key];
                     const rating = _.get(indexedRatingSchemes, propPath);
                     return Object.assign({}, v, { rating, count: v.value });
-                });
+                })
+                .concat([{
+                    key: "z",
+                    rating: {
+                        id: -1,
+                        name: "Not Provided",
+                        color: grey
+                    },
+                    count: _.max([0, total - assignedTotal])
+                }])
+                .filter(d => d.count > 0)
+                .value();
 
             const extension = { definition, values };
             return Object.assign({}, d , extension);

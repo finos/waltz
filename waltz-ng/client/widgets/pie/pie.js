@@ -59,13 +59,13 @@ const BLUR_DURATION = 50;
 function mkPieArc(radius, focused = false) {
     if(focused) {
         return arc()
-            .outerRadius(radius - 10 + 3)
+            .outerRadius(radius - 1)
             .innerRadius(radius / 2.5)
             .padAngle(0.07)
             .cornerRadius(0);
     } else {
         return arc()
-            .outerRadius(radius - 10)
+            .outerRadius(radius - 3)
             .innerRadius(radius / 2.5)
             .padAngle(0.07)
             .cornerRadius(0);
@@ -97,7 +97,7 @@ function renderArcs(holder, config, data, onSelect) {
         colorProvider,
         valueProvider = (d) => d.count,
         idProvider = (d) => d.data.key,
-        size = DEFAULT_SIZE
+        size// = DEFAULT_SIZE
     } = config;
 
     const radius = size / 2;

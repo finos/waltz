@@ -88,7 +88,7 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                         valueProvider: (d) => d.count,
                         idProvider: (d) => d.data.key,
                         labelProvider: d => _.capitalize(d.key),
-                        size: 40
+                        size: 20
                     };
 
                     vm.overviewConfig =  Object.assign({}, vm.summaryConfig, { size: 80 });
