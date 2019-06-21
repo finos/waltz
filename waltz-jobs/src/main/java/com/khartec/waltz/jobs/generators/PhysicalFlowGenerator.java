@@ -18,11 +18,10 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ArrayUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -37,9 +36,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -65,6 +64,12 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
             Criticality.VERY_HIGH,
             Criticality.VERY_HIGH);
 
+    private static List<EntityLifecycleStatus> lifecycleStatusDistribution = newArrayList(
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.ACTIVE,
+            EntityLifecycleStatus.PENDING);
+
 
     private static List<PhysicalFlowRecord> mkPhysicalFlowRecords(PhysicalSpecification spec,
                                                                   List<Long> logicalFlowIds,
@@ -85,6 +90,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setFrequency(randomPick(FrequencyKind.values()).name());
                     record.setLastUpdatedBy("admin");
                     record.setCriticality(randomPick(criticalityDistribution).name());
+                    record.setEntityLifecycleStatus(randomPick(lifecycleStatusDistribution).name());
                     return record;
                 })
                 .collect(Collectors.toList());
@@ -146,6 +152,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
         flowBatch.clear();
         log("---done");   return null;
     }
+
 
     @Override
     public boolean remove(ApplicationContext ctx) {

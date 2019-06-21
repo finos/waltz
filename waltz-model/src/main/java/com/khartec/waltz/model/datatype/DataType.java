@@ -43,6 +43,11 @@ public abstract class DataType implements
     }
 
     @Value.Default
+    public boolean deprecated() {
+        return false;
+    }
+
+    @Value.Default
     public EntityKind kind() { return EntityKind.DATA_TYPE; }
 
     @Value.Default

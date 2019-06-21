@@ -30,7 +30,6 @@ const customRoleState = {
 };
 
 function configureStates(stateProvider) {
-    console.log('checking role config')
     stateProvider
         .state('main.role', base)
         .state('main.role.list', customRoleState);
