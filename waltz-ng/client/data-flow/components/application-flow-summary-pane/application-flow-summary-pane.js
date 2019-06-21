@@ -21,7 +21,7 @@ import _ from 'lodash';
 import { initialiseData } from '../../../common';
 
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { findUnknownDataType } from '../../../data-types/data-type-utils';
+import { findUnknownDataTypeId } from '../../../data-types/data-type-utils';
 import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
 import { nest } from "d3-collection";
 
@@ -129,7 +129,7 @@ function controller($q, serviceBroker) {
     const loadUnknownDataType = () => {
         return serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => findUnknownDataType(r.data));
+            .then(r => findUnknownDataTypeId(r.data));
     };
 
 
