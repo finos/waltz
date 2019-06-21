@@ -21,10 +21,11 @@ package com.khartec.waltz.model.measurable_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.LastUpdatedProvider;
+import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
-
-import java.time.LocalDate;
 
 
 @Value.Immutable
@@ -38,8 +39,4 @@ public abstract class MeasurableRating implements
     public abstract EntityReference entityReference();
     public abstract long measurableId();
     public abstract char rating();
-
-    @Nullable
-    public abstract LocalDate plannedDate();
-
 }
