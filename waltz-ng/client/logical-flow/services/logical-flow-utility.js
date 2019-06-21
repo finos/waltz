@@ -65,11 +65,6 @@ export default [
                                 const rating = calcRating(d);
                                 return authoritativeRatingColorScale(rating).brighter();
                             });
-                            //
-                            // .attr('marker-end', d => {
-                            //     const rating = calcRating(d);
-                            //     return `url(#arrowhead-${rating})`;
-                            // })
                     },
                     enter: (selection) => {
                         return selection
