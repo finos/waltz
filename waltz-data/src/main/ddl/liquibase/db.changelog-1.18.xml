@@ -21,17 +21,35 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.18.xml">
+    
+  <changeSet id="20190620-1110-1"
+               author="muzammilali">
+        <comment>11:00: Add deprecated flag in datatype table</comment>
+            <addColumn tableName="data_type">
+                <column name="deprecated"
+                        type="boolean"
+                        defaultValueBoolean="false">
+                    <constraints nullable="false"/>
+                </column>
+            </addColumn>
+            <update tableName="data_type">
+                <column name="deprecated"
+                        valueBoolean="true"/>
+                <where>name like 'DEPRECATED%'</where>
+            </update>
+  </changeSet>
 
-    <changeSet id="20190620-3912-1"
+  
+  <changeSet id="20190620-3912-1"
                author="kamransaleem">
         <dropColumn tableName="rating_scheme_item"
                     columnName="needs_planned_date" />
-    </changeSet>
+  </changeSet>
 
-    <changeSet id="20190620-3912-2"
+  <changeSet id="20190620-3912-2"
                author="kamransaleem">
         <dropColumn tableName="measurable_rating"
                     columnName="planned_date" />
-    </changeSet>
+  </changeSet>
 
 </databaseChangeLog>

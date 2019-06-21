@@ -20,10 +20,20 @@
 import _ from "lodash";
 
 
-export function findUnknownDataType(dataTypes = []) {
+export function findUnknownDataTypeId(dataTypes = []) {
     const unknownDataType = _.find(dataTypes, dt => dt.unknown);
     if (! unknownDataType) {
         throw 'Unknown data type not found!'
     }
-    return unknownDataType;
+    return unknownDataType.id;
+}
+
+export function findDeprecatedDataTypeIds(dataTypes = []) {
+    return _.filter(dataTypes, dt => dt.deprecated)
+          .map(dt => dt.id);
+}
+
+export function findNonConcreteDataTypeIds(dataTypes = []) {
+    return _.filter(dataTypes, dt => !dt.concrete)
+            .map(dt => dt.id);
 }
