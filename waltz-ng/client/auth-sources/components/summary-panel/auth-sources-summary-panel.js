@@ -144,11 +144,16 @@ function controller($q, serviceBroker) {
         $q.all([p1, p2])
             .then(() => {
                 const sumOfPrimaryAndSecondaryValues = (map) => {
-                    return map['PRIMARY'] + map['SECONDARY'];
+                    return safGetNumber(map, 'PRIMARY') + safGetNumber(map, 'SECONDARY');
                 };
 
                 const sumOfDiscouragedAndNoOpinionValues = (map) => {
-                    return map['DISCOURAGED'] + map['NO_OPINION'];
+                    return safGetNumber(map, 'DISCOURAGED') + safGetNumber(map, 'NO_OPINION');
+                };
+
+                const safGetNumber = (map, key) => {
+                    const value = map[key];
+                    return _.isNumber(value) && !_.isNaN(value) ? value : 0;
                 };
 
                 const sumRasNonRas = sumOfPrimaryAndSecondaryValues(vm.inboundStats)
@@ -159,7 +164,7 @@ function controller($q, serviceBroker) {
                                     + sumOfDiscouragedAndNoOpinionValues(vm.outboundStats)
 
                 const overallPercentage = sumRasNonRas / sumOfAll * 100;
-                vm.overallPercentageOfAuthoritiveSources = overallPercentage;
+                vm.overallPercentageOfAuthoritiveSources = Number(overallPercentage).toFixed(2);
             });
     };
 
