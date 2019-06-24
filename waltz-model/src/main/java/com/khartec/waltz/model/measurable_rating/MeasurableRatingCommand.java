@@ -20,13 +20,13 @@
 package com.khartec.waltz.model.measurable_rating;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.command.Command;
 
 public abstract class MeasurableRatingCommand implements Command {
 
     public abstract EntityReference entityReference();
     public abstract long measurableId();
-    public abstract LastUpdate lastUpdate();
+    public abstract UserTimestamp lastUpdate();
 
 }

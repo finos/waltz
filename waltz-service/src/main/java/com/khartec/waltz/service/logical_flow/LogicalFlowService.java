@@ -27,12 +27,8 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
@@ -49,6 +45,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -165,11 +162,13 @@ public class LogicalFlowService {
                 username,
                 Operation.ADD);
 
+        LocalDateTime now = nowUtc();
         LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
                 .source(addCmd.source())
                 .target(addCmd.target())
-                .lastUpdatedAt(nowUtc())
+                .lastUpdatedAt(now)
                 .lastUpdatedBy(username)
+                .created(UserTimestamp.mkForUser(username, now))
                 .build();
 
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
@@ -223,13 +222,15 @@ public class LogicalFlowService {
                 .collect(Collectors.toList());
         changeLogService.write(logEntries);
 
+        LocalDateTime now = nowUtc();
         List<LogicalFlow> flowsToAdd = addCmds
                 .stream()
                 .map(addCmd -> ImmutableLogicalFlow.builder()
                         .source(addCmd.source())
                         .target(addCmd.target())
-                        .lastUpdatedAt(nowUtc())
+                        .lastUpdatedAt(now)
                         .lastUpdatedBy(username)
+                        .created(UserTimestamp.mkForUser(username, now))
                         .provenance("waltz")
                         .build())
                 .collect(toList());

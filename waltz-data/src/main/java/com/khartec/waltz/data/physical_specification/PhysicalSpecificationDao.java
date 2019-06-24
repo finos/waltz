@@ -22,6 +22,7 @@ package com.khartec.waltz.data.physical_specification;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -74,6 +75,7 @@ public class PhysicalSpecificationDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
                 .isRemoved(record.getIsRemoved())
+                .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .build();
     };
 
@@ -179,6 +181,9 @@ public class PhysicalSpecificationDao {
         record.setLastUpdatedBy(specification.lastUpdatedBy());
         record.setIsRemoved(specification.isRemoved());
         record.setProvenance("waltz");
+
+        record.setCreatedAt(specification.created().get().atTimestamp());
+        record.setCreatedBy(specification.created().get().by());
 
         record.store();
         return record.getId();

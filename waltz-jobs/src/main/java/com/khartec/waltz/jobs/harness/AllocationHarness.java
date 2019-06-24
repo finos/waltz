@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
 import com.khartec.waltz.model.allocation_scheme.ImmutableAllocationScheme;
 import com.khartec.waltz.model.application.*;
@@ -33,7 +33,6 @@ import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.AllocationRecord;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.allocation.AllocationService;
 import com.khartec.waltz.service.allocation_schemes.AllocationSchemeService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.measurable.MeasurableService;
@@ -47,6 +46,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.List;
 
 import static com.khartec.waltz.schema.Tables.*;
+
 
 public class AllocationHarness {
 
@@ -128,7 +128,7 @@ public class AllocationHarness {
                 .measurableId(stuff.v3.get(measurableIdx).id().get())
                 .provenance(PROVENANCE)
                 .rating('G')
-                .lastUpdate(LastUpdate.mkForUser("admin"))
+                .lastUpdate(UserTimestamp.mkForUser("admin"))
                 .build();
 
         ratingService.create(command1);
