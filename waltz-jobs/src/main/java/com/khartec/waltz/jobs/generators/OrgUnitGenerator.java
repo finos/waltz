@@ -62,7 +62,7 @@ public class OrgUnitGenerator implements SampleDataGenerator {
                     if (cells.length > 3) {
                         record.setDescription(cells[3]);
                     }
-                    record.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+                    record.setLastUpdatedAt(new Timestamp(System.currentTimeMillis()));
                     return record;
                 })
                 .collect(Collectors.toList());

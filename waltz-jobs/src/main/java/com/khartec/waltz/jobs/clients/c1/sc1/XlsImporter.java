@@ -35,7 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -46,7 +49,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.StreamUtilities.mkSiphon;
-import static com.khartec.waltz.common.StreamUtilities.tap;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateMeasurableCategory;
@@ -517,7 +519,7 @@ public class XlsImporter {
         record.setDescription("Sample OrgUnit: "+ name);
         record.setName(name);
         record.setCreatedAt(nowUtcTimestamp());
-        record.setUpdatedAt(nowUtcTimestamp());
+        record.setLastUpdatedAt(nowUtcTimestamp());
         return record;
     }
 

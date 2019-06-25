@@ -182,4 +182,42 @@
     </changeSet>
 
 
+    <!-- 3656 - Org Unit - Provenance, Created By, Updated By -->
+    <changeSet id="20190625-3656-1"
+               author="kamransaleem">
+        <addColumn tableName="organisational_unit">
+            <column name="created_by"
+                    type="${name.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="last_updated_by"
+                    type="${name.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190625-3656-2"
+               author="kamransaleem">
+        <renameColumn columnDataType="TIMESTAMP"
+                      newColumnName="last_updated_at"
+                      oldColumnName="updated_at"
+                      remarks="Rename for consistency"
+                      tableName="organisational_unit" />
+    </changeSet>
+
+    <changeSet id="20190625-3656-3"
+               author="kamransaleem">
+        <addColumn tableName="organisational_unit">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
