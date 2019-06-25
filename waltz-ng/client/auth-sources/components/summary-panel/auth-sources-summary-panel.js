@@ -144,14 +144,14 @@ function controller($q, serviceBroker) {
         $q.all([p1, p2])
             .then(() => {
                 const sumOfPrimaryAndSecondaryValues = (map) => {
-                    return safGetNumber(map, 'PRIMARY') + safGetNumber(map, 'SECONDARY');
+                    return safeGetNumber(map, 'PRIMARY') + safeGetNumber(map, 'SECONDARY');
                 };
 
                 const sumOfDiscouragedAndNoOpinionValues = (map) => {
-                    return safGetNumber(map, 'DISCOURAGED') + safGetNumber(map, 'NO_OPINION');
+                    return safeGetNumber(map, 'DISCOURAGED') + safeGetNumber(map, 'NO_OPINION');
                 };
 
-                const safGetNumber = (map, key) => {
+                const safeGetNumber = (map, key) => {
                     const value = map[key];
                     return _.isNumber(value) && !_.isNaN(value) ? value : 0;
                 };
@@ -163,7 +163,7 @@ function controller($q, serviceBroker) {
                                    + sumOfDiscouragedAndNoOpinionValues(vm.inboundStats)
                                     + sumOfDiscouragedAndNoOpinionValues(vm.outboundStats)
 
-                const overallPercentage = sumRasNonRas / sumOfAll * 100;
+                const overallPercentage = sumOfAll !== 0 ? sumRasNonRas / sumOfAll * 100 : 0;
                 vm.overallPercentageOfAuthoritiveSources = Number(overallPercentage).toFixed(2);
             });
     };
