@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -132,6 +132,11 @@ function controller($q,
 
 
     vm.onSelectNavItem = (navItem) => {
+
+        if (!navItem) {
+            return;
+        }
+
         vm.reloading = true;
 
         resetValueData();
@@ -143,7 +148,6 @@ function controller($q,
             kind: entityKind
         };
         vm.parentRef = entityReference;
-
 
         const selector = mkStatisticSelector(entityReference, vm.filters);
 
@@ -186,7 +190,6 @@ function controller($q,
 
         loadHistory();
 
-        updateUrlWithoutReload($state, navItem);
     };
 
     vm.onSelectDefinition = (node) => {
