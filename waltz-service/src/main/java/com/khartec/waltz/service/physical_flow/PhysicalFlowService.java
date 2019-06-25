@@ -39,6 +39,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -206,13 +207,15 @@ public class PhysicalFlowService {
         //check we have a logical data flow
         LogicalFlow logicalFlow = ensureLogicalDataFlowExists(command.logicalFlowId(), username);
 
+        LocalDateTime now = nowUtc();
         long specId = command
                 .specification()
                 .id()
                 .orElseGet(() -> physicalSpecificationDao.create(ImmutablePhysicalSpecification
                         .copyOf(command.specification())
                         .withLastUpdatedBy(username)
-                        .withLastUpdatedAt(nowUtc())));
+                        .withLastUpdatedAt(now)
+                        .withCreated(UserTimestamp.mkForUser(username, now))));
 
         PhysicalFlow flow = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
@@ -223,7 +226,8 @@ public class PhysicalFlowService {
                 .description(mkSafe(command.flowAttributes().description()))
                 .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
-                .lastUpdatedAt(nowUtc())
+                .lastUpdatedAt(now)
+                .created(UserTimestamp.mkForUser(username, now))
                 .build();
 
         // ensure existing not in database

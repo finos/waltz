@@ -20,7 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.measurable_rating.*;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
@@ -135,7 +135,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .measurableId(getLong(request, "measurableId"))
-                .lastUpdate(LastUpdate.mkForUser(username))
+                .lastUpdate(UserTimestamp.mkForUser(username))
                 .build();
         return measurableRatingService.remove(command);
     }
@@ -162,7 +162,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .measurableId(getLong(request, "measurableId"))
                 .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
                 .description(body.getOrDefault("description", ""))
-                .lastUpdate(LastUpdate.mkForUser(username))
+                .lastUpdate(UserTimestamp.mkForUser(username))
                 .provenance("waltz")
                 .build();
     }

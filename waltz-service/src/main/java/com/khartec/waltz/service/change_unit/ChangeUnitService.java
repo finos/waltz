@@ -99,7 +99,7 @@ public class ChangeUnitService {
 
         ImmutableUpdateExecutionStatusCommand updateCommand = ImmutableUpdateExecutionStatusCommand
                 .copyOf(command)
-                .withLastUpdate(LastUpdate.mkForUser(userName));
+                .withLastUpdate(UserTimestamp.mkForUser(userName));
 
         // if execute - need to affect changes
         if(command.executionStatus().newVal() == ExecutionStatus.COMPLETE) {

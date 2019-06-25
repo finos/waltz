@@ -29,11 +29,12 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableLogicalFlow.class)
 @JsonDeserialize(as = ImmutableLogicalFlow.class)
 public abstract class LogicalFlow implements
+        CreatedUserTimestampProvider,
+        EntityLifecycleStatusProvider,
         IdProvider,
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
-        EntityLifecycleStatusProvider,
         WaltzEntity {
 
     public abstract EntityReference source();

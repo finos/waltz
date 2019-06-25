@@ -22,7 +22,7 @@ package com.khartec.waltz.data.change_unit;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.change_set.ChangeSet;
 import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
@@ -134,7 +134,7 @@ public class ChangeUnitDao {
         checkOptionalIsPresent(command.lastUpdate(), "lastUpdate must be present");
         checkTrue(command.executionStatus().oldVal().equals(ExecutionStatus.PENDING), "Current status should be PENDING");
 
-        LastUpdate lastUpdate = command.lastUpdate().get();
+        UserTimestamp lastUpdate = command.lastUpdate().get();
 
         int count = dsl.update(CHANGE_UNIT)
                 .set(CHANGE_UNIT.EXECUTION_STATUS, command.executionStatus().newVal().name())

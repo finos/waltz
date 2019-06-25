@@ -20,10 +20,7 @@
 package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
@@ -93,6 +90,7 @@ public class LogicalFlowDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
+                .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -110,6 +108,8 @@ public class LogicalFlowDao {
         record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setProvenance(flow.provenance());
         record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
+        record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
+        record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
         return record;
     };
 
