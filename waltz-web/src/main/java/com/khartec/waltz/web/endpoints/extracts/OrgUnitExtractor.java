@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 
 import org.jooq.DSLContext;
-import org.jooq.Record4;
+import org.jooq.Record6;
 import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,13 +52,15 @@ public class OrgUnitExtractor extends BaseDataExtractor {
     }
 
 
-    private SelectJoinStep<Record4<Long, Long, String, String>> prepareExtract() {
+    private SelectJoinStep<Record6<Long, Long, String, String, String, String>> prepareExtract() {
         return dsl
                 .select(
                     ORGANISATIONAL_UNIT.ID.as("id"),
                     ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
                     ORGANISATIONAL_UNIT.NAME.as("name"),
-                    ORGANISATIONAL_UNIT.DESCRIPTION.as("description"))
+                    ORGANISATIONAL_UNIT.DESCRIPTION.as("description"),
+                    ORGANISATIONAL_UNIT.EXTERNAL_ID.as("externalId"),
+                    ORGANISATIONAL_UNIT.PROVENANCE.as("provenance"))
                 .from(ORGANISATIONAL_UNIT);
     }
 
