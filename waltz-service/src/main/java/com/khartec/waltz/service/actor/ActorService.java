@@ -23,7 +23,7 @@ import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.actor.ActorSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
 import com.khartec.waltz.model.actor.ActorCreateCommand;
@@ -81,7 +81,7 @@ public class ActorService {
 
         ImmutableActorChangeCommand updateCommand = ImmutableActorChangeCommand
                 .copyOf(command)
-                .withLastUpdate(LastUpdate.mkForUser(username));
+                .withLastUpdate(UserTimestamp.mkForUser(username));
 
         boolean success = actorDao.update(updateCommand);
         return ImmutableCommandResponse.<ActorChangeCommand>builder()

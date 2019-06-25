@@ -20,7 +20,7 @@
 package com.khartec.waltz.data.actor;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
 import com.khartec.waltz.model.actor.ActorCreateCommand;
@@ -141,7 +141,7 @@ public class ActorDao {
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
         command.isExternal().ifPresent(change -> record.setIsExternal(change.newVal()));
 
-        LastUpdate lastUpdate = command.lastUpdate().get();
+        UserTimestamp lastUpdate = command.lastUpdate().get();
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
 

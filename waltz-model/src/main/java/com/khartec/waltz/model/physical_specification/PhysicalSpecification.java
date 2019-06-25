@@ -37,6 +37,7 @@ import org.immutables.value.Value;
 public abstract class PhysicalSpecification implements
         IdProvider,
         IsRemovedProvider,
+        CreatedUserTimestampProvider,
         ExternalIdProvider,
         NameProvider,
         DescriptionProvider,

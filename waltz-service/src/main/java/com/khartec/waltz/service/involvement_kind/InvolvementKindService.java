@@ -22,7 +22,7 @@ package com.khartec.waltz.service.involvement_kind;
 import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
@@ -75,7 +75,7 @@ public class InvolvementKindService {
 
         ImmutableInvolvementKindChangeCommand updateCommand = ImmutableInvolvementKindChangeCommand
                 .copyOf(command)
-                .withLastUpdate(LastUpdate.mkForUser(username));
+                .withLastUpdate(UserTimestamp.mkForUser(username));
 
         boolean success = involvementKindDao.update(updateCommand);
         return ImmutableCommandResponse.<InvolvementKindChangeCommand>builder()

@@ -12,6 +12,7 @@ import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.command.CommandOutcome;
@@ -30,7 +31,11 @@ import com.khartec.waltz.service.enum_value.EnumValueAliasService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -352,11 +357,15 @@ public class PhysicalFlowUploadService {
         LogicalFlow flow = logicalFlowDao.getBySourceAndTarget(source, target);
 
         if (flow == null) {
+            LocalDateTime now = nowUtc();
+
             LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
                     .source(source)
                     .target(target)
                     .lastUpdatedBy(username)
+                    .lastUpdatedAt(now)
                     .provenance("waltz")
+                    .created(UserTimestamp.mkForUser(username, now))
                     .build();
 
             flow = logicalFlowDao.addFlow(flowToAdd);
@@ -384,6 +393,7 @@ public class PhysicalFlowUploadService {
         if (spec == null) {
 
             // create
+            LocalDateTime now = nowUtc();
             PhysicalSpecification specToAdd = ImmutablePhysicalSpecification.builder()
                     .owningEntity(owner)
                     .format(format)
@@ -391,8 +401,9 @@ public class PhysicalFlowUploadService {
                     .externalId(Optional.ofNullable(flow.specExternalId()).orElse(""))
                     .description(Optional.ofNullable(flow.specDescription()).orElse(""))
                     .lastUpdatedBy(username)
-                    .lastUpdatedAt(nowUtc())
+                    .lastUpdatedAt(now)
                     .provenance("waltz")
+                    .created(UserTimestamp.mkForUser(username, now))
                     .build();
 
             Long id = physicalSpecificationDao.create(specToAdd);

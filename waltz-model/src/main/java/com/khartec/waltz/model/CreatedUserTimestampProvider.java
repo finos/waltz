@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,30 +19,10 @@
 
 package com.khartec.waltz.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.common.DateTimeUtilities;
-import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
+public interface CreatedUserTimestampProvider {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableLastUpdate.class)
-@JsonDeserialize(as = ImmutableLastUpdate.class)
-public abstract class LastUpdate {
-
-    @Value.Default
-    public LocalDateTime at() {
-        return DateTimeUtilities.nowUtc();
-    }
-
-
-    public abstract String by();
-
-    public static LastUpdate mkForUser(String username) {
-        return ImmutableLastUpdate.builder()
-                .by(username)
-                .build();
-    }
+    Optional<UserTimestamp> created();
 }

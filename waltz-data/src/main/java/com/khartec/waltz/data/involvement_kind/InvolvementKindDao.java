@@ -20,7 +20,7 @@
 package com.khartec.waltz.data.involvement_kind;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKind;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
 import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
@@ -132,7 +132,7 @@ public class InvolvementKindDao {
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
 
-        LastUpdate lastUpdate = command.lastUpdate().get();
+        UserTimestamp lastUpdate = command.lastUpdate().get();
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
 

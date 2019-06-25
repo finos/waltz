@@ -23,6 +23,7 @@ import com.khartec.waltz.data.enum_value.EnumValueDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -77,6 +78,7 @@ public class PhysicalFlowDao {
                 .isRemoved(record.getIsRemoved())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
+                .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .build();
     };
 
@@ -253,6 +255,9 @@ public class PhysicalFlowDao {
         record.setIsRemoved(flow.isRemoved());
         record.setProvenance("waltz");
         record.setExternalId(flow.externalId().orElse(null));
+
+        record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
+        record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
 
         record.store();
         return record.getId();
