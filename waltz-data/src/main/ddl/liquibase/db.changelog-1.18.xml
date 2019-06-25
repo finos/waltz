@@ -188,13 +188,13 @@
         <addColumn tableName="organisational_unit">
             <column name="created_by"
                     type="${name.type}"
-                    defaultValue="UNKNOWN">
+                    defaultValue="waltz">
                 <constraints nullable="false" />
             </column>
 
             <column name="last_updated_by"
                     type="${name.type}"
-                    defaultValue="UNKNOWN">
+                    defaultValue="waltz">
                 <constraints nullable="false" />
             </column>
         </addColumn>
