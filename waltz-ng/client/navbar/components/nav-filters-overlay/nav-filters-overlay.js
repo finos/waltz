@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -89,15 +89,24 @@ function controller($element,
 
     const loadFacets = (stateName, id) => {
         if(areFiltersVisible(stateName)) {
-            const kind = viewStateToKind(stateName);
+            if(viewStateToKind(stateName).toString() === "ENTITY_STATISTIC"){
+                const ref = mkRef($stateParams.kind.toString(), id);
+                const selector = mkSelectionOptions(ref);
 
-            const ref = mkRef(kind, id);
-            const selector = mkSelectionOptions(ref);
+                return serviceBroker
+                    .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
+                    .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
+                    .then(() => vm.appKindFilterOptions = mkAppKindFilterOptions(vm.facetCounts, displayNameService, descriptionService));
+            }else {
+                const kind = viewStateToKind(stateName);
+                const ref = mkRef(kind, id);
+                const selector = mkSelectionOptions(ref);
 
-            return serviceBroker
-                .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
-                .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
-                .then(() => vm.appKindFilterOptions = mkAppKindFilterOptions(vm.facetCounts, displayNameService, descriptionService));
+                return serviceBroker
+                    .loadAppData(CORE_API.FacetStore.countByApplicationKind, [selector])
+                    .then(r => vm.facetCounts = _.keyBy(r.data, "id"))
+                    .then(() => vm.appKindFilterOptions = mkAppKindFilterOptions(vm.facetCounts, displayNameService, descriptionService));
+            }
         } else {
             return Promise.resolve();
         }
@@ -109,7 +118,9 @@ function controller($element,
             const name = $state.current.name;
             const id = _.parseInt($stateParams.id);
             loadFacets(name, id)
-                .then(() => vm.filterChanged());
+                .then(() => {
+                    vm.filterChanged();
+                });
         });
     };
 
@@ -142,6 +153,7 @@ function controller($element,
 
     vm.filterChanged = () => {
         // we need to convert the simple internal structures to the more complex filterOptions object structure
+
         const appKindFilterOptions = _.reduce(
             vm.appKindFilterOptions,
             (acc, opt) => {
@@ -149,7 +161,6 @@ function controller($element,
                 return acc;
             },
             {});
-
         const filterOptions = {
             APPLICATION: {
                 applicationKind: appKindFilterOptions

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,11 +19,6 @@
 
 import {rollupKind} from "../common/services/enums/rollup-kind";
 import {notEmpty} from "../common";
-
-
-export function updateUrlWithoutReload($state, navItem) {
-    $state.go('.', {id: navItem.id}, {notify: false});
-}
 
 
 const defaultDefinitions = {
