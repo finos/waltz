@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,6 +24,7 @@ import { CORE_API } from "../../../common/services/core-api-utils";
 import { mkTweakers } from "../source-and-target-graph/source-and-target-utilities";
 
 import template from "./source-and-target-panel.html";
+import {sameRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -38,7 +39,7 @@ const bindings = {
 
 const initialState = {
     filteredFlowData: {
-        selectedTypeId: 0,
+        filterApplied: false,
         flows: [],
         decorators: []
     }
@@ -56,7 +57,7 @@ function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowI
 
 
 function filterByType(typeId, flows = [], decorators = []) {
-    if (typeId == 0) {
+    if (typeId === 0) {
         return {
             selectedTypeId: 0,
             decorators,
@@ -69,7 +70,7 @@ function filterByType(typeId, flows = [], decorators = []) {
     const fs = _.filter(flows, f => _.includes(dataFlowIds, f.id));
 
     return {
-        selectedTypeId: typeId,
+        filterApplied: true,
         decorators: ds,
         flows: fs
     };
@@ -124,7 +125,38 @@ function scrollIntoView(element, $window) {
 function controller($element, $timeout, $window, displayNameService, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.showAll = () => vm.filteredFlowData = filterByType(0, vm.logicalFlows, vm.decorators);
+    function applyFilter(fn) {
+        $timeout(fn)
+            .then(filteredData => {
+                vm.filteredFlowData = filteredData;
+                scrollIntoView($element[0], $window);
+            });
+    }
+
+    function resetFilter() {
+        return {
+            filterApplied: false,
+            flows: vm.logicalFlows,
+            decorators: vm.decorators
+        };
+    }
+
+    /**
+     * @param position 'source' or 'target'
+     * @param node  the node to test against either the source or target
+     * @returns {{decorators: *, flows: Array, filterApplied: boolean}}
+     */
+    function filterByNode(position, node) {
+        return {
+            filterApplied: true,
+            decorators: vm.decorators,
+            flows: _.filter(vm.logicalFlows, f => sameRef(f[position], node))
+        };
+    }
+
+
+    vm.showAll = () => vm.filteredFlowData = resetFilter();
+
     vm.$onChanges = (changes) => {
 
         if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
@@ -162,36 +194,31 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "source", flowId, evt);
+                    applyFilter(() => filterByNode("source", entity));
                 })
             },
             target: {
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "target", flowId, evt);
+                    applyFilter(() => filterByNode("target", entity));
                 })
             },
             type: {
                 onSelect: d => {
                     event.stopPropagation();
-                    $timeout(() =>  {
-                        return vm.filteredFlowData = filterByType(
+                    applyFilter(() => filterByType(
                             d.id,
                             vm.logicalFlows,
-                            vm.decorators)
-                    }).then(() => {
-                        scrollIntoView($element[0], $window);
-                    });
-
+                            vm.decorators));
                 }
             },
             typeBlock: {
                 onSelect: () => {
                     event.stopPropagation();
-                    $timeout(() => {
-                        if (vm.filteredFlowData.selectedTypeId > 0) {
-                            vm.showAll();
-                        }
-                    });
+                    if (vm.filteredFlowData.filterApplied) {
+                        applyFilter(resetFilter);
+                    }
                 }
             }
         };

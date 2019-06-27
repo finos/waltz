@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ function mkRagRating(run = {}, instance = {}) {
 
 
 function mkInstancesWithRagRating(run = {}, instances = []) {
-   return _.map(instances, i => Object.assign({}, i, { rating: mkRagRating(run, i) }));
+    return _.map(instances, i => Object.assign({}, i, { rating: mkRagRating(run, i) }));
 }
 
 const ratingOrdinal = {

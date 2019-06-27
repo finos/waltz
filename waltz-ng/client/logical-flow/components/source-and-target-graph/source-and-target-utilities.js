@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import * as _ from 'lodash';
-
+import * as _ from "lodash";
+import * as colors from "../../../common/colors";
 
 const iconCodes = {
     // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)
-    files: '\uf0c5',
-    file: '\uf016',
-    question: '\uf128',
-    questionCircle: '\uf29c',
-    folder: '\uf115',
-    hourglass: '\uf252',
+    files: "\uf0c5",
+    file: "\uf016",
+    question: "\uf128",
+    questionCircle: "\uf29c",
+    folder: "\uf115",
+    hourglass: "\uf252",
 };
 
 
@@ -35,26 +35,26 @@ function toIcon(count = 0) {
         case 0:
             return {
                 code: iconCodes.questionCircle,
-                description: 'No physical files specified',
-                color: '#c66'
+                description: "No physical files specified",
+                color: colors.amber
             };
         case 1:
             return {
                 code: iconCodes.file,
-                description: 'One linked physical files',
-                color: '#000'
+                description: "One linked physical files",
+                color: colors.black
             };
         case 2:
             return {
                 code: iconCodes.files,
-                description: 'Two linked physical files',
-                color: '#000'
+                description: "Two linked physical files",
+                color: colors.black
             };
         default:
             return {
                 code: iconCodes.folder,
-                description: 'Several linked physical files',
-                color: '#000'
+                description: "Several linked physical files",
+                color: colors.black
             };
     }
 }
@@ -64,15 +64,15 @@ function toCUIcon(count = 0) {
     switch (count) {
         case 0:
             return {
-                code: '',
-                description: '',
-                color: '#000'
+                code: "",
+                description: "",
+                color: "#000"
             };
         default:
             return {
                 code: iconCodes.hourglass,
-                description: 'Changes are associated with this flow',
-                color: '#000'
+                description: "Changes are associated with this flow",
+                color: "#000"
             };
     }
 }
@@ -85,8 +85,8 @@ export function mkTweakers(tweakers = {},
 
     const toIdentifier = (entRef) => `${entRef.kind}/${entRef.id}`;
 
-    const logicalFlowsById = _.keyBy(logicalFlows, 'id');
-    const physicalFlowsById = _.keyBy(physicalFlows, 'id');
+    const logicalFlowsById = _.keyBy(logicalFlows, "id");
+    const physicalFlowsById = _.keyBy(physicalFlows, "id");
 
 
     const countPhysicalFlows = (direction) =>
@@ -97,8 +97,8 @@ export function mkTweakers(tweakers = {},
                 : null;
         });
 
-    const sourceCounts = countPhysicalFlows('source');
-    const targetCounts = countPhysicalFlows('target');
+    const sourceCounts = countPhysicalFlows("source");
+    const targetCounts = countPhysicalFlows("target");
 
     const physicalFlowChangeUnits = _.filter(
         changeUnits,
@@ -113,8 +113,8 @@ export function mkTweakers(tweakers = {},
             : null;
     });
 
-    const cuSourceCounts = countChangeUnits('source');
-    const cuTargetCounts = countChangeUnits('target');
+    const cuSourceCounts = countChangeUnits("source");
+    const cuTargetCounts = countChangeUnits("target");
 
     tweakers.source.icon = (appRef) => toIcon(sourceCounts[toIdentifier(appRef)]);
     tweakers.target.icon = (appRef) => toIcon(targetCounts[toIdentifier(appRef)]);
