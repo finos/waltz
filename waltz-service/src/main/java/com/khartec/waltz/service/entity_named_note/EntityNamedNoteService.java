@@ -21,7 +21,10 @@ package com.khartec.waltz.service.entity_named_note;
 
 import com.khartec.waltz.data.entity_named_note.EntityNamedNoteDao;
 import com.khartec.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
@@ -73,7 +76,7 @@ public class EntityNamedNoteService {
                 ref,
                 namedNoteTypeId,
                 noteText,
-                LastUpdate.mkForUser(username));
+                UserTimestamp.mkForUser(username));
 
         if (rc) {
             logMsg(ref, username, Operation.UPDATE, "Updated note: " + type.name());

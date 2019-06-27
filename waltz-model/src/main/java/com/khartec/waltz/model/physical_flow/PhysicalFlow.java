@@ -39,6 +39,7 @@ import java.util.Optional;
 public abstract class PhysicalFlow implements
         IdProvider,
         IsRemovedProvider,
+        CreatedUserTimestampProvider,
         DescriptionProvider,
         ProvenanceProvider,
         LastUpdatedProvider,

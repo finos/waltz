@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
@@ -98,7 +98,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private boolean removeRoute(Request request, Response z) throws IOException {
         String username = getUsername(request);
-        LastUpdate lastUpdate = LastUpdate.mkForUser(username);
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
@@ -115,7 +115,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String username = getUsername(request);
 
         Map<String, Object> body = readBody(request, Map.class);
-        LastUpdate lastUpdate = LastUpdate.mkForUser(username);
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
 
         return ImmutableSaveAssessmentRatingCommand.builder()
                 .entityReference(getEntityReference(request))

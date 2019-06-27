@@ -21,7 +21,7 @@ package com.khartec.waltz.data.entity_named_note;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdate;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
 import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNote;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;
@@ -76,7 +76,7 @@ public class EntityNamedNoteDao {
 
     
     
-    public boolean save(EntityReference ref, long namedNoteTypeId, String noteText, LastUpdate lastUpdate) {
+    public boolean save(EntityReference ref, long namedNoteTypeId, String noteText, UserTimestamp lastUpdate) {
         checkNotNull(ref, "ref cannot be null");
         checkNotNull(lastUpdate, "lastUpdate cannot be null");
 
