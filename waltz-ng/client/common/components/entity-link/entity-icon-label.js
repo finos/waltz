@@ -18,21 +18,21 @@
  */
 
 import {initialiseData} from "../../../common";
-import template from './entity-icon-label.html';
+import template from "./entity-icon-label.html";
 import {CORE_API} from "../../services/core-api-utils";
 
 
 const bindings = {
-    entityRef: '<',
-    iconPlacement: '@',
-    tooltipPlacement: '@'
+    entityRef: "<",
+    iconPlacement: "@",
+    tooltipPlacement: "@"
 };
 
 
 const initialState = {
-    iconPlacement: 'left', // can be left, right, none
-    tooltipPlacement: 'top', // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
-    trigger: 'none'
+    iconPlacement: "left", // can be left, right, none
+    tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    trigger: "none"
 };
 
 
@@ -57,6 +57,27 @@ const entityLoaders = {
                 value: displayNameService.lookup("criticality", app.businessCriticality, "?")
             }
         ])
+    },
+    "CHANGE_INITIATIVE": {
+        method: CORE_API.ChangeInitiativeStore.getById,
+        mkProps: (ci, displayNameService) => ([
+            {
+                name: "External Id",
+                value: ci.externalId|| "?"
+            }, {
+                name: "Kind",
+                value: displayNameService.lookup("changeInitiative", ci.changeInitiativeKind, "?")
+            }, {
+                name: "Lifecycle",
+                value: displayNameService.lookup("changeInitiativeLifecyclePhase", ci.lifecyclePhase, "?")
+            }, {
+                name: "Start",
+                value: ci.startDate
+            }, {
+                name: "End",
+                value: ci.endDate
+            }
+        ])
     }
 };
 
@@ -67,13 +88,13 @@ function controller(displayNameService, serviceBroker) {
     vm.$onChanges = c => {
         if (! vm.entityRef) return;
         if (_.has(entityLoaders, vm.entityRef.kind)) {
-            vm.popoverTemplate = `weil-popover-custom`;
+            vm.popoverTemplate = "weil-popover-custom";
             vm.trigger = "mouseenter";
         } else {
-            vm.popoverTemplate = `weil-popover-basic`;
+            vm.popoverTemplate = "weil-popover-basic";
             vm.trigger = vm.entityRef.description || vm.entityRef.lifecyclePhase
-                ? 'mouseenter'
-                : 'none';
+                ? "mouseenter"
+                : "none";
         }
     };
 
@@ -82,8 +103,15 @@ function controller(displayNameService, serviceBroker) {
         if (loader) {
             serviceBroker
                 .loadViewData(loader.method, [ vm.entityRef.id ])
-                .then(r => vm.entity = r.data)
-                .then(() => vm.props = loader.mkProps(vm.entity, displayNameService));
+                .then(r => {
+                    vm.entity = r.data;
+                    if (vm.entity) {
+                        vm.props = loader.mkProps(vm.entity, displayNameService);
+                    } else {
+                        // fall back to basic popover as no entity found
+                        vm.popoverTemplate = "weil-popover-basic";
+                    }
+                })
         }
     };
 }

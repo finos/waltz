@@ -19,20 +19,20 @@
 
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import template from './entity-link.html';
+import template from "./entity-link.html";
 
 
 const bindings = {
-    entityRef: '<',
-    iconPlacement: '@',
-    tooltipPlacement: '@',
-    target: '@', /** if '_blank' the external icon is shown **/
+    entityRef: "<",
+    iconPlacement: "@",
+    tooltipPlacement: "@",
+    target: "@", /** if '_blank' the external icon is shown **/
 };
 
 
 const initialState = {
-    iconPlacement: 'left', // can be left, right, none
-    tooltipPlacement: 'top' // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    iconPlacement: "left", // can be left, right, none
+    tooltipPlacement: "top" // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
 };
 
 
@@ -52,7 +52,7 @@ function controller($state) {
 }
 
 controller.$inject = [
-    '$state'
+    "$state"
 ];
 
 

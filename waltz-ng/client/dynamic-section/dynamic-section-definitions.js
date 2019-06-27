@@ -192,12 +192,6 @@ export const dynamicSections = {
         icon: "random",
         id: 29
     },
-    changeInitiativeNavigatorSection: {
-        componentId: "change-initiative-navigator-section",
-        name: "Change Initiatives",
-        icon: "paper-plane-o",
-        id: 30
-    },
     relatedPhysicalFieldSection: {
         componentId: "related-physical-spec-defn-field-section",
         name: "Physical Fields",
@@ -269,7 +263,6 @@ export const dynamicSectionsByKind = {
     ],
     "CHANGE_INITIATIVE": [
         dynamicSections.bookmarksSection,
-        dynamicSections.changeInitiativeNavigatorSection,
         dynamicSections.changeSetSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.involvedPeopleSection,

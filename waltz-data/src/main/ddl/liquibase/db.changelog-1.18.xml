@@ -39,6 +39,11 @@
         </update>
     </changeSet>
 
+    <changeSet author="davidwatkins73"
+               id="20190620-3912-1a">
+        <dropDefaultValue tableName="rating_scheme_item"
+                          columnName="needs_planned_date"/>
+    </changeSet>
 
     <changeSet id="20190620-3912-1"
                author="kamransaleem">

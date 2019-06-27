@@ -81,47 +81,47 @@ function store($http, BaseApiUrl) {
     }
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ["$http", "BaseApiUrl"];
 
 
-const serviceName = 'ChangeInitiativeStore';
+const serviceName = "ChangeInitiativeStore";
 
 
 export const ChangeInitiativeStore_API = {
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'finds change initiatives by id selector'
+        serviceFnName: "findBySelector",
+        description: "finds change initiatives by id selector"
     },
     findByExternalId: {
         serviceName,
-        serviceFnName: 'findByExternalId',
-        description: 'finds change initiatives by external id'
+        serviceFnName: "findByExternalId",
+        description: "finds change initiatives by external id"
     },
     findHierarchyBySelector: {
         serviceName,
-        serviceFnName: 'findHierarchyBySelector',
-        description: 'finds change initiatives (and parents) by id selector'
+        serviceFnName: "findHierarchyBySelector",
+        description: "finds change initiatives (and parents) by id selector"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'get a change initiative by id'
+        serviceFnName: "getById",
+        description: "get a change initiative by id"
     },
     findRelatedForId: {
         serviceName,
-        serviceFnName: 'findRelatedForId',
-        description: 'find related change initiatives related to one with supplied id'
+        serviceFnName: "findRelatedForId",
+        description: "find related change initiatives related to one with supplied id"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'search change initiatives'
+        serviceFnName: "search",
+        description: "search change initiatives"
     },
     changeRelationship: {
         serviceName,
-        serviceFnName: 'changeRelationship',
-        description: 'change relationship between a change initiative and entity reference'
+        serviceFnName: "changeRelationship",
+        description: "change relationship between a change initiative and entity reference"
     }
 };
 
