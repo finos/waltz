@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div class="row waltz-source-and-target-panel">
     <div class="col-sm-12 waltz-visibility-parent">
         <waltz-source-and-target-graph entity-ref="$ctrl.entityRef"
@@ -6,18 +25,14 @@
                                        change-units="$ctrl.changeUnits"
                                        tweakers="$ctrl.tweakers">
         </waltz-source-and-target-graph>
-        <div ng-if='$ctrl.filteredFlowData.selectedTypeId > 0'
-             class="small text-muted">
-            <hr>
+        <div ng-if='$ctrl.filteredFlowData.filterApplied'
+             class="alert alert-warning">
             <waltz-icon name="filter"></waltz-icon>
-            Showing only
-            <span ng-bind="$ctrl.filteredFlowData.selectedTypeId | toDisplayName:'dataType'"></span>
-            -
-            <a class="clickable btn btn-xs btn-success"
+            Showing a filtered set of flows:
+            <a class="clickable"
                ng-click="$ctrl.showAll()">
-                Show All
+                Remove filter and show All
             </a>
-            <hr>
         </div>
 
         <div class="pull-right" style="margin-right: 30px; margin-bottom: 4px">

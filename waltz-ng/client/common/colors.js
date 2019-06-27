@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ import {rgb} from "d3-color";
 import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
-
+export const black = rgb("#000");
 export const amber = rgb("#D9923F");
 export const green = rgb("#5BB65D");
 export const red = rgb("#DA524B");
