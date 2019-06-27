@@ -154,13 +154,6 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
         };
     }
 
-    function filterByTarget(node) {
-        return {
-            filterApplied: true,
-            decorators: vm.decorators,
-            flows: _.filter(vm.logicalFlows, f => sameRef(f.source, node))
-        };
-    }
 
     vm.showAll = () => vm.filteredFlowData = resetFilter();
 
