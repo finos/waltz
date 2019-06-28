@@ -98,8 +98,8 @@ function controller($q,
             .then(r => _
                 .chain(r.data)
                 .flatMap(rel => ([
-                    {entity: rel.a, relationship: rel.relationship},
-                    {entity: rel.b, relationship: rel.relationship}
+                    {entity: rel.a, relationship: rel.relationship, provenance: rel.provenance},
+                    {entity: rel.b, relationship: rel.relationship, provenance: rel.provenance}
                 ]))
                 .filter(rel => rel.entity.kind === "APPLICATION")
                 .reject(rel => sameRef(rel.entity, vm.parentEntityRef, { skipChecks: true }))
@@ -124,7 +124,8 @@ function controller($q,
                         id: r.entity.id,
                         name: r.entity.name,
                         kind: "APPLICATION"
-                    }
+                    },
+                    isReadOnly: r.provenance !== "waltz"
                 }));
             });
     }
