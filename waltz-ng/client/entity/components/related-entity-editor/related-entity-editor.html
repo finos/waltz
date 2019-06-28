@@ -38,7 +38,8 @@
                             </waltz-editable-dropdown>
                         </td>
                         <td>
-                            <span class="waltz-visibility-child-50">
+                            <span class="waltz-visibility-child-50"
+                                  ng-if="!rel.isReadOnly">
                                 <a ng-click="$ctrl.onRemove(rel)"
                                    class="clickable">
                                     Remove
