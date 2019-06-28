@@ -25,7 +25,10 @@ const initialState = {
     model: [],
     expandedNodes: [],
     selectedNode: null,
-    onSelect: (n) => console.log("No handler provided for entity-hierarchy-navigator:onSelect", n)
+    onSelect: (n) => console.log("No handler provided for entity-hierarchy-navigator:onSelect", n),
+    treeOptions: {
+        equality: (a, b) => a && b && a.id === b.id
+    }
 };
 
 
@@ -69,7 +72,8 @@ const component = {
     bindings: {
         selectedNode: "<",
         model: "<",
-        onSelect: "<"
+        onSelect: "<",
+        expandedNodes: "<"
     },
     transclude: {
         "nodeTemplate": "?nodeTemplate"

@@ -1,0 +1,20 @@
+<waltz-entity-hierarchy-navigator model="$ctrl.hierarchy"
+                                  selected-node="$ctrl.selected"
+                                  expanded-nodes="$ctrl.expandedNodes"
+                                  on-select="$ctrl.onSelectNavItem">
+    <node-template>
+        <span class="clickable"
+              ng-style="{ 'font-weight': node.isSelf ? 'bold' : 'none'}">
+            <waltz-entity-icon-label entity-ref="node"
+                                     icon-placement="none"
+                                     tooltip-placement="right">
+            </waltz-entity-icon-label>
+
+            -
+
+            <span class="text-muted"
+                   ng-bind="node.externalId">
+            </span>
+        </span>
+    </node-template>
+</waltz-entity-hierarchy-navigator>

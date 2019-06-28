@@ -34,84 +34,33 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div class="row">
             <div class="col-sm-7">
-                <div class="waltz-display-section">
-                    <!-- NAME, EXTERNAL ID -->
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Name
+                <!-- OVERVIEW -->
+                <waltz-sub-section name="Overview">
+                    <content>
+                        <div style="padding: 8px"
+                             ng-include="'wciv-overview'">
                         </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.name"></span>
+                    </content>
+                </waltz-sub-section>
+                <br>
+                <!-- HIER -->
+                <waltz-sub-section name="Hierarchy">
+                    <content>
+                        <div style="padding:8px">
+                            <waltz-change-initiative-tree parent-entity-ref="ctrl.entityRef">
+                            </waltz-change-initiative-tree>
                         </div>
-
-                        <div class="col-sm-2 waltz-display-field-label">
-                            External Id
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.externalId"></span>
-                        </div>
-                    </div>
-
-                    <!-- KIND, PHASE -->
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Type
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative'"></span>
-                        </div>
-
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Phase
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.lifecyclePhase | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
-                        </div>
-                    </div>
-
-                    <!-- START, END -->
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Start
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.startDate"></span>
-                        </div>
-
-                        <div class="col-sm-2 waltz-display-field-label">
-                            End
-                        </div>
-                        <div class="col-sm-4">
-                            <span ng-bind="ctrl.changeInitiative.endDate"></span>
-                        </div>
-                    </div>
-
-
-                    <!-- Entity Enum -->
-                    <waltz-entity-enum parent-entity-ref="ctrl.entityRef">
-                    </waltz-entity-enum>
-
-
-                    <div class="row">
-                        <div class="col-sm-2 waltz-display-field-label">
-                            Description
-                        </div>
-                        <div class="col-sm-10">
-                            <waltz-markdown text="ctrl.changeInitiative.description">
-                            </waltz-markdown>
-                        </div>
-                    </div>
-
-                    <br>
-
-                </div>
+                    </content>
+                </waltz-sub-section>
+                <br>
             </div>
-            <!-- Assessment Ratings -->
+            <!-- ASSESSMENT RATINGS -->
             <div class="col-sm-5">
                 <waltz-assessment-rating-sub-section parent-entity-ref="ctrl.entityRef">
                 </waltz-assessment-rating-sub-section>
             </div>
         </div>
+
     </div>
 
 
@@ -127,3 +76,79 @@
     </waltz-dynamic-sections-view>
 
 </div>
+
+
+
+<!-- templates -->
+
+<script type="text/ng-template"
+        id="wciv-overview">
+    <div class="waltz-display-section">
+        <!-- NAME, EXTERNAL ID -->
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Name
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.name"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                External Id
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.externalId"></span>
+            </div>
+        </div>
+
+        <!-- KIND, PHASE -->
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Type
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative'"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Phase
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.lifecyclePhase | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+            </div>
+        </div>
+
+        <!-- START, END -->
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Start
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.startDate"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                End
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="ctrl.changeInitiative.endDate"></span>
+            </div>
+        </div>
+
+
+        <!-- Entity Enum -->
+        <waltz-entity-enum parent-entity-ref="ctrl.entityRef">
+        </waltz-entity-enum>
+
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Description
+            </div>
+            <div class="col-sm-10">
+                <waltz-markdown text="ctrl.changeInitiative.description">
+                </waltz-markdown>
+            </div>
+        </div>
+    </div>
+</script>
