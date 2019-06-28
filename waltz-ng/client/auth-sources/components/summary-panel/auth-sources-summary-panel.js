@@ -140,6 +140,34 @@ function controller($q, serviceBroker) {
             });
     };
 
+    const calculateOverallPercentage = (p1, p2) => {
+        $q.all([p1, p2])
+            .then(() => {
+                const sumOfPrimaryAndSecondaryValues = (map) => {
+                    return safeGetNumber(map, 'PRIMARY') + safeGetNumber(map, 'SECONDARY');
+                };
+
+                const sumOfDiscouragedAndNoOpinionValues = (map) => {
+                    return safeGetNumber(map, 'DISCOURAGED') + safeGetNumber(map, 'NO_OPINION');
+                };
+
+                const safeGetNumber = (map, key) => {
+                    const value = map[key];
+                    return _.isNumber(value) && !_.isNaN(value) ? value : 0;
+                };
+
+                const sumRasNonRas = sumOfPrimaryAndSecondaryValues(vm.inboundStats)
+                                        + sumOfPrimaryAndSecondaryValues(vm.outboundStats);
+
+                const sumOfAll = sumRasNonRas
+                                   + sumOfDiscouragedAndNoOpinionValues(vm.inboundStats)
+                                    + sumOfDiscouragedAndNoOpinionValues(vm.outboundStats)
+
+                const overallPercentage = sumOfAll !== 0 ? sumRasNonRas / sumOfAll * 100 : 0;
+                vm.overallPercentageOfAuthoritiveSources = Number(overallPercentage).toFixed(2);
+            });
+    };
+
     const loadSummaryStats = () => {
         if(! vm.parentEntityRef) return;
 
@@ -170,6 +198,7 @@ function controller($q, serviceBroker) {
             });
 
         determineIfChartShouldBeVisible(inboundPromise, outboundPromise);
+        calculateOverallPercentage(inboundPromise, outboundPromise);
     };
 
     vm.$onInit = () => {
