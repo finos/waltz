@@ -46,8 +46,9 @@
         id="weil-popover-custom">
     <div ng-init="$ctrl.lazyLoad()"
          class="small">
-        <waltz-markdown text="$ctrl.entity.description"></waltz-markdown>
-        <br>
+        <h4>
+            <span ng-bind="$ctrl.entity.name"></span>
+        </h4>
         <table class="table small table-condensed">
             <tr ng-repeat="prop in $ctrl.props">
                 <td>
@@ -61,5 +62,6 @@
                 </td>
             </tr>
         </table>
+        <waltz-markdown text="$ctrl.entity.description"></waltz-markdown>
     </div>
 </script>

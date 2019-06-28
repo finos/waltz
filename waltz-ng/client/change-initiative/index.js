@@ -17,19 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import {registerComponents, registerStore} from '../common/module-utils';
+import {registerComponents, registerStore} from "../common/module-utils";
 
-import changeInitiativeStore from './services/change-initiative-store';
-import changeInitiativeSelector from './directives/change-initiative-selector';
-import changeInitiativeSection from './components/change-initiative-section/change-initiative-section';
-import changeInitiativeNavigatorSection from './components/change-initiative-navigator-section/change-initiative-navigator-section';
-import Routes from './routes';
+import changeInitiativeStore from "./services/change-initiative-store";
+import changeInitiativeSelector from "./directives/change-initiative-selector";
+
+import changeInitiativeSection from "./components/change-initiative-section/change-initiative-section";
+import changeInitiativeTree from "./components/tree/change-initiative-tree";
+
+import Routes from "./routes";
 
 
 function setup() {
-    const module = angular.module('waltz.change.initiative', []);
+    const module = angular.module("waltz.change.initiative", []);
     module
         .config(Routes);
 
@@ -40,7 +42,7 @@ function setup() {
 
     registerComponents(module, [
         changeInitiativeSection,
-        changeInitiativeNavigatorSection
+        changeInitiativeTree
     ]);
 
     return module.name;
