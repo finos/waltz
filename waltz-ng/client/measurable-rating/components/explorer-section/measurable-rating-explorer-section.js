@@ -135,7 +135,7 @@ function prepareColumnDefs(measurableCategory, measurables) {
         field: "description",
         name: "Comment",
         cellTemplate: `<span class="waltz-entity-icon-label"
-                      uib-popover-template="'wmr/desc-popup.html'"
+                      uib-popover-template="'mres/desc-popup.html'"
                       popover-trigger="mouseenter"
                       popover-enable="true"
                       popover-class="waltz-popover-wide"
