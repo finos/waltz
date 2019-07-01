@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
-import template from './change-initiative-section.html';
+import template from "./change-initiative-section.html";
 import {changeInitiative} from "../../../common/services/enums/change-initiative";
 import {getEnumName} from "../../../common/services/enums";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
@@ -63,10 +63,10 @@ const initialState = {
     },
     gridOptions: {
         columnDefs: [
-            { field: 'externalId', name: 'id', cellTemplate: externalIdCellTemplate },
-            { field: 'name', cellTemplate: nameCellTemplate },
-            { field: 'kindName', name: 'Kind' },
-            { field: 'lifecyclePhaseName', name: 'Phase' }
+            { field: "externalId", name: "id", cellTemplate: externalIdCellTemplate },
+            { field: "name", cellTemplate: nameCellTemplate },
+            { field: "kindName", name: "Kind" },
+            { field: "lifecyclePhaseName", name: "Phase" }
         ],
         data: []
     }
@@ -78,13 +78,13 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const processChangeInitiativeHierarchy = (changeInitiatives) => {
-        const cisByParentId = _.groupBy(changeInitiatives, 'parentId');
+        const cisByParentId = _.groupBy(changeInitiatives, "parentId");
         const roots = _
             .chain(changeInitiatives)
             .filter(ci => !ci.parentId)
             .map(ci => {
                 const children = cisByParentId[ci.id] || [];
-                const icon = children.length > 0 ? 'sitemap' : 'fw';
+                const icon = children.length > 0 ? "sitemap" : "fw";
                 const extensions = {
                     kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
                     lifecyclePhaseName: getEnumName(vm.changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase),
@@ -113,9 +113,9 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.changeInitiativeLifecyclePhaseByKey = _
                     .chain(r.data)
-                    .filter({ type: 'changeInitiativeLifecyclePhase'})
+                    .filter({ type: "changeInitiativeLifecyclePhase"})
                     .map(c => ({ key: c.key, name: c.name }))
-                    .keyBy('key')
+                    .keyBy("key")
                     .value();
             });
     };
@@ -135,7 +135,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -148,5 +148,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzChangeInitiativeSection'
+    id: "waltzChangeInitiativeSection"
 };
