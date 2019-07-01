@@ -283,6 +283,27 @@ function controller(notification,
     vm.onSubmit = () => {
         if (vm.submitDisabled) return;
         const cmd = mkUpdCmd();
+
+        function isMovedToItself() {
+            return cmd.changeType === "MOVE"
+                && cmd.primaryReference.id === cmd.params.destinationId;
+        }
+
+        function isMovedToAnExistingChild() {
+            return cmd.changeType === "MOVE"
+                && vm.measurable.children
+                .filter(c => (c.id === cmd.params.destinationId))
+                .length > 0;
+        }
+
+        if (isMovedToItself()) {
+            return alert("Parent reference cannot point to the same Measurable");
+        }
+
+        if (isMovedToAnExistingChild()) {
+            return alert("Cannot add this measurable as a parent. Already found as a child of this measurable.");
+        }
+
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
             .catch(e => displayError(notification, "Error when submitting command", e));
