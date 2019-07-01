@@ -26,6 +26,9 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./change-initiative-section.html";
 import {changeInitiative} from "../../../common/services/enums/change-initiative";
 import {getEnumName} from "../../../common/services/enums";
+import indexByKeyForType from "../../../enum-value/enum-value-utilities";
+import {mkRef} from "../../../common/entity-utils";
+import {fakeInitiative, fakeProgramme} from "../../change-initiative-utils";
 
 
 const bindings = {
@@ -34,24 +37,13 @@ const bindings = {
 
 
 const externalIdCellTemplate = `
-    <div class="ui-grid-cell-contents" style="vertical-align: baseline; ">
-        <a ng-click="grid.appScope.onSelectViaGrid(row.entity)"
-           class="clickable">
-            <span ng-bind="row.entity.externalId"></span>
-            &nbsp;
-            <waltz-icon name="{{row.entity.icon}}" rotate="270"></waltz-icon>
-        </a>
+    <div class="ui-grid-cell-contents" 
+         style="vertical-align: baseline; ">
+        <waltz-entity-link entity-ref="COL_FIELD">
+        </waltz-entity-link>
     </div>
 `;
 
-const nameCellTemplate = `
-    <div class="ui-grid-cell-contents">
-        <a ng-click="grid.appScope.onSelectViaGrid(row.entity)"
-           class="clickable">
-            <span ng-bind="row.entity.name"></span>
-        </a>
-    </div>
-`;
 
 
 const initialState = {
@@ -63,22 +55,63 @@ const initialState = {
     },
     gridOptions: {
         columnDefs: [
-            { field: "externalId", name: "id", cellTemplate: externalIdCellTemplate },
-            { field: "name", cellTemplate: nameCellTemplate },
-            { field: "kindName", name: "Kind" },
-            { field: "lifecyclePhaseName", name: "Phase" }
+            { field: "initiative", name: "Initiative", cellTemplate: externalIdCellTemplate },
+            { field: "programme", name: "Programme", cellTemplate: externalIdCellTemplate },
+            { field: "project", name: "Project", cellTemplate: externalIdCellTemplate },
+            { field: "name", name: "Name" },
+            { field: "kind", name: "Kind" },
+            { field: "lifecyclePhase", name: "Phase" }
         ],
         data: []
     }
 };
 
 
+const NONE = null;
+
+function determineHierarchy(cisById = {}, cisByParent = {}, ci) {
+    switch (ci.kind) {
+        case "INITIATIVE":
+            return {
+                initiative: ci,
+                programme: NONE,
+                project: NONE,
+            };
+        default:
+            return {
+                initiative: NONE,
+                programme: NONE,
+                project: NONE,
+            };
+    };
+}
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const processChangeInitiativeHierarchy = (changeInitiatives) => {
-        const cisByParentId = _.groupBy(changeInitiatives, "parentId");
+    const prepareTableData = (changeInitiatives) => {
+        const cisByParentId = _.groupBy(changeInitiatives, d => d.parentId);
+        const cisById = _.keyBy(changeInitiatives, d => d.id);
+
+
+        vm.gridOptions.data = _
+            .chain(changeInitiatives)
+            .map(ci => {
+                const hier = determineHierarchy(cisById, cisByParentId, ci);
+                return {
+                    initiative: hier.initiative,
+                    programme: hier.programme,
+                    project: hier.project,
+                    name: ci.name,
+                    description: ci.description,
+                    lifecyclePhase: getEnumName(vm.changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase),
+                    kind: getEnumName(changeInitiative, ci.changeInitiativeKind)
+                }
+            })
+            .value();
+
+        return;
+
         const roots = _
             .chain(changeInitiatives)
             .filter(ci => !ci.parentId)
@@ -105,18 +138,14 @@ function controller(serviceBroker) {
         vm.selectedChange = ci;
     };
 
-    vm.onClearSelection = () => vm.selectedChange = null;
 
     vm.$onInit = () => {
         serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll)
             .then(r => {
-                vm.changeInitiativeLifecyclePhaseByKey = _
-                    .chain(r.data)
-                    .filter({ type: "changeInitiativeLifecyclePhase"})
-                    .map(c => ({ key: c.key, name: c.name }))
-                    .keyBy("key")
-                    .value();
+                vm.changeInitiativeLifecyclePhaseByKey = indexByKeyForType(
+                    r.data,
+                    "changeInitiativeLifecyclePhase");
             });
     };
 
@@ -126,7 +155,7 @@ function controller(serviceBroker) {
                 .loadViewData(
                     CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
                     [ mkSelectionOptions(vm.parentEntityRef) ])
-                .then(r => processChangeInitiativeHierarchy(r.data));
+                .then(r => prepareTableData(r.data));
         }
     };
 

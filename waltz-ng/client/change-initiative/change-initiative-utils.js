@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,3 +42,30 @@ export function enrichRelationships(rels = [], entities = []) {
         .filter(rel => rel.entity)
         .value();
 }
+
+
+export const fakeProgramme = {
+    id: -2,
+    parentId: -1,
+    isFake: true,
+    name: "Programme Placeholder",
+    description: "Placeholder programme as there is no actual linked programme",
+    kind: "CHANGE_INITIATIVE",
+    changeInitiativeKind: "INITIATIVE"
+};
+
+export const fakeInitiative = {
+    id: -1,
+    parentId: null,
+    isFake: true,
+    name: "Initiative Placeholder",
+    description: "Placeholder programme as there is no actual linked initiative",
+    kind: "CHANGE_INITIATIVE",
+    changeInitiativeKind: "INITIATIVE"
+};
+
+export const fakeParentsByChildKind = {
+    "PROJECT": fakeProgramme,
+    "PROGRAMME": fakeInitiative
+};
+
