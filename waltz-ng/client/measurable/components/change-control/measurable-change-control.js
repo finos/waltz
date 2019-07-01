@@ -297,11 +297,11 @@ function controller(notification,
         }
 
         if (isMovedToItself()) {
-            return alert("Parent reference cannot point to the same Measurable");
+            return alert("Cannot set a Measurable as its own parent.");
         }
 
         if (isMovedToAnExistingChild()) {
-            return alert("Cannot add this measurable as a parent. Already found as a child of this measurable.");
+            return alert("Cannot add a measurable as parent if it is already a child of the subject.");
         }
 
         vm.onSubmitChange(cmd)
