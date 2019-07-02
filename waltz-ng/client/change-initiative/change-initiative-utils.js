@@ -48,6 +48,7 @@ export const fakeProgramme = {
     id: -2,
     parentId: -1,
     isFake: true,
+    externalId: "-",
     name: "Programme Placeholder",
     description: "Placeholder programme as there is no actual linked programme",
     kind: "CHANGE_INITIATIVE",
@@ -57,6 +58,7 @@ export const fakeProgramme = {
 export const fakeInitiative = {
     id: -1,
     parentId: null,
+    externalId: "-",
     isFake: true,
     name: "Initiative Placeholder",
     description: "Placeholder programme as there is no actual linked initiative",

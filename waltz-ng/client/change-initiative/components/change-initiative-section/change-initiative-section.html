@@ -31,19 +31,27 @@
     </waltz-source-data-overlay>
 
     <div class="row"
-         ng-if="$ctrl.gridOptions.data.length > 0">
-        <div class="col-md-12">
+         ng-if="$ctrl.changeInitiatives.length > 0">
+
+        <div class="col-sm-8">
             <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
                                     entries="$ctrl.gridOptions.data"
                                     scope-provider="$ctrl"
+                                    search-fields="['searchableStr']"
                                     search-placeholder-text="Search...">
-
             </waltz-grid-with-search>
         </div>
+
+        <div class="col-sm-4">
+            <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"
+                                                  help-text="{{$ctrl.filterHelpText}}"
+                                                  on-segment-select="$ctrl.onFilterSelect">
+            </waltz-assessment-rating-summary-pies>
+        </div>
+
     </div>
 
-
-    <waltz-no-data ng-if="$ctrl.gridOptions.data.length == 0">
+    <waltz-no-data ng-if="$ctrl.changeInitiatives.length == 0">
         <message>
             No associated Change Initiatives found
         </message>

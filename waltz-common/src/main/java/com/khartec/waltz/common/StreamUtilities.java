@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,12 +43,14 @@ public class StreamUtilities {
                 .flatMap(Collection::stream);
     }
 
+
     public static <T> Function<T, T> tap() {
         return t -> {
             System.out.println(t);
             return t;
         };
     }
+
 
     public static <T> Function<T, T> tap(Consumer<T> consumer) {
         return t -> {
@@ -66,7 +68,8 @@ public class StreamUtilities {
 
 
     public static <T> Stream<T> concat(Stream<T>... streams) {
-        return Stream.of(streams)
+        return Stream
+                .of(streams)
                 .reduce(Stream.empty(),
                         (acc, s) -> Stream.concat(acc, s));
     }
@@ -74,9 +77,9 @@ public class StreamUtilities {
 
     public static class Siphon<T> implements Predicate<T> {
         private final Predicate<T> pred;
-        private final List<T> results = new ArrayList();
+        private final List<T> results = new ArrayList<>();
 
-        public Siphon(Predicate<T> pred) {
+        Siphon(Predicate<T> pred) {
             this.pred = pred;
         }
 
@@ -92,7 +95,8 @@ public class StreamUtilities {
         }
     }
 
+
     public static <T> Siphon<T> mkSiphon(Predicate<T> pred) {
-        return new Siphon(pred);
+        return new Siphon<T>(pred);
     }
 }

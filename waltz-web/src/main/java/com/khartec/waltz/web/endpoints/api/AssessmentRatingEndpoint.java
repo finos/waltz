@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,8 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -71,14 +73,25 @@ public class AssessmentRatingEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
 
-        ListRoute<AssessmentRating> findForEntityRoute = (request, response) -> assessmentRatingService.findForEntity(getEntityReference(request));
-
-        getForList(findForEntityPath, findForEntityRoute);
+        getForList(findForEntityPath, this::findForEntityRoute);
+        postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(modifyPath, this::createRoute);
         putForDatum(modifyPath, this::updateRoute);
         deleteForDatum(modifyPath, this::removeRoute);
+    }
+
+    private List<AssessmentRating> findByTargetKindForRelatedSelectorRoute(Request request, Response response) throws IOException {
+        return assessmentRatingService.findByTargetKindForRelatedSelector(
+                getKind(request, "targetKind"),
+                readIdSelectionOptionsFromBody(request));
+    }
+
+
+    private List<AssessmentRating> findForEntityRoute(Request request, Response response) {
+        return assessmentRatingService.findForEntity(getEntityReference(request));
     }
 
 

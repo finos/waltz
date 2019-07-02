@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,12 @@
 import _ from "lodash";
 import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
 import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
-import template from './group-technology-summary.html';
+import template from "./group-technology-summary.html";
 
 
 const bindings = {
-    stats: '<',
-    parentEntityRef: '<'
+    stats: "<",
+    parentEntityRef: "<"
 };
 
 const initialState = {
@@ -44,27 +44,27 @@ const PIE_SIZE = 70;
 const PIE_CONFIG = {
     environment: {
         size: PIE_SIZE,
-        colorProvider: (d) => environmentColorScale(d.data.key)
+        colorProvider: (d) => environmentColorScale(d.key)
     },
     operatingSystem: {
         size: PIE_SIZE,
-        colorProvider: (d) => operatingSystemColorScale(d.data.key)
+        colorProvider: (d) => operatingSystemColorScale(d.key)
     },
     location: {
         size: PIE_SIZE,
-        colorProvider: (d) => variableScale(d.data.key)
+        colorProvider: (d) => variableScale(d.key)
     },
     vendor: {
         size: PIE_SIZE,
-        colorProvider: (d) => variableScale(d.data.key)
+        colorProvider: (d) => variableScale(d.key)
     },
     maturity: {
         size: PIE_SIZE,
-        colorProvider: (d) => maturityColorScale(d.data.key)
+        colorProvider: (d) => maturityColorScale(d.key)
     },
     endOfLifeStatus: {
         size: PIE_SIZE,
-        colorProvider: (d) => variableScale(d.data.key),
+        colorProvider: (d) => variableScale(d.key),
         labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
     }
 };
@@ -154,6 +154,6 @@ const component = {
 
 
 export default {
-    id: 'waltzGroupTechnologySummary',
+    id: "waltzGroupTechnologySummary",
     component
 };

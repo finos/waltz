@@ -27,23 +27,34 @@ import template from "./change-initiative-section.html";
 import {changeInitiative} from "../../../common/services/enums/change-initiative";
 import {getEnumName} from "../../../common/services/enums";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
-import {mkRef} from "../../../common/entity-utils";
+import {isSameParentEntityRef, refToString} from "../../../common/entity-utils";
 import {fakeInitiative, fakeProgramme} from "../../change-initiative-utils";
-
+import {filterByAssessmentRating, mkAssessmentSummaries} from "../../../assessments/assessment-utils";
 
 const bindings = {
     parentEntityRef: "<",
 };
 
 
+
 const externalIdCellTemplate = `
     <div class="ui-grid-cell-contents" 
          style="vertical-align: baseline; ">
-        <waltz-entity-link entity-ref="COL_FIELD">
+        <waltz-entity-link icon-placement="none" 
+                           entity-ref="COL_FIELD">
         </waltz-entity-link>
     </div>
 `;
 
+
+function mkRefCol(propName) {
+    return {
+        width: "15%",
+        field: propName,
+        toSearchTerm: d => _.get(d, [propName, "name"], ""),
+        cellTemplate: externalIdCellTemplate
+    };
+}
 
 
 const initialState = {
@@ -53,91 +64,120 @@ const initialState = {
     visibility: {
         sourcesOverlay: false
     },
+    filterHelpText: "Select an assessment category to filter the change initiatives",
     gridOptions: {
         columnDefs: [
-            { field: "initiative", name: "Initiative", cellTemplate: externalIdCellTemplate },
-            { field: "programme", name: "Programme", cellTemplate: externalIdCellTemplate },
-            { field: "project", name: "Project", cellTemplate: externalIdCellTemplate },
-            { field: "name", name: "Name" },
-            { field: "kind", name: "Kind" },
-            { field: "lifecyclePhase", name: "Phase" }
+            { width: "15%", field: "kind", name: "Kind" },
+            mkRefCol("initiative"),
+            mkRefCol("programme"),
+            mkRefCol("project"),
+            { width: "25%", field: "name", name: "Name" },
+            { width: "15%", field: "lifecyclePhase", name: "Phase" }
         ],
         data: []
     }
 };
 
 
-const NONE = null;
+function determineHierarchy(cisById = {}, ci) {
+    const none = null;
 
-function determineHierarchy(cisById = {}, cisByParent = {}, ci) {
-    switch (ci.kind) {
+    switch (ci.changeInitiativeKind) {
         case "INITIATIVE":
             return {
                 initiative: ci,
-                programme: NONE,
-                project: NONE,
+                programme: none,
+                project: none,
+            };
+        case "PROGRAMME":
+            const programmeParent = cisById[ci.parentId] || fakeInitiative;
+            return {
+                initiative: programmeParent,
+                programme: ci,
+                project: none,
+            };
+        case "PROJECT":
+            const projectParent = cisById[ci.parentId] || fakeProgramme;
+            const projectProgrammeParent = cisById[projectParent.parentId] || fakeInitiative;
+            return {
+                initiative: projectProgrammeParent,
+                programme: projectParent || fakeInitiative,
+                project: ci,
             };
         default:
             return {
-                initiative: NONE,
-                programme: NONE,
-                project: NONE,
+                initiative: none,
+                programme: none,
+                project: none,
             };
-    };
+    }
 }
 
-function controller(serviceBroker) {
+
+function toExtRef(d) {
+    if (!d) {
+        return null;
+    } else {
+        return {
+            kind: d.kind,
+            name: d.externalId,
+            id: d.id
+        };
+    }
+}
+
+
+function prepareTableData(changeInitiatives = [], lifecycleNamesByKey = {}) {
+    const cisById = _.keyBy(changeInitiatives, d => d.id);
+
+    return _
+        .chain(changeInitiatives)
+        .map(ci => {
+            const hierarchy = determineHierarchy(cisById, ci);
+            const phaseName = getEnumName(lifecycleNamesByKey, ci.lifecyclePhase);
+            const changeKind = getEnumName(changeInitiative, ci.changeInitiativeKind);
+            return {
+                initiative: toExtRef(hierarchy.initiative),
+                programme: toExtRef(hierarchy.programme),
+                project: toExtRef(hierarchy.project),
+                name: ci.name,
+                description: ci.description,
+                lifecyclePhase: phaseName,
+                kind: changeKind
+            }
+        })
+        .orderBy(d => ["initiative.name", "programme.name", "project.name", "name"])
+        .value();
+}
+
+
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const prepareTableData = (changeInitiatives) => {
-        const cisByParentId = _.groupBy(changeInitiatives, d => d.parentId);
-        const cisById = _.keyBy(changeInitiatives, d => d.id);
+    function init() {
+        const enumPromise = serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {
+                vm.changeInitiativeLifecyclePhaseByKey = _
+                    .chain(r.data)
+                    .filter({ type: "changeInitiativeLifecyclePhase"})
+                    .map(d => ({ key: d.key, name: d.name }))
+                    .keyBy( d => d.key)
+                    .value();
+            });
 
+        const schemePromise = serviceBroker
+            .loadAppData(CORE_API.RatingSchemeStore.findAll)
+            .then(r => vm.ratingSchemes = r.data);
 
-        vm.gridOptions.data = _
-            .chain(changeInitiatives)
-            .map(ci => {
-                const hier = determineHierarchy(cisById, cisByParentId, ci);
-                return {
-                    initiative: hier.initiative,
-                    programme: hier.programme,
-                    project: hier.project,
-                    name: ci.name,
-                    description: ci.description,
-                    lifecyclePhase: getEnumName(vm.changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase),
-                    kind: getEnumName(changeInitiative, ci.changeInitiativeKind)
-                }
-            })
-            .value();
+        const assessmentDefinitionPromise = serviceBroker
+            .loadAppData(
+                CORE_API.AssessmentDefinitionStore.findByKind,
+                [ "CHANGE_INITIATIVE" ])
+            .then(r => vm.assessmentDefinitions = r.data);
 
-        return;
-
-        const roots = _
-            .chain(changeInitiatives)
-            .filter(ci => !ci.parentId)
-            .map(ci => {
-                const children = cisByParentId[ci.id] || [];
-                const icon = children.length > 0 ? "sitemap" : "fw";
-                const extensions = {
-                    kindName: getEnumName(changeInitiative, ci.changeInitiativeKind),
-                    lifecyclePhaseName: getEnumName(vm.changeInitiativeLifecyclePhaseByKey, ci.lifecyclePhase),
-                    icon,
-                    parent: null,
-                    children
-                };
-                return Object.assign({}, ci, extensions);
-            })
-            .value();
-
-        vm.changeInitiatives = roots;
-        vm.gridOptions.data = roots;
-    };
-
-
-    vm.onSelectViaGrid = (ci) => {
-        vm.selectedChange = ci;
-    };
-
+        return $q.all([enumPromise, schemePromise, assessmentDefinitionPromise]);
+    }
 
     vm.$onInit = () => {
         serviceBroker
@@ -147,23 +187,53 @@ function controller(serviceBroker) {
                     r.data,
                     "changeInitiativeLifecyclePhase");
             });
+
+        init();
     };
 
     vm.$onChanges = (changes) => {
-        if(vm.parentEntityRef && changes.parentEntityRef.previousValue.id !== changes.parentEntityRef.currentValue.id) {
-            serviceBroker
+        const sameParent = isSameParentEntityRef(changes);
+
+        if (vm.parentEntityRef && !sameParent) {
+            const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+            const ciPromise = serviceBroker
                 .loadViewData(
                     CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
                     [ mkSelectionOptions(vm.parentEntityRef) ])
-                .then(r => prepareTableData(r.data));
+                .then(r => {
+                    vm.changeInitiatives = r.data;
+                    vm.gridOptions.data = prepareTableData(vm.changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
+                });
+
+            const assessmentRatingsPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+                    [ "CHANGE_INITIATIVE", selectionOptions ])
+                .then(r => vm.assessmentRatings = r.data);
+
+            $q.all([init(), ciPromise, assessmentRatingsPromise])
+                .then(() => {
+                    vm.assessmentSummaries = mkAssessmentSummaries(
+                        vm.assessmentDefinitions,
+                        vm.ratingSchemes,
+                        vm.assessmentRatings,
+                        vm.changeInitiatives.length);
+                });
         }
     };
 
+    vm.onFilterSelect = d => {
+        const changeInitiatives = d === null
+            ? vm.changeInitiatives
+            : filterByAssessmentRating(vm.changeInitiatives, vm.assessmentRatings, d);
 
+        vm.gridOptions.data = prepareTableData(changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
+    };
 }
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
