@@ -2,7 +2,6 @@ package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.common.exception.DatabaseException;
 import com.khartec.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -21,10 +20,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.Checks.*;
 import static java.util.stream.Collectors.toMap;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -100,10 +97,10 @@ public class TaxonomyChangeService {
         TaxonomyChangeCommand command = taxonomyChangeDao.getDraftCommandById(id);
         verifyUserHasPermissions(userId, command.changeDomain());
 
-        returnErrorIfMoveIsInvalid(command)
-                .ifPresent(message -> {
-                    throw new DatabaseException(message);
-                });
+        checkFalse(isMoveToSameParent(command),
+                "Measurable cannot set it self as its parent.");
+        checkFalse(isMoveToANodeWhichIsAlreadyAChild(command),
+                "Parent node is already a child of the measurable.");
 
         TaxonomyCommandProcessor processor = getCommandProcessor(command);
         TaxonomyChangeCommand updatedCommand = processor.apply(command, userId);
@@ -136,31 +133,33 @@ public class TaxonomyChangeService {
         }
     }
 
-
     private void verifyUserHasPermissions(String userId) {
         if (! userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
             throw new NotAuthorizedException();
         }
     }
 
-    private Optional<String> returnErrorIfMoveIsInvalid(TaxonomyChangeCommand command) {
+    private boolean isMoveToSameParent(TaxonomyChangeCommand command) {
         String destinationId = command.params().get("destinationId");
-        if(command.changeType().equals(TaxonomyChangeType.MOVE) &&
-                StringUtilities.notEmpty(destinationId)) {
+        if(isMovingToANode(command, destinationId)) {
 
             long parentId = Long.parseLong(destinationId);
             final Measurable parent = measurableService.getById(parentId);
 
-            if(parent.parentId().isPresent()
-                    && command.primaryReference().id() == parent.parentId().get()) {
-                return Optional.of("Parent node is already a child of the measurable.");
-            }
-
-            if (parentId == command.primaryReference().id()) {
-                return Optional.of("Measurable cannot set it self as parent.");
-            }
+            return parent.parentId().isPresent()
+                    && command.primaryReference().id() == parent.parentId().get();
         }
-        return Optional.empty();
+        return false;
     }
 
+    private boolean isMoveToANodeWhichIsAlreadyAChild(TaxonomyChangeCommand command) {
+        String destinationId = command.params().get("destinationId");
+        return isMovingToANode(command, destinationId) &&
+             Long.parseLong(destinationId) == command.primaryReference().id();
+    }
+
+    private boolean isMovingToANode(TaxonomyChangeCommand command, String destinationId) {
+        return command.changeType().equals(TaxonomyChangeType.MOVE) &&
+                StringUtilities.notEmpty(destinationId);
+    }
 }

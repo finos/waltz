@@ -297,11 +297,17 @@ function controller(notification,
         }
 
         if (isMovedToItself()) {
-            return alert("Cannot set a Measurable as its own parent.");
+            notification.warning("Cannot set a Measurable as its own parent, ignoring....");
+            vm.commandParams.destination = null;
+            vm.submitDisabled = true;
+            return;
         }
 
         if (isMovedToAnExistingChild()) {
-            return alert("Cannot add a measurable as parent if it is already a child of the subject.");
+            notification.warning("Cannot add a measurable as parent if it is already a child of the subject, ignoring....");
+            vm.commandParams.destination = null;
+            vm.submitDisabled = true;
+            return;
         }
 
         vm.onSubmitChange(cmd)
