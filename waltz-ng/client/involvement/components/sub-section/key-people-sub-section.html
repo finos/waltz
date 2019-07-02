@@ -1,0 +1,39 @@
+<waltz-sub-section name="KeyPeople">
+    <content>
+        <div class="waltz-sub-section-content">
+            :::: INSIDE KEY PEOPLE :::
+            <div ng-switch="$ctrl.mode" style="padding: 5px 0">
+<!--                <div ng-switch-when="LIST">-->
+<!--                    <waltz-person-direct-list assessments="$ctrl.assessments"-->
+<!--                                                  on-select="$ctrl.onSelect">-->
+<!--                    </waltz-person-direct-list>-->
+
+                    <div ng-if="$ctrl.visibility.editor === false">
+                        <div ng-if="$ctrl.gridData.length > 0">
+                            <waltz-grid column-defs="$ctrl.columnDefs"
+                                                    row-data="$ctrl.gridData">
+                            </waltz-grid>
+                        </div>
+
+
+                        <waltz-no-data ng-if="$ctrl.gridData.length == 0">
+                            <message>
+                                <strong>
+                                    No people
+                                </strong>
+                                have been associated.
+                            </message>
+                        </waltz-no-data>
+                    </div>
+                </div>
+<!--                <div ng-switch-when="VIEW">-->
+<!--                    <waltz-assessment-editor assessment="$ctrl.selectedAssessment"-->
+<!--                                             on-save="$ctrl.onSave"-->
+<!--                                             on-close="$ctrl.onClose"-->
+<!--                                             on-remove="$ctrl.onRemove">-->
+<!--                    </waltz-assessment-editor>-->
+<!--                </div>-->
+            </div>
+<!--        </div>-->
+    </content>
+</waltz-sub-section>
