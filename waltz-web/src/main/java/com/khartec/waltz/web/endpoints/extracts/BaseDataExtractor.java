@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -36,12 +37,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static java.util.Optional.ofNullable;
 
 
 public abstract class BaseDataExtractor {
@@ -113,7 +114,7 @@ public abstract class BaseDataExtractor {
                               Response response) {
         String csv = qry.fetch().formatCSV();
         response.type(MimeTypes.Type.TEXT_PLAIN.name());
-        response.header("Content-disposition", "attachment; filename="+suggestedFilenameStem+".csv");
+        response.header("Content-disposition", "attachment; filename=" + suggestedFilenameStem + ".csv");
         return csv;
     }
 
@@ -129,17 +130,20 @@ public abstract class BaseDataExtractor {
     private void writeExcelBody(Select<?> qry, XSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         qry.fetch().forEach(r -> {
-                Row row = sheet.createRow(rowNum.getAndIncrement());
-                AtomicInteger colNum = new AtomicInteger(0);
-                colNum.set(0);
-                for (Field<?> field : r.fields()) {
-                    Cell cell = row.createCell(colNum.getAndIncrement());
-                    cell.setCellValue(Optional
-                            .ofNullable(r.get(field))
-                            .map(Objects::toString)
-                            .orElse(""));
-                }
-            });
+            Row row = sheet.createRow(rowNum.getAndIncrement());
+            AtomicInteger colNum = new AtomicInteger(0);
+            for (Field<?> field : r.fields()) {
+                Cell cell = row.createCell(colNum.getAndIncrement());
+                ofNullable(r.get(field)).ifPresent(v -> {
+                    if (v instanceof Number) {
+                        cell.setCellType(CellType.NUMERIC);
+                        cell.setCellValue(((Number) v).doubleValue());
+                    } else {
+                        cell.setCellValue(Objects.toString(v));
+                    }
+                });
+            }
+        });
     }
 
 
