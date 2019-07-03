@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.assessment_rating;
 
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
@@ -40,6 +41,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
 
 @Repository
@@ -115,4 +117,16 @@ public class AssessmentRatingDao {
                 .execute() == 1;
     }
 
+
+    public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
+        return dsl
+                .select()
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION)
+                .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
+                        .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(genericSelector.kind().name())))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(ASSESSMENT_RATING.ENTITY_ID.in(genericSelector.selector()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

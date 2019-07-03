@@ -21,7 +21,8 @@
 
     <!-- HEADER -->
     <waltz-page-header icon="user"
-                       name="{{ ctrl.person.displayName }}">
+                       name="{{ ctrl.person.displayName }}"
+                       small="{{ ctrl.person.employeeId}}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li><a ui-sref="main.person">People</a></li>

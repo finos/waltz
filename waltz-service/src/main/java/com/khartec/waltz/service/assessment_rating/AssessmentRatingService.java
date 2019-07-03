@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.data.assessment_rating.AssessmentRatingDao;
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
@@ -48,21 +48,25 @@ public class AssessmentRatingService {
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
+    private final GenericSelectorFactory genericSelectorFactory;
 
     @Autowired
     public AssessmentRatingService(
             AssessmentRatingDao assessmentRatingDao,
             AssessmentDefinitionDao assessmentDefinitionDao,
             RatingSchemeDAO ratingSchemeDAO,
+            GenericSelectorFactory genericSelectorFactory,
             ChangeLogService changeLogService) {
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
+        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
+        this.genericSelectorFactory = genericSelectorFactory;
         this.changeLogService = changeLogService;
 
     }
@@ -131,5 +135,11 @@ public class AssessmentRatingService {
         changeLogService.write(logEntry);
 
         return assessmentRatingDao.remove(command);
+    }
+
+    public List<AssessmentRating> findByTargetKindForRelatedSelector(EntityKind targetKind,
+                                                                     IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+        return assessmentRatingDao.findByGenericSelector(genericSelector);
     }
 }

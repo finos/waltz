@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 
-import { checkIsEntityRef } from '../../common/checks';
+import { checkIsEntityRef } from "../../common/checks";
 
 export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/assessment-rating`;
@@ -54,8 +54,15 @@ export function store($http, BaseApiUrl) {
     };
 
 
+    const findByTargetKindForRelatedSelector = (targetKind, selector) => {
+        return $http
+            .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
+            .then(r => r.data);
+    };
+
     return {
         findForEntityReference,
+        findByTargetKindForRelatedSelector,
         create,
         update,
         remove
@@ -64,19 +71,24 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl',
+    "$http",
+    "BaseApiUrl",
 ];
 
 
-export const serviceName = 'AssessmentRatingStore';
+export const serviceName = "AssessmentRatingStore";
 
 
 export const AssessmentRatingStore_API = {
     findForEntityReference: {
         serviceName,
-        serviceFnName: 'findForEntityReference',
-        description: 'find all assessment ratings for an entity'
+        serviceFnName: "findForEntityReference",
+        description: "find all assessment ratings for an entity"
+    },
+    findByTargetKindForRelatedSelector: {
+        serviceName,
+        serviceFnName: "findByTargetKindForRelatedSelector",
+        description: "find all assessment ratings for a particular target kind by a selector for that kind [targetKind, selector]"
     },
     create: {
         serviceName,

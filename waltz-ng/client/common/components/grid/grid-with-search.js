@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -46,9 +46,10 @@ const initialState = {
 
 
 function mkSearchFields(columnDefs = []) {
-    return _.chain(columnDefs)
-        .filter(c => !_.isUndefined(c.field))
-        .map("field")
+    return _
+        .chain(columnDefs)
+        .map(c => c.toSearchTerm || c.field)
+        .compact()
         .value();
 }
 

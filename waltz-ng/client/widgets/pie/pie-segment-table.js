@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,14 +19,14 @@
 import _ from "lodash";
 import {variableScale} from "../../common/colors";
 import {numberFormatter, toPercentage} from "../../common/string-utils";
-import template from './pie-segment-table.html';
+import template from "./pie-segment-table.html";
 
 
 const bindings = {
-    config: '<',
-    data: '<',
-    headings: '<',
-    selectedSegmentKey: '<'
+    config: "<",
+    data: "<",
+    headings: "<",
+    selectedSegmentKey: "<"
 };
 
 
@@ -38,25 +38,26 @@ const initialState = {
 
 const defaultConfig = {
     labelProvider: (d) => d.key,
-    colorProvider: (d) => variableScale(d),
+    valueProvider: (d) => d.count,
+    colorProvider: (d) => variableScale(d.key),
     descriptionProvider: (d) => null
 };
 
 
-const defaultOnSelect = (d) => console.log('no pie-segment-table::on-select handler provided:', d);
+const defaultOnSelect = (d) => console.log("no pie-segment-table::on-select handler provided:", d);
 
 
 function controller() {
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onChanges = (changes) => {
+        vm.config = _.defaultsDeep(vm.config, defaultConfig);
         if (changes.data) {
-            vm.total = _.sumBy(vm.data, 'count');
+            vm.total = _.sumBy(vm.data, vm.config.valueProvider);
             vm.totalStr = numberFormatter(vm.total, 2, false);
         }
 
         if (changes.config) {
-            vm.config = _.defaultsDeep(vm.config, defaultConfig);
             vm.rowSelected = (d, e) => {
                 e.stopPropagation();
                 (vm.config.onSelect || defaultOnSelect)(d);
@@ -64,7 +65,7 @@ function controller() {
         }
     };
 
-    vm.asPercentage = (d) => toPercentage(d.count, vm.total);
+    vm.asPercentage = (d) => toPercentage(vm.config.valueProvider(d), vm.total);
 }
 
 

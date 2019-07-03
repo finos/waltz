@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -130,7 +130,8 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
-        return DSL.selectDistinct(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID)
+        return DSL
+                .selectDistinct(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID)
                 .from(SCENARIO_RATING_ITEM)
                 .innerJoin(APPLICATION).on(APPLICATION.ID.eq(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID))
                 .and(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND.eq(EntityKind.APPLICATION.name()))

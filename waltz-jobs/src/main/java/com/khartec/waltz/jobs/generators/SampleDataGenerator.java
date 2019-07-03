@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,8 +19,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public interface SampleDataGenerator {
     String SAMPLE_DATA_USER = "admin";
 
     int NUM_APPS = 500;
-    int NUM_CHANGE_INITIATIVES = 4;
+    int NUM_CHANGE_INITIATIVES = 100;
     int NUM_PROCESS_GROUPS = 3;
     int NUM_PROCESSES_IN_GROUP = 6;
     int MAX_RATINGS_PER_APP = 12;
@@ -58,10 +59,24 @@ public interface SampleDataGenerator {
 
 
     default List<Long> getAppIds(DSLContext dsl) {
-        return dsl.select(APPLICATION.ID)
-                .from(APPLICATION)
-                .fetch()
-                .map(r -> r.value1());
+        return loadAllIds(dsl, APPLICATION.ID);
+    }
+
+
+    default <T> List<T> loadAllIds(DSLContext dsl,
+                                   TableField<? extends Record, T> idCol) {
+        return loadAllIds(dsl, idCol, DSL.trueCondition());
+    }
+
+
+    default <T> List<T> loadAllIds(DSLContext dsl,
+                                   TableField<? extends Record, T> idCol,
+                                   Condition condition) {
+        return dsl
+                .select(idCol)
+                .from(idCol.getTable())
+                .where(condition)
+                .fetch(idCol);
     }
 
 
@@ -74,8 +89,7 @@ public interface SampleDataGenerator {
                 .select(MEASURABLE.ID)
                 .from(MEASURABLE)
                 .where(sampleMeasurableCondition)
-                .fetch()
-                .map(r -> r.value1());
+                .fetch(MEASURABLE.ID);
 
         dsl.deleteFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(mIds));

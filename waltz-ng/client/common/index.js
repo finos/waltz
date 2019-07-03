@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -84,24 +84,32 @@ export function perhaps(fn, dflt) {
  *
  * @param items - items to be searched
  * @param searchStr - query string to search for
- * @param searchFields - fields in the items to consider when searching
+ * @param searchFields - fields in the items to consider when searching, may be a function
  * @returns {Array}
  */
-export function termSearch(items = [], searchStr = "", searchFields = []) {
+export function termSearch(items = [],
+                           searchStr = "",
+                           searchFields = []) {
     if (_.isEmpty(searchStr)) {
         return items;
     }
 
     const terms = searchStr.toLowerCase().split(/\W/);
 
-    return _.filter(items, item => {
-        const fields = _.isEmpty(searchFields)
-            ? _.keys(item)
-            : searchFields;
-
-        const targetStr = _.chain(fields)
+    const getSearchFieldsForItem = item => _.isEmpty(searchFields)
+        ? _.chain(item)
+            .keys()
             .reject(field => field.startsWith("$") || _.isFunction(_.get(item, field)))
-            .map(field => _.get(item, field))
+            .value()
+        : searchFields;
+
+    return _.filter(items, item => {
+        const targetStr = _
+            .chain(getSearchFieldsForItem(item))
+            .map(field => _.isFunction(field)
+                ? field(item)
+                : _.get(item, [ field ], ""))
+            .map(v => v.toLowerCase())
             .join(" ")
             .value()
             .toLowerCase();
