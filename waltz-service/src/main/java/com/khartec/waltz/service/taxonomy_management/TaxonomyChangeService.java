@@ -1,14 +1,17 @@
 package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.exceptions.NotAuthorizedException;
+import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.client_cache_key.ClientCacheKeyService;
+import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import com.khartec.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.Checks.*;
 import static java.util.stream.Collectors.toMap;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -31,6 +33,7 @@ public class TaxonomyChangeService {
     private final ClientCacheKeyService clientCacheKeyService;
     private final UserRoleService userRoleService;
     private final MeasurableCategoryService measurableCategoryService;
+    private final MeasurableService measurableService;
 
 
     @Autowired
@@ -38,7 +41,8 @@ public class TaxonomyChangeService {
                                  ClientCacheKeyService clientCacheKeyService,
                                  MeasurableCategoryService measurableCategoryService,
                                  UserRoleService userRoleService,
-                                 List<TaxonomyCommandProcessor> processors) {
+                                 List<TaxonomyCommandProcessor> processors,
+                                 MeasurableService measurableService) {
         checkNotNull(taxonomyChangeDao, "taxonomyChangeDao cannot be null");
         checkNotNull(clientCacheKeyService, "clientCacheKeyService cannot be null");
         this.clientCacheKeyService = clientCacheKeyService;
@@ -51,6 +55,7 @@ public class TaxonomyChangeService {
                         .stream()
                         .map(st -> tuple(st, p)))
                 .collect(toMap(t -> t.v1, t -> t.v2));
+        this.measurableService = measurableService;
     }
 
 
@@ -91,6 +96,12 @@ public class TaxonomyChangeService {
     public TaxonomyChangeCommand applyById(long id, String userId) {
         TaxonomyChangeCommand command = taxonomyChangeDao.getDraftCommandById(id);
         verifyUserHasPermissions(userId, command.changeDomain());
+
+        checkFalse(isMoveToSameParent(command),
+                "Measurable cannot set it self as its parent.");
+        checkFalse(isMoveToANodeWhichIsAlreadyAChild(command),
+                "Parent node is already a child of the measurable.");
+
         TaxonomyCommandProcessor processor = getCommandProcessor(command);
         TaxonomyChangeCommand updatedCommand = processor.apply(command, userId);
         clientCacheKeyService.createOrUpdate("TAXONOMY");
@@ -122,11 +133,33 @@ public class TaxonomyChangeService {
         }
     }
 
-
     private void verifyUserHasPermissions(String userId) {
         if (! userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
             throw new NotAuthorizedException();
         }
     }
 
+    private boolean isMoveToSameParent(TaxonomyChangeCommand command) {
+        String destinationId = command.params().get("destinationId");
+        if(isMovingToANode(command, destinationId)) {
+
+            long parentId = Long.parseLong(destinationId);
+            final Measurable parent = measurableService.getById(parentId);
+
+            return parent.parentId().isPresent()
+                    && command.primaryReference().id() == parent.parentId().get();
+        }
+        return false;
+    }
+
+    private boolean isMoveToANodeWhichIsAlreadyAChild(TaxonomyChangeCommand command) {
+        String destinationId = command.params().get("destinationId");
+        return isMovingToANode(command, destinationId) &&
+             Long.parseLong(destinationId) == command.primaryReference().id();
+    }
+
+    private boolean isMovingToANode(TaxonomyChangeCommand command, String destinationId) {
+        return command.changeType().equals(TaxonomyChangeType.MOVE) &&
+                StringUtilities.notEmpty(destinationId);
+    }
 }
