@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,15 @@ export function sameRef(r1, r2, options = { skipChecks: false }) {
         checkIsEntityRef(r2);
     }
     return r1.kind === r2.kind && r1.id === r2.id;
+}
+
+
+
+export function isSameParentEntityRef(changes) {
+    return sameRef(
+        changes.parentEntityRef.previousValue,
+        changes.parentEntityRef.currentValue,
+        {skipChecks: true});
 }
 
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './pie-table.html';
+import template from "./pie-table.html";
 
 import {limitSegments} from "./pie-utils";
 import {initialiseData} from "../../common/index";
 
 
 const bindings = {
-    data: '<',
-    config: '<',
-    title: '@',
-    subTitle: '@',
-    icon: '@',
-    description: '@',
-    selectedSegmentKey: '<'
+    data: "<",
+    config: "<",
+    title: "@",
+    subTitle: "@",
+    icon: "@",
+    description: "@",
+    selectedSegmentKey: "<",
+    renderMode: "@?"
 };
 
 

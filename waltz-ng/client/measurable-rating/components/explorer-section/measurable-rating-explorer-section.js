@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,7 @@ function preparePie(ratings = [],
         config: {
             size: 130,
             onSelect,
-            colorProvider: (d) => colorScale(d.data.key),
+            colorProvider: (d) => colorScale(d.key),
             labelProvider: (d) => _.get(schemeItemsByCode, [d.key, "name"], d.key),
             descriptionProvider: (d) => _.get(schemeItemsByCode, [d.key, "description"], d.key)
         }
@@ -94,7 +94,8 @@ function prepareTableData(ratings = [],
             return {
                 rating: ratingItemsByCode[r.rating],
                 measurable: measurablesById[r.measurableId],
-                entityReference: Object.assign({}, r.entityReference, { assetCode: appsById[r.entityReference.id].assetCode })
+                entityReference: Object.assign({}, r.entityReference, { assetCode: appsById[r.entityReference.id].assetCode }),
+                description: r.description
             };
         })
         .value();
@@ -131,8 +132,18 @@ function prepareColumnDefs(measurableCategory, measurables) {
         : [];
 
     const finalCols = [{
-        field: "rating.description",
-        name: "Comment"
+        field: "description",
+        name: "Comment",
+        cellTemplate: `<span class="waltz-entity-icon-label"
+                      uib-popover-template="'mres/desc-popup.html'"
+                      popover-trigger="mouseenter"
+                      popover-enable="true"
+                      popover-class="waltz-popover-wide"
+                      popover-placement="top-right"
+                      popover-append-to-body="true">
+                      {{row.entity.description | limitTo: 25 }}
+                      {{row.entity.description.length > 25 ? '...' : ''}}
+                </span>`
     }];
 
     return [].concat(initialCols, measurableCols, finalCols);

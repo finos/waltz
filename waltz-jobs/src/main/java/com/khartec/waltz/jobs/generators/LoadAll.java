@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -31,44 +32,46 @@ public class LoadAll {
     private static final boolean SKIP_SLOW = false;
 
     private static final SampleDataGenerator[] loaders = new SampleDataGenerator[] {
-            new DataTypeGenerator(),
-            new OrgUnitGenerator(),
-            SKIP_SLOW ? null : new PersonDataGenerator(),
-            new AppGenerator(),
-            new AppGroupGenerator(),
-            new AppGroupEntryGenerator(),
-            new BookmarkGenerator(),
+//            new DataTypeGenerator(),
+//            new OrgUnitGenerator(),
+//            SKIP_SLOW ? null : new PersonDataGenerator(),
+//            new AppGenerator(),
+//            new AppGroupGenerator(),
+//            new AppGroupEntryGenerator(),
+//            new BookmarkGenerator(),
             new ChangeInitiativeGenerator(),
-            new ProcessGenerator(),
-            new MeasurableGenerator("PRODUCT"),
-            new MeasurableGenerator("CAPABILITY"),
-            new MeasurableGenerator("REGULATION"),
-            new MeasurableRatingGenerator(),
-            SKIP_SLOW ? null : new EntityStatisticGenerator(),
-            new AuthSourceGenerator(),
+//            new ProcessGenerator(),
+//            new MeasurableGenerator("PRODUCT"),
+//            new MeasurableGenerator("CAPABILITY"),
+//            new MeasurableGenerator("REGULATION"),
+//            new MeasurableRatingGenerator(),
+//            SKIP_SLOW ? null : new EntityStatisticGenerator(),
+//            new AuthSourceGenerator(),
             new AssessmentGenerator(),
-            new RoadmapGenerator(),
-            new ServerGenerator(),
-            new LogicalFlowGenerator(),
-            new LogicalFlowDecorationGenerator(),
-            new PhysicalSpecificationGenerator(),
-            new PhysicalFlowGenerator(),
-            new PhysicalFlowParticipantGenerator(),
-            new InvolvementGenerator(),
-            new DatabaseGenerator(),
-            new AssetCostGenerator(),
-            new ChangeLogGenerator(),
-            new EndUserAppGenerator(),
-            new EndUserAppInvolvmentGenerator(),
-            new SurveyTemplateGenerator(),
-            new SurveyRunGenerator(),
-            new ChangeSetGenerator(),
-            new ChangeUnitGenerator()
+//            new RoadmapGenerator(),
+//            new ServerGenerator(),
+//            new LogicalFlowGenerator(),
+//            new LogicalFlowDecorationGenerator(),
+//            new PhysicalSpecificationGenerator(),
+//            new PhysicalFlowGenerator(),
+//            new PhysicalFlowParticipantGenerator(),
+//            new InvolvementGenerator(),
+//            new DatabaseGenerator(),
+//            new AssetCostGenerator(),
+//            new ChangeLogGenerator(),
+//            new EndUserAppGenerator(),
+//            new EndUserAppInvolvmentGenerator(),
+//            new SurveyTemplateGenerator(),
+//            new SurveyRunGenerator(),
+//            new ChangeSetGenerator(),
+//            new ChangeUnitGenerator()
     };
 
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
+        LoggingUtilities.configureLogging();
 
         Arrays.stream(loaders)
                 .filter(Objects::nonNull)

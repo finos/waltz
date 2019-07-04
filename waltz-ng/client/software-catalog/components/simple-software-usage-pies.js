@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,12 @@
 
 import _ from "lodash";
 import {maturityColorScale, variableScale} from "../../common/colors";
-import template from './simple-software-usage-pies.html';
+import template from "./simple-software-usage-pies.html";
 
 
 const bindings = {
-    usages: '<',
-    packages: '<'
+    usages: "<",
+    packages: "<"
 };
 
 
@@ -32,7 +32,7 @@ const PIE_SIZE = 70;
 
 
 function prepareStats(items = [], usages = []) {
-    const usageCounts = _.countBy(usages, 'softwarePackageId');
+    const usageCounts = _.countBy(usages, "softwarePackageId");
 
     const countPieDataBy = (items = [], fn = (x => x)) =>
         _.chain(items)
@@ -64,11 +64,11 @@ function controller() {
     vm.pieConfig = {
         maturity: {
             size: PIE_SIZE,
-            colorProvider: (d) => maturityColorScale(d.data.key)
+            colorProvider: (d) => maturityColorScale(d.key)
         },
         vendor: {
             size: PIE_SIZE,
-            colorProvider: (d) => variableScale(d.data.key)
+            colorProvider: (d) => variableScale(d.key)
         }
     };
 

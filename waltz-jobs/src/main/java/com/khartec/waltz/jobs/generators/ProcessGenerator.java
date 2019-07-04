@@ -1,6 +1,7 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,8 +20,6 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
-import org.jooq.Batch;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -31,7 +30,6 @@ import java.util.Map;
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 public class ProcessGenerator implements SampleDataGenerator {
 
@@ -40,6 +38,7 @@ public class ProcessGenerator implements SampleDataGenerator {
             "Customer", "Financial", "Market",
             "Industry", "Vertical", "Horizontal"
     };
+
 
     private static final String[] p2 = new String[] {
             "Onboarding", "Processing", "Reporting",
@@ -101,28 +100,10 @@ public class ProcessGenerator implements SampleDataGenerator {
 
     @Override
     public boolean remove(ApplicationContext ctx) {
-
         DSLContext dsl = getDsl(ctx);
         long category = getCategory(dsl);
 
-        Condition sampleMeasurableCondition = MEASURABLE.MEASURABLE_CATEGORY_ID.eq(category)
-                .and(MEASURABLE.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE));
-
-        List<Long> mIds = dsl
-                .select(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .where(sampleMeasurableCondition)
-                .fetch()
-                .map(r -> r.value1());
-
-        dsl.deleteFrom(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.MEASURABLE_ID.in(mIds));
-
-        dsl.deleteFrom(MEASURABLE)
-                .where(sampleMeasurableCondition)
-                .execute();
-
-        return true;
+        return deleteRatingsForCategory(dsl, category);
     }
 
 
