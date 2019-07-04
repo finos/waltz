@@ -2,7 +2,6 @@
     <content>
         <div class="waltz-sub-section-content">
             <div ng-switch="$ctrl.mode" style="padding: 5px 0">
-                <div ng-if="$ctrl.visibility.editor === false">
                     <div ng-if="$ctrl.keyPeople.length > 0" style="min-height: 1px;">
                         <table class="table table-condensed small" width="100%">
                             <colgroup>
@@ -10,7 +9,7 @@
                                 <col width="70%">
                             </colgroup>
                             <thead>
-                            <tr style="border-bottom: 1px solid #d4d4d4;">
+                            <tr>
                                 <th>Role</th>
                                 <th>Name</th>
                             </tr>
@@ -43,6 +42,5 @@
                     </waltz-no-data>
                 </div>
             </div>
-        </div>
     </content>
 </waltz-sub-section>

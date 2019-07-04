@@ -5,15 +5,13 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {getPeopleWithInvolvements} from "../../involvement-utils";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
+
 const bindings = {
     parentEntityRef: "<",
 };
 
 const initialState = {
-    keyPeople: [],
-    visibility: {
-        editor: false
-    }
+    keyPeople: []
 };
 
 
@@ -23,7 +21,7 @@ function getPeopleWithRoleNames(involvements = [], displayNameService) {
             person: inv.person,
             rolesDisplayName: displayNameService.lookup("involvementKind", inv.involvement.kindId)
         }))
-        .sortBy("person.displayName")
+        .sortBy("rolesDisplayName")
         .value();
 }
 
