@@ -50,6 +50,7 @@ import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static com.khartec.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static java.util.stream.Collectors.*;
@@ -98,6 +99,20 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
+                .fetch(involvementMapper);
+    }
+
+    public List<Involvement> findByEntityReferenceAndKeyInvolvements(EntityReference ref) {
+        SelectConditionStep<Record1<Long>> keyInvolvements =
+                dsl.selectDistinct(KEY_INVOLVEMENT_KIND.INVOLVEMENT_KIND_ID)
+                .from(KEY_INVOLVEMENT_KIND)
+                .where(KEY_INVOLVEMENT_KIND.ENTITY_KIND.eq(ref.kind().name()));
+
+        return dsl.select()
+                .from(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
+                .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
+                .and(INVOLVEMENT.KIND_ID.in(keyInvolvements))
                 .fetch(involvementMapper);
     }
 

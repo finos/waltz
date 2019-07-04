@@ -1,39 +1,48 @@
-<waltz-sub-section name="KeyPeople">
+<waltz-sub-section name="Key People" ng-click="$ctrl.onSelect()">
     <content>
         <div class="waltz-sub-section-content">
-            :::: INSIDE KEY PEOPLE :::
             <div ng-switch="$ctrl.mode" style="padding: 5px 0">
-<!--                <div ng-switch-when="LIST">-->
-<!--                    <waltz-person-direct-list assessments="$ctrl.assessments"-->
-<!--                                                  on-select="$ctrl.onSelect">-->
-<!--                    </waltz-person-direct-list>-->
-
-                    <div ng-if="$ctrl.visibility.editor === false">
-                        <div ng-if="$ctrl.gridData.length > 0">
-                            <waltz-grid column-defs="$ctrl.columnDefs"
-                                                    row-data="$ctrl.gridData">
-                            </waltz-grid>
-                        </div>
-
-
-                        <waltz-no-data ng-if="$ctrl.gridData.length == 0">
-                            <message>
-                                <strong>
-                                    No people
-                                </strong>
-                                have been associated.
-                            </message>
-                        </waltz-no-data>
+                <div ng-if="$ctrl.visibility.editor === false">
+                    <div ng-if="$ctrl.keyPeople.length > 0" style="min-height: 1px;">
+                        <table class="table table-condensed small" width="100%">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="70%">
+                            </colgroup>
+                            <thead>
+                            <tr style="border-bottom: 1px solid #d4d4d4;">
+                                <th>Role</th>
+                                <th>Name</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in $ctrl.keyPeople">
+                                <td>
+                                    <span ng-bind="item.rolesDisplayName"></span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <a ui-sref="main.person.view ({empId: item.person.employeeId})"
+                                           ng-bind="item.person.displayName"></a> -
+                                        <a href="mailto:{{item.person.email}}">
+                                            <waltz-icon name="envelope-o"></waltz-icon>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    <waltz-no-data ng-if="$ctrl.keyPeople.length == 0">
+                        <message>
+                            <strong>
+                                No key people
+                            </strong>
+                            have been associated.
+                        </message>
+                    </waltz-no-data>
                 </div>
-<!--                <div ng-switch-when="VIEW">-->
-<!--                    <waltz-assessment-editor assessment="$ctrl.selectedAssessment"-->
-<!--                                             on-save="$ctrl.onSave"-->
-<!--                                             on-close="$ctrl.onClose"-->
-<!--                                             on-remove="$ctrl.onRemove">-->
-<!--                    </waltz-assessment-editor>-->
-<!--                </div>-->
             </div>
-<!--        </div>-->
+        </div>
     </content>
 </waltz-sub-section>

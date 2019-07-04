@@ -3,79 +3,38 @@ import {initialiseData} from "../../../common";
 import template from "./key-people-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
-import {aggregatePeopleInvolvements} from "../../involvement-utils";
-
-
+import {getPeopleWithInvolvements} from "../../involvement-utils";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 const bindings = {
     parentEntityRef: "<",
 };
 
 const initialState = {
-    allowedInvolvements: [],
-    gridData: [],
-    gridDataCount: 0,
-    exportGrid: () => {},
+    keyPeople: [],
     visibility: {
         editor: false
     }
 };
 
 
-function mkGridData(involvements = [], displayNameService) {
+function getPeopleWithRoleNames(involvements = [], displayNameService) {
     return _.chain(involvements)
-        .map(inv => {
-            const roles = _.map(inv.involvements, ik => ({
-                provenance: ik.provenance,
-                displayName: displayNameService.lookup("involvementKind", ik.kindId)
-            }));
-
-            const rolesDisplayName = _.chain(roles)
-                .map("displayName")
-                .join(", ")
-                .value();
-
-            return {
-                person: inv.person,
-                roles,
-                rolesDisplayName
-            }
-        })
+        .map(inv => ({
+            person: inv.person,
+            rolesDisplayName: displayNameService.lookup("involvementKind", inv.involvement.kindId)
+        }))
         .sortBy("person.displayName")
         .value();
 }
 
-function mkEntityRef(person) {
-    if (person) {
-        return {
-            id: person.id,
-            name: person.displayName,
-            kind: "PERSON"
-        };
-    }
-    return person;
-}
-
-function mkCurrentInvolvements(involvements = []) {
-    return _.chain(involvements)
-        .flatMap(i => {
-            const personEntityRef = mkEntityRef(i.person);
-            return _.map(i.involvements, inv => ({
-                entity: personEntityRef,
-                involvement: +inv.kindId,
-                isReadOnly: inv.provenance !== "waltz"
-            }));
-        })
-        .value();
-}
-
-function controller($q, displayNameService, serviceBroker, involvedSectionService) {
+function controller($q, displayNameService, serviceBroker, dynamicSectionManager) {
 
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
         const involvementPromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findByEntityReference,
+                CORE_API.InvolvementStore.findByEntityReferenceAndKeyInvolvements,
                 [ vm.parentEntityRef ],
                 { force: true })
             .then(r => r.data);
@@ -89,70 +48,27 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
         $q.all([involvementPromise, peoplePromise])
             .then(([involvements = [], people = []]) => {
-                // console.log("people = " + JSON.stringify(people));
-                const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
-                vm.gridData = mkGridData(aggInvolvements, displayNameService);
-                // console.log("people aggregate = " + JSON.stringify(vm.gridData));
-                vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
+                const aggInvolvements = getPeopleWithInvolvements(involvements, people);
+                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, displayNameService);
             });
     };
 
-
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
-            .then(r => vm.involementKinds = r.data);
-    };
-
-    vm.$onChanges = (changes) => {
+    vm.$onChanges = () => {
         if (vm.parentEntityRef) {
             refresh();
         }
-
-
-        vm.allowedInvolvements = _.map(
-            displayNameService.getAllByType("involvementKind"),
-            (name, id) => ({ value: +id, name }));
     };
 
-    vm.columnDefs = [
-        {
-            field: "person.displayName",
-            displayName: "Name",
-            cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - 
-                    <a href="mailto:{{row.entity.person.email}}">
-                        <waltz-icon name="envelope-o"></waltz-icon>
-                    </a>
-                </div>`
-        },
-        {
-            field: "rolesDisplayName",
-            displayName: "Roles",
-            // sortingAlgorithm: (a, b) => {
-            //     const aNames = _.join(_.map(a, "displayName"));
-            //     const bNames = _.join(_.map(b, "displayName"));
-            //     return aNames.localeCompare(bNames);
-            // },
-            // cellTemplate: `
-            //     <div class="ui-grid-cell-contents">
-            //         <span ng-bind="COL_FIELD"
-            //               uib-popover-template="'wips/roles-popup.html'"
-            //               popover-trigger="mouseenter"
-            //               popover-append-to-body="true">
-            //         </span>
-            //     </div>`
-        }
-    ];
+    vm.onSelect = () => {
+        dynamicSectionManager.activate(dynamicSections.involvedPeopleSection);
+    };
 }
-
 
 controller.$inject = [
     "$q",
     "DisplayNameService",
     "ServiceBroker",
-    "InvolvedSectionService"
+    "DynamicSectionManager"
 ];
 
 

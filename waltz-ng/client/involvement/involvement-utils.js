@@ -37,6 +37,20 @@ export function aggregatePeopleInvolvements(involvements, people) {
         .value();
 }
 
+export function getPeopleWithInvolvements(involvements, people) {
+
+    const peopleById = _
+        .chain(people)
+            .groupBy("employeeId")
+            .value();
+
+    return _
+        .chain(involvements)
+        .map(inv => ({
+            person: peopleById[inv.employeeId][0],
+            involvement: ({kindId: inv.kindId})
+        })).value();
+}
 
 export function mkChangeCommand(operation, personEntityRef, involvementKindId) {
     return {

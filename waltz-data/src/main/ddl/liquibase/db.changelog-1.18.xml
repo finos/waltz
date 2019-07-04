@@ -225,4 +225,26 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20190703-1500-1"
+               author="muzammilali">
+       <createTable tableName="key_involvement_kind"
+                remarks="Key Involvement Kind For Entity Kind">
+           <column name="involvement_kind_id"
+                   type="${id.type}">
+               <constraints nullable="false"/>
+           </column>
+           <column name="entity_kind"
+                   type="${enum.type}">
+               <constraints nullable="false"/>
+           </column>
+       </createTable>
+    </changeSet>
+
+    <changeSet id="20190703-1500-2"
+               author="muzammilali">
+        <addUniqueConstraint columnNames="involvement_kind_id, entity_kind"
+                             constraintName="unique_key_involvement_kind_for_entity_kind"
+                             tableName="key_involvement_kind"/>
+    </changeSet>
+
 </databaseChangeLog>
