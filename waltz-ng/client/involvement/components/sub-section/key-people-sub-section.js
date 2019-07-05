@@ -16,13 +16,20 @@ const initialState = {
 
 
 function getPeopleWithRoleNames(involvements = [], displayNameService) {
-    return _.chain(involvements)
+    const object = _.chain(involvements)
         .map(inv => ({
             person: inv.person,
             rolesDisplayName: displayNameService.lookup("involvementKind", inv.involvement.kindId)
         }))
-        .sortBy("rolesDisplayName")
+        .groupBy("rolesDisplayName")
         .value();
+
+    return _.map(object, function(value, key) {
+        return {
+            person: value,
+            rolesDisplayName: key
+        }
+    });
 }
 
 function controller($q, displayNameService, serviceBroker, dynamicSectionManager) {

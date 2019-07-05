@@ -1,45 +1,32 @@
-<waltz-sub-section name="Key People" ng-click="$ctrl.onSelect()">
+<waltz-sub-section ng-if="$ctrl.keyPeople.length > 0" name="Key People" ng-click="$ctrl.onSelect()">
     <content>
         <div class="waltz-sub-section-content">
             <div ng-switch="$ctrl.mode" style="padding: 5px 0">
-                    <div ng-if="$ctrl.keyPeople.length > 0" style="min-height: 1px;">
+                    <div  style="min-height: 1px;">
                         <table class="table table-condensed small" width="100%">
                             <colgroup>
                                 <col width="30%">
                                 <col width="70%">
                             </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>Name</th>
-                            </tr>
-                            </thead>
-                            <tbody>
                             <tr ng-repeat="item in $ctrl.keyPeople">
                                 <td>
                                     <span ng-bind="item.rolesDisplayName"></span>
                                 </td>
                                 <td>
                                     <div>
-                                        <a ui-sref="main.person.view ({empId: item.person.employeeId})"
-                                           ng-bind="item.person.displayName"></a> -
-                                        <a href="mailto:{{item.person.email}}">
+                                        <span ng-repeat="p in item.person">
+                                        <a ui-sref="main.person.view ({empId: p.person.employeeId})"
+                                           ng-bind="p.person.displayName"></a> -
+                                        <a href="mailto:{{p.person.email}}">
                                             <waltz-icon name="envelope-o"></waltz-icon>
                                         </a>
+                                            <font ng-show="!$last">, </font>
+                                        </span>
                                     </div>
                                 </td>
                             </tr>
-                            </tbody>
                         </table>
                     </div>
-                    <waltz-no-data ng-if="$ctrl.keyPeople.length == 0">
-                        <message>
-                            <strong>
-                                No key people
-                            </strong>
-                            have been associated.
-                        </message>
-                    </waltz-no-data>
                 </div>
             </div>
     </content>
