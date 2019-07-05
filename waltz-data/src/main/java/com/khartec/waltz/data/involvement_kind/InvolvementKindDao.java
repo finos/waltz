@@ -20,6 +20,7 @@
 package com.khartec.waltz.data.involvement_kind;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKind;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
@@ -42,6 +43,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static com.khartec.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
 
 @Repository
 public class InvolvementKindDao {
@@ -120,6 +122,15 @@ public class InvolvementKindDao {
         return record.getId();
     }
 
+    public List<InvolvementKind> findKeyInvolvementKindsByEntityKind(EntityKind kind) {
+        return dsl.select(involvementKind.fields())
+                .from(involvementKind)
+                .where(involvementKind.ID.in(
+                        dsl.selectDistinct(KEY_INVOLVEMENT_KIND.INVOLVEMENT_KIND_ID)
+                        .from(KEY_INVOLVEMENT_KIND)
+                        .where(KEY_INVOLVEMENT_KIND.ENTITY_KIND.eq(kind.name()))))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 
     public boolean update(InvolvementKindChangeCommand command) {
         checkNotNull(command, "command cannot be null");

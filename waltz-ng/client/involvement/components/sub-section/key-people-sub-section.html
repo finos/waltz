@@ -20,7 +20,9 @@
                                         <a href="mailto:{{p.person.email}}">
                                             <waltz-icon name="envelope-o"></waltz-icon>
                                         </a>
-                                            <font ng-show="!$last">, </font>
+                                            <span ng-show="!$last">, </span>
+                                        </span>
+                                        <span ng-show="!item.person.length">No person associated with this role
                                         </span>
                                     </div>
                                 </td>

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 
 @Service
 public class InvolvementKindService {
@@ -60,6 +61,11 @@ public class InvolvementKindService {
         return involvementKindDao.getById(id);
     }
 
+    public List<InvolvementKind> findKeyInvolvementKindsByEntityKind(EntityKind entityKind) {
+        checkNotNull(entityKind, "entityKind cannot be null");
+        return time("IKS.findKeyInvolvementKindsByEntityKind",
+                () -> involvementKindDao.findKeyInvolvementKindsByEntityKind(entityKind));
+    }
 
     public Long create(InvolvementKindCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");

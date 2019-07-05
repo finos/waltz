@@ -14,25 +14,22 @@ const initialState = {
     keyPeople: []
 };
 
+function getPeopleWithRoleNames(involvements = [], keyInvolvementKind = []) {
+    const peopleGroupByKindId =
+        _.chain(involvements)
+            .groupBy(inv => inv.involvement.kindId);
 
-function getPeopleWithRoleNames(involvements = [], displayNameService) {
-    const object = _.chain(involvements)
-        .map(inv => ({
-            person: inv.person,
-            rolesDisplayName: displayNameService.lookup("involvementKind", inv.involvement.kindId)
+    return _.chain(keyInvolvementKind)
+        .map(kind => ({
+            rolesDisplayName: kind.name,
+            person: peopleGroupByKindId.get(kind.id).value()
         }))
-        .groupBy("rolesDisplayName")
+        .sortBy("rolesDisplayName")
         .value();
-
-    return _.map(object, function(value, key) {
-        return {
-            person: value,
-            rolesDisplayName: key
-        }
-    });
 }
 
-function controller($q, displayNameService, serviceBroker, dynamicSectionManager) {
+
+function controller($q, serviceBroker, dynamicSectionManager) {
 
     const vm = initialiseData(this, initialState);
 
@@ -51,10 +48,17 @@ function controller($q, displayNameService, serviceBroker, dynamicSectionManager
                 { force: true })
             .then(r => r.data);
 
-        $q.all([involvementPromise, peoplePromise])
-            .then(([involvements = [], people = []]) => {
+        const keyInvolvementsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.InvolvementKindStore.findKeyInvolvementKindsByEntityKind,
+                [ vm.parentEntityRef.kind ],
+                { force: true })
+            .then(r => r.data);
+
+        $q.all([involvementPromise, peoplePromise, keyInvolvementsPromise])
+            .then(([involvements = [], people = [], keyInvolvements = []]) => {
                 const aggInvolvements = getPeopleWithInvolvements(involvements, people);
-                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, displayNameService);
+                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, keyInvolvements);
             });
     };
 
@@ -71,7 +75,6 @@ function controller($q, displayNameService, serviceBroker, dynamicSectionManager
 
 controller.$inject = [
     "$q",
-    "DisplayNameService",
     "ServiceBroker",
     "DynamicSectionManager"
 ];
