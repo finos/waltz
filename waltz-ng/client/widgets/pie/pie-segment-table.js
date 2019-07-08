@@ -51,21 +51,22 @@ function controller() {
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.config = _.defaultsDeep(vm.config, defaultConfig);
-        if (changes.data) {
+        if (changes.data || changes.config) {
+            vm.config = _.defaultsDeep(vm.config, defaultConfig);
             vm.total = _.sumBy(vm.data, vm.config.valueProvider);
+            vm.data = _.map(
+                vm.data,
+                d => Object.assign(
+                    {},
+                    d,
+                    { percentage: toPercentage(vm.config.valueProvider(d), vm.total) }));
             vm.totalStr = numberFormatter(vm.total, 2, false);
-        }
-
-        if (changes.config) {
             vm.rowSelected = (d, e) => {
                 e.stopPropagation();
                 (vm.config.onSelect || defaultOnSelect)(d);
             };
         }
     };
-
-    vm.asPercentage = (d) => toPercentage(vm.config.valueProvider(d), vm.total);
 }
 
 

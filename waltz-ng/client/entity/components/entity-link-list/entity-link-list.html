@@ -22,16 +22,8 @@
     <ul class="list-unstyled"
         ng-if="$ctrl.list.length > 0">
         <li ng-repeat="item in $ctrl.list">
-            <span style="display: inline-block"
-                  uib-popover-template="'well/popup.html'"
-                  popover-append-to-body="true"
-                  popover-placement="right"
-                  popover-trigger="mouseenter click"
-                  popover-enable="item.description"
-                  popover-popup-delay="200">
-                <waltz-entity-link entity-ref="item">
-                </waltz-entity-link>
-            </span>
+            <waltz-entity-link entity-ref="item">
+            </waltz-entity-link>
         </li>
     </ul>
     <i ng-if="$ctrl.list.length == 0">
@@ -40,12 +32,3 @@
 </div>
 
 
-
-
-<!-- DESCRIPTION POPUP -->
-<script type="text/ng-template"
-        id="well/popup.html">
-    <div class="small">
-        <waltz-markdown text="item.description"></waltz-markdown>
-    </div>
-</script>

@@ -91,18 +91,18 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
                         colorProvider: (d) => {
-                            if(d.data.key === "VALID") {
+                            if(d.key === "VALID") {
                                 return color(green);
-                            } else if (d.data.key === "DEPRECATED") {
+                            } else if (d.key === "DEPRECATED") {
                                 return color(amber);
-                            } else if (d.data.key === "NON CONCRETE") {
+                            } else if (d.key === "NON CONCRETE") {
                                 return color(grey);
                             } else {
                                 return color(red);
                             }
                         },
                         valueProvider: (d) => d.count,
-                        idProvider: (d) => d.data.key,
+                        idProvider: (d) => d.key,
                         labelProvider: d => _.capitalize(d.key),
                         size: 40
                     };
