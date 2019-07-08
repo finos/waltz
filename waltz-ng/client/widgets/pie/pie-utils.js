@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export function calcTotal(data) {
-    return _.sumBy(data, 'count')
+    return _.sumBy(data, "count")
 }
 
 
@@ -30,15 +30,17 @@ export function isPieEmpty(data) {
 }
 
 
+const MAX_PIE_SEGMENTS = 8;
 
-export function limitSegments(data = [], maxSegments = 5) {
-    const removeEmptySegments = segs => _.filter(segs, s => s.count !== 0)
+
+export function limitSegments(data = [], maxSegments = MAX_PIE_SEGMENTS) {
+    const removeEmptySegments = segs => _.filter(segs, s => s.count !== 0);
     if (data.length > maxSegments) {
         const sorted = _.sortBy(data, d => d.count * -1);
         const topData = _.take(sorted, maxSegments);
         const otherData = _.drop(sorted, maxSegments);
         const otherDatum = {
-            key: 'Other',
+            key: "Other",
             count : _.sumBy(otherData, "count")
         };
 

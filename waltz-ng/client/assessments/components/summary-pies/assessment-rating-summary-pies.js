@@ -29,10 +29,10 @@ const bindings = {
 };
 
 const basePieConfig = {
-    labelProvider: d => d.rating.name,
+    labelProvider: d => _.get(d, ["rating", "name"], "Other"),
     valueProvider: d => d.count,
-    colorProvider: d => color(d.rating.color),
-    descriptionProvider: d => d.rating.description
+    colorProvider: d => color(_.get(d, ["rating", "color"], "#bbbbbb")),
+    descriptionProvider: d => _.get(d, ["rating", "description"], "Other")
 };
 
 const initialState = {

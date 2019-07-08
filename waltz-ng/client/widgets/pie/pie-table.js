@@ -39,9 +39,6 @@ const initialState = {
 };
 
 
-const MAX_PIE_SEGMENTS = 5;
-
-
 function controller() {
 
     const vm = initialiseData(this, initialState);
@@ -53,7 +50,7 @@ function controller() {
     };
 
     const dataChanged = (data = []) => {
-        vm.pieData = limitSegments(data, MAX_PIE_SEGMENTS);
+        vm.pieData = limitSegments(data);
     };
 
     vm.$onChanges = (changes) => {
