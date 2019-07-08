@@ -19,8 +19,9 @@
 
 import template from "./pie-table.html";
 
-import {limitSegments} from "./pie-utils";
+import {toSegments} from "./pie-utils";
 import {initialiseData} from "../../common/index";
+import {invokeFunction} from "../../common";
 
 
 const bindings = {
@@ -50,17 +51,46 @@ function controller() {
     };
 
     const dataChanged = (data = []) => {
-        vm.pieData = limitSegments(data);
+        const segmentedData = toSegments(data);
+        vm.summarizedSegments = _.chain(segmentedData.primary).concat([segmentedData.overspillSummary]).compact().value();
+        vm.detailedSegments = _.chain(segmentedData.primary).concat(segmentedData.overspill).value();
+        vm.pieData = vm.summarizedSegments;
+        vm.tableData = vm.summarizedSegments;
     };
 
+    function pieOnSelect(d) {
+        if (d.isOverspillSummary === true || vm.config.onSelect == null) {
+            vm.selectedSegmentKey = d.key;
+        } else {
+            invokeFunction(vm.config.onSelect, d);
+        }
+    }
+
+
+    function tableOnSelect(d) {
+        if (d.isOverspillSummary === true || vm.config.onSelect == null) {
+            vm.selectedSegmentKey = d.key;
+            vm.tableData = vm.detailedSegments;
+        } else {
+            invokeFunction(vm.config.onSelect, d);
+        }
+    }
+
+
     vm.$onChanges = (changes) => {
-        dataChanged(vm.data);
+        if (changes.data) {
+            dataChanged(vm.data);
+        }
 
         if (changes.config) {
-            vm.config = Object.assign(
+            vm.pieConfig = Object.assign(
                 {},
-                { onSelect: defaultOnSelect },
-                vm.config);
+                vm.config,
+                { onSelect: pieOnSelect });
+            vm.tableConfig = Object.assign(
+                {},
+                vm.config,
+                { onSelect: tableOnSelect });
         }
     };
 
