@@ -225,7 +225,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20190703-1337-1"
+    <changeSet id="20190703-4128-1"
                author="muzammilali">
         <comment>1337: Key involvements per entity kind</comment>
        <createTable tableName="key_involvement_kind"
@@ -241,7 +241,7 @@
        </createTable>
     </changeSet>
 
-    <changeSet id="20190703-1337-2"
+    <changeSet id="20190703-4128-2"
                author="muzammilali">
         <addUniqueConstraint columnNames="involvement_kind_id, entity_kind"
                              constraintName="unique_key_involvement_kind_for_entity_kind"
