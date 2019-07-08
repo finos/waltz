@@ -46,9 +46,6 @@ export function responsivefy(svg, type = "both") {
         }
     };
 
-    // add viewBox and preserveAspectRatio properties,
-    // and call resize so that svg resizes on inital page load
-    svg.attr("viewBox", `0 0 ${width} ${height}`);
     if (type === "both") {
         svg.attr("perserveAspectRatio", "xMinYMid");
     }
