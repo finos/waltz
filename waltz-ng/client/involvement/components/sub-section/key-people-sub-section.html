@@ -3,13 +3,15 @@
         <div class="waltz-sub-section-content">
             <div ng-switch="$ctrl.mode" style="padding: 5px 0">
                     <div  style="min-height: 1px;">
-                        <table class="table table-condensed small" width="100%">
+                        <table class="waltz-field-table  waltz-field-table-border"
+                               style="width: 100%">
                             <colgroup>
                                 <col width="30%">
                                 <col width="70%">
                             </colgroup>
-                            <tr ng-repeat="item in $ctrl.keyPeople">
-                                <td>
+                            <tbody>
+                            <tr ng-repeat="item in $ctrl.keyPeople" >
+                                <td class="wft-label" style="padding: 3px;">
                                     <span ng-bind="item.rolesDisplayName"></span>
                                 </td>
                                 <td>
@@ -22,11 +24,12 @@
                                         </a>
                                             <span ng-show="!$last">, </span>
                                         </span>
-                                        <span ng-show="!item.person.length">No person associated with this role
+                                        <span class="wft-label" ng-show="!item.person.length">No people have been associated with this role.
                                         </span>
                                     </div>
                                 </td>
                             </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
