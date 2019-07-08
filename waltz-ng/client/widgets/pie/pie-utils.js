@@ -58,7 +58,7 @@ export function toSegments(data = [], maxSegments = MAX_PIE_SEGMENTS) {
         const overspillSummary = {
             key: "Other",
             isOverspillSummary: true,
-            count : _.sumBy(overspill, "count") + 1000
+            count : _.sumBy(overspill, "count")
         };
         return {
             primary,
