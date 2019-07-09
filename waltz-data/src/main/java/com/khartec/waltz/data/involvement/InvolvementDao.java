@@ -102,7 +102,7 @@ public class InvolvementDao {
                 .fetch(involvementMapper);
     }
 
-    public List<Involvement> findByEntityReferenceAndKeyInvolvements(EntityReference ref) {
+    public List<Involvement> findKeyInvolvementsForEntity(EntityReference ref) {
         SelectConditionStep<Record1<Long>> keyInvolvements =
                 dsl.selectDistinct(KEY_INVOLVEMENT_KIND.INVOLVEMENT_KIND_ID)
                 .from(KEY_INVOLVEMENT_KIND)

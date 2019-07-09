@@ -88,9 +88,9 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findByEntityReference(entityReference);
         };
 
-        ListRoute<Involvement>  findByEntityRefRouteAndKeyInvolvements = (request, response) -> {
+        ListRoute<Involvement>  findKeyInvolvementsForEntity = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
-            return service.findByEntityReferenceAndKeyInvolvements(entityReference);
+            return service.findKeyInvolvementsForEntity(entityReference);
         };
 
         ListRoute<Person>  findPeopleByEntityRefRoute = (request, response) -> {
@@ -104,7 +104,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
-        getForList(findByEntityRefPathAndKeyInvolvements, findByEntityRefRouteAndKeyInvolvements);
+        getForList(findByEntityRefPathAndKeyInvolvements, findKeyInvolvementsForEntity);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }

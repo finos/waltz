@@ -15,14 +15,12 @@ const initialState = {
 };
 
 function getPeopleWithRoleNames(involvements = [], keyInvolvementKind = []) {
-    const peopleGroupByKindId =
-        _.chain(involvements)
-            .groupBy(inv => inv.involvement.kindId);
+    const peopleGroupByKindId = _.groupBy(involvements, inv => inv.involvement.kindId);
 
     return _.chain(keyInvolvementKind)
         .map(kind => ({
             rolesDisplayName: kind.name,
-            person: peopleGroupByKindId.get(kind.id).value()
+            person: peopleGroupByKindId[kind.id]
         }))
         .sortBy("rolesDisplayName")
         .value();
@@ -36,7 +34,7 @@ function controller($q, serviceBroker, dynamicSectionManager) {
     const refresh = () => {
         const involvementPromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findByEntityReferenceAndKeyInvolvements,
+                CORE_API.InvolvementStore.findKeyInvolvementsForEntity,
                 [ vm.parentEntityRef ],
                 { force: true })
             .then(r => r.data);

@@ -1,8 +1,8 @@
 <waltz-sub-section ng-if="$ctrl.keyPeople.length > 0" name="Key People" ng-click="$ctrl.onSelect()">
     <content>
         <div class="waltz-sub-section-content">
-            <div ng-switch="$ctrl.mode" style="padding: 5px 0">
-                    <div  style="min-height: 1px;">
+            <div style="padding: 5px 0">
+                    <div style="min-height: 1px;">
                         <table class="waltz-field-table  waltz-field-table-border"
                                style="width: 100%">
                             <colgroup>
@@ -24,7 +24,7 @@
                                         </a>
                                             <span ng-show="!$last">, </span>
                                         </span>
-                                        <span class="wft-label" ng-show="!item.person.length">
+                                        <span class="wft-label small" ng-show="!item.person.length">
                                             No people have been associated with this role.
                                         </span>
                                     </div>

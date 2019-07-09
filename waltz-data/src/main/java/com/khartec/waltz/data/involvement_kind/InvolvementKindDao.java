@@ -122,6 +122,7 @@ public class InvolvementKindDao {
         return record.getId();
     }
 
+
     public List<InvolvementKind> findKeyInvolvementKindsByEntityKind(EntityKind kind) {
         return dsl.select(involvementKind.fields())
                 .from(involvementKind)
@@ -131,6 +132,7 @@ public class InvolvementKindDao {
                         .where(KEY_INVOLVEMENT_KIND.ENTITY_KIND.eq(kind.name()))))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 
     public boolean update(InvolvementKindChangeCommand command) {
         checkNotNull(command, "command cannot be null");

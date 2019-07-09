@@ -96,9 +96,9 @@ public class InvolvementService {
         return time("IS.findByEntityReference", () -> involvementDao.findByEntityReference(ref));
     }
 
-    public List<Involvement> findByEntityReferenceAndKeyInvolvements(EntityReference ref) {
+    public List<Involvement> findKeyInvolvementsForEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return time("IS.findByEntityReferenceAndKeyInvolvements", () -> involvementDao.findByEntityReferenceAndKeyInvolvements(ref));
+        return time("IS.findKeyInvolvementsForEntity", () -> involvementDao.findKeyInvolvementsForEntity(ref));
     }
 
 

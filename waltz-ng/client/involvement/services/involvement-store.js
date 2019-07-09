@@ -43,7 +43,7 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findByEntityReferenceAndKeyInvolvements = (kind, id) => {
+    const findKeyInvolvementsForEntity = (kind, id) => {
         const ref = _.isObject(kind) ? kind : { id, kind };
 
         return $http.get(`${BASE}/entity/key-involvements/${ref.kind}/${ref.id}`)
@@ -71,7 +71,7 @@ function store($http, BaseApiUrl) {
         findAppsForEmployeeId,
         findByEmployeeId,
         findByEntityReference,
-        findByEntityReferenceAndKeyInvolvements,
+        findKeyInvolvementsForEntity: findKeyInvolvementsForEntity,
         findPeopleByEntityReference,
         changeInvolvement
     };
@@ -100,10 +100,10 @@ export const InvolvementStore_API = {
         serviceFnName: 'findByEntityReference',
         description: 'find involvements by entity reference'
     },
-    findByEntityReferenceAndKeyInvolvements: {
+    findKeyInvolvementsForEntity: {
         serviceName,
-        serviceFnName: 'findByEntityReferenceAndKeyInvolvements',
-        description: 'find involvements by entity reference and key involvements'
+        serviceFnName: 'findKeyInvolvementsForEntity',
+        description: 'find key involvements by entity reference'
     },
     findPeopleByEntityReference: {
         serviceName,

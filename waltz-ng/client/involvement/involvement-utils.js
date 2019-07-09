@@ -39,10 +39,7 @@ export function aggregatePeopleInvolvements(involvements, people) {
 
 export function getPeopleWithInvolvements(involvements, people) {
 
-    const peopleById = _
-        .chain(people)
-            .groupBy("employeeId")
-            .value();
+    const peopleById = _.groupBy(people, "employeeId");
 
     return _
         .chain(involvements)
