@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 
 
 export function calcTotal(data) {
-    return _.sumBy(data, 'count')
+    return _.sumBy(data, "count")
 }
 
 
@@ -30,21 +30,47 @@ export function isPieEmpty(data) {
 }
 
 
+const MAX_PIE_SEGMENTS = 6;
 
-export function limitSegments(data = [], maxSegments = 5) {
-    const removeEmptySegments = segs => _.filter(segs, s => s.count !== 0)
-    if (data.length > maxSegments) {
-        const sorted = _.sortBy(data, d => d.count * -1);
-        const topData = _.take(sorted, maxSegments);
-        const otherData = _.drop(sorted, maxSegments);
-        const otherDatum = {
-            key: 'Other',
-            count : _.sumBy(otherData, "count")
+
+/**
+ * Takes a list of elements which match: `{ ... count: <number> ... }`
+ * and returns an object with 3 parts.
+ *
+ * - The `primary` list is consist of the highest ranked elements (cutoff at `maxSegments`),
+ * - the `overspill` is those elements after the `maxSegments` cutoff,
+ * - the `overspillSummary` is a sum of the `overspill`
+ *
+ * @param data
+ * @param maxSegments
+ * @returns {*}  `{ primary: [], overspill: [], overspillSummary: {} }`
+ */
+export function toSegments(data = [], maxSegments = MAX_PIE_SEGMENTS) {
+    const orderedData = _
+        .chain(data)
+        .filter(d => d.count !== 0)
+        .sortBy(d => d.count * -1)
+        .value();
+
+    if (orderedData.length > maxSegments) {
+        const overspill = _.drop(orderedData, (maxSegments - 1));
+        const primary = _.take(orderedData, (maxSegments - 1));
+        const overspillSummary = {
+            key: "Other",
+            isOverspillSummary: true,
+            count : _.sumBy(overspill, "count")
         };
-
-        return removeEmptySegments(_.concat(topData, otherDatum));
+        return {
+            primary,
+            overspill,
+            overspillSummary
+        };
     } else {
-        return removeEmptySegments(data);
+        return {
+            primary: orderedData,
+            overspill: [],
+            overspillSummary: null
+        };
     }
 }
 

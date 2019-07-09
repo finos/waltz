@@ -31,7 +31,7 @@
     </thead>
 
     <tbody>
-    <tr ng-repeat="r in $ctrl.data | orderBy:'key'"
+    <tr ng-repeat="r in $ctrl.data"
         class="small"
         ng-click="$ctrl.rowSelected(r, $event)"
         ng-class="{
@@ -59,7 +59,7 @@
         </td>
         <td class="wpst-number-col">
             <span class="small"
-                  ng-bind="$ctrl.asPercentage(r)">
+                  ng-bind="r.percentage">
             </span>
             %
         </td>
