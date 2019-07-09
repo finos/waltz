@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
       <div class="pull-right">
         <waltz-data-extract-link name="Export"
@@ -18,7 +37,7 @@
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystem"
                                  config="$ctrl.pieConfig.operatingSystem"
-                                 title="By Operating System">
+                                 name="By Operating System">
                 </waltz-pie-table>
             </div>
 
@@ -26,14 +45,14 @@
                 <waltz-pie-table data="$ctrl.serverStats.environment"
                                  config="$ctrl.pieConfig.environment"
                                  description="{{$ctrl.environmentDescription}}"
-                                 title="By Environment">
+                                 name="By Environment">
                 </waltz-pie-table>
             </div>
 
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.location"
                                  config="$ctrl.pieConfig.location"
-                                 title="By Location">
+                                 name="By Location">
                 </waltz-pie-table>
             </div>
         </div>
@@ -41,14 +60,14 @@
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystemEndOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
-                                 title="By Operating System EOL Status">
+                                 name="By Operating System EOL Status">
                 </waltz-pie-table>
             </div>
 
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.hardwareEndOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
-                                 title="By Hardware EOL Status">
+                                 name="By Hardware EOL Status">
                 </waltz-pie-table>
             </div>
         </div>
@@ -74,21 +93,21 @@
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.databaseStats.vendor"
                                  config="$ctrl.pieConfig.vendor"
-                                 title="By Vendor">
+                                 name="By Vendor">
                 </waltz-pie-table>
             </div>
 
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.databaseStats.environment"
                                  config="$ctrl.pieConfig.environment"
-                                 title="By Environment">
+                                 name="By Environment">
                 </waltz-pie-table>
             </div>
 
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.databaseStats.endOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
-                                 title="By EOL Status">
+                                 name="By EOL Status">
                 </waltz-pie-table>
             </div>
         </div>
@@ -107,14 +126,14 @@
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.softwareStats.vendor"
                                  config="$ctrl.pieConfig.vendor"
-                                 title="By Vendor">
+                                 name="By Vendor">
                 </waltz-pie-table>
             </div>
 
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.softwareStats.maturity"
                                  config="$ctrl.pieConfig.maturity"
-                                 title="By Maturity">
+                                 name="By Maturity">
                 </waltz-pie-table>
             </div>
         </div>
