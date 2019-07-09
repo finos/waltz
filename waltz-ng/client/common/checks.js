@@ -179,8 +179,15 @@ export function checkNotEmpty(x, msg = "is empty") {
     assert(notEmpty(x), msg);
 }
 
-export const checkIsEntityRef = ref => {
-    assert(_.has(ref, "kind") && _.has(ref, "id"), () => `Ref: ${JSON.stringify(ref)} does not look like an entity ref`);
+
+export function checkIsEntityRef(ref) {
+    const hasKind = _.isString(ref.kind);
+    const hasId = _.isNumber(ref.id);
+    if (hasKind && hasId) {
+        // nop
+    } else {
+        throw `Ref: ${JSON.stringify(ref)} does not look like an entity ref`;
+    }
 }
 
 
