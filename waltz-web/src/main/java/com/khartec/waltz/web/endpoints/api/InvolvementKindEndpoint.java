@@ -90,10 +90,12 @@ public class InvolvementKindEndpoint implements Endpoint {
         return service.getById(id);
     }
 
+
     private List<InvolvementKind> findKeyInvolvementKindByEntityKind (Request request, Response response) {
         EntityKind entityKind = getKind(request);
         return service.findKeyInvolvementKindsByEntityKind(entityKind);
     }
+
 
     private Long createInvolvementKindRoute(Request request, Response response) throws IOException {
         ensureUserHasAdminRights(request);
