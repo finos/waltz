@@ -96,11 +96,6 @@ public class InvolvementService {
         return time("IS.findByEntityReference", () -> involvementDao.findByEntityReference(ref));
     }
 
-    public List<Involvement> findKeyInvolvementsForEntity(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
-        return time("IS.findKeyInvolvementsForEntity", () -> involvementDao.findKeyInvolvementsForEntity(ref));
-    }
-
 
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "employeeId cannot be empty");

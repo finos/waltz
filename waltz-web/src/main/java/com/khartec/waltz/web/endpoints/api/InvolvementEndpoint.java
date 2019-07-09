@@ -62,7 +62,6 @@ public class InvolvementEndpoint implements Endpoint {
         String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
         String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
-        String findByEntityRefPathAndKeyInvolvements = mkPath(BASE_URL, "entity", "key-involvements", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
         String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
@@ -88,11 +87,6 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findByEntityReference(entityReference);
         };
 
-        ListRoute<Involvement>  findKeyInvolvementsForEntity = (request, response) -> {
-            EntityReference entityReference = getEntityReference(request);
-            return service.findKeyInvolvementsForEntity(entityReference);
-        };
-
         ListRoute<Person>  findPeopleByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findPeopleByEntityReference(entityReference);
@@ -104,7 +98,6 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
-        getForList(findByEntityRefPathAndKeyInvolvements, findKeyInvolvementsForEntity);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }

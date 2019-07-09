@@ -26,7 +26,6 @@ function getPeopleWithRoleNames(involvements = [], keyInvolvementKind = []) {
         .value();
 }
 
-
 function controller($q, serviceBroker, dynamicSectionManager) {
 
     const vm = initialiseData(this, initialState);
@@ -34,29 +33,26 @@ function controller($q, serviceBroker, dynamicSectionManager) {
     const refresh = () => {
         const involvementPromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findKeyInvolvementsForEntity,
-                [ vm.parentEntityRef ],
-                { force: true })
+                CORE_API.InvolvementStore.findByEntityReference,
+                [ vm.parentEntityRef ])
             .then(r => r.data);
 
         const peoplePromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findPeopleByEntityReference,
-                [ vm.parentEntityRef ],
-                { force: true })
+                [ vm.parentEntityRef ])
             .then(r => r.data);
 
         const keyInvolvementsPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementKindStore.findKeyInvolvementKindsByEntityKind,
-                [ vm.parentEntityRef.kind ],
-                { force: true })
+                [ vm.parentEntityRef.kind ])
             .then(r => r.data);
 
         $q.all([involvementPromise, peoplePromise, keyInvolvementsPromise])
-            .then(([involvements = [], people = [], keyInvolvements = []]) => {
+            .then(([involvements = [], people = [], keyInvolvementKinds = []]) => {
                 const aggInvolvements = getPeopleWithInvolvements(involvements, people);
-                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, keyInvolvements);
+                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, keyInvolvementKinds);
             });
     };
 
