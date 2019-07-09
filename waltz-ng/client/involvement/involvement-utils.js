@@ -37,16 +37,25 @@ export function aggregatePeopleInvolvements(involvements, people) {
         .value();
 }
 
-export function getPeopleWithInvolvements(involvements, people) {
+export function aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds = []) {
+    const peopleById = _.keyBy(people, "employeeId");
 
-    const peopleById = _.groupBy(people, "employeeId");
-
-    return _
+    const aggregatePeopleByInvolvementKind = _
         .chain(involvements)
         .map(inv => ({
-            person: peopleById[inv.employeeId][0],
+            person: peopleById[inv.employeeId],
             involvement: ({kindId: inv.kindId})
-        })).value();
+        }))
+        .groupBy(inv => inv.involvement.kindId)
+        .value();
+
+    return _.chain(keyInvolvementKinds)
+        .map(kind => ({
+            roleName: kind.name,
+            persons: aggregatePeopleByInvolvementKind[kind.id]
+        }))
+        .sortBy("roleName")
+        .value();
 }
 
 export function mkChangeCommand(operation, personEntityRef, involvementKindId) {

@@ -12,11 +12,11 @@
                             <tbody>
                             <tr ng-repeat="item in $ctrl.keyPeople" >
                                 <td class="wft-label" style="padding: 3px;">
-                                    <span ng-bind="item.rolesDisplayName"></span>
+                                    <span ng-bind="item.roleName"></span>
                                 </td>
                                 <td>
                                     <div>
-                                        <span ng-repeat="p in item.person">
+                                        <span ng-repeat="p in item.persons">
                                         <a ui-sref="main.person.view ({empId: p.person.employeeId})"
                                            ng-bind="p.person.displayName"></a> -
                                         <a href="mailto:{{p.person.email}}">
@@ -24,8 +24,8 @@
                                         </a>
                                             <span ng-show="!$last">, </span>
                                         </span>
-                                        <span class="wft-label small" ng-show="!item.person.length">
-                                            No people have been associated with this role.
+                                        <span class="wft-label small" ng-show="!item.persons.length">
+                                            Not defined
                                         </span>
                                     </div>
                                 </td>

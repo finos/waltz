@@ -2,8 +2,7 @@ import {initialiseData} from "../../../common";
 
 import template from "./key-people-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import _ from "lodash";
-import {getPeopleWithInvolvements} from "../../involvement-utils";
+import {aggregatePeopleByKeyInvolvementKind} from "../../involvement-utils";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 const bindings = {
@@ -13,18 +12,6 @@ const bindings = {
 const initialState = {
     keyPeople: []
 };
-
-function getPeopleWithRoleNames(involvements = [], keyInvolvementKind = []) {
-    const peopleGroupByKindId = _.groupBy(involvements, inv => inv.involvement.kindId);
-
-    return _.chain(keyInvolvementKind)
-        .map(kind => ({
-            rolesDisplayName: kind.name,
-            person: peopleGroupByKindId[kind.id]
-        }))
-        .sortBy("rolesDisplayName")
-        .value();
-}
 
 function controller($q, serviceBroker, dynamicSectionManager) {
 
@@ -51,8 +38,7 @@ function controller($q, serviceBroker, dynamicSectionManager) {
 
         $q.all([involvementPromise, peoplePromise, keyInvolvementsPromise])
             .then(([involvements = [], people = [], keyInvolvementKinds = []]) => {
-                const aggInvolvements = getPeopleWithInvolvements(involvements, people);
-                vm.keyPeople = getPeopleWithRoleNames(aggInvolvements, keyInvolvementKinds);
+                vm.keyPeople = aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds);
             });
     };
 
