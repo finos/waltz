@@ -68,7 +68,7 @@ function controller() {
 
 
     function tableOnSelect(d) {
-        if (d.isOverspillSummary === true || vm.config.onSelect == null) {
+        if (d != null && (vm.config.onSelect == null || d.isOverspillSummary === true )) {
             vm.selectedSegmentKey = d.key;
             vm.tableData = vm.detailedSegments;
         } else {
