@@ -30,6 +30,10 @@ export function store($http, BaseApiUrl) {
         $http.get(BASE)
             .then(result => result.data);
 
+    const findKeyInvolvementKindsByEntityKind = (entityKind) =>
+        $http.get(`${BASE}/key-involvement-kinds/${entityKind}`)
+            .then(result => result.data);
+
 
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
@@ -66,6 +70,7 @@ export function store($http, BaseApiUrl) {
 
     return {
         findAll,
+        findKeyInvolvementKindsByEntityKind,
         getById,
         create,
         update,
@@ -88,6 +93,11 @@ export const InvolvementKindStore_API = {
         serviceName,
         serviceFnName: 'findAll',
         description: 'executes findAll'
+    },
+    findKeyInvolvementKindsByEntityKind: {
+        serviceName,
+        serviceFnName: 'findKeyInvolvementKindsByEntityKind',
+        description: 'executes findKeyInvolvementKindsByEntityKind'
     },
     getById: {
         serviceName,
