@@ -19,9 +19,9 @@
 
 import template from "./pie-table.html";
 
-import {toSegments} from "./pie-utils";
-import {initialiseData} from "../../common/index";
-import {invokeFunction} from "../../common";
+import { toSegments } from "./pie-utils";
+import { initialiseData } from "../../common/index";
+import { invokeFunction } from "../../common";
 
 
 const bindings = {

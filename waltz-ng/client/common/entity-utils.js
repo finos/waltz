@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef} from "./checks";
-import {CORE_API} from "./services/core-api-utils";
+import { checkIsEntityRef } from "./checks";
+import { CORE_API } from "./services/core-api-utils";
 
 export function sameRef(r1, r2, options = { skipChecks: false }) {
     if (! options.skipChecks) {

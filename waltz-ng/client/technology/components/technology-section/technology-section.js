@@ -18,11 +18,12 @@
  */
 
 import _ from "lodash";
-import {termSearch, perhaps} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import { perhaps, termSearch } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
 import { mkLinkGridCell } from '../../../common/grid-utils';
 
 import template from './technology-section.html';
+import { mkSelectionOptions } from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -148,6 +149,21 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
 }
 
 
+function prepareLicenceGridOptions($animate, uiGridConstants) {
+
+    const columnDefs = [
+        mkLinkGridCell('Name', 'name', 'id', 'main.licence.view'),
+        { field: 'externalId', displayName: 'External Id' },
+        { field: 'approvalStatus', displayName: 'Approval Status', cellFilter: "toDisplayName:'approvalStatus'"},
+    ];
+
+    const baseTable = createDefaultTableOptions($animate, uiGridConstants, "licences.csv");
+    return _.extend(baseTable, {
+        columnDefs
+    });
+}
+
+
 function enrichServersWithEOLFlags(servers = []) {
     return _
         .map(
@@ -220,10 +236,23 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             })
             .then(() => refresh(vm.qry));
 
+        // licences
+        serviceBroker
+            .loadViewData(
+                CORE_API.LicenceStore.findBySelector,
+                [ mkSelectionOptions(vm.parentEntityRef)]
+            )
+            .then(r => {
+                vm.licences = r.data;
+                vm.licenceGridOptions.data = vm.licences;
+            })
+            .then(() => refresh(vm.qry));
+
     };
 
     vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);
     vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
+    vm.licenceGridOptions = prepareLicenceGridOptions($animate, uiGridConstants);
 
     vm.doSearch = () => refresh(vm.qry);
 

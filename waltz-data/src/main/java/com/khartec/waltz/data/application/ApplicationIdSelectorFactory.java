@@ -106,11 +106,13 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
             case APPLICATION:
                 return mkForApplication(options);
             case CHANGE_INITIATIVE:
-                return mkForChangeInitiative(options);
+                return mkForEntityRelationship(options);
             case DATA_TYPE:
                 return mkForDataType(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
+            case LICENCE:
+                return mkForEntityRelationship(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case SCENARIO:
@@ -125,6 +127,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
     }
+
 
     private Select<Record1<Long>> mkForScenario(ApplicationIdSelectionOptions options) {
         ensureScopeIsExact(options);
@@ -220,12 +223,12 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForChangeInitiative(ApplicationIdSelectionOptions options) {
-        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given a change initiative");
+    private Select<Record1<Long>> mkForEntityRelationship(ApplicationIdSelectionOptions options) {
+        ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
 
-        Select<Record1<Long>> appToCi = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_A)
+        Select<Record1<Long>> appToEntity = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_A)
                 .from(ENTITY_RELATIONSHIP)
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_A))
@@ -234,7 +237,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(options.entityReference().id()))
                 .and(applicationConditions);
 
-        Select<Record1<Long>> ciToApp = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_B)
+        Select<Record1<Long>> entityToApp = DSL.selectDistinct(ENTITY_RELATIONSHIP.ID_B)
                 .from(ENTITY_RELATIONSHIP)
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_B))
@@ -244,8 +247,8 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .and(applicationConditions);
 
 
-        return appToCi
-                .union(ciToApp);
+        return appToEntity
+                .union(entityToApp);
     }
 
 

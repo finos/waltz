@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: BSD 2-Clause "Simplified" License
+  licenseId: BSD-2-Clause
+  notes:
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”

@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../../common/colors";
-import {initialiseData, toKeyCounts} from "../../../common";
-import {endOfLifeStatus} from "../../../common/services/enums/end-of-life-status";
+import { environmentColorScale, operatingSystemColorScale, variableScale } from "../../../common/colors";
+import { initialiseData, toKeyCounts } from "../../../common";
+import { endOfLifeStatus } from "../../../common/services/enums/end-of-life-status";
 import template from "./server-pies.html";
 
 

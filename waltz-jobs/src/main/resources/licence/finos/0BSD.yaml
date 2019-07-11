@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: BSD Zero Clause License
+  licenseId: 0BSD
+  notes: This is a blanket license with no conditions.
+  terms:
+  - type: other
+    description: This license places no conditions whatsoever on using, copyring, modifying or distributing the software for any purpose.
+      

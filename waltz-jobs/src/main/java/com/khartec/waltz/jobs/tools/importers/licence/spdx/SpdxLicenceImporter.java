@@ -1,0 +1,196 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.khartec.waltz.jobs.tools.importers.licence.spdx;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.data.licence.LicenceDao;
+import com.khartec.waltz.model.ApprovalStatus;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.schema.tables.records.BookmarkRecord;
+import com.khartec.waltz.schema.tables.records.LicenceRecord;
+import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
+import static com.khartec.waltz.schema.tables.Licence.LICENCE;
+import static java.util.stream.Collectors.toList;
+
+public class SpdxLicenceImporter {
+
+    public static final String PROVENANCE = "spdx";
+
+    private final DSLContext dsl;
+    private final LicenceDao licenceDao;
+    private final ObjectMapper mapper;
+
+
+    public SpdxLicenceImporter(DSLContext dsl, LicenceDao licenceDao) {
+
+        this.dsl = dsl;
+        this.licenceDao = licenceDao;
+
+        mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        ctx.register(SpdxLicenceImporter.class);
+        SpdxLicenceImporter importer = ctx.getBean(SpdxLicenceImporter.class);
+
+
+        String path = "licence/spdx/details";
+        importer.importData(path);
+    }
+
+
+    private void importData(String path) throws IOException {
+
+        List<SpdxLicence> spdxLicences = parseData(path);
+        Timestamp now = DateTimeUtilities.nowUtcTimestamp();
+
+        // fetching existing licences
+        Set<String> existingExternalIds = licenceDao.findAll()
+                .stream()
+                .filter(l -> l.externalId() != null)
+                .map(l -> l.externalId().get().toLowerCase())
+                .collect(Collectors.toSet());
+
+        // add only new ones
+        List<LicenceRecord> records = spdxLicences.stream()
+                .filter(l -> !existingExternalIds.contains(l.licenseId().toLowerCase()))
+                .map(l -> {
+                    LicenceRecord record = dsl.newRecord(LICENCE);
+                    record.setName(l.name());
+                    record.setExternalId(l.licenseId());
+                    record.setProvenance(PROVENANCE);
+                    record.setApprovalStatus(ApprovalStatus.PENDING_APPROVAL.name());
+                    record.setCreatedAt(now);
+                    record.setCreatedBy("admin");
+                    record.setLastUpdatedAt(now);
+                    record.setLastUpdatedBy("admin");
+                    return record;
+                })
+                .collect(toList());
+
+        int[] execute = dsl.batchStore(records).execute();
+
+        System.out.println("Licence records stored to database: " + execute.length);
+
+
+        // now create bookmarks from seeAlso section
+        deleteExistingBookmarks();
+
+        Map<String, LicenceRecord> licencesByExternalId = dsl
+                .selectFrom(LICENCE)
+                .where(LICENCE.EXTERNAL_ID.isNotNull())
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(l -> l.getExternalId(), l -> l));
+
+        List<BookmarkRecord> bookmarks = spdxLicences.stream()
+                .flatMap(l -> {
+                    return Stream
+                            .of(l.seeAlso())
+                            .map(url -> {
+                                Long licenceId = licencesByExternalId.get(l.licenseId()).getId();
+
+                                BookmarkRecord bookmarkRecord = dsl.newRecord(BOOKMARK);
+                                bookmarkRecord.setTitle("See Also");
+                                bookmarkRecord.setKind("DOCUMENTATION");
+                                bookmarkRecord.setUrl(url);
+                                bookmarkRecord.setParentKind(EntityKind.LICENCE.name());
+                                bookmarkRecord.setParentId(licenceId);
+                                bookmarkRecord.setIsPrimary(false);
+                                bookmarkRecord.setProvenance(PROVENANCE);
+                                bookmarkRecord.setLastUpdatedBy("admin");
+                                bookmarkRecord.setCreatedAt(now);
+                                bookmarkRecord.setUpdatedAt(now);
+                                bookmarkRecord.setIsRequired(false);
+                                return bookmarkRecord;
+                            });
+                })
+                .collect(toList());
+
+        int[] bookmarkStoreExecute = dsl.batchStore(bookmarks).execute();
+
+        System.out.println("Bookmark records stored: " + bookmarkStoreExecute.length);
+    }
+
+
+    private void deleteExistingBookmarks() {
+        int bookmarkDeleteCount = dsl.deleteFrom(BOOKMARK)
+                .where(BOOKMARK.PROVENANCE.eq(PROVENANCE))
+                .execute();
+
+        System.out.printf("Deleted %s licence bookmarks \n", bookmarkDeleteCount);
+    }
+
+
+    private List<SpdxLicence> parseData(String directoryPath) throws IOException {
+        URL directoryUrl = SpdxLicenceImporter.class.getClassLoader().getResource(directoryPath);
+
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryUrl.getPath()))) {
+
+            List<SpdxLicence> spdxLicences = paths
+                    .filter(Files::isRegularFile)
+                    .map(this::parseSpdxLicence)
+                    .filter(l -> l.isPresent())
+                    .map(l -> l.get())
+                    .filter(l -> !l.isDeprecatedLicenseId())
+                    .collect(toList());
+
+            System.out.printf("Parsed %s SPDX licence files \n", spdxLicences.size());
+            return spdxLicences;
+        }
+    }
+
+
+    private Optional<SpdxLicence> parseSpdxLicence(Path path) {
+
+        try {
+            System.out.println("Parsing: " + path);
+            SpdxLicence spdxLicence = mapper.readValue(path.toFile(), SpdxLicence.class);
+            return Optional.of(spdxLicence);
+        } catch (IOException e) {
+            System.out.println(e);
+            return Optional.empty();
+        }
+    }
+
+}

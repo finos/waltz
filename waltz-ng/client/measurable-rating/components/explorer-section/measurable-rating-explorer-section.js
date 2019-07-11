@@ -18,11 +18,11 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkLinkGridCell} from "../../../common/grid-utils";
-import {mkRatingSchemeColorScale} from "../../../common/colors";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import { initialiseData } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkLinkGridCell } from "../../../common/grid-utils";
+import { mkRatingSchemeColorScale } from "../../../common/colors";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
 
 import template from "./measurable-rating-explorer-section.html";
 

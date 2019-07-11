@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -18,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ragColorScale} from "../../common/colors";
-import {toKeyCounts} from "../../common";
+import { ragColorScale } from "../../common/colors";
+import { toKeyCounts } from "../../common";
 import template from "./apps-by-investment-pie.html";
 
 

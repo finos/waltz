@@ -1,9 +1,9 @@
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 
 import template from "./key-people-sub-section.html";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {aggregatePeopleByKeyInvolvementKind} from "../../involvement-utils";
-import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { aggregatePeopleByKeyInvolvementKind } from "../../involvement-utils";
+import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
 
 const bindings = {
     parentEntityRef: "<",

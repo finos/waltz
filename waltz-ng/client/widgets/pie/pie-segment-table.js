@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
-import {numberFormatter, toPercentage} from "../../common/string-utils";
+import { variableScale } from "../../common/colors";
+import { numberFormatter, toPercentage } from "../../common/string-utils";
 import template from "./pie-segment-table.html";
 
 

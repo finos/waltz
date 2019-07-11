@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -18,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {lifecyclePhaseColorScale} from "../../common/colors";
-import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
-import {toKeyCounts} from "../../common";
+import { lifecyclePhaseColorScale } from "../../common/colors";
+import { lifecyclePhase } from "../../common/services/enums/lifecycle-phase";
+import { toKeyCounts } from "../../common";
 import template from "./apps-by-lifecycle-phase-pie.html";
 
 

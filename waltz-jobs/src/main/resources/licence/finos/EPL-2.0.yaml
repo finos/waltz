@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Eclipse Public License 2.0
+  licenseId: EPL-2.0
+  notes:
+  terms:
+  - type: condition
+    description: Provide license
+    use_cases: [US, MB, US, MS]
+    compliance_notes: Accompany the program with a statement that the source code if available under the license. For source code distributions, must provide a copy of the license.
+        
+  - type: condition
+    description: Provide source code
+    use_cases: [UB, MB]
+    compliance_notes: Must inform recipients how to obtain source code by reasonable manner via a "medium customarily used for software exchange"
+
+  - type: condition
+    description: Modifications under same license
+    use_cases: [MS]
+    compliance_notes: File-level reciprocal license meaning that modifications to any file or new files that contain part of original software are governed by the terms of this license. This does not include additional separate software modules that are distributed with the program and are not derivative works of the program (see sections 1 and 3.2 for more details)
+ 
+  - type: condition
+    description: Retain notices
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: You must retain license notices with every source code distribution or include notices in another likely location
+ 
+  - type: termination
+    description: License terminates upon failure to comply with "material terms or conditions" and failure to cure in a reasonable period of time after becoming aware of noncompliance
+
+  - type: termination
+    description: Any patent claims accusing the software by a licensee results in termination of patent licenses to the licensee
+    
+  - type: other
+    description: You may distribute program under a different license, provided you disclaim contributors from warranties, liability, and defend contributors against any third party claims brought as a result of your distribution. Clarify that any provisions offered by you are offered by you only (see section 3 for details)
+    use_cases: [UB, MB, US, MS]
+    
+  - type: other
+    description: You may distribute under an enumerated 'Secondary License' if authorized by the initial Contributor or combined with code under that Secondary License (see section 3.2 for more details)
+ 
+  - type: license_versions
+    description: Allows use of covered code under the terms of same version or any later version of the license.

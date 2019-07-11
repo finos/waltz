@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {CORE_API} from "../../../common/services/core-api-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
 import template from "./change-initiative-view.html";
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 
 
 const initialState = {

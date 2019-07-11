@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: BSD-4-Clause (University of California-Specific)
+  licenseId: BSD-4-Clause-UC
+  notes:  The advertising clause was rescinded by the University of California in 1999 for all material under BSD-4-Clause with University of California copyright notice. Thus, you do not need to comply with the advertising/acknowledgment requirement, which makes the license essentially BSD-3-Clause.
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+    

@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Mozilla Public License 1.1
+  licenseId: MPL-1.1
+  notes:
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [US, MS]
+    compliance_notes: You must include a copy of the license with every source code distribution
+
+  - type: condition
+    description: Retain notices
+    use_cases: [US, MS]
+    compliance_notes: You must retain license notices with every source code distribution or include notices in another likely location
+
+  - type: condition
+    description: Provide source code
+    use_cases: [UB, MB]
+    compliance_notes: Provide source code on same media as binary or make available via other electronic distribution mechanism for 12 months after initial availability or at least 6 months after a subsequent version has been made available. See section 3.2 for more details.
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Document changes you made and date; include a prominent statement as to the origin of the original code. See section 3.3 for more details.
+    
+  - type: condition
+    description: Modifications under same license
+    use_cases: [MB, MS]
+    compliance_notes: File-level reciprocal license meaning that modifications to any file or new files that contain part of original software are governed by the terms of this license. Larger works may be created by combining covered software with code not governed by this license, so long as you comply with this license for the covered software (see sections 1.9 and 3.7 for more details)
+    
+  - type: termination
+    description: License terminates upon failure to comply with license after a 30 day cure period
+
+  - type: termination
+    description: Any patent claims accusing the software by a licensee results in termination of all licenses to the licensee, with a 60 day cure. Any patent claims by a licensee accusing any contributor results in termination of all of that contributor's patent licenses (see section 8.2 and 8.3 for more details).
+    
+  - type: termination
+    description: If you initiate a patent infringement litigation against the initial developer or a contributor alleging that any software, hardware or device other than a contributor's version infringed any patent, then the license from such parties terminates (see section 8.2 for more details).
+
+  - type: other
+    description: Provide notice in a file called, LEGAL, of any third party intellectual property rights for particular functionality or code, including if your modifications are an application programming intereface and you own, control, or have knowledge of any patent licenses which are reasonably necessary to implement the API. See section 3.4 for more details.
+
+  - type: other
+    description: You may offer and charge a fee for warranty, support, indemnity or liability obligations to recipients. However, you must make it clear that any such offer is offered by you alone and you agree to indemnify the initial developer and every contributor for any liability incurred by them as a result of the offer you make. See section 3.5 for more details.
+    
+  - type: other
+    description: You may distribute binary versions under a different license, so long as you do not limit or alter the recipient's right in the source code under this license. You must make it clear that any differing terms are offered by you alone and you agree to indemnify the initial developer and every contributor for any liability incurred by them as a result of the offer you make. See section 3.6 for more details.
+    
+  - type: other
+    description: You may distribute binary versions under a different license, so long as you do not limit or alter the recipient's right in the source code under this license. You must make it clear that any differing terms are offered by you alone and you agree to indemnify the initial developer and every contributor for any liability incurred by them as a result of the offer you make. See section 3.6 for more details.
+        
+  - type: license_versions
+    description: Allows use of covered code under the terms of of same version or any later version of the license.

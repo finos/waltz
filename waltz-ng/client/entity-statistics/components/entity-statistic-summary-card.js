@@ -18,8 +18,8 @@
  */
 
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
-import {mkSummaryTableHeadings, navigateToStatistic} from "../utilities";
+import { variableScale } from "../../common/colors";
+import { mkSummaryTableHeadings, navigateToStatistic } from "../utilities";
 import template from "./entity-statistic-summary-card.html";
 
 const bindings = {

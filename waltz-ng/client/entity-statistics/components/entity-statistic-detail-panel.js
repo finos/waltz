@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
-import {mkSummaryTableHeadings} from "../utilities";
+import { variableScale } from "../../common/colors";
+import { mkSummaryTableHeadings } from "../utilities";
 import template from "./entity-statistic-detail-panel.html";
 
 

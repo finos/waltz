@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Plexus Classworlds License
+  licenseId: Plexus
+  notes: This license also includes a clause that states, "due credit should be given" to the copyright holder, but given the non-obligatory nature of "should", this is not considered a requirement.
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Name of project cannot be used for derived products without permission
+    use_cases: [MB, MS]

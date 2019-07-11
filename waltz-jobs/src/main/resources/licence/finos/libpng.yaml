@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: libpng License
+  licenseId: Libpng
+  notes:
+  terms:
+  - type: condition
+    description: notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Modified verions must be "plainly marked as such" and not misrepresented as the original software
+    
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [US, MS]
+    compliance_notes:  Copyright notices may not be removed or altered for any source distribution
+       
+  - type: other
+    description: The origin of the code must not be misrepresented

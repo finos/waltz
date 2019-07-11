@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: GNU General Public License 2.0
+  licenseId:
+  - GPL-2.0-only
+  - GPL-2.0-or-later
+  notes: GPL-2.0 provides the option to use either that version of the license only or to make it available under any later version of that license. This is denoted in the standard license header and by using GPL-2.0-only or GPL-2.0-or-later
+  
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: It must be an actual copy of the license not a website link
+
+  - type: condition
+    description: Retain notices on all files
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: Source files usually have a standard license header that includes a copyright notice and disclaimer of warranty. This is also where projects typically indicate if the -or-later version option is available.
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Modified files must have “prominent notices that you changed the files” and a date
+
+  - type: condition
+    description: Modifications or derivative work must be licensed under same license
+    use_cases: [MB, MS]
+    compliance_notes: Strong copyleft or reciprocal, project-based license meaning that derivative works must also be under GPL-2.0. For more information about GPL-2.0 compliance and this condition in particular, see the references provided or consult your open source legal counsel.
+    seeAlso: 
+    - https://copyleft.org/guide/comprehensive-gpl-guidech6.html#x9-410005[Copyleft Guide]
+    - https://www.gnu.org/licenses/gpl-faq.html#TheGPLSaysModifiedVersions[FSF FAQ: GPL says modified versions]
+    - https://www.gnu.org/licenses/gpl-faq.en.html#MereAggregation[FSF FAQ: mere aggregation]
+
+  - type: condition
+    description: Provide corresponding source code
+    use_cases: [UB, MB]
+    compliance_notes: Corresponding Source = all the source code needed to generate, install, and (for an executable work) run the object code and to modify the work, including scripts to control those activities. Options for providing source = with binary, written offer (see section 3 for more details). For more information about GPL-2.0 compliance and this condition in particular, see the references provided or consult your open source legal counsel.
+    seeAlso: 
+    - https://copyleft.org/guide/comprehensive-gpl-guidech6.html#x9-410005[Copyleft Guide]
+    - https://www.gnu.org/licenses/gpl-faq.html#SystemLibraryException[FSF FAQ: System library exception]
+    - https://www.gnu.org/licenses/gpl-faq.html#MustSourceBuildToMatchExactHashOfBinary[FSF FAQ: source code match binary]
+
+  - type: condition
+    description: No additional restrictions
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: You may not impose any further restrictions on the exercise of the rights granted under this license.
+
+  - type: termination
+    description: License automatically terminates if you do not comply with the terms of the license
+
+  - type: license_versions
+    description: Allows use of covered code under the terms of same version or any later version of the license or that version only, as specified. If no license version is specified, then you may use any version ever published by the FSF.
+    seeAlso:
+    - https://www.gnu.org/licenses/identify-licenses-clearly.html[Stallman: For Clarity's Sake] 
+
