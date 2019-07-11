@@ -19,16 +19,16 @@
 
 import template from "./pie-table.html";
 
-import {toSegments} from "./pie-utils";
-import {initialiseData} from "../../common/index";
-import {invokeFunction} from "../../common";
+import { toSegments } from "./pie-utils";
+import { initialiseData } from "../../common/index";
+import { invokeFunction } from "../../common";
 
 
 const bindings = {
     data: "<",
     config: "<",
-    title: "@",
-    subTitle: "@",
+    name: "@",
+    subName: "@",
     icon: "@",
     description: "@",
     selectedSegmentKey: "<",
@@ -68,11 +68,22 @@ function controller() {
 
 
     function tableOnSelect(d) {
-        if (d.isOverspillSummary === true || vm.config.onSelect == null) {
-            vm.selectedSegmentKey = d.key;
+        const handleNormalSelection = (d) => {
+            if (_.isNil(vm.config.onSelect)) {
+                vm.selectedSegmentKey = d ? d.key : null;
+            } else {
+                vm.config.onSelect(d);
+            }
+        };
+
+        const handleExpansionOfOtherSegment = () => {
             vm.tableData = vm.detailedSegments;
+        };
+
+        if (d != null && d.isOverspillSummary === true) {
+            handleExpansionOfOtherSegment();
         } else {
-            invokeFunction(vm.config.onSelect, d);
+            handleNormalSelection(d);
         }
     }
 

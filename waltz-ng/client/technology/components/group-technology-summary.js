@@ -18,8 +18,13 @@
  */
 
 import _ from "lodash";
-import {environmentColorScale, operatingSystemColorScale, maturityColorScale, variableScale} from "../../common/colors";
-import {endOfLifeStatus} from "../../common/services/enums/end-of-life-status";
+import {
+    environmentColorScale,
+    maturityColorScale,
+    operatingSystemColorScale,
+    variableScale
+} from "../../common/colors";
+import { endOfLifeStatus } from "../../common/services/enums/end-of-life-status";
 import template from "./group-technology-summary.html";
 
 

@@ -18,8 +18,8 @@
  */
 
 import template from "./assessment-rating-summary-pies.html";
-import {initialiseData, invokeFunction} from "../../../common";
-import {color} from "d3-color";
+import { initialiseData, invokeFunction } from "../../../common";
+import { color } from "d3-color";
 
 
 const bindings = {

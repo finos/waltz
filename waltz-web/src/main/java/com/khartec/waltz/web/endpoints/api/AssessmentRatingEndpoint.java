@@ -27,7 +27,6 @@ import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: GNU General Public License 3.0
+  licenseId:
+  - GPL-3.0-only
+  - GPL-3.0-or-later
+  notes: "GPL-3.0 provides the option to use either that version of the license only or to make it available under any later version of that license. This is denoted in the standard license header and by using GPL-3.0-only or GPL-3.0-or-later. For a comparison of GPL-3.0 to GPL-2.0, see http://copyleft.org/guide/comprehensive-gpl-guidech10.html#x13-660009.1[Copyleft Guide: Understanding GPLv3 As An Upgraded GPLv2]"
+
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: It must be an actual copy of the license not a website link
+
+  - type: condition
+    description: Retain notices on all files
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: Source files usually have a standard license header that includes a copyright notice and disclaimer of warranty. This is also were you determine if the license is “or later” or the specific version only
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Modified files must have “prominent notices that you changed the files” and a date
+
+  - type: condition
+    description: Modifications or derivative work must be licensed under same license
+    use_cases: [MB, MS]
+    compliance_notes: Strong copyleft or reciprocal, project-based license meaning that derivative works must also be under GPL-3.0. For more information about GPL-3.0 compliance and this condition in particular, see the references provided or consult with your open source legal counsel.
+    seeAlso: 
+    - https://copyleft.org/guide/comprehensive-gpl-guidech10.html#x13-650009[Copyleft Guide]
+    - https://www.gnu.org/licenses/gpl-faq.en.html#MereAggregation[FSF FAQ: mere aggregation]
+
+  - type: condition
+    description: Provide corresponding source code
+    use_cases: [UB, MB]
+    compliance_notes: Corresponding Source = all the source code needed to generate, install, and (for an executable work) run the object code and to modify the work, including scripts to control those activities. Options for providing source = with binary, written offer, or via a network server (see section 6 for more details). For more information about GPL-3.0 compliance and this condition in particular, see the references provided or consult your open source legal counsel.
+    seeAlso: 
+    - https://copyleft.org/guide/comprehensive-gpl-guidech10.html#x13-740009.3[Copyleft Guide]
+    - https://www.gnu.org/licenses/gpl-faq.html#SystemLibraryException[FSF FAQ: System library exception]
+    - https://www.gnu.org/licenses/gpl-faq.html#MustSourceBuildToMatchExactHashOfBinary[FSF FAQ: source code match binary]
+
+  - type: condition
+    description: May not prohibit circumvention of technological measures that prevent users from exercising rights under the license (see section 3 for more details)
+    use_cases:  [UB, MB, US, MS]
+    
+  - type: condition
+    description: No additional restrictions
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: You may not impose any further restrictions on the exercise of the rights granted under this license.
+
+  - type: termination
+    description: License automatically terminates if you do not comply with the terms of the license
+    
+  - type: termination
+    description: License terminates if you initiate litigation claiming use of the program under this license violates a patent
+
+  - type: other
+    description: Author may include 'additional permissions' making exceptions from license terms. You may remove additional permission when you convey the work.
+    
+  - type: other
+    description: Contributors may add certain additional restrictions for their contributions, including disclaimers, legal notices, limitation of trademark and publicity rights, extension of indemnification received by licensor.
+    
+  - type: other
+    description: Provide information necessary to install modified versions on 'User Products'
+    compliance_notes: If convey object code in, with, or specificially for use in a User Product and the right of possession for the User Product is tranferred as part of the conveyance, then the corresponding source code must include Installation Information (methods, procedures, authorization keys, or other information required to install and execute modified versions of a covered work in that User Product from a modified version of its Corresponding Source) (see section 6 for more details)
+    seeAlso:
+    - https://copyleft.org/guide/comprehensive-gpl-guidech10.html#x13-830009.9
+    - https://www.gnu.org/licenses/gpl-faq.en.html#InstInfo  
+
+  - type: other
+    description: If software is combined with software under AGPL-3.0, AGPL-3.0 applies to combined work and this license continues to the covered work originally under GPL-3.0 (see section 13 for more details).
+
+  - type: license_versions
+    description: Allows use of covered code under the terms of same version or any later version of the license or that version only, as specified. If no license version is specificed, then you may use any version ever published by the FSF.
+    seeAlso:
+    - https://www.gnu.org/licenses/identify-licenses-clearly.html[Stallman: For Clarity's Sake] 

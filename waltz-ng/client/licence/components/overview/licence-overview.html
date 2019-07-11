@@ -1,0 +1,79 @@
+<waltz-page-header icon="id-card-o"
+                   name="{{ $ctrl.licence.name }}"
+                   small="{{ $ctrl.licence.externalId }}">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li><a ui-sref="main.licence.list">Licence Management</a></li>
+        <li><span ng-bind="$ctrl.licence.name"></span></li>
+    </ol>
+</waltz-page-header>
+
+
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="!$ctrl.licence">
+        <message>
+            <strong>No Licence</strong> found.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-display-section"
+         ng-if="$ctrl.licence">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Name
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.licence.name"></span>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        External Id
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.licence.externalId"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-markdown text="$ctrl.licence.description">
+                        </waltz-markdown>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Approval Status
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.licence.approvalStatus | toDisplayName:'approvalStatus'"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <waltz-last-updated entity="$ctrl.licence">
+                        </waltz-last-updated>
+                    </div>
+                </div>
+
+
+                <!-- Entity Enum -->
+                <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-entity-enum>
+
+            </div>
+            <div class="col-sm-5">
+                <!-- Assessment Ratings -->
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-sub-section>
+            </div>
+        </div>
+    </div>
+</div>

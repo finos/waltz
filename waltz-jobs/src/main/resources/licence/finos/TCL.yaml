@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: TCL/TK License
+  licenseId: TCL
+  notes:
+  terms:
+  - type:
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes:
+    
+  - type:
+    description: Retain copyright notices
+    use_cases: [UB, MB, US, MS]
+    compliance_notes:
+    
+  - type: other
+    description: Licensing of modified versions
+    use_cases: [MB, MS]
+    description: Modified versions need not follow this license, provided that new license terms appear on first page of each applicable file
+   

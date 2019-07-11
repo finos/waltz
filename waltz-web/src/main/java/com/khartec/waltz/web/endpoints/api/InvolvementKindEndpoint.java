@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.involvement_kind.InvolvementKind;
 import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
@@ -36,6 +37,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -66,6 +68,9 @@ public class InvolvementKindEndpoint implements Endpoint {
 
         // read
         getForList(BASE_URL, (request, response) -> service.findAll());
+
+        getForList(mkPath(BASE_URL, "key-involvement-kinds", ":kind"), this::findKeyInvolvementKindByEntityKind);
+
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
 
         // create
@@ -83,6 +88,12 @@ public class InvolvementKindEndpoint implements Endpoint {
     private InvolvementKind getByIdRoute(Request request, Response response) {
         long id = getId(request);
         return service.getById(id);
+    }
+
+
+    private List<InvolvementKind> findKeyInvolvementKindByEntityKind (Request request, Response response) {
+        EntityKind entityKind = getKind(request);
+        return service.findKeyInvolvementKindsByEntityKind(entityKind);
     }
 
 

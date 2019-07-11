@@ -1,10 +1,10 @@
 import template from "./measurable-change-control.html";
-import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
-import {determineColorOfSubmitButton} from "../../../common/severity-utils";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
-import {displayError} from "../../../common/error-utils";
+import { initialiseData } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { toEntityRef } from "../../../common/entity-utils";
+import { determineColorOfSubmitButton } from "../../../common/severity-utils";
+import { buildHierarchies } from "../../../common/hierarchy-utils";
+import { displayError } from "../../../common/error-utils";
 
 const modes = {
     MENU: "MENU",

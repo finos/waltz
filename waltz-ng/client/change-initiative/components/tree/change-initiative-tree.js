@@ -18,18 +18,14 @@
  */
 
 import template from "./change-initiative-tree.html";
-import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, sameRef} from "../../../common/entity-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {
-    buildHierarchies,
-    findNode,
-    getParents
-} from "../../../common/hierarchy-utils";
-import {kindToViewState} from "../../../common/link-utils";
-import {entity} from "../../../common/services/enums/entity";
-import {fakeParentsByChildKind} from "../../change-initiative-utils";
+import { initialiseData } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { sameRef } from "../../../common/entity-utils";
+import { mkSelectionOptions } from "../../../common/selector-utils";
+import { buildHierarchies, findNode, getParents } from "../../../common/hierarchy-utils";
+import { kindToViewState } from "../../../common/link-utils";
+import { entity } from "../../../common/services/enums/entity";
+import { fakeParentsByChildKind } from "../../change-initiative-utils";
 
 const bindings = {
     parentEntityRef: "<",

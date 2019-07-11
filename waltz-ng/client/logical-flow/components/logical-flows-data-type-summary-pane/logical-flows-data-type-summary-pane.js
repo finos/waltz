@@ -18,11 +18,15 @@
  */
 
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {initialiseData} from "../../../common/index";
-import {color} from "d3-color";
-import {amber, green, red, grey} from "../../../common/colors";
-import {findNonConcreteDataTypeIds, findDeprecatedDataTypeIds, findUnknownDataTypeId} from "../../../data-types/data-type-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common/index";
+import { color } from "d3-color";
+import { amber, green, grey, red } from "../../../common/colors";
+import {
+    findDeprecatedDataTypeIds,
+    findNonConcreteDataTypeIds,
+    findUnknownDataTypeId
+} from "../../../data-types/data-type-utils";
 
 import template from "./logical-flows-data-type-summary-pane.html";
 

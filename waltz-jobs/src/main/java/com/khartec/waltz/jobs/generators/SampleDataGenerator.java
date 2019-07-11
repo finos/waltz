@@ -19,7 +19,10 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.springframework.context.ApplicationContext;
 

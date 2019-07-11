@@ -21,7 +21,7 @@
     <div ng-switch="$ctrl.renderMode">
         <div ng-switch-when="frameless">
             <h4>
-                <span ng-bind="$ctrl.title"></span>
+                <span ng-bind="$ctrl.name"></span>
             </h4>
             <p class="help-text">
                 <waltz-markdown text="$ctrl.description"></waltz-markdown>
@@ -30,8 +30,8 @@
             <div ng-include="'wpt-pie-and-table'"></div>
         </div>
         <div ng-switch-default>
-            <waltz-basic-info-tile name="{{ $ctrl.title }}"
-                                   sub-name="{{ $ctrl.subTitle }}"
+            <waltz-basic-info-tile name="{{ $ctrl.name }}"
+                                   sub-name="{{ $ctrl.subName }}"
                                    description="{{ $ctrl.description }}"
                                    icon="{{ $ctrl.icon }}">
                 <div ng-include="'wpt-pie-and-table'"></div>

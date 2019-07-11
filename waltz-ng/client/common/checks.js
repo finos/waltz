@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import apiCheck from "api-check";
-import {notEmpty} from "./index";
+import { notEmpty } from "./index";
 
 
 const myApiCheck = apiCheck({ verbose: false });

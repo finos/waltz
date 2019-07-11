@@ -19,17 +19,17 @@
 
 import _ from "lodash";
 
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {initialiseData} from "../../../common";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
+import { mkSelectionOptions } from "../../../common/selector-utils";
 
 import template from "./change-initiative-section.html";
-import {changeInitiative} from "../../../common/services/enums/change-initiative";
-import {getEnumName} from "../../../common/services/enums";
+import { changeInitiative } from "../../../common/services/enums/change-initiative";
+import { getEnumName } from "../../../common/services/enums";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
-import {isSameParentEntityRef, refToString} from "../../../common/entity-utils";
-import {fakeInitiative, fakeProgramme} from "../../change-initiative-utils";
-import {filterByAssessmentRating, mkAssessmentSummaries} from "../../../assessments/assessment-utils";
+import { isSameParentEntityRef } from "../../../common/entity-utils";
+import { fakeInitiative, fakeProgramme } from "../../change-initiative-utils";
+import { filterByAssessmentRating, mkAssessmentSummaries } from "../../../assessments/assessment-utils";
 
 const bindings = {
     parentEntityRef: "<",

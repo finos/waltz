@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -37,6 +36,26 @@ export function aggregatePeopleInvolvements(involvements, people) {
         .value();
 }
 
+export function aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds = []) {
+    const peopleById = _.keyBy(people, "employeeId");
+
+    const aggregatePeopleByInvolvementKind = _
+        .chain(involvements)
+        .map(inv => ({
+            person: peopleById[inv.employeeId],
+            involvement: ({kindId: inv.kindId})
+        }))
+        .groupBy(inv => inv.involvement.kindId)
+        .value();
+
+    return _.chain(keyInvolvementKinds)
+        .map(kind => ({
+            roleName: kind.name,
+            persons: aggregatePeopleByInvolvementKind[kind.id]
+        }))
+        .sortBy("roleName")
+        .value();
+}
 
 export function mkChangeCommand(operation, personEntityRef, involvementKindId) {
     return {

@@ -1,0 +1,39 @@
+<waltz-sub-section ng-if="$ctrl.keyPeople.length > 0" name="Key People" ng-click="$ctrl.onSelect()">
+    <content>
+        <div class="waltz-sub-section-content">
+            <div style="padding: 5px 0">
+                    <div style="min-height: 1px;">
+                        <table class="waltz-field-table  waltz-field-table-border"
+                               style="width: 100%">
+                            <colgroup>
+                                <col width="30%">
+                                <col width="70%">
+                            </colgroup>
+                            <tbody>
+                            <tr ng-repeat="item in $ctrl.keyPeople" >
+                                <td class="wft-label" style="padding: 3px;">
+                                    <span ng-bind="item.roleName"></span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span ng-repeat="p in item.persons">
+                                        <a ui-sref="main.person.view ({empId: p.person.employeeId})"
+                                           ng-bind="p.person.displayName"></a> -
+                                        <a href="mailto:{{p.person.email}}">
+                                            <waltz-icon name="envelope-o"></waltz-icon>
+                                        </a>
+                                            <span ng-show="!$last">, </span>
+                                        </span>
+                                        <span class="wft-label small" ng-show="!item.persons.length">
+                                            Not defined
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </content>
+</waltz-sub-section>

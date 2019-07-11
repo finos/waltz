@@ -132,6 +132,13 @@ export const entity = {
         description: null,
         position: 150
     },
+    LICENCE: {
+        key: "LICENCE",
+        name: "Licence",
+        icon: "id-card-o",
+        description: null,
+        position: 153
+    },
     LOGICAL_DATA_ELEMENT: {
         key: "LOGICAL_DATA_ELEMENT",
         name: "Logical Data Element",

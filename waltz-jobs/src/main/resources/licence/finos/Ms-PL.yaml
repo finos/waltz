@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Microsoft Public License
+  licenseId: Ms-PL
+  notes:
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [US, MS]
+    compliance_notes: Include a complete copy of license with source code distributions
+  
+  - type: condition
+    description: Retain all notices
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: Retain all notices present in software
+
+  - type: condition
+    description: Source code under same license
+    use_cases: [US, MS]
+    compliance_notes: Distributions of "any portion of the software in source code form" must be under this license
+
+  - type: condition
+    description: Comply with this license
+    use_cases: [UB, MB]
+    compliance_notes: Object or compiled code distributions must be under a license that complies with this license
+
+  - type: termination
+    description: Any patent claims by licensee against any contributor accusing the software result in termination of all patent licenses from that contributor

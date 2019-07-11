@@ -17,13 +17,13 @@ forceCenter/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
-import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
-import {event, select} from "d3-selection";
-import {forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
-import {drag} from "d3-drag";
-import {symbol, symbolWye} from "d3-shape";
-import {zoom, zoomIdentity} from "d3-zoom";
+import { initialiseData } from "../../../common";
+import { lineWithArrowPath, responsivefy } from "../../../common/d3-utils";
+import { event, select } from "d3-selection";
+import { forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY } from "d3-force";
+import { drag } from "d3-drag";
+import { symbol, symbolWye } from "d3-shape";
+import { zoom, zoomIdentity } from "d3-zoom";
 import "d3-selection-multi";
 import _ from "lodash";
 

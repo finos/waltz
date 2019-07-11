@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {CORE_API} from '../../../common/services/core-api-utils';
-import template from './change-initiative-view.html';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import template from "./change-initiative-view.html";
+import { initialiseData } from "../../../common";
 
 
 const initialState = {
@@ -25,6 +26,8 @@ const initialState = {
     related: {
         appGroupRelationships: []
     },
+    orgUnit: null,
+    entityRef: null
 };
 
 
@@ -34,30 +37,35 @@ function controller($stateParams,
                     serviceBroker) {
 
     const {id} = $stateParams;
-    const vm = Object.assign(this, initialState);
+    const vm = initialiseData(this, initialState);
 
     vm.entityRef = {
-        kind: 'CHANGE_INITIATIVE',
+        kind: "CHANGE_INITIATIVE",
         id: id
     };
 
     vm.$onInit = () => {
-        serviceBroker
+        const ciPromise = serviceBroker
             .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
             .then(result => {
-                const ci = result.data;
-                vm.changeInitiative = ci;
-                vm.entityRef = Object.assign({},
-                    vm.entityRef,
-                    { name: vm.changeInitiative.name, description: vm.changeInitiative.description });
-
-                historyStore
-                    .put(
-                        ci.name,
-                        'CHANGE_INITIATIVE',
-                        'main.change-initiative.view',
-                        { id: ci.id });
+                vm.changeInitiative = result.data;
+                return vm.changeInitiative;
             });
+
+        ciPromise
+            .then((ci) => serviceBroker
+                .loadViewData(
+                    CORE_API.OrgUnitStore.getById,
+                    [ ci.organisationalUnitId ])
+                .then( r => vm.orgUnit = r.data));
+
+        ciPromise
+            .then((ci) => historyStore
+                .put(
+                    ci.name,
+                    "CHANGE_INITIATIVE",
+                    "main.change-initiative.view",
+                    { id: ci.id }));
 
         dynamicSectionManager.initialise("CHANGE_INITIATIVE");
 
@@ -67,17 +75,17 @@ function controller($stateParams,
 
 
 controller.$inject = [
-    '$stateParams',
-    'DynamicSectionManager',
-    'HistoryStore',
-    'ServiceBroker'
+    "$stateParams",
+    "DynamicSectionManager",
+    "HistoryStore",
+    "ServiceBroker"
 ];
 
 
 const page = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 

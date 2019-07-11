@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {indexRatingSchemes} from "../ratings/rating-utils";
-import {nest} from "d3-collection";
-import {grey} from "../common/colors";
-import {refToString} from "../common/entity-utils";
+import { indexRatingSchemes } from "../ratings/rating-utils";
+import { nest } from "d3-collection";
+import { grey } from "../common/colors";
+import { refToString } from "../common/entity-utils";
 
 /**
  * Creates an enriched assessment definition which adds fields for

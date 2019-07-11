@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Python License 2.0
+  licenseId: Python-2.0
+  notes: This is a license “stack” comprised of various licenses that apply to Python as it has developed over the years.
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes:
+    
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes:
+    
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Indicate the nature of the modifiations made in the work
+    
+  - type: termination
+    description: Termination of license upon breach

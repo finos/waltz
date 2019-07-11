@@ -55,7 +55,8 @@ public enum RelationshipKind {
             tuple(MEASURABLE, APP_GROUP),
             tuple(MEASURABLE, MEASURABLE),
             tuple(MEASURABLE, CHANGE_INITIATIVE),
-            tuple(ORG_UNIT, ROADMAP)
+            tuple(ORG_UNIT, ROADMAP),
+            tuple(LICENCE, APPLICATION)
     )),
 
     SUPPORTS(fromArray(

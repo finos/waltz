@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: GNU Lesser General Public License 3.0
+  licenseId:
+  - LGPL-3.0-only
+  - LGPL-3.0-or-later
+  notes: LGPL-3.0 incorporates the terms of GPL-3.0 and supplements the parent license with the terms listed here.
+  terms:
+  - type: other
+    description: If you modify the library so that it does not function without data or function supplied by your application, the modified library can only be distributed under the terms of GPL-3.0. This restriction does not apply if the data or function is supplied as an argument.
+
+  - type: other
+    description: Object code incorporating header file material from the library that is not limited to numerical parameters, data structure layouts and accessors or small macros, inline functions and templates of fewer than ten lines must include a prominent notice that the library is used, its use is covered by LGPL-3.0, and provide a copy of the license (see section 3 for more details)
+    
+  - type: other
+    description: Allows distribution of combined LGPL-3.0 and other code under under a different license, under certain conditions.
+    compliance_notes: Allows use of a "suitable shared library mechanism" (including dynamic linking) to combine the LGPL-3.0 code with non-LGPL-3.0 code, so long as the source code is provided to allow the user to recombine or relink the application with a modified version of the LGPL-3.0 library. This must include installation information as defined in GPL-3.0, if necessary to install and execute a modified version of the combined work (see sections 4d and 4e for more details). For more information about LGPL-3.0 compliance and this condition in particular, see the references provided or consult your open source legal counsel.
+    seeAlso:
+    - https://www.gnu.org/licenses/gpl-faq.html#LGPLStaticVsDynamic[FSF FAQ: Static v. dynamic]
+    - www.softwarefreedom.org/resources/2014/SFLC-Guide_to_GPL_Compliance_2d_ed.html#lgpl[SFLC Compliance Guide]
+    - https://copyleft.org/guide/comprehensive-gpl-guidech11.html#x14-9600010[Copyleft Guide]
+    
+  - type: other
+    description: If you create a combined library combining parts of the library (modified or not) with functions that are not based on the library, then you must accompany the combined library with a copy of the same work based on the library uncombined; give prominent notice that the library is used and explain where to find the accompanying uncomibed form of the work (see section 5 for more details)
+        
+  - type: license_versions
+    description: Allows use of covered code under the terms of of same version or any later version of the license or that version only, as specified. If no license version is specificed, then you may use any version ever published by the FSF.
+

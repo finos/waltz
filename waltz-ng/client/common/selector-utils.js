@@ -19,7 +19,7 @@
 
 
 import _ from "lodash";
-import {checkIsEntityRef} from "./checks";
+import { checkIsEntityRef } from "./checks";
 
 export function getDefaultScopeForEntityKind(kind) {
     switch (kind) {
@@ -28,6 +28,7 @@ export function getDefaultScopeForEntityKind(kind) {
         case "APP_GROUP":
         case "CHANGE_INITIATIVE":
         case "FLOW_DIAGRAM":
+        case "LICENCE":
         case "LOGICAL_DATA_ELEMENT":
         case "LOGICAL_FLOW":
         case "PHYSICAL_FLOW":

@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Mozilla Public License 2.0
+  licenseId: MPL-2.0
+  notes: This license includes a license-compatibility provision related to use of the code with the GPL-2.0-or-later, LGPL-2.1-or-later, and GPL-3.0-or-later which is difficult to capture, please see sections 1.12, 2.4, 3.3, and 10.4 for more details.
+  terms:
+  - type: condition
+    description: Provide license
+    use_cases: [US, MS]
+    compliance_notes: You must inform recipients that source code is goverened by this licenses and how to obtain a copy
+    
+  - type: condition
+    description: Modifications under same license
+    use_cases: [MS]
+    compliance_notes: File-level reciprocal license meaning that modifications to any file or new files that contain part of original software are governed by the terms of this license. Larger works may be created by combining covered software with code not governed by this license, so long as you comply with this license for the covered software (see sections 1.10 and 3.3 for more details)
+    
+  - type: condition
+    description: Retain notices
+    use_cases: [US, MS]
+    compliance_notes: You must retain license notices with every source code distribution or include notices in another likely location
+
+  - type: condition
+    description: Provide source code
+    use_cases: [UB, MB]
+    compliance_notes: Must inform recipients how to obtain source code by reasonable means in a timely manner and at no cost more than the cost of distribution to the recipient.
+
+  - type: termination
+    description: License terminates upon failure to comply with license unless certain conditions are met by you and contributor (see section 5.1 for more details)
+
+  - type: termination
+    description: Any patent claims accusing the software by a licensee results in termination of all licenses to the licensee
+
+  - type: other
+    description: You may distribute binary versions under a different license, so long as you do not limit or alter the recipient's right in the source code under this license.
+    
+  - type: other
+    description: You may offer and charge a fee for warranty, support, indemnity or liability obligations to recipients. However, you must make it clear that any such offer is offered by you alone and you agree to indemnify the initial developer and every contributor for any liability incurred by them as a result of the offer you make. See section 3.5 for more details.
+
+  - type: other
+    description: You may distribute binary versions under a different license, so long as you do not limit or alter the recipient's right in the source code under this license. You must make it clear that any differing terms are offered by you alone and you agree to indemnify the initial developer and every contributor for any liability incurred by them as a result of the offer you make. See section 3.6 for more details.
+  
+  - type: license_versions
+    description: Allows use of covered code under the terms of same version or any later version of the license.
+
