@@ -63,7 +63,7 @@
          ng-if="$ctrl.currentInvolvements != 0">
         <waltz-data-extract-link name="Download involved people"
                                  styling="link"
-                                 filename="Allocations.csv"
+                                 filename="InvolvedPeople.csv"
                                  extract="people/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
                                  method="POST"
                                  request-body="$ctrl.selector">
