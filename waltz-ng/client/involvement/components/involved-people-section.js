@@ -67,7 +67,6 @@ const initialState = {
     allowedInvolvements: [],
     currentInvolvements: [],
     gridData: [],
-    gridDataCount: 0,
     columnDefs,
     exportGrid: () => {},
     visibility: {
@@ -131,7 +130,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        const options = mkSelectionOptions(vm.parentEntityRef, "EXACT");
+        const options = mkSelectionOptions(vm.parentEntityRef, "PARENTS");
         const involvementPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
@@ -141,8 +140,8 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
         const peoplePromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findPeopleByEntityReference,
-                [ vm.parentEntityRef ],
+                CORE_API.InvolvementStore.findPeopleBySelector,
+                [ options ],
                 { force: true })
             .then(r => r.data);
 
@@ -172,14 +171,6 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
             (name, id) => ({ value: +id, name }));
     };
 
-
-
-    vm.onGridInitialise = () => {
-    };
-
-    vm.onGridChange = (e) => {
-        vm.gridDataCount = e.entriesCount;
-    };
 
     vm.editMode = (editMode) => {
         vm.visibility.editor = editMode;

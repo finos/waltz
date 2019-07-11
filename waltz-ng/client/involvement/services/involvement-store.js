@@ -43,13 +43,9 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findBySelector = (kind, id, scope="EXACT") => {
-        const options = _.isObject(id)
-            ? id
-            : {scope, entityReference: {id, kind}};
-
+    const findBySelector = (selectorOptions) => {
         return $http
-            .post(`${BASE}/selector`, options)
+            .post(`${BASE}/selector/involvement`, selectorOptions)
             .then(result => result.data);
     };
 
@@ -58,6 +54,12 @@ function store($http, BaseApiUrl) {
         const ref = _.isObject(kind) ? kind : { id, kind };
 
         return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}/people`)
+            .then(result => result.data);
+    };
+
+
+    const findPeopleBySelector = (selectorOptions) => {
+        return $http.get(`${BASE}/selector/people`)
             .then(result => result.data);
     };
 
@@ -76,6 +78,7 @@ function store($http, BaseApiUrl) {
         findByEntityReference,
         findBySelector,
         findPeopleByEntityReference,
+        findPeopleBySelector,
         changeInvolvement
     };
 }
@@ -112,6 +115,11 @@ export const InvolvementStore_API = {
         serviceName,
         serviceFnName: "findPeopleByEntityReference",
         description: "find people by involved entity reference"
+    },
+    findPeopleBySelector: {
+        serviceName,
+        serviceFnName: "findPeopleBySelector",
+        description: "find people by generic selector"
     },
     changeInvolvement: {
         serviceName,

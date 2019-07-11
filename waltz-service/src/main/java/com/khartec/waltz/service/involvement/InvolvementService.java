@@ -121,6 +121,13 @@ public class InvolvementService {
     }
 
 
+    public List<Person> findPeopleByGenericEntitySelector(IdSelectionOptions selectionOptions) {
+        checkNotNull(selectionOptions, "selectionOptions cannot be null");
+        GenericSelector genericSelector = genericSelectorFactory.apply(selectionOptions);
+        return involvementDao.findPeopleByGenericEntitySelector(genericSelector);
+    }
+
+
     public boolean addEntityInvolvement(String userId,
                                         EntityReference entityReference,
                                         EntityInvolvementChangeCommand command) {
