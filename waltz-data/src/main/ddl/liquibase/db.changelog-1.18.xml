@@ -304,4 +304,28 @@
         </sql>
     </changeSet>
 
+    <!-- 4128 Create Table - key_involvement_kind -->
+    <changeSet id="20190703-4128-1"
+               author="muzammilali">
+        <comment>4128: Key involvements per entity kind</comment>
+       <createTable tableName="key_involvement_kind"
+                remarks="Key Involvement Kind For Entity Kind">
+           <column name="involvement_kind_id"
+                   type="${id.type}">
+               <constraints nullable="false"/>
+           </column>
+           <column name="entity_kind"
+                   type="${enum.type}">
+               <constraints nullable="false"/>
+           </column>
+       </createTable>
+    </changeSet>
+
+    <changeSet id="20190703-4128-2"
+               author="muzammilali">
+        <addUniqueConstraint columnNames="involvement_kind_id, entity_kind"
+                             constraintName="unique_inv_kind_entity_kind"
+                             tableName="key_involvement_kind"/>
+    </changeSet>
+
 </databaseChangeLog>

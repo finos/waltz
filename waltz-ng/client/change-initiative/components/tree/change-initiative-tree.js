@@ -1,47 +1,37 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import template from "./change-initiative-tree.html";
-import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, sameRef} from "../../../common/entity-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {
-    buildHierarchies,
-    findNode,
-    getParents
-} from "../../../common/hierarchy-utils";
-import {kindToViewState} from "../../../common/link-utils";
-import {entity} from "../../../common/services/enums/entity";
+import { initialiseData } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { sameRef } from "../../../common/entity-utils";
+import { mkSelectionOptions } from "../../../common/selector-utils";
+import { buildHierarchies, findNode, getParents } from "../../../common/hierarchy-utils";
+import { kindToViewState } from "../../../common/link-utils";
+import { entity } from "../../../common/services/enums/entity";
+import { fakeParentsByChildKind } from "../../change-initiative-utils";
 
 const bindings = {
     parentEntityRef: "<",
 };
 
 const initialState = {};
-
-const fakeProgramme = {
-    id: -2,
-    parentId: -1,
-    isFake: true,
-    name: "Programme Placeholder",
-    description: "Placeholder programme as there is no actual linked programme",
-    kind: "CHANGE_INITIATIVE",
-    changeInitiativeKind: "INITIATIVE"
-};
-
-const fakeInitiative = {
-    id: -1,
-    parentId: null,
-    isFake: true,
-    name: "Initiative Placeholder",
-    description: "Placeholder programme as there is no actual linked initiative",
-    kind: "CHANGE_INITIATIVE",
-    changeInitiativeKind: "INITIATIVE"
-};
-
-const fakeParentsByChildKind = {
-    "PROJECT": fakeProgramme,
-    "PROGRAMME": fakeInitiative
-};
-
 
 function controller($state, serviceBroker) {
     const vm = initialiseData(this, initialState);

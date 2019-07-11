@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {select} from 'd3-selection';
-import {arc, pie} from 'd3-shape';
-import {easeElasticOut} from 'd3-ease';
+import { select } from "d3-selection";
+import { arc, pie } from "d3-shape";
+import { easeElasticOut } from "d3-ease";
 import "d3-selection-multi";
 
 import _ from "lodash";
-import {isPieEmpty} from "./pie-utils";
-import template from './pie.html';
+import { isPieEmpty } from "./pie-utils";
+import template from "./pie.html";
 
 
 /**
@@ -38,14 +38,14 @@ import template from './pie.html';
  */
 
 const bindings = {
-    data: '<',
-    config: '<',
-    selectedSegmentKey: '<'
+    data: "<",
+    config: "<",
+    selectedSegmentKey: "<"
 };
 
 
 const styles = {
-    emptyPie: 'empty-pie'
+    emptyPie: "empty-pie"
 };
 
 const defaultOnSelect = (d) => console.log("pie.onSelect default handler: ", d);
@@ -59,13 +59,13 @@ const BLUR_DURATION = 50;
 function mkPieArc(radius, focused = false) {
     if(focused) {
         return arc()
-            .outerRadius(radius - 10 + 3)
+            .outerRadius(radius - 1)
             .innerRadius(radius / 2.5)
             .padAngle(0.07)
             .cornerRadius(0);
     } else {
         return arc()
-            .outerRadius(radius - 10)
+            .outerRadius(radius - 3)
             .innerRadius(radius / 2.5)
             .padAngle(0.07)
             .cornerRadius(0);
@@ -97,7 +97,7 @@ function renderArcs(holder, config, data, onSelect) {
         colorProvider,
         valueProvider = (d) => d.count,
         idProvider = (d) => d.data.key,
-        size = DEFAULT_SIZE
+        size// = DEFAULT_SIZE
     } = config;
 
     const radius = size / 2;
@@ -110,24 +110,24 @@ function renderArcs(holder, config, data, onSelect) {
     const pieData = pieLayout(_.filter(data, r => r.count > 0));
 
     const arcs = holder
-        .selectAll('.arc')
-        .data(pieData, idProvider);
+        .selectAll(".arc")
+        .data(pieData, d => idProvider(d));
 
     const newArcs = arcs
         .enter()
-        .append('path')
-        .classed('arc clickable', true)
-        .on('click', d => onSelect(d.data));
+        .append("path")
+        .classed("arc clickable", true)
+        .on("click", d => onSelect(d.data));
 
     newArcs
-        .append('title')
-        .text(d => `${d.data.key} - ${d.data.count}`);
+        .append("title")
+        .text(d => `${d.data.key} - #${d.data.count}`);
 
     arcs
         .merge(newArcs)
-        .attr('d', d => pieArc(d))
-        .attr("fill", d => colorProvider(d).brighter())
-        .attr("stroke", d => colorProvider(d));
+        .attr("d", d => pieArc(d))
+        .attr("fill", d => colorProvider(d.data).brighter())
+        .attr("stroke", d => colorProvider(d.data));
 
     arcs.exit()
         .remove();
@@ -138,14 +138,14 @@ function renderArcs(holder, config, data, onSelect) {
 
     emptyPie
         .enter()
-        .append('circle')
+        .append("circle")
         .attrs({
             cx: 0,
             cy: 0,
             r: radius / 2,
-            fill: '#eee',
-            stroke: '#bbb',
-            'stroke-dasharray': [5, 1]
+            fill: "#eee",
+            stroke: "#bbb",
+            "stroke-dasharray": [5, 1]
         })
         .classed(styles.emptyPie, true);
 
@@ -163,27 +163,27 @@ function render(svg, config, data, onSelect) {
     svg.attrs( { width, height });
 
     const mainGroup = svg
-        .selectAll('.main-group')
+        .selectAll(".main-group")
         .data([1]);
 
     const newMainGroup = mainGroup
         .enter()
-        .append('g')
-        .classed('main-group', true);
+        .append("g")
+        .classed("main-group", true);
 
     const g = newMainGroup
         .merge(mainGroup)
-        .attr('transform', `translate(${width / 2},${height / 2})`);
+        .attr("transform", `translate(${width / 2},${height / 2})`);
 
     renderArcs(g, config, data, onSelect);
 }
 
 
 function controller($element, $scope) {
-    const vizElem = $element[0].querySelector('.waltz-pie');
+    const vizElem = $element[0].querySelector(".waltz-pie");
 
     const svg = select(vizElem)
-        .append('svg');
+        .append("svg");
 
     const vm = this;
 
@@ -195,8 +195,8 @@ function controller($element, $scope) {
         }
 
         if (changes.selectedSegmentKey) {
-            svg.selectAll('.arc')
-                .classed('wp-selected', function(d) {
+            svg.selectAll(".arc")
+                .classed("wp-selected", function(d) {
                     const isSelected = d.data.key === vm.selectedSegmentKey;
                     if(isSelected) {
                         expandArc(this, vm.config.size / 2);
@@ -211,8 +211,8 @@ function controller($element, $scope) {
 
 
 controller.$inject = [
-    '$element',
-    '$scope'
+    "$element",
+    "$scope"
 ];
 
 

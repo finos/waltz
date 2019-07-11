@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './pie-table.html';
+import template from "./pie-table.html";
 
-import {limitSegments} from "./pie-utils";
-import {initialiseData} from "../../common/index";
+import { toSegments } from "./pie-utils";
+import { initialiseData } from "../../common/index";
+import { invokeFunction } from "../../common";
 
 
 const bindings = {
-    data: '<',
-    config: '<',
-    title: '@',
-    subTitle: '@',
-    icon: '@',
-    description: '@',
-    selectedSegmentKey: '<'
+    data: "<",
+    config: "<",
+    name: "@",
+    subName: "@",
+    icon: "@",
+    description: "@",
+    selectedSegmentKey: "<",
+    renderMode: "@?"
 };
 
 
 const initialState = {
 };
-
-
-const MAX_PIE_SEGMENTS = 5;
 
 
 function controller() {
@@ -52,17 +51,57 @@ function controller() {
     };
 
     const dataChanged = (data = []) => {
-        vm.pieData = limitSegments(data, MAX_PIE_SEGMENTS);
+        const segmentedData = toSegments(data);
+        vm.summarizedSegments = _.chain(segmentedData.primary).concat([segmentedData.overspillSummary]).compact().value();
+        vm.detailedSegments = _.chain(segmentedData.primary).concat(segmentedData.overspill).value();
+        vm.pieData = vm.summarizedSegments;
+        vm.tableData = vm.summarizedSegments;
     };
 
+    function pieOnSelect(d) {
+        if (d.isOverspillSummary === true || vm.config.onSelect == null) {
+            vm.selectedSegmentKey = d.key;
+        } else {
+            invokeFunction(vm.config.onSelect, d);
+        }
+    }
+
+
+    function tableOnSelect(d) {
+        const handleNormalSelection = (d) => {
+            if (_.isNil(vm.config.onSelect)) {
+                vm.selectedSegmentKey = d ? d.key : null;
+            } else {
+                vm.config.onSelect(d);
+            }
+        };
+
+        const handleExpansionOfOtherSegment = () => {
+            vm.tableData = vm.detailedSegments;
+        };
+
+        if (d != null && d.isOverspillSummary === true) {
+            handleExpansionOfOtherSegment();
+        } else {
+            handleNormalSelection(d);
+        }
+    }
+
+
     vm.$onChanges = (changes) => {
-        dataChanged(vm.data);
+        if (changes.data) {
+            dataChanged(vm.data);
+        }
 
         if (changes.config) {
-            vm.config = Object.assign(
+            vm.pieConfig = Object.assign(
                 {},
-                { onSelect: defaultOnSelect },
-                vm.config);
+                vm.config,
+                { onSelect: pieOnSelect });
+            vm.tableConfig = Object.assign(
+                {},
+                vm.config,
+                { onSelect: tableOnSelect });
         }
     };
 

@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -18,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsCreateInvolvementKindCommand} from "../../common/checks";
+import { checkIsCreateInvolvementKindCommand } from "../../common/checks";
 
 
 export function store($http, BaseApiUrl) {
@@ -28,6 +27,10 @@ export function store($http, BaseApiUrl) {
 
     const findAll = () =>
         $http.get(BASE)
+            .then(result => result.data);
+
+    const findKeyInvolvementKindsByEntityKind = (entityKind) =>
+        $http.get(`${BASE}/key-involvement-kinds/${entityKind}`)
             .then(result => result.data);
 
 
@@ -66,6 +69,7 @@ export function store($http, BaseApiUrl) {
 
     return {
         findAll,
+        findKeyInvolvementKindsByEntityKind,
         getById,
         create,
         update,
@@ -88,6 +92,11 @@ export const InvolvementKindStore_API = {
         serviceName,
         serviceFnName: 'findAll',
         description: 'executes findAll'
+    },
+    findKeyInvolvementKindsByEntityKind: {
+        serviceName,
+        serviceFnName: 'findKeyInvolvementKindsByEntityKind',
+        description: 'executes findKeyInvolvementKindsByEntityKind'
     },
     getById: {
         serviceName,

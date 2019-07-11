@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -17,23 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
 
-.waltz-pie {
-
-    .arc {
-        opacity: 0.75;
-        transition: opacity 0.4s, stroke 0.4s;
-
-
-        &:hover {
-            opacity: 1;
-        }
-
-    }
-
-    .wp-selected {
-        opacity: 1;
-        stroke: #999;
-    }
-
+/**
+ * Given a list of enums will filter by `type` and then index the resultant list
+ * by the key.  Each item returned looks like:
+ * ```
+ * { key, name, data: {...} }
+ * ```
+ * @param enums  list of enums to filter and index
+ * @param type  type of enums to filter (keep)
+ * @returns {*}
+ */
+export default function indexByKeyForType(enums = [], type) {
+    return _
+        .chain(enums)
+        .filter(d => d.type = type)
+        .map(d => ({ key: d.key, name: d.name, data: d }))
+        .keyBy("key")
+        .value();
 }

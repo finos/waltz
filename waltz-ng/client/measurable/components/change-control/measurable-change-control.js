@@ -1,10 +1,10 @@
 import template from "./measurable-change-control.html";
-import {initialiseData} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
-import {determineColorOfSubmitButton} from "../../../common/severity-utils";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
-import {displayError} from "../../../common/error-utils";
+import { initialiseData } from "../../../common";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { toEntityRef } from "../../../common/entity-utils";
+import { determineColorOfSubmitButton } from "../../../common/severity-utils";
+import { buildHierarchies } from "../../../common/hierarchy-utils";
+import { displayError } from "../../../common/error-utils";
 
 const modes = {
     MENU: "MENU",
@@ -283,6 +283,33 @@ function controller(notification,
     vm.onSubmit = () => {
         if (vm.submitDisabled) return;
         const cmd = mkUpdCmd();
+
+        function isMovedToItself() {
+            return cmd.changeType === "MOVE"
+                && cmd.primaryReference.id === cmd.params.destinationId;
+        }
+
+        function isMovedToAnExistingChild() {
+            return cmd.changeType === "MOVE"
+                && vm.measurable.children
+                .filter(c => (c.id === cmd.params.destinationId))
+                .length > 0;
+        }
+
+        if (isMovedToItself()) {
+            notification.warning("Cannot set a Measurable as its own parent, ignoring....");
+            vm.commandParams.destination = null;
+            vm.submitDisabled = true;
+            return;
+        }
+
+        if (isMovedToAnExistingChild()) {
+            notification.warning("Cannot add a measurable as parent if it is already a child of the subject, ignoring....");
+            vm.commandParams.destination = null;
+            vm.submitDisabled = true;
+            return;
+        }
+
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
             .catch(e => displayError(notification, "Error when submitting command", e));

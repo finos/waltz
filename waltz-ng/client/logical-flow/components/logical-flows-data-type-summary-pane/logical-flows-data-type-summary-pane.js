@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,18 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from "../../../common/index";
-import {color} from "d3-color";
-import {amber, green, red, grey} from "../../../common/colors";
-import {findNonConcreteDataTypeIds, findDeprecatedDataTypeIds, findUnknownDataTypeId} from '../../../data-types/data-type-utils';
+import _ from "lodash";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common/index";
+import { color } from "d3-color";
+import { amber, green, grey, red } from "../../../common/colors";
+import {
+    findDeprecatedDataTypeIds,
+    findNonConcreteDataTypeIds,
+    findUnknownDataTypeId
+} from "../../../data-types/data-type-utils";
 
-import template from './logical-flows-data-type-summary-pane.html';
+import template from "./logical-flows-data-type-summary-pane.html";
 
 
 const bindings = {
-    stats: '<'
+    stats: "<"
 };
 
 
@@ -42,9 +46,9 @@ function prepareSummary(counts = [], unknownId, direction, deprecatedDataTypeIds
     return _
         .chain(counts)
         .map(d => ({
-                typeId: d.dataType.id,
-                name: d.dataType.name,
-                count: d[direction] }))
+            typeId: d.dataType.id,
+            name: d.dataType.name,
+            count: d[direction] }))
         .reduce((acc, d) => {
             if (d.typeId === Number(unknownId)) {
                 acc.UNKNOWN  += d.count;
@@ -62,7 +66,7 @@ function prepareSummary(counts = [], unknownId, direction, deprecatedDataTypeIds
 }
 
 function friendlyName(name) {
-    return name.replace('_', ' ');
+    return name.replace("_", " ");
 }
 
 function controller(displayNameService, logicalFlowUtilityService, serviceBroker) {
@@ -91,18 +95,18 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                     vm.visibility.summaries = true;
                     vm.summaryConfig =  {
                         colorProvider: (d) => {
-                            if(d.data.key === 'VALID') {
+                            if(d.key === "VALID") {
                                 return color(green);
-                            } else if (d.data.key === 'DEPRECATED') {
+                            } else if (d.key === "DEPRECATED") {
                                 return color(amber);
-                            } else if (d.data.key === 'NON CONCRETE') {
+                            } else if (d.key === "NON CONCRETE") {
                                 return color(grey);
                             } else {
                                 return color(red);
                             }
                         },
                         valueProvider: (d) => d.count,
-                        idProvider: (d) => d.data.key,
+                        idProvider: (d) => d.key,
                         labelProvider: d => _.capitalize(d.key),
                         size: 40
                     };
@@ -110,10 +114,10 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                     vm.overviewConfig =  Object.assign({}, vm.summaryConfig, { size: 80 });
 
                     const summaries = [
-                        { title: 'Intra', prop: 'intra'} ,
-                        { title: 'Inbound', prop: 'inbound'} ,
-                        { title: 'Outbound', prop: 'outbound'} ,
-                        { title: 'All', prop: 'total'}
+                        { title: "Intra", prop: "intra"} ,
+                        { title: "Inbound", prop: "inbound"} ,
+                        { title: "Outbound", prop: "outbound"} ,
+                        { title: "All", prop: "total"}
                     ];
 
                     vm.summaries= _.map(summaries, d => {
@@ -134,9 +138,9 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
 
 
 controller.$inject = [
-    'DisplayNameService',
-    'LogicalFlowUtilityService',
-    'ServiceBroker',
+    "DisplayNameService",
+    "LogicalFlowUtilityService",
+    "ServiceBroker",
 ];
 
 
@@ -151,5 +155,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzLogicalFlowsDataTypeSummaryPane'
+    id: "waltzLogicalFlowsDataTypeSummaryPane"
 }

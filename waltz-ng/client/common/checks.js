@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import apiCheck from "api-check";
-import {notEmpty} from "./index";
+import { notEmpty } from "./index";
 
 
 const myApiCheck = apiCheck({ verbose: false });
@@ -168,7 +168,7 @@ const entityRelationshipChangeCommandShape = {
 
 const check = (test, x) => myApiCheck.throw(test, x);
 
-const assert = (b, msg) => { if (!b) throw msg; };
+const assert = (b, msg) => { if (!b) throw _.isFunction(msg) ? msg() : msg; };
 
 
 export function checkTrue(b, msg) {
@@ -179,8 +179,16 @@ export function checkNotEmpty(x, msg = "is empty") {
     assert(notEmpty(x), msg);
 }
 
-export const checkIsEntityRef = ref =>
-    check(myApiCheck.shape(entityRefShape), ref);
+
+export function checkIsEntityRef(ref) {
+    const hasKind = _.isString(ref.kind);
+    const hasId = _.isNumber(ref.id);
+    if (hasKind && hasId) {
+        // nop
+    } else {
+        throw `Ref: ${JSON.stringify(ref)} does not look like an entity ref`;
+    }
+}
 
 
 export const checkIsLogicalFlow = flow =>

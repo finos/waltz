@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,15 @@
  */
 
 import _ from "lodash";
-import {variableScale} from "../../common/colors";
-import {mkSummaryTableHeadings, navigateToStatistic} from "../utilities";
-import template from './entity-statistic-summary-card.html';
+import { variableScale } from "../../common/colors";
+import { mkSummaryTableHeadings, navigateToStatistic } from "../utilities";
+import template from "./entity-statistic-summary-card.html";
 
 const bindings = {
-    definition: '<',
-    parentRef: '<',
-    subTitle: '@',
-    summary: '<'
+    definition: "<",
+    parentRef: "<",
+    subTitle: "@",
+    summary: "<"
 };
 
 
@@ -36,7 +36,7 @@ const PIE_SIZE = 100;
 function mkStatChartData(counts = []) {
     return {
         config: {
-            colorProvider: (d) => variableScale(d.data.key),
+            colorProvider: (d) => variableScale(d.key),
             labelProvider: d => d.key,
             size: PIE_SIZE
         },
@@ -69,7 +69,7 @@ function controller($state) {
 
 
 controller.$inject = [
-    '$state'
+    "$state"
 ];
 
 

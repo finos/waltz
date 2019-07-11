@@ -1,0 +1,67 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+
+<div class="small">
+
+    <div ng-if="$ctrl.summaries.length != 0">
+
+        <!-- LIST -->
+        <div ng-if="!$ctrl.selectedSummary">
+            <p class="help-block">
+               <waltz-markdown text="$ctrl.helpText">
+               </waltz-markdown>
+            </p>
+
+            <table class="table table-condensed">
+                <tr ng-repeat="summary in $ctrl.summaries"
+                    ng-click="$ctrl.onSelectSummary(summary)"
+                    class="clickable">
+                    <td>
+                        <waltz-pie data="summary.values"
+                                   config="$ctrl.listConfig">
+                        </waltz-pie>
+                    </td>
+                    <td>
+                        <div ng-bind="summary.definition.name"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- DETAIL -->
+        <div ng-if="$ctrl.selectedSummary">
+
+            <a ng-click="$ctrl.onCloseSummary()"
+               class="clickable">
+                &laquo; Close
+            </a>
+
+            <waltz-pie-table render-mode="frameless"
+                             class="small"
+                             name="{{$ctrl.selectedSummary.definition.name}}"
+                             description="{{$ctrl.selectedSummary.definition.description}}"
+                             data="$ctrl.selectedSummary.values"
+                             selected-segment-key="$ctrl.selectedSegment.key"
+                             config="$ctrl.selectedConfig">
+            </waltz-pie-table>
+        </div>
+    </div>
+
+</div>

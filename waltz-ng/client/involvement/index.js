@@ -18,11 +18,12 @@
  */
 
 import angular from 'angular';
-import {registerStore} from '../common/module-utils';
+import { registerComponents, registerStore } from '../common/module-utils';
 
 import involvedPeopleSection from './components/involved-people-section';
 import involvedSectionService from './services/involved-section-service';
 import involvementStore from './services/involvement-store';
+import keyPeopleSubSection from './components/sub-section/key-people-sub-section';
 
 
 export default () => {
@@ -30,6 +31,8 @@ export default () => {
 
     module
         .component('waltzInvolvedPeopleSection', involvedPeopleSection);
+
+    registerComponents(module, [keyPeopleSubSection]);
 
     module
         .service('InvolvedSectionService', involvedSectionService);

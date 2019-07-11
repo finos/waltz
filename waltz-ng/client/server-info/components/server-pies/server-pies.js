@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {environmentColorScale, operatingSystemColorScale, variableScale} from "../../../common/colors";
-import {initialiseData, toKeyCounts} from "../../../common";
-import {endOfLifeStatus} from "../../../common/services/enums/end-of-life-status";
-import template from './server-pies.html';
+import { environmentColorScale, operatingSystemColorScale, variableScale } from "../../../common/colors";
+import { initialiseData, toKeyCounts } from "../../../common";
+import { endOfLifeStatus } from "../../../common/services/enums/end-of-life-status";
+import template from "./server-pies.html";
 
 
 const bindings = {
-    servers: '<',
-    serverUsages: '<'
+    servers: "<",
+    serverUsages: "<"
 };
 
 
@@ -33,7 +33,7 @@ const PIE_SIZE = 70;
 
 const EOL_STATUS_CONFIG = {
     size: PIE_SIZE,
-    colorProvider: (d) => variableScale(d.data.key),
+    colorProvider: (d) => variableScale(d.key),
     labelProvider: (d) => endOfLifeStatus[d.key] ? endOfLifeStatus[d.key].name : "Unknown"
 };
 
@@ -51,19 +51,19 @@ function controller() {
         env: {
             config: {
                 size: PIE_SIZE,
-                colorProvider: (d) => environmentColorScale(d.data.key)
+                colorProvider: (d) => environmentColorScale(d.key)
             }
         },
         os: {
             config: {
                 size: PIE_SIZE,
-                colorProvider: (d) => operatingSystemColorScale(d.data.key)
+                colorProvider: (d) => operatingSystemColorScale(d.key)
             }
         },
         location: {
             config: {
                 size: PIE_SIZE,
-                colorProvider: (d) => variableScale(d.data.key)
+                colorProvider: (d) => variableScale(d.key)
             }
         },
         operatingSystemEndOfLifeStatus: {

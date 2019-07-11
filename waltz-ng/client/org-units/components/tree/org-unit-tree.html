@@ -8,11 +8,11 @@
                 <a ui-sref="main.org-unit.view ({id: node.id })">
 
                     <span>
-                        <span ng-if="$ctrl.hasOwnApps(node)"
-                              ng-bind="node.name">
+                        <span ng-if="$ctrl.hasOwnApps(node)">
                         </span>
-                        <i ng-bind="node.name"
-                           ng-if="! $ctrl.hasOwnApps(node)">
+                        <i ng-if="! $ctrl.hasOwnApps(node)">
+                            <waltz-entity-link entity-ref="node">
+                            </waltz-entity-link>
                         </i>
                     </span>
 

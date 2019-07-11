@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
  */
 
 import _ from "lodash";
-import {tallyBy} from "../../common/tally-utils";
-import {notEmpty} from "../../common";
-import {lifecyclePhaseColorScale, criticalityColorScale, variableScale} from "../../common/colors";
+import { tallyBy } from "../../common/tally-utils";
+import { notEmpty } from "../../common";
+import { criticalityColorScale, lifecyclePhaseColorScale, variableScale } from "../../common/colors";
 
 import template from "./app-summary.html";
 
@@ -48,9 +48,9 @@ const lifecycleLabelProvider = (displayNameService, d) => displayNameService.loo
 const criticalityLabelProvider = (displayNameService, d) => d ? displayNameService.lookup("criticality", d.key, d.key) : d;
 const applicationKindLabelProvider = (displayNameService, d) => displayNameService.lookup("applicationKind", d.key, d.key);
 
-const randomColorProvider = d => variableScale(d.data.key);
-const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.data.key);
-const criticalityColorProvider = d => criticalityColorScale(d.data.key);
+const randomColorProvider = d => variableScale(d.key);
+const lifecycleColorProvider = d => lifecyclePhaseColorScale(d.key);
+const criticalityColorProvider = d => criticalityColorScale(d.key);
 
 
 function mkChartData(data,
