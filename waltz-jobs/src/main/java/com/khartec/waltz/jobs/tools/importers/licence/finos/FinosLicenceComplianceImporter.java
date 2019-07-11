@@ -36,7 +36,8 @@ import org.jooq.lambda.tuple.Tuple;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,7 +92,7 @@ public class FinosLicenceComplianceImporter {
     }
 
 
-    private void importData(String path) throws IOException {
+    private void importData(String path) throws IOException, URISyntaxException {
         EntityNamedNoteTypeRecord conditionsNoteType = createEntityNoteDefinitionIfNotExists(
                 ENTITY_NOTE_CONDITIONS_NAME,
                 ENTITY_NOTE_CONDITIONS_DESC);
@@ -307,10 +308,10 @@ public class FinosLicenceComplianceImporter {
 
 
 
-    private List<LicenceCompliance> parseData(String directoryPath) throws IOException {
-        URL directoryUrl = FinosLicenceComplianceImporter.class.getClassLoader().getResource(directoryPath);
+    private List<LicenceCompliance> parseData(String directoryPath) throws IOException, URISyntaxException {
+        URI directoryUrl = this.getClass().getClassLoader().getResource(directoryPath).toURI();
 
-        try (Stream<Path> paths = Files.walk(Paths.get(directoryUrl.getPath()))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryUrl))) {
 
             List<LicenceCompliance> compliances = paths
                     .filter(Files::isRegularFile)
