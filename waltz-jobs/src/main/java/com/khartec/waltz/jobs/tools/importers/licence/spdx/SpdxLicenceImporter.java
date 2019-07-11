@@ -52,6 +52,7 @@ import static java.util.stream.Collectors.toList;
 public class SpdxLicenceImporter {
 
     public static final String PROVENANCE = "spdx";
+    private static final String SPDX_LICENCE_TEMPLATE_URL = "https://spdx.org/licenses/%s.html";
 
     private final DSLContext dsl;
     private final LicenceDao licenceDao;
@@ -126,11 +127,11 @@ public class SpdxLicenceImporter {
 
         List<BookmarkRecord> bookmarks = spdxLicences.stream()
                 .flatMap(l -> {
-                    return Stream
+                    Long licenceId = licencesByExternalId.get(l.licenseId()).getId();
+
+                    Stream<BookmarkRecord> stream = Stream
                             .of(l.seeAlso())
                             .map(url -> {
-                                Long licenceId = licencesByExternalId.get(l.licenseId()).getId();
-
                                 BookmarkRecord bookmarkRecord = dsl.newRecord(BOOKMARK);
                                 bookmarkRecord.setTitle("See Also");
                                 bookmarkRecord.setKind("DOCUMENTATION");
@@ -145,6 +146,21 @@ public class SpdxLicenceImporter {
                                 bookmarkRecord.setIsRequired(false);
                                 return bookmarkRecord;
                             });
+
+                    BookmarkRecord spdxRecord = dsl.newRecord(BOOKMARK);
+                    spdxRecord.setTitle("SPDX");
+                    spdxRecord.setKind("DOCUMENTATION");
+                    spdxRecord.setUrl(String.format(SPDX_LICENCE_TEMPLATE_URL, l.licenseId()));
+                    spdxRecord.setParentKind(EntityKind.LICENCE.name());
+                    spdxRecord.setParentId(licenceId);
+                    spdxRecord.setIsPrimary(false);
+                    spdxRecord.setProvenance(PROVENANCE);
+                    spdxRecord.setLastUpdatedBy("admin");
+                    spdxRecord.setCreatedAt(now);
+                    spdxRecord.setUpdatedAt(now);
+                    spdxRecord.setIsRequired(false);
+
+                    return Stream.concat(stream, Stream.of(spdxRecord));
                 })
                 .collect(toList());
 
@@ -173,7 +189,6 @@ public class SpdxLicenceImporter {
                     .map(this::parseSpdxLicence)
                     .filter(l -> l.isPresent())
                     .map(l -> l.get())
-                    .filter(l -> !l.isDeprecatedLicenseId())
                     .collect(toList());
 
             System.out.printf("Parsed %s SPDX licence files \n", spdxLicences.size());
