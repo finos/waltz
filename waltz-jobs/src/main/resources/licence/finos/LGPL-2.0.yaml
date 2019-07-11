@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: GNU Library General Public License 2.0
+  licenseId:
+  - LGPL-2.0-only
+  - LGPL-2.0-or-later
+
+  notes: LGPL-2.0 and LGPL-2.1 are the same substantive license except for the addition of section 6(b) in LGPL-2.1.
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: It must be an actual copy of the license not a website link
+
+  - type: condition
+    description: Retain notices on all files
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: Source files usually have a standard license header that includes a copyright notice and disclaimer of warranty. This is also were you determine if the license is “or later” or the specific version only
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Modified files must have “prominent notices that you changed the files” and a date
+
+  - type: condition
+    description: Modifications or derivative work must be licensed under same license
+    use_cases: [MB, MS]
+    compliance_notes: Derivative works of the library must also be under LGPL (this usually includes statically linked code).
+
+  - type: condition
+    description: Provide corresponding source code
+    use_cases: [UB, MB]
+    compliance_notes: complete source code = all the source code for all modules it contains, plus any associated interface definition files, plus the scripts used to control compilation and installation of the library (see section 4 or section 6, as applicable).
+
+  - type: condition
+    description: No additional restrictions
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: You may not impose any further restrictions on the exercise of the rights granted under this license.
+
+  - type: termination
+    description: License automatically terminates if you do not comply with the terms of the license
+
+  - type: other
+    description: Allows dynamic linking of code with “a work that uses the Library” under a different license, under certain conditions.
+    compliance_notes: Terms of the other license must permit reverse engineering and debugging; must provide a copy of the license and prominent notice that the Library is used; must provide source code via one of the options in section 6 of the license. Also must include any data and utility programs needed for reproducing the executable, but this need not include anything that is normally distributed with the major components of the operating system. For more information about LGPL-2.0 compliance and this condition in particular, see the references provided or consult your open source legal counsel.
+    seeAlso:
+    - https://www.gnu.org/licenses/gpl-faq.html#LGPLStaticVsDynamic[FSF FAQ: Static v. dynamic]
+    - www.softwarefreedom.org/resources/2014/SFLC-Guide_to_GPL_Compliance_2d_ed.html#lgpl[SFLC Compliance Guide]
+    - https://copyleft.org/guide/comprehensive-gpl-guidech11.html#x14-9600010[Copyleft Guide]
+
+  - type: license_versions
+    description: Allows use of covered code under the terms of same version or any later version of the license or that version only, as specified. If no license version is specificed, then you may use any version ever published by the FSF.
+    seeAlso:
+    - https://www.gnu.org/licenses/identify-licenses-clearly.html[Stallman: For Clarity's Sake]

@@ -3,8 +3,18 @@
     Last Modified:
 </span>
 <span ng-if="$ctrl.entity.lastUpdatedBy">
-    <span ng-bind="$ctrl.entity.lastUpdatedBy"></span>,
+    <span ng-if="$ctrl.entity.lastUpdatedBy">
+        <span ng-bind="$ctrl.entity.lastUpdatedBy"></span>,
+    </span>
+    <waltz-from-now class='text-muted'
+                    timestamp="$ctrl.entity.lastUpdatedAt">
+    </waltz-from-now>
 </span>
-<waltz-from-now class='text-muted'
-                timestamp="$ctrl.entity.lastUpdatedAt">
-</waltz-from-now>
+<span ng-if="$ctrl.entity.lastUpdated">
+    <span ng-if="$ctrl.entity.lastUpdated.by">
+        <span ng-bind="$ctrl.entity.lastUpdated.by"></span>,
+    </span>
+    <waltz-from-now class='text-muted'
+                    timestamp="$ctrl.entity.lastUpdated.at">
+    </waltz-from-now>
+</span>

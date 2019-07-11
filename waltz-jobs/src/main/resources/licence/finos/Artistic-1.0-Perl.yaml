@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Artistic License 1.0 (Perl)
+  licenseId: Artistic-1.0-Perl
+  notes: This is the Artistic License 1.0 found on the Perl site, which is different (particularly, clauses 5, 6, 7 and 8) than the Artistic License 1.0 w/clause 8 found on the OSI site. This license has specific use cases and conditions that are difficult to summarize; please see sections 5-8 and relevant definitions for more details.
+  terms:
+  - type: condition
+    description: Retain all notices
+    use_cases: [US]
+    compliance_notes: Copyright notices and other notices
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Modified files must have "prominent notice" in each file stating how the file was modified and when
+    
+  - type: condition
+    description: Provide access to modifications
+    use_cases: [MB, MS]
+    compliance_notes: 'Do at least one of the following: place modification in the public domain or otherwise make them freely available; OR rename non-standard executables; OR "make other distribution arrangements" with the copyright holder (see section 3 for more details).'
+    
+  - type: condition
+    description: Access to source
+    use_cases: [UB, MB]
+    compliance_notes: 'Do at least one of the following: provide a Standard Version of the executables and library files; OR provide source for your modifications; OR give non-standard executables non-standard name and document the differences with instructions on where to get the Standard Version; OR "make other distribution arrangements" with the copyright holder (see section 4 for more details)'
+         
+  - type: condition
+    description: You may distribute this package as part of a larger (commercial) distribution, but cannot charge a fee for the standalone package. You may charge a reasonable fee for copying or support.
+    use_cases: [UB, MB, US, MS]
+    
+  - type: other
+    description: 'The following are not considered part of the package or do not fall under copyright of this package and subject to the license: scripts and library files supplied as input to or produced as output from the program; C subroutines (or comparably compiled subroutines in other languages) supplied by you and linked into this Package in order to emulate subroutines and variables of the language defined by this package; aggregation of this package with other software where the package is embedded and the interfaces are not visible to the end user (see sections 6, 7, and 8 for more details)'

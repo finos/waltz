@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Apache Software License 1.1
+  licenseId: Apache-1.1
+  notes: Apache-1.1 and Entessa are essentially the same license (as per SPDX License List Matching Guidelines).  Because the OSI approved them separately, they are listed separately (here and on the SPDX License List).
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+
+  - type: condition
+    description: Acknowledgement must be included in end-user documentation, in software or wherever third-party acknowledgments appear
+    use_cases: [UB, MB, US, MS]
+    acknowledgement: This product includes software developed by the [[Apache Software Foundation (http://www.apache.org/)]].
+ 
+  - type: condition
+    description: Name of project cannot be used for derived products without permission
+    use_cases: [MB, MS]

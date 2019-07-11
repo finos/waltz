@@ -57,6 +57,7 @@ import { FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore } from "..
 import { FlowDiagramEntityStore_API as FlowDiagramEntityStore } from "../../flow-diagram/services/flow-diagram-entity-store";
 import { InvolvementStore_API as InvolvementStore } from "../../involvement/services/involvement-store";
 import { InvolvementKindStore_API as InvolvementKindStore } from "../../involvement-kind/services/involvement-kind-store";
+import { LicenceStore_API as LicenceStore } from "../../licence/services/licence-store";
 import { LogicalDataElementStore_API as LogicalDataElementStore } from "../../logical-data-element/services/logical-data-element-store";
 import { LogicalFlowStore_API as LogicalFlowStore } from "../../logical-flow/services/logical-flow-store";
 import { LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore } from "../../logical-flow-decorator/services/logical-flow-decorator-store";
@@ -135,6 +136,7 @@ export const CORE_API = {
     EntitySvgDiagramStore,
     InvolvementStore,
     InvolvementKindStore,
+    LicenceStore,
     LogicalDataElementStore,
     LogicalFlowStore,
     LogicalFlowDecoratorStore,

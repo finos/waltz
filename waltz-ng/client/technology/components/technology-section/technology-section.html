@@ -55,21 +55,20 @@
                     </div>
                 </div>
             </uib-tab>
+
+            <uib-tab heading="Licences"
+                     select="showLicenceDetail = true"
+                     disable="$ctrl.licences.length == 0">
+                <div ng-if="showLicenceDetail">
+                    <br>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.licenceGridOptions">
+                    </div>
+                </div>
+            </uib-tab>
         </uib-tabset>
-
-
-
-        <div class="waltz-paragraph text-muted pull-right small">
-            <waltz-icon name="info-circle"></waltz-icon>
-            Associated software packages have been sourced from:
-            <ul class="list-inline"
-                style="display: inline-block">
-                <li ng-repeat="(source, usages) in $ctrl.softwareUsages">
-                    {{ source }}
-                    <span ng-if="!$last">,</span>
-                </li>
-            </ul>
-        </div>
 
     </div>
 

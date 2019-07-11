@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: Artistic License 2.0
+  licenseId: Artistic-2.0
+  notes: This license has specific use cases and conditions that are difficult to summarize; please see sections 4-9 and relevant definitions for more details.
+  terms:
+  - type: condition
+    description: Retain all notices
+    use_cases: [UB, US]
+    compliance_notes: Copyright notices and other notices
+
+  - type: condition
+    description: Notice of modifications
+    use_cases: [MB, MS]
+    compliance_notes: Document how the modified version differs from the standard version
+    
+  - type: condition
+    description: Provide access to modified version
+    use_cases: [MB, MS]
+    compliance_notes: 'Do at least one of the following: make modified version available to copyright holder under same license; OR ensure modified version does not prevent user from installing or running standard version and use different name; OR allow any recipients of modified version to make source available to others under same license or a similarly free/open license (see section 4 for more details)'
+    
+  - type: condition
+    description: Access to source
+    use_cases: [UB]
+    compliance_notes: Provide complete instructions on how to get source for standard version; instructions must be kept current for your distribution
+         
+  - type: condition
+    description: You may distribute this package as part of a larger (commercial) distribution, but cannot charge a licensing fee for the standalone package. You may charge distributor fees or licensing fees for other components in the distribution.
+    use_cases: [UB, MB, US, MS]
+    
+  - type: termination
+    description: Any patent claims accusing the work by a licensee results in termination of all licenses to the licensee
+
+  - type: other
+    description:  Modified or standard versions linked with other works; embedding the package in a larger work of your own; or stand-alone binary or bytecode versions of applications that include the package may be distributed without restriction provided the result does not expose a direct interface to the package. See sections 8 for more details.
+
+  - type: other
+    description: Works that merely extend or make use of the package do not cause the package to be a modified version, are not considered parts of the package itself, and are not subject to the terms of this license. See section 9 for more details.

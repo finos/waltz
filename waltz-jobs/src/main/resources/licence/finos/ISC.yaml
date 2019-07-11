@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: ISC License
+  licenseId: ISC
+  notes:
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: This information must appear "in all copies"
+  
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: This information must appear "in all copies"

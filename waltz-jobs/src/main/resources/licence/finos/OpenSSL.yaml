@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0    
+-
+  name: OpenSSL License
+  licenseId: OpenSSL
+  notes: This license is actually a set of two licenses, which have similar text and requirements but different copyright holders and therefore different acknowledgment text. Some requirements to include acknowledgements may only apply if you are using that part of the project written by a specific copyright holder.
+  
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+  
+  - type: condition
+    description: Acknowledgement must be included for any redistribution
+    use_cases: [UB, MB, US, MS]
+    acknowledgement: "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+  
+  - type: condition
+    description: Include acknowledgement in advertising mentioning features or use
+    acknowledgement: "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+  
+  - type: condition
+    description: Include acknowledgement in advertising mentioning features or use. "The word 'cryptographic' can be left out if the rouines from the library being used are not cryptographic related".
+    acknowledgement: "This product includes cryptographic software written by Eric Young (eay@cryptsoft.com)"
+    
+  - type: condition
+    description: Include acknowledgement If you include any Windows specific code (or a derivative thereof) from the apps directory (application code)
+    acknowledgement: "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
+    
+  - type: condition
+    description: Name of project cannot be used for derived products without permission
+    use_cases: [MB, MS]

@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+-
+  name: University of Illinois/NCSA Open Source License
+  licenseId: NCSA
+  notes: NCSA is essentially an MIT grant with BSD-3-Clause conditions, thus compliance is the same as BSD-3-Clause.
+ 
+  terms:
+  - type: condition
+    description: Provide copy of license
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”
+ 
+  - type: condition
+    description: Provide copyright notice
+    use_cases: [UB, MB, US, MS]
+    compliance_notes: For binary distributions, this information must be provided in “the documentation and/or other materials provided with the distribution”

@@ -48,6 +48,11 @@
             <version>4.0.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

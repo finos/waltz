@@ -40,7 +40,8 @@
     </changeSet>
 
     <changeSet author="davidwatkins73"
-               id="20190620-3912-1a">
+               id="20190620-3912-1a"
+               dbms="mssql">
         <dropDefaultValue tableName="rating_scheme_item"
                           columnName="needs_planned_date"/>
     </changeSet>
@@ -223,6 +224,84 @@
                 <constraints nullable="false" />
             </column>
         </addColumn>
+    </changeSet>
+
+
+    <!-- 4174 - Licence-->
+    <changeSet id="20190701-4174-1"
+               author="kamransaleem">
+        <comment>4174: Licence table</comment>
+        <createTable tableName="licence">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="licence_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="approval_status"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20190701-4174-2a"
+               author="kamransaleem"
+               dbms="mysql,postgresql,h2">
+        <comment>4174: Licence table - index external_id</comment>
+        <createIndex indexName="idx_licence_external_id"
+                     tableName="licence"
+                     unique="true">
+            <column name="external_id"
+                    type="${external-id.type}">
+            </column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20190701-4174-2b"
+               author="kamransaleem"
+               dbms="mssql">
+        <comment>4174: Licence table - index external_id</comment>
+        <sql>
+            CREATE UNIQUE NONCLUSTERED INDEX idx_licence_external_id
+            ON [licence]([external_id])
+            WHERE [external_id] IS NOT NULL;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>
