@@ -174,8 +174,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
 
 
-    vm.onGridInitialise = (e) => {
-        vm.exportGrid = () => e.exportFn("people.csv");
+    vm.onGridInitialise = () => {
     };
 
     vm.onGridChange = (e) => {
