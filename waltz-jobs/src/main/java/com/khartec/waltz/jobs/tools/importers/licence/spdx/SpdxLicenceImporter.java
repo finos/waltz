@@ -32,7 +32,8 @@ import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,7 +80,7 @@ public class SpdxLicenceImporter {
     }
 
 
-    private void importData(String path) throws IOException {
+    private void importData(String path) throws IOException, URISyntaxException {
 
         List<SpdxLicence> spdxLicences = parseData(path);
         Timestamp now = DateTimeUtilities.nowUtcTimestamp();
@@ -162,10 +163,10 @@ public class SpdxLicenceImporter {
     }
 
 
-    private List<SpdxLicence> parseData(String directoryPath) throws IOException {
-        URL directoryUrl = SpdxLicenceImporter.class.getClassLoader().getResource(directoryPath);
+    private List<SpdxLicence> parseData(String directoryPath) throws IOException, URISyntaxException {
+        URI directoryUrl = this.getClass().getClassLoader().getResource(directoryPath).toURI();
 
-        try (Stream<Path> paths = Files.walk(Paths.get(directoryUrl.getPath()))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryUrl))) {
 
             List<SpdxLicence> spdxLicences = paths
                     .filter(Files::isRegularFile)
