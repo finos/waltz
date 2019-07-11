@@ -12,12 +12,6 @@
                 ng-if="$ctrl.visibility.editor === true">
             Done
         </button>
-        <button ng-click="$ctrl.exportGrid()"
-                class="btn btn-xs btn-primary"
-                ng-disabled="$ctrl.gridDataCount == 0">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
             <waltz-icon name="map-signs"></waltz-icon>
@@ -62,6 +56,19 @@
                                      on-add="$ctrl.onAdd"
                                      on-remove="$ctrl.onRemove">
     </waltz-entity-involvement-editor>
+
+    <br>
+    <!-- Exporter -->
+    <div align="right"
+         ng-if="$ctrl.currentInvolvements != 0">
+        <waltz-data-extract-link name="Download involved people"
+                                 styling="link"
+                                 filename="Allocations.csv"
+                                 extract="people/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                 method="POST"
+                                 request-body="$ctrl.selector">
+        </waltz-data-extract-link>
+    </div>
 
 </div>
 
