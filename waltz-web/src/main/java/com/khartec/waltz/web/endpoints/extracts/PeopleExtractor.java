@@ -67,7 +67,7 @@ public class PeopleExtractor extends BaseDataExtractor{
                     .orderBy(PERSON.DISPLAY_NAME);
 
             return writeExtract(
-                    "people",
+                    "Involved_people",
                     qry,
                     request,
                     response);
