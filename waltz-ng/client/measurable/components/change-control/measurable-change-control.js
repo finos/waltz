@@ -5,6 +5,7 @@ import { toEntityRef } from "../../../common/entity-utils";
 import { determineColorOfSubmitButton } from "../../../common/severity-utils";
 import { buildHierarchies } from "../../../common/hierarchy-utils";
 import { displayError } from "../../../common/error-utils";
+import {getValidationErrorIfMeasurableChangeIsNotValid} from "../../measurable-change-utils";
 
 const modes = {
     MENU: "MENU",
@@ -16,7 +17,8 @@ const modes = {
 const bindings = {
     measurable: "<",
     changeDomain: "<",
-    onSubmitChange: "<"
+    onSubmitChange: "<",
+    pendingChanges: "<"
 };
 
 
@@ -284,27 +286,11 @@ function controller(notification,
         if (vm.submitDisabled) return;
         const cmd = mkUpdCmd();
 
-        function isMovedToItself() {
-            return cmd.changeType === "MOVE"
-                && cmd.primaryReference.id === cmd.params.destinationId;
-        }
+        const errorMessage =
+            getValidationErrorIfMeasurableChangeIsNotValid(cmd, vm.measurable, vm.pendingChanges);
 
-        function isMovedToAnExistingChild() {
-            return cmd.changeType === "MOVE"
-                && vm.measurable.children
-                .filter(c => (c.id === cmd.params.destinationId))
-                .length > 0;
-        }
-
-        if (isMovedToItself()) {
-            notification.warning("Cannot set a Measurable as its own parent, ignoring....");
-            vm.commandParams.destination = null;
-            vm.submitDisabled = true;
-            return;
-        }
-
-        if (isMovedToAnExistingChild()) {
-            notification.warning("Cannot add a measurable as parent if it is already a child of the subject, ignoring....");
+        if (errorMessage != null) {
+            notification.warning(errorMessage);
             vm.commandParams.destination = null;
             vm.submitDisabled = true;
             return;
