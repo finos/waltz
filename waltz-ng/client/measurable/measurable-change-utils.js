@@ -42,15 +42,17 @@ export function getValidationErrorIfMeasurableChangeIsNotValid(cmd, measurable, 
         "Cannot set a Measurable as its own parent, ignoring....";
     const errorIsNodeMovedToAnExistingChild =
         "Cannot add a measurable as parent if it is already a child of the subject, ignoring....";
-    const ErrorIsSameChangeTypeExistForTheNode =
+    const errorIsSameChangeTypeExistForTheNode =
         `${cmd.changeType} is already pending for ${cmd.primaryReference.name}, Please delete the pending request to recreate`;
 
-    return isMovedToItself(cmd)
-        ? errorIsNodeMovedToItSelf
-        : isMovedToAnExistingChild(cmd, measurable)
-            ? errorIsNodeMovedToAnExistingChild
-            : isSameChangeTypeCommandAlreadyExist(cmd, pendingChanges)
-                ? ErrorIsSameChangeTypeExistForTheNode
-                : null;
+    if (isMovedToItself(cmd)){
+        return errorIsNodeMovedToItSelf;
+    } else if (isMovedToAnExistingChild(cmd, measurable)) {
+        return errorIsNodeMovedToAnExistingChild;
+    } else if (isSameChangeTypeCommandAlreadyExist(cmd, pendingChanges)) {
+        return errorIsSameChangeTypeExistForTheNode;
+    } else {
+        return null;
+    }
 }
 
