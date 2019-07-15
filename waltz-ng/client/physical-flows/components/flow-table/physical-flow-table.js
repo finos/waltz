@@ -82,9 +82,7 @@ function controller($q, serviceBroker) {
 
         $q.all([flowPromise, specPromise])
             .then(([flows, specs]) => {
-                console.log('gt: ', {flows, specs});
                 vm.tableData = mkData(vm.parentEntityRef, specs, flows);
-                console.log('table data: ', vm.tableData);
             });
     };
 
