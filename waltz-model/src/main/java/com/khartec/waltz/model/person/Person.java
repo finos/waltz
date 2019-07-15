@@ -47,6 +47,11 @@ public abstract class Person implements
     public abstract Optional<String> departmentName();
     public abstract Optional<Long> organisationalUnitId();
 
+    @Value.Derived
+    public String name() {
+        return displayName();
+    }
+
     @Value.Default
     public String userId() { //TODO change as part of 247
         return email();

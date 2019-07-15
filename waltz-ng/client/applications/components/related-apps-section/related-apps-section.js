@@ -23,7 +23,7 @@ import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {mapToDisplayNames} from "../../application-utils";
 import {relationshipKind} from "../../../common/services/enums/relationship-kind";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {getDefaultScopeForEntityKind, mkSelectionOptions} from "../../../common/selector-utils";
+import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {
     allowedRelationshipsByKind,
@@ -109,7 +109,7 @@ function controller($q,
             CORE_API.ApplicationStore.findBySelector,
             [ mkSelectionOptions(
                 vm.parentEntityRef,
-                getDefaultScopeForEntityKind(vm.parentEntityRef.kind),
+                determineDownwardsScopeForKind(vm.parentEntityRef.kind),
                 ["ACTIVE", "PENDING", "REMOVED"])
             ],
             { force })

@@ -23,7 +23,7 @@ import {initialiseData} from "../../common";
 import template from "./involved-people-section.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {aggregatePeopleInvolvements} from "../involvement-utils";
-import {mkSelectionOptions} from "../../common/selector-utils";
+import {determineUpwardsScopeForKind, mkSelectionOptions} from "../../common/selector-utils";
 
 
 const bindings = {
@@ -36,10 +36,13 @@ const columnDefs = [
         displayName: "Name",
         cellTemplate: `
                 <div class="ui-grid-cell-contents"> 
-                    <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - 
+                    <waltz-entity-link entity-ref="row.entity.person" 
+                                       tooltip-placement="right" 
+                                       icon-placement="none"></waltz-entity-link> 
+                    -
                     <a href="mailto:{{row.entity.person.email}}">
                         <waltz-icon name="envelope-o"></waltz-icon>
-                    </a>
+                    </a> 
                 </div>`
     },
     { field: "person.title", displayName: "Title" },
@@ -130,7 +133,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        const options = mkSelectionOptions(vm.parentEntityRef, "PARENTS");
+        const options = mkSelectionOptions(vm.parentEntityRef, determineUpwardsScopeForKind(vm.parentEntityRef.kind));
         const involvementPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
@@ -161,7 +164,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
     };
 
     vm.$onChanges = (changes) => {
-        if (vm.parentEntityRef) {
+        if (changes.parentEntityRef && vm.parentEntityRef) {
             refresh();
         }
 

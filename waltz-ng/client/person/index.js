@@ -26,12 +26,9 @@ import PersonChangeSetSection from "./components/person-change-set-section/perso
 import PersonSummary from "./components/summary/person-summary";
 import PersonAppsSection from "./components/person-apps-section/person-apps-section";
 import PersonHierarchySection from "./components/person-hierarchy-section/person-hierarchy-section";
-
+import PersonList from "./components/person-list/person-list";
 
 import Routes from "./routes";
-import PersonLink from "./directives/person-link";
-import ManagersList from "./directives/manager-list";
-import PersonDirectsList from "./directives/person-directs-list";
 
 
 export default () => {
@@ -41,17 +38,13 @@ export default () => {
     module
         .config(Routes);
 
-    module
-        .directive("waltzPersonLink", PersonLink)
-        .directive("waltzManagerList", ManagersList)
-        .directive("waltzPersonDirectsList", PersonDirectsList);
-
     registerStore(module, PersonStore);
     registerComponents(module, [
         PersonAppsSection,
         PersonChangeSetSection,
         PersonHierarchySection,
-        PersonSummary
+        PersonSummary,
+        PersonList
     ]);
 
     return module.name;

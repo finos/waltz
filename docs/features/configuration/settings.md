@@ -14,11 +14,17 @@ settings.override=ui.logo.overlay.text=Hello World;database.pool.max=20
 * ```ui.logo.overlay.text``` - optional text to overlay on the logo, keep it short
 * ```ui.logo.overlay.color``` - colour used to render the optional overlay on the logo
 * ```ui.inactivity-timeout``` - time in miliseconds of inactivity before the UI triggers a page refresh, disabled if not provided
+* ```ui.avatar.template.url``` - url template to use when rendering person avatar images. 
+  * Example: `http://directory.intranet.mycomp.com/photo?empId=${employeeId}` - Available variables:
+    * `employeeId` 
+    * `id` - waltz internal id
+    * `email`
 
 Use these settings to let users know if they are on a beta instance. 
 
 * ```web.beta``` - is this instance of waltz running beta code (```true | false```)
 * ```web.beta.nag-message``` - the message to display if non-beta user on a beta environment
+
 
 
 ## Security

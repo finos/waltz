@@ -24,5 +24,6 @@ export default {
     httpHeaderPrefix: "web.devext.http.header.",
     betaEnvironment: "web.beta",
     betaNagMessage: "web.beta.nag-message",
-    defaultCurrency: "settings.asset-cost.default-currency"
+    defaultCurrency: "settings.asset-cost.default-currency",
+    avatarTemplateUrl: "ui.avatar.template.url"
 };

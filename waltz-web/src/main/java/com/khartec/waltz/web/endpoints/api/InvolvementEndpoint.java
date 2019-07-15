@@ -114,7 +114,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findByEntityRefPath, findByEntityRefRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
-        getForList(findPeopleBySelectorPath, findPeopleBySelectorRoute);
+        postForList(findPeopleBySelectorPath, findPeopleBySelectorRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }
 

@@ -59,7 +59,8 @@ function store($http, BaseApiUrl) {
 
 
     const findPeopleBySelector = (selectorOptions) => {
-        return $http.get(`${BASE}/selector/people`)
+        return $http
+            .post(`${BASE}/selector/people`, selectorOptions)
             .then(result => result.data);
     };
 

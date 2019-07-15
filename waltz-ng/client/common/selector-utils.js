@@ -21,7 +21,7 @@
 import _ from "lodash";
 import { checkIsEntityRef } from "./checks";
 
-export function getDefaultScopeForEntityKind(kind) {
+export function determineDownwardsScopeForKind(kind) {
     switch (kind) {
         case "ACTOR":
         case "APPLICATION":
@@ -42,12 +42,37 @@ export function getDefaultScopeForEntityKind(kind) {
 }
 
 
+/**
+ * Replaced by `determineDownwardsScopeForKind`:
+ * TODO: remove in 1.19
+ * @deprecated
+ * @param kind
+ */
+export function getDefaultScopeForEntityKind(kind) {
+    console.log("Deprecated call to getDefaultScopeForEntityKind", kind);
+    return determineDownwardsScopeForKind(kind);
+}
+
+
+export function determineUpwardsScopeForKind(kind) {
+    switch (kind) {
+        case "ORG_UNIT":
+        case "MEASURABLE":
+        case "DATA_TYPE":
+        case "CHANGE_INITIATIVE":
+            return "PARENTS";
+        default:
+            return "EXACT";
+    }
+}
+
+
 export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"]) {
     checkIsEntityRef(entityReference);
 
     return {
         entityReference,
-        scope: scope || getDefaultScopeForEntityKind(entityReference.kind),
+        scope: scope || determineDownwardsScopeForKind(entityReference.kind),
         entityLifecycleStatuses
     };
 }

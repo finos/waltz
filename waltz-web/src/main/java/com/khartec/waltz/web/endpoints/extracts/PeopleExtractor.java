@@ -20,13 +20,18 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.DSLContext;
-import org.jooq.Record4;
+import org.jooq.Record5;
 import org.jooq.SelectSeekStep1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -37,9 +42,13 @@ import static spark.Spark.post;
 public class PeopleExtractor extends BaseDataExtractor{
 
 
+    private final GenericSelectorFactory genericSelectorFactory;
+
+
     @Autowired
-    public PeopleExtractor(DSLContext dsl) {
+    public PeopleExtractor(DSLContext dsl, GenericSelectorFactory genericSelectorFactory) {
         super(dsl);
+        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 
@@ -53,17 +62,20 @@ public class PeopleExtractor extends BaseDataExtractor{
         post(path, (request, response) -> {
 
             EntityReference entityRef = getEntityReference(request);
+            IdSelectionOptions selectionOptions = mkOpts(entityRef, HierarchyQueryScope.determineUpwardsScopeForKind(entityRef.kind()));
+            GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
 
-            SelectSeekStep1<Record4<String, String, String, String>, String> qry = dsl
+            SelectSeekStep1<Record5<String, String, String, String, String>, String> qry = dsl
                     .select(PERSON.DISPLAY_NAME.as("Name"),
                             PERSON.TITLE.as("Title"),
                             PERSON.OFFICE_PHONE.as("Telephone"),
+                            PERSON.EMAIL.as("Email"),
                             INVOLVEMENT_KIND.NAME.as("Role"))
                     .from(PERSON)
                     .innerJoin(INVOLVEMENT).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
                     .innerJoin(INVOLVEMENT_KIND).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT.KIND_ID))
-                    .where(INVOLVEMENT.ENTITY_ID.eq(entityRef.id())
-                            .and(INVOLVEMENT.ENTITY_KIND.eq(entityRef.kind().name())))
+                    .where(INVOLVEMENT.ENTITY_ID.in(selector.selector())
+                            .and(INVOLVEMENT.ENTITY_KIND.eq(selector.kind().name())))
                     .orderBy(PERSON.DISPLAY_NAME);
 
             return writeExtract(
