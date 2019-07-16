@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
 import com.khartec.waltz.model.involvement.Involvement;
@@ -37,6 +38,7 @@ import spark.Request;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class InvolvementEndpoint implements Endpoint {
@@ -63,8 +65,11 @@ public class InvolvementEndpoint implements Endpoint {
         String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
-        String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
+        String findBySelectorPath = mkPath(BASE_URL, "selector", "involvement");
+        String findPeopleBySelectorPath = mkPath(BASE_URL, "selector", "people");
+
+        String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
         ListRoute<Involvement> findByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
@@ -81,15 +86,24 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findAllApplicationsByEmployeeId(employeeId);
         };
 
-
-        ListRoute<Involvement>  findByEntityRefRoute = (request, response) -> {
+        ListRoute<Involvement> findByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findByEntityReference(entityReference);
+        };
+
+        ListRoute<Involvement> findBySelectorRoute = (request, response) -> {
+            IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+            return service.findByGenericEntitySelector(selectionOptions);
         };
 
         ListRoute<Person>  findPeopleByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findPeopleByEntityReference(entityReference);
+        };
+
+        ListRoute<Person>  findPeopleBySelectorRoute = (request, response) -> {
+            IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+            return service.findPeopleByGenericEntitySelector(selectionOptions);
         };
 
         DatumRoute<Boolean> updateForEntityRefRoute = (request, response) -> updateEntityInvolvement(request);
@@ -98,7 +112,9 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
+        postForList(findPeopleBySelectorPath, findPeopleBySelectorRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }
 

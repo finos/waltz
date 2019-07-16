@@ -1,7 +1,7 @@
 <span class="waltz-entity-icon-label"
       uib-popover-template="$ctrl.popoverTemplate"
       popover-trigger="{{$ctrl.trigger}}"
-      popover-popup-delay="200"
+      popover-popup-delay="300"
       popover-append-to-body="true"
       popover-placement="{{ $ctrl.tooltipPlacement }}" >
     <waltz-icon fixed-width="true"
@@ -46,22 +46,34 @@
         id="weil-popover-custom">
     <div ng-init="$ctrl.lazyLoad()"
          class="small">
-        <h4>
-            <span ng-bind="$ctrl.entity.name"></span>
-        </h4>
-        <table class="table small table-condensed">
-            <tr ng-repeat="prop in $ctrl.props">
-                <td>
+        <div ng-if="!$ctrl.ready">Loading...</div>
+        <div ng-if="$ctrl.ready">
+            <h4>
+                <span ng-bind="$ctrl.entity.name"></span>
+            </h4>
+
+            <div style="margin-left: 12px;  margin-bottom: 6px;"
+                 ng-if="$ctrl.imageUrl">
+                <img height="100"
+                     onerror="this.src=genericAvatarDataUrl;"
+                     ng-src="{{$ctrl.imageUrl}}">
+            </div>
+
+            <table class="table small table-condensed">
+                <tr ng-repeat="prop in $ctrl.props">
+                    <td>
                     <span class="text-muted"
                           ng-bind="prop.name">
                     </span>
-                </td>
-                <td>
+                    </td>
+                    <td>
                     <span ng-bind="prop.value">
                     </span>
-                </td>
-            </tr>
-        </table>
-        <waltz-markdown text="$ctrl.entity.description"></waltz-markdown>
+                    </td>
+                </tr>
+            </table>
+            <waltz-markdown text="$ctrl.entity.description"></waltz-markdown>
+
+        </div>
     </div>
 </script>

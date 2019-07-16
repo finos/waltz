@@ -35,18 +35,18 @@ export function store($http, baseUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'SettingsStore';
+export const serviceName = "SettingsStore";
 
 
 export const SettingsStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'executes findAll'
+        serviceFnName: "findAll",
+        description: "executes findAll"
     }
 };

@@ -119,12 +119,18 @@ const sectionManagerSvc = {
             persistState();
         }
 
+        
+        function clear() {
+            blat(active, []);
+        }
+
         return {
             activate,
             close,
             getAvailable,
             getActive,
-            initialise
+            initialise,
+            clear
         };
     }
 };

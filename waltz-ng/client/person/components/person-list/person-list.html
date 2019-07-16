@@ -1,0 +1,31 @@
+<table class="table table-condensed table-hover">
+    <colgroup>
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+    </colgroup>
+    <tr ng-repeat="person in $ctrl.people track by person.id"
+        class="waltz-visibility-parent">
+        <td>
+            <waltz-entity-link entity-ref="person"
+                               tooltip-placement="right">
+            </waltz-entity-link>
+        </td>
+        <td>
+            <span class="waltz-visibility-child-30"
+                  ng-bind="person.personKind | toDisplayName:'PersonKind'">
+            </span>
+        </td>
+        <td>
+            <span ng-bind="person.title"></span>
+        </td>
+        <td>
+            <waltz-mail-to person="person"></waltz-mail-to>
+        </td>
+        <td>
+            <waltz-phone-link number="{{ person.officePhone }}"></waltz-phone-link>
+        </td>
+    </tr>
+</table>

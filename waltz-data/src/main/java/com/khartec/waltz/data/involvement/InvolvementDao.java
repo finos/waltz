@@ -185,6 +185,17 @@ public class InvolvementDao {
     }
 
 
+    public List<Person> findPeopleByGenericEntitySelector(GenericSelector selector) {
+        return dsl.selectDistinct()
+                .from(PERSON)
+                .innerJoin(INVOLVEMENT)
+                .on(INVOLVEMENT.ENTITY_ID.in(selector.selector()))
+                .and(INVOLVEMENT.ENTITY_KIND.eq(selector.kind().name()))
+                .where(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                .fetch(PersonDao.personMapper);
+    }
+
+
     public Map<EntityReference, List<Person>> findPeopleByEntitySelectorAndInvolvement(
             EntityKind entityKind,
             Select<Record1<Long>> entityIdSelector,

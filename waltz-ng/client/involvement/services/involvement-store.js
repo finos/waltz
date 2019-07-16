@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import { checkIsEntityInvolvementChangeCommand } from '../../common/checks';
+import _ from "lodash";
+import { checkIsEntityInvolvementChangeCommand } from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
@@ -43,11 +43,24 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findBySelector = (selectorOptions) => {
+        return $http
+            .post(`${BASE}/selector/involvement`, selectorOptions)
+            .then(result => result.data);
+    };
+
 
     const findPeopleByEntityReference = (kind, id) => {
         const ref = _.isObject(kind) ? kind : { id, kind };
 
         return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}/people`)
+            .then(result => result.data);
+    };
+
+
+    const findPeopleBySelector = (selectorOptions) => {
+        return $http
+            .post(`${BASE}/selector/people`, selectorOptions)
             .then(result => result.data);
     };
 
@@ -64,43 +77,55 @@ function store($http, BaseApiUrl) {
         findAppsForEmployeeId,
         findByEmployeeId,
         findByEntityReference,
+        findBySelector,
         findPeopleByEntityReference,
+        findPeopleBySelector,
         changeInvolvement
     };
 }
 
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ["$http", "BaseApiUrl"];
 
 
-const serviceName = 'InvolvementStore';
+const serviceName = "InvolvementStore";
 
 
 export const InvolvementStore_API = {
     findAppsForEmployeeId: {
         serviceName,
-        serviceFnName: 'findAppsForEmployeeId',
-        description: 'finds apps by employee id'
+        serviceFnName: "findAppsForEmployeeId",
+        description: "finds apps by employee id"
     },
     findByEmployeeId: {
         serviceName,
-        serviceFnName: 'findByEmployeeId',
-        description: 'find involvements by employee id'
+        serviceFnName: "findByEmployeeId",
+        description: "find involvements by employee id"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'find involvements by entity reference'
+        serviceFnName: "findByEntityReference",
+        description: "find involvements by entity reference"
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find involvements by entity selector"
     },
     findPeopleByEntityReference: {
         serviceName,
-        serviceFnName: 'findPeopleByEntityReference',
-        description: 'find people by involved entity reference'
+        serviceFnName: "findPeopleByEntityReference",
+        description: "find people by involved entity reference"
+    },
+    findPeopleBySelector: {
+        serviceName,
+        serviceFnName: "findPeopleBySelector",
+        description: "find people by generic selector"
     },
     changeInvolvement: {
         serviceName,
-        serviceFnName: 'changeInvolvement',
-        description: 'change person involvement for a given entity reference'
+        serviceFnName: "changeInvolvement",
+        description: "change person involvement for a given entity reference"
     }
 };
 

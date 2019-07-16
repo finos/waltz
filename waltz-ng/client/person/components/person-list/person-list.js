@@ -18,16 +18,29 @@
  */
 
 
-import template from './person-directs-list.html';
+import template from "./person-list.html";
 
-export default () => ({
-    replace: true,
-    restrict: 'E',
-    scope: {},
-    bindToController: {
-        directs: '='
-    },
-    controllerAs: 'ctrl',
-    controller: () => {},
+
+const bindings = {
+    people: "<"
+};
+
+
+function controller() {
+
+}
+
+controller.$inject = [];
+
+
+const component = {
+    bindings,
+    controller,
     template
-});
+};
+
+
+export default {
+    component,
+    id: "waltzPersonList"
+};
