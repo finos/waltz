@@ -137,7 +137,7 @@ function prepareTableData(measurable,
 
 function prepareUnmappedTableData(applications = [],
                                 ratings = [],
-                                measurables,
+                                measurables = [],
                                 categoryId) {
 
     const measurableIdsOfACategory =
