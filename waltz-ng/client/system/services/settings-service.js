@@ -60,7 +60,7 @@ Please see docs/features/configuration/settings.md for more details about this t
 
     const isDevModeEnabled = () => {
         return findOrDefault(namedSettings.devExtEnabled, false)
-            .then(devModeEnabled => 'true' === devModeEnabled );
+            .then(devModeEnabled => "true" === devModeEnabled );
     };
 
 
@@ -73,7 +73,7 @@ Please see docs/features/configuration/settings.md for more details about this t
 }
 
 service.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 

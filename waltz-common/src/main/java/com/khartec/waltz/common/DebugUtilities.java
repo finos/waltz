@@ -21,6 +21,7 @@ package com.khartec.waltz.common;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DebugUtilities {
@@ -70,5 +71,18 @@ public class DebugUtilities {
     public static <K, V> Map<K, V> dump(Map<K, V> m) {
         m.forEach((k, v) -> System.out.println(k + " -> " + v));
         return m;
+    }
+
+
+    public static void dump(String preamble, StreamUtilities.Siphon<?> siphon) {
+        dump(preamble, siphon, Function.identity());
+    }
+
+
+    public static <V> void dump(String preamble, StreamUtilities.Siphon<V> siphon, Function<V, ?> formatter) {
+        System.out.printf(
+                "%s - %s\n",
+                preamble,
+                ListUtilities.map(siphon.getResults(), formatter));
     }
 }

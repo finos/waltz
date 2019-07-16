@@ -2,7 +2,7 @@
 
     <div ng-if="$ctrl.managers.length > 0">
         <h4>Managers</h4>
-        <waltz-person-directs-list directs="$ctrl.managers"></waltz-person-directs-list>
+        <waltz-person-list people="$ctrl.managers"></waltz-person-list>
     </div>
 
 
@@ -20,7 +20,7 @@
                 <span ng-bind="$ctrl.cumulativeCount"></span>
             </small>
         </h4>
-        <waltz-person-directs-list directs="$ctrl.directs"></waltz-person-directs-list>
+        <waltz-person-list people="$ctrl.directs"></waltz-person-list>
     </div>
 </div>
 

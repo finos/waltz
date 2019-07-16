@@ -23,18 +23,54 @@ import {initialiseData} from "../../common";
 import template from "./involved-people-section.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {aggregatePeopleInvolvements} from "../involvement-utils";
+import {determineUpwardsScopeForKind, mkSelectionOptions} from "../../common/selector-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
 };
 
+const columnDefs = [
+    {
+        field: "person.displayName",
+        displayName: "Name",
+        cellTemplate: `
+                <div class="ui-grid-cell-contents"> 
+                    <waltz-entity-link entity-ref="row.entity.person" 
+                                       tooltip-placement="right" 
+                                       icon-placement="none"></waltz-entity-link> 
+                    -
+                    <a href="mailto:{{row.entity.person.email}}">
+                        <waltz-icon name="envelope-o"></waltz-icon>
+                    </a> 
+                </div>`
+    },
+    { field: "person.title", displayName: "Title" },
+    { field: "person.officePhone", displayName: "Telephone" },
+    {
+        field: "rolesDisplayName",
+        displayName: "Roles",
+        sortingAlgorithm: (a, b) => {
+            const aNames = _.join(_.map(a, "displayName"));
+            const bNames = _.join(_.map(b, "displayName"));
+            return aNames.localeCompare(bNames);
+        },
+        cellTemplate: `
+                <div class="ui-grid-cell-contents"> 
+                    <span ng-bind="COL_FIELD" 
+                          uib-popover-template="'wips/roles-popup.html'"
+                          popover-trigger="mouseenter"
+                          popover-append-to-body="true">
+                    </span>   
+                </div>`
+    }
+];
 
 const initialState = {
     allowedInvolvements: [],
     currentInvolvements: [],
     gridData: [],
-    gridDataCount: 0,
+    columnDefs,
     exportGrid: () => {},
     visibility: {
         editor: false
@@ -97,17 +133,18 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
+        const options = mkSelectionOptions(vm.parentEntityRef, determineUpwardsScopeForKind(vm.parentEntityRef.kind));
         const involvementPromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findByEntityReference,
-                [ vm.parentEntityRef ],
+                CORE_API.InvolvementStore.findBySelector,
+                [ options ],
                 { force: true })
             .then(r => r.data);
 
         const peoplePromise = serviceBroker
             .loadViewData(
-                CORE_API.InvolvementStore.findPeopleByEntityReference,
-                [ vm.parentEntityRef ],
+                CORE_API.InvolvementStore.findPeopleBySelector,
+                [ options ],
                 { force: true })
             .then(r => r.data);
 
@@ -127,7 +164,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
     };
 
     vm.$onChanges = (changes) => {
-        if (vm.parentEntityRef) {
+        if (changes.parentEntityRef && vm.parentEntityRef) {
             refresh();
         }
 
@@ -137,46 +174,6 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
             (name, id) => ({ value: +id, name }));
     };
 
-    vm.columnDefs = [
-        {
-            field: "person.displayName",
-            displayName: "Name",
-            cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <a ui-sref="main.person.view ({empId: row.entity.person.employeeId})" ng-bind="COL_FIELD"></a> - 
-                    <a href="mailto:{{row.entity.person.email}}">
-                        <waltz-icon name="envelope-o"></waltz-icon>
-                    </a>
-                </div>`
-        },
-        { field: "person.title", displayName: "Title" },
-        { field: "person.officePhone", displayName: "Telephone" },
-        {
-            field: "rolesDisplayName",
-            displayName: "Roles",
-            sortingAlgorithm: (a, b) => {
-                const aNames = _.join(_.map(a, "displayName"));
-                const bNames = _.join(_.map(b, "displayName"));
-                return aNames.localeCompare(bNames);
-            },
-            cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <span ng-bind="COL_FIELD" 
-                          uib-popover-template="'wips/roles-popup.html'"
-                          popover-trigger="mouseenter"
-                          popover-append-to-body="true">
-                    </span>   
-                </div>`
-        }
-    ];
-
-    vm.onGridInitialise = (e) => {
-        vm.exportGrid = () => e.exportFn("people.csv");
-    };
-
-    vm.onGridChange = (e) => {
-        vm.gridDataCount = e.entriesCount;
-    };
 
     vm.editMode = (editMode) => {
         vm.visibility.editor = editMode;

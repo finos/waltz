@@ -22,5 +22,30 @@ package com.khartec.waltz.model;
 public enum HierarchyQueryScope {
     EXACT,
     PARENTS,
-    CHILDREN
+    CHILDREN;
+
+
+    public static HierarchyQueryScope determineUpwardsScopeForKind(EntityKind kind) {
+        switch (kind) {
+            case ORG_UNIT:
+            case MEASURABLE:
+            case CHANGE_INITIATIVE:
+            case DATA_TYPE:
+                return PARENTS;
+            default:
+                return EXACT;
+        }
+    }
+
+    public static HierarchyQueryScope determineDownwardsScopeForKind(EntityKind kind) {
+        switch (kind) {
+            case ORG_UNIT:
+            case MEASURABLE:
+            case CHANGE_INITIATIVE:
+            case DATA_TYPE:
+                return CHILDREN;
+            default:
+                return EXACT;
+        }
+    }
 }

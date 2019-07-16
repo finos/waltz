@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common/index";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { getDefaultScopeForEntityKind, mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { entity } from "../../../common/services/enums/entity";
-import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+import {initialiseData} from "../../../common/index";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {determineDownwardsScopeForKind, mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {entity} from "../../../common/services/enums/entity";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
 
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./auth-sources-section.html";
 
@@ -52,7 +52,7 @@ function controller(serviceBroker) {
     const mkSelector = () => {
         const scope = vm.parentEntityRef.kind === entity.ORG_UNIT.key
             ? hierarchyQueryScope.PARENTS.key
-            : getDefaultScopeForEntityKind(vm.parentEntityRef.kind);
+            : determineDownwardsScopeForKind(vm.parentEntityRef.kind);
 
         return mkApplicationSelectionOptions(
             vm.parentEntityRef,

@@ -115,14 +115,16 @@ configureBetaNagMessageNotification.$inject = [
 
 // -- STATE CHANGE ---
 
-function configureStateChangeListener($transitions, $window, accessLogStore) {
+function configureStateChangeListener($transitions, $window, accessLogStore, dynamicSectionManager) {
+    $transitions.onExit({}, (transition) => dynamicSectionManager.clear());
+
     $transitions.onSuccess({}, (transition) => {
         const {name} = transition.to();
         const infoPromise = accessLogStore.write(name, transition.params());
 
         if (__ENV__ === "prod") {
             infoPromise.then(info => {
-                if (info.revision != __REVISION__) {
+                if (info.revision !== __REVISION__) {
                     console.log(
                         "Waltz reloading as server reported version does not match client. Server:",
                         info,
@@ -139,7 +141,8 @@ function configureStateChangeListener($transitions, $window, accessLogStore) {
 configureStateChangeListener.$inject = [
     "$transitions",
     "$window",
-    "AccessLogStore"
+    "AccessLogStore",
+    "DynamicSectionManager"
 ];
 
 // -- ROUTE DEBUGGER ---
@@ -185,7 +188,7 @@ function configureInactivityTimer($timeout, $transitions, $window, settingsServi
                     //if existing timeout promise, then cancel
                     if (timeoutPromise) {
                         $timeout.cancel(timeoutPromise);
-                    };
+                    }
 
                     // set a new countdown
                     timeoutPromise = $timeout(reloadPage, inactivityTime);
