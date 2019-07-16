@@ -280,8 +280,8 @@ function controller($q, serviceBroker) {
 
     vm.onSelect = (measurable, categoryId) => {
         if(_.isEmpty(measurable)) {
-            vm.selectedMeasurable = {name: "Unmapped Applications",
-                description: "Display application which does not have any measurable ratings in current measurable category."};
+            vm.selectedMeasurable = { name: "Unmapped Applications",
+                description: "Display applications which do not have any associated measurable rating for this category."};
             loadUnmappedApplications(vm.measurables, categoryId);
             return;
         }
