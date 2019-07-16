@@ -20,6 +20,7 @@
 package com.khartec.waltz.service.software_catalog;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
@@ -106,4 +107,15 @@ public class SoftwareCatalogService {
                 .build();
     }
 
+
+    public SoftwareCatalog getByPackageId(long id) {
+
+        SoftwarePackage softwarePackage = softwarePackageDao.getById(id);
+        List<SoftwareUsage> softwareUsages = softwareUsageDao.findBySoftwarePackageIds(id);
+
+        return ImmutableSoftwareCatalog.builder()
+                .usages(softwareUsages)
+                .packages(ListUtilities.newArrayList(softwarePackage))
+                .build();
+    }
 }

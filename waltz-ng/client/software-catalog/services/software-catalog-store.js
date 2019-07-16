@@ -16,32 +16,61 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash';
+import _ from "lodash";
 
 
-function service($http, base) {
-    const baseUrl = `${base}/software-catalog`;
+export function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/software-catalog`;
 
-    const findByAppIds = (ids = []) =>
-        $http.post(`${baseUrl}/apps`, ids)
+    const findByAppIds = (ids = []) => {
+        return $http.post(`${BASE}/apps`, ids)
             .then(r => r.data);
+    };
 
-    const findStatsForSelector = (id, kind, scope = 'CHILDREN') => {
+    const findStatsForSelector = (id, kind, scope = "CHILDREN") => {
         const options = _.isObject(id)
             ? id
             : {scope, entityReference: {id, kind}};
 
-        return $http.post(`${baseUrl}/stats`, options)
+        return $http.post(`${BASE}/stats`, options)
             .then(result => result.data);
     };
 
+    const getByPackageId = (id) => $http
+        .get(`${BASE}/package-id/${id}`)
+        .then(r => r.data);
+
     return {
         findByAppIds,
-        findStatsForSelector
+        findStatsForSelector,
+        getByPackageId
     };
 }
 
-service.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
+];
 
 
-export default service;
+export const serviceName = "SoftwareCatalogStore";
+
+
+export const SoftwareCatalogStore_API = {
+    findByAppIds: {
+        serviceName,
+        serviceFnName: "findByAppIds",
+        description: "retrieve catalog for a list of app ids"
+    },
+    findStatsForSelector: {
+        serviceName,
+        serviceFnName: "findStatsForSelector",
+        description: "find software catalog stats the given selector options"
+    },
+    getByPackageId: {
+        serviceName,
+        serviceFnName: 'getByPackageId',
+        description: 'executes getByPackageId'
+    },
+};
+

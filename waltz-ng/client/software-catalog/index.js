@@ -17,28 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import SoftwareCatalogStore from './services/software-catalog-store';
-import SimpleSoftwareUsagePies from './components/simple-software-usage-pies';
-import SimpleSoftwareUsageList from './directives/simple-software-usage-list';
-import MaturityStatus from './directives/maturity-status';
-import SoftwareCatalogSection from './directives/software-catalog-section';
+import angular from "angular";
+import { registerComponents, registerStore } from "../common/module-utils";
+import * as SoftwareCatalogStore from "./services/software-catalog-store";
+import SimpleSoftwareUsagePies from "./components/simple-software-usage-pies";
+import SimpleSoftwareUsageList from "./directives/simple-software-usage-list";
+import MaturityStatus from "./directives/maturity-status";
+import SoftwareCatalogSection from "./directives/software-catalog-section";
+
+import SoftwarePackageOverview from "./components/overview/software-package-overview";
+import SoftwarePackageView from "./pages/view/software-package-view";
+
+import Routes from "./routes";
 
 
 export default () => {
 
-    const module = angular.module('waltz.software.catalog', []);
+    const module = angular.module("waltz.software.catalog", []);
 
     module
-        .service('SoftwareCatalogStore', SoftwareCatalogStore);
+        .config(Routes);
+
+    registerStore(module, SoftwareCatalogStore);
 
     module
-        .component('waltzSimpleSoftwareUsagePies', SimpleSoftwareUsagePies);
+        .component("waltzSimpleSoftwareUsagePies", SimpleSoftwareUsagePies);
+
+    registerComponents(module, [
+        SoftwarePackageOverview,
+        SoftwarePackageView
+    ]);
 
     module
-        .directive('waltzSimpleSoftwareUsageList', SimpleSoftwareUsageList)
-        .directive('waltzMaturityStatus', MaturityStatus)
-        .directive('waltzSoftwareCatalogSection', SoftwareCatalogSection);
+        .directive("waltzSimpleSoftwareUsageList", SimpleSoftwareUsageList)
+        .directive("waltzMaturityStatus", MaturityStatus)
+        .directive("waltzSoftwareCatalogSection", SoftwareCatalogSection);
 
     return module.name;
 };

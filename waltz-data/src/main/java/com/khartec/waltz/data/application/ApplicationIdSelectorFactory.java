@@ -43,8 +43,7 @@ import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
-import static com.khartec.waltz.schema.Tables.SCENARIO_RATING_ITEM;
-import static com.khartec.waltz.schema.Tables.SERVER_USAGE;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -123,9 +122,26 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return mkForOrgUnit(options);
             case PERSON:
                 return mkForPerson(options);
+            case SOFTWARE:
+                return mkForSoftwarePackage(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForSoftwarePackage(ApplicationIdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition applicationConditions = mkApplicationConditions(options);
+        return dsl
+                .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
+                .from(SOFTWARE_USAGE)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
+                .where(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
+                .and(applicationConditions);
+
     }
 
 
@@ -141,8 +157,6 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .where(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(options.entityReference().id()))
                 .and(applicationConditions);
     }
-
-
 
 
     private Select<Record1<Long>> mkForServer(ApplicationIdSelectionOptions options) {

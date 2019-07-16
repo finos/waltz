@@ -56,6 +56,19 @@
                 </div>
             </uib-tab>
 
+            <uib-tab heading="Software"
+                     select="showSoftwareCatalog = true"
+                     disable="$ctrl.softwareCatalog.packages.length == 0">
+                <div ng-if="showSoftwareCatalog">
+                    <br>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.softwareCatalogGridOptions">
+                    </div>
+                </div>
+            </uib-tab>
+
             <uib-tab heading="Licences"
                      select="showLicenceDetail = true"
                      disable="$ctrl.licences.length == 0">

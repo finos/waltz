@@ -16,38 +16,28 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { registerComponents, registerStores } from "../common/module-utils";
-import LicenceStore from "./services/licence-store";
 
-import Routes from "./routes";
-
-import LicencePanel from "./components/panel/licence-panel";
-import LicenceSection from "./components/section/licence-section";
-import LicenceOverview from "./components/overview/licence-overview";
-
-import LicenceList from "./pages/list/licence-list";
-import LicenceView from "./pages/view/licence-view";
+import SoftwarePackageView from "./pages/view/software-package-view";
 
 
-export default () => {
-
-    const module = angular.module("waltz.licence", []);
-
-    module
-        .config(Routes);
-
-    registerStores(
-        module,
-        [ LicenceStore ]);
-
-    registerComponents(module, [
-        LicencePanel,
-        LicenceSection,
-        LicenceOverview,
-
-        LicenceList,
-        LicenceView
-    ]);
-
-    return module.name;
+const baseState = {
 };
+
+
+const viewState = {
+    url: "software-package/{id:int}",
+    views: { "content@": SoftwarePackageView.id }
+};
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state("main.software-package", baseState)
+        .state("main.software-package.view", viewState);
+}
+
+
+setup.$inject = ["$stateProvider"];
+
+
+export default setup;

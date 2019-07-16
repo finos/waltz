@@ -1,0 +1,88 @@
+<waltz-page-header icon="gift"
+                   name="{{ $ctrl.softwarePackage.name }}"
+                   small="{{ $ctrl.softwarePackage.externalId }}">
+    <ol class="waltz-breadcrumbs">
+        <li><a ui-sref="main">Home</a></li>
+        <li><span>Software</span></li>
+        <li><span ng-bind="$ctrl.softwarePackage.name"></span></li>
+    </ol>
+</waltz-page-header>
+
+
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="!$ctrl.softwarePackage">
+        <message>
+            <strong>No Software Package</strong> found.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-display-section"
+         ng-if="$ctrl.softwarePackage">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Name
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.softwarePackage.name"></span>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        External Id
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.softwarePackage.externalId"></span>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Vendor
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.softwarePackage.vendor"></span>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Version
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.softwarePackage.version"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-markdown text="$ctrl.softwarePackage.description">
+                        </waltz-markdown>
+                    </div>
+
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Maturity Status
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-maturity-status status="$ctrl.softwarePackage.maturityStatus"></waltz-maturity-status>
+                    </div>
+                </div>
+
+                <!-- Entity Enum -->
+                <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-entity-enum>
+
+            </div>
+            <div class="col-sm-5">
+                <!-- Assessment Ratings -->
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-sub-section>
+            </div>
+        </div>
+    </div>
+</div>

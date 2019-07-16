@@ -26,6 +26,7 @@ public enum MaturityStatus {
     HOLD,
     DISINVEST,
     UNSUPPORTED,
-    RESTRICTED
+    RESTRICTED,
+    UNKNOWN
 
 }
