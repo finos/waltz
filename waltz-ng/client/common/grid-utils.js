@@ -54,13 +54,14 @@ export function mkEnumGridCell(columnHeading, entityRefField, showIcon = false) 
  * @param iconPlacement icon position, allowed values: left, right, none
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
-export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacement = 'left') {
+export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacement = "left", tooltipPlacement = "top") {
     return {
-        field: entityRefField + '.name',
+        field: entityRefField + ".name",
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <waltz-entity-link entity-ref="row.entity.${entityRefField}" 
+                <waltz-entity-link entity-ref="row.entity.${entityRefField}"
+                                   tooltip-placement="${tooltipPlacement}" 
                                    icon-placement="${iconPlacement}">
                 </waltz-entity-link>
             </div>`
