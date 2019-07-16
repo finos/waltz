@@ -90,7 +90,7 @@ function prepareUnmappedColumnDefs() {
         {
             field: "application.assetCode",
             name: "Asset Code",
-            width: "10%"
+            width: "50%"
         }
     ];
 }
