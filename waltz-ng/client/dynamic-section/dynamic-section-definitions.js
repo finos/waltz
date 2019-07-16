@@ -227,7 +227,13 @@ export const dynamicSections = {
         name: "Change Sets",
         icon: "hourglass-2",
         id: 90
-    }
+    },
+    licenceSection: {
+        componentId: "licence-section",
+        name: "Licences",
+        icon: "id-card-o",
+        id: 100
+    },
 
 };
 

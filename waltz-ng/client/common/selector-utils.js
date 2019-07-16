@@ -35,6 +35,7 @@ export function determineDownwardsScopeForKind(kind) {
         case "PHYSICAL_SPECIFICATION":
         case "SCENARIO":
         case "SERVER":
+        case "SOFTWARE":
             return "EXACT";
         default:
             return "CHILDREN";

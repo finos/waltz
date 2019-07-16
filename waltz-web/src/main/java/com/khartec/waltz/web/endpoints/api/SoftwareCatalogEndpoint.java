@@ -26,8 +26,11 @@ import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
@@ -57,9 +60,16 @@ public class SoftwareCatalogEndpoint implements Endpoint {
                 -> service.calculateStatisticsForAppIdSelector(readAppIdSelectionOptionsFromBody(request));
 
 
+        getForDatum(mkPath(BASE_URL, "package-id", ":id"), this::getByPackageIdRoute);
         postForDatum(makeCatalogForAppIdsPath, makeCatalogForAppIdsRoute);
         postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
 
+    }
+
+
+    private SoftwareCatalog getByPackageIdRoute(Request request, Response response) {
+        long id = getId(request);
+        return service.getByPackageId(id);
     }
 
 }

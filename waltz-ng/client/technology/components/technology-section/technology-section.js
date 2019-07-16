@@ -33,6 +33,8 @@ const bindings = {
 
 const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
 
+const MATURITY_STATUS_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status></div>';
+
 
 function mkBooleanColumnFilter(uiGridConstants) {
     return {
@@ -164,6 +166,24 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
 }
 
 
+function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
+
+    const columnDefs = [
+        mkLinkGridCell('Name', 'name', 'id', 'main.software-package.view'),
+        { field: 'externalId', displayName: 'External Id' },
+        { field: 'version', displayName: 'Version'},
+        { field: 'description', displayName: 'Description'},
+        { field: 'maturityStatus', displayName: 'Maturity Status', cellTemplate: MATURITY_STATUS_TEMPLATE},
+        { field: 'notable', displayName: 'Notable'},
+    ];
+
+    const baseTable = createDefaultTableOptions($animate, uiGridConstants, "software.csv");
+    return _.extend(baseTable, {
+        columnDefs
+    });
+}
+
+
 function enrichServersWithEOLFlags(servers = []) {
     return _
         .map(
@@ -248,11 +268,24 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             })
             .then(() => refresh(vm.qry));
 
+        // software catalog
+        serviceBroker
+            .loadViewData(
+                CORE_API.SoftwareCatalogStore.findByAppIds,
+                [ [vm.parentEntityRef.id] ]
+            )
+            .then(r => {
+                vm.softwareCatalog = r.data;
+                vm.softwareCatalogGridOptions.data = vm.softwareCatalog.packages;
+            })
+            .then(() => refresh(vm.qry));
+
     };
 
     vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);
     vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
     vm.licenceGridOptions = prepareLicenceGridOptions($animate, uiGridConstants);
+    vm.softwareCatalogGridOptions = prepareSoftwareCatalogGridOptions($animate, uiGridConstants);
 
     vm.doSearch = () => refresh(vm.qry);
 

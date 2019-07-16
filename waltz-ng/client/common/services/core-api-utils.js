@@ -82,6 +82,7 @@ import { ServerInfoStore_API as ServerInfoStore } from "../../server-info/servic
 import { ServerUsageStore_API as ServerUsageStore } from "../../server-info/services/server-usage-store";
 import { SettingsStore_API as SettingsStore } from "../../system/services/settings-store";
 import { SharedPreferenceStore_API as SharedPreferenceStore } from "../../shared-preference/services/shared-preference-store";
+import { SoftwareCatalogStore_API as SoftwareCatalogStore } from "../../software-catalog/services/software-catalog-store";
 import { SourceDataRatingStore_API as SourceDataRatingStore } from "../../source-data-rating/services/source-data-rating-store";
 import { StaticPanelStore_API as StaticPanelStore } from "../../static-panel/services/static-panel-store";
 import { SurveyInstanceStore_API as SurveyInstanceStore } from "../../survey/services/survey-instance-store";
@@ -161,6 +162,7 @@ export const CORE_API = {
     ServerUsageStore,
     SettingsStore,
     SharedPreferenceStore,
+    SoftwareCatalogStore,
     SourceDataRatingStore,
     StaticPanelStore,
     SurveyInstanceStore,

@@ -49,9 +49,11 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APPLICATION:
+            case SOFTWARE:
                 return mkForRef(options);
             case LICENCE:
                 return mkForLicence(options);
+
             default:
                 String msg = String.format(
                         "Cannot create Licence Id selector from kind: %s",

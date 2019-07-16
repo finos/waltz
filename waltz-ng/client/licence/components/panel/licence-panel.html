@@ -1,0 +1,23 @@
+<div>
+    <waltz-no-data ng-if="$ctrl.licences.length == 0">
+        <message>
+            <strong>No licences</strong>
+        </message>
+    </waltz-no-data>
+
+    <div ng-if="$ctrl.licences.length > 0">
+        <waltz-grid-with-search entries="$ctrl.licences"
+                                column-defs="$ctrl.columnDefs"
+                                on-initialise="$ctrl.onGridInitialise">
+        </waltz-grid-with-search>
+
+        <div class="pull-right" style="margin-bottom: 4px">
+            <a class="clickable waltz-visibility-child-30"
+               ng-click="$ctrl.exportLicences()">
+                <waltz-icon name="download"></waltz-icon>
+                Export licences
+            </a>
+        </div>
+    </div>
+
+</div>

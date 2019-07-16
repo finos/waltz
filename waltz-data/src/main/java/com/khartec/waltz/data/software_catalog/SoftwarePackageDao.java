@@ -111,6 +111,14 @@ public class SoftwarePackageDao {
     }
 
 
+    public SoftwarePackage getById(long id) {
+        return dsl.select(SOFTWARE_PACKAGE.fields())
+                .from(SOFTWARE_PACKAGE)
+                .where(SOFTWARE_PACKAGE.ID.eq(id))
+                .fetchOne(TO_DOMAIN);
+    }
+
+
     public List<SoftwarePackage> findByExternalIds(String... externalIds) {
         return findByCondition(SOFTWARE_PACKAGE.EXTERNAL_ID.in(externalIds));
     }
