@@ -51,7 +51,8 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
 
 
     @Autowired
-    public MeasurableRatingExtractor(DSLContext dsl, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public MeasurableRatingExtractor(DSLContext dsl,
+                                     ApplicationIdSelectorFactory applicationIdSelectorFactory) {
         super(dsl);
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
@@ -63,7 +64,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
         String path = mkPath("data-extract", "measurable-rating", ":id");
         getAllocations(path);
 
-        String unmappedPath = mkPath("data-extract", "measurable-rating", "unmapped", ":id", ":appGroupId");
+        String unmappedPath = mkPath("data-extract", "measurable-rating", "unmapped", ":id");
         getUnmappedAllocations(unmappedPath);
     }
 
@@ -117,7 +118,9 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
     private void getUnmappedAllocations(String path) {
         post(path, (request, response) -> {
             long categoryId = getId(request);
-            long groupId = getLong(request, "appGroupId");
+
+            ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
+            Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOpts);
 
             SelectConditionStep<Record1<Long>> appIdsNotAllocatedToAnyMeasurableInTheCategory = dsl
                     .selectDistinct(MEASURABLE_RATING.ENTITY_ID)
@@ -127,22 +130,21 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
                     .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
 
-            SelectConditionStep<?> qry = dsl
+            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = dsl
                     .selectDistinct(app.NAME.as("App Name"),
                             app.ASSET_CODE.as("App Code"),
                             app.ID.as("App Waltz Id"),
                             app.KIND.as("App Kind"))
                     .from(app)
-                    .join(APPLICATION_GROUP_ENTRY)
-                    .on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(app.ID))
                     .leftJoin(MEASURABLE_RATING)
                     .on(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE_RATING.ENTITY_ID.eq(app.ID)))
-                    .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
+                    .where(app.ID.in(appIds))
                     .and(MEASURABLE_RATING.ENTITY_ID.isNull()
                             .or(app.ID.notIn(
                                     appIdsNotAllocatedToAnyMeasurableInTheCategory
-                            )));
+                            )))
+                    .orderBy(app.NAME);
 
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
             String suggestedFilename = toCamelCase(categoryName) + "-Unmapped-Applications";

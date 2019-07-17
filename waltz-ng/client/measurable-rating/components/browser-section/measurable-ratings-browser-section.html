@@ -31,8 +31,9 @@
                     <waltz-data-extract-link name="Unmapped"
                                              styling="link"
                                              filename="unmappedApplications.csv"
-                                             extract="measurable-rating/unmapped/{{$ctrl.activeCategory.id}}/{{$ctrl.parentEntityRef.id}}"
-                                             method="POST">
+                                             extract="measurable-rating/unmapped/{{$ctrl.activeCategory.id}}"
+                                             method="POST"
+                                             request-body="$ctrl.selector">
                     </waltz-data-extract-link>
                     <span>|</span>
                     <waltz-data-extract-link name="Ratings"
