@@ -55,7 +55,8 @@ function controller($state,
                     personStore,
                     surveyInstanceStore,
                     surveyRunStore,
-                    surveyQuestionStore) {
+                    surveyQuestionStore,
+                    changeInitiativeStore) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -64,6 +65,20 @@ function controller($state,
         id,
         kind: 'SURVEY_INSTANCE'
     };
+
+    function surveyDisplayName(surveyRun) {
+        const entityReference = surveyRun.selectionOptions.entityReference;
+        if(entityReference.kind === "CHANGE_INITIATIVE") {
+            changeInitiativeStore
+                .getById(entityReference.id)
+                .then(ci => {
+                    if(!surveyRun.name.includes(ci.externalId)){
+                        vm.surveyDisplayName = surveyRun.name + " (" + ci.externalId + ")";
+                    }
+                })
+        }
+        vm.surveyDisplayName = surveyRun.name;
+    }
 
     surveyInstanceStore
         .getById(id)
@@ -76,6 +91,7 @@ function controller($state,
         .then(sr => personStore
             .getById(sr.ownerId)
             .then(p => vm.owner = p))
+        .then(() => surveyDisplayName(vm.surveyRun))
         .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
         .then(prevVersionInstances => {
             const prevVersions = _.chain(prevVersionInstances)
@@ -170,7 +186,8 @@ controller.$inject = [
     'PersonStore',
     'SurveyInstanceStore',
     'SurveyRunStore',
-    'SurveyQuestionStore'
+    'SurveyQuestionStore',
+    'ChangeInitiativeStore'
 ];
 
 
