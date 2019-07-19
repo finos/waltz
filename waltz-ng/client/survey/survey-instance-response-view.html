@@ -1,6 +1,6 @@
 <div>
     <waltz-page-header icon="wpforms"
-                       name="{{ ctrl.surveyDisplayName }}"
+                       name="{{ ctrl.surveyRun.name }}"
                        small="Response">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -139,17 +139,11 @@
         <br>
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                Participants
+                External Id
             </div>
             <div class="col-sm-4">
-                <ul class="list-unstyled list-inline">
-                    <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
-                        <span>
-                            <span ng-bind="p.displayName"></span>
-                        </span>
-                        <span ng-hide="$last">, </span>
-                    </li>
-                </ul>
+                <waltz-entity-link ng-bind="ctrl.externalId">
+                </waltz-entity-link>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
                 Approved By
@@ -167,6 +161,23 @@
                     -
                 </span>
             </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Participants
+            </div>
+            <div class="col-sm-4">
+                <ul class="list-unstyled list-inline">
+                    <li ng-repeat="p in ctrl.participants | orderBy:'displayName'">
+                        <span>
+                            <span ng-bind="p.displayName"></span>
+                        </span>
+                        <span ng-hide="$last">, </span>
+                    </li>
+                </ul>
+            </div>
+
         </div>
     </div>
 

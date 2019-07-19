@@ -87,6 +87,8 @@ function determineLoadByIdCall(kind) {
             return CORE_API.ApplicationStore.getById;
         case "ACTOR":
             return CORE_API.ActorStore.getById;
+        case "CHANGE_INITIATIVE":
+            return CORE_API.ChangeInitiativeStore.getById;
         default:
             throw "Unsupported kind for loadEntity: " + kind;
     }
