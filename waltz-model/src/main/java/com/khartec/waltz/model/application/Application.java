@@ -62,8 +62,9 @@ public abstract class Application implements
         return "waltz";
     }
 
+
     @Value.Derived
-    public String externalId() { return assetCode().get(); }
+    public Optional<String> externalId() { return assetCode(); }
 
 
     @Value.Default
