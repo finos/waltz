@@ -44,8 +44,6 @@ function controller() {
                 assessment => _.isNil(assessment.rating));
             vm.assessmentsWithoutRatings = _.sortBy(partitioned[0], d => d.definition.name);
             vm.assessmentsWithRatings = _.sortBy(partitioned[1], d => d.definition.name);
-
-            console.log({a: vm.assessments})
         }
     };
 
