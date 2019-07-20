@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  */
 
 import {initialiseData} from "../../../common";
+import _ from "lodash";
 import template from "./assessment-rating-list.html";
 
 
@@ -28,11 +29,26 @@ const bindings = {
 
 
 const initialState = {
+    assessmentsWithRatings: [],
+    assessmentsWithoutRatings: []
 };
 
 
 function controller() {
-    initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        if (vm.assessments) {
+            const partitioned = _.partition(
+                vm.assessments,
+                assessment => _.isNil(assessment.rating));
+            vm.assessmentsWithoutRatings = _.sortBy(partitioned[0], d => d.definition.name);
+            vm.assessmentsWithRatings = _.sortBy(partitioned[1], d => d.definition.name);
+
+            console.log({a: vm.assessments})
+        }
+    };
+
 }
 
 
