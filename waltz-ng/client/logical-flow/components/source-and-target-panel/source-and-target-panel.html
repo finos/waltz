@@ -78,10 +78,16 @@
         </h4>
 
         <div>
-            <waltz-entity-link entity-ref="{
-                    kind: 'LOGICAL_DATA_FLOW',
-                    id: $ctrl.selected.logicalFlow.id,
-                    name: 'More about this logical flow &raquo;'}">
+            <a ng-click="$ctrl.focusOnEntity($ctrl.selected)"
+               class="clickable">
+                Focus on node
+            </a>
+            /
+            <waltz-entity-link icon-placement="none"
+                               entity-ref="{
+                                   kind: 'LOGICAL_DATA_FLOW',
+                                   id: $ctrl.selected.logicalFlow.id,
+                                   name: 'Go to flow'}">
             </waltz-entity-link>
         </div>
 
