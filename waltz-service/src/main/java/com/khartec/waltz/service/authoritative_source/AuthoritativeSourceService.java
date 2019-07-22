@@ -216,18 +216,18 @@ public class AuthoritativeSourceService {
 
     public List<NonAuthoritativeSource> findNonAuthSources(IdSelectionOptions options) {
         Condition customSelectionCriteria;
-        GenericSelector genericSelector = genericSelectorFactory.apply(options);
-
         ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
 
         switch(options.entityReference().kind()) {
             case DATA_TYPE:
-                customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(genericSelector.selector())
+                GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
+                customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector.selector())
                     .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
 
             case ORG_UNIT:
-                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(genericSelector.selector())
+                GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
+                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector.selector())
                     .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
 
@@ -248,20 +248,21 @@ public class AuthoritativeSourceService {
 
     public List<AuthoritativeSource> findAuthSources(IdSelectionOptions options) {
         Condition customSelectionCriteria;
-        GenericSelector genericSelector = genericSelectorFactory.apply(options);
 
         ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
 
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
-                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(genericSelector.selector())
+                GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
+                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(orgUnitSelector.selector())
                         .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
             case DATA_TYPE:
+                GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
                 SelectConditionStep<Record1<String>> codeSelector = DSL
                         .select(DATA_TYPE.CODE)
                         .from(DATA_TYPE)
-                        .where(DATA_TYPE.ID.in(genericSelector.selector()));
+                        .where(DATA_TYPE.ID.in(dataTypeSelector.selector()));
                 customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector)
                         .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
                 break;
