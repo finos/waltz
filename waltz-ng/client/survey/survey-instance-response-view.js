@@ -22,6 +22,7 @@ import {initialiseData} from "../common";
 import {groupQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from './survey-instance-response-view.html';
+import {loadEntity} from "../common/entity-utils";
 
 
 const initialState = {
@@ -55,7 +56,8 @@ function controller($state,
                     personStore,
                     surveyInstanceStore,
                     surveyRunStore,
-                    surveyQuestionStore) {
+                    surveyQuestionStore,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -64,6 +66,11 @@ function controller($state,
         id,
         kind: 'SURVEY_INSTANCE'
     };
+
+    function getExternalId(surveyInstance) {
+        loadEntity(serviceBroker, surveyInstance.surveyEntity)
+            .then(entity => vm.externalId = entity.externalId)
+    }
 
     surveyInstanceStore
         .getById(id)
@@ -76,6 +83,7 @@ function controller($state,
         .then(sr => personStore
             .getById(sr.ownerId)
             .then(p => vm.owner = p))
+        .then(() => getExternalId(vm.surveyInstance))
         .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
         .then(prevVersionInstances => {
             const prevVersions = _.chain(prevVersionInstances)
@@ -170,7 +178,8 @@ controller.$inject = [
     'PersonStore',
     'SurveyInstanceStore',
     'SurveyRunStore',
-    'SurveyQuestionStore'
+    'SurveyQuestionStore',
+    'ServiceBroker'
 ];
 
 

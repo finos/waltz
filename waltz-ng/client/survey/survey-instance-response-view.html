@@ -82,16 +82,34 @@
         <br>
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                Status
+                External Id
             </div>
-            <div class="col-sm-4"
-                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            <div class="col-sm-4">
+                <waltz-entity-link ng-bind="ctrl.externalId">
+                </waltz-entity-link>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
                 Survey ID
             </div>
             <div class="col-sm-4"
                  ng-bind="ctrl.surveyInstance.id">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Status
+            </div>
+            <div class="col-sm-4"
+                 ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-from-now timestamp="ctrl.surveyInstance.dueDate"
+                                days-only="true">
+                </waltz-from-now>
             </div>
         </div>
         <br>
@@ -108,12 +126,13 @@
                 </span>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
-                Due
+                Owner
             </div>
             <div class="col-sm-4">
-                <waltz-from-now timestamp="ctrl.surveyInstance.dueDate"
-                                days-only="true">
-                </waltz-from-now>
+                <span ng-bind="ctrl.owner.displayName"></span>
+                <span ng-if="! ctrl.owner">
+                    -
+                </span>
             </div>
         </div>
         <br>
@@ -127,11 +146,18 @@
                 </waltz-from-now>
             </div>
             <div class="col-sm-2 waltz-display-field-label">
-                Owner
+                Approved By
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.owner.displayName"></span>
-                <span ng-if="! ctrl.owner">
+                <span ng-if="ctrl.surveyInstance.approvedBy">
+                    <span ng-bind="ctrl.surveyInstance.approvedBy">
+                </span>,
+                </span>
+                <waltz-from-now class='text-muted'
+                                ng-if="ctrl.surveyInstance.approvedAt"
+                                timestamp="ctrl.surveyInstance.approvedAt">
+                </waltz-from-now>
+                <span ng-if="! ctrl.surveyInstance.approvedAt">
                     -
                 </span>
             </div>
@@ -150,22 +176,6 @@
                         <span ng-hide="$last">, </span>
                     </li>
                 </ul>
-            </div>
-            <div class="col-sm-2 waltz-display-field-label">
-                Approved By
-            </div>
-            <div class="col-sm-4">
-                <span ng-if="ctrl.surveyInstance.approvedBy">
-                    <span ng-bind="ctrl.surveyInstance.approvedBy">
-                </span>,
-                </span>
-                <waltz-from-now class='text-muted'
-                                ng-if="ctrl.surveyInstance.approvedAt"
-                                timestamp="ctrl.surveyInstance.approvedAt">
-                </waltz-from-now>
-                <span ng-if="! ctrl.surveyInstance.approvedAt">
-                    -
-                </span>
             </div>
         </div>
     </div>
