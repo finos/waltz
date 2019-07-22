@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,16 +68,17 @@ public class EntityHierarchyDao {
         checkNotNull(kind, "kind cannot be null");
         checkNotNull(hierarchyItems, "hierarchyItems cannot be null");
 
-        LOG.info("Replacing hierarchy items for kind: {}, deleting existing", kind);
-        dsl.deleteFrom(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
-                .execute();
+        List<EntityHierarchyRecord> records = map(hierarchyItems, ITEM_TO_RECORD_MAPPER);
 
         LOG.info("Replacing hierarchy items for kind: {}, inserting new record (#{})", kind, hierarchyItems.size());
-
-        List<EntityHierarchyRecord> records = map(hierarchyItems, ITEM_TO_RECORD_MAPPER);
-        dsl.batchInsert(records)
-                .execute();
+        dsl.transaction(configuration -> {
+            DSLContext txDsl = DSL.using(configuration);
+            txDsl.deleteFrom(ENTITY_HIERARCHY)
+                    .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
+                    .execute();
+            txDsl.batchInsert(records)
+                    .execute();
+        });
 
         return records.size();
 

@@ -63,6 +63,10 @@ public abstract class Application implements
     }
 
 
+    @Value.Derived
+    public Optional<String> externalId() { return assetCode(); }
+
+
     @Value.Default
     public Criticality businessCriticality() { return Criticality.UNKNOWN; }
 

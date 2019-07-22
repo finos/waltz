@@ -292,7 +292,9 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
     vm.hasAnyData = () => {
         const hasServers = perhaps(() => vm.servers.length > 0, false);
         const hasDatabases = perhaps(() => vm.databases.length > 0, false);
-        return hasServers || hasDatabases;
+        const hasLicences = perhaps(() => vm.licences.length > 0, false);
+        const hasSoftware = perhaps(() => vm.softwareCatalog.length > 0, false);
+        return hasServers || hasDatabases || hasLicences || hasSoftware;
     };
 }
 

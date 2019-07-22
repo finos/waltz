@@ -5,7 +5,7 @@
 ## Pre Requisites
 
 * Java 8
-* Maven 3
+* Maven 3.5
 * Tomcat 8 (optional)
 
 ## Building

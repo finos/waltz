@@ -20,6 +20,7 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ColorUtilities;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.rating.RatingScheme;
@@ -52,6 +53,8 @@ public class AssessmentGenerator implements SampleDataGenerator {
         RatingScheme impactRatingScheme = getOrCreateImpactRatingScheme(ctx);
         Long archAssessmentRating = createArchImpactAssessmentDefinition(ctx, impactRatingScheme);
         Long regAssessmentRating = createRegulatoryImpactAssessmentDefinition(ctx, impactRatingScheme);
+
+        createLotsOfAssessmentDefinitions(ctx, impactRatingScheme);
 
         createAssessmentRecords(getDsl(ctx), confidentialityRatingScheme, appDefnId, EntityKind.APPLICATION, APPLICATION.ID, 0.9);
         createAssessmentRecords(getDsl(ctx), impactRatingScheme, archAssessmentRating, EntityKind.CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, 0.9);
@@ -113,6 +116,22 @@ public class AssessmentGenerator implements SampleDataGenerator {
                 EntityKind.CHANGE_INITIATIVE,
                 ratingScheme);
     }
+
+
+    private void createLotsOfAssessmentDefinitions(ApplicationContext ctx, RatingScheme ratingScheme) {
+        List<Tuple3<EntityKind, String, String>> defns = ListUtilities.newArrayList(
+                tuple(EntityKind.APPLICATION, "Sanctions Apply", "Indicates if sanctions apply to this application"),
+                tuple(EntityKind.APPLICATION, "Records Retentions Relevancy", "Indicates what record retention rules (if any) apply to this app"),
+                tuple(EntityKind.APPLICATION, "Internet facing", "Indicates if an application has a direct connection to the internet"));
+
+        defns.forEach(d -> createAssessmentDefinition(
+                getDsl(ctx),
+                d.v2,
+                d.v3,
+                d.v1,
+                ratingScheme));
+    }
+
 
     private Long createRegulatoryImpactAssessmentDefinition(ApplicationContext ctx, RatingScheme ratingScheme) {
         return createAssessmentDefinition(
