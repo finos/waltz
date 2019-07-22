@@ -194,14 +194,12 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "source", flowId, evt);
-                    //applyFilter(() => filterByNode("source", entity));
                 })
             },
             target: {
                 onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "target", flowId, evt);
-                    //applyFilter(() => filterByNode("target", entity));
                 })
             },
             type: {
