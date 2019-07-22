@@ -38,6 +38,7 @@ const bindings = {
     categories: '<',
     ratingTallies: '<',
     onSelect: '<',
+    onSelectUnmapped: '<',
     onCategorySelect: '<',
     scrollHeight: '<'
 };

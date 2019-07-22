@@ -122,7 +122,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
             ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOpts);
 
-            SelectConditionStep<Record1<Long>> appIdsNotAllocatedToAnyMeasurableInTheCategory = dsl
+            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = dsl
                     .selectDistinct(MEASURABLE_RATING.ENTITY_ID)
                     .from(MEASURABLE_RATING)
                     .join(MEASURABLE)
@@ -136,14 +136,8 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
                             app.ID.as("App Waltz Id"),
                             app.KIND.as("App Kind"))
                     .from(app)
-                    .leftJoin(MEASURABLE_RATING)
-                    .on(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                            .and(MEASURABLE_RATING.ENTITY_ID.eq(app.ID)))
                     .where(app.ID.in(appIds))
-                    .and(MEASURABLE_RATING.ENTITY_ID.isNull()
-                            .or(app.ID.notIn(
-                                    appIdsNotAllocatedToAnyMeasurableInTheCategory
-                            )))
+                    .and(app.ID.notIn(appIdsAssignedToAnyMeasurableInTheCategory))
                     .orderBy(app.NAME);
 
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);

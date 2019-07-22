@@ -277,14 +277,13 @@ function controller($q, serviceBroker) {
         }
     };
 
+    vm.onSelectUnmapped = (categoryId) => {
+        vm.selectedMeasurable = { name: "Unmapped Applications",
+            description: "Display applications which do not have any associated measurable rating for this category."};
+        loadUnmappedApplications(vm.measurables, categoryId);
+    };
 
-    vm.onSelect = (measurable, categoryId) => {
-        if(_.isEmpty(measurable)) {
-            vm.selectedMeasurable = { name: "Unmapped Applications",
-                description: "Display applications which do not have any associated measurable rating for this category."};
-            loadUnmappedApplications(vm.measurables, categoryId);
-            return;
-        }
+    vm.onSelect = (measurable) => {
         vm.visibility.ratingDetail = false;
         vm.visibility.loading = true;
 
