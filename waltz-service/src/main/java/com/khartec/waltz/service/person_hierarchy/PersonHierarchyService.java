@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,8 +67,11 @@ public class PersonHierarchyService {
 
         List<PersonHierarchyRecord> records = toHierarchyRecords(forest);
 
-        dsl.deleteFrom(PERSON_HIERARCHY).execute();
-        return dsl.batchStore(records).execute();
+        return dsl.transactionResult(configuration -> {
+            DSLContext txDsl = DSL.using(configuration);
+            txDsl.deleteFrom(PERSON_HIERARCHY).execute();
+            return txDsl.batchStore(records).execute();
+        });
     }
 
 
@@ -80,7 +83,7 @@ public class PersonHierarchyService {
                     ListUtilities.reverse(
                             HierarchyUtilities.parents(node)
                                     .stream()
-                                    .map(n -> n.getData())
+                                    .map(Node::getData)
                                     .collect(Collectors.toList()));
 
             for (int i = 0; i < ancestors.size(); i++) {
