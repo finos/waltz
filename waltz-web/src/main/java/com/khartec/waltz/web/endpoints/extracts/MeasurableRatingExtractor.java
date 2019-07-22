@@ -62,13 +62,13 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
     public void register() {
 
         String path = mkPath("data-extract", "measurable-rating", ":id");
-        getAllocations(path);
+        registerAllocations(path);
 
         String unmappedPath = mkPath("data-extract", "measurable-rating", "unmapped", ":id");
-        getUnmappedAllocations(unmappedPath);
+        registerUnmappedAllocations(unmappedPath);
     }
 
-    private void getAllocations(String path) {
+    private void registerAllocations(String path) {
         post(path, (request, response) -> {
             long categoryId = getId(request);
             ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
@@ -115,7 +115,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
         });
     }
 
-    private void getUnmappedAllocations(String path) {
+    private void registerUnmappedAllocations(String path) {
         post(path, (request, response) -> {
             long categoryId = getId(request);
 
