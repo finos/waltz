@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div class="waltz-assessment-rating-panel">
     <div class="row">
         <div class="col-md-12">
@@ -9,55 +28,19 @@
                 </message>
             </waltz-no-data>
 
-            <div ng-if="$ctrl.assessments.length > 0"
-                 ng-class="{ 'waltz-scroll-region-200' : $ctrl.assessments.length > 7}">
+            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.assessmentsWithRatings.length > 7}">
                 <table class="waltz-field-table waltz-field-table-border"
                        style="width: 100%">
                     <colgroup>
                         <col width="30%">
                         <col width="70%">
                     </colgroup>
-                    <tbody>
-                        <tr ng-repeat="item in $ctrl.assessments">
-                            <!-- definition name -->
-                            <td class="wft-label">
-                                <span uib-popover-template="'arp-desc-popover.html'"
-                                      popover-placement="left"
-                                      popover-enable="item.definition.description"
-                                      popover-trigger="mouseenter"
-                                      popover-popup-delay="300"
-                                      popover-append-to-body="true">
-                                    <span ng-bind="item.definition.name"></span>
-                                </span>
-                            </td>
-                            <!-- rating -->
-                            <td valign="top">
-                                <span ng-if="item.rating"
-                                      uib-popover-template="'arp-popover.html'"
-                                      popover-placement="right"
-                                      popover-trigger="mouseenter"
-                                      popover-popup-delay="300"
-                                      popover-append-to-body="true">
-                                    <a ng-click="$ctrl.onSelect(item)"
-                                       class="clickable">
-                                        <waltz-rating-indicator-cell rating="item.ratingItem"
-                                                                     show-name="true">
-                                        </waltz-rating-indicator-cell>
-                                        <span style="position: relative; top: -4px;"
-                                              ng-if="item.rating.description.length > 0">
-                                            <waltz-icon name="sticky-note-o">
-                                            </waltz-icon>
-                                        </span>
-                                    </a>
-                                </span>
-                                <span ng-if="!item.rating">
-                                    <a ng-click="$ctrl.onSelect(item)"
-                                       class="clickable">
-                                        Not Provided
-                                    </a>
-                                </span>
-                            </td>
-                        </tr>
+                    <tbody ng-if="$ctrl.assessmentsWithRatings.length > 0"
+                           ng-include="'warl-list-with-ratings'">
+                    </tbody>
+                    <tbody ng-if="$ctrl.assessmentsWithoutRatings.length > 0"
+                           style="border-top: 1px solid #eee;"
+                           ng-include="'warl-list-without-ratings'">
                     </tbody>
                 </table>
             </div>
@@ -65,14 +48,100 @@
     </div>
 </div>
 
+
+<!-- WITHOUT RATINGS -->
 <script type="text/ng-template"
-        id="arp-popover.html">
+        id="warl-list-without-ratings">
+    <tr style="vertical-align: top">
+        <td>
+            <span class="wft-label">
+                Not Provided
+            </span>
+        </td>
+        <td>
+            <ul class="text-muted list-inline">
+                <li ng-repeat="item in $ctrl.assessmentsWithoutRatings">
+                    <span ng-if="item.definition.isReadOnly">
+                        <span ng-include="'warl-definition-name'"></span>
+                    </span>
+                    <a ng-click="$ctrl.onSelect(item)"
+                       ng-if="!item.definition.isReadOnly"
+                       class="clickable">
+                        <span ng-include="'warl-definition-name'"></span>
+                    </a>
+                    <span ng-if="!$last">, </span>
+                </li>
+            </ul>
+        </td>
+    </tr>
+</script>
+
+
+<!-- WITH RATINGS -->
+<script type="text/ng-template"
+        id="warl-list-with-ratings">
+    <tr ng-repeat="item in $ctrl.assessmentsWithRatings"
+        style="vertical-align: top">
+        <!-- definition name -->
+        <td class="wft-label">
+            <span ng-include="'warl-definition-name'"></span>
+        </td>
+        <!-- rating -->
+        <td>
+            <a ng-click="$ctrl.onSelect(item)"
+               class="clickable">
+                <span ng-include="'warl-rating-name'"></span>
+            </a>
+        </td>
+    </tr>
+</script>
+
+
+
+<!-- RATING NAME WITH POPOVER -->
+<script type="text/ng-template"
+        id="warl-rating-name">
+    <span uib-popover-template="'warl-rating-popover.html'"
+          popover-placement="right"
+          popover-trigger="mouseenter"
+          popover-popup-delay="300"
+          popover-append-to-body="true">
+        <waltz-rating-indicator-cell rating="item.ratingItem"
+                                     show-name="true">
+        </waltz-rating-indicator-cell>
+        <span style="position: relative; top: -4px;"
+              ng-if="item.rating.description.length > 0">
+            <waltz-icon name="sticky-note-o">
+            </waltz-icon>
+        </span>
+    </span>
+</script>
+
+<!-- DEFINITION NAME WITH POPOVER -->
+<script type="text/ng-template"
+        id="warl-definition-name">
+    <span uib-popover-template="'warl-desc-popover.html'"
+          popover-placement="left"
+          popover-enable="item.definition.description"
+          popover-trigger="mouseenter"
+          popover-popup-delay="300"
+          popover-append-to-body="true">
+        <span ng-bind="item.definition.name"></span>
+    </span>
+    <waltz-icon name="lock"
+                ng-if="item.definition.isReadOnly">
+    </waltz-icon>
+</script>
+
+
+<!-- RATING POPOVER -->
+<script type="text/ng-template"
+        id="warl-rating-popover.html">
     <div>
         <div>
             <div>
                 <strong ng-bind="item.ratingItem.name"></strong>
             </div>
-
             <span class="text-muted">
                 <waltz-markdown text="item.rating.description">
                 </waltz-markdown>
@@ -89,8 +158,9 @@
 </script>
 
 
+<!-- DEFINITION POPOVER -->
 <script type="text/ng-template"
-        id="arp-desc-popover.html">
+        id="warl-desc-popover.html">
     <div>
         <div>
             <div>
@@ -103,6 +173,12 @@
             <div class="text-muted">
                 <waltz-markdown text="item.definition.description">
                 </waltz-markdown>
+            </div>
+            <div class="text-muted small"
+                 ng-if="item.definition.isReadOnly">
+                <hr>
+                <waltz-icon name="lock"></waltz-icon>
+                Assessments relating to this definition are read-only and cannot be edited.
             </div>
         </div>
     </div>

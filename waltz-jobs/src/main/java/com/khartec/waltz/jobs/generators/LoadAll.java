@@ -39,7 +39,7 @@ public class LoadAll {
 //            new AppGroupGenerator(),
 //            new AppGroupEntryGenerator(),
 //            new BookmarkGenerator(),
-            new ChangeInitiativeGenerator(),
+//            new ChangeInitiativeGenerator(),
 //            new ProcessGenerator(),
 //            new MeasurableGenerator("PRODUCT"),
 //            new MeasurableGenerator("CAPABILITY"),
