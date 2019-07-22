@@ -30,7 +30,7 @@ public class AttestationExtractor extends BaseDataExtractor {
 
     @Override
     public void register() {
-        String path = mkPath("data-prepareExtractQuery", "attestation", ":id");
+        String path = mkPath("data-extract", "attestation", ":id");
         get(path, (request, response) -> {
             long runId = getId(request);
 
