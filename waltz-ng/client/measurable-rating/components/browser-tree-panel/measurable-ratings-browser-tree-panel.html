@@ -6,6 +6,7 @@
                                               categories="$ctrl.measurableCategories"
                                               scroll-height="500"
                                               on-select="$ctrl.onSelect"
+                                              on-select-unmapped="$ctrl.onSelectUnmapped"
                                               on-category-select="$ctrl.onCategorySelect">
             </waltz-measurable-ratings-browser>
 
@@ -25,19 +26,31 @@
             <div ng-if="$ctrl.visibility.ratingDetail && $ctrl.tableData"
                  class="waltz-fade-if">
                 <strong>
-                    <a ng-bind="$ctrl.selectedMeasurable.name"
-                       ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
-                    </a>
+                    <div ng-if="$ctrl.selectedMeasurable.id">
+                        <a ng-bind="$ctrl.selectedMeasurable.name"
+                           ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
+                        </a>
+                    </div>
+                    <div ng-if="!$ctrl.selectedMeasurable.id">
+                        <span ng-bind="$ctrl.selectedMeasurable.name"></span>
+                    </div>
                 </strong>
                 <p class="text-muted">
                     <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
                 </p>
 
-                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                <waltz-grid-with-search ng-if="$ctrl.tableData.length > 0"
+                                        column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
                                         searchPlaceholderText="Search"
                                         exportFilename="ratings.csv">
                 </waltz-grid-with-search>
+
+                <waltz-no-data ng-if="$ctrl.tableData.length == 0">
+                    <message>
+                        No Applications found
+                    </message>
+                </waltz-no-data>
 
             </div>
         </div>
