@@ -86,6 +86,7 @@ import { SoftwareCatalogStore_API as SoftwareCatalogStore } from "../../software
 import { SourceDataRatingStore_API as SourceDataRatingStore } from "../../source-data-rating/services/source-data-rating-store";
 import { StaticPanelStore_API as StaticPanelStore } from "../../static-panel/services/static-panel-store";
 import { SurveyInstanceStore_API as SurveyInstanceStore } from "../../survey/services/survey-instance-store";
+import { SurveyQuestionStore_API as SurveyQuestionStore } from "../../survey/services/survey-question-store";
 import { SurveyRunStore_API as SurveyRunStore } from "../../survey/services/survey-run-store";
 import { SurveyTemplateStore_API as SurveyTemplateStore } from "../../survey/services/survey-template-store";
 import { SvgDiagramStore_API as SvgDiagramStore } from "../../svg-diagram/services/svg-diagram-store";
@@ -166,6 +167,7 @@ export const CORE_API = {
     SourceDataRatingStore,
     StaticPanelStore,
     SurveyInstanceStore,
+    SurveyQuestionStore,
     SurveyRunStore,
     SurveyTemplateStore,
     SvgDiagramStore,

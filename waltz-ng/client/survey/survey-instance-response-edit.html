@@ -17,115 +17,14 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <div class="row">
-            <div class="col-sm-12">
-                 <waltz-markdown text="ctrl.surveyRun.description">
-                 </waltz-markdown>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Survey Subject
-                    </div>
-                    <div class="col-sm-8">
-                        <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
-                        </waltz-entity-link>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Survey ID
-                    </div>
-                    <div class="col-sm-8">
-                        <span ng-bind="ctrl.surveyInstance.id">
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Status
-                    </div>
-                    <div class="col-sm-8"
-                         ng-bind="ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Due
-                    </div>
-                    <div class="col-sm-8">
-                        <waltz-from-now timestamp="ctrl.surveyInstance.dueDate"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Other Participants
-                    </div>
-                    <div class="col-sm-8">
-                        <span ng-repeat="recipient in ctrl.otherRecipients">
-                            <a href="mailto:{{recipient.email}}?Subject=RE: {{ctrl.surveyRun.name}}"
-                               ng-bind="recipient.displayName">
-                            </a><span ng-hide="$last">, </span>
-                        </span>
-                        <br>
-                        <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject={{ctrl.surveyRun.name}} (Instance: {{ctrl.surveyInstance.id}})&body=Survey Instance: {{ctrl.surveyInstanceLink}}%0D%0A%0D%0APlease add the following participants to this survey instance:%0D%0A%0D%0A"
-                           ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited"
-                           class="clickable">
-                            <strong>+Request more participants</strong>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Owner
-                    </div>
-                    <div class="col-sm-8">
-                        <span ng-bind="ctrl.owner.displayName"></span>
-                        <span ng-if="! ctrl.owner">
-                            -
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="row">
-                    <div class="col-sm-4 waltz-display-field-label">
-                        Contact Email
-                    </div>
-                    <div class="col-sm-8">
-                        <a href="mailto:{{ctrl.surveyRun.contactEmail}}?Subject=RE: {{ctrl.surveyRun.name}}"
-                           ng-bind="ctrl.surveyRun.contactEmail"></a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <waltz-survey-instance-summary instance-id="ctrl.surveyInstance.id">
+        </waltz-survey-instance-summary>
     </div>
 
     <br>
+
+    <br>
+
     <waltz-section name="Responses"
                    ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
         <form name="surveyResponseForm"

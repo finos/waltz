@@ -27,7 +27,6 @@ import com.khartec.waltz.service.survey.SurveyRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,47 +89,37 @@ public class SurveyRunEndpoint implements Endpoint {
                 -> surveyRunService.findForRecipient(getUsername(req));
 
         DatumRoute<IdCommandResponse> surveyRunCreateRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
             SurveyRunCreateCommand surveyRunChangeCommand = readBody(req, SurveyRunCreateCommand.class);
 
             return surveyRunService
-                    .createSurveyRun(WebUtilities.getUsername(req), surveyRunChangeCommand);
+                    .createSurveyRun(getUsername(req), surveyRunChangeCommand);
         };
 
         DatumRoute<Integer> surveyRunUpdateRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
 
-            res.type(WebUtilities.TYPE_JSON);
             SurveyRunChangeCommand surveyRunChangeCommand = readBody(req, SurveyRunChangeCommand.class);
 
             return surveyRunService.updateSurveyRun(
-                    WebUtilities.getUsername(req),
+                    getUsername(req),
                     getId(req),
                     surveyRunChangeCommand);
         };
 
         DatumRoute<Integer> surveyRunUpdateStatusRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
             SurveyRunStatusChangeCommand surveyRunStatusChangeCommand = readBody(req, SurveyRunStatusChangeCommand.class);
 
             return surveyRunService.updateSurveyRunStatus(
-                    WebUtilities.getUsername(req),
+                    getUsername(req),
                     getId(req),
                     surveyRunStatusChangeCommand.newStatus());
         };
 
         DatumRoute<Integer> surveyRunUpdateDueDateRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
             DateChangeCommand command = readBody(req, DateChangeCommand.class);
 
             return surveyRunService.updateSurveyRunDueDate(
-                    WebUtilities.getUsername(req),
+                    getUsername(req),
                     getId(req),
                     command);
         };
@@ -150,8 +139,6 @@ public class SurveyRunEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
-            ensureUserHasAdminRights(request);
-
             long runId = getId(request);
             List<Long> personIds = readIdsFromBody(request);
             return surveyRunService.createDirectSurveyInstances(

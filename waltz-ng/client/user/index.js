@@ -18,41 +18,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
-import {registerStore} from '../common/module-utils';
+import angular from "angular";
+import {registerComponents, registerStore} from "../common/module-utils";
 
-import userAgentInfoStore from './services/user-agent-info-store';
-import userService from './services/user-service';
-import userStore from './services/user-store';
-import userPreferenceStore from './services/user-preference-store';
-import userPreferenceService from './services/user-preference-service';
+import userAgentInfoStore from "./services/user-agent-info-store";
+import userService from "./services/user-service";
+import userStore from "./services/user-store";
+import userPreferenceStore from "./services/user-preference-store";
+import userPreferenceService from "./services/user-preference-service";
 
-import hasRole from './directives/has-role';
-import hasRoleForEntityKind from './directives/has-role-for-entity-kind';
-import unlessRole from './directives/unless-role';
-import ifAnonymous from './directives/if-anonymous';
-import Routes from './routes';
+import userPickList from "./components/user-pick-list/user-pick-list";
+
+import hasRole from "./directives/has-role";
+import hasRoleForEntityKind from "./directives/has-role-for-entity-kind";
+import unlessRole from "./directives/unless-role";
+import ifAnonymous from "./directives/if-anonymous";
+import Routes from "./routes";
 
 
 export default () => {
-    const module = angular.module('waltz.user', []);
+    const module = angular.module("waltz.user", []);
 
     module
         .config(Routes);
 
     registerStore(module, userStore);
+    registerComponents(module, [userPickList])
 
     module
-        .service('UserAgentInfoStore', userAgentInfoStore)
-        .service('UserService', userService)
-        .service('UserPreferenceStore', userPreferenceStore)
-        .service('UserPreferenceService', userPreferenceService);
+        .service("UserAgentInfoStore", userAgentInfoStore)
+        .service("UserService", userService)
+        .service("UserPreferenceStore", userPreferenceStore)
+        .service("UserPreferenceService", userPreferenceService);
 
     module
-        .directive('waltzHasRole', hasRole)
-        .directive('waltzHasRoleForEntityKind', hasRoleForEntityKind)
-        .directive('waltzUnlessRole', unlessRole)
-        .directive('waltzIfAnonymous', ifAnonymous);
+        .directive("waltzHasRole", hasRole)
+        .directive("waltzHasRoleForEntityKind", hasRoleForEntityKind)
+        .directive("waltzUnlessRole", unlessRole)
+        .directive("waltzIfAnonymous", ifAnonymous);
 
     return module.name;
 };

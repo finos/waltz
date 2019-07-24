@@ -22,12 +22,14 @@
  *
  * eg: usage: mkEntityLinkGridCell('Source', 'source', 'none')
  *
- * @param columnHeading column display name
- * @param entityRefField field name in grid data that stores the entity ref for which the link needs to be rendered
- * @param iconPlacement icon position, allowed values: left, right, none
+ * @param columnHeading  column display name
+ * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
+ * @param showIcon  whether to display the icon or not
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
-export function mkEnumGridCell(columnHeading, entityRefField, showIcon = false) {
+export function mkEnumGridCell(columnHeading,
+                               entityRefField,
+                               showIcon = false) {
     return {
         field: entityRefField,
         displayName: columnHeading,
@@ -42,19 +44,21 @@ export function mkEnumGridCell(columnHeading, entityRefField, showIcon = false) 
 }
 
 
-
-
 /**
  * Creates a column def to render an entity link
  *
  * eg: usage: mkEntityLinkGridCell('Source', 'source', 'none')
  *
- * @param columnHeading column display name
- * @param entityRefField field name in grid data that stores the entity ref for which the link needs to be rendered
- * @param iconPlacement icon position, allowed values: left, right, none
+ * @param columnHeading  column display name
+ * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
+ * @param iconPlacement  icon position, allowed values: left, right, none
+ * @param tooltipPlacement  position of tooltip, allowed values are: left, right, bottom, top
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
-export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacement = "left", tooltipPlacement = "top") {
+export function mkEntityLinkGridCell(columnHeading,
+                                     entityRefField,
+                                     iconPlacement = "left",
+                                     tooltipPlacement = "top") {
     return {
         field: entityRefField + ".name",
         displayName: columnHeading,
@@ -72,17 +76,25 @@ export function mkEntityLinkGridCell(columnHeading, entityRefField, iconPlacemen
 /**
  * Creates a column def to render a link with an id parameter
  *
- * @param columnHeading column display name
- * @param displayField field name that stores the value to be displayed on the grid
- * @param linkIdField field name that stores the link id field
- * @param linkNavViewName navigation view name
+ * @param columnHeading  column display name
+ * @param displayField  field name that stores the value to be displayed on the grid
+ * @param linkIdField  field name that stores the link id field
+ * @param linkNavViewName  navigation view name
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
-export function mkLinkGridCell(columnHeading, displayField, linkIdField, linkNavViewName) {
+export function mkLinkGridCell(columnHeading,
+                               displayField,
+                               linkIdField,
+                               linkNavViewName) {
     return {
         field: displayField,
         displayName: columnHeading,
-        cellTemplate: `<div class="ui-grid-cell-contents">\n<a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" ng-bind="COL_FIELD">\n</a>\n</div>`
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" 
+                   ng-bind="COL_FIELD">
+                </a>
+            </div>`
     };
 }
 

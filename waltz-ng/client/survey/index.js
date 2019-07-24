@@ -22,19 +22,21 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import SurveyInstanceStore from "./services/survey-instance-store";
 import SurveyRunStore from "./services/survey-run-store";
 import SurveyTemplateStore from "./services/survey-template-store";
+
 import SurveyInstanceList from "./components/instance-list/survey-instance-list";
+import SurveyInstanceSummary from "./components/instance-summary/survey-instance-summary";
 
 import surveySection from "./components/survey-section";
-import Routes from './routes';
-import SurveyDropdownEditor from './components/dropdown/survey-dropdown-editor';
-import SurveyRunCreateGeneral from './components/survey-run-create-general';
-import SurveyRunCreateRecipient from './components/survey-run-create-recipient';
-import SurveyRunOverview from './components/survey-run-overview';
-import SurveyTemplateOverview from './components/survey-template-overview';
-import SurveyQuestionStore from './services/survey-question-store';
+import Routes from "./routes";
+import SurveyDropdownEditor from "./components/dropdown/survey-dropdown-editor";
+import SurveyRunCreateGeneral from "./components/survey-run-create-general";
+import SurveyRunCreateRecipient from "./components/survey-run-create-recipient";
+import SurveyRunOverview from "./components/survey-run-overview";
+import SurveyTemplateOverview from "./components/survey-template-overview";
+import SurveyQuestionStore from "./services/survey-question-store";
 
 export default () => {
-    const module = angular.module('waltz.survey', []);
+    const module = angular.module("waltz.survey", []);
 
     module
         .config(Routes);
@@ -44,24 +46,24 @@ export default () => {
     ]);
 
     module
-        .component('waltzSurveyDropdownEditor', SurveyDropdownEditor)
-        .component('waltzSurveyRunCreateGeneral', SurveyRunCreateGeneral)
-        .component('waltzSurveyRunCreateRecipient', SurveyRunCreateRecipient)
-        .component('waltzSurveyRunOverview', SurveyRunOverview)
-        .component('waltzSurveyTemplateOverview', SurveyTemplateOverview);
+        .component("waltzSurveyDropdownEditor", SurveyDropdownEditor)
+        .component("waltzSurveyRunCreateGeneral", SurveyRunCreateGeneral)
+        .component("waltzSurveyRunCreateRecipient", SurveyRunCreateRecipient)
+        .component("waltzSurveyRunOverview", SurveyRunOverview)
+        .component("waltzSurveyTemplateOverview", SurveyTemplateOverview);
 
 
-    module
-        .service('SurveyQuestionStore', SurveyQuestionStore);
 
     registerStores(module, [
         SurveyInstanceStore,
+        SurveyQuestionStore,
         SurveyRunStore,
         SurveyTemplateStore
     ]);
 
     registerComponents(module, [
-        SurveyInstanceList
+        SurveyInstanceList,
+        SurveyInstanceSummary
     ]);
 
     return module.name;

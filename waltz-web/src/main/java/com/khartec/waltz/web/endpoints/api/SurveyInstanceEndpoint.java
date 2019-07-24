@@ -23,16 +23,13 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.DateChangeCommand;
 import com.khartec.waltz.model.StringChangeCommand;
 import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -118,10 +115,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 (req, res) -> {
                     SurveyInstanceStatusChangeCommand command = readBody(req, SurveyInstanceStatusChangeCommand.class);
 
-                    if (command.newStatus() != SurveyInstanceStatus.COMPLETED) {
-                        ensureUserHasAdminRights(req);
-                    }
-
                     return surveyInstanceService.updateStatus(
                             getUsername(req),
                             getId(req),
@@ -130,25 +123,19 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 };
 
         DatumRoute<Integer> updateDueDateRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
             DateChangeCommand command = readBody(req, DateChangeCommand.class);
 
             return surveyInstanceService.updateDueDate(
-                    WebUtilities.getUsername(req),
+                    getUsername(req),
                     getId(req),
                     command);
         };
 
         DatumRoute<Integer> markApprovedRoute = (req, res) -> {
-            ensureUserHasAdminRights(req);
-
-            res.type(WebUtilities.TYPE_JSON);
             StringChangeCommand command = readBody(req, StringChangeCommand.class);
 
             return surveyInstanceService.markApproved(
-                    WebUtilities.getUsername(req),
+                    getUsername(req),
                     getId(req),
                     command.newStringVal().orElse(null));
         };
@@ -156,27 +143,21 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         DatumRoute<Boolean> updateRecipientRoute =
                 (req, res) -> {
-                    ensureUserHasAdminRights(req);
-
                     SurveyInstanceRecipientUpdateCommand command = readBody(req, SurveyInstanceRecipientUpdateCommand.class);
-                    return surveyInstanceService.updateRecipient(command);
+                    return surveyInstanceService.updateRecipient(getUsername(req), command);
                 };
 
         DatumRoute<Long> addRecipientRoute =
                 (req, res) -> {
-                    ensureUserHasAdminRights(req);
-
                     SurveyInstanceRecipientCreateCommand command = readBody(req, SurveyInstanceRecipientCreateCommand.class);
-                    return surveyInstanceService.addRecipient(command);
+                    return surveyInstanceService.addRecipient(getUsername(req), command);
                 };
 
         DatumRoute<Boolean> deleteRecipientRoute =
-                (req, res) -> {
-                    ensureUserHasAdminRights(req);
-
-                    long instanceRecipientId = getLong(req, "instanceRecipientId");
-                    return surveyInstanceService.delete(instanceRecipientId);
-                };
+                (req, res) -> surveyInstanceService.deleteRecipient(
+                        getUsername(req),
+                        getId(req),
+                        getLong(req, "instanceRecipientId"));
 
 
         getForDatum(getByIdPath, getByIdRoute);
@@ -195,8 +176,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
     }
 
-
-    private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.SURVEY_ADMIN);
-    }
+//
+//    private void ensureUserHasAdminRights(Request request) {
+//        requireRole(userRoleService, request, SystemRole.SURVEY_ADMIN);
+//    }
 }

@@ -265,7 +265,6 @@ public class SurveyInstanceDao {
                 .notStartedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.NOT_STARTED))
                 .inProgressCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.IN_PROGRESS))
                 .completedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.COMPLETED))
-                .expiredCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.EXPIRED))
                 .build();
     }
 
