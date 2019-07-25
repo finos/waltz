@@ -2,7 +2,7 @@
 
     <!-- ACTIONS -->
     <waltz-section-actions>
-        <span waltz-has-role="SURVEY_ADMIN">
+        <span>
             <a class="btn btn-xs btn-primary"
                ng-if="$ctrl.visibility.mode == 'list'"
                ng-click="$ctrl.onShowCreateForm()">
@@ -27,14 +27,33 @@
             <div class="help-block">
                 Select the survey template to issue
             </div>
-            <ul class="list-unstyled">
-                <li ng-repeat="template in $ctrl.templates">
-                    <a ng-click="$ctrl.onSelectTemplate(template)"
-                       class="clickable">
-                        <span ng-bind="template.name"></span>
-                    </a>
-                </li>
-            </ul>
+            <table class="table table-condensed small">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Owner</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="template in $ctrl.templates">
+                    <td>
+                        <a ng-click="$ctrl.onSelectTemplate(template)"
+                           class="clickable">
+                            <span ng-bind="template.name"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="template.description"></span>
+                    </td>
+                    <td>
+                        <waltz-entity-link tooltip-placement="left"
+                                           entity-ref="{ kind: 'PERSON', id: template.ownerId}">
+                        </waltz-entity-link>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
             <a ng-click="$ctrl.onDismissCreateForm()"
                class="clickable">
@@ -133,23 +152,21 @@
                                 <span class="text-danger">*</span>
                             </label>
                         </div>
-                        <div class="col-md-3">
-                            <waltz-entity-selector required="true"
-                                                   on-select="$ctrl.addRecipient"
-                                                   entity-kinds="['PERSON']">
-                            </waltz-entity-selector>
-                            <div class="small help-block">
-                                Who should fill in this survey?
+                        <div class="col-md-6">
+                            <div>
+                                <div ng-if="$ctrl.surveyRunForm.recipients.length === 0">
+                                    No Recipients defined
+                                </div>
+                                <waltz-user-pick-list people="$ctrl.surveyRunForm.recipients"
+                                                      can-remove-last="false"
+                                                      on-add="$ctrl.onAddRecipient"
+                                                      on-remove="$ctrl.onRemoveRecipient">
+                                </waltz-user-pick-list>
+
+                                <div class="small help-block">
+                                    Who should fill in this survey?
+                                </div>
                             </div>
-                            <br>
-                            <ul class="list-unstyled">
-                                <li ng-repeat="p in $ctrl.surveyRunForm.recipients">
-                                    <span ng-bind="p.name"></span>
-                                    <a ng-click="$ctrl.removeRecipient(p)" class="clickable">
-                                        <waltz-icon name="close"></waltz-icon>
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
                     </div>
 

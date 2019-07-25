@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function service($http, baseUrl) {
+function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/survey-question`;
 
@@ -57,10 +57,44 @@ function service($http, baseUrl) {
 }
 
 
-service.$inject = [
-    '$http',
-    'BaseApiUrl'
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export default service;
+const serviceName = "SurveyQuestionStore";
+
+
+export const SurveyQuestionStore_API = {
+    create: {
+        serviceName,
+        serviceFnName: "create",
+        description: "create a question"
+    },
+    update: {
+        serviceName,
+        serviceFnName: "update",
+        description: "updates a question"
+    },
+    deleteQuestion: {
+        serviceName,
+        serviceFnName: "deleteQuestion",
+        description: "delete a question"
+    },
+    findForInstance: {
+        serviceName,
+        serviceFnName: "findForInstance",
+        description: "findForInstance"
+    },
+    findForTemplate: {
+        serviceName,
+        serviceFnName: "findForTemplate",
+        description: "findForTemplate"
+    }
+};
+
+export default {
+    store,
+    serviceName
+};

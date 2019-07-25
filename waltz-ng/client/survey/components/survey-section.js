@@ -21,11 +21,12 @@ import {initialiseData} from "../../common/index";
 import {CORE_API} from "../../common/services/core-api-utils";
 import template from "./survey-section.html";
 import {timeFormat} from "d3-time-format";
+import {displayError} from "../../common/error-utils";
 
 
 const initialState = {
     visibility: {
-        mode: 'list' // list | issue
+        mode: "list" // list | issue
     },
     selectedTemplate: null,
     surveyRunForm: {
@@ -38,7 +39,7 @@ const initialState = {
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -57,36 +58,36 @@ function controller(notification, serviceBroker, userService) {
     };
 
     vm.onShowCreateForm = () => {
-        vm.visibility.mode = 'create';
+        vm.visibility.mode = "create";
         vm.selectedTemplate = null;
         serviceBroker
             .loadViewData(CORE_API.SurveyTemplateStore.findAll)
             .then(r => vm.templates = _
                 .chain(r.data)
                 .filter(t => t.targetEntityKind === vm.parentEntityRef.kind)
-                .filter(t => t.status === 'ACTIVE')
-                .sortBy('name')
+                .filter(t => t.status === "ACTIVE")
+                .sortBy("name")
                 .value());
     };
 
     vm.onDismissCreateForm = () => {
-        vm.visibility.mode = 'list';
+        vm.visibility.mode = "list";
     };
 
     vm.submitRun = () => {
         save();
     };
 
-    vm.addRecipient = (p) => {
+    vm.onAddRecipient = (p) => {
         if (! p) return;
         const recipients = vm.surveyRunForm.recipients;
         vm.surveyRunForm.recipients = _.concat(recipients ? recipients : [], [ p ])
     };
 
-    vm.removeRecipient = (p) => {
+    vm.onRemoveRecipient = (p) => {
         if (! p) return;
         const recipients = vm.surveyRunForm.recipients;
-        vm.surveyRunForm.recipients = _.reject(recipients, r => r.id == p.id);
+        vm.surveyRunForm.recipients = _.reject(recipients, r => r.id === p.id);
     };
 
     vm.$onInit = () => {
@@ -96,9 +97,9 @@ function controller(notification, serviceBroker, userService) {
     };
 
     function save () {
-        const recipientIds = _.map(vm.surveyRunForm.recipients, 'id');
+        const recipientIds = _.map(vm.surveyRunForm.recipients, "id");
 
-        if (recipientIds.length == 0) {
+        if (_.isEmpty(recipientIds)) {
             alert("Please provide at least one recipient");
             return;
         }
@@ -108,11 +109,11 @@ function controller(notification, serviceBroker, userService) {
             surveyTemplateId: vm.selectedTemplate.id,
             selectionOptions: {
                 entityReference: vm.parentEntityRef,
-                scope: 'EXACT',
+                scope: "EXACT",
             },
             involvementKindIds: [],
             issuanceKind: vm.surveyRunForm.issuanceKind,
-            dueDate: vm.surveyRunForm.dueDate ? timeFormat('%Y-%m-%d')(vm.surveyRunForm.dueDate) : null,
+            dueDate: vm.surveyRunForm.dueDate ? timeFormat("%Y-%m-%d")(vm.surveyRunForm.dueDate) : null,
             contactEmail: vm.surveyRunForm.contactEmail
         };
 
@@ -124,20 +125,21 @@ function controller(notification, serviceBroker, userService) {
                 .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, recipientIds ])
                 .then(() => runId))
             .then(runId => serviceBroker
-                .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: 'ISSUED'}]))
+                .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))
             .then(() => {
-                notification.success('Survey issued successfully');
+                notification.success("Survey issued successfully");
                 vm.onDismissCreateForm();
-            });
+            })
+            .catch(e => displayError(notification, "Could not create survey", e));
     }
 
 }
 
 
 controller.$inject = [
-    'Notification',
-    'ServiceBroker',
-    'UserService'
+    "Notification",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
@@ -149,7 +151,7 @@ const component = {
 
 export default {
     component,
-    id: 'waltzSurveySection'
+    id: "waltzSurveySection"
 };
 
 

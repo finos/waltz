@@ -26,7 +26,7 @@ import template from "./survey-instance-list.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -39,20 +39,20 @@ const initialState = {
 
 
 function mkTableData(surveyRuns = [], surveyInstances = []) {
-    const runsById = _.keyBy(surveyRuns, 'id');
+    const runsById = _.keyBy(surveyRuns, "id");
 
     const surveys = _.map(surveyInstances, instance => {
         return {
-            'surveyInstance': instance,
-            'surveyRun': runsById[instance.surveyRunId],
-            'surveyEntity': instance.surveyEntity
+            "surveyInstance": instance,
+            "surveyRun": runsById[instance.surveyRunId],
+            "surveyEntity": instance.surveyEntity
         }
     });
 
     const now = moment();
     const grouped = _.groupBy(surveys, s => {
         const subMoment = moment(s.surveyInstance.submittedAt);
-        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, 'months') >= 12 ? 'ARCHIVE' : 'CURRENT'
+        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, "months") >= 12 ? "ARCHIVE" : "CURRENT"
     });
     return grouped;
 }
@@ -70,11 +70,17 @@ function controller($q, serviceBroker) {
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {
             const runsPromise = serviceBroker
-                .loadViewData(CORE_API.SurveyRunStore.findByEntityReference, [vm.parentEntityRef])
+                .loadViewData(
+                    CORE_API.SurveyRunStore.findByEntityReference,
+                    [vm.parentEntityRef],
+                    { force: true })
                 .then(r => r.data);
 
             const instancesPromise = serviceBroker
-                .loadViewData(CORE_API.SurveyInstanceStore.findByEntityReference, [vm.parentEntityRef])
+                .loadViewData(
+                    CORE_API.SurveyInstanceStore.findByEntityReference,
+                    [vm.parentEntityRef],
+                    { force: true })
                 .then(r => r.data);
 
             $q.all([runsPromise, instancesPromise])
@@ -87,8 +93,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -100,7 +106,7 @@ const component = {
 
 export default {
     component,
-    id: 'waltzSurveyInstanceList'
+    id: "waltzSurveyInstanceList"
 };
 
 

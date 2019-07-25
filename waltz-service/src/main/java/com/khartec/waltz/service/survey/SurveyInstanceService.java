@@ -25,11 +25,14 @@ import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
 import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
+import com.khartec.waltz.data.survey.SurveyRunDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserRoleService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -52,6 +56,9 @@ public class SurveyInstanceService {
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
 
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory;
+    private SurveyRunDao surveyRunDao;
+    private UserRoleService userRoleService;
+
 
     @Autowired
     public SurveyInstanceService(ChangeLogService changeLogService,
@@ -59,19 +66,25 @@ public class SurveyInstanceService {
                                  SurveyInstanceDao surveyInstanceDao,
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                                  SurveyQuestionResponseDao surveyQuestionResponseDao,
+                                 SurveyRunDao surveyRunDao,
+                                 UserRoleService userRoleService,
                                  SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
+        checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
+        this.surveyRunDao = surveyRunDao;
+        this.userRoleService = userRoleService;
         this.surveyInstanceIdSelectorFactory = surveyInstanceIdSelectorFactory;
     }
 
@@ -84,8 +97,7 @@ public class SurveyInstanceService {
     public List<SurveyInstance> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        Person person = personDao.getActiveByUserEmail(userName);
-        checkNotNull(person, "userName " + userName + " cannot be resolved");
+        Person person = getPerson(userName);
 
         return surveyInstanceDao.findForRecipient(person.id().get());
     }
@@ -113,13 +125,7 @@ public class SurveyInstanceService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(questionResponse, "questionResponse cannot be null");
 
-        Person person = personDao.getActiveByUserEmail(userName);
-        checkNotNull(person, "userName " + userName + " cannot be resolved");
-
-        boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(
-                person.id().get(),
-                instanceId);
-        checkTrue(isPersonInstanceRecipient, "Permission denied");
+        Person person = checkPersonIsRecipient(userName, instanceId);
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         checkTrue(surveyInstance.status() == SurveyInstanceStatus.NOT_STARTED
@@ -140,8 +146,31 @@ public class SurveyInstanceService {
     }
 
 
+    public Person checkPersonIsOwnerOrAdmin(String userName, long instanceId) {
+        Person person = getPerson(userName);
+        checkTrue(
+                isAdmin(userName) || isOwner(instanceId, person),
+                "Permission denied");
+        return person;
+    }
+
+
+    public Person checkPersonIsRecipient(String userName, long instanceId) {
+        Person person = getPerson(userName);
+        boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(
+                person.id().get(),
+                instanceId);
+        checkTrue(isPersonInstanceRecipient, "Permission denied");
+        return person;
+    }
+
+
     public int updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
+
+        if (command.newStatus() != SurveyInstanceStatus.COMPLETED) {
+            checkPersonIsOwnerOrAdmin(userName, instanceId);
+        }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
 
@@ -178,6 +207,7 @@ public class SurveyInstanceService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "command cannot be null");
 
+        checkPersonIsOwnerOrAdmin(userName, instanceId);
         LocalDate newDueDate = command.newDateVal().orElse(null);
 
         checkNotNull(newDueDate, "newDueDate cannot be null");
@@ -199,6 +229,7 @@ public class SurveyInstanceService {
     public int markApproved(String userName, long instanceId, String reason) {
         checkNotNull(userName, "userName cannot be null");
 
+        checkPersonIsOwnerOrAdmin(userName, instanceId);
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
 
         checkTrue(surveyInstance.status() == SurveyInstanceStatus.COMPLETED, "Only completed surveys can be approved");
@@ -231,15 +262,16 @@ public class SurveyInstanceService {
     }
 
 
-    public long addRecipient(SurveyInstanceRecipientCreateCommand command) {
+    public long addRecipient(String username, SurveyInstanceRecipientCreateCommand command) {
         checkNotNull(command, "command cannot be null");
-
+        checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
         return surveyInstanceRecipientDao.create(command);
     }
 
 
-    public boolean updateRecipient(SurveyInstanceRecipientUpdateCommand command) {
+    public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
         checkNotNull(command, "command cannot be null");
+        checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
 
         boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
         long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
@@ -250,8 +282,31 @@ public class SurveyInstanceService {
     }
 
 
-    public boolean delete(long surveyInstanceRecipientId) {
-        return surveyInstanceRecipientDao.delete(surveyInstanceRecipientId);
+    public boolean deleteRecipient(String username, long surveyInstanceId, long recipientId) {
+        checkPersonIsOwnerOrAdmin(username, surveyInstanceId);
+        return surveyInstanceRecipientDao.delete(recipientId);
     }
+
+
+    private Person getPerson(String userName) {
+        Person person = personDao.getActiveByUserEmail(userName);
+        checkNotNull(person, "userName " + userName + " cannot be resolved");
+        return person;
+    }
+
+
+    private boolean isOwner(long instanceId, Person person) {
+        SurveyInstance instance = surveyInstanceDao.getById(instanceId);
+        SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
+
+        return contentsEqual(person.id(), run.ownerId());
+    }
+
+
+    private boolean isAdmin(String userName) {
+        return userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
+    }
+
+
 
 }

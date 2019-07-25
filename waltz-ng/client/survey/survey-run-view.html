@@ -61,14 +61,8 @@
                 </td>
                 <td>
                     <a class='clickable'
-                       ui-sref="main.survey.instance.response.view ({id: instance.id })"
-                       ng-if="instance.status === 'COMPLETED' || instance.status === 'APPROVED' || instance.status === 'EXPIRED'">
-                        view response
-                    </a>
-                    <a class='clickable'
-                       ui-sref="main.survey.instance.view ({id: instance.id })"
-                       ng-if="instance.status === 'NOT_STARTED' || instance.status === 'IN_PROGRESS'">
-                        edit
+                       ui-sref="main.survey.instance.response.view ({id: instance.id })">
+                        Show survey
                     </a>
                 </td>
             </tr>

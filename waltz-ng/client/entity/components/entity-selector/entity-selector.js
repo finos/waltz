@@ -18,19 +18,20 @@
  */
 
 import {initialiseData, invokeFunction} from "../../../common";
-import _ from 'lodash';
-import template from './entity-selector.html';
+import _ from "lodash";
+import template from "./entity-selector.html";
 
 
 const bindings = {
-    clearable: '<',
-    currentSelection: '<',
-    entityKinds: '<',
-    itemId: '<',
-    limit: '<',
-    onSelect: '<',
-    required: '<',
-    selectionFilter: '<'
+    clearable: "<",
+    currentSelection: "<",
+    entityKinds: "<",
+    entityLifecycleStatuses: "<?",
+    itemId: "<",
+    limit: "<",
+    onSelect: "<",
+    required: "<",
+    selectionFilter: "<"
 };
 
 
@@ -39,7 +40,8 @@ const initialState = {
     limit: 20,
     entityKinds: [],
     required: false,
-    selectionFilter: (x) => true
+    selectionFilter: (x) => true,
+    entityLifecycleStatuses: ["ACTIVE", "PENDING", "REMOVED"]
 };
 
 
@@ -50,7 +52,7 @@ function controller(entitySearchStore) {
         vm.options = {
             entityKinds: vm.entityKinds,
             limit: vm.limit,
-            entityLifecycleStatuses: ['ACTIVE', 'PENDING', 'REMOVED']
+            entityLifecycleStatuses: vm.entityLifecycleStatuses
         };
 
         if (changes.entityKinds) {
@@ -78,7 +80,7 @@ function controller(entitySearchStore) {
 }
 
 
-controller.$inject = ['EntitySearchStore'];
+controller.$inject = ["EntitySearchStore"];
 
 
 const component = {

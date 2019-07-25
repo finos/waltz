@@ -23,7 +23,7 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import template from './survey-instance-response-edit.html';
+import template from "./survey-instance-response-edit.html";
 
 
 const initialState = {
@@ -43,15 +43,15 @@ function indexResponses(responses = []) {
         .map(qr => {
             if (!_.isNil(qr.booleanResponse) && !_.isString(qr.booleanResponse)) {
                 qr.booleanResponse = qr.booleanResponse
-                    ? 'true'
-                    : 'false';
+                    ? "true"
+                    : "false";
             }
             if (!_.isNil(qr.dateResponse)) {
                 qr.dateResponse = moment(qr.dateResponse, formats.parseDateOnly).toDate()
             }
             return qr;
         })
-        .keyBy('questionId')
+        .keyBy("questionId")
         .value();
 }
 
@@ -63,7 +63,6 @@ function controller($location,
                     notification,
                     serviceBroker,
                     surveyInstanceStore,
-                    surveyRunStore,
                     surveyQuestionStore,
                     userService) {
 
@@ -73,23 +72,16 @@ function controller($location,
 
     vm.entityReference = {
         id,
-        kind: 'SURVEY_INSTANCE'
+        kind: "SURVEY_INSTANCE"
     };
 
     const instancePromise  = surveyInstanceStore
         .getById(id)
         .then(r => {
-            vm.instanceCanBeEdited = (r.status === 'NOT_STARTED' || r.status === 'IN_PROGRESS' || r.status === 'REJECTED');
+            vm.instanceCanBeEdited = (r.status === "NOT_STARTED" || r.status === "IN_PROGRESS" || r.status === "REJECTED");
             vm.surveyInstance = r;
             return r;
         });
-
-    instancePromise
-        .then(instance => surveyRunStore.getById(instance.surveyRunId))
-        .then(sr => vm.surveyRun = sr)
-        .then(sr => serviceBroker
-            .loadViewData(CORE_API.PersonStore.getById, [sr.ownerId])
-            .then(r => vm.owner = r.data));
 
     surveyQuestionStore
         .findForInstance(id)
@@ -112,15 +104,15 @@ function controller($location,
 
 
     vm.surveyInstanceLink = encodeURIComponent(
-        _.replace($location.absUrl(), '#' + $location.url(), '')
-        + $state.href('main.survey.instance.view', {id: id}));
+        _.replace($location.absUrl(), "#" + $location.url(), "")
+        + $state.href("main.survey.instance.view", {id: id}));
 
     vm.saveResponse = (questionId) => {
         const questionResponse = vm.surveyResponses[questionId];
         surveyInstanceStore.saveResponse(
             vm.surveyInstance.id,
             Object.assign(
-                {'questionId': questionId},
+                {"questionId": questionId},
                 questionResponse,
                 {
                     dateResponse : questionResponse && questionResponse.dateResponse
@@ -157,13 +149,13 @@ function controller($location,
 
         return surveyInstanceStore.saveResponse(
             vm.surveyInstance.id,
-            Object.assign({'questionId': question.id}, questionResponse)
+            Object.assign({"questionId": question.id}, questionResponse)
         );
     };
 
     vm.saveForLater = () => {
-        notification.success('Survey response saved successfully');
-        $state.go('main.survey.instance.user');
+        notification.success("Survey response saved successfully");
+        $state.go("main.survey.instance.user");
     };
 
     vm.submit = () => {
@@ -172,12 +164,12 @@ function controller($location,
             \nAre you sure you want to submit your responses?`)) {
             surveyInstanceStore.updateStatus(
                 vm.surveyInstance.id,
-                {newStatus: 'COMPLETED'}
+                {newStatus: "COMPLETED"}
             )
             .then(() => {
-                notification.success('Survey response submitted successfully');
+                notification.success("Survey response submitted successfully");
                 serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
-                $state.go('main.survey.instance.response.view', {id: id});
+                $state.go("main.survey.instance.response.view", {id: id});
             });
         }
     };
@@ -185,21 +177,20 @@ function controller($location,
 }
 
 controller.$inject = [
-    '$location',
-    '$state',
-    '$stateParams',
-    'Notification',
-    'ServiceBroker',
-    'SurveyInstanceStore',
-    'SurveyRunStore',
-    'SurveyQuestionStore',
-    'UserService'
+    "$location",
+    "$state",
+    "$stateParams",
+    "Notification",
+    "ServiceBroker",
+    "SurveyInstanceStore",
+    "SurveyQuestionStore",
+    "UserService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
