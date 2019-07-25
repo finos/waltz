@@ -71,12 +71,6 @@
             </div>
         </div>
 
-        <waltz-physical-flow-export-buttons ng-if="$ctrl.visibility.dataTab == 1"
-                                            export-consumes="$ctrl.exportPhysicalFlowConsumes"
-                                            export-produces="$ctrl.exportPhysicalFlowProduces"
-                                            export-unused="exportPhysicalFlowUnusedSpecifications">
-        </waltz-physical-flow-export-buttons>
-
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.logicalFlows = ! $ctrl.visibility.logicalFlows">
             <waltz-icon name="map-signs"></waltz-icon>
