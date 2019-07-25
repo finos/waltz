@@ -51,7 +51,8 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
 
 
     @Autowired
-    public MeasurableRatingExtractor(DSLContext dsl, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public MeasurableRatingExtractor(DSLContext dsl,
+                                     ApplicationIdSelectorFactory applicationIdSelectorFactory) {
         super(dsl);
         this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
@@ -61,6 +62,13 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
     public void register() {
 
         String path = mkPath("data-extract", "measurable-rating", ":id");
+        registerAllocations(path);
+
+        String unmappedPath = mkPath("data-extract", "measurable-rating", "unmapped", ":id");
+        registerUnmappedAllocations(unmappedPath);
+    }
+
+    private void registerAllocations(String path) {
         post(path, (request, response) -> {
             long categoryId = getId(request);
             ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
@@ -98,6 +106,42 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
 
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
             String suggestedFilename = toCamelCase(categoryName);
+
+            return writeExtract(
+                    suggestedFilename,
+                    qry,
+                    request,
+                    response);
+        });
+    }
+
+    private void registerUnmappedAllocations(String path) {
+        post(path, (request, response) -> {
+            long categoryId = getId(request);
+
+            ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
+            Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOpts);
+
+            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = dsl
+                    .selectDistinct(MEASURABLE_RATING.ENTITY_ID)
+                    .from(MEASURABLE_RATING)
+                    .join(MEASURABLE)
+                    .on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                    .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                            .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
+
+            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = dsl
+                    .selectDistinct(app.NAME.as("App Name"),
+                            app.ASSET_CODE.as("App Code"),
+                            app.ID.as("App Waltz Id"),
+                            app.KIND.as("App Kind"))
+                    .from(app)
+                    .where(app.ID.in(appIds))
+                    .and(app.ID.notIn(appIdsAssignedToAnyMeasurableInTheCategory))
+                    .orderBy(app.NAME);
+
+            String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
+            String suggestedFilename = toCamelCase(categoryName) + "-Unmapped-Applications";
 
             return writeExtract(
                     suggestedFilename,
