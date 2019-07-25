@@ -21,8 +21,8 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import {groupQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import template from './survey-instance-response-view.html';
-import {loadEntity} from "../common/entity-utils";
+import template from "./survey-instance-response-view.html";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -39,24 +39,18 @@ function extractAnswer(response = {}) {
 
 function indexResponses(rs = []) {
     return _.chain(rs)
-        .map('questionResponse')
+        .map("questionResponse")
         .map(qr => ({
             questionId: qr.questionId,
             answer: extractAnswer(qr),
             comment: qr.comment
         }))
-        .keyBy('questionId')
+        .keyBy("questionId")
         .value();
 }
 
 
-function controller($state,
-                    $stateParams,
-                    notification,
-                    personStore,
-                    surveyInstanceStore,
-                    surveyRunStore,
-                    surveyQuestionStore,
+function controller($stateParams,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -64,128 +58,48 @@ function controller($state,
 
     vm.entityReference = {
         id,
-        kind: 'SURVEY_INSTANCE'
+        kind: "SURVEY_INSTANCE"
     };
 
-    function getExternalId(surveyInstance) {
-        loadEntity(serviceBroker, surveyInstance.surveyEntity)
-            .then(entity => vm.externalId = entity.externalId)
-    }
-
-    surveyInstanceStore
-        .getById(id)
-        .then(surveyInstance => {
-            vm.surveyInstance = surveyInstance;
-            return surveyRunStore
-                .getById(surveyInstance.surveyRunId)
+    serviceBroker
+        .loadViewData(
+            CORE_API.SurveyInstanceStore.getById,
+            [ id ])
+        .then(r => {
+            vm.surveyInstance = r.data;
+            return serviceBroker
+                .loadViewData(
+                    CORE_API.SurveyRunStore.getById,
+                    [ vm.surveyInstance.surveyRunId ]);
         })
-        .then(sr => vm.surveyRun = sr)
-        .then(sr => personStore
-            .getById(sr.ownerId)
-            .then(p => vm.owner = p))
-        .then(() => getExternalId(vm.surveyInstance))
-        .then(() => surveyInstanceStore.findPreviousVersions(vm.surveyInstance.originalInstanceId || id))
-        .then(prevVersionInstances => {
-            const prevVersions = _.chain(prevVersionInstances)
-                .sortBy('submittedAt')
-                .map((pv, i) => ({
-                    versionNum: `${i + 1}.0`,
-                    instanceId: pv.id,
-                    isLatest: false
-                }))
-                .reverse()
-                .value();
+        .then(r => vm.surveyRun = r.data);
 
-            const latestInstanceId = vm.surveyInstance.originalInstanceId || id;
-            const latestResponseVersion = {
-                versionNum: `${prevVersions.length + 1}.0`,
-                instanceId: latestInstanceId,
-                isLatest: true
-            };
+    serviceBroker
+        .loadViewData(
+            CORE_API.SurveyQuestionStore.findForInstance,
+            [ id ])
+        .then(r => vm.surveyQuestionInfos = groupQuestions(r.data));
 
-            const allResponseVersions = [latestResponseVersion].concat(prevVersions);
-            vm.currentResponseVersion = _.keyBy(allResponseVersions, 'instanceId')[id];
-            vm.otherResponseVersions = _.filter(
-                allResponseVersions,
-                rv => rv.instanceId !== vm.currentResponseVersion.instanceId);
+    serviceBroker
+        .loadViewData(
+            CORE_API.SurveyInstanceStore.findResponses,
+            [ id ])
+        .then(r => {
+            vm.answers = indexResponses(r.data);
         });
 
-
-    const loadParticipants = responses => {
-        vm.participants = [];
-        _.chain(responses)
-            .map('personId')
-            .uniq()
-            .map(pid => personStore
-                .getById(pid)
-                .then(p => vm.participants.push(p)))
-            .value();
-    };
-
-    surveyQuestionStore
-        .findForInstance(id)
-        .then(qis => vm.surveyQuestionInfos = groupQuestions(qis));
-
-    surveyInstanceStore
-        .findResponses(id)
-        .then(responses => {
-            vm.answers = indexResponses(responses);
-            loadParticipants(responses);
-        });
-
-    vm.reject = () => {
-        const reason = prompt('Are you sure you want reject this survey? Please enter a reason below (mandatory):');
-
-        if (reason) {
-            surveyInstanceStore.updateStatus(
-                vm.surveyInstance.id,
-                {
-                    newStatus: 'REJECTED',
-                    reason
-                }
-            )
-            .then(result => {
-                notification.success('Survey response rejected');
-                $state.reload();
-            });
-        }
-    };
-
-    vm.approve = () => {
-        const reason = prompt('Are you sure you want to approve this survey? Please enter a reason below (optional):');
-
-        if (!_.isNil(reason)) {
-            surveyInstanceStore.markApproved(vm.surveyInstance.id, {
-                newStringVal: (_.isEmpty(reason) ? null : reason)
-            })
-            .then(result => {
-                notification.success('Survey response approved');
-                $state.reload();
-            });
-        }
-    };
-
-    vm.viewOtherResponseVersion = (otherVer) => {
-        $state.go('main.survey.instance.response.view', {id: otherVer.instanceId});
-    };
 }
 
 
 controller.$inject = [
-    '$state',
-    '$stateParams',
-    'Notification',
-    'PersonStore',
-    'SurveyInstanceStore',
-    'SurveyRunStore',
-    'SurveyQuestionStore',
-    'ServiceBroker'
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
 const view = {
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     template
 };
 

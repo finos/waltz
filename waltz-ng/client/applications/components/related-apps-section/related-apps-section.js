@@ -43,7 +43,7 @@ const bindings = {
 
 const initialState = {
     columnDefs: [
-        Object.assign(mkEntityLinkGridCell("Name", "app"), { width: "25%"} ),
+        Object.assign(mkEntityLinkGridCell("Name", "app", "left", "right"), { width: "25%"} ),
         { field: "relationshipDisplay", name: "Relationship"},
         { field: "app.assetCode"},
         { field: "app.kindDisplay", name: "Kind"},

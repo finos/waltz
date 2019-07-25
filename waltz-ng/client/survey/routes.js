@@ -19,7 +19,6 @@
 import SurveyRunCreate from './survey-run-create';
 import SurveyRunView from './survey-run-view';
 import SurveyInstanceListUserView from './survey-instance-list-user-view';
-import SurveyInstanceView from './survey-instance-view';
 import SurveyInstanceResponseView from './survey-instance-response-view';
 import SurveyInstanceResponseEdit from './survey-instance-response-edit';
 import SurveyTemplateList from './survey-template-list';
@@ -71,9 +70,10 @@ const instanceUserState = {
 };
 
 
+// TODO: this state is now simply an alias for the instanceResponseViewState, delete in 1.20
 const instanceViewState = {
     url: '/{id:int}/view',
-    views: {'content@': SurveyInstanceView}
+    views: {'content@': SurveyInstanceResponseView}
 };
 
 

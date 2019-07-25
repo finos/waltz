@@ -30,5 +30,4 @@ public abstract class SurveyRunCompletionRate {
     public abstract int notStartedCount();
     public abstract int inProgressCount();
     public abstract int completedCount();
-    public abstract int expiredCount();
 }
