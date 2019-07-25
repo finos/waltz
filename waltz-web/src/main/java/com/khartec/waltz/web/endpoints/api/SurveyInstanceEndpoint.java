@@ -176,8 +176,4 @@ public class SurveyInstanceEndpoint implements Endpoint {
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
     }
 
-//
-//    private void ensureUserHasAdminRights(Request request) {
-//        requireRole(userRoleService, request, SystemRole.SURVEY_ADMIN);
-//    }
 }
