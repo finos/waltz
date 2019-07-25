@@ -77,10 +77,10 @@ function controller($element,
         if(vm.visible) {
             const input = $element.find("input")[0];
             input.focus();
-            $timeout(() => $document.on("click", documentClick), 200);
+            $timeout(() => $document.on("mousedown", documentClick), 200);
             $timeout(() => $element.on("keydown", onOverlayKeypress), 200);
         }  else {
-            $document.off("click", documentClick);
+            $document.off("mousedown", documentClick);
             $element.off("keydown", onOverlayKeypress);
         }
     };
