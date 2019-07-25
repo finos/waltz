@@ -292,7 +292,6 @@ function controller($state, serviceBroker, userService, notification) {
 
     vm.editRecipient = (data, instanceRecipientId) => {
         const cmd = mkUpdateRecipientCommand(instanceRecipientId, data.newVal, vm.surveyInstance.id);
-        console.log({ cmd })
         serviceBroker
             .execute(
                 CORE_API.SurveyInstanceStore.updateRecipient,
