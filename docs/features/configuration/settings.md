@@ -19,6 +19,7 @@ settings.override=ui.logo.overlay.text=Hello World;database.pool.max=20
     * `employeeId` 
     * `id` - waltz internal id
     * `email`
+  * Example 2: `https://gravatar.com/avatar/${id}?s=200&d=robohash&r=pg`
 
 Use these settings to let users know if they are on a beta instance. 
 
