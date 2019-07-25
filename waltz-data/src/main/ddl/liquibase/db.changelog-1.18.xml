@@ -338,6 +338,18 @@
     </changeSet>
 
 
+    <!-- 4211 increased length of string_response column from 4000 to max -->
+    <changeSet id="20190722-4211"
+               author="muzammilali"
+               dbms="mssql">
+        <comment>4211: Change string response column to nvarchar(max) to allow string larger than 4000 characters</comment>
+
+        <modifyDataType columnName="string_response"
+                        newDataType="nvarchar(max)"
+                        tableName="survey_question_response"/>
+    </changeSet>
+
+
     <!-- 4228: Create table - app group org unit table-->
     <changeSet id="20190725-4228-1"
                author="woodjes">
