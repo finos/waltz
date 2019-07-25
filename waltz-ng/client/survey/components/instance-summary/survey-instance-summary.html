@@ -18,29 +18,28 @@
     <br />
 
     <!-- SUBJECT / STATUS -->
-    <div class="row">
+    <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-status'"></div>
         <div ng-include="'wsis-response-version'"></div>
     </div>
 
     <!-- EXT_ID / VERSION -->
-    <div class="row">
+    <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-issued-date'"></div>
         <div ng-include="'wsis-approval'"></div>
     </div>
 
     <!-- DUE / ISSUED -->
-    <div class="row">
+    <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-subject'"></div>
         <div ng-include="'wsis-due-date'"></div>
     </div>
 
     <!-- SUBMITTED / APPROVED BY -->
-    <div class="row">
+    <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-subject-ext-id'"></div>
         <div ng-include="'wsis-submitted-date'"></div>
     </div>
-    <br>
 
     <!-- RECIPIENTS -->
     <div class="row">
@@ -48,7 +47,7 @@
             <span ng-bind="$ctrl.surveyRun.issuanceKind | toDisplayName:'issuance'"></span>
             Recipient/s
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <!-- For groups -->
             <div ng-if="$ctrl.surveyRun.issuanceKind === 'GROUP'"
                  ng-include="'wsis-group-recipients'">
