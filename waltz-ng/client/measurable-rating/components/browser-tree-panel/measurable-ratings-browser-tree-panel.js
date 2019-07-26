@@ -84,6 +84,17 @@ function prepareColumnDefs(measurableCategory) {
     ];
 }
 
+function prepareUnmappedColumnDefs() {
+    return [
+        mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
+        {
+            field: "application.assetCode",
+            name: "Asset Code",
+            width: "50%"
+        }
+    ];
+}
+
 
 function findChildIds(measurable) {
     const recurse = (acc, n) => {
@@ -123,6 +134,36 @@ function prepareTableData(measurable,
     return _.sortBy(data, "application.name");
 }
 
+
+function prepareUnmappedTableData(applications = [],
+                                ratings = [],
+                                measurables = [],
+                                categoryId) {
+
+    const measurableIdsOfACategory =
+        _.chain(measurables)
+            .filter(m => m.categoryId === categoryId)
+            .map(m => m.id)
+            .value();
+
+    const appIdsWithMeasurable =
+        _.chain(ratings)
+            .filter(r => measurableIdsOfACategory.includes(r.measurableId))
+            .map(r => r.entityReference.id)
+            .value();
+
+    const tableData =
+        _.chain(applications)
+            .filter(a => !appIdsWithMeasurable.includes(a.id))
+            .map(app => {
+                return {
+                    application: app
+                };
+            }).sortBy("application.name")
+            .value();
+
+    return tableData;
+}
 
 function log() {
     console.log("wmrbs::", arguments);
@@ -236,6 +277,11 @@ function controller($q, serviceBroker) {
         }
     };
 
+    vm.onSelectUnmapped = (categoryId) => {
+        vm.selectedMeasurable = { name: "Unmapped Applications",
+            description: "Display applications which do not have any associated measurable rating for this category."};
+        loadUnmappedApplications(vm.measurables, categoryId);
+    };
 
     vm.onSelect = (measurable) => {
         vm.visibility.ratingDetail = false;
@@ -266,7 +312,20 @@ function controller($q, serviceBroker) {
         }
     };
 
+    const loadUnmappedApplications = (measurables, measurableCategoryId) => {
+        vm.columnDefs = prepareUnmappedColumnDefs();
 
+        loadRatingDetail()
+            .then(ratings => vm.tableData = prepareUnmappedTableData(
+                vm.applications,
+                ratings,
+                measurables,
+                measurableCategoryId))
+            .then(() => {
+                vm.visibility.loading = false;
+                vm.visibility.ratingDetail = true;
+            });
+    };
 
 
     vm.onCategorySelect = (c) => {

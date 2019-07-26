@@ -252,21 +252,6 @@ public class SurveyRunGenerator implements SampleDataGenerator {
                     LOG.debug(" --- {} instances: {}", SurveyInstanceStatus.COMPLETED, completedInstanceIds);
                 }
 
-                // update instances to EXPIRED
-                if (surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.NOT_STARTED)
-                        || surveyInstanceStatusMap.containsKey(SurveyInstanceStatus.IN_PROGRESS)) {
-                    Set<Long> expiredInstanceIds = surveyInstanceStatusMap.entrySet()
-                            .stream()
-                            .filter(e -> e.getKey() != SurveyInstanceStatus.COMPLETED)
-                            .flatMap(e -> e.getValue().stream())
-                            .collect(toSet());
-
-                    dsl.update(SURVEY_INSTANCE)
-                            .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.EXPIRED.name())
-                            .where(SURVEY_INSTANCE.ID.in(expiredInstanceIds))
-                            .execute();
-                    LOG.debug(" --- {} instances: {}", SurveyInstanceStatus.EXPIRED, expiredInstanceIds);
-                }
             } else {
                 surveyInstanceStatusMap.forEach(((status, instanceIds) -> {
                     dsl.update(SURVEY_INSTANCE)

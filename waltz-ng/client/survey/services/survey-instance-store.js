@@ -167,6 +167,11 @@ export const SurveyInstanceStore_API = {
         serviceFnName: 'findResponses',
         description: 'finds responses for a given survey instance id'
     },
+    findPreviousVersions: {
+        serviceName,
+        serviceFnName: 'findPreviousVersions',
+        description: 'finds previouse versions for a given survey instance id'
+    },
     saveResponse: {
         serviceName,
         serviceFnName: 'saveResponse',

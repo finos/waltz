@@ -1,0 +1,48 @@
+<table class="table table-condensed">
+    <tbody>
+    <tr ng-repeat="person in $ctrl.people | orderBy:'name'"
+        class="waltz-visibility-parent">
+        <td width="70%">
+            <waltz-entity-icon-label entity-ref="person">
+            </waltz-entity-icon-label>
+        </td>
+        <td>
+            <button class="btn btn-danger btn-xs"
+                    waltz-has-role="{{$ctrl.requiredRole}}"
+                    ng-if="$ctrl.canRemoveLast || $ctrl.people.length > 1"
+                    ng-click="$ctrl.onRemove(person)">
+                remove
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td width="70%">
+            <div waltz-has-role="{{$ctrl.requiredRole}}">
+                <button class="btn btn-primary btn-xs"
+                        ng-if="$ctrl.addingPerson === false"
+                        ng-click="$ctrl.onStartAddPerson()">
+                    Add
+                </button>
+                <div ng-if="$ctrl.addingPerson === true">
+                    <waltz-entity-selector on-select="$ctrl.onSelectPerson"
+                                           entity-kinds="['PERSON']"
+                                           entity-lifecycle-statuses="['ACTIVE']">
+                    </waltz-entity-selector>
+                </div>
+            </div>
+        </td>
+        <td>
+            <div ng-if="$ctrl.addingPerson === true">
+                <button class="btn btn-success btn-sm"
+                        ng-click="$ctrl.onAddPerson()">
+                    Save
+                </button>
+                <button class="btn btn-default btn-sm"
+                        ng-click="$ctrl.onCancelAddPerson()">
+                    Cancel
+                </button>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
