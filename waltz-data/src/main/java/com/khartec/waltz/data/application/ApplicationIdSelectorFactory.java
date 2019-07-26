@@ -66,15 +66,14 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
 
-    private final ApplicationGroupEntry appGroup = APPLICATION_GROUP_ENTRY.as("appgrp");
-    private final EntityRelationship relationship = ENTITY_RELATIONSHIP.as("relationship");
-    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("flowdiag");
-    private final Involvement involvement = INVOLVEMENT.as("involvement");
-    private final LogicalFlow logicalFlow = LOGICAL_FLOW.as("log_flow");
-    private final MeasurableRating measurableRating = MEASURABLE_RATING.as("m_rating");
-    private final Person person = PERSON.as("per");
-    private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
-    private final PhysicalFlow physicalFlow = PHYSICAL_FLOW.as("phy_flow");
+    private final ApplicationGroupEntry appGroupAppEntry = APPLICATION_GROUP_ENTRY.as("agae");
+    private final ApplicationGroupOuEntry appGroupOuEntry = APPLICATION_GROUP_OU_ENTRY.as("agoe");
+    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("fd");
+    private final Involvement involvement = INVOLVEMENT.as("inv");
+    private final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf");
+    private final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr");
+    private final Person person = PERSON.as("p");
+    private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
 
 
     @Autowired
@@ -141,7 +140,6 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
                 .where(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
                 .and(applicationConditions);
-
     }
 
 
@@ -285,19 +283,38 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private SelectConditionStep<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
+    private SelectOrderByStep<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         if (options.scope() != EXACT) {
             throw new UnsupportedOperationException(
                     "App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
         }
 
         Condition applicationConditions = mkApplicationConditions(options);
+
+        SelectConditionStep<Record1<Long>> associatedOrgUnits = DSL
+                .selectDistinct(ENTITY_HIERARCHY.ID)
+                .from(appGroupOuEntry)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(appGroupOuEntry.ORG_UNIT_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .where(appGroupOuEntry.GROUP_ID.eq(options.entityReference().id()));
+
+        SelectConditionStep<Record1<Long>> applicationIdsFromAssociatedOrgUnits = DSL
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .innerJoin(ORGANISATIONAL_UNIT)
+                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .where(ORGANISATIONAL_UNIT.ID.in(associatedOrgUnits));
+
+        SelectConditionStep<Record1<Long>> directApps = DSL
+                .select(appGroupAppEntry.APPLICATION_ID)
+                .from(appGroupAppEntry)
+                .where(appGroupAppEntry.GROUP_ID.eq(options.entityReference().id()));
+
         return dsl
-                .selectDistinct(appGroup.APPLICATION_ID)
-                .from(appGroup)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(appGroup.APPLICATION_ID))
-                .where(appGroup.GROUP_ID.eq(options.entityReference().id()))
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(directApps.unionAll(applicationIdsFromAssociatedOrgUnits)))
                 .and(applicationConditions);
     }
 
