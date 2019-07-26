@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -26,6 +27,8 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
@@ -40,6 +43,43 @@ import static spark.Spark.post;
 
 @Service
 public class PhysicalFlowExtractor extends BaseDataExtractor {
+
+    private static List<Field> RECEIVER_NAME_AND_NAR_FIELDS;
+    private static List<Field> SOURCE_NAME_AND_NAR_FIELDS;
+
+    static {
+        Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                LOGICAL_FLOW.SOURCE_ENTITY_ID,
+                LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+        Field<String> sourceAssetCodeField = DSL
+                .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(APPLICATION.ASSET_CODE)
+                                .from(APPLICATION)
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
+
+        SOURCE_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+                SOURCE_NAME_FIELD.as("Source"),
+                sourceAssetCodeField.as("Source Asset Code"));
+
+
+        Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                LOGICAL_FLOW.TARGET_ENTITY_ID,
+                LOGICAL_FLOW.TARGET_ENTITY_KIND,
+                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+        Field<String> targetAssetCodeField = DSL
+                .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
+                        DSL.select(APPLICATION.ASSET_CODE)
+                                .from(APPLICATION)
+                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
+
+        RECEIVER_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+                TARGET_NAME_FIELD.as("Receiver"),
+                targetAssetCodeField.as("Receiver Asset Code"));
+    }
+
 
     @Autowired
     public PhysicalFlowExtractor(DSLContext dsl) {
@@ -73,7 +113,7 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
 
         Condition isProduces = isOwnerCondition.or(isSourceCondition);
 
-        return getQuery(getReceiverNameAndNarColumn(), isProduces);
+        return getQuery(RECEIVER_NAME_AND_NAR_FIELDS, isProduces);
     }
 
 
@@ -83,11 +123,11 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
                 .and(NOT_REMOVED);
 
-        return getQuery(getSourceNameAndNarColumn(), isConsumes);
+        return getQuery(SOURCE_NAME_AND_NAR_FIELDS, isConsumes);
     }
 
 
-    private SelectConditionStep<Record> getQuery(SelectFieldOrAsterisk[] senderOrReceiverColumn,
+    private SelectConditionStep<Record> getQuery(List<Field> senderOrReceiverColumn,
                                                  Condition condition) {
 
         return dsl.select(PHYSICAL_SPECIFICATION.NAME.as("Name"),
@@ -106,42 +146,4 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .where(condition);
     }
-
-    private SelectFieldOrAsterisk[] getSourceNameAndNarColumn() {
-
-        Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                LOGICAL_FLOW.SOURCE_ENTITY_ID,
-                LOGICAL_FLOW.SOURCE_ENTITY_KIND,
-                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
-
-        Field<String> sourceAssetCodeField = DSL
-                .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
-                        DSL.select(APPLICATION.ASSET_CODE)
-                                .from(APPLICATION)
-                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
-
-        return new SelectFieldOrAsterisk[]{
-                SOURCE_NAME_FIELD.as("Source"),
-                sourceAssetCodeField.as("Source Asset Code")};
-    }
-
-
-    private SelectFieldOrAsterisk[] getReceiverNameAndNarColumn() {
-
-        Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                LOGICAL_FLOW.TARGET_ENTITY_ID,
-                LOGICAL_FLOW.TARGET_ENTITY_KIND,
-                newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
-
-        Field<String> targetAssetCodeField = DSL
-                .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
-                        DSL.select(APPLICATION.ASSET_CODE)
-                                .from(APPLICATION)
-                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
-
-        return new SelectFieldOrAsterisk[]{
-                TARGET_NAME_FIELD.as("Receiver"),
-                targetAssetCodeField.as("Receiver Asset Code")};
-    }
-
 }
