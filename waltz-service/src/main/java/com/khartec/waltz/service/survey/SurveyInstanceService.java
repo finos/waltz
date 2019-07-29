@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -97,7 +97,7 @@ public class SurveyInstanceService {
     public List<SurveyInstance> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        Person person = getPerson(userName);
+        Person person = getPersonByUsername(userName);
 
         return surveyInstanceDao.findForRecipient(person.id().get());
     }
@@ -147,7 +147,7 @@ public class SurveyInstanceService {
 
 
     public Person checkPersonIsOwnerOrAdmin(String userName, long instanceId) {
-        Person person = getPerson(userName);
+        Person person = getPersonByUsername(userName);
         checkTrue(
                 isAdmin(userName) || isOwner(instanceId, person),
                 "Permission denied");
@@ -156,7 +156,7 @@ public class SurveyInstanceService {
 
 
     public Person checkPersonIsRecipient(String userName, long instanceId) {
-        Person person = getPerson(userName);
+        Person person = getPersonByUsername(userName);
         boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(
                 person.id().get(),
                 instanceId);
@@ -265,8 +265,18 @@ public class SurveyInstanceService {
     public long addRecipient(String username, SurveyInstanceRecipientCreateCommand command) {
         checkNotNull(command, "command cannot be null");
         checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
-        return surveyInstanceRecipientDao.create(command);
+        long rc = surveyInstanceRecipientDao.create(command);
+
+        logRecipientChange(
+                username,
+                command.surveyInstanceId(),
+                command.personId(),
+                Operation.ADD,
+                "Survey Instance: Added %s as a recipient");
+
+        return rc;
     }
+
 
 
     public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
@@ -274,23 +284,47 @@ public class SurveyInstanceService {
         checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
 
         boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
-        long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
+        long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand
+                .builder()
                 .personId(command.personId())
                 .surveyInstanceId(command.surveyInstanceId())
                 .build());
+
+        logRecipientChange(
+                username,
+                command.surveyInstanceId(),
+                command.personId(),
+                Operation.UPDATE,
+                "Survey Instance: Set %s as a recipient");
+
         return delete && id > 0;
     }
 
 
     public boolean deleteRecipient(String username, long surveyInstanceId, long recipientId) {
         checkPersonIsOwnerOrAdmin(username, surveyInstanceId);
-        return surveyInstanceRecipientDao.delete(recipientId);
+        boolean rc = surveyInstanceRecipientDao.delete(recipientId);
+
+        logRecipientChange(
+                username,
+                surveyInstanceId,
+                recipientId,
+                Operation.REMOVE,
+                "Survey Instance: Removed %s as a recipient");
+
+        return rc;
     }
 
 
-    private Person getPerson(String userName) {
+    private Person getPersonByUsername(String userName) {
         Person person = personDao.getActiveByUserEmail(userName);
-        checkNotNull(person, "userName " + userName + " cannot be resolved");
+        checkNotNull(person, "userName %s cannot be resolved", userName);
+        return person;
+    }
+
+    private Person getPersonById(Long id) {
+        Person person = personDao.getById(id);
+        checkNotNull(person, "Person with id %d cannot be resolved", id);
         return person;
     }
 
@@ -308,5 +342,18 @@ public class SurveyInstanceService {
     }
 
 
+
+    private void logRecipientChange(String username, long instanceId, long personId, Operation op, String msg) {
+        Person recipient = getPersonById(personId);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(op)
+                        .userId(username)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
+                        .childKind(EntityKind.PERSON)
+                        .message(String.format(msg, recipient.name()))
+                        .build());
+    }
 
 }
