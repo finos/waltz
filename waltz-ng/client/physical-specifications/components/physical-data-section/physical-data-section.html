@@ -8,7 +8,6 @@
 
             <waltz-grid-with-search column-defs="$ctrl.produceColumnDefs"
                         entries="$ctrl.produces"
-                        on-initialise="$ctrl.onProducesGridInitialise"
                         class="small">
             </waltz-grid-with-search>
             <hr>
@@ -22,7 +21,6 @@
 
             <waltz-grid-with-search column-defs="$ctrl.consumeColumnDefs"
                                     entries="$ctrl.consumes"
-                                    on-initialise="$ctrl.onConsumesGridInitialise"
                                     class="small">
             </waltz-grid-with-search>
         </div>
@@ -62,7 +60,6 @@
 
             <waltz-grid column-defs="$ctrl.unusedSpecificationsColumnDefs"
                         row-data="$ctrl.unusedSpecifications"
-                        on-initialise="$ctrl.onUnusedSpecificationsGridInitialise"
                         class="small">
             </waltz-grid>
         </div>
