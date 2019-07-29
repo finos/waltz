@@ -23,11 +23,12 @@ import { initialiseData } from "../../../common";
 
 const initialState = {
     changeInitiative: {},
+    displayRetiredCis: false,
     related: {
         appGroupRelationships: []
     },
     orgUnit: null,
-    entityRef: null
+    entityRef: null,
 };
 
 
@@ -71,6 +72,10 @@ function controller($stateParams,
 
     };
 
+    vm.onToggleDisplayRetiredCis = () => {
+        vm.displayRetiredCis = ! vm.displayRetiredCis;
+    };
+
 }
 
 
@@ -85,7 +90,7 @@ controller.$inject = [
 const page = {
     template,
     controller,
-    controllerAs: "ctrl"
+    controllerAs: "$ctrl"
 };
 
 

@@ -1,10 +1,22 @@
-<waltz-entity-hierarchy-navigator model="$ctrl.hierarchy"
+<style>
+    .wcit-retired {
+        text-decoration-line: line-through;
+        color: #999;
+    }
+</style>
+<waltz-entity-hierarchy-navigator model="$ctrl.treeData.hierarchy"
                                   selected-node="$ctrl.selected"
-                                  expanded-nodes="$ctrl.expandedNodes"
+                                  expanded-nodes="$ctrl.treeData.expandedNodes"
                                   on-select="$ctrl.onSelectNavItem">
     <node-template>
+
         <span class="clickable"
+              ng-class="{
+                'wcit-active': node.lifecyclePhase !== 'RETIRED',
+                'wcit-retired': node.lifecyclePhase === 'RETIRED'
+              }"
               ng-style="{ 'font-weight': node.isSelf ? 'bold' : 'none'}">
+
             <waltz-entity-icon-label entity-ref="node"
                                      icon-placement="none"
                                      tooltip-placement="right">
@@ -16,5 +28,6 @@
                    ng-bind="node.externalId">
             </span>
         </span>
+
     </node-template>
 </waltz-entity-hierarchy-navigator>

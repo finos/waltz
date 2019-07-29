@@ -27,7 +27,7 @@ import template from "./change-initiative-section.html";
 import { changeInitiative } from "../../../common/services/enums/change-initiative";
 import { getEnumName } from "../../../common/services/enums";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
-import { isSameParentEntityRef } from "../../../common/entity-utils";
+import {isSameParentEntityRef} from "../../../common/entity-utils";
 import { fakeInitiative, fakeProgramme } from "../../change-initiative-utils";
 import { filterByAssessmentRating, mkAssessmentSummaries } from "../../../assessments/assessment-utils";
 
@@ -60,6 +60,8 @@ function mkRefCol(propName) {
 const initialState = {
     changeInitiatives: [],
     changeInitiativeLifecyclePhaseByKey: {},
+    displayRetiredCis: false,
+    selectedAssessmentRating: null,
     selectedChange: null,
     visibility: {
         sourcesOverlay: false
@@ -127,7 +129,7 @@ function toExtRef(d) {
 }
 
 
-function prepareTableData(changeInitiatives = [], lifecycleNamesByKey = {}) {
+function mkTableData(changeInitiatives = [], lifecycleNamesByKey = {}) {
     const cisById = _.keyBy(changeInitiatives, d => d.id);
 
     return _
@@ -202,7 +204,7 @@ function controller($q, serviceBroker) {
                     [ mkSelectionOptions(vm.parentEntityRef) ])
                 .then(r => {
                     vm.changeInitiatives = r.data;
-                    vm.gridOptions.data = prepareTableData(vm.changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
+                    vm.gridOptions.data = mkTableData(vm.changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
                 });
 
             const assessmentRatingsPromise = serviceBroker
@@ -213,22 +215,67 @@ function controller($q, serviceBroker) {
 
             $q.all([init(), ciPromise, assessmentRatingsPromise])
                 .then(() => {
-                    vm.assessmentSummaries = mkAssessmentSummaries(
-                        vm.assessmentDefinitions,
-                        vm.ratingSchemes,
-                        vm.assessmentRatings,
-                        vm.changeInitiatives.length);
+                    applyFilters();
                 });
         }
     };
 
-    vm.onFilterSelect = d => {
-        const changeInitiatives = d === null
-            ? vm.changeInitiatives
-            : filterByAssessmentRating(vm.changeInitiatives, vm.assessmentRatings, d);
+    function applyFilters() {
 
-        vm.gridOptions.data = prepareTableData(changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
+        const retiredCiFilter =  vm.displayRetiredCis
+            ? () => true
+            : ci => ci.lifecyclePhase !== "RETIRED";
+
+        const inScopeCis = _.filter(vm.changeInitiatives, retiredCiFilter);
+        const inScopeCisById = _.keyBy(inScopeCis, ci => ci.id);
+
+        const inScopeRatings = _.filter(
+            vm.assessmentRatings,
+            r => inScopeCisById[r.entityReference.id] !== null);
+
+        const relevantCis = vm.selectedAssessmentRating === null
+            ? inScopeCis
+            : filterByAssessmentRating(
+                inScopeCis,
+                inScopeRatings,
+                {
+                    assessmentId: vm.selectedAssessmentSummary.definition.id,
+                    ratingId: vm.selectedAssessmentRating.rating.id
+                });
+
+        const changeInitiatives = relevantCis;
+        const assessmentRatings = inScopeRatings;
+
+        vm.assessmentSummaries = mkAssessmentSummaries(
+            vm.assessmentDefinitions,
+            vm.ratingSchemes,
+            inScopeRatings,
+            inScopeCis.length);
+
+        vm.gridOptions.data = mkTableData(
+            changeInitiatives,
+            vm.changeInitiativeLifecyclePhaseByKey);
+
+    }
+
+    vm.onSelectAssessmentRating = d => {
+        vm.selectedAssessmentRating = d;
+        applyFilters();
     };
+
+    vm.onToggleDisplayRetiredCis = () => {
+        vm.displayRetiredCis = ! vm.displayRetiredCis;
+        vm.selectedAssessmentSummary = null;
+        vm.selectedAssessmentRating = null;
+        applyFilters();
+    };
+
+    vm.onSelectAssessmentSummary = (summary) => {
+        vm.selectedAssessmentSummary = summary;
+        vm.selectedAssessmentRating = null;
+        applyFilters();
+    };
+
 }
 
 

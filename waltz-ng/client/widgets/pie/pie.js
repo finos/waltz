@@ -97,7 +97,7 @@ function renderArcs(holder, config, data, onSelect) {
         colorProvider,
         valueProvider = (d) => d.count,
         idProvider = (d) => d.data.key,
-        size// = DEFAULT_SIZE
+        size = DEFAULT_SIZE
     } = config;
 
     const radius = size / 2;
