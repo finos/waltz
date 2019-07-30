@@ -31,7 +31,7 @@
 
             <table class="table table-condensed">
                 <tr ng-repeat="summary in $ctrl.summaries"
-                    ng-click="$ctrl.onSelectSummary(summary)"
+                    ng-click="$ctrl.onSelectGroup(summary)"
                     class="clickable">
                     <td>
                         <waltz-pie data="summary.values"
@@ -58,7 +58,7 @@
                              name="{{$ctrl.selectedSummary.definition.name}}"
                              description="{{$ctrl.selectedSummary.definition.description}}"
                              data="$ctrl.selectedSummary.values"
-                             selected-segment-key="$ctrl.selectedSegment.key"
+                             selected-segment-key="$ctrl.selectedRating.key"
                              config="$ctrl.selectedConfig">
             </waltz-pie-table>
         </div>

@@ -24,8 +24,11 @@ import { color } from "d3-color";
 
 const bindings = {
     summaries: "<",
+    selectedSummary: "<",
+    selectedRating: "<",
     helpText: "@?",
-    onSegmentSelect: "<?" // fn, data looks like:  `{ assessmentId, ratingId }` or `null` if cleared
+    onSelectSummary: "<?",
+    onSelectSegment: "<?" // fn, data looks like:  `{ assessmentId, ratingId }` or `null` if cleared
 };
 
 const basePieConfig = {
@@ -47,32 +50,27 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        vm.listConfig = Object.assign({}, basePieConfig, { size: 24, onSelect: vm.onSelectRating });
-        vm.selectedConfig = Object.assign({}, basePieConfig, { size: 48, onSelect: vm.onSelectRating });
+        vm.listConfig = Object.assign({}, basePieConfig, { size: 24 });
+        vm.selectedConfig = Object.assign({}, basePieConfig, { size: 48, onSelect: vm.onSelectRatingItem });
     };
 
-    vm.onSelectSummary = (s) => {
-        vm.selectedSummary = s;
+    vm.onSelectGroup = (s) => {
+        if (vm.onSelectSummary) {
+            vm.onSelectSummary(s);
+        } else {
+            vm.selectedSummary = s;
+        }
     };
 
     vm.onCloseSummary = () => {
-        vm.selectedSummary = null;
-        vm.selectedSegment = null;
-        invokeFunction(vm.onSegmentSelect, null);
+        vm.onSelectGroup(null);
+        vm.onSelectRatingItem(null);
     };
 
-    vm.onSelectRating = (d) => {
-        vm.selectedSegment = d;
-
-        const param = d == null
-            ? null
-            : {
-                assessmentId: vm.selectedSummary.definition.id,
-                ratingId: d.rating.id
-            };
-
-        invokeFunction(vm.onSegmentSelect, param);
+    vm.onSelectRatingItem = (d) => {
+        invokeFunction(vm.onSelectSegment, d);
     };
+
 }
 
 controller.$inject = [];

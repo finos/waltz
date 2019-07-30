@@ -22,16 +22,64 @@ import { initialiseData } from "../../../common";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { sameRef } from "../../../common/entity-utils";
 import { mkSelectionOptions } from "../../../common/selector-utils";
-import { buildHierarchies, findNode, getParents } from "../../../common/hierarchy-utils";
+import {buildHierarchies, findNode, getParents, switchToParentIds} from "../../../common/hierarchy-utils";
 import { kindToViewState } from "../../../common/link-utils";
 import { entity } from "../../../common/services/enums/entity";
 import { fakeParentsByChildKind } from "../../change-initiative-utils";
 
 const bindings = {
     parentEntityRef: "<",
+    displayRetired: "<"
 };
 
 const initialState = {};
+
+
+function mkTreeData(changeInitiatives = [], parentEntityRef, displayRetired = true) {
+    const initiatives = _
+        .chain(changeInitiatives)
+        .flatMap(d => {
+            const maybeFakeParent = d.parentId
+                ? null // fake parent not needed
+                : fakeParentsByChildKind[d.changeInitiativeKind]; // use fake parent for kind (except for top level items)
+
+            const enriched = Object.assign(
+                {},
+                d,
+                {
+                    parentId: d.parentId || _.get(maybeFakeParent, "id", null),
+                    isSelf: sameRef(d, parentEntityRef, { skipChecks: true })
+                });
+            return [enriched, maybeFakeParent]
+
+        })
+        .compact()
+        .uniqBy(d => d.id)
+        .filter(d => displayRetired
+            ? true
+            : d.lifecyclePhase !== "RETIRED")
+        .value();
+
+    const hierarchy = buildHierarchies(initiatives, false);
+
+    const self = findNode(hierarchy, parentEntityRef.id);
+    const byId = _.keyBy(initiatives, d => d.id);
+
+    const expandedNodes =  _.concat(
+        [self],
+        getParents(self, n => byId[n.parentId]));
+
+    return {
+        hierarchy: switchToParentIds(hierarchy),
+        initiatives,
+        expandedNodes
+    };
+}
+
+
+function expandNodes(hierarchy, initiatives, parentEntityRef) {
+}
+
 
 function controller($state, serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -43,34 +91,15 @@ function controller($state, serviceBroker) {
                 CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
                 [ selector ])
             .then(r => {
-                const initiatives = _
-                    .chain(r.data)
-                    .flatMap(d => {
-                        const maybeFakeParent = d.parentId
-                            ? null // fake parent not needed
-                            : fakeParentsByChildKind[d.changeInitiativeKind]; // use fake parent for kind (except for top level items)
-
-                        const enriched = Object.assign(
-                            {},
-                            d,
-                            {
-                                parentId: d.parentId || _.get(maybeFakeParent, "id", null),
-                                isSelf: sameRef(d, vm.parentEntityRef, { skipChecks: true })
-                            });
-                        return [enriched, maybeFakeParent]
-
-                    })
-                    .compact()
-                    .uniqBy(d => d.id)
-                    .value();
-
-                const hierarchy = buildHierarchies(initiatives, false);
-                const byId = _.keyBy(initiatives, d => d.id);
-                const self = findNode(hierarchy, vm.parentEntityRef.id);
-
-                vm.expandedNodes = _.concat([self], getParents(self, n => byId[n.parentId]));
-                vm.hierarchy = hierarchy; //switchToParentIds(hierarchy);
+                vm.rawInitiatives = r.data;
+                vm.treeData = mkTreeData(vm.rawInitiatives, vm.parentEntityRef, vm.displayRetired);
             });
+    };
+
+    vm.$onChanges = (c) => {
+        if (c.displayRetired) {
+            vm.treeData = mkTreeData(vm.rawInitiatives, vm.parentEntityRef, vm.displayRetired);
+        }
     };
 
     vm.onSelectNavItem = (item) => {
