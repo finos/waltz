@@ -182,6 +182,13 @@ public class SurveyInstanceService {
             surveyInstanceDao.clearApproved(instanceId);
         }
 
+        if ((surveyInstance.status() == SurveyInstanceStatus.APPROVED || surveyInstance.status() == SurveyInstanceStatus.WITHDRAWN)
+                && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
+            long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
+            surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
+            surveyInstanceDao.clearApproved(instanceId);
+        }
+
         int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
 
         if (result > 0) {
