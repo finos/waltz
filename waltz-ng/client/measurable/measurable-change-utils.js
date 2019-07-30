@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,11 +31,22 @@ function isMovedToAnExistingChild(cmd, measurable) {
             c => (c.id === cmd.params.destinationId));
 }
 
-function isSameChangeTypeCommandAlreadyExist(cmd, pendingChanges) {
-    return _.some(pendingChanges,
-        c => c.changeType === cmd.changeType
-            && sameRef(c.primaryReference, cmd.primaryReference));
+function isDuplicateAction(c, cmd) {
+    if (c.changeType === cmd.changeType
+        && sameRef(c.primaryReference, cmd.primaryReference)) {
+        const allowedChangeTypes = ["ADD_PEER", "ADD_CHILD"];
+        return !(allowedChangeTypes.includes(cmd.changeType)
+            && cmd.params.name !== c.params.name);
+    } else {
+        return false;
+    }
 }
+
+
+function isSameChangeTypeCommandAlreadyExist(cmd, pendingChanges) {
+    return _.some(pendingChanges, c => isDuplicateAction(c, cmd));
+}
+
 
 export function getValidationErrorIfMeasurableChangeIsNotValid(cmd, measurable, pendingChanges) {
     const errorIsNodeMovedToItSelf =
