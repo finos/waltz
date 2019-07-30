@@ -40,12 +40,24 @@
                                     search-fields="['searchableStr']"
                                     search-placeholder-text="Search...">
             </waltz-grid-with-search>
+            <br>
+            <span>
+                <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
+                   class="clickable no-text-select">
+                    <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
+                    phase:
+                    <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+                </a>
+            </span>
         </div>
 
         <div class="col-sm-4">
             <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"
                                                   help-text="{{$ctrl.filterHelpText}}"
-                                                  on-segment-select="$ctrl.onFilterSelect">
+                                                  selected-summary="$ctrl.selectedAssessmentSummary"
+                                                  selected-rating="$ctrl.selectedAssessmentRating"
+                                                  on-select-summary="$ctrl.onSelectAssessmentSummary"
+                                                  on-select-segment="$ctrl.onSelectAssessmentRating">
             </waltz-assessment-rating-summary-pies>
         </div>
 

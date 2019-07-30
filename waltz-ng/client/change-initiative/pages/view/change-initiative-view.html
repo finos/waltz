@@ -19,13 +19,13 @@
 
 <div>
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.changeInitiative.name }}"
+    <waltz-page-header name="{{ $ctrl.changeInitiative.name }}"
                        icon="paper-plane-o"
-                       small="{{ ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative' }}">
+                       small="{{ $ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative' }}">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
             <li>Change Initiative</li>
-            <li><span ng-bind="ctrl.changeInitiative.name"></span></li>
+            <li><span ng-bind="$ctrl.changeInitiative.name"></span></li>
         </ol>
 
     </waltz-page-header>
@@ -47,8 +47,20 @@
                 <waltz-sub-section name="Hierarchy">
                     <content>
                         <div style="padding:8px">
-                            <waltz-change-initiative-tree parent-entity-ref="ctrl.entityRef">
+                            <waltz-change-initiative-tree display-retired="$ctrl.displayRetiredCis"
+                                                          parent-entity-ref="$ctrl.entityRef">
                             </waltz-change-initiative-tree>
+                        </div>
+                        <div class="waltz-sub-section-controls">
+                            <span>
+                                <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
+                                   class="clickable no-text-select">
+                                    <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
+                                    phase:
+                                    <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+                                </a>
+                            </span>
+
                         </div>
                     </content>
                 </waltz-sub-section>
@@ -56,12 +68,12 @@
             </div>
             <!-- ASSESSMENT RATINGS -->
             <div class="col-sm-5">
-                <waltz-assessment-rating-sub-section parent-entity-ref="ctrl.entityRef">
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.entityRef">
                 </waltz-assessment-rating-sub-section>
 
                 <br/>
                 <!-- Key People -->
-                <waltz-key-people-sub-section parent-entity-ref="ctrl.entityRef">
+                <waltz-key-people-sub-section parent-entity-ref="$ctrl.entityRef">
                 </waltz-key-people-sub-section>
             </div>
         </div>
@@ -77,7 +89,7 @@
 
     <br>
 
-    <waltz-dynamic-sections-view parent-entity-ref="ctrl.entityRef">
+    <waltz-dynamic-sections-view parent-entity-ref="$ctrl.entityRef">
     </waltz-dynamic-sections-view>
 
 </div>
@@ -95,14 +107,14 @@
                 Name
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.name"></span>
+                <span ng-bind="$ctrl.changeInitiative.name"></span>
             </div>
 
             <div class="col-sm-2 waltz-display-field-label">
                 External Id
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.externalId"></span>
+                <span ng-bind="$ctrl.changeInitiative.externalId"></span>
             </div>
         </div>
 
@@ -112,14 +124,14 @@
                 Type
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative'"></span>
+                <span ng-bind="$ctrl.changeInitiative.changeInitiativeKind | toDisplayName:'changeInitiative'"></span>
             </div>
 
             <div class="col-sm-2 waltz-display-field-label">
                 Phase
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.lifecyclePhase | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+                <span ng-bind="$ctrl.changeInitiative.lifecyclePhase | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
             </div>
         </div>
 
@@ -129,20 +141,20 @@
                 Start
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.startDate"></span>
+                <span ng-bind="$ctrl.changeInitiative.startDate"></span>
             </div>
 
             <div class="col-sm-2 waltz-display-field-label">
                 End
             </div>
             <div class="col-sm-4">
-                <span ng-bind="ctrl.changeInitiative.endDate"></span>
+                <span ng-bind="$ctrl.changeInitiative.endDate"></span>
             </div>
         </div>
 
 
         <!-- Entity Enum -->
-        <waltz-entity-enum parent-entity-ref="ctrl.entityRef">
+        <waltz-entity-enum parent-entity-ref="$ctrl.entityRef">
         </waltz-entity-enum>
 
 
@@ -151,7 +163,7 @@
                 Owning Org Unit
             </div>
             <div class="col-sm-10">
-                <waltz-entity-link entity-ref="ctrl.orgUnit"></waltz-entity-link>
+                <waltz-entity-link entity-ref="$ctrl.orgUnit"></waltz-entity-link>
             </div>
         </div>
         <div class="row">
@@ -159,7 +171,7 @@
                 Description
             </div>
             <div class="col-sm-10">
-                <waltz-markdown text="ctrl.changeInitiative.description">
+                <waltz-markdown text="$ctrl.changeInitiative.description">
                 </waltz-markdown>
             </div>
         </div>
