@@ -22,7 +22,11 @@ package com.khartec.waltz.web.endpoints.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.model.settings.NamedSettings;
+import com.khartec.waltz.model.user.AuthenticationResponse;
+import com.khartec.waltz.model.user.ImmutableAuthenticationResponse;
 import com.khartec.waltz.model.user.LoginRequest;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -34,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Filter;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -102,16 +108,18 @@ public class AuthenticationEndpoint implements Endpoint {
         post(mkPath(BASE_URL, "login"), (request, response) -> {
 
             LoginRequest login = readBody(request, LoginRequest.class);
-            if (userService.authenticate(login)) {
+            AuthenticationResponse authResponse = authenticate(login);
+
+            if (authResponse.success()) {
                 Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
 
                 String[] roles = userRoleService
-                        .getUserRoles(login.userName())
+                        .getUserRoles(authResponse.waltzUserName())
                         .toArray(new String[0]);
 
                 String token = JWT.create()
                         .withIssuer(JWTUtilities.ISSUER)
-                        .withSubject(login.userName())
+                        .withSubject(authResponse.waltzUserName())
                         .withArrayClaim("roles", roles)
                         .withClaim("displayName", login.userName())
                         .withClaim("employeeId", login.userName())
@@ -120,7 +128,7 @@ public class AuthenticationEndpoint implements Endpoint {
                 return newHashMap("token", token);
             } else {
                 response.status(401);
-                return "Unknown user/password";
+                return authResponse.errorMessage();
             }
         }, transformer);
 
@@ -128,4 +136,51 @@ public class AuthenticationEndpoint implements Endpoint {
 
     }
 
+
+    private AuthenticationResponse authenticate(LoginRequest loginRequest) {
+        return settingsService
+                .getValue(NamedSettings.externalAuthenticationEndpointUrl)
+                .map(url -> doExternalAuth(loginRequest, url))
+                .orElseGet(() -> doInternalAuth(loginRequest));
+    }
+
+
+    private AuthenticationResponse doExternalAuth(LoginRequest loginRequest, String url) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String loginParamsStr = mapper.writerFor(LoginRequest.class).writeValueAsString(loginRequest);
+
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.getOutputStream().write(loginParamsStr.getBytes("UTF-8"));
+
+            String responseStr = IOUtilities.readAsString(conn.getInputStream());
+            return mapper.readValue(responseStr, AuthenticationResponse.class);
+        } catch (Exception e) {
+            return ImmutableAuthenticationResponse.builder()
+                    .success(false)
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
+    }
+
+
+    private AuthenticationResponse doInternalAuth(LoginRequest loginRequest) {
+
+        ImmutableAuthenticationResponse.Builder builder = ImmutableAuthenticationResponse.builder()
+                .waltzUserName(loginRequest.userName());
+
+        if (userService.authenticate(loginRequest)) {
+            return builder
+                    .success(true)
+                    .build();
+        } else {
+            return builder
+                    .success(false)
+                    .errorMessage("Invalid username/password")
+                    .build();
+        }
+    }
 }

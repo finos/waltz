@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -59,6 +60,14 @@ public class IOUtilities {
         while ((bytesRead = input.read(buff)) != -1) {
             output.write(buff, 0, bytesRead);
         }
+    }
+
+
+    public static String readAsString(InputStream stream) {
+        checkNotNull(stream, "stream must not be null");
+
+        return streamLines(stream)
+                .collect(Collectors.joining());
     }
 
 
