@@ -15,7 +15,7 @@ a specific function etc.).
 
 ![Screenshot 2](images/survey_edit_screenshot.png)
 
-####Survey Instance Lifecycle
+#### Survey Instance Lifecycle
 
 A survey can be issued via the `Surveys` section on the navigation bar for the related entity type, provided there is an existing survey template. Alternatively, these can be issued in bulk via a 'Survey Run' by a 'Survey Admin'.
 
