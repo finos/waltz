@@ -126,37 +126,6 @@ function controller() {
     vm.$onChanges = () => {
         Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows));
     };
-
-    vm.onProducesGridInitialise = (e) => {
-        vm.producesExportFn = e.exportFn;
-    };
-
-    vm.onConsumesGridInitialise = (e) => {
-        vm.consumesExportFn = e.exportFn;
-    };
-
-    vm.onUnusedSpecificationsGridInitialise = (e) => {
-        vm.unusedSpecificationsExportFn = e.exportFn;
-    };
-
-    vm.exportProduces = () => {
-        vm.producesExportFn('produces.csv');
-    };
-
-    vm.exportConsumes = () => {
-        vm.consumesExportFn('consumes.csv');
-    };
-
-    vm.exportUnusedSpecifications = () => {
-        vm.unusedSpecificationsExportFn('unused-specifications.csv');
-    };
-
-    // callback
-    vm.onInitialise({
-        exportProducesFn: vm.exportProduces,
-        exportConsumesFn: vm.exportConsumes,
-        exportUnusedSpecificationsFn: vm.exportUnusedSpecifications
-    });
 }
 
 controller.$inject = ['$scope'];
