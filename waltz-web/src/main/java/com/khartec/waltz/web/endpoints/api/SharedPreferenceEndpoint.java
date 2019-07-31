@@ -61,9 +61,8 @@ public class SharedPreferenceEndpoint implements Endpoint {
     }
 
 
-    private String generateKeyRoute(Request request, Response response) throws IOException, NoSuchAlgorithmException {
-        String body = request.body();
-        return digest(body.getBytes());
+    private String generateKeyRoute(Request request, Response response) throws NoSuchAlgorithmException {
+        return digest(request.body().getBytes());
     }
 
 
