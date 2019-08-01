@@ -35,7 +35,6 @@ import PhysicalFlowEditTargetLogicalFlow from "./components/register/edit-target
 import PhysicalFlowEditSpecification from "./components/register/edit-specification/physical-flow-edit-specification";
 import PhysicalFlowAttributeEditor from "./components/register/attribute-editor/physical-flow-attribute-editor";
 import PhysicalFlowTable from "./components/flow-table/physical-flow-table";
-import PhysicalFlowExportButtons from "./components/export-buttons/physical-flow-export-buttons";
 import PhysicalFlowSection from "./components/physical-flow-section/physical-flow-section";
 import PhysicalFlowParticipantSection from "./components/participants-section/physical-flow-participants-section";
 import PhysicalFlowParticipantSubSection from "./components/participants-sub-section/physical-flow-participants-sub-section";
@@ -54,8 +53,7 @@ function setup() {
     ]);
 
     module
-        .component("waltzPhysicalFlowTable", PhysicalFlowTable)
-        .component("waltzPhysicalFlowExportButtons", PhysicalFlowExportButtons);
+        .component("waltzPhysicalFlowTable", PhysicalFlowTable);
 
     registerComponents(module, [
         BulkPhysicalFlowLoaderWizard,
