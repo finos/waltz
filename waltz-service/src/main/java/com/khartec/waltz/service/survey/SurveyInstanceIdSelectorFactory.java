@@ -25,31 +25,19 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
-import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 
-@Service
 public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
-    private final DSLContext dsl;
 
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
-
-
-    @Autowired
-    public SurveyInstanceIdSelectorFactory(DSLContext dsl,
-                                           OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
-        this.dsl = dsl;
-        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
-    }
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
     @Override
@@ -76,7 +64,7 @@ public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForNonHierarchicalEntity(EntityReference ref, HierarchyQueryScope scope) {
         checkTrue(scope == EXACT, "Can only create selector for exact matches if given a non-hierarchical ref");
 
-        return dsl
+        return DSL
                 .select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ENTITY_KIND.eq(ref.kind().name())
@@ -94,7 +82,7 @@ public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
 
         Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(ouSelectorOptions);
 
-        return dsl
+        return DSL
                 .selectDistinct(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.ENTITY_KIND.eq(ref.kind().name())

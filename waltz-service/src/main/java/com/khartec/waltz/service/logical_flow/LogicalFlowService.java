@@ -69,45 +69,40 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Service
 public class LogicalFlowService {
 
-    private final ApplicationIdSelectorFactory appIdSelectorFactory;
     private final ChangeLogService changeLogService;
     private final DataTypeService dataTypeService;
     private final DataTypeUsageService dataTypeUsageService;
     private final DBExecutorPoolInterface dbExecutorPool;
     private final LogicalFlowDao logicalFlowDao;
-    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
+    private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
+
 
     @Autowired
-    public LogicalFlowService(ApplicationIdSelectorFactory appIdSelectorFactory,
-                              ChangeLogService changeLogService,
+    public LogicalFlowService(ChangeLogService changeLogService,
                               DataTypeService dataTypeService,
                               DataTypeUsageService dataTypeUsageService,
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               LogicalFlowDao logicalFlowDao,
-                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
                               LogicalFlowStatsDao logicalFlowStatsDao) {
-        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
-        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
 
-        this.appIdSelectorFactory = appIdSelectorFactory;
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
-        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
     }
 
@@ -255,9 +250,9 @@ public class LogicalFlowService {
      *
      * todo: #WALTZ-1894 for cleanupOrphans task
      *
-     * @param flowId
-     * @param username
-     * @return
+     * @param flowId  identifier of flow to be removed
+     * @param username  who initiated the removal
+     * @return number of flows removed
      */
     public int removeFlow(Long flowId, String username) {
         LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(flowId);

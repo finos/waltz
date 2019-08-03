@@ -38,16 +38,13 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class LicenceService {
 
     private final LicenceDao licenceDao;
-    private final LicenceIdSelectorFactory licenceIdSelectorFactory;
+    private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
 
 
     @Autowired
-    public LicenceService(LicenceDao licenceDao, LicenceIdSelectorFactory licenceIdSelectorFactory) {
+    public LicenceService(LicenceDao licenceDao) {
         checkNotNull(licenceDao, "licenceDao cannot be null");
-        checkNotNull(licenceIdSelectorFactory, "licenceIdSelectorFactory cannot be null");
-
         this.licenceDao = licenceDao;
-        this.licenceIdSelectorFactory = licenceIdSelectorFactory;
     }
 
 

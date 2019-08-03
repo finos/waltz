@@ -30,7 +30,6 @@ import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 public class MeasurableRatingExporterHarness {
 
@@ -38,7 +37,7 @@ public class MeasurableRatingExporterHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        ApplicationIdSelectorFactory applicationIdSelectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
         Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(
                 mkRef(EntityKind.ORG_UNIT, 10L),

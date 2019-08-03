@@ -37,13 +37,12 @@ import static spark.Spark.post;
 @Service
 public class AllocationsExtractor extends BaseDataExtractor{
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
-    public AllocationsExtractor(DSLContext dsl, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public AllocationsExtractor(DSLContext dsl) {
         super(dsl);
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -104,7 +103,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
             ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
 
-            Record2<String, String> fileNameInfoRow = dsl.select(MEASURABLE_CATEGORY.NAME, ALLOCATION_SCHEME.NAME)
+            Record2<String, String> fileNameInfoRow = dsl
+                    .select(MEASURABLE_CATEGORY.NAME, ALLOCATION_SCHEME.NAME)
                     .from(ALLOCATION_SCHEME)
                     .innerJoin(MEASURABLE_CATEGORY).on(ALLOCATION_SCHEME.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
                     .where(ALLOCATION_SCHEME.ID.eq(schemeId))

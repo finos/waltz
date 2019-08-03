@@ -24,8 +24,6 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,15 +40,13 @@ import static spark.Spark.post;
 @Service
 public class ComplexityExtractor extends BaseDataExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComplexityExtractor.class);
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
-    public ComplexityExtractor(DSLContext dsl, ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public ComplexityExtractor(DSLContext dsl) {
         super(dsl);
         checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 

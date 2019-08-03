@@ -6,8 +6,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.impl.DSL.selectDistinct;
@@ -22,13 +20,7 @@ import static org.jooq.impl.DSL.selectDistinct;
  *
  *  Note, currently, this selector factory only supports the first of these options.
  */
-@Service
 public class RoadmapIdSelectorFactory implements IdSelectorFactory {
-
-
-    @Autowired
-    public RoadmapIdSelectorFactory() {
-    }
 
 
     @Override

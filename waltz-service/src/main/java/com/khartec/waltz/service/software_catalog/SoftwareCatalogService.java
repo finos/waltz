@@ -45,23 +45,20 @@ public class SoftwareCatalogService {
 
     private final SoftwarePackageDao softwarePackageDao;
     private final SoftwareUsageDao softwareUsageDao;
-    private final ApplicationIdSelectorFactory factory;
+    private final ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
     private final DSLContext dsl;
 
 
     @Autowired
     public SoftwareCatalogService(SoftwarePackageDao softwarePackageDao,
                                   SoftwareUsageDao softwareUsageDao,
-                                  ApplicationIdSelectorFactory factory,
                                   DSLContext dsl) {
 
         Checks.checkNotNull(softwarePackageDao, "softwarePackageDao cannot be null");
         Checks.checkNotNull(softwareUsageDao, "softwareUsageDao cannot be null");
-        Checks.checkNotNull(factory, "factory cannot be null");
 
         this.softwarePackageDao = softwarePackageDao;
         this.softwareUsageDao = softwareUsageDao;
-        this.factory = factory;
         this.dsl = dsl;
     }
 
@@ -69,7 +66,7 @@ public class SoftwareCatalogService {
     public SoftwareCatalog makeCatalogForAppIds(List<Long> appIds) {
         List<SoftwareUsage> usages = softwareUsageDao.findByAppIds(appIds);
         Set<Long> packageIds = usages.stream()
-                .map(u -> u.softwarePackageId())
+                .map(SoftwareUsage::softwarePackageId)
                 .collect(Collectors.toSet());
         List<SoftwarePackage> packages =
                 softwarePackageDao.findByIds(packageIds);
@@ -82,7 +79,8 @@ public class SoftwareCatalogService {
 
 
     private List<Tally<String>> toTallies(Condition condition, Field groupingField) {
-        return dsl.select(groupingField, DSL.count(groupingField))
+        return dsl
+                .select(groupingField, DSL.count(groupingField))
                 .from(SOFTWARE_PACKAGE)
                 .innerJoin(SOFTWARE_USAGE)
                 .on(SOFTWARE_PACKAGE.ID.eq(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID))

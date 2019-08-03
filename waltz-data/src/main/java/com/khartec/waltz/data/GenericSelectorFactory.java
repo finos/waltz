@@ -15,42 +15,19 @@ import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
-@Service
 public class GenericSelectorFactory {
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
-    private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory;
-    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
-    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
-    private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
-
-    @Autowired
-    public GenericSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                  ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory,
-                                  ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory,
-                                  DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                  FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory,
-                                  LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory,
-                                  MeasurableIdSelectorFactory measurableIdSelectorFactory,
-                                  OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory) {
-
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
-        this.changeInitiativeIdSelectorFactory = changeInitiativeIdSelectorFactory;
-        this.changeUnitIdSelectorFactory = changeUnitIdSelectorFactory;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-        this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
-        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
-        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
-        this.organisationalUnitIdSelectorFactory = organisationalUnitIdSelectorFactory;
-    }
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory = new ChangeInitiativeIdSelectorFactory();
+    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
     public GenericSelector apply(IdSelectionOptions selectionOptions) {

@@ -54,7 +54,6 @@ import static java.util.stream.Collectors.toList;
 public class SurveyRunService {
 
     private final ChangeLogService changeLogService;
-    private final GenericSelectorFactory genericSelectorFactory;
     private final InvolvementDao involvementDao;
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
@@ -62,38 +61,33 @@ public class SurveyRunService {
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
 
-    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
 
 
     @Autowired
     public SurveyRunService(ChangeLogService changeLogService,
-                            GenericSelectorFactory genericSelectorFactory,
                             InvolvementDao involvementDao,
                             PersonDao personDao,
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                             SurveyRunDao surveyRunDao,
-                            SurveyTemplateDao surveyTemplateDao,
-                            SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
+                            SurveyTemplateDao surveyTemplateDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
-        checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
-        this.genericSelectorFactory = genericSelectorFactory;
         this.involvementDao = involvementDao;
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
-        this.surveyInstanceIdSelectorFactory = surveyInstanceIdSelectorFactory;
     }
 
 

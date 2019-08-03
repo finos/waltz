@@ -46,23 +46,20 @@ public class ChangeUnitService {
 
     private final ChangeLogService changeLogService;
     private final ChangeUnitDao dao;
-    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory;
+    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
     private final Map<ChangeAction, ChangeUnitCommandProcessor> processorsByChangeAction;
 
 
     @Autowired
     public ChangeUnitService(ChangeLogService changeLogService,
-                             ChangeUnitDao dao,
-                             ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory,
+                             ChangeUnitDao changeUnitDao,
                              List<ChangeUnitCommandProcessor> processors) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(changeUnitIdSelectorFactory, "changeUnitIdSelectorFactory cannot be null");
-        checkNotNull(dao, "dao cannot be null");
+        checkNotNull(changeUnitDao, "changeUnitDao cannot be null");
         checkNotNull(processors, "processors cannot be null");
 
         this.changeLogService = changeLogService;
-        this.changeUnitIdSelectorFactory = changeUnitIdSelectorFactory;
-        this.dao = dao;
+        this.dao = changeUnitDao;
 
         processorsByChangeAction = processors
                 .stream()

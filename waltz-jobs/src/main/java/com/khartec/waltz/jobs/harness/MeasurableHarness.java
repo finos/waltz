@@ -44,7 +44,7 @@ public class MeasurableHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        MeasurableIdSelectorFactory factory = ctx.getBean(MeasurableIdSelectorFactory.class);
+        MeasurableIdSelectorFactory factory = new MeasurableIdSelectorFactory();
         MeasurableService measurableService = ctx.getBean(MeasurableService.class);
 
         EntityReference ref = mkRef(

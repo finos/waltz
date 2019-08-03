@@ -58,7 +58,7 @@ public class DataExtractHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = ctx.getBean(LogicalFlowIdSelectorFactory.class);
+        LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 4326),

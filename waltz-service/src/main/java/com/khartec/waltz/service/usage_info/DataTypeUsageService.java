@@ -54,21 +54,14 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 public class DataTypeUsageService {
 
     private final DataTypeUsageDao dataTypeUsageDao;
-    private final ApplicationIdSelectorFactory appIdSelectorFactor;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactor = new ApplicationIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
 
     @Autowired
-    public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao,
-                                ApplicationIdSelectorFactory selectorFactory,
-                                DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
+    public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao) {
         checkNotNull(dataTypeUsageDao, "dataTypeUsageDao cannot be null");
-        checkNotNull(selectorFactory, "appIdSelectorFactor cannot be null");
-        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-
         this.dataTypeUsageDao = dataTypeUsageDao;
-        this.appIdSelectorFactor = selectorFactory;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
     }
 
 

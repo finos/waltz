@@ -35,7 +35,7 @@ public class RoadmapService {
     private final RoadmapDao roadmapDao;
     private final RoadmapSearchDao roadmapSearchDao;
     private final ScenarioDao scenarioDao;
-    private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
+    private final RoadmapIdSelectorFactory roadmapIdSelectorFactory = new RoadmapIdSelectorFactory();
     private final ChangeLogService changeLogService;
     private final EntityRelationshipDao entityRelationshipDao;
 
@@ -44,19 +44,16 @@ public class RoadmapService {
     public RoadmapService(RoadmapDao roadmapDao,
                           RoadmapSearchDao roadmapSearchDao,
                           ScenarioDao scenarioDao,
-                          RoadmapIdSelectorFactory roadmapIdSelectorFactory,
                           ChangeLogService changeLogService,
                           EntityRelationshipDao entityRelationshipDao) {
         checkNotNull(roadmapDao, "roadmapDao cannot be null");
         checkNotNull(roadmapSearchDao, "roadmapSearchDao cannot be null");
         checkNotNull(scenarioDao, "scenarioDao cannot be null");
-        checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
         this.roadmapDao = roadmapDao;
         this.roadmapSearchDao = roadmapSearchDao;
         this.scenarioDao = scenarioDao;
-        this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
         this.changeLogService = changeLogService;
         this.entityRelationshipDao = entityRelationshipDao;
     }
@@ -154,7 +151,7 @@ public class RoadmapService {
     public List<EntityReference> search(String query) {
         List<Roadmap> roadmaps = search(query, EntitySearchOptions.mkForEntity(EntityKind.ROADMAP));
         return roadmaps.stream()
-                .map(a -> a.entityReference())
+                .map(Roadmap::entityReference)
                 .collect(toList());
     }
 

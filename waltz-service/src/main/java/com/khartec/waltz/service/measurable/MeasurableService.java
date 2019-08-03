@@ -49,7 +49,7 @@ import static java.util.Optional.ofNullable;
 public class MeasurableService {
     
     private final MeasurableDao measurableDao;
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
@@ -57,18 +57,15 @@ public class MeasurableService {
 
     @Autowired
     public MeasurableService(MeasurableDao measurableDao,
-                             MeasurableIdSelectorFactory measurableIdSelectorFactory,
                              MeasurableSearchDao measurableSearchDao,
                              EntityReferenceNameResolver nameResolver,
                              ChangeLogService changeLogService) {
         checkNotNull(measurableDao, "measurableDao cannot be null");
-        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         checkNotNull(measurableSearchDao, "measurableSearchDao cannot be null");
         checkNotNull(nameResolver, "nameResolver cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableDao = measurableDao;
-        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
         this.measurableSearchDao = measurableSearchDao;
         this.nameResolver = nameResolver;
         this.changeLogService = changeLogService;
@@ -142,7 +139,7 @@ public class MeasurableService {
 
 
     public boolean updateExternalId(long id, String newValue, String userId) {
-        logUpdate(id, "externalId", newValue, m -> m.externalId(), userId);
+        logUpdate(id, "externalId", newValue, ExternalIdProvider::externalId, userId);
         return measurableDao.updateExternalId(id, newValue, userId);
     }
 

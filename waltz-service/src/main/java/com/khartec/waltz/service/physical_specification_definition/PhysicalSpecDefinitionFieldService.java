@@ -43,20 +43,17 @@ public class PhysicalSpecDefinitionFieldService {
 
     private final ChangeLogService changeLogService;
     private final PhysicalSpecDefinitionFieldDao dao;
-    private final PhysicalSpecDefnFieldIdSelectorFactory idSelectorFactory;
+    private final PhysicalSpecDefnFieldIdSelectorFactory idSelectorFactory = new PhysicalSpecDefnFieldIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecDefinitionFieldService(ChangeLogService changeLogService,
-                                              PhysicalSpecDefinitionFieldDao dao,
-                                              PhysicalSpecDefnFieldIdSelectorFactory physicalSpecDefnFieldIdSelectorFactory) {
+                                              PhysicalSpecDefinitionFieldDao dao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "dao cannot be null");
-        checkNotNull(physicalSpecDefnFieldIdSelectorFactory, "idSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.dao = dao;
-        this.idSelectorFactory = physicalSpecDefnFieldIdSelectorFactory;
     }
 
 

@@ -28,12 +28,13 @@ import com.khartec.waltz.schema.tables.EndUserApplication;
 import com.khartec.waltz.schema.tables.Involvement;
 import com.khartec.waltz.schema.tables.Person;
 import com.khartec.waltz.schema.tables.PersonHierarchy;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
@@ -43,30 +44,16 @@ import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
-
-@Service
 public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>>  {
 
     private static final Logger LOG = LoggerFactory.getLogger(EndUserAppIdSelectorFactory.class);
 
-    private final DSLContext dsl;
-
     private final EndUserApplication eua = END_USER_APPLICATION.as("eua");
     private final Involvement involvement = INVOLVEMENT.as("involvement");
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final Person person = PERSON.as("per");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
 
-
-    @Autowired
-    public EndUserAppIdSelectorFactory(DSLContext dsl,
-                                       OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
-        checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
-
-        this.dsl = dsl;
-        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
-    }
 
 
     @Override
@@ -92,10 +79,10 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
 
         Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(options);
 
-        return dsl
+        return DSL
                 .selectDistinct(eua.ID)
                 .from(eua)
-                .where(dsl.renderInlined(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector)));
+                .where(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector));
     }
 
 
@@ -122,7 +109,7 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
 
         Select<Record1<String>> employeeId = mkEmployeeIdSelect(options.entityReference());
 
-        return dsl
+        return DSL
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
                 .innerJoin(eua)
@@ -147,7 +134,7 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
                 .and(involvement.EMPLOYEE_ID.eq(employeeId)
                         .or(involvement.EMPLOYEE_ID.in(reporteeIds)));
 
-        return dsl
+        return DSL
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
                 .innerJoin(eua)
@@ -157,14 +144,16 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
 
 
     private Select<Record1<String>> mkEmployeeIdSelect(EntityReference ref) {
-        return dsl.select(person.EMPLOYEE_ID)
+        return DSL
+                .select(person.EMPLOYEE_ID)
                 .from(person)
                 .where(person.ID.eq(ref.id()));
     }
 
 
     private Select<Record1<Long>> mkEmptySelect() {
-        return dsl.select(eua.ID)
+        return DSL
+                .select(eua.ID)
                 .from(eua)
                 .where(DSL.falseCondition());
     }

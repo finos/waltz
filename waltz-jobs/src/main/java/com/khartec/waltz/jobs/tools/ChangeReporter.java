@@ -48,7 +48,7 @@ public class ChangeReporter {
     public static void main(String[] args) throws IOException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        ApplicationIdSelectorFactory selectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory selectorFactory = new ApplicationIdSelectorFactory();
 
         LocalDateTime exerciseStart = LocalDateTime.of(2018, 06, 04, 0, 1).truncatedTo(ChronoUnit.DAYS);
         LocalDateTime dayBeforeYesterday = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(1);

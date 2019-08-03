@@ -4,8 +4,7 @@ import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import org.jooq.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -22,20 +21,16 @@ import static spark.Spark.get;
 @Service
 public class TechnologyEOLServerExtractor extends BaseDataExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TechnologyEOLServerExtractor.class);
     private final EntityReferenceNameResolver nameResolver;
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
     public TechnologyEOLServerExtractor(DSLContext dsl,
-                                        EntityReferenceNameResolver nameResolver,
-                                        ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+                                        EntityReferenceNameResolver nameResolver) {
         super(dsl);
         checkNotNull(nameResolver, "nameResolver cannot be null");
-        checkNotNull(applicationIdSelectorFactory, "appIdSelectorFactory cannot be null");
         this.nameResolver = nameResolver;
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -46,7 +41,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
             EntityReference ref = getReference(request);
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref));
 
-            SelectConditionStep<Record> qry = dsl
+            SelectConditionStep<Record> qry = DSL
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(SERVER_INFORMATION.HOSTNAME.as("Host Name"),

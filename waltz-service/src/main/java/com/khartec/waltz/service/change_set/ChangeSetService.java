@@ -39,17 +39,14 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class ChangeSetService {
 
     private final ChangeSetDao changeSetDao;
-    private final ChangeSetIdSelectorFactory changeSetIdSelectorFactory;
+    private final ChangeSetIdSelectorFactory changeSetIdSelectorFactory = new ChangeSetIdSelectorFactory();
 
 
     @Autowired
-    public ChangeSetService(ChangeSetDao changeSetDao,
-                            ChangeSetIdSelectorFactory changeSetIdSelectorFactory) {
+    public ChangeSetService(ChangeSetDao changeSetDao) {
         checkNotNull(changeSetDao, "changeSetDao cannot be null");
-        checkNotNull(changeSetIdSelectorFactory, "changeSetIdSelectorFactory cannot be null");
 
         this.changeSetDao = changeSetDao;
-        this.changeSetIdSelectorFactory = changeSetIdSelectorFactory;
     }
 
 

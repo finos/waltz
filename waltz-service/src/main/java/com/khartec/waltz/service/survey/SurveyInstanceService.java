@@ -55,7 +55,7 @@ public class SurveyInstanceService {
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
 
-    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory;
+    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
     private SurveyRunDao surveyRunDao;
     private UserRoleService userRoleService;
 
@@ -67,15 +67,13 @@ public class SurveyInstanceService {
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                                  SurveyQuestionResponseDao surveyQuestionResponseDao,
                                  SurveyRunDao surveyRunDao,
-                                 UserRoleService userRoleService,
-                                 SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory) {
+                                 UserRoleService userRoleService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
-        checkNotNull(surveyInstanceIdSelectorFactory, "surveyInstanceIdSelectorFactory cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogService = changeLogService;
@@ -85,7 +83,6 @@ public class SurveyInstanceService {
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
         this.surveyRunDao = surveyRunDao;
         this.userRoleService = userRoleService;
-        this.surveyInstanceIdSelectorFactory = surveyInstanceIdSelectorFactory;
     }
 
 

@@ -40,16 +40,12 @@ public class FacetService {
 
     private final ApplicationDao applicationDao;
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
-    public FacetService(ApplicationDao applicationDao,
-                        ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public FacetService(ApplicationDao applicationDao) {
         checkNotNull(applicationDao, "applicationDao cannot be null");
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.applicationDao = applicationDao;
     }
 

@@ -48,25 +48,22 @@ public class AssessmentRatingService {
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
     public AssessmentRatingService(
             AssessmentRatingDao assessmentRatingDao,
             AssessmentDefinitionDao assessmentDefinitionDao,
             RatingSchemeDAO ratingSchemeDAO,
-            GenericSelectorFactory genericSelectorFactory,
             ChangeLogService changeLogService) {
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
-        this.genericSelectorFactory = genericSelectorFactory;
         this.changeLogService = changeLogService;
 
     }
