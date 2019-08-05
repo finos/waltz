@@ -42,21 +42,14 @@ import static com.khartec.waltz.common.FunctionUtilities.time;
 public class EndUserAppService {
 
     private final EndUserAppDao endUserAppDao;
-    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory = new EndUserAppIdSelectorFactory();
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory= new OrganisationalUnitIdSelectorFactory();
 
 
     @Autowired
-    public EndUserAppService(EndUserAppDao endUserAppDao,
-                             EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
-                             OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+    public EndUserAppService(EndUserAppDao endUserAppDao) {
         checkNotNull(endUserAppDao, "EndUserAppDao is required");
-        checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
-        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
-
         this.endUserAppDao = endUserAppDao;
-        this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
-        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
     }
 
 

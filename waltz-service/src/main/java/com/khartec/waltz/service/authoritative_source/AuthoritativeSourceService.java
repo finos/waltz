@@ -28,7 +28,6 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
@@ -74,12 +73,11 @@ public class AuthoritativeSourceService {
     private final OrganisationalUnitDao organisationalUnitDao;
     private final ApplicationDao applicationDao;
     private final AuthSourceRatingCalculator ratingCalculator;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory;
     private final ChangeLogService changeLogService;
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     @Autowired
@@ -88,21 +86,13 @@ public class AuthoritativeSourceService {
                                       OrganisationalUnitDao organisationalUnitDao,
                                       ApplicationDao applicationDao,
                                       AuthSourceRatingCalculator ratingCalculator,
-                                      ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                      DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                      GenericSelectorFactory genericSelectorFactory,
-                                      OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory,
-                                      ChangeLogService changeLogService, 
+                                      ChangeLogService changeLogService,
                                       LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(ratingCalculator, "ratingCalculator cannot be null");
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
-        checkNotNull(organisationalUnitIdSelectorFactory, "organisationalUnitIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
@@ -111,10 +101,6 @@ public class AuthoritativeSourceService {
         this.organisationalUnitDao = organisationalUnitDao;
         this.applicationDao = applicationDao;
         this.ratingCalculator = ratingCalculator;
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-        this.genericSelectorFactory = genericSelectorFactory;
-        this.organisationalUnitIdSelectorFactory = organisationalUnitIdSelectorFactory;
         this.changeLogService = changeLogService;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }

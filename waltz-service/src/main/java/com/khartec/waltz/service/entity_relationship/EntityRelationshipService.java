@@ -42,17 +42,13 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class EntityRelationshipService {
 
     private final EntityRelationshipDao entityRelationshipDao;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     @Autowired
-    public EntityRelationshipService(EntityRelationshipDao entityRelationshipDao,
-                                     GenericSelectorFactory genericSelectorFactory) {
+    public EntityRelationshipService(EntityRelationshipDao entityRelationshipDao) {
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
-
         this.entityRelationshipDao = entityRelationshipDao;
-        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 

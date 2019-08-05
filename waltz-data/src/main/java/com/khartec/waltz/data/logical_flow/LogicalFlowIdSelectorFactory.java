@@ -31,8 +31,6 @@ import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.map;
@@ -44,29 +42,17 @@ import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
-@Service
 public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
     private final static Application CONSUMER_APP = APPLICATION.as("consumer");
     private final static Application SUPPLIER_APP = APPLICATION.as("supplier");
 
-
-    @Autowired
-    public LogicalFlowIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                        DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-    }
 
 
     @Override

@@ -55,26 +55,23 @@ public class ApplicationService {
     private final EntityTagDao entityTagDao;
     private final EntityAliasDao entityAliasDao;
     private final ApplicationSearchDao appSearchDao;
-    private final ApplicationIdSelectorFactory appIdSelectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
     public ApplicationService(ApplicationDao appDao,
                               EntityTagDao entityTagDao,
                               EntityAliasDao entityAliasDao,
-                              ApplicationSearchDao appSearchDao,
-                              ApplicationIdSelectorFactory appIdSelectorFactory) {
+                              ApplicationSearchDao appSearchDao) {
         checkNotNull(appDao, "appDao must not be null");
         checkNotNull(entityTagDao, "entityTagDao must not be null");
         checkNotNull(entityAliasDao, "entityAliasDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
-        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.applicationDao = appDao;
         this.entityTagDao = entityTagDao;
         this.entityAliasDao = entityAliasDao;
         this.appSearchDao = appSearchDao;
-        this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 

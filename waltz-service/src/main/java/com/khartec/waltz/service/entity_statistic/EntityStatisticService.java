@@ -53,7 +53,7 @@ import static java.util.Collections.emptyList;
 @Service
 public class EntityStatisticService {
 
-    private final ApplicationIdSelectorFactory factory;
+    private final ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
     private final EntityStatisticValueDao valueDao;
     private final EntityStatisticDefinitionDao definitionDao;
     private final EntityStatisticSummaryDao summaryDao;
@@ -61,19 +61,16 @@ public class EntityStatisticService {
 
 
     @Autowired
-    public EntityStatisticService(ApplicationIdSelectorFactory factory,
-                                  EntityStatisticValueDao valueDao,
+    public EntityStatisticService(EntityStatisticValueDao valueDao,
                                   EntityStatisticDefinitionDao definitionDao,
                                   EntityStatisticSummaryDao summaryDao,
-                                  EntityStatisticDao statisticDao
-                                  ) {
-        checkNotNull(factory, "factory cannot be null");
+                                  EntityStatisticDao statisticDao)
+    {
         checkNotNull(valueDao, "valueDao cannot be null");
         checkNotNull(definitionDao, "definitionDao cannot be null");
         checkNotNull(summaryDao, "summaryDao cannot be null");
         checkNotNull(statisticDao, "statisticDao cannot be null");
 
-        this.factory = factory;
         this.valueDao = valueDao;
         this.definitionDao = definitionDao;
         this.summaryDao = summaryDao;
@@ -84,8 +81,7 @@ public class EntityStatisticService {
 
     public ImmediateHierarchy<EntityStatisticDefinition> getRelatedStatDefinitions(long id, boolean rollupOnly) {
         List<EntityStatisticDefinition> defs = definitionDao.findRelated(id, rollupOnly);
-        ImmediateHierarchy<EntityStatisticDefinition> relations = ImmediateHierarchyUtilities.build(id, defs);
-        return relations;
+        return ImmediateHierarchyUtilities.build(id, defs);
     }
 
 
@@ -116,7 +112,7 @@ public class EntityStatisticService {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         Map<RollupKind, Collection<Long>> definitionIdsByRollupKind = groupBy(
-                d -> d.rollupKind(),
+                EntityStatisticDefinition::rollupKind,
                 d -> d.id().orElse(null),
                 definitionDao.findByIds(statisticIds));
 

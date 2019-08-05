@@ -20,7 +20,6 @@
 package com.khartec.waltz.service.orgunit;
 
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -43,20 +42,16 @@ public class OrganisationalUnitService {
 
     private final OrganisationalUnitDao dao;
     private final OrganisationalUnitSearchDao organisationalUnitSearchDao;
-    private final OrganisationalUnitIdSelectorFactory selectorFactory;
 
 
     @Autowired
     public OrganisationalUnitService(OrganisationalUnitDao dao,
-                                     OrganisationalUnitSearchDao organisationalUnitSearchDao,
-                                     OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
+                                     OrganisationalUnitSearchDao organisationalUnitSearchDao) {
         checkNotNull(dao, "dao must not be null");
         checkNotNull(organisationalUnitSearchDao, "organisationalUnitSearchDao must not be null");
-        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
 
         this.dao = dao;
         this.organisationalUnitSearchDao = organisationalUnitSearchDao;
-        this.selectorFactory = orgUnitIdSelectorFactory;
     }
 
 

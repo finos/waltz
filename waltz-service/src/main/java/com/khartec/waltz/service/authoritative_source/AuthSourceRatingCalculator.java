@@ -51,25 +51,22 @@ public class AuthSourceRatingCalculator {
     private static final Logger LOG = LoggerFactory.getLogger(AuthSourceRatingCalculator.class);
 
     private final DataTypeDao dataTypeDao;
-    private final ApplicationIdSelectorFactory appIdSelectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final LogicalFlowDecoratorRatingsCalculator ratingsCalculator;
 
 
     @Autowired
     public AuthSourceRatingCalculator(DataTypeDao dataTypeDao,
-                                      ApplicationIdSelectorFactory appIdSelectorFactory,
                                       LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                       LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
 
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
-        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
         checkNotNull(ratingsCalculator, "ratingsCalculator cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
         this.dataTypeDao = dataTypeDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
-        this.appIdSelectorFactory = appIdSelectorFactory;
         this.ratingsCalculator = ratingsCalculator;
     }
 

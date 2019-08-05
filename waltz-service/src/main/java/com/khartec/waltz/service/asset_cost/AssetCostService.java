@@ -44,20 +44,17 @@ public class AssetCostService {
 
     private final AssetCostDao assetCostDao;
     private final AssetCostStatsDao assetCostStatsDao;
-    private final ApplicationIdSelectorFactory idSelectorFactory;
+    private final ApplicationIdSelectorFactory idSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
     public AssetCostService(AssetCostDao assetCodeDao,
-                            AssetCostStatsDao assetCostStatsDao,
-                            ApplicationIdSelectorFactory idSelectorFactory) {
+                            AssetCostStatsDao assetCostStatsDao) {
         checkNotNull(assetCodeDao, "assetCodeDao cannot be null");
         checkNotNull(assetCostStatsDao, "assetCostStatsDao cannot be null");
-        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
 
         this.assetCostDao = assetCodeDao;
         this.assetCostStatsDao = assetCostStatsDao;
-        this.idSelectorFactory = idSelectorFactory;
     }
 
 

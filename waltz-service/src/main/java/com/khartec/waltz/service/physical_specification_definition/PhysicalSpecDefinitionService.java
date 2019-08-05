@@ -52,25 +52,22 @@ public class PhysicalSpecDefinitionService {
     private final PhysicalSpecDefinitionFieldDao physicalSpecDefinitionFieldDao;
     private final PhysicalSpecDefinitionSampleFileDao physicalSpecDefinitionSampleFileDao;
     private final Map<ReleaseLifecycleStatus, List<ReleaseLifecycleStatus>> stateTransitions;
-    private final PhysicalSpecDefnIdSelectorFactory physicalSpecDefnIdSelectorFactory;
+    private final PhysicalSpecDefnIdSelectorFactory physicalSpecDefnIdSelectorFactory = new PhysicalSpecDefnIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecDefinitionService(ChangeLogService changeLogService,
                                          PhysicalSpecDefinitionDao physicalSpecDefinitionDao,
                                          PhysicalSpecDefinitionFieldDao physicalSpecDefinitionFieldDao,
-                                         PhysicalSpecDefnIdSelectorFactory physicalSpecDefnIdSelectorFactory,
                                          PhysicalSpecDefinitionSampleFileDao physicalSpecDefinitionSampleFileDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(physicalSpecDefinitionDao, "physicalSpecDefinitionDao cannot be null");
         checkNotNull(physicalSpecDefinitionFieldDao, "physicalSpecDefinitionFieldDao cannot be null");
-        checkNotNull(physicalSpecDefnIdSelectorFactory, "physicalSpecDefnIdSelectorFactory cannot be null");
         checkNotNull(physicalSpecDefinitionSampleFileDao, "physicalSpecDefinitionSampleFileDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.physicalSpecDefinitionDao = physicalSpecDefinitionDao;
         this.physicalSpecDefinitionFieldDao = physicalSpecDefinitionFieldDao;
-        this.physicalSpecDefnIdSelectorFactory = physicalSpecDefnIdSelectorFactory;
         this.physicalSpecDefinitionSampleFileDao = physicalSpecDefinitionSampleFileDao;
 
         // initialise valid state transitions

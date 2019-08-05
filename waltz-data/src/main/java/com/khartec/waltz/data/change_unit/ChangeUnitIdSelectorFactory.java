@@ -29,8 +29,6 @@ import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
@@ -38,17 +36,10 @@ import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
-@Service
 public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
-
-    @Autowired
-    public ChangeUnitIdSelectorFactory(ApplicationIdSelectorFactory applicationIdSelectorFactory) {
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
-    }
 
 
     @Override

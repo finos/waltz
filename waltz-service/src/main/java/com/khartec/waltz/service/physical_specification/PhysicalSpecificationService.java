@@ -53,24 +53,21 @@ public class PhysicalSpecificationService {
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSearchDao specificationSearchDao;
-    private final PhysicalSpecificationIdSelectorFactory idSelectorFactory;
+    private final PhysicalSpecificationIdSelectorFactory idSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
-                                        PhysicalSpecificationSearchDao specificationSearchDao,
-                                        PhysicalSpecificationIdSelectorFactory idSelectorFactory)
+                                        PhysicalSpecificationSearchDao specificationSearchDao)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
-        checkNotNull(idSelectorFactory, "idSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.specificationSearchDao = specificationSearchDao;
-        this.idSelectorFactory = idSelectorFactory;
     }
 
 

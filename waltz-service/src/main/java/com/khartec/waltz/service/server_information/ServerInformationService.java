@@ -40,20 +40,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 @Service
 public class ServerInformationService {
 
-    private final ApplicationIdSelectorFactory selectorFactory;
+    private final ApplicationIdSelectorFactory selectorFactory = new ApplicationIdSelectorFactory();
     private final ServerInformationDao serverInformationDao;
     private final ServerInformationSearchDao serverInformationSearchDao;
 
 
     @Autowired
-    public ServerInformationService(ApplicationIdSelectorFactory selectorFactory,
-                                    ServerInformationDao serverInfoDao,
+    public ServerInformationService(ServerInformationDao serverInfoDao,
                                     ServerInformationSearchDao serverInformationSearchDao) {
-        checkNotNull(selectorFactory, "selectorFactory cannot be null");
         checkNotNull(serverInfoDao, "serverInformationDao must not be null");
         checkNotNull(serverInformationSearchDao, "serverInformationSearchDao cannot be null");
 
-        this.selectorFactory = selectorFactory;
         this.serverInformationDao = serverInfoDao;
         this.serverInformationSearchDao = serverInformationSearchDao;
     }

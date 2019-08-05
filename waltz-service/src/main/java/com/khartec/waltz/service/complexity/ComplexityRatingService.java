@@ -54,27 +54,24 @@ public class ComplexityRatingService {
     private final ConnectionComplexityService connectionComplexityService;
     private final ServerComplexityService serverComplexityService;
 
-    private final ApplicationIdSelectorFactory appIdSelectorFactory;
+    private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
     public ComplexityRatingService(ComplexityScoreDao complexityScoreDao,
                                    MeasurableComplexityService measurableComplexityService,
                                    ConnectionComplexityService connectionComplexityService,
-                                   ServerComplexityService serverComplexityService,
-                                   ApplicationIdSelectorFactory appIdSelectorFactory) {
+                                   ServerComplexityService serverComplexityService) {
 
         checkNotNull(complexityScoreDao, "complexityScoreDao cannot be null");
         checkNotNull(measurableComplexityService, "measurableComplexityService cannot be null");
         checkNotNull(connectionComplexityService, "connectionComplexityService cannot be null");
         checkNotNull(serverComplexityService, "serverComplexityService cannot be null");
-        checkNotNull(appIdSelectorFactory, "appIdSelectorFactory cannot be null");
 
         this.complexityScoreDao = complexityScoreDao;
         this.measurableComplexityService = measurableComplexityService;
         this.connectionComplexityService = connectionComplexityService;
         this.serverComplexityService = serverComplexityService;
-        this.appIdSelectorFactory = appIdSelectorFactory;
     }
 
 

@@ -30,7 +30,6 @@ import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.attribute_change.AttributeChangeService;
 import com.khartec.waltz.service.change_unit.AttributeChangeCommandProcessor;
 import com.khartec.waltz.service.change_unit.ChangeUnitCommandProcessor;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,27 +46,23 @@ import static java.util.stream.Collectors.toMap;
 public class ModifyCommandProcessor implements ChangeUnitCommandProcessor {
 
     private final AttributeChangeService attributeChangeService;
-    private final ChangeLogService changeLogService;
     private final PhysicalFlowService physicalFlowService;
     private final Map<String, AttributeChangeCommandProcessor> processorsByAttribute;
 
 
     @Autowired
     public ModifyCommandProcessor(AttributeChangeService attributeChangeService,
-                                  ChangeLogService changeLogService,
                                   PhysicalFlowService physicalFlowService,
                                   List<AttributeChangeCommandProcessor> processors) {
         checkNotNull(attributeChangeService, "attributeChangeService cannot be null");
-        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(processors, "processors cannot be null");
 
         this.attributeChangeService = attributeChangeService;
-        this.changeLogService = changeLogService;
         this.physicalFlowService = physicalFlowService;
         this.processorsByAttribute = processors
                 .stream()
-                .collect(toMap(t -> t.supportedAttribute(), t -> t));
+                .collect(toMap(AttributeChangeCommandProcessor::supportedAttribute, t -> t));
     }
 
 

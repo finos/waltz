@@ -39,7 +39,7 @@ public class ChangeInitiativeHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         ChangeInitiativeDao dao = ctx.getBean(ChangeInitiativeDao.class);
-        ChangeInitiativeIdSelectorFactory selectorFactory = ctx.getBean(ChangeInitiativeIdSelectorFactory.class);
+        ChangeInitiativeIdSelectorFactory selectorFactory = new ChangeInitiativeIdSelectorFactory();
 
         IdSelectionOptions opts = mkOpts(
                 mkRef(EntityKind.APPLICATION, 40),

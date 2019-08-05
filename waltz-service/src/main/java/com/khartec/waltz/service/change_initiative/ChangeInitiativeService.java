@@ -51,26 +51,22 @@ public class ChangeInitiativeService {
     private final ChangeInitiativeSearchDao searchDao;
     private final EntityRelationshipDao relationshipDao;
     private final ChangeLogService changeLogService;
-    private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory;
+    private final ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory = new ChangeInitiativeIdSelectorFactory();
 
     @Autowired
-    public ChangeInitiativeService(
-            ChangeInitiativeDao changeInitiativeDao,
-            ChangeInitiativeSearchDao searchDao,
-            EntityRelationshipDao relationshipDao,
-            ChangeInitiativeIdSelectorFactory changeInitiativeIdSelectorFactory,
-            ChangeLogService changeLogService) {
-
+    public ChangeInitiativeService(ChangeInitiativeDao changeInitiativeDao,
+                                   ChangeInitiativeSearchDao searchDao,
+                                   EntityRelationshipDao relationshipDao,
+                                   ChangeLogService changeLogService)
+    {
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
         checkNotNull(relationshipDao, "relationshipDao cannot be null");
-        checkNotNull(changeInitiativeIdSelectorFactory, "changeInitiativeIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.changeInitiativeDao = changeInitiativeDao;
         this.searchDao = searchDao;
         this.relationshipDao = relationshipDao;
-        this.changeInitiativeIdSelectorFactory = changeInitiativeIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 

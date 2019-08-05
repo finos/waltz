@@ -22,7 +22,6 @@ package com.khartec.waltz.service.attestation;
 
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
@@ -36,7 +35,10 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -50,7 +52,7 @@ public class AttestationRunService {
     private final AttestationInstanceRecipientDao attestationInstanceRecipientDao;
     private final AttestationRunDao attestationRunDao;
     private final EmailService emailService;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final InvolvementDao involvementDao;
 
     @Autowired
@@ -58,20 +60,17 @@ public class AttestationRunService {
                                  AttestationInstanceRecipientDao attestationInstanceRecipientDao,
                                  AttestationRunDao attestationRunDao,
                                  EmailService emailService,
-                                 GenericSelectorFactory genericSelectorFactory,
                                  InvolvementDao involvementDao) {
         checkNotNull(attestationInstanceRecipientDao, "attestationInstanceRecipientDao cannot be null");
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunDao, "attestationRunDao cannot be null");
         checkNotNull(emailService, "emailService cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationInstanceRecipientDao = attestationInstanceRecipientDao;
         this.attestationRunDao = attestationRunDao;
         this.emailService = emailService;
-        this.genericSelectorFactory = genericSelectorFactory;
         this.involvementDao = involvementDao;
     }
 
