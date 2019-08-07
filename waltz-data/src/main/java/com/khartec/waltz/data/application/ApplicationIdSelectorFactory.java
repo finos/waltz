@@ -31,7 +31,6 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
@@ -54,43 +53,22 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 
 @Service
 public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
-    private final DSLContext dsl;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
-    private final ApplicationGroupEntry appGroupAppEntry = APPLICATION_GROUP_ENTRY.as("agae");
-    private final ApplicationGroupOuEntry appGroupOuEntry = APPLICATION_GROUP_OU_ENTRY.as("agoe");
     private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("fd");
     private final Involvement involvement = INVOLVEMENT.as("inv");
     private final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf");
     private final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr");
     private final Person person = PERSON.as("p");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
-
-
-    @Autowired
-    public ApplicationIdSelectorFactory(DSLContext dsl,
-                                        DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
-                                        MeasurableIdSelectorFactory measurableIdSelectorFactory, 
-                                        OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
-        checkNotNull(dsl, "dsl cannot be null");
-        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
-        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
-        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
-
-        this.dsl = dsl;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
-        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
-    }
 
 
     public Select<Record1<Long>> apply(ApplicationIdSelectionOptions options) {
@@ -133,7 +111,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
-        return dsl
+        return DSL
                 .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
                 .from(SOFTWARE_USAGE)
                 .innerJoin(APPLICATION)
@@ -219,7 +197,8 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
         Condition applicationConditions = mkApplicationConditions(options);
 
-        return dsl.select(measurableRating.ENTITY_ID)
+        return DSL
+                .select(measurableRating.ENTITY_ID)
                 .from(measurableRating)
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(measurableRating.ENTITY_ID))
@@ -275,7 +254,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
         Condition applicationConditions = mkApplicationConditions(options);
 
-        return dsl
+        return DSL
                 .selectDistinct(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ouSelector))
@@ -283,7 +262,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private SelectOrderByStep<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
+    public static SelectOrderByStep<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         if (options.scope() != EXACT) {
             throw new UnsupportedOperationException(
                     "App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
@@ -293,11 +272,11 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
         SelectConditionStep<Record1<Long>> associatedOrgUnits = DSL
                 .selectDistinct(ENTITY_HIERARCHY.ID)
-                .from(appGroupOuEntry)
+                .from(APPLICATION_GROUP_OU_ENTRY)
                 .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(appGroupOuEntry.ORG_UNIT_ID)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
-                .where(appGroupOuEntry.GROUP_ID.eq(options.entityReference().id()));
+                .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(options.entityReference().id()));
 
         SelectConditionStep<Record1<Long>> applicationIdsFromAssociatedOrgUnits = DSL
                 .select(APPLICATION.ID)
@@ -307,11 +286,11 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .where(ORGANISATIONAL_UNIT.ID.in(associatedOrgUnits));
 
         SelectConditionStep<Record1<Long>> directApps = DSL
-                .select(appGroupAppEntry.APPLICATION_ID)
-                .from(appGroupAppEntry)
-                .where(appGroupAppEntry.GROUP_ID.eq(options.entityReference().id()));
+                .select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
+                .from(APPLICATION_GROUP_ENTRY)
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
 
-        return dsl
+        return DSL
                 .select(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(directApps.unionAll(applicationIdsFromAssociatedOrgUnits)))
@@ -336,11 +315,13 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
     private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
 
-        Select<Record1<String>> emp = dsl.select(person.EMPLOYEE_ID)
+        Select<Record1<String>> emp = DSL
+                .select(person.EMPLOYEE_ID)
                 .from(person)
                 .where(person.ID.eq(options.entityReference().id()));
 
-        SelectConditionStep<Record1<String>> reporteeIds = DSL.selectDistinct(personHierarchy.EMPLOYEE_ID)
+        SelectConditionStep<Record1<String>> reporteeIds = DSL
+                .selectDistinct(personHierarchy.EMPLOYEE_ID)
                 .from(personHierarchy)
                 .where(personHierarchy.MANAGER_ID.eq(emp));
 
@@ -350,7 +331,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                         .or(involvement.EMPLOYEE_ID.in(reporteeIds)))
                 .and(applicationConditions);
 
-        return dsl
+        return DSL
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
                 .innerJoin(APPLICATION)
@@ -361,12 +342,13 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
     private Select<Record1<Long>> mkForSinglePerson(ApplicationIdSelectionOptions options) {
 
-        Select<Record1<String>> employeeId = dsl.select(person.EMPLOYEE_ID)
+        Select<Record1<String>> employeeId = DSL
+                .select(person.EMPLOYEE_ID)
                 .from(person)
                 .where(person.ID.eq(options.entityReference().id()));
 
         Condition applicationConditions = mkApplicationConditions(options);
-        return dsl
+        return DSL
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
                 .innerJoin(APPLICATION)
@@ -401,7 +383,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                         .and(applicationConditions),
                 LOGICAL_FLOW.TARGET_ENTITY_ID);
 
-        return dsl
+        return DSL
                 .selectDistinct(appId)
                 .from(sources)
                 .union(targets);
@@ -409,7 +391,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
 
 
     private SelectConditionStep<Record1<Long>> selectLogicalFlowAppsByDataType(Field<Long> appField, Condition condition, Field<Long> joinField) {
-        return dsl
+        return DSL
                 .select(appField)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR)

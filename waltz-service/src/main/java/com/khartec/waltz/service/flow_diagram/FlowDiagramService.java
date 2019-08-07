@@ -77,14 +77,14 @@ public class FlowDiagramService {
     private final FlowDiagramDao flowDiagramDao;
     private final FlowDiagramEntityDao flowDiagramEntityDao;
     private final FlowDiagramAnnotationDao flowDiagramAnnotationDao;
-    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
     private final ApplicationDao applicationDao;
     private final LogicalFlowDao logicalFlowDao;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ActorDao actorDao;
     private final Random rnd = RandomUtilities.getRandom();
-    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory;
+    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final MeasurableDao measurableDao;
     private final ChangeInitiativeDao changeInitiativeDao;
 
@@ -94,20 +94,17 @@ public class FlowDiagramService {
                               FlowDiagramDao flowDiagramDao,
                               FlowDiagramEntityDao flowDiagramEntityDao,
                               FlowDiagramAnnotationDao flowDiagramAnnotationDao,
-                              FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory,
                               ApplicationDao applicationDao,
                               LogicalFlowDao logicalFlowDao,
                               PhysicalFlowDao physicalFlowDao,
                               PhysicalSpecificationDao physicalSpecificationDao,
                               ActorDao actorDao,
                               MeasurableDao measurableDao,
-                              ChangeInitiativeDao changeInitiativeDao,
-                              LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory) {
+                              ChangeInitiativeDao changeInitiativeDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(flowDiagramDao, "flowDiagramDao cannot be null");
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
         checkNotNull(flowDiagramAnnotationDao, "flowDiagramAnnotationDao cannot be null");
-        checkNotNull(flowDiagramIdSelectorFactory, "flowDiagramIdSelectorFactory cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
@@ -115,13 +112,11 @@ public class FlowDiagramService {
         checkNotNull(actorDao, "actorDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
-        checkNotNull(logicalFlowIdSelectorFactory, "logicalFlowIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.flowDiagramDao = flowDiagramDao;
         this.flowDiagramEntityDao = flowDiagramEntityDao;
         this.flowDiagramAnnotationDao = flowDiagramAnnotationDao;
-        this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
         this.applicationDao = applicationDao;
         this.logicalFlowDao = logicalFlowDao;
         this.physicalFlowDao = physicalFlowDao;
@@ -129,7 +124,6 @@ public class FlowDiagramService {
         this.actorDao = actorDao;
         this.measurableDao = measurableDao;
         this.changeInitiativeDao = changeInitiativeDao;
-        this.logicalFlowIdSelectorFactory = logicalFlowIdSelectorFactory;
     }
 
 

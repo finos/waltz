@@ -23,6 +23,7 @@ import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSele
 import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification_data_type.ImmutablePhysicalSpecificationDataType;
 import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -51,26 +52,23 @@ public class PhysicalSpecDataTypeService {
     private final LogicalFlowDecoratorService logicalFlowDecoratorService;
     private final PhysicalFlowService physicalFlowService;
     private final PhysicalSpecDataTypeDao physicalSpecDataTypeDao;
-    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory;
+    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecDataTypeService(ChangeLogService changeLogService,
                                        LogicalFlowDecoratorService logicalFlowDecoratorService,
                                        PhysicalFlowService physicalFlowService,
-                                       PhysicalSpecDataTypeDao physicalSpecDataTypeDao,
-                                       PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory) {
+                                       PhysicalSpecDataTypeDao physicalSpecDataTypeDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeDao, "physicalSpecDataTypeDao cannot be null");
-        checkNotNull(specificationIdSelectorFactory, "specificationIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.physicalFlowService = physicalFlowService;
         this.physicalSpecDataTypeDao = physicalSpecDataTypeDao;
-        this.specificationIdSelectorFactory = specificationIdSelectorFactory;
     }
 
 
@@ -108,7 +106,7 @@ public class PhysicalSpecDataTypeService {
         List<Long> logicalFlowIds = physicalFlowService
                 .findBySpecificationId(specificationId)
                 .stream()
-                .map(f -> f.logicalFlowId())
+                .map(PhysicalFlow::logicalFlowId)
                 .collect(toList());
 
         Set<EntityReference> dataTypeRefs = dataTypeIds.stream()

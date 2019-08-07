@@ -42,13 +42,12 @@ import static spark.Spark.post;
 public class PeopleExtractor extends BaseDataExtractor{
 
 
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     @Autowired
-    public PeopleExtractor(DSLContext dsl, GenericSelectorFactory genericSelectorFactory) {
+    public PeopleExtractor(DSLContext dsl) {
         super(dsl);
-        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 

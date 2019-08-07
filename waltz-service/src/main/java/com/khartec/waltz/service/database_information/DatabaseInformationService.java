@@ -38,15 +38,12 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class DatabaseInformationService {
 
     private final DatabaseInformationDao databaseInformationDao;
-    private final ApplicationIdSelectorFactory factory;
+    private final ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
 
     @Autowired
-    public DatabaseInformationService(DatabaseInformationDao databaseInformationDao, ApplicationIdSelectorFactory factory) {
+    public DatabaseInformationService(DatabaseInformationDao databaseInformationDao) {
         Checks.checkNotNull(databaseInformationDao, "databaseInformationDao cannot be null");
-        Checks.checkNotNull(factory, "factory cannot be null");
-
         this.databaseInformationDao = databaseInformationDao;
-        this.factory = factory;
     }
 
     public List<DatabaseInformation> findByApplicationId(Long id) {

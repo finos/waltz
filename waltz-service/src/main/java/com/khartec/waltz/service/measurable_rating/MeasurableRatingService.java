@@ -56,35 +56,30 @@ public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory;
     private final PerspectiveRatingDao perspectiveRatingDao;
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
     private final ChangeLogService changeLogService;
     private final MeasurableCategoryDao measurableCategoryDao;
+
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableCategoryDao measurableCategoryDao,
-                                   MeasurableIdSelectorFactory measurableIdSelectorFactory,
                                    PerspectiveRatingDao perspectiveRatingDao,
-                                   ApplicationIdSelectorFactory applicationIdSelectorFactory,
                                    ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
-        checkNotNull(measurableIdSelectorFactory, "measurableIdSelectorFactory cannot be null");
         checkNotNull(perspectiveRatingDao, "perspectiveRatingDao cannot be null");
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableCategoryDao = measurableCategoryDao;
-        this.measurableIdSelectorFactory = measurableIdSelectorFactory;
         this.perspectiveRatingDao = perspectiveRatingDao;
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 

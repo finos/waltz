@@ -42,13 +42,13 @@ public class ApplicationIdSelectorHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ApplicationIdSelectorFactory factory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 
         ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.APP_GROUP, 8L),
+                EntityReference.mkRef(EntityKind.APP_GROUP, 11309L),
                 HierarchyQueryScope.EXACT);
 
 

@@ -46,7 +46,7 @@ public class DataFlowHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
         LogicalFlowDao dao = ctx.getBean(LogicalFlowDao.class);
-        LogicalFlowIdSelectorFactory factory = ctx.getBean(LogicalFlowIdSelectorFactory.class);
+        LogicalFlowIdSelectorFactory factory = new LogicalFlowIdSelectorFactory();
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 5000),

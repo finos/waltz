@@ -4,16 +4,17 @@ import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.DATABASE_INFORMATION;
+import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -25,17 +26,15 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TechnologyEOLDatabaseExtractor.class);
     private final EntityReferenceNameResolver nameResolver;
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
     @Autowired
     public TechnologyEOLDatabaseExtractor(DSLContext dsl,
-                                          EntityReferenceNameResolver nameResolver,
-                                          ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+                                          EntityReferenceNameResolver nameResolver) {
         super(dsl);
         checkNotNull(nameResolver, "nameResolver cannot be null");
         checkNotNull(applicationIdSelectorFactory, "appIdSelectorFactory cannot be null");
         this.nameResolver = nameResolver;
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -46,7 +45,7 @@ public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
             EntityReference ref = getReference(request);
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref));
 
-            SelectConditionStep<Record> qry = dsl
+            SelectConditionStep<Record> qry = DSL
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(DATABASE_INFORMATION.DATABASE_NAME.as("Database Name"),

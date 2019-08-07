@@ -27,6 +27,7 @@ import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +42,7 @@ import static spark.Spark.post;
 @Service
 public class MeasurableRatingExtractor extends BaseDataExtractor {
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final Measurable m = MEASURABLE.as("m");
     private final Application app = APPLICATION.as("app");
     private final MeasurableCategory mc = Tables.MEASURABLE_CATEGORY.as("mc");
@@ -51,10 +52,8 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
 
 
     @Autowired
-    public MeasurableRatingExtractor(DSLContext dsl,
-                                     ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public MeasurableRatingExtractor(DSLContext dsl) {
         super(dsl);
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -75,7 +74,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
             Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(selectionOpts);
 
 
-            SelectSelectStep<Record> reportColumns = dsl
+            SelectSelectStep<Record> reportColumns = DSL
                     .select(m.NAME.as("Taxonomy Item Name"),
                             m.EXTERNAL_ID.as("Taxonomy Item Code"))
                     .select(app.NAME.as("App Name"),
@@ -122,7 +121,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
             ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOpts);
 
-            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = dsl
+            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = DSL
                     .selectDistinct(MEASURABLE_RATING.ENTITY_ID)
                     .from(MEASURABLE_RATING)
                     .join(MEASURABLE)
@@ -130,7 +129,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
                     .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
 
-            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = dsl
+            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = DSL
                     .selectDistinct(app.NAME.as("App Name"),
                             app.ASSET_CODE.as("App Code"),
                             app.ID.as("App Waltz Id"),

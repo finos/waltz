@@ -45,7 +45,7 @@ public class MeasurableRatingHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         MeasurableRatingDao measurableRatingDao = ctx.getBean(MeasurableRatingDao.class);
-        MeasurableIdSelectorFactory measurableIdSelectorFactory = ctx.getBean(MeasurableIdSelectorFactory.class);
+        MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
 
         EntityReference direct = mkRef(MEASURABLE, 18310);
         EntityReference indirect = mkRef(MEASURABLE, 18064);

@@ -22,12 +22,12 @@ package com.khartec.waltz.service.involvement;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
@@ -56,11 +56,10 @@ public class InvolvementService {
 
     private final ChangeLogService changeLogService;
     private final InvolvementDao involvementDao;
-    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final InvolvementKindService involvementKindService;
     private final PersonDao personDao;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     private Map<Long, String> involvementKindIdToNameMap;
 
@@ -68,23 +67,17 @@ public class InvolvementService {
     @Autowired
     public InvolvementService(ChangeLogService changeLogService,
                               InvolvementDao dao,
-                              GenericSelectorFactory genericSelectorFactory,
-                              EndUserAppIdSelectorFactory endUserAppIdSelectorFactory,
                               EntityReferenceNameResolver entityReferenceNameResolver,
                               InvolvementKindService involvementKindService,
                               PersonDao personDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "involvementDao must not be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
-        checkNotNull(endUserAppIdSelectorFactory, "endUserAppIdSelectorFactory cannot be null");
         checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
         checkNotNull(involvementKindService, "involvementKindService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.involvementDao = dao;
-        this.genericSelectorFactory = genericSelectorFactory;
-        this.endUserAppIdSelectorFactory = endUserAppIdSelectorFactory;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.involvementKindService = involvementKindService;
         this.personDao = personDao;
@@ -211,7 +204,7 @@ public class InvolvementService {
         return applyToFirst(
                     entityReferenceNameResolver.resolve(newArrayList(ref)),
                     EntityReferenceUtilities::pretty)
-                .orElseGet(() -> ref.toString());
+                .orElseGet(ref::toString);
     }
 
 
@@ -219,7 +212,7 @@ public class InvolvementService {
         return involvementKindService
                 .findAll()
                 .stream()
-                .collect(Collectors.toMap(ik -> ik.id().get(), ik -> ik.name()));
+                .collect(Collectors.toMap(ik -> ik.id().get(), NameProvider::name));
     }
 
 }

@@ -23,25 +23,20 @@ import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.impl.DSL.selectDistinct;
 
 
-@Service
 public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
 
 
-    @Autowired
-    public LicenceIdSelectorFactory(DSLContext dsl) {
-        super(dsl, EntityKind.LICENCE);
+    public LicenceIdSelectorFactory() {
+        super(EntityKind.LICENCE);
     }
 
 

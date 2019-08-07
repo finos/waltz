@@ -19,19 +19,16 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -45,27 +42,21 @@ import static spark.Spark.post;
 @Service
 public class LogicalFlowExtractor extends BaseDataExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowExtractor.class);
-
-    private static final Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> SOURCE_NAME_FIELD = mkNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
             LOGICAL_FLOW.SOURCE_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
-    private static final Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> TARGET_NAME_FIELD = mkNameField(
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
     @Autowired
-    public LogicalFlowExtractor(DSLContext dsl,
-                                ApplicationIdSelectorFactory applicationIdSelectorFactory) {
+    public LogicalFlowExtractor(DSLContext dsl) {
         super(dsl);
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
-
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
     }
 
 
@@ -128,7 +119,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        SelectConditionStep<Record> qry = dsl
+        return DSL
                 .select(SOURCE_NAME_FIELD.as("Source"),
                         sourceAssetCodeField.as("Source Asset Code"),
                         sourceOrgUnitNameField.as("Source Org Unit"))
@@ -155,7 +146,6 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()));
 
-        return qry;
     }
 
 }

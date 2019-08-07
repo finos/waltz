@@ -61,7 +61,7 @@ public class PhysicalFlowService {
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
-    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory;
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
     @Autowired
@@ -69,16 +69,12 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               PhysicalFlowSearchDao searchDao,
-                               PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
-        this.physicalFlowIdSelectorFactory = physicalFlowIdSelectorFactory;
-
+                               PhysicalFlowSearchDao searchDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
-        checkNotNull(physicalFlowIdSelectorFactory, "physicalFlowIdSelectorFactory cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
