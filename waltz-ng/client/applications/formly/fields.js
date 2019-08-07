@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -121,8 +121,9 @@ export const overallRatingField = {
         ],
         label: 'Overall Rating',
         placeholder: '',
-        required: true
-    }
+        required: true,
+    },
+    className: "ux-app-reg-overall-rating"
 };
 
 
@@ -136,5 +137,6 @@ export const businessCriticalityField = {
         label: 'Business Criticality',
         placeholder: '',
         required: true
-    }
+    },
+    className: "ux-app-reg-business-criticality"
 };
