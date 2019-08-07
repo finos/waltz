@@ -82,6 +82,8 @@ public class AppGroupEndpoint implements Endpoint {
         String deleteApplicationListPath = mkPath(idPath, "applications", "list", "remove");
         String addApplicationPath = mkPath(idPath, "applications");
         String removeApplicationPath = mkPath(idPath, "applications", ":applicationId");
+        String addOrgUnitPath = mkPath(idPath, "orgUnits");
+        String removeOrgUnitPath = mkPath(idPath, "orgUnits", ":orgUnitId");
         String updateGroupOverviewPath = idPath;
 
         String addChangeInitiativePath = mkPath(idPath, "change-initiatives");
@@ -181,6 +183,19 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.removeApplication(getUsername(request), groupId, applicationId);
         };
 
+        ListRoute<EntityReference> addOrgUnitRoute = (request, response) -> {
+            long groupId = getId(request);
+            long orgUnitId = readBody(request, Long.class);
+            LOG.info("Adding orgUnit: {}, to application group: {} ", orgUnitId,  groupId);
+            return appGroupService.addOrganisationalUnit(getUsername(request), groupId, orgUnitId);
+        };
+        ListRoute<EntityReference> removeOrgUnitRoute = (request, response) -> {
+            long groupId = getId(request);
+            long orgUnitId = getLong(request, "orgUnitId");
+            LOG.info("Removing orgUnit: {}, from application group: {} ", orgUnitId,  groupId);
+            return appGroupService.removeOrganisationalUnit(getUsername(request), groupId, orgUnitId);
+        };
+
         ListRoute<EntityReference> removeApplicationListRoute = (request, response) -> {
             long groupId = getId(request);
             List<Long> applicationIds = readIdsFromBody(request);
@@ -236,6 +251,9 @@ public class AppGroupEndpoint implements Endpoint {
         postForList(applicationListPath, addApplicationListRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
         postForList(deleteApplicationListPath, removeApplicationListRoute);
+
+        postForList(addOrgUnitPath, addOrgUnitRoute);
+        deleteForList(removeOrgUnitPath, removeOrgUnitRoute);
 
         postForList(addChangeInitiativePath, addChangeInitiativeRoute);
         deleteForList(removeChangeInitiativePath, removeChangeInitiativeRoute);

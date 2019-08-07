@@ -162,7 +162,7 @@
                     <message>
                         <waltz-icon name="warning"></waltz-icon>
                         <strong>No applications</strong> have been registered to this
-                        group yet.  Use the search field on the right to start adding
+                        group yet. Use the search field on the right to start adding
                         applications.
                     </message>
                 </waltz-no-data>
@@ -311,7 +311,83 @@
             </div>
         </div>
     </waltz-section>
+    <waltz-section icon="desktop" name="Organisational Units In Group">
+        <div class="row">
+            <div class="col-md-6">
+                <div ng-if="ctrl.organisationalUnits.length > 0">
 
+                    <p class="waltz-paragraph">
+                        Current organisational units within this group
+                    </p>
+                    <p class="waltz-paragraph">
+                        Use the search field to the right to locate
+                        an application to add to the group.
+                    </p>
+
+                    <div class="waltz-scroll-region" style="height: 530px">
+                        <table class="table table-striped table-condensed">
+                            <thead>
+                            <tr>
+                                <th>Organisational Unit</th>
+                                <th>Operations</th>
+                            </tr>
+                            </thead>
+                            <tr ng-repeat="orgUnit in ctrl.organisationalUnits | orderBy:'name'"
+                                class="waltz-visibility-parent">
+
+                                <td>
+                                    <a ng-click="ctrl.focusOnOrganisationalUnit(orgUnit)"
+                                       class="clickable"
+                                       ng-bind="orgUnit.name">
+                                    </a>
+                                </td>
+                                <td>
+                                <span class="waltz-visibility-child-50">
+                                    <a ng-click="ctrl.removeOrgUnitFromGroup(orgUnit)"
+                                       class="clickable">
+                                        Remove
+                                    </a>
+                                </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <waltz-no-data ng-if="ctrl.organisationalUnits.length ==0">
+                    <message>
+                        <waltz-icon name="warning"></waltz-icon>
+                        <strong>No Organisational Units</strong> have been registered to this
+                        group yet. Use the search field on the right to start adding
+                        Organisational Units.
+                    </message>
+                </waltz-no-data>
+            </div>
+            <div class="col-md-6">
+
+                <p class="waltz-paragraph">
+                    Use the search box below to locate an Organisational Unit and add it
+                    to the group.
+                </p>
+                <uib-tabset>
+                    <uib-tab heading="Single Editor">
+                        <!-- Single Selector -->
+                        <div style="padding: 1em 0">
+                            <span>
+                                Once a selection is made related Organisational Units
+                                will also be shown.
+                            </span>
+                            <!-- exclude the ones that the one that are selected -->
+                            <waltz-entity-selector on-select="$ctrl.addOrgUnitToGroup"
+                                                   current-selection="$ctrl.currentlySelected"
+                                                   entity-kinds="['ORG_UNIT']"
+                                                   selection-filter="$ctrl.selectionFilter">
+                            </waltz-entity-selector>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
+            </div>
+        </div>
+    </waltz-section>
     <waltz-section icon="users" name="Group Users">
         <table class="table table-condensed table-striped">
             <thead>
@@ -335,7 +411,7 @@
         </table>
 
         <div class="waltz-paragraph text-muted">
-            <strong>Owners</strong> can add and remove applications from a group.  They may also promote other
+            <strong>Owners</strong> can add and remove applications from a group. They may also promote other
             subscribers to be co-owners.
         </div>
 

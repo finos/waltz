@@ -24,8 +24,10 @@ import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.app_group.AppGroupMemberDao;
+import com.khartec.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.application.Application;
@@ -36,6 +38,7 @@ import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +62,8 @@ public class AppGroupService {
     private final AppGroupMemberDao appGroupMemberDao;
     private final AppGroupEntryDao appGroupEntryDao;
     private final ApplicationDao applicationDao;
+    private final AppGroupOrganisationalUnitDao appGroupOrganisationalUnitDao;
+    private final OrganisationalUnitDao organisationalUnitDao;
     private final EntityRelationshipDao entityRelationshipDao;
     private final ChangeInitiativeService changeInitiativeService;
     private final ChangeLogService changeLogService;
@@ -69,6 +74,8 @@ public class AppGroupService {
                            AppGroupMemberDao appGroupMemberDao,
                            AppGroupEntryDao appGroupEntryDao,
                            ApplicationDao applicationDao,
+                           AppGroupOrganisationalUnitDao appGroupOrganisationalUnitDao,
+                           OrganisationalUnitDao organisationalUnitDao,
                            EntityRelationshipDao entityRelationshipDao,
                            ChangeInitiativeService changeInitiativeService,
                            ChangeLogService changeLogService) {
@@ -76,6 +83,8 @@ public class AppGroupService {
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
         checkNotNull(appGroupEntryDao, "appGroupEntryDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
+        checkNotNull(appGroupOrganisationalUnitDao, "appGroupOrganisationalUnitDao cannot be null");
+        checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
         checkNotNull(entityRelationshipDao, "entityRelationshipDao cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
@@ -84,6 +93,8 @@ public class AppGroupService {
         this.appGroupMemberDao = appGroupMemberDao;
         this.appGroupEntryDao = appGroupEntryDao;
         this.applicationDao = applicationDao;
+        this.appGroupOrganisationalUnitDao = appGroupOrganisationalUnitDao;
+        this.organisationalUnitDao = organisationalUnitDao;
         this.entityRelationshipDao = entityRelationshipDao;
         this.changeInitiativeService = changeInitiativeService;
         this.changeLogService = changeLogService;
@@ -95,6 +106,7 @@ public class AppGroupService {
                 .appGroup(appGroupDao.getGroup(groupId))
                 .applications(appGroupEntryDao.getEntriesForGroup(groupId))
                 .members(appGroupMemberDao.getMembers(groupId))
+                .organisationalUnits(appGroupOrganisationalUnitDao.getEntriesForGroup(groupId))
                 .build();
     }
 
@@ -217,7 +229,27 @@ public class AppGroupService {
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 
+    public List<EntityReference> addOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
 
+        verifyUserCanUpdateGroup(userId, groupId);
+
+//        Application app = applicationDao.getById(applicationId);
+//        if (app != null) {
+//            appGroupEntryDao.addApplication(groupId, applicationId);
+//            audit(groupId, userId, String.format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
+//        }
+//
+//        return appGroupEntryDao.getEntriesForGroup(groupId);
+        throw new RuntimeException("Unimplemented yet!");
+    }
+
+    public List<EntityReference> removeOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
+        verifyUserCanUpdateGroup(userId, groupId);
+        appGroupOrganisationalUnitDao.removeOrgUnit(groupId, orgUnitId);
+        OrganisationalUnit ou = organisationalUnitDao.getById(orgUnitId);
+        audit(groupId, userId, String.format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, Operation.REMOVE);
+        return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
+    }
     public List<EntityReference> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
 
@@ -272,7 +304,7 @@ public class AppGroupService {
     public Long createNewGroup(String userId) {
         long groupId = appGroupDao.insert(ImmutableAppGroup.builder()
                 .description("New group created by: " + userId)
-                .name("New group created by: "+userId)
+                .name("New group created by: " + userId)
                 .appGroupKind(AppGroupKind.PRIVATE)
                 .build());
 
@@ -360,7 +392,6 @@ public class AppGroupService {
                 .provenance("waltz")
                 .build();
     }
-
 
 
     private void audit(long groupId, String userId, String message, EntityKind childKind, Operation operation) {

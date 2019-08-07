@@ -34,7 +34,7 @@ const initialState = {
 
 
 function setup(groupDetail) {
-    const { applications, members, appGroup } = groupDetail;
+    const {organisationalUnits, applications, members, appGroup } = groupDetail;
 
     const owners = _.filter(members, m => m.role === "OWNER" );
     const viewers = _.filter(members, m => m.role === "VIEWER" );
@@ -42,6 +42,7 @@ function setup(groupDetail) {
     return {
         owners,
         viewers,
+        organisationalUnits,
         applications,
         appGroup
     };
@@ -123,7 +124,7 @@ function controller($q,
             return userService
                 .whoami()
                 .then(me => {
-                    const owner = _.find(vm.owners, o => o.userId == me.userName && o.role === "OWNER");
+                    const owner = _.find(vm.owners, o => o.userId === me.userName && o.role === "OWNER");
                     vm.canDelete = owner != null;
                 });
         });
@@ -144,6 +145,23 @@ function controller($q,
             .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
             .then(() => notification.warning("Removed: " + app.name));
+    };
+
+    vm.addOrgUnitToGroup = (orgUnit) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.addOrganisationalUnit, [id, orgUnit.id])
+            .then(r => r.data)
+            .then(orgUnits => vm.orgUnits = orgUnits, e => handleError(e))
+            .then(() => notification.success("Added: " + orgUnit.name));
+    };
+
+
+    vm.removeOrgUnitFromGroup = (orgUnit) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.removeOrganisationalUnit, [id, orgUnit.id])
+            .then(r => r.data)
+            .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
+            .then(() => notification.warning("Removed: " + orgUnit.name));
     };
 
 
@@ -204,6 +222,7 @@ function controller($q,
             })
             .then(() => vm.focusApp = focusApp);
     };
+    vm.focusOnOrganisationalUnit = (orgUnit) => {};
 
     vm.showSingleEditor = () => {
         vm.editor = "SINGLE"
@@ -269,7 +288,7 @@ function controller($q,
 
     //add app via recently viewed
     vm.history = localStorageService
-        .get("history_2").filter(r => r.kind == "APPLICATION" ) || [];
+        .get("history_2").filter(r => r.kind === "APPLICATION" ) || [];
 
     vm.addRecentViewed = (app) => {
         app.id = app.stateParams.id;
