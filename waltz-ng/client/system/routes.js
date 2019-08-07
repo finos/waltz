@@ -33,6 +33,7 @@ import ActorsView from "./actors-view";
 import EntityNamedNoteTypesView from "./entity-named-node-types-view";
 import InvolvementKindsView from "./involvement-kinds-view";
 import StaticPanelsView from "./static-panels-view";
+import RatingSchemesView from "./rating-schemes-view";
 
 const listViewState = {
     url: "/list",
@@ -89,6 +90,12 @@ const staticPanelsState = {
 };
 
 
+const ratingSchemesState = {
+    url: "/rating-schemes",
+    views: { "content@": RatingSchemesView }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state("main.system", baseState)
@@ -100,6 +107,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
         .state("main.system.involvement-kinds", involvementKindsState)
         .state("main.system.static-panels", staticPanelsState)
+        .state("main.system.rating-schemes", ratingSchemesState)
         .state("main.system.recalculate", recalculateState);
 }
 
