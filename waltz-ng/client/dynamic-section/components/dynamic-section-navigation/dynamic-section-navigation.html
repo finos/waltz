@@ -23,7 +23,8 @@
             class="wdsn-option">
             <div ng-style="$ctrl.mkStyle(section)">
                 <a ng-click="$ctrl.onSelect(section)"
-                   class="clickable">
+                   class="clickable"
+                   ng-class="'wdsn-{{section.componentId}}'">
                     <waltz-icon name="{{ section.icon }}">
                     </waltz-icon>
                     <span class='small'
