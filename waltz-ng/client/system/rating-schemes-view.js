@@ -40,8 +40,8 @@ function controller(serviceBroker, $q) {
             CORE_API.RatingSchemeStore.findAll)
         .then(r => vm.ratingSchemes =
             _.forEach( r.data,
-                r => _.forEach(
-                    r.ratings,
+                d => _.forEach(
+                    d.ratings,
                         rating => rating.name = rating.name + " (" + rating.rating + ")")));
 
     const assessmentDefinitionPromise = serviceBroker
