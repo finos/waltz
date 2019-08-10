@@ -12,9 +12,9 @@ script:
 
 addons:
   mariadb: '10.1'
-  apt:
-    packages:
-      - open-java8-installer
+#  apt:
+#    packages:
+#      - open-java8-installer
 
 # Stop travis from running mvn install (without profile)
 install: true
