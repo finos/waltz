@@ -23,6 +23,7 @@ import template from "./measurable-category-list.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
 import roles from "../../../user/system-roles";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const initialState = {
@@ -61,6 +62,7 @@ function controller($q,
             .then(r => {
                 vm.categories = r.data;
                 vm.category = _.find(vm.categories, { id: $stateParams.id });
+                vm.categoryRef = toEntityRef(vm.category);
                 if (vm.category.editable) {
                     userService
                         .whoami()
