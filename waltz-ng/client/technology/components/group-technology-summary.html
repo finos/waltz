@@ -18,21 +18,101 @@
   -->
 
 <div>
-      <div class="pull-right">
-        <waltz-data-extract-link name="Export"
-                                 styling="link"
-                                 extract="technology-server/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                 filename="{{technology-server-eol}}.csv">
-        </waltz-data-extract-link>
-    </div>
-
 
     <div ng-if="$ctrl.visibility.servers">
-        <h4 style="padding-left:32px">
-            <waltz-icon name="server">
-            </waltz-icon>
-            Servers
-        </h4>
+        <waltz-sub-section name="Servers">
+            <content>
+               <div ng-include="'wgts-servers'">
+               </div>
+            </content>
+        </waltz-sub-section>
+    </div>
+
+    <br>
+
+    <div ng-if="$ctrl.visibility.databases">
+        <waltz-sub-section name="Databases">
+            <content>
+                <div ng-include="'wgts-databases'">
+                </div>
+            </content>
+        </waltz-sub-section>
+    </div>
+
+    <br>
+
+    <div ng-if="$ctrl.visibility.software">
+        <waltz-sub-section name="Software">
+            <content>
+                <div ng-include="'wgts-software'">
+                </div>
+            </content>
+        </waltz-sub-section>
+    </div>
+
+    <br>
+
+    <div ng-if="$ctrl.licenses.length > 0">
+        <waltz-sub-section name="Licenses">
+            <content>
+                <div ng-include="'wgts-licenses'">
+                </div>
+            </content>
+        </waltz-sub-section>
+    </div>
+
+</div>
+
+
+<!-- SOFTWARE -->
+<script type="text/ng-template"
+        id="wgts-software">
+    <div style="padding:8px">
+        <div class="row"
+             style="padding-top: 8px;"
+             ng-if="$ctrl.visibility.software">
+            <div class="col-sm-4">
+                <waltz-pie-table data="$ctrl.softwareStats.vendor"
+                                 config="$ctrl.pieConfig.vendor"
+                                 name="By Vendor">
+                </waltz-pie-table>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-pie-table data="$ctrl.softwareStats.maturity"
+                                 config="$ctrl.pieConfig.maturity"
+                                 name="By Maturity">
+                </waltz-pie-table>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<!-- LICENSES -->
+<script type="text/ng-template"
+        id="wgts-licenses">
+    <div style="padding:8px">
+        <div class="help-block">
+            This section shows the licenses which have been associated with
+            any software packages linked to applications in this group.
+        </div>
+
+        <waltz-grid-with-search ng-if="$ctrl.licenses.length > 0"
+                                column-defs="$ctrl.licenseGridCols"
+                                entries="$ctrl.licenses"
+                                search-placeholder-text="Search licenses...">
+        </waltz-grid-with-search>
+
+        <br>
+    </div>
+</script>
+
+
+<!-- SERVERS -->
+<script type="text/ng-template"
+        id="wgts-servers">
+    <div style="padding:8px">
         <div class="row">
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystem"
@@ -72,21 +152,20 @@
             </div>
         </div>
     </div>
+    <div class="waltz-sub-section-controls">
+        <waltz-data-extract-link name="Export Servers"
+                                 styling="link"
+                                 extract="technology-server/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                 filename="{{technology-server-eol}}.csv">
+        </waltz-data-extract-link>
+    </div>
+</script>
 
-    <div ng-if="$ctrl.visibility.databases"
-         style="border-top: 2px dotted #ddd;">
-        <div class="pull-right" style="padding-top: 2em">
-            <waltz-data-extract-link name="Export"
-                                     styling="link"
-                                     extract="technology-database/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                     filename="{{technology-database-eol}}.csv">
-            </waltz-data-extract-link>
-        </div>
-        <h4 style="padding-left:32px; padding-top: 16px;">
-            <waltz-icon name="database">
-            </waltz-icon>
-            Databases
-        </h4>
+
+<!-- DATABASES -->
+<script type="text/ng-template"
+        id="wgts-databases">
+    <div style="padding:8px">
         <div class="row"
              style="padding-top: 8px;">
 
@@ -111,31 +190,12 @@
                 </waltz-pie-table>
             </div>
         </div>
-    </div>
-
-    <div ng-if="$ctrl.visibility.software"
-         style="border-top: 2px dotted #ddd;">
-        <h4 style="padding-left:32px; padding-top: 16px;">
-            <waltz-icon name="leaf">
-            </waltz-icon>
-            Software
-        </h4>
-        <div class="row"
-             style="padding-top: 8px;"
-             ng-if="$ctrl.visibility.software">
-            <div class="col-sm-4">
-                <waltz-pie-table data="$ctrl.softwareStats.vendor"
-                                 config="$ctrl.pieConfig.vendor"
-                                 name="By Vendor">
-                </waltz-pie-table>
-            </div>
-
-            <div class="col-sm-4">
-                <waltz-pie-table data="$ctrl.softwareStats.maturity"
-                                 config="$ctrl.pieConfig.maturity"
-                                 name="By Maturity">
-                </waltz-pie-table>
-            </div>
+        <div class="waltz-sub-section-controls">
+            <waltz-data-extract-link name="Export Databases"
+                                     styling="link"
+                                     extract="technology-database/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                     filename="{{technology-database-eol}}.csv">
+            </waltz-data-extract-link>
         </div>
     </div>
-</div>
+</script>
