@@ -20,12 +20,6 @@
 <div>
 
     <waltz-source-data-section-addon entities="['APPLICATION', 'END_USER_APPLICATION', 'INVOLVEMENT']">
-        <a class="btn btn-xs btn-primary"
-           ng-click="$ctrl.exportApps()"
-           ng-if="$ctrl.allApps.length > 0">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </a>
     </waltz-source-data-section-addon>
 
 
@@ -72,5 +66,13 @@
             </uib-tab>
 
         </uib-tabset>
+        <div class="pull-right">
+            <waltz-data-extract-link name="Download all application involvements"
+                                     styling="link"
+                                     filename="applications.csv"
+                                     extract="application/person/{{$ctrl.person.employeeId}}"
+                                     method="GET">
+            </waltz-data-extract-link>
+        </div>
     </div>
 </div>
