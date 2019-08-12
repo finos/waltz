@@ -17,17 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as _ from "lodash";
+import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
 
 import template from "./logical-flow-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
+import {sameRef} from "../../../common/entity-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
@@ -38,7 +39,7 @@ const initialState = {
     dataTypeUsages: [],
     flows: [],
     isDirty: false,
-    mode: '', // editCounterpart | editDataTypeUsage
+    mode: "", // editCounterpart | editDataTypeUsage
     physicalFlows: [],
     selectedCounterpart: null,
     selectedDecorators: null,
@@ -64,7 +65,7 @@ function mkAddFlowCommand(flow) {
 
 
 function notifyIllegalFlow(notification, primaryApp, counterpartRef) {
-    if (primaryApp.id === counterpartRef.id && counterpartRef.kind === 'APPLICATION') {
+    if (primaryApp.id === counterpartRef.id && counterpartRef.kind === "APPLICATION") {
         notification.warning("An application may not link to itself.");
         return true;
     }
@@ -74,7 +75,7 @@ function notifyIllegalFlow(notification, primaryApp, counterpartRef) {
 
 function vetoMove(isDirty) {
     if (isDirty) {
-        alert('Unsaved changes, either apply them or cancel');
+        alert("Unsaved changes, either apply them or cancel");
         return true;
     }
     return false;
@@ -153,7 +154,7 @@ function controller($q,
         return serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [ { entityReference: vm.parentEntityRef, scope: 'EXACT' }, 'DATA_TYPE' ],
+                [ { entityReference: vm.parentEntityRef, scope: "EXACT" }, "DATA_TYPE" ],
                 { force: true })
             .then(r => vm.logicalFlowDecorators = r.data);
     }
@@ -180,29 +181,39 @@ function controller($q,
     };
 
     const selectSource = (selection) => {
-        selectCounterpart(selection, { source: { id: selection.id, kind: selection.kind }});
+        const flowMatchingCriteria = {
+            source: { id: selection.id, kind: selection.kind },
+            target: vm.parentEntityRef
+        };
+        selectCounterpart(selection, flowMatchingCriteria);
     };
 
     const selectTarget = (selection) => {
-        selectCounterpart(selection, { target: { id: selection.id, kind: selection.kind }});
+        const flowMatchingCriteria = {
+            source: vm.parentEntityRef,
+            target: { id: selection.id, kind: selection.kind }
+        };
+        selectCounterpart(selection, flowMatchingCriteria);
     };
 
-    const selectCounterpart = (selection, flowSelectionPredicate) => {
+    const selectCounterpart = (selection, matchCriteria) => {
         if (vetoMove(vm.isDirty)) { return; }
-        vm.setMode('editCounterpart');
+        vm.setMode("editCounterpart");
         vm.selectedCounterpart = selection;
-        vm.selectedFlow = _.find(vm.logicalFlows, flowSelectionPredicate);
+        vm.selectedFlow = _.find(vm.logicalFlows, f =>
+            sameRef(f.source, matchCriteria.source) &&
+            sameRef(f.target, matchCriteria.target));
         vm.selectedDecorators = vm.selectedFlow
             ? _.filter(vm.logicalFlowDecorators, { dataFlowId: vm.selectedFlow.id })
             : [];
     };
 
     const selectType = (type) => {
-        vm.setMode('editDataTypeUsage');
+        vm.setMode("editDataTypeUsage");
         vm.selectedDataType = type;
         vm.selectedUsages = _.chain(vm.dataTypeUsages)
             .filter({ dataTypeId: type.id })
-            .map('usage')
+            .map("usage")
             .value();
     };
 
@@ -212,7 +223,7 @@ function controller($q,
                 CORE_API.LogicalFlowDecoratorStore.updateDecorators,
                 [command])
             .then(reload)
-            .then(() => notification.success('Data flow updated'));
+            .then(() => notification.success("Data flow updated"));
     };
 
 
@@ -224,7 +235,7 @@ function controller($q,
         vm.selectedDecorators = null;
         vm.selectedFlow = null;
         vm.isDirty = false;
-        vm.setMode('');
+        vm.setMode("");
     };
 
     vm.updateFlow = (command) => {
@@ -249,7 +260,7 @@ function controller($q,
                     CORE_API.LogicalFlowStore.removeFlow,
                     [flow.id])
                 .then(reload)
-                .then(() => notification.warning('Data flow removed'))
+                .then(() => notification.warning("Data flow removed"))
                 .catch(e => displayError(notification, "System error, please contact support", e));
         } else {
             notification.warning("This data flow has associated physical flows, please check and remove those first")
@@ -263,7 +274,7 @@ function controller($q,
                 CORE_API.DataTypeUsageStore.save,
                 [vm.parentEntityRef, dataTypeId, usages])
             .then(() => reload())
-            .then(() => notification.success('Data usage updated'));
+            .then(() => notification.success("Data usage updated"));
     };
 
     const addSource = (kind, entity) => {
@@ -281,22 +292,24 @@ function controller($q,
     };
 
     vm.addSourceApplication = (srcApp) => {
-        addSource('APPLICATION', srcApp);
+        addSource("APPLICATION", srcApp);
     };
 
     vm.addSourceActor = (actor) => {
-        addSource('ACTOR', actor);
+        addSource("ACTOR", actor);
     };
 
     vm.addTargetApplication = (targetApp) => {
-        addTarget('APPLICATION', targetApp);
+        addTarget("APPLICATION", targetApp);
     };
 
     vm.addTargetActor = (actor) => {
-        addTarget('ACTOR', actor);
+        addTarget("ACTOR", actor);
     };
 
-    vm.setDirtyChange = (dirty) => vm.isDirty = dirty;
+    vm.setDirtyChange = (dirty) => {
+        vm.isDirty = dirty;
+    };
 
     vm.setMode = (mode) => {
         if (vetoMove(vm.isDirty)) {
@@ -308,10 +321,10 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$scope',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "$scope",
+    "Notification",
+    "ServiceBroker"
 ];
 
 
@@ -324,5 +337,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzLogicalFlowEditPanel'
+    id: "waltzLogicalFlowEditPanel"
 };
