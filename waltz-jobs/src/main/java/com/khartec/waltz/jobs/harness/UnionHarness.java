@@ -19,45 +19,50 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
+import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
-
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.APPLICATION;
 
 
-public class AppGroupHarness {
+public class UnionHarness {
 
-    public static void main(String[] args) {
-        System.out.println("--- start");
-
-        ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
+    public static void main(String[] args) throws ParseException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
 
-        EntityReference grp5 = mkRef(EntityKind.APP_GROUP, 5);
-        Select<Record1<Long>> selector = appSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(grp5));
+        SelectConditionStep<Record1<Long>> part1 = dsl
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.KIND.eq(ApplicationKind.IN_HOUSE.name()));
 
-        System.out.println(dsl.render(selector));
-        List<Application> apps = applicationDao.findByAppIdSelector(selector);
+        SelectConditionStep<Record1<Long>> part2 = dsl
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.KIND.eq(ApplicationKind.IN_HOUSE.name()));
 
-        System.out.println(apps.size());
+        SelectJoinStep<Record1<Long>> t = DSL
+                .select(DSL.field("id", Long.class))
+                .from(part1.unionAll(part2));
 
-        System.out.println("--- done");
+        System.out.println(t);
 
+        SelectConditionStep<Record1<String>> q = dsl
+                .select(APPLICATION.NAME)
+                .from(APPLICATION)
+                .where(APPLICATION.ID.in(t));
 
+        System.out.println(q);
+        System.out.println(q.fetch(APPLICATION.NAME));
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
@@ -130,7 +131,10 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
-        return aToB.union(bToA);
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(aToB.unionAll(bToA));
     }
 
 }

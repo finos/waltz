@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -187,8 +187,10 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
 
-        return viaAppRatings.union(viaDirectRelationship);
-
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(viaAppRatings.unionAll(viaDirectRelationship));
     }
 
 

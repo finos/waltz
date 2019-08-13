@@ -30,6 +30,8 @@ import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.conf.Settings;
+import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
@@ -48,12 +50,13 @@ public class ApplicationIdSelectorHarness {
         ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 
         ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.APP_GROUP, 11309L),
-                HierarchyQueryScope.EXACT);
+                EntityReference.mkRef(EntityKind.DATA_TYPE, 5000L),
+                HierarchyQueryScope.CHILDREN);
 
 
         Select<Record1<Long>> selector = factory.apply(options);
-        System.out.println(selector);
+
+        dsl.settings().withRenderFormatted(true);
         List<Application> apps = applicationService.findByAppIdSelector(options);
 
         System.out.println("--- sz: "+apps.size());

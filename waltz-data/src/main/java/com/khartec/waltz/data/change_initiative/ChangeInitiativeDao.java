@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -111,7 +111,10 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(selector)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
 
-        SelectOrderByStep<Record1<Long>> hierarchySelector = descendants.unionAll(ancestors);
+        // UNION like this to support maria (see #4267)
+        SelectOrderByStep<Record1<Long>> hierarchySelector = DSL
+                .select(DSL.field("id", Long.class))
+                .from(descendants.unionAll(ancestors));
 
         return findForSelector(hierarchySelector);
     }
