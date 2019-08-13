@@ -35,14 +35,16 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static com.khartec.waltz.schema.Tables.*;
 import static java.util.Optional.ofNullable;
 
 @Repository
@@ -253,19 +255,65 @@ public class SurveyInstanceDao {
     }
 
 
-    public SurveyRunCompletionRate getCompletionRateForSurveyRun(long surveyRunId) {
-        final Result<Record2<String, Integer>> countsByStatus = dsl.select(SURVEY_INSTANCE.STATUS, DSL.count(SURVEY_INSTANCE.ID))
+    public SurveyRunCompletionRate getCompletionRateForSurveyRun(Long surveyRunId) {
+        Condition condition = SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId);
+        return CollectionUtilities
+                .maybeFirst(calcCompletionRateForSurveyRuns(condition))
+                .orElse(null);
+    }
+
+    public List<SurveyRunCompletionRate> findCompletionRateForSurveyTemplate(Long surveyTemplateId) {
+        Condition condition = SURVEY_INSTANCE.SURVEY_RUN_ID.in(DSL
+                .select(SURVEY_RUN.ID)
+                .from(SURVEY_RUN)
+                .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(surveyTemplateId)));
+
+        return calcCompletionRateForSurveyRuns(condition);
+    }
+
+
+    private List<SurveyRunCompletionRate> calcCompletionRateForSurveyRuns(Condition surveyRunSelectionCondition) {
+        Field<Integer> statCount = DSL.count(SURVEY_INSTANCE.ID).as("statCount");
+
+        final Result<Record3<Long, String, Integer>> countsByRunAndStatus = dsl
+                .select(SURVEY_INSTANCE.SURVEY_RUN_ID,
+                        SURVEY_INSTANCE.STATUS,
+                        statCount)
                 .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .where(surveyRunSelectionCondition)
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .groupBy(SURVEY_INSTANCE.STATUS)
+                .groupBy(SURVEY_INSTANCE.SURVEY_RUN_ID, SURVEY_INSTANCE.STATUS)
                 .fetch();
 
-        return ImmutableSurveyRunCompletionRate.builder()
-                .notStartedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.NOT_STARTED))
-                .inProgressCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.IN_PROGRESS))
-                .completedCount(getCountByStatus(countsByStatus, SurveyInstanceStatus.COMPLETED))
-                .build();
+        Map<Long, ImmutableSurveyRunCompletionRate.Builder> buildersByRunId = new HashMap<>();
+        countsByRunAndStatus.forEach(r -> {
+            Long runId = r.get(SURVEY_INSTANCE.SURVEY_RUN_ID);
+            ImmutableSurveyRunCompletionRate.Builder inProgressBuilder = buildersByRunId.getOrDefault(
+                    runId,
+                    ImmutableSurveyRunCompletionRate.builder().surveyRunId(runId));
+            if (isStatTypeOf(r, SurveyInstanceStatus.NOT_STARTED)) {
+                inProgressBuilder.notStartedCount(r.get(statCount));
+            }
+            if (isStatTypeOf(r, SurveyInstanceStatus.IN_PROGRESS)) {
+                inProgressBuilder.inProgressCount(r.get(statCount));
+            }
+            if (isStatTypeOf(r, SurveyInstanceStatus.COMPLETED)) {
+                inProgressBuilder.completedCount(r.get(statCount));
+            }
+
+            buildersByRunId.put(runId, inProgressBuilder);
+        });
+
+        return buildersByRunId
+                .values()
+                .stream()
+                .map(ImmutableSurveyRunCompletionRate.Builder::build)
+                .collect(Collectors.toList());
+    }
+
+
+    private boolean isStatTypeOf(Record3<Long, String, Integer> r, SurveyInstanceStatus status) {
+        return r.get(SURVEY_INSTANCE.STATUS).equals(status.name());
     }
 
 

@@ -20,32 +20,32 @@
 import _ from "lodash";
 import {notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './logical-flow-type-editor.html';
+import template from "./logical-flow-type-editor.html";
 
 
 const bindings = {
-    flow: '<',
-    decorators: '<',
-    allDataTypes: '<',
-    onSave: '<',
-    onDelete: '<',
-    onCancel: '<',
-    onDirty: '<'
+    flow: "<",
+    decorators: "<",
+    allDataTypes: "<",
+    onSave: "<",
+    onDelete: "<",
+    onCancel: "<",
+    onDirty: "<"
 };
 
 
 const initialState = {
-    title: '-',
+    title: "-",
     flow: null,
     decorators: [],
     checkedItemIds: [],
     expandedItemIds: [],
     originalSelectedItemIds: [],
     saving: false,
-    onSave: (x) => console.log('lfte: default onSave()', x),
-    onDelete: (x) => console.log('lfte: default onDelete()', x),
-    onCancel: (x) => console.log('lfte: default onCancel()', x),
-    onDirty: (x) => console.log('lfte: default onDirty()', x)
+    onSave: (x) => console.log("lfte: default onSave()", x),
+    onDelete: (x) => console.log("lfte: default onDelete()", x),
+    onCancel: (x) => console.log("lfte: default onCancel()", x),
+    onDirty: (x) => console.log("lfte: default onDirty()", x)
 };
 
 
@@ -62,14 +62,14 @@ function anySelected(selectedIds = []) {
 function mkTitle(flow) {
     return flow
         ? `Datatypes sent from ${flow.source.name} to ${flow.target.name}`
-        : '?';
+        : "?";
 }
 
 
 function mkSelectedTypeIds(decorators = []) {
     return _.chain(decorators)
-        .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
-        .map('decoratorEntity.id')
+        .filter(d => d.decoratorEntity.kind === "DATA_TYPE")
+        .map("decoratorEntity.id")
         .value();
 }
 
@@ -78,13 +78,11 @@ function mkUpdateCommand(flow, selectedIds = [], originalIds = []) {
     const addedIds = _.difference(selectedIds, originalIds);
     const removedIds = _.difference(originalIds, selectedIds);
 
-    const command = {
+    return {
         flowId: flow.id,
-        addedDecorators: _.map(addedIds, id => ({ id, kind: 'DATA_TYPE' })),
-        removedDecorators: _.map(removedIds, id => ({ id, kind: 'DATA_TYPE' }))
+        addedDecorators: _.map(addedIds, id => ({ id, kind: "DATA_TYPE" })),
+        removedDecorators: _.map(removedIds, id => ({ id, kind: "DATA_TYPE" }))
     };
-
-    return command;
 }
 
 
@@ -104,7 +102,7 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
                 vm.allDataTypes = r.data;
-                vm.allDataTypesById = _.keyBy(r.data, 'id');
+                vm.allDataTypesById = _.keyBy(r.data, "id");
                 refresh();
             });
     };
@@ -136,12 +134,18 @@ function controller(serviceBroker) {
         let dt = vm.allDataTypesById[id];
         while (dt) {
             const parent = vm.allDataTypesById[dt.parentId];
-            if (_.get(parent, 'concrete', true) === false) {
+            if (_.get(parent, "concrete", true) === false) {
                 vm.typeUnchecked(parent.id);
             }
             dt = parent;
         }
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id]);
+        vm.onChange();
+    };
+
+    vm.typeUnchecked = (id) => {
+        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+        vm.onChange();
     };
 
     vm.toggleTypeChecked = (id) => {
@@ -149,14 +153,10 @@ function controller(serviceBroker) {
             ? vm.typeUnchecked(id)
             : vm.typeChecked(id);
     };
-
-    vm.typeUnchecked = (id) => {
-        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
-    };
 }
 
 
-controller.$inject = ['ServiceBroker'];
+controller.$inject = ["ServiceBroker"];
 
 const component = {
     bindings,
@@ -165,7 +165,7 @@ const component = {
 };
 
 
-const id = 'waltzLogicalFlowTypeEditor';
+const id = "waltzLogicalFlowTypeEditor";
 
 
 export default {

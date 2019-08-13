@@ -84,7 +84,11 @@ public abstract class BaseDataExtractor {
         writeExcelHeader(qry, sheet);
         writeExcelBody(qry, sheet);
 
-        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, qry.fields().length));
+        int endFilterColumnIndex = qry.fields().length == 0
+                ? 0
+                : qry.fields().length - 1;
+
+        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, endFilterColumnIndex));
         sheet.createFreezePane(0, 1);
 
         byte[] bytes = convertExcelToByteArray(workbook);

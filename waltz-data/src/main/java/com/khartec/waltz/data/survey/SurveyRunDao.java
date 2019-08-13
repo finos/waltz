@@ -182,9 +182,11 @@ public class SurveyRunDao {
 
 
     public List<SurveyRun> findByTemplateId(long templateId) {
-        return dsl
+        List<SurveyRun> runs = dsl
                 .selectFrom(SURVEY_RUN)
                 .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(templateId))
                 .fetch(TO_DOMAIN_MAPPER);
+        return runs;
     }
+
 }

@@ -53,7 +53,7 @@ const instanceResponseBaseState = {
 
 
 const runCreateState = {
-    url: '/template/{id:int}/new-run',
+    url: '/template/{id:int}/run-create',
     views: {'content@': SurveyRunCreate}
 };
 
