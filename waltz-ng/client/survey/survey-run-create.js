@@ -19,15 +19,15 @@
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
-import template from './survey-run-create.html';
+import template from "./survey-run-create.html";
 
 
 const initialState = {
-    step: 'GENERAL',
+    step: "GENERAL",
     surveyRun: {
-        selectorEntityKind: 'APP_GROUP',
-        selectorScope: 'EXACT',
-        issuanceKind: 'GROUP'
+        selectorEntityKind: "APP_GROUP",
+        selectorScope: "EXACT",
+        issuanceKind: "GROUP"
     },
     onSaveGeneral: (s) => {},
     onSaveRecipient: (r) => {}
@@ -60,14 +60,12 @@ function controller($document,
             .chain(includedRecipients)
             .map(r => r.person.email)
             .uniq()
-            .join(';');
+            .join(";");
 
         const surveyEmailSubject = `Survey invitation: ${surveyRun.name}`;
-        const surveyLink = encodeURIComponent(
-            _.replace($location.absUrl(), '#' + $location.url(), '')
-            + $state.href('main.survey.instance.user'));
+        const surveyLink = $state.href("main.survey.instance.user", {}, {absolute: true});
 
-        const newLine = '%0D%0A';
+        const newLine = "%0D%0A";
         const surveyEmailBody = `You have been invited to participate in the following survey. ${newLine}${newLine}`
                 + `Name: ${surveyRun.name} ${newLine}${newLine}`
                 + `Description: ${surveyRun.description} ${newLine}${newLine}`
@@ -103,54 +101,54 @@ function controller($document,
             },
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
-            dueDate: surveyRun.dueDate ? timeFormat('%Y-%m-%d')(surveyRun.dueDate) : null,
+            dueDate: surveyRun.dueDate ? timeFormat("%Y-%m-%d")(surveyRun.dueDate) : null,
             contactEmail: surveyRun.contactEmail
         };
 
         if (surveyRun.id) {
             surveyRunStore.update(surveyRun.id, command)
                 .then(() => {
-                    vm.step = 'RECIPIENT';
+                    vm.step = "RECIPIENT";
                 });
         } else {
             surveyRunStore.create(command)
                 .then(r => {
                     vm.surveyRun.id = r.id;
-                    vm.step = 'RECIPIENT';
+                    vm.step = "RECIPIENT";
                 });
         }
     };
 
     vm.onSaveRecipient = (surveyRun, includedRecipients, excludedRecipients) => {
         surveyRunStore.createSurveyRunInstancesAndRecipients(surveyRun.id, excludedRecipients)
-            .then(r => surveyRunStore.updateStatus(surveyRun.id, {newStatus: 'ISSUED'})
+            .then(r => surveyRunStore.updateStatus(surveyRun.id, {newStatus: "ISSUED"})
                 .then(() => {
-                    vm.step = 'COMPLETED';
+                    vm.step = "COMPLETED";
                     generateEmailLink(surveyRun, includedRecipients);
                 })
             );
     };
 
     vm.goBack = () => {
-        if (vm.step === 'RECIPIENT') vm.step = 'GENERAL';
+        if (vm.step === "RECIPIENT") vm.step = "GENERAL";
     };
 }
 
 
 controller.$inject = [
-    '$document',
-    '$interval',
-    '$location',
-    '$state',
-    '$stateParams',
-    'SurveyRunStore',
-    'SurveyTemplateStore'
+    "$document",
+    "$interval",
+    "$location",
+    "$state",
+    "$stateParams",
+    "SurveyRunStore",
+    "SurveyTemplateStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
