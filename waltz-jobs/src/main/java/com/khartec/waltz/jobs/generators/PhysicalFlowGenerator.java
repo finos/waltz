@@ -1,5 +1,24 @@
 /*
  * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Waltz - Enterprise Architecture
  * Copyright (C) 2016  Khartec Ltd.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,6 +55,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
@@ -88,9 +108,11 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
                     record.setTransport(randomPick(transportKinds));
                     record.setFrequency(randomPick(FrequencyKind.values()).name());
-                    record.setLastUpdatedBy("admin");
                     record.setCriticality(randomPick(criticalityDistribution).name());
                     record.setEntityLifecycleStatus(randomPick(lifecycleStatusDistribution).name());
+                    record.setLastUpdatedBy("admin");
+                    record.setCreatedBy("admin");
+                    record.setCreatedAt(nowUtcTimestamp());
                     return record;
                 })
                 .collect(Collectors.toList());

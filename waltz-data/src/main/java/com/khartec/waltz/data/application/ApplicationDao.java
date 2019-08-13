@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -231,7 +231,8 @@ public class ApplicationDao {
 
 
     public List<Application> findByAppIdSelector(Select<Record1<Long>> selector) {
-        return dsl.selectFrom(APPLICATION)
+        return dsl
+                .selectFrom(APPLICATION)
                 .where(APPLICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -64,13 +64,15 @@ public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
                 selector = DSL.select(DSL.val(options.entityReference().id()));
                 break;
             case CHILDREN:
-                selector = DSL.select(ENTITY_HIERARCHY.ID)
+                selector = DSL
+                        .select(ENTITY_HIERARCHY.ID)
                         .from(ENTITY_HIERARCHY)
                         .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
                         .and(ENTITY_HIERARCHY.KIND.eq(entityKind.name()));
                 break;
             case PARENTS:
-                selector = DSL.select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                selector = DSL
+                        .select(ENTITY_HIERARCHY.ANCESTOR_ID)
                         .from(ENTITY_HIERARCHY)
                         .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
                         .and(ENTITY_HIERARCHY.KIND.eq(entityKind.name()));

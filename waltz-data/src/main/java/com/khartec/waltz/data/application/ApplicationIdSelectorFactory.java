@@ -81,14 +81,10 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return mkForAppGroup(options);
             case APPLICATION:
                 return mkForApplication(options);
-            case CHANGE_INITIATIVE:
-                return mkForEntityRelationship(options);
             case DATA_TYPE:
                 return mkForDataType(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
-            case LICENCE:
-                return mkForEntityRelationship(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case SCENARIO:
@@ -101,6 +97,9 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 return mkForPerson(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
+            case CHANGE_INITIATIVE: // drop thru
+            case LICENCE:
+                return mkForEntityRelationship(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
@@ -173,8 +172,10 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                         .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
                         .and(applicationConditions);
 
-        return sourceAppIds
-                .union(targetAppIds);
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(sourceAppIds.unionAll(targetAppIds));
     }
 
 
@@ -237,9 +238,10 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(options.entityReference().id()))
                 .and(applicationConditions);
 
-
-        return appToEntity
-                .union(entityToApp);
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(appToEntity.unionAll(entityToApp));
     }
 
 
@@ -290,10 +292,15 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .from(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
 
+        // UNION like this to support maria (see #4267)
+        SelectJoinStep<Record1<Long>> appIds = DSL
+                .select(DSL.field("id", Long.class))
+                .from(directApps.unionAll(applicationIdsFromAssociatedOrgUnits));
+
         return DSL
                 .select(APPLICATION.ID)
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(directApps.unionAll(applicationIdsFromAssociatedOrgUnits)))
+                .where(APPLICATION.ID.in(appIds))
                 .and(applicationConditions);
     }
 
@@ -383,10 +390,10 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                         .and(applicationConditions),
                 LOGICAL_FLOW.TARGET_ENTITY_ID);
 
+        // UNION like this to support maria (see #4267)
         return DSL
-                .selectDistinct(appId)
-                .from(sources)
-                .union(targets);
+                .select(DSL.field("id", Long.class))
+                .from(sources.unionAll(targets));
     }
 
 

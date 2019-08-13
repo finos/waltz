@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -83,8 +83,10 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.in(appSelector));
 
-        return aToB.unionAll(bToA);
-
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(aToB.unionAll(bToA));
     }
 
 
@@ -109,6 +111,9 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
-        return aToB.union(bToA);
+        // UNION like this to support maria (see #4267)
+        return DSL
+                .select(DSL.field("id", Long.class))
+                .from(aToB.unionAll(bToA));
     }
 }
