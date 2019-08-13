@@ -236,4 +236,13 @@ public class CollectionUtilities {
                 : Optional.of(first(xs));
     }
 
+
+    public static <X> Optional<X> maybeFirst(Collection<X> xs,
+                                             Predicate<X> predicate) {
+        return xs
+                .stream()
+                .filter(predicate)
+                .findFirst();
+    }
+
 }

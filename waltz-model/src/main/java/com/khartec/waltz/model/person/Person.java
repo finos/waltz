@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.model.person;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
@@ -29,6 +30,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutablePerson.class)
 @JsonDeserialize(as = ImmutablePerson.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Person implements
         EntityKindProvider,
         IdProvider,

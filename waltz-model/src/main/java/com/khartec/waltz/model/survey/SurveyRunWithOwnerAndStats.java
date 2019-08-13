@@ -19,43 +19,23 @@
 
 package com.khartec.waltz.model.survey;
 
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.Nullable;
+import com.khartec.waltz.model.person.Person;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableSurveyRunCompletionRate.class)
-@JsonDeserialize(as = ImmutableSurveyRunCompletionRate.class)
-public abstract class SurveyRunCompletionRate {
-    public abstract long surveyRunId();
+@JsonSerialize(as = ImmutableSurveyRunWithOwnerAndStats.class)
+@JsonDeserialize(as = ImmutableSurveyRunWithOwnerAndStats.class)
+public abstract class SurveyRunWithOwnerAndStats {
 
-    @Value.Default
-    public int notStartedCount() {
-        return 0;
-    };
+    public abstract SurveyRun surveyRun();
 
+    @Nullable
+    public abstract Person owner();
 
-    @Value.Default
-    public int inProgressCount() {
-        return 0;
-    };
+    public abstract SurveyRunCompletionRate completionRateStats();
 
-
-    @Value.Default
-    public int completedCount() {
-        return 0;
-    };
-
-
-    @Value.Derived
-    public int totalCount() {
-        return notStartedCount() + inProgressCount() + completedCount();
-    };
-
-    public static SurveyRunCompletionRate mkNoData(long runId) {
-        return ImmutableSurveyRunCompletionRate
-                .builder()
-                .surveyRunId(runId)
-                .build();
-    }
 }

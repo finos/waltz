@@ -20,6 +20,7 @@
 package com.khartec.waltz.service.survey;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
@@ -39,13 +40,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -301,8 +301,27 @@ public class SurveyRunService {
     }
 
 
-    public List<SurveyRun> findByTemplateId(long templateId) {
-        return surveyRunDao.findByTemplateId(templateId);
+    public List<SurveyRunWithOwnerAndStats> findByTemplateId(long templateId) {
+        List<SurveyRun> runs = surveyRunDao.findByTemplateId(templateId);
+        Set<Person> owners = personDao.findByIds(SetUtilities.map(runs, SurveyRun::ownerId));
+        Map<Long, Person> ownersById = indexBy(owners, p -> p.id().orElse(-1L));
+
+        List<SurveyRunCompletionRate> stats = surveyInstanceDao.findCompletionRateForSurveyTemplate(templateId);
+        Map<Long, SurveyRunCompletionRate> statsByRunId = indexBy(stats, s -> s.surveyRunId());
+
+        return map(runs, run -> {
+            Person owner = ownersById.get(run.ownerId());
+            Long runId = run.id().orElse(-1L);
+            SurveyRunCompletionRate completionRateStats = statsByRunId.getOrDefault(
+                    runId,
+                    SurveyRunCompletionRate.mkNoData(runId));
+
+            return ImmutableSurveyRunWithOwnerAndStats.builder()
+                    .surveyRun(run)
+                    .owner(owner)
+                    .completionRateStats(completionRateStats)
+                    .build();
+        });
     }
 
 
@@ -310,13 +329,14 @@ public class SurveyRunService {
         return surveyInstanceDao.getCompletionRateForSurveyRun(surveyRunId);
     }
 
+
     public boolean createDirectSurveyInstances(long runId, List<Long> personIds) {
         SurveyRun run = getById(runId);
         EntityReference subjectRef = run.selectionOptions().entityReference();
 
         switch (run.issuanceKind()) {
             case INDIVIDUAL:
-                ListUtilities.map(personIds, p -> mkSurveyInstance(
+                map(personIds, p -> mkSurveyInstance(
                         subjectRef,
                         run,
                         ListUtilities.newArrayList(p)));
