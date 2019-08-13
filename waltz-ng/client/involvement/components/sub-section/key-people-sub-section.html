@@ -17,11 +17,10 @@
                                 <td>
                                     <div>
                                         <span ng-repeat="p in item.persons">
-                                        <a ui-sref="main.person.view ({empId: p.person.employeeId})"
-                                           ng-bind="p.person.displayName"></a> -
-                                        <a href="mailto:{{p.person.email}}">
-                                            <waltz-icon name="envelope-o"></waltz-icon>
-                                        </a>
+                                            <waltz-entity-link entity-ref="p.person"></waltz-entity-link> -
+                                            <a href="mailto:{{p.person.email}}">
+                                                <waltz-icon name="envelope-o"></waltz-icon>
+                                            </a>
                                             <span ng-show="!$last">, </span>
                                         </span>
                                         <span class="wft-label small" ng-show="!item.persons.length">
