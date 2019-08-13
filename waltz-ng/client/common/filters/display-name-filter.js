@@ -18,7 +18,7 @@
  */
 
 function filter(displayNameService) {
-    return (value, type) => displayNameService.lookup(type, value);
+    return (value, type) => displayNameService.lookup(type, value, value);
 }
 
 filter.$inject = ['DisplayNameService'];
