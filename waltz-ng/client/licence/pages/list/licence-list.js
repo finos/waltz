@@ -85,7 +85,7 @@ function controller($q, serviceBroker) {
         $q.all([licencePromise, usagePromise])
             .then(([licences, usageByLicenseId]) => {
                 vm.licences = _.map(licences, d => {
-                    const usageCount = usageByLicenseId[d.id] || 0;
+                    const usageCount = _.get(usageByLicenseId, [d.id, "count"], 0);
                     const usageInfo = usageCount > 0
                         ? `${usageCount} Applications`
                         : "-";
