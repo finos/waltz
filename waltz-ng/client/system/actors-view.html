@@ -71,87 +71,6 @@
                                 </message>
                             </waltz-no-data>
 
-                            <div ng-if="$ctrl.selectedActor && !$ctrl.creatingActor">
-                                <span>Name: </span>
-                                <waltz-editable-field class="text-muted"
-                                                      on-save="$ctrl.updateName"
-                                                      field-type="text"
-                                                      initial-val="$ctrl.selectedActor.name"
-                                                      ctx="$ctrl.selectedActor">
-                                </waltz-editable-field>
-                                <br>
-                                <span>Description: </span>
-                                <waltz-editable-field class="text-muted"
-                                                      on-save="$ctrl.updateDescription"
-                                                      field-type="text"
-                                                      initial-val="$ctrl.selectedActor.description"
-                                                      ctx="$ctrl.selectedActor">
-                                </waltz-editable-field>
-                                <br>
-                                <span>Is External:</span>
-                                <waltz-editable-field class="text-muted"
-                                                      on-save="$ctrl.updateIsExternal"
-                                                      field-type="boolean"
-                                                      initial-val="$ctrl.selectedActor.isExternal"
-                                                      ctx="$ctrl.selectedActor">
-                                </waltz-editable-field>
-
-                                <hr>
-
-                                <a class="clickable" ng-click="$ctrl.startNewActor()">
-                                    Add new actor
-                                </a>
-                            </div>
-                            <div ng-if="$ctrl.selectedActor && !$ctrl.creatingActor">
-                                <div>
-                                    <button class="btn btn-primary btn-sm"
-                                            ng-if="$ctrl.creatingActor === false"
-                                            ng-click="$ctrl.startNewActor()">
-                                        Add
-                                    </button>
-                                    <div ng-if="$ctrl.creatingActor === true">
-                                        <div class="form-group">
-                                            <label for="wav-name">
-                                                Name
-                                            </label>
-                                            <input type="text"
-                                                   id="wav-name"
-                                                   ng-model="$ctrl.newActor.name"
-                                                   class="form-control input-sm">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="wav-desc">
-                                                Description
-                                            </label>
-                                            <input type="text"
-                                                   id="wav-desc"
-                                                   ng-model="$ctrl.newActor.description"
-                                                   class="form-control input-sm center-block">
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input ng-model="$ctrl.newActor.isExternal"
-                                                           type="checkbox">
-                                                    Is External ?
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <button class="btn btn-success btn-sm"
-                                                ng-if="$ctrl.creatingActor === true"
-                                                ng-click="$ctrl.saveNewActor()">
-                                            Save
-                                        </button>
-                                        <button class="btn btn-default btn-sm"
-                                                ng-if="$ctrl.creatingActor === true"
-                                                ng-click="$ctrl.cancelNewActor()">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div ng-if="$ctrl.selectedActor">
                                 <span>Name: </span>
                                 <waltz-editable-field class="text-muted"
@@ -181,9 +100,6 @@
                             </div>
 
                         </div>
-                        <waltz-section-actions>
-
-                        </waltz-section-actions>
                     </content>
                 </waltz-sub-section>
             </div>
