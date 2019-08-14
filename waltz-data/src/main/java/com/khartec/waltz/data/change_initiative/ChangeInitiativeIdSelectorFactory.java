@@ -27,7 +27,6 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
-import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
@@ -131,10 +130,7 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
-        // UNION like this to support maria (see #4267)
-        return DSL
-                .select(DSL.field("id", Long.class))
-                .from(aToB.unionAll(bToA));
+        return aToB.union(bToA);
     }
 
 }

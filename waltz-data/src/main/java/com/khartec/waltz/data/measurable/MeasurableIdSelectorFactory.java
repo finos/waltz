@@ -187,10 +187,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
 
-        // UNION like this to support maria (see #4267)
-        return DSL
-                .select(DSL.field("id", Long.class))
-                .from(viaAppRatings.unionAll(viaDirectRelationship));
+        return viaAppRatings.union(viaDirectRelationship);
+
     }
 
 

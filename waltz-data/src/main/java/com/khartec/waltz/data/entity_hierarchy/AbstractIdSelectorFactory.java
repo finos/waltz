@@ -64,15 +64,13 @@ public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
                 selector = DSL.select(DSL.val(options.entityReference().id()));
                 break;
             case CHILDREN:
-                selector = DSL
-                        .select(ENTITY_HIERARCHY.ID)
+                selector = DSL.select(ENTITY_HIERARCHY.ID)
                         .from(ENTITY_HIERARCHY)
                         .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
                         .and(ENTITY_HIERARCHY.KIND.eq(entityKind.name()));
                 break;
             case PARENTS:
-                selector = DSL
-                        .select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                selector = DSL.select(ENTITY_HIERARCHY.ANCESTOR_ID)
                         .from(ENTITY_HIERARCHY)
                         .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
                         .and(ENTITY_HIERARCHY.KIND.eq(entityKind.name()));
