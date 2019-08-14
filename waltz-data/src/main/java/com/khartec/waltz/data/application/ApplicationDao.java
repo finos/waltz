@@ -231,8 +231,7 @@ public class ApplicationDao {
 
 
     public List<Application> findByAppIdSelector(Select<Record1<Long>> selector) {
-        return dsl
-                .selectFrom(APPLICATION)
+        return dsl.selectFrom(APPLICATION)
                 .where(APPLICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }

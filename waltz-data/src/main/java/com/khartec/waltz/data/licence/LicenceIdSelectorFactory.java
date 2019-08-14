@@ -83,10 +83,8 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.in(appSelector));
 
-        // UNION like this to support maria (see #4267)
-        return DSL
-                .select(DSL.field("id", Long.class))
-                .from(aToB.unionAll(bToA));
+        return aToB.unionAll(bToA);
+
     }
 
 
@@ -111,9 +109,6 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
-        // UNION like this to support maria (see #4267)
-        return DSL
-                .select(DSL.field("id", Long.class))
-                .from(aToB.unionAll(bToA));
+        return aToB.union(bToA);
     }
 }
