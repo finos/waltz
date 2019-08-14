@@ -18,7 +18,9 @@
  */
 
 import _ from "lodash";
+import {mkChunks} from "../../common/list-utils";
 import template from './related-entity-statistics-summaries.html';
+import {initialiseData} from "../../common";
 
 
 const bindings = {
@@ -28,12 +30,23 @@ const bindings = {
 };
 
 
+const initialState = {
+    chunkedEntries: []
+};
+
+
 function controller() {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes => {
         if (vm.summaries) {
-            vm.summariesByDefinitionId = _.keyBy(vm.summaries, 'entityReference.id');
+            const summariesByDefinitionId = _.keyBy(vm.summaries, 'entityReference.id');
+            const entries = _.map(vm.definitions.children,
+                c => ({
+                    definition: c,
+                    summary: summariesByDefinitionId[c.id]
+                }));
+            vm.chunkedEntries = mkChunks(entries, 2);
         }
     });
 

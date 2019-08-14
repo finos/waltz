@@ -94,3 +94,17 @@ export function move(array, idx, delta) {
     return copy;
 }
 
+/**
+ * given an array, breaks it into multiple arrays
+ *
+ * @param entries original array (eg: [e1, e2, e3, e4, e5])
+ * @param chunkSize size of chunks (eg: 2)
+ * @returns {Array} array of chunked arrays (eg: [[e1, e2], [e3, e4], [e5])
+ */
+export function mkChunks(entries = [], chunkSize) {
+    const chunkedEntries = [];
+    for (var i = 0; i < entries.length; i += chunkSize) {
+        chunkedEntries.push(entries.slice(i, i + chunkSize));
+    }
+    return chunkedEntries;
+}

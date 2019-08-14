@@ -1,15 +1,16 @@
-<div class="row">
-
-    <div class="col-sm-6 waltz-stat-summary"
-         ng-repeat="child in $ctrl.definitions.children">
-        <div style="padding: 8px; border-radius: 3px; border: 1px solid #eee; background-color: #fcfcfc;">
-            <waltz-entity-statistic-summary-card summary="$ctrl.summariesByDefinitionId[child.id]"
-                                                 definition="child"
-                                                 parent-ref="$ctrl.parentRef"
-                                                 sub-title="Child">
-            </waltz-entity-statistic-summary-card>
+<div>
+    <div class="row"
+         ng-repeat="entriesChunk in $ctrl.chunkedEntries">
+        <div class="col-sm-6 waltz-stat-summary"
+             ng-repeat="entry in entriesChunk">
+            <div style="padding: 8px; border-radius: 3px; border: 1px solid #eee; background-color: #fcfcfc;">
+                <waltz-entity-statistic-summary-card summary="entry.summary"
+                                                     definition="entry.definition"
+                                                     parent-ref="$ctrl.parentRef"
+                                                     sub-title="Child">
+                </waltz-entity-statistic-summary-card>
+            </div>
+            <br>
         </div>
-        <br>
     </div>
-
 </div>
