@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -85,8 +85,9 @@ export function mkEntityLinkGridCell(columnHeading,
 export function mkLinkGridCell(columnHeading,
                                displayField,
                                linkIdField,
-                               linkNavViewName) {
-    return {
+                               linkNavViewName,
+                               additionalProps = {}) {
+    return Object.assign({}, additionalProps, {
         field: displayField,
         displayName: columnHeading,
         cellTemplate: `
@@ -95,6 +96,6 @@ export function mkLinkGridCell(columnHeading,
                    ng-bind="COL_FIELD">
                 </a>
             </div>`
-    };
+    });
 }
 

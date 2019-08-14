@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,10 @@ package com.khartec.waltz.model;
 
 public enum ApprovalStatus {
 
-    PENDING_APPROVAL,
-    APPROVED,
-    REJECTED,
-    REQUIRES_EXCEPTION
+    PENDING_APPROVAL,   // Pending approval, therefore no current opinion
+    APPROVED_ALL,       // Approved for internal and external use
+    INTERNAL_ONLY,      // Approved for internal use only, external use would require further review
+    REJECTED_ALL,       // Cannot be used
+    REQUIRES_EXCEPTION  // Exception must be obtained before use
+
 }

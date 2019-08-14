@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ import _ from "lodash";
 import { action } from "./action";
 import { applicationKind } from "./application-kind";
 import { appGroupKind } from "./app-group-kind";
-import { approvalStatus } from "./approval-status";
 import { attestationType } from "./attestation-type";
 import { BOOLEAN } from "./boolean";
 import { criticality } from "./criticality";
@@ -63,7 +62,6 @@ export const enums = {
     applicationKind,
     applicationRating,
     appGroupKind,
-    approvalStatus,
     attestationType,
     BOOLEAN,
     capabilityRating,
@@ -106,7 +104,7 @@ export function getEnumName(enumValues = {}, key) {
 /**
  * Used to convert a map of ( { code -> displayName } or a list of items
  * taken directly from the `enum-store`.
- * @param lookups
+ * @param items
  * @param excludeUnknown
  */
 export function toOptions(items = {}, excludeUnknown = false) {

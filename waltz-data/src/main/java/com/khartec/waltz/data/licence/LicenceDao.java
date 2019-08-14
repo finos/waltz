@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -127,7 +127,8 @@ public class LicenceDao {
 
 
         Table<Record2<Long, Long>> appLicences = appToLicence
-                .union(licenceToApp).asTable("appLicences");
+                .union(licenceToApp)
+                .asTable("appLicences");
 
 
         return JooqUtilities.calculateLongTallies(
