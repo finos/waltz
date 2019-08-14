@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import template from './actors-view.html';
+import template from "./actors-view.html";
 
 const initialState = {
     actors: [],
@@ -37,25 +37,25 @@ function controller($q,
     function update(actor, change) {
         const updateCmd = Object.assign(change, { id: actor.id });
         return actorService.update(updateCmd)
-            .then(() => notification.success('Updated'));
+            .then(() => notification.success("Updated"));
     }
 
     vm.updateName = (change, actor) => {
         if(change.newVal === "") return $q.reject("Too short");
         return update(actor, { name: change })
-            .then(() => _.find(vm.actors, {'id': actor.id}).name = change.newVal);
+            .then(() => _.find(vm.actors, {"id": actor.id}).name = change.newVal);
     };
 
     vm.updateDescription = (change, actor) => {
         if(change.newVal === "") return $q.reject("Too short");
         return update(actor, { description: change })
-            .then(() => _.find(vm.actors, {'id': actor.id}).description = change.newVal);
+            .then(() => _.find(vm.actors, {"id": actor.id}).description = change.newVal);
     };
 
     vm.updateIsExternal = (change, actor) => {
         if(change.newVal === null) return $q.reject("No value provided");
         return update(actor, { isExternal: change })
-            .then(() => _.find(vm.actors, {'id': actor.id}).isExternal = change.newVal);
+            .then(() => _.find(vm.actors, {"id": actor.id}).isExternal = change.newVal);
     };
 
 
@@ -67,7 +67,7 @@ function controller($q,
         actorService
             .create(vm.newActor)
             .then(() => {
-                notification.success('Created');
+                notification.success("Created");
                 vm.creatingActor = false;
                 vm.newActor = {};
                 loadActors();
@@ -78,7 +78,7 @@ function controller($q,
 
     vm.cancelNewActor = () => {
         vm.creatingActor = false;
-        console.log('cancelled new');
+        console.log("cancelled new");
     };
 
 
@@ -91,20 +91,26 @@ function controller($q,
     }
 
     loadActors();
+
+    vm.selectActor = (actor) => {
+        vm.selectedActor = actor;
+    }
+
+
 }
 
 
 controller.$inject = [
-    '$q',
-    'ActorService',
-    'Notification'
+    "$q",
+    "ActorService",
+    "Notification",
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };
