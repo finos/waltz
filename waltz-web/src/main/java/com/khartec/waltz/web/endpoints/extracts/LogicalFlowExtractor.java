@@ -64,13 +64,13 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
     public void register() {
         post(mkPath("data-extract", "logical-flows"), (request, response) -> {
             ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
-            SelectConditionStep<Record> qry = prepareQuery(options);
+            SelectConditionStep<Record> qry = prepareQuery(dsl, options);
             return writeExtract("logical-flows", qry, request, response);
         });
     }
 
 
-    private SelectConditionStep<Record> prepareQuery(ApplicationIdSelectionOptions options) {
+    private SelectConditionStep<Record> prepareQuery(DSLContext dsl, ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
@@ -119,7 +119,7 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
                                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        return DSL
+        return dsl
                 .select(SOURCE_NAME_FIELD.as("Source"),
                         sourceAssetCodeField.as("Source Asset Code"),
                         sourceOrgUnitNameField.as("Source Org Unit"))
