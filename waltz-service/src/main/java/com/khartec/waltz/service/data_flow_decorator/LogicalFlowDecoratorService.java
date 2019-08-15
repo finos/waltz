@@ -61,8 +61,8 @@ public class LogicalFlowDecoratorService {
 
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final LogicalFlowDecoratorRatingsCalculator ratingsCalculator;
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory;
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final DataTypeUsageService dataTypeUsageService;
     private final LogicalFlowDao logicalFlowDao;
     private final ChangeLogService changeLogService;
@@ -71,24 +71,18 @@ public class LogicalFlowDecoratorService {
     @Autowired
     public LogicalFlowDecoratorService(LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                                        LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
-                                       ApplicationIdSelectorFactory applicationIdSelectorFactory,
-                                       DataTypeIdSelectorFactory dataTypeIdSelectorFactory,
                                        DataTypeUsageService dataTypeUsageService,
                                        LogicalFlowDao logicalFlowDao,
                                        ChangeLogService changeLogService) {
 
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
-        checkNotNull(applicationIdSelectorFactory, "applicationIdSelectorFactory cannot be null");
         checkNotNull(ratingsCalculator, "ratingsCalculator cannot be null");
-        checkNotNull(dataTypeIdSelectorFactory, "dataTypeIdSelectorFactory cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.ratingsCalculator = ratingsCalculator;
-        this.applicationIdSelectorFactory = applicationIdSelectorFactory;
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
         this.dataTypeUsageService = dataTypeUsageService;
         this.logicalFlowDao = logicalFlowDao;
         this.changeLogService = changeLogService;

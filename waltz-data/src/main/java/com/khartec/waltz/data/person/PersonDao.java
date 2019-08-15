@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
@@ -97,8 +98,8 @@ public class PersonDao {
 
     /**
      * Finds Person by user email. If duplicates returns active one. Otherwise returns first.
-     * @param email
-     * @return
+     * @param email  email address of user
+     * @return Person
      */
     public Person getByUserEmail(String email) {
         checkNotEmpty(email, "Cannot find person without a email");
@@ -213,4 +214,12 @@ public class PersonDao {
                 .fetchMap(r -> PersonKind.valueOf(r.get(PERSON.KIND)), r -> r.get(countField));
     }
 
+
+    public Set<Person> findByIds(Set<Long> ids) {
+        return dsl
+                .select(PERSON.fields())
+                .from(PERSON)
+                .where(PERSON.ID.in(ids))
+                .fetchSet(personMapper);
+    }
 }

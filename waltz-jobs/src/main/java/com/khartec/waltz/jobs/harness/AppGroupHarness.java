@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,15 +19,16 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
@@ -38,33 +39,21 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 public class AppGroupHarness {
 
     public static void main(String[] args) {
-
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-
-        AppGroupDao dao = ctx.getBean(AppGroupDao.class);
-
-        EntityRelationshipDao relDao = ctx.getBean(EntityRelationshipDao.class);
-
         System.out.println("--- start");
 
+        ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
+
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+        ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
+
         EntityReference grp5 = mkRef(EntityKind.APP_GROUP, 5);
-        EntityReference grp3 = mkRef(EntityKind.APP_GROUP, 3);
+        Select<Record1<Long>> selector = appSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(grp5));
 
-        EntityRelationship relationship = ImmutableEntityRelationship
-                .builder()
-                .a(grp5)
-                .b(grp3)
-                .relationship(RelationshipKind.RELATES_TO)
-                .lastUpdatedBy("admin")
-                .build();
+        System.out.println(dsl.render(selector));
+        List<Application> apps = applicationDao.findByAppIdSelector(selector);
 
-        relDao.create(relationship);
-
-        List<AppGroup> groups = dao.findRelatedByEntityReferenceAndUser(
-                grp5,
-                "admin");
-
-        groups.forEach(System.out::println);
+        System.out.println(apps.size());
 
         System.out.println("--- done");
 

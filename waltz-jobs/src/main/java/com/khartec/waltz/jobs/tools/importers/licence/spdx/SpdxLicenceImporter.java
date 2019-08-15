@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -74,12 +74,13 @@ public class SpdxLicenceImporter {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         ctx.register(SpdxLicenceImporter.class);
         SpdxLicenceImporter importer = ctx.getBean(SpdxLicenceImporter.class);
-
-
-        String path = "licence/spdx/details";
-        importer.importData(path);
+        importer.doImport();
     }
 
+    public void doImport() throws IOException, URISyntaxException {
+        String path = "licence/spdx/details";
+        importData(path);
+    }
 
     private void importData(String path) throws IOException, URISyntaxException {
 

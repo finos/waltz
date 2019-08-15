@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package com.khartec.waltz.data.measurable;
 
 
 import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -28,35 +29,20 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
 
-@Service
 public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory;
-    private final DSLContext dsl;
-
-    @Autowired
-    public MeasurableIdSelectorFactory(DSLContext dsl, 
-                                       OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory) {
-        checkNotNull(orgUnitIdSelectorFactory, "orgUnitIdSelectorFactory cannot be null");
-        checkNotNull(dsl, "dsl cannot be null");
-        this.dsl = dsl;
-        this.orgUnitIdSelectorFactory = orgUnitIdSelectorFactory;
-    }
+    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
     @Override
@@ -104,7 +90,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
 
-        Select<Record1<String>> emp = dsl.select(PERSON.EMPLOYEE_ID)
+        Select<Record1<String>> emp = DSL.select(PERSON.EMPLOYEE_ID)
                 .from(PERSON)
                 .where(PERSON.ID.eq(options.entityReference().id()));
 
@@ -156,13 +142,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
-        SelectConditionStep<Record1<Long>> validAppIdsInGroup = DSL
-                .select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
-                .from(APPLICATION_GROUP_ENTRY)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(APPLICATION_GROUP_ENTRY.APPLICATION_ID))
-                .where(mkApplicationConditions(options)
-                        .and(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id())));
+
+        Select<Record1<Long>> validAppIdsInGroup = ApplicationIdSelectorFactory.mkForAppGroup(options);
 
         SelectConditionStep<Record1<Long>> measurableIdsUsedByGroup = DSL
                 .selectDistinct(MEASURABLE_RATING.MEASURABLE_ID)

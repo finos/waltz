@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <form name="bookmarkForm"
       class="form-horizontal"
       novalidate
@@ -12,6 +31,7 @@
             <input class="form-control"
                    id="title"
                    placeholder="Link title"
+                   data-ux="bookmarks-title-field"
                    ng-disabled="ctrl.bookmark.isRequired"
                    ng-model="ctrl.bookmark.title">
             <p class="help-block">Provide a descriptive title for this link</p>
@@ -25,6 +45,7 @@
         <div class="col-sm-10">
             <input class="form-control"
                    id="url"
+                   data-ux="bookmarks-url-field"
                    ng-model="ctrl.bookmark.url"
                    maxlength="500"
                    placeholder="URL">
@@ -65,6 +86,7 @@
         <div class="col-sm-10">
             <textarea rows="8"
                       cols="80"
+                      data-ux="bookmarks-description-field"
                       id="description"
                       ng-model="ctrl.bookmark.description">
             </textarea>
@@ -74,6 +96,7 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-disabled="ctrl.submitDisabled"
+                    data-ux="bookmarks-submit-new"
                     class="btn btn-success">
                 {{ ctrl.confirmLabel }}
             </button>

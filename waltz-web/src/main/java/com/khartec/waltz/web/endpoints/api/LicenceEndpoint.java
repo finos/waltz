@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ public class LicenceEndpoint implements Endpoint {
         // read
         getForList(mkPath(BASE_URL, "all"), (request, response) -> service.findAll());
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
-        getForList(mkPath(BASE_URL, "count", "application"), (request, response) -> service.countAppslications());
+        getForList(mkPath(BASE_URL, "count", "application"), (request, response) -> service.countApplications());
         postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
     }
 

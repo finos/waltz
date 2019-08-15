@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,29 +19,28 @@
 
 package com.khartec.waltz.data.licence;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.DSLContext;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.selectDistinct;
 
 
-@Service
 public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
 
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
-    @Autowired
-    public LicenceIdSelectorFactory(DSLContext dsl) {
-        super(dsl, EntityKind.LICENCE);
+    public LicenceIdSelectorFactory() {
+        super(EntityKind.LICENCE);
     }
 
 
@@ -53,7 +52,16 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 return mkForRef(options);
             case LICENCE:
                 return mkForLicence(options);
-
+            case ACTOR:
+            case APP_GROUP:
+            case CHANGE_INITIATIVE:
+            case MEASURABLE:
+            case ORG_UNIT:
+            case PERSON:
+            case SCENARIO:
+                ApplicationIdSelectionOptions appSelectionOptions = ApplicationIdSelectionOptions.mkOpts(options);
+                Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(appSelectionOptions);
+                return mkFromAppSelector(appSelector);
             default:
                 String msg = String.format(
                         "Cannot create Licence Id selector from kind: %s",
@@ -63,9 +71,26 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
     }
 
 
+    private Select<Record1<Long>> mkFromAppSelector(Select<Record1<Long>> appSelector) {
+        Select<Record1<Long>> aToB = select(ENTITY_RELATIONSHIP.ID_A)
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.LICENCE.name()))
+                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
+                .and(ENTITY_RELATIONSHIP.ID_B.in(appSelector));
+        Select<Record1<Long>> bToA = select(ENTITY_RELATIONSHIP.ID_B)
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name()))
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
+                .and(ENTITY_RELATIONSHIP.ID_A.in(appSelector));
+
+        return aToB.unionAll(bToA);
+
+    }
+
+
     private Select<Record1<Long>> mkForLicence(IdSelectionOptions options) {
         ensureScopeIsExact(options);
-        return DSL.select(DSL.val(options.entityReference().id()));
+        return select(DSL.val(options.entityReference().id()));
     }
 
 

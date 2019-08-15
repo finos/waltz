@@ -44,7 +44,7 @@ public class AssetCostHarness {
         AssetCostService service = ctx.getBean(AssetCostService.class);
         AssetCostStatsDao statsDao = ctx.getBean(AssetCostStatsDao.class);
         AssetCostDao costDao = ctx.getBean(AssetCostDao.class);
-        ApplicationIdSelectorFactory selectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory selectorFactory = new ApplicationIdSelectorFactory();
 
 
         long st = System.currentTimeMillis();

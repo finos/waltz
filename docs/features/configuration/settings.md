@@ -46,6 +46,9 @@ If using header based authentication provide an additional setting which gives t
 
 * `server.authentication.filter.headerbased.param`  e.g. `ct_user`
 
+If using [external authentication](../../integration/external-authentication/external-authentication.md), provide an additional setting which gives the external URL to handle authentication:
+
+* `server.authentication.external.endpoint.url`  e.g. `http://localhost:8080/authenticate-user`
 
 ## Development (```web.devext``` )
 

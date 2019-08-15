@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,16 +38,13 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class LicenceService {
 
     private final LicenceDao licenceDao;
-    private final LicenceIdSelectorFactory licenceIdSelectorFactory;
+    private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
 
 
     @Autowired
-    public LicenceService(LicenceDao licenceDao, LicenceIdSelectorFactory licenceIdSelectorFactory) {
+    public LicenceService(LicenceDao licenceDao) {
         checkNotNull(licenceDao, "licenceDao cannot be null");
-        checkNotNull(licenceIdSelectorFactory, "licenceIdSelectorFactory cannot be null");
-
         this.licenceDao = licenceDao;
-        this.licenceIdSelectorFactory = licenceIdSelectorFactory;
     }
 
 
@@ -68,7 +65,7 @@ public class LicenceService {
     }
 
 
-    public List<Tally<Long>> countAppslications() {
+    public List<Tally<Long>> countApplications() {
         return licenceDao.countApplications();
     }
 }

@@ -156,7 +156,7 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
     const columnDefs = [
         mkLinkGridCell('Name', 'name', 'id', 'main.licence.view'),
         { field: 'externalId', displayName: 'External Id' },
-        { field: 'approvalStatus', displayName: 'Approval Status', cellFilter: "toDisplayName:'approvalStatus'"},
+        { field: 'approvalStatus', displayName: 'Approval Status', cellFilter: "toDisplayName:'ApprovalStatus'"},
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "licences.csv");

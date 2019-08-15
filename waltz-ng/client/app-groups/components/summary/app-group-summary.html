@@ -17,8 +17,8 @@
 
             <div  ng-if="$ctrl.appGroup">
                 <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
-                     class="waltz-paragraph"
-                     ng-bind="$ctrl.appGroup.description">
+                     class="waltz-paragraph">
+                    <waltz-markdown text="$ctrl.appGroup.description"></waltz-markdown>
                 </div>
 
 

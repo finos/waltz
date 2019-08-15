@@ -28,8 +28,6 @@ import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
@@ -40,17 +38,9 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPE
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
-@Service
 public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory {
 
-    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory;
-
-
-    @Autowired
-    public PhysicalSpecificationIdSelectorFactory(PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory) {
-        checkNotNull(physicalFlowIdSelectorFactory, "physicalFlowIdSelectorFactory cannot be null");
-        this.physicalFlowIdSelectorFactory = physicalFlowIdSelectorFactory;
-    }
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
     @Override

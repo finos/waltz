@@ -32,6 +32,7 @@ public class LoadAll {
     private static final boolean SKIP_SLOW = false;
 
     private static final SampleDataGenerator[] loaders = new SampleDataGenerator[] {
+//            new DemoSettingsGenerator(),
 //            new DataTypeGenerator(),
 //            new OrgUnitGenerator(),
 //            SKIP_SLOW ? null : new PersonDataGenerator(),
@@ -47,9 +48,9 @@ public class LoadAll {
 //            new MeasurableRatingGenerator(),
 //            SKIP_SLOW ? null : new EntityStatisticGenerator(),
 //            new AuthSourceGenerator(),
-            new AssessmentGenerator(),
+//            new AssessmentGenerator(),
 //            new RoadmapGenerator(),
-//            new ServerGenerator(),
+//            SKIP_SLOW ? null : new ServerGenerator(),
 //            new LogicalFlowGenerator(),
 //            new LogicalFlowDecorationGenerator(),
 //            new PhysicalSpecificationGenerator(),
@@ -64,6 +65,7 @@ public class LoadAll {
 //            new SurveyTemplateGenerator(),
 //            new SurveyRunGenerator(),
 //            new ChangeSetGenerator(),
+            new LicenceGenerator()
 //            new ChangeUnitGenerator()
     };
 

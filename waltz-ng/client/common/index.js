@@ -108,8 +108,8 @@ export function termSearch(items = [],
             .chain(getSearchFieldsForItem(item))
             .map(field => _.isFunction(field)
                 ? field(item)
-                : _.get(item, [ field ], ""))
-            .map(v => v.toLowerCase())
+                : _.get(item, field, ""))
+            .map(v => String(v).toLowerCase())
             .join(" ")
             .value()
             .toLowerCase();

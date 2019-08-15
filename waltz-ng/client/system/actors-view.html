@@ -10,101 +10,163 @@
 
 
     <div class='waltz-page-summary waltz-page-summary-attach'>
+        <br>
         <form class="form-inline">
             <div class="form-group">
                 <label>Search</label>
                 <input type="search" class="form-control" placeholder="Filter..." ng-model="userQuery">
             </div>
         </form>
+
         <hr>
-        <div class="waltz-user-admin-scroll">
-            <table class="table table-condensed">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>External?</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="actor in ctrl.actors | orderBy:'name' | filter:userQuery"
-                    class="waltz-visibility-parent">
-                    <td>
-                        <waltz-editable-field on-save="ctrl.updateName"
-                                              field-type="text"
-                                              initial-val="actor.name"
-                                              ctx="actor">
-                        </waltz-editable-field>
-                    </td>
-                    <td align="left">
-                        <waltz-editable-field on-save="ctrl.updateDescription"
-                                              field-type="text"
-                                              initial-val="actor.description"
-                                              ctx="actor">
-                        </waltz-editable-field>
-                    </td>
-                    <td align="left">
-                        <waltz-editable-field on-save="ctrl.updateIsExternal"
-                                              field-type="boolean"
-                                              initial-val="actor.isExternal"
-                                              ctx="actor">
-                        </waltz-editable-field>
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button class="btn btn-primary btn-sm"
-                                ng-if="ctrl.creatingActor === false"
-                                ng-click="ctrl.startNewActor()">
-                            Add
-                        </button>
-                        <div ng-if="ctrl.creatingActor === true">
+
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="waltz-scroll-region-400">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <tr>
+                                <th>Actor</th>
+                                <th>Description</th>
+                                <th>External?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="actor in $ctrl.actors | orderBy:'name' | filter:userQuery"
+                                ng-click="$ctrl.selectActor(actor)">
+                                <td class="col-sm-2 clickable">
+                                    <span>
+                                        <a ng-bind="actor.name"></a>
+                                    </span>
+                                </td>
+                                <td class="col-sm-9 clickable">
+                                    <span class="force-wrap"
+                                          ng-if="actor.description"
+                                          ng-bind="actor.description">
+                                    </span>
+                                    <span class="force-wrap text-muted"
+                                          ng-if="!actor.description">
+                                        No description provided
+                                    </span>
+                                </td>
+                                <td class="col-sm-1 clickable">
+                                    <span class="force-wrap"
+                                          ng-bind="actor.isExternal">
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <waltz-sub-section name="Edit Actor">
+                    <content>
+                        <div class="container-fluid"
+                             style="padding: 18px;">
+
+                            <waltz-no-data ng-if="!$ctrl.selectedActor">
+                                <message>
+                                    Select an actor on the left to edit its attributes.
+                                </message>
+                            </waltz-no-data>
+
+                            <div ng-if="$ctrl.selectedActor">
+                                <span>Name: </span>
+                                <waltz-editable-field class="text-muted"
+                                                      on-save="$ctrl.updateName"
+                                                      field-type="text"
+                                                      initial-val="$ctrl.selectedActor.name"
+                                                      ctx="$ctrl.selectedActor">
+                                </waltz-editable-field>
+                                <br>
+                                <span>Description: </span>
+                                <waltz-editable-field class="text-muted"
+                                                      on-save="$ctrl.updateDescription"
+                                                      field-type="text"
+                                                      initial-val="$ctrl.selectedActor.description"
+                                                      ctx="$ctrl.selectedActor">
+                                </waltz-editable-field>
+                                <br>
+                                <span>Is External:</span>
+                                <waltz-editable-field class="text-muted"
+                                                      on-save="$ctrl.updateIsExternal"
+                                                      field-type="boolean"
+                                                      initial-val="$ctrl.selectedActor.isExternal"
+                                                      ctx="$ctrl.selectedActor">
+                                </waltz-editable-field>
+
+
+                            </div>
+
+                        </div>
+                    </content>
+                </waltz-sub-section>
+            </div>
+        </div>
+
+        <br>
+        <hr>
+        <div class="row">
+            <div class="col-sm-8">
+                <div>
+                    <button class="btn btn-primary btn-sm"
+                            ng-if="$ctrl.creatingActor === false"
+                            ng-click="$ctrl.startNewActor()">
+                        Add
+                    </button>
+                    <div ng-if="$ctrl.creatingActor === true">
+                        <div class="form-group">
+                            <label for="wav-name">
+                                Name
+                            </label>
                             <input type="text"
-                                   ng-model="ctrl.newActor.name"
+                                   id="wav-name"
+                                   ng-model="$ctrl.newActor.name"
                                    class="form-control input-sm">
                         </div>
-                    </td>
-                    <td>
-                        <div ng-if="ctrl.creatingActor === true">
+                        <div class="form-group">
+                            <label for="wav-desc">
+                                Description
+                            </label>
                             <input type="text"
-                                   ng-model="ctrl.newActor.description"
-                                   class="form-control input-sm">
+                                   id="wav-desc"
+                                   ng-model="$ctrl.newActor.description"
+                                   class="form-control input-sm center-block">
                         </div>
-                    </td>
-                    <td>
-                        <div ng-if="ctrl.creatingActor === true">
-                            <input type="checkbox"
-                                   ng-model="ctrl.newActor.isExternal"
-                                   class="form-control input-sm">
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input ng-model="$ctrl.newActor.isExternal"
+                                           type="checkbox">
+                                    Is External ?
+                                </label>
+                            </div>
                         </div>
-                    </td>
-                    <td>
+
                         <button class="btn btn-success btn-sm"
-                                ng-if="ctrl.creatingActor === true"
-                                ng-click="ctrl.saveNewActor()">
+                                ng-if="$ctrl.creatingActor === true"
+                                ng-click="$ctrl.saveNewActor()">
                             Save
                         </button>
                         <button class="btn btn-default btn-sm"
-                                ng-if="ctrl.creatingActor === true"
-                                ng-click="ctrl.cancelNewActor()">
+                                ng-if="$ctrl.creatingActor === true"
+                                ng-click="$ctrl.cancelNewActor()">
                             Cancel
                         </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    </div>
+                </div>
+            </div>
         </div>
-        <hr>
-        <blockquote>
-            <p>
+        <br>
+        <br>
+        <div>
+            <blockquote>
+                <p>
                 Deletion of Actors is not supported in the user interface because an actor could be in used in
                 Physical Flows.  Please check these before removing an actor from the system.
-            </p>
-        </blockquote>
+                </p>
+            </blockquote>
+        </div>
     </div>
-
-
 </div>

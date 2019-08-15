@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <waltz-page-header name="Licence Management"
                    small="List"
                    icon="id-card-o">
@@ -24,53 +43,11 @@
                 the organisation.  Applications that use unapproved licences may be a risk unless previously exempted.
             </blockquote>
 
-            <table class="table table-condensed table-hover">
-                <thead>
-                <tr>
-                    <th>Licence</th>
-                    <th>Status</th>
-                    <th style="text-align: center"># Applications</th>
-                    <th>Last updated</th>
-                </tr>
-                <tbody ng-repeat="licence in $ctrl.list">
-                <tr>
-                    <td>
-                            <span uib-popover-template="'wrl-r-popover.html'"
-                                  popover-trigger="mouseenter"
-                                  popover-enable="licence.description"
-                                  popover-popup-delay="300"
-                                  popover-append-to-body="true">
-                                <a ui-sref="main.licence.view ({id: licence.id})">
-                                    <span ng-bind="licence.name"></span>
-                                    <span ng-if="licence.externalId">
-                                        (<span ng-bind="licence.externalId"></span>)
-                                    </span>
-                                </a>
-                            </span>
-                    </td>
-                    <td>
-                        <span ng-bind="licence.approvalStatus | toDisplayName:'approvalStatus'"></span>
-                    </td>
-                    <td style="text-align: center">
-                        <span ng-if="$ctrl.appCountsByLicenceId[licence.id]">
-                            <span ng-bind="$ctrl.appCountsByLicenceId[licence.id].count">
-                            </span>
-                            applications
-                        </span>
+            <waltz-grid-with-search entries="$ctrl.licences"
+                                    column-defs="$ctrl.columnDefs"
+                                    on-initialise="$ctrl.onInitialise">
+            </waltz-grid-with-search>
 
-                        <span ng-if="!$ctrl.appCountsByLicenceId[licence.id]">
-                            -
-                        </span>
-                    </td>
-                    <td>
-                        <waltz-last-updated entity="licence"
-                                            show-label="false">
-                        </waltz-last-updated>
-                    </td>
-                </tr>
-                </tbody>
-                </thead>
-            </table>
         </div>
     </div>
 </div>

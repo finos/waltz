@@ -30,7 +30,6 @@ import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.change_unit.ChangeUnitCommandProcessor;
-import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,17 +41,13 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 @Service
 public class RetireCommandProcessor implements ChangeUnitCommandProcessor {
 
-    private final ChangeLogService changeLogService;
     private final PhysicalFlowService physicalFlowService;
 
 
     @Autowired
-    public RetireCommandProcessor(ChangeLogService changeLogService,
-                                  PhysicalFlowService physicalFlowService) {
-        checkNotNull(changeLogService, "changeLogService cannot be null");
+    public RetireCommandProcessor(PhysicalFlowService physicalFlowService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
 
-        this.changeLogService = changeLogService;
         this.physicalFlowService = physicalFlowService;
     }
 

@@ -43,21 +43,14 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 public class FlowDiagramEntityService {
 
     private final FlowDiagramEntityDao flowDiagramEntityDao;
-    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     @Autowired
-    public FlowDiagramEntityService(FlowDiagramEntityDao flowDiagramEntityDao,
-                                    FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory,
-                                    GenericSelectorFactory genericSelectorFactory) {
+    public FlowDiagramEntityService(FlowDiagramEntityDao flowDiagramEntityDao) {
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
-        checkNotNull(flowDiagramIdSelectorFactory, "flowDiagramIdSelectorFactory cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
-
         this.flowDiagramEntityDao = flowDiagramEntityDao;
-        this.flowDiagramIdSelectorFactory = flowDiagramIdSelectorFactory;
-        this.genericSelectorFactory = genericSelectorFactory;
     }
 
 

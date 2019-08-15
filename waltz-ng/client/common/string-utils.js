@@ -93,8 +93,8 @@ export function truncateMiddle(origStr = "",
  * @param str
  * @returns {boolean}
  */
-export function stringToBoolean(str = ""){
-    switch(str.toLowerCase().trim()){
+export function stringToBoolean(str){
+    switch(_.toLower(str).trim()){
         case "true":
         case "yes":
         case "1":

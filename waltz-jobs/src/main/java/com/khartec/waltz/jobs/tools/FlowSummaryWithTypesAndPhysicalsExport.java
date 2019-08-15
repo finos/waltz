@@ -74,7 +74,7 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
     public static void main(String[] args) throws IOException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        ApplicationIdSelectorFactory appIdSelectorFactory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
         ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
         OrganisationalUnitDao organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);
         LogicalFlowDao logicalFlowDao = ctx.getBean(LogicalFlowDao.class);

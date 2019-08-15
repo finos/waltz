@@ -26,6 +26,9 @@ import {
 } from "../../common/colors";
 import { endOfLifeStatus } from "../../common/services/enums/end-of-life-status";
 import template from "./group-technology-summary.html";
+import {mkSelectionOptions} from "../../common/selector-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {mkLinkGridCell} from "../../common/grid-utils";
 
 
 const bindings = {
@@ -35,6 +38,11 @@ const bindings = {
 
 const initialState = {
     environmentDescription: "",
+    licenseGridCols:  [
+        mkLinkGridCell("Name", "name", "id", "main.licence.view"),
+        {field: "externalId", displayName: "External Id"},
+        {field: "approvalStatus", displayName: "Approval Status", cellFilter: "toDisplayName:'ApprovalStatus'"},
+    ],
     visibility: {
         servers: false,
         software: false,
@@ -124,9 +132,20 @@ function calculateVisibility(stats) {
     };
 }
 
-function controller() {
+
+function controller(serviceBroker) {
 
     const vm = _.defaultsDeep(this, initialState);
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.LicenceStore.findBySelector,
+                [ mkSelectionOptions(vm.parentEntityRef) ])
+            .then(r => {
+                vm.licenses = r.data;
+            });
+    };
 
     vm.$onChanges = () => {
         if (! vm.stats) return;
@@ -150,6 +169,10 @@ function controller() {
     vm.pieConfig = PIE_CONFIG;
 }
 
+
+controller.$inject = [
+    "ServiceBroker"
+];
 
 const component = {
     template,

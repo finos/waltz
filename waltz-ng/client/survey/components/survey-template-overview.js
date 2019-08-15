@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../common';
-import template from './survey-template-overview.html';
+import {initialiseData} from "../../common";
+import template from "./survey-template-overview.html";
 
 
 /**
@@ -30,8 +30,8 @@ import template from './survey-template-overview.html';
 
 
 const bindings = {
-    template: '<',
-    people: '<'
+    template: "<",
+    owner: "<"
 };
 
 

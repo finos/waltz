@@ -67,7 +67,7 @@ public class RemoveTaxonomy {
                 return;
             }
 
-            MeasurableIdSelectorFactory selectorFactory = ctx.getBean(MeasurableIdSelectorFactory.class);
+            MeasurableIdSelectorFactory selectorFactory = new MeasurableIdSelectorFactory();
             Select<Record1<Long>> measurableIdSelector = selectorFactory
                     .apply(mkOpts(
                         mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId),

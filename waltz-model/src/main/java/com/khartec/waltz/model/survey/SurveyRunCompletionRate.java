@@ -27,7 +27,35 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableSurveyRunCompletionRate.class)
 @JsonDeserialize(as = ImmutableSurveyRunCompletionRate.class)
 public abstract class SurveyRunCompletionRate {
-    public abstract int notStartedCount();
-    public abstract int inProgressCount();
-    public abstract int completedCount();
+    public abstract long surveyRunId();
+
+    @Value.Default
+    public int notStartedCount() {
+        return 0;
+    };
+
+
+    @Value.Default
+    public int inProgressCount() {
+        return 0;
+    };
+
+
+    @Value.Default
+    public int completedCount() {
+        return 0;
+    };
+
+
+    @Value.Derived
+    public int totalCount() {
+        return notStartedCount() + inProgressCount() + completedCount();
+    };
+
+    public static SurveyRunCompletionRate mkNoData(long runId) {
+        return ImmutableSurveyRunCompletionRate
+                .builder()
+                .surveyRunId(runId)
+                .build();
+    }
 }

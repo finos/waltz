@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -32,15 +31,11 @@ import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
 
-    private final DSLContext dsl;
     private final EntityKind entityKind;
 
 
-    public AbstractIdSelectorFactory(DSLContext dsl, EntityKind entityKind) {
-        Checks.checkNotNull(dsl, "dsl cannot be null");
+    public AbstractIdSelectorFactory(EntityKind entityKind) {
         Checks.checkNotNull(entityKind, "entityKind cannot be null");
-
-        this.dsl = dsl;
         this.entityKind = entityKind;
     }
 

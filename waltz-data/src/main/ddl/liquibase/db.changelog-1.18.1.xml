@@ -1,0 +1,63 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~   
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~   
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~   
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.18.1.xml">
+
+   <changeSet id="20190814-4282-1"
+              author="davidwatkins73">
+       <insert tableName="enum_value">
+           <column name="type" value="ApprovalStatus"/>
+           <column name="key" value="PENDING_APPROVAL"/>
+           <column name="display_name" value="Pending Approval"/>
+           <column name="description" value="Pending approval, therefore no current opinion"/>
+           <column name="position" valueNumeric="10"/>
+       </insert>
+       <insert tableName="enum_value">
+           <column name="type" value="ApprovalStatus"/>
+           <column name="key" value="APPROVED_ALL"/>
+           <column name="display_name" value="Approved for all use"/>
+           <column name="description" value="Approved for internal and external use"/>
+           <column name="position" valueNumeric="20"/>
+       </insert>
+       <insert tableName="enum_value">
+           <column name="type" value="ApprovalStatus"/>
+           <column name="key" value="INTERNAL_ONLY"/>
+           <column name="display_name" value="Approved for internal use"/>
+           <column name="description" value="Approved for internal use only, external use would require further review"/>
+           <column name="position" valueNumeric="30"/>
+       </insert>
+       <insert tableName="enum_value">
+           <column name="type" value="ApprovalStatus"/>
+           <column name="key" value="REJECTED_ALL"/>
+           <column name="display_name" value="Rejected"/>
+           <column name="description" value="Cannot be used"/>
+           <column name="position" valueNumeric="40"/>
+       </insert>
+       <insert tableName="enum_value">
+           <column name="type" value="ApprovalStatus"/>
+           <column name="key" value="REQUIRES_EXCEPTION"/>
+           <column name="display_name" value="Requires Exception"/>
+           <column name="description" value="Exception must be obtained before use"/>
+           <column name="position" valueNumeric="50"/>
+       </insert>
+   </changeSet>
+</databaseChangeLog>

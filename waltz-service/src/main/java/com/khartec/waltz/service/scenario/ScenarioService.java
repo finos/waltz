@@ -29,7 +29,7 @@ public class ScenarioService {
     private final ScenarioDao scenarioDao;
     private final ScenarioAxisItemDao scenarioAxisItemDao;
     private final ScenarioRatingItemDao scenarioRatingItemDao;
-    private final RoadmapIdSelectorFactory roadmapIdSelectorFactory;
+    private final RoadmapIdSelectorFactory roadmapIdSelectorFactory = new RoadmapIdSelectorFactory();
     private final ChangeLogService changeLogService;
 
 
@@ -37,16 +37,14 @@ public class ScenarioService {
     public ScenarioService(ScenarioDao scenarioDao,
                            ScenarioAxisItemDao scenarioAxisItemDao,
                            ScenarioRatingItemDao scenarioRatingItemDao,
-                           RoadmapIdSelectorFactory roadmapIdSelectorFactory, ChangeLogService changeLogService) {
+                           ChangeLogService changeLogService) {
         checkNotNull(scenarioDao, "scenarioDao cannot be null");
         checkNotNull(scenarioAxisItemDao, "scenarioAxisItemDao cannot be null");
         checkNotNull(scenarioRatingItemDao, "scenarioRatingItemDao cannot be null");
-        checkNotNull(roadmapIdSelectorFactory, "roadmapIdSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         this.scenarioDao = scenarioDao;
         this.scenarioAxisItemDao = scenarioAxisItemDao;
         this.scenarioRatingItemDao = scenarioRatingItemDao;
-        this.roadmapIdSelectorFactory = roadmapIdSelectorFactory;
         this.changeLogService = changeLogService;
     }
 

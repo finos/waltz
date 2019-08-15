@@ -26,8 +26,6 @@ import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -37,16 +35,9 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEF
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
 
 
-@Service
 public class LogicalDataElementIdSelectorFactory implements IdSelectorFactory {
 
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory;
-
-
-    @Autowired
-    public LogicalDataElementIdSelectorFactory(DataTypeIdSelectorFactory dataTypeIdSelectorFactory) {
-        this.dataTypeIdSelectorFactory = dataTypeIdSelectorFactory;
-    }
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
 
     @Override

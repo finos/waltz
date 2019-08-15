@@ -44,7 +44,7 @@
         </waltz-section-actions>
 
         <waltz-survey-template-overview template="ctrl.template"
-                                        people="ctrl.people">
+                                        owner="ctrl.owner">
         </waltz-survey-template-overview>
     </div>
 
@@ -52,7 +52,7 @@
 
     <waltz-section icon='bolt'
                    name="Runs"
-                   small="( {{ctrl.issuedAndCompletedRuns.length }} )" >
+                   small="( {{ctrl.issuedAndCompleted.length }} )" >
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="SURVEY_ADMIN"
@@ -64,14 +64,14 @@
 
         <div>
             <waltz-grid-with-search column-defs="ctrl.columnDefs"
-                                    entries="ctrl.issuedAndCompletedRunsEnriched"
+                                    entries="ctrl.issuedAndCompleted"
                                     scope-provider="ctrl"
                                     search-placeholder-text="Search...">
             </waltz-grid-with-search>
         </div>
-        <span ng-if="ctrl.draftRuns.length > 0"
+        <span ng-if="ctrl.draft.length > 0"
               class="text-muted small">
-            Excluding <b ng-bind="ctrl.draftRuns.length"></b> draft run(s).
+            Excluding <b ng-bind="ctrl.draft.length"></b> draft run(s).
         </span>
     </waltz-section>
 

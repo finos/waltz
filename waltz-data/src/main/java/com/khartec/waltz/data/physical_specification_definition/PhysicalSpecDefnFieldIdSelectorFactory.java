@@ -24,21 +24,13 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
 
 
-@Service
 public class PhysicalSpecDefnFieldIdSelectorFactory implements IdSelectorFactory {
-
-    @Autowired
-    public PhysicalSpecDefnFieldIdSelectorFactory() {
-    }
-
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {

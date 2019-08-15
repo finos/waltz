@@ -10,7 +10,6 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -20,19 +19,16 @@ public class LogicalDataElementService {
     
     private final LogicalDataElementDao logicalDataElementDao;
     private final LogicalDataElementSearchDao logicalDataElementSearchDao;
-    private final LogicalDataElementIdSelectorFactory idSelectorFactory;
+    private final LogicalDataElementIdSelectorFactory idSelectorFactory = new LogicalDataElementIdSelectorFactory();
 
 
     public LogicalDataElementService(LogicalDataElementDao logicalDataElementDao,
-                                     LogicalDataElementSearchDao logicalDataElementSearchDao,
-                                     LogicalDataElementIdSelectorFactory logicalDataElementIdSelectorFactory) {
+                                     LogicalDataElementSearchDao logicalDataElementSearchDao) {
         checkNotNull(logicalDataElementDao, "logicalDataElementDao cannot be null");
         checkNotNull(logicalDataElementSearchDao, "logicalDataElementSearchDao cannot be null");
-        checkNotNull(logicalDataElementIdSelectorFactory, "logicalDataElementIdSelectorFactory cannot be null");
 
         this.logicalDataElementDao = logicalDataElementDao;
         this.logicalDataElementSearchDao = logicalDataElementSearchDao;
-        this.idSelectorFactory = logicalDataElementIdSelectorFactory;
     }
 
 

@@ -41,22 +41,16 @@ public class BookmarkService {
 
     private final BookmarkDao bookmarkDao;
     private final ChangeLogService changeLogService;
-    private final BookmarkIdSelectorFactory bookmarkIdSelectorFactory;
-    private final GenericSelectorFactory genericSelectorFactory;
+    private final BookmarkIdSelectorFactory bookmarkIdSelectorFactory = new BookmarkIdSelectorFactory();
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     @Autowired
     public BookmarkService(BookmarkDao bookmarkDao,
-                           BookmarkIdSelectorFactory bookmarkIdSelectorFactory,
-                           GenericSelectorFactory genericSelectorFactory,
                            ChangeLogService changeLogService) {
         checkNotNull(bookmarkDao, "bookmarkDao must not be null");
-        checkNotNull(bookmarkIdSelectorFactory, "bookmarkIdSelectorFactory cannot be null");
-        checkNotNull(genericSelectorFactory, "genericSelectorFactory cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         this.bookmarkDao = bookmarkDao;
-        this.bookmarkIdSelectorFactory = bookmarkIdSelectorFactory;
-        this.genericSelectorFactory = genericSelectorFactory;
         this.changeLogService = changeLogService;
     }
 

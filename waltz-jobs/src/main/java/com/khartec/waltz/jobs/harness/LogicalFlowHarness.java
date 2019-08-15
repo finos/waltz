@@ -43,7 +43,7 @@ public class LogicalFlowHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LogicalFlowDao dao = ctx.getBean(LogicalFlowDao.class);
         LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
-        ApplicationIdSelectorFactory factory = ctx.getBean(ApplicationIdSelectorFactory.class);
+        ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
 
         IdSelectionOptions options = IdSelectionOptions.mkOpts(
                 mkRef(EntityKind.PERSON, 262508),

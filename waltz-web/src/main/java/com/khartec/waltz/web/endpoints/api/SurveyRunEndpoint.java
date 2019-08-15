@@ -79,7 +79,7 @@ public class SurveyRunEndpoint implements Endpoint {
         DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
                 surveyRunService.getById(getId(req));
 
-        ListRoute<SurveyRun> findByTemplateIdRoute = (req, res) ->
+        ListRoute<SurveyRunWithOwnerAndStats> findByTemplateIdRoute = (req, res) ->
                 surveyRunService.findByTemplateId(getId(req));
 
         ListRoute<SurveyRun> findByEntityRoute = (req, res)

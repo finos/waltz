@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -86,9 +86,12 @@ public class FinosLicenceComplianceImporter {
         ctx.register(FinosLicenceComplianceImporter.class);
         FinosLicenceComplianceImporter importer = ctx.getBean(FinosLicenceComplianceImporter.class);
 
+        importer.doImport();
+    }
 
+    public void doImport() throws IOException, URISyntaxException {
         String path = "licence/finos";
-        importer.importData(path);
+        importData(path);
     }
 
 

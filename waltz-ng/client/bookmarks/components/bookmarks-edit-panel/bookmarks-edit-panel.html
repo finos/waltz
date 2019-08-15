@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
     <div ng-if="$ctrl.bookmarks.length > 0">
         <table class="table table-condensed" >
@@ -48,13 +67,16 @@
                     <span class="waltz-visibility-child-50">
                         <a class="clickable wbep-action-remove"
                            ng-if="! bookmark.isRequired"
+                           data-ux="bookmarks-remove"
                            ng-click="$ctrl.remove(bookmark)">
                             Remove
                         </a>
                         <span ng-if="! bookmark.isRequired">
                             |
                         </span>
-                        <a class="clickable wbep-action-edit" ng-click="$ctrl.edit(bookmark)">
+                        <a class="clickable wbep-action-edit"
+                           data-ux="bookmarks-edit"
+                           ng-click="$ctrl.edit(bookmark)">
                             Edit
                         </a>
                     </span>
@@ -73,11 +95,13 @@
     <div>
         <div ng-if="!$ctrl.visibility.form">
             <button ng-click="$ctrl.create()"
+                    data-ux="bookmarks-add-new"
                     class="btn btn-sm btn-primary">
                 Add New
             </button>
             &nbsp;
             <a class="clickable"
+               data-ux="bookmarks-done"
                ng-click="$ctrl.onDismiss()">
                 Done
             </a>

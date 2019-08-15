@@ -27,25 +27,14 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 
-@Service
 public class ChangeSetIdSelectorFactory implements IdSelectorFactory {
 
-    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory;
-
-
-    @Autowired
-    public ChangeSetIdSelectorFactory(ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory) {
-        checkNotNull(changeUnitIdSelectorFactory, "changeUnitIdSelectorFactory cannot be null");
-
-        this.changeUnitIdSelectorFactory = changeUnitIdSelectorFactory;
-    }
+    private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
 
 
     @Override

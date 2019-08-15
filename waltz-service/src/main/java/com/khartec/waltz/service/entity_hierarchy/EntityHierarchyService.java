@@ -58,7 +58,7 @@ public class EntityHierarchyService {
     private final ChangeInitiativeDao changeInitiativeDao;
     private final DataTypeDao dataTypeDao;
     private final EntityHierarchyDao entityHierarchyDao;
-    private final EntityRootsSelectorFactory entityRootsSelectorFactory;
+    private final EntityRootsSelectorFactory entityRootsSelectorFactory = new EntityRootsSelectorFactory();
     private final EntityStatisticDao entityStatisticDao;
     private final MeasurableDao measurableDao;
     private final OrganisationalUnitDao organisationalUnitDao;
@@ -69,7 +69,6 @@ public class EntityHierarchyService {
                                   ChangeInitiativeDao changeInitiativeDao,
                                   DataTypeDao dataTypeDao,
                                   EntityHierarchyDao entityHierarchyDao,
-                                  EntityRootsSelectorFactory entityRootsSelectorFactory,
                                   EntityStatisticDao entityStatisticDao,
                                   MeasurableDao measurableDao, 
                                   OrganisationalUnitDao organisationalUnitDao,
@@ -79,7 +78,6 @@ public class EntityHierarchyService {
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
-        checkNotNull(entityRootsSelectorFactory, "entityRootsSelectorFactory cannot be null");
         checkNotNull(entityStatisticDao, "entityStatisticDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
@@ -89,7 +87,6 @@ public class EntityHierarchyService {
         this.changeInitiativeDao = changeInitiativeDao;
         this.dataTypeDao = dataTypeDao;
         this.entityHierarchyDao = entityHierarchyDao;
-        this.entityRootsSelectorFactory = entityRootsSelectorFactory;
         this.entityStatisticDao = entityStatisticDao;
         this.measurableDao = measurableDao;
         this.organisationalUnitDao = organisationalUnitDao;
