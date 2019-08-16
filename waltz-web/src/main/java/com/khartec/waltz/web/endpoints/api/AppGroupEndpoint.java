@@ -189,6 +189,7 @@ public class AppGroupEndpoint implements Endpoint {
             LOG.info("Adding orgUnit: {}, to application group: {} ", orgUnitId,  groupId);
             return appGroupService.addOrganisationalUnit(getUsername(request), groupId, orgUnitId);
         };
+
         ListRoute<EntityReference> removeOrgUnitRoute = (request, response) -> {
             long groupId = getId(request);
             long orgUnitId = getLong(request, "orgUnitId");
