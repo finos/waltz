@@ -230,8 +230,6 @@ function controller($q,
             })
             .then(() => vm.focusApp = focusApp);
     };
-    vm.focusOnOrganisationalUnit = (orgUnit) => {};
-
     vm.showSingleEditor = () => {
         vm.editor = "SINGLE"
     };

@@ -334,12 +334,8 @@
                             </thead>
                             <tr ng-repeat="orgUnit in ctrl.organisationalUnits | orderBy:'name'"
                                 class="waltz-visibility-parent">
-
                                 <td>
-                                    <a ng-click="ctrl.focusOnOrganisationalUnit(orgUnit)"
-                                       class="clickable"
-                                       ng-bind="orgUnit.name">
-                                    </a>
+                                    <span ng-bind="orgUnit.name"/>
                                 </td>
                                 <td>
                                 <span class="waltz-visibility-child-50">

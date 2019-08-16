@@ -25,8 +25,11 @@ public class AppGroupOrganisationalUnitDao {
     }
 
     public List<EntityReference> getEntriesForGroup(long groupId) {
-        SelectConditionStep<Record3<Long, String, String>> q = dsl.select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME, ORGANISATIONAL_UNIT.DESCRIPTION)
-                .from(ORGANISATIONAL_UNIT)
+        SelectConditionStep<Record3<Long, String, String>> q = dsl.select(
+                ORGANISATIONAL_UNIT.ID,
+                ORGANISATIONAL_UNIT.NAME,
+                ORGANISATIONAL_UNIT.DESCRIPTION
+        ).from(ORGANISATIONAL_UNIT)
                 .where(
                         ORGANISATIONAL_UNIT.ID.in(
                                 DSL.select(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID)
