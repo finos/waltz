@@ -377,11 +377,10 @@
                                 will also be shown.
                             </span>
                             <!-- exclude the ones that the one that are selected -->
-                            <waltz-entity-selector on-select="$ctrl.addOrgUnitToGroup"
-                                                   current-selection="$ctrl.currentlySelected"
+                            <waltz-entity-selector on-select="ctrl.onOrgUnitSelect"
+                                                   current-selection="ctrl.currentOrgUnit"
                                                    entity-kinds="['ORG_UNIT']"
-                                                   selection-filter="$ctrl.selectionFilter">
-                            </waltz-entity-selector>
+                                                   selection-filter="ctrl.orgUnitSelectionFilter"/>
                         </div>
                     </uib-tab>
                 </uib-tabset>

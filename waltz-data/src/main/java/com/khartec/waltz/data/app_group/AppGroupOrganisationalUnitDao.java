@@ -50,4 +50,12 @@ public class AppGroupOrganisationalUnitDao {
                 .and(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.eq(orgUnitId))
                 .execute();
     }
+
+    public int addOrgUnit(long groupId, long orgUnitId) {
+        return dsl.insertInto(APPLICATION_GROUP_OU_ENTRY)
+                .set(APPLICATION_GROUP_OU_ENTRY.GROUP_ID, groupId)
+                .set(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID, orgUnitId)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
 }

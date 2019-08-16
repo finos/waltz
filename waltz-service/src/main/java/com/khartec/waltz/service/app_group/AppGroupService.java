@@ -232,15 +232,12 @@ public class AppGroupService {
     public List<EntityReference> addOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
 
         verifyUserCanUpdateGroup(userId, groupId);
-
-//        Application app = applicationDao.getById(applicationId);
-//        if (app != null) {
-//            appGroupEntryDao.addApplication(groupId, applicationId);
-//            audit(groupId, userId, String.format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
-//        }
-//
-//        return appGroupEntryDao.getEntriesForGroup(groupId);
-        throw new RuntimeException("Unimplemented yet!");
+        OrganisationalUnit orgUnit = organisationalUnitDao.getById(orgUnitId);
+        if (orgUnit != null) {
+            appGroupOrganisationalUnitDao.addOrgUnit(groupId, orgUnitId);
+            audit(groupId, userId, String.format("Added application %s to group", orgUnit.name()), EntityKind.ORG_UNIT, Operation.ADD);
+        }
+        return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
 
     public List<EntityReference> removeOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
