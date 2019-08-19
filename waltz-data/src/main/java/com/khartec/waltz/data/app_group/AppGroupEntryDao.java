@@ -56,7 +56,6 @@ public class AppGroupEntryDao {
     }
 
 
-    @Deprecated
     public List<EntityReference> getEntriesForGroup(long groupId) {
         return dsl.select(APPLICATION.ID, APPLICATION.NAME)
                 .from(APPLICATION)
