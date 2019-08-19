@@ -97,6 +97,33 @@ describe("ListUtils", () => {
             assert.deepEqual(move(arr, 1, -10), ["b", "a", "c"]);
             assert.deepEqual(move(arr, 2, -10), ["c", "a", "b"]);
         });
-    })
+    });
+
+
+    describe("mkChunks", () => {
+        it("works for empty arrays", () => {
+            assert.deepEqual(lu.mkChunks([], 2), []);
+        });
+
+        it("works for undefined arrays", () => {
+            assert.deepEqual(lu.mkChunks(undefined, 2), []);
+        });
+
+        it("works for equal chunks", () => {
+            assert.deepEqual(lu.mkChunks(abcd, 2), [["a", "b"], ["c", "d"]]);
+        });
+
+        it("works for unequal chunks", () => {
+            assert.deepEqual(lu.mkChunks(abc, 2), [["a", "b"], ["c"]]);
+        });
+
+        it("works for chunk size equal to original array size", () => {
+            assert.deepEqual(lu.mkChunks(abc, 3), [["a", "b", "c"]]);
+        });
+
+        it("works for chunk size greater than original array size", () => {
+            assert.deepEqual(lu.mkChunks(abc, 4), [["a", "b", "c"]]);
+        });
+    });
 });
 
