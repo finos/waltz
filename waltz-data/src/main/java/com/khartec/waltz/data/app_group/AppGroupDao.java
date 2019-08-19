@@ -39,8 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.Tables.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
@@ -106,16 +105,35 @@ public class AppGroupDao {
 
 
     public List<AppGroup> findRelatedByApplicationAndUser(long appId, String userId) {
-        SelectConditionStep<Record1<Long>> groupsByUser = DSL
+        SelectConditionStep<Record1<Long>> groupsByUser = dsl
                 .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
                 .from(APPLICATION_GROUP_MEMBER)
                 .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
 
+        SelectConditionStep<Record1<Long>> groupsFromAppGroupEntry = dsl
+                .select(APPLICATION_GROUP_ENTRY.GROUP_ID)
+                .from(APPLICATION_GROUP_ENTRY)
+                .where(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(appId));
+
+        SelectConditionStep<Record1<Long>> orgUnitIds = dsl
+                .select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .innerJoin(ORGANISATIONAL_UNIT).on(ENTITY_HIERARCHY.ID.eq(ORGANISATIONAL_UNIT.ID))
+                .innerJoin(APPLICATION).on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .where(APPLICATION.ID.eq(appId));
+
+        SelectConditionStep<Record1<Long>> groupsFromAppGroupOUEntry = dsl
+                .select(APPLICATION_GROUP_OU_ENTRY.GROUP_ID)
+                .from(APPLICATION_GROUP_OU_ENTRY)
+                .where(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.in(orgUnitIds));
+
+        SelectOrderByStep<Record1<Long>> appGroups = groupsFromAppGroupEntry.unionAll(groupsFromAppGroupOUEntry);
+
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
-                .join(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP.ID.eq(APPLICATION_GROUP_ENTRY.GROUP_ID))
-                .where(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(appId))
-                .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()).or(APPLICATION_GROUP.ID.in(groupsByUser)))
+                .where((APPLICATION_GROUP.ID.in(appGroups)
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
+                        .or(APPLICATION_GROUP.ID.in(groupsByUser))))
                 .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
