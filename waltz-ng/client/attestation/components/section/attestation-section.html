@@ -14,45 +14,8 @@
         </message>
     </waltz-no-data>
 
-    <div ng-if="$ctrl.enableAttest && $ctrl.createType != null">
-        <div class="waltz-attestation-confirmation">
-            <div class="wac-header">
-                <span class="wac-declaration">
-                    You are attesting that the
-                    <span ng-if="$ctrl.createType == 'LOGICAL_DATA_FLOW'"
-                          class="wac-entity"> Logical Flows
-                    </span>
-                    <span ng-if="$ctrl.createType == 'PHYSICAL_FLOW'"
-                          class="wac-entity"> Physical Flows
-                    </span>
-                    for
-                    <span ng-bind="$ctrl.parentEntityRef.name"
-                          class="wac-entity">
-                    </span> are correct.
-                </span>
-                <span style="padding-left: 30px">
-                    <a class="btn btn-success btn-sm"
-                       ng-click="$ctrl.attestEntity()">
-                        Confirm
-                    </a>
-                    <a ng-click="$ctrl.cancelAttestation()"
-                       class="clickable">
-                        Cancel
-                    </a>
-                </span>
-            </div>
-
-            <waltz-inline-logical-flow-panel ng-if="$ctrl.createType == 'LOGICAL_DATA_FLOW'"
-                                             parent-entity-ref="$ctrl.parentEntityRef">
-            </waltz-inline-logical-flow-panel>
-
-            <waltz-inline-physical-flow-panel ng-if="$ctrl.createType == 'PHYSICAL_FLOW'"
-                                              parent-entity-ref="$ctrl.parentEntityRef">
-            </waltz-inline-physical-flow-panel>
-
-            <br>
-        </div>
-    </div>
+    <div ng-if="$ctrl.enableAttest && $ctrl.createType != null"
+         ng-include="'app-attest-confirmation'"></div>
 
     <div ng-if="$ctrl.attestations.length > 0">
         <br>
@@ -118,3 +81,44 @@
         </message>
     </waltz-no-data>
 </div>
+
+<script type="text/ng-template"
+        id="app-attest-confirmation">
+    <div class="waltz-attestation-confirmation">
+        <div class="wac-header">
+            <span class="wac-declaration">
+                You are attesting that the
+                <span ng-if="$ctrl.createType == 'LOGICAL_DATA_FLOW'"
+                      class="wac-entity"> Logical Flows
+                </span>
+                <span ng-if="$ctrl.createType == 'PHYSICAL_FLOW'"
+                      class="wac-entity"> Physical Flows
+                </span>
+                for
+                <span ng-bind="$ctrl.parentEntityRef.name"
+                      class="wac-entity">
+                </span> are correct.
+            </span>
+            <span style="padding-left: 30px">
+                <a class="btn btn-success btn-sm"
+                   ng-click="$ctrl.attestEntity()">
+                    Confirm
+                </a>
+                <a ng-click="$ctrl.cancelAttestation()"
+                   class="clickable">
+                    Cancel
+                </a>
+            </span>
+        </div>
+
+        <waltz-inline-logical-flow-panel ng-if="$ctrl.createType == 'LOGICAL_DATA_FLOW'"
+                                         parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-inline-logical-flow-panel>
+
+        <waltz-inline-physical-flow-panel ng-if="$ctrl.createType == 'PHYSICAL_FLOW'"
+                                          parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-inline-physical-flow-panel>
+
+        <br>
+    </div>
+</script>
