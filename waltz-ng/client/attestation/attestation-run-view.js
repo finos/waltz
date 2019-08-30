@@ -129,7 +129,7 @@ function controller($q,
     loadData();
 
     vm.selectInstance = (instance) => {
-      vm.selectedInstance = instance;
+        vm.selectedInstance = instance;
     };
 
     vm.onGridInitialise = (cfg) => {

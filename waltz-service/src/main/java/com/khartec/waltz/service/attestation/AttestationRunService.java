@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -139,7 +140,10 @@ public class AttestationRunService {
         Long runId = attestationRunDao.create(userId, command);
 
         // generate instances and recipients
-        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(runId, command.attestedEntityKind());
+        List<AttestationInstanceRecipient> instanceRecipients = generateAttestationInstanceRecipients(
+                runId,
+                command.attestedEntityKind(),
+                userId);
 
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
@@ -153,21 +157,29 @@ public class AttestationRunService {
 
 
     private List<AttestationInstanceRecipient> generateAttestationInstanceRecipients(long attestationRunId,
-                                                                                     EntityKind attestedEntityKind) {
+                                                                                     EntityKind attestedEntityKind,
+                                                                                     String userId) {
         AttestationRun attestationRun = attestationRunDao.getById(attestationRunId);
         checkNotNull(attestationRun, "attestationRun " + attestationRunId + " not found");
 
-        Map<EntityReference, List<Person>> entityRefToPeople = getEntityReferenceToPeople(
-                attestationRun.targetEntityKind(),
-                attestationRun.selectionOptions(),
-                attestationRun.involvementKindIds());
+        if(attestationRun.involvementKindIds().isEmpty()) {
 
-        return entityRefToPeople.entrySet()
-                .stream()
-                .flatMap(e -> e.getValue().stream()
-                                .map(p -> mkInstanceRecipient(attestationRunId, e.getKey(), p.email(), attestedEntityKind)))
-                .distinct()
-                .collect(toList());
+            return asList(mkInstanceRecipient(attestationRunId, attestationRun.selectionOptions().entityReference(), userId, attestedEntityKind));
+
+        } else {
+
+            Map<EntityReference, List<Person>> entityRefToPeople = getEntityReferenceToPeople(
+                    attestationRun.targetEntityKind(),
+                    attestationRun.selectionOptions(),
+                    attestationRun.involvementKindIds());
+
+            return entityRefToPeople.entrySet()
+                    .stream()
+                    .flatMap(e -> e.getValue().stream()
+                            .map(p -> mkInstanceRecipient(attestationRunId, e.getKey(), p.email(), attestedEntityKind)))
+                    .distinct()
+                    .collect(toList());
+        }
     }
 
 
@@ -208,7 +220,8 @@ public class AttestationRunService {
 
 
     private void createAttestationInstancesAndRecipients(List<AttestationInstanceRecipient> instanceRecipients) {
-        Map<AttestationInstance, List<AttestationInstanceRecipient>> instancesAndRecipientsToSave = instanceRecipients.stream()
+        Map<AttestationInstance, List<AttestationInstanceRecipient>> instancesAndRecipientsToSave = instanceRecipients
+                .stream()
                 .collect(groupingBy(
                         AttestationInstanceRecipient::attestationInstance,
                         toList()
