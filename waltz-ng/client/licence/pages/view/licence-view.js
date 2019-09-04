@@ -21,9 +21,20 @@ import { initialiseData } from "../../../common";
 import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./licence-view.html";
+import { CORE_API } from "../../../common/services/core-api-utils";
 
 
 const bindings = {
+};
+
+
+const addToHistory = (historyStore, licence) => {
+    if (! licence) { return; }
+    historyStore.put(
+        licence.name,
+        'LICENCE',
+        'main.licence.view',
+        { id: licence.id });
 };
 
 
@@ -35,8 +46,17 @@ const initialState = {
 };
 
 
-function controller($stateParams) {
+function controller($stateParams, historyStore, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    const loadLicence = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.LicenceStore.getById,
+                [vm.parentEntityRef.id])
+            .then(r => vm.licence = r.data);
+    };
+
 
     vm.$onInit = () => {
         vm.licenceId = $stateParams.id;
@@ -45,12 +65,16 @@ function controller($stateParams) {
             id: vm.licenceId
         };
 
+        loadLicence()
+            .then(() => addToHistory(historyStore, vm.licence));
     };
 }
 
 
 controller.$inject = [
-    "$stateParams"
+    "$stateParams",
+    "HistoryStore",
+    "ServiceBroker"
 ];
 
 
