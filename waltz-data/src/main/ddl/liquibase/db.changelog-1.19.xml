@@ -1,0 +1,80 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.19.xml">
+
+    <changeSet id="20190904-4301-1"
+               author="muzammilali">
+    <comment>4301: Added column for enum_value</comment>
+        <addColumn tableName="enum_value">
+            <column name="color"
+                    type="VARCHAR(64)"
+                    defaultValue="none">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190904-4301-2"
+               author="muzammilali">
+        <comment>4301: Added enum values to represent freshness</comment>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="NEVER_OBSERVED"/>
+            <column name="display_name" value="Never Observed"/>
+            <column name="description" value="No communication observed"/>
+            <column name="color" value="red"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="RECENTLY_OBSERVED"/>
+            <column name="display_name" value="Recently Observed"/>
+            <column name="description" value="The communication was observed recently"/>
+            <column name="color" value="green"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="HISTORICALLY_OBSERVED"/>
+            <column name="display_name" value="Historically Observed"/>
+            <column name="description" value="No recent communication but there is some historic communication observed"/>
+            <column name="color" value="orange"/>
+            <column name="position" value="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20190904-4301-3"
+               author="muzammilali">
+        <comment>4301: Added freshness indicator column</comment>
+        <addColumn tableName="physical_flow">
+            <column name="freshness_indicator"
+                    type="${enum.type}"
+                    defaultValue="NEVER_OBSERVED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
