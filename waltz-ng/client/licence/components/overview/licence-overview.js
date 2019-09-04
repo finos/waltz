@@ -29,7 +29,11 @@ const bindings = {
 
 
 const initialState = {
-    licence: null
+    aliases: [],
+    licence: null,
+    visibility: {
+        aliasEditor: false
+    }
 };
 
 
@@ -44,9 +48,27 @@ function controller(serviceBroker) {
             .then(r => vm.licence = r.data);
     };
 
+    const loadAliases = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.AliasStore.getForEntity,
+                [vm.parentEntityRef])
+            .then(r => vm.aliases = r.data);
+    };
+
+    vm.showAliasEditor = () => vm.visibility.aliasEditor = true;
+    vm.dismissAliasEditor = () =>  vm.visibility.aliasEditor = false;
+
+    vm.saveAliases = (aliases = []) => serviceBroker
+        .execute(
+            CORE_API.AliasStore.update,
+            [ vm.parentEntityRef, aliases ])
+        .then(r =>  vm.aliases = r.data);
+
 
     vm.$onInit = () => {
         loadLicence();
+        loadAliases();
     };
 }
 

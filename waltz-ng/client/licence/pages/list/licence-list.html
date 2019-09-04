@@ -45,8 +45,17 @@
 
             <waltz-grid-with-search entries="$ctrl.licences"
                                     column-defs="$ctrl.columnDefs"
-                                    on-initialise="$ctrl.onInitialise">
+                                    on-initialise="$ctrl.onGridInitialised">
             </waltz-grid-with-search>
+
+            <br>
+            <a ng-click="$ctrl.exportLicences()"
+               class="clickable pull-right"
+               ng-if="$ctrl.licences.length > 0">
+                <waltz-icon name="cloud-download"></waltz-icon>
+                Export
+            </a>
+            <br>
 
         </div>
     </div>
