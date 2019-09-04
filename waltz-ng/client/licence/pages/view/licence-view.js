@@ -32,8 +32,8 @@ const addToHistory = (historyStore, licence) => {
     if (! licence) { return; }
     historyStore.put(
         licence.name,
-        'LICENCE',
-        'main.licence.view',
+        "LICENCE",
+        "main.licence.view",
         { id: licence.id });
 };
 
