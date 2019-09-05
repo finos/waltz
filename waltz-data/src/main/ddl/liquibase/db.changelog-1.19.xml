@@ -66,7 +66,7 @@
         </insert>
     </changeSet>
 
-<!--    <changeSet id="20190904-4301-3"
+    <changeSet id="20190904-4301-3"
                author="muzammilali">
         <comment>4301: Added freshness indicator column to physical_flow table</comment>
         <addColumn tableName="physical_flow">
@@ -76,5 +76,5 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-    </changeSet>-->
+    </changeSet>
 </databaseChangeLog>

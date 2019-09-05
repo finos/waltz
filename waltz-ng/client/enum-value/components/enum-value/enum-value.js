@@ -51,8 +51,6 @@ function controller(displayNameService, descriptionService, iconNameService, ico
 
     vm.$onInit = () => refresh();
     vm.$onChanges = () => refresh();
-
-
 }
 
 
