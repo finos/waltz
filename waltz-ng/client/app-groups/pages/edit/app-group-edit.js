@@ -29,19 +29,22 @@ const initialState = {
     selectedChangeInitiative: null,
     editor: "SINGLE",
     canDelete: false,
-    history: []
+    history: [],
+    organisationalUnits: [],
+    currentOrgUnit: null
 };
 
 
 function setup(groupDetail) {
-    const { applications, members, appGroup } = groupDetail;
+    const {organisationalUnits, applications, members, appGroup} = groupDetail;
 
-    const owners = _.filter(members, m => m.role === "OWNER" );
-    const viewers = _.filter(members, m => m.role === "VIEWER" );
+    const owners = _.filter(members, m => m.role === "OWNER");
+    const viewers = _.filter(members, m => m.role === "VIEWER");
 
     return {
         owners,
         viewers,
+        organisationalUnits,
         applications,
         appGroup
     };
@@ -123,7 +126,7 @@ function controller($q,
             return userService
                 .whoami()
                 .then(me => {
-                    const owner = _.find(vm.owners, o => o.userId == me.userName && o.role === "OWNER");
+                    const owner = _.find(vm.owners, o => o.userId === me.userName && o.role === "OWNER");
                     vm.canDelete = owner != null;
                 });
         });
@@ -146,12 +149,35 @@ function controller($q,
             .then(() => notification.warning("Removed: " + app.name));
     };
 
+    vm.addOrgUnitToGroup = (orgUnit) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.addOrganisationalUnit, [id, orgUnit.id])
+            .then(r => r.data)
+            .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
+            .then(() => notification.success("Added: " + orgUnit.name));
+    };
+
+
+    vm.removeOrgUnitFromGroup = (orgUnit) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.removeOrganisationalUnit, [id, orgUnit.id])
+            .then(r => r.data)
+            .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
+            .then(() => notification.warning("Removed: " + orgUnit.name));
+    };
+
 
     vm.isAppInGroup = (app) => {
         return _.some(vm.applications, a => app.id === a.id);
     };
 
-
+    vm.onOrgUnitSelect = (entity) => {
+        vm.currentOrgUnit = entity;
+        vm.addOrgUnitToGroup(entity);
+    };
+    vm.orgUnitSelectionFilter = (orgUnit) => {
+        return (vm.currentOrgUnit && orgUnit.id !== vm.currentOrgUnit.id) || !vm.organisationalUnits.map(e=>e.id).includes(orgUnit.id);
+    };
     vm.promoteToOwner = (member) => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.addOwner, [member.groupId, member.userId])
@@ -204,7 +230,6 @@ function controller($q,
             })
             .then(() => vm.focusApp = focusApp);
     };
-
     vm.showSingleEditor = () => {
         vm.editor = "SINGLE"
     };
@@ -225,7 +250,7 @@ function controller($q,
             .value();
 
 
-        if(appIdsToAdd.length > 0) {
+        if (appIdsToAdd.length > 0) {
             serviceBroker
                 .execute(CORE_API.AppGroupStore.addApplications, [id, appIdsToAdd])
                 .then(r => r.data)
@@ -233,7 +258,7 @@ function controller($q,
                 .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
         }
 
-        if(appIdsToRemove.length > 0) {
+        if (appIdsToRemove.length > 0) {
             serviceBroker
                 .execute(CORE_API.AppGroupStore.removeApplications, [id, appIdsToRemove])
                 .then(r => r.data)
@@ -244,7 +269,7 @@ function controller($q,
 
 
     vm.deleteGroup = () => {
-        if (! confirm("Really delete this group ? \n " + vm.appGroup.name)) return;
+        if (!confirm("Really delete this group ? \n " + vm.appGroup.name)) return;
 
         serviceBroker
             .execute(CORE_API.AppGroupStore.deleteGroup, [id])
@@ -261,7 +286,7 @@ function controller($q,
     vm.searchedApp = {};
 
     $scope.$watch("ctrl.searchedApp.app", (app) => {
-        if (! _.isObject(app)) return;
+        if (!_.isObject(app)) return;
         vm.addToGroup(app);
         vm.focusOnApp(app);
     }, true);
@@ -269,7 +294,7 @@ function controller($q,
 
     //add app via recently viewed
     vm.history = localStorageService
-        .get("history_2").filter(r => r.kind == "APPLICATION" ) || [];
+        .get("history_2").filter(r => r.kind === "APPLICATION") || [];
 
     vm.addRecentViewed = (app) => {
         app.id = app.stateParams.id;
@@ -299,7 +324,7 @@ function controller($q,
     serviceBroker
         .loadViewData(
             CORE_API.ChangeInitiativeStore.findBySelector,
-            [ mkSelectionOptions({ kind: "APP_GROUP", id }, "EXACT") ])
+            [mkSelectionOptions({kind: "APP_GROUP", id}, "EXACT")])
         .then(result => vm.changeInitiatives = result.data);
 
 }

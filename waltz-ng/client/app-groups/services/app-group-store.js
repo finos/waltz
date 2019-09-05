@@ -86,6 +86,15 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
+    const addOrganisationalUnit = (groupId, orgUnitId) => $http
+        .post(`${BASE}/id/${groupId}/orgUnits`, orgUnitId)
+        .then(result => result.data);
+
+    const removeOrganisationalUnit = (groupId, orgUnitId) => $http
+        .delete(`${BASE}/id/${groupId}/orgUnits/${orgUnitId}`)
+        .then(result => result.data);
+
+
     const addApplications = (groupId, applicationIds) => $http
         .post(`${BASE}/id/${groupId}/applications/list`, applicationIds)
         .then(result => result.data);
@@ -147,7 +156,8 @@ export function store($http, BaseApiUrl) {
 
         addChangeInitiative,
         removeChangeInitiative,
-
+        addOrganisationalUnit,
+        removeOrganisationalUnit,
         search
     };
 
@@ -238,6 +248,16 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'removeApplication',
         description: 'executes removeApplication'
+    },
+    addOrganisationalUnit: {
+        serviceName,
+        serviceFnName: 'addOrganisationalUnit',
+        description: 'executes addOrganisationalUnit'
+    },
+    removeOrganisationalUnit: {
+        serviceName,
+        serviceFnName: 'removeOrganisationalUnit',
+        description: 'executes removeOrganisationalUnit'
     },
     addApplications: {
         serviceName,

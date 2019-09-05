@@ -22,7 +22,7 @@ import { initialiseData } from "../../../common";
 import { CORE_API } from "../../../common/services/core-api-utils";
 
 import template from "./licence-list.html";
-import {mkLinkGridCell} from "../../../common/grid-utils";
+import { mkLinkGridCell } from "../../../common/grid-utils";
 
 
 const bindings = {
@@ -36,11 +36,15 @@ const nameCol = mkLinkGridCell(
     "main.licence.view",
     { width: "50%" });
 
-
 const approvalCol = {
     field: "approvalStatus",
     name: "Status",
     cellFilter: "toDisplayName:'ApprovalStatus'"
+};
+
+const externalIdCol = {
+    field: "externalId",
+    name: "External Id",
 };
 
 
@@ -63,6 +67,7 @@ const initialState = {
     licences: [],
     columnDefs: [
         nameCol,
+        externalIdCol,
         approvalCol,
         usageCol,
         lastUpdatedCol
@@ -93,6 +98,11 @@ function controller($q, serviceBroker) {
                     return Object.assign({}, d, { usageInfo })
                 });
             });
+    };
+
+
+    vm.onGridInitialised = (api) => {
+        vm.exportLicences = () => api.exportFn("licences.csv");
     };
 }
 
