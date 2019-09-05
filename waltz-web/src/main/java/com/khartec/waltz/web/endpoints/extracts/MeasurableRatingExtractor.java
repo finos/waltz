@@ -27,7 +27,6 @@ import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +73,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
             Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(selectionOpts);
 
 
-            SelectSelectStep<Record> reportColumns = DSL
+            SelectSelectStep<Record> reportColumns = dsl
                     .select(m.NAME.as("Taxonomy Item Name"),
                             m.EXTERNAL_ID.as("Taxonomy Item Code"))
                     .select(app.NAME.as("App Name"),
@@ -121,7 +120,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
             ApplicationIdSelectionOptions selectionOpts = readAppIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOpts);
 
-            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = DSL
+            SelectConditionStep<Record1<Long>> appIdsAssignedToAnyMeasurableInTheCategory = dsl
                     .selectDistinct(MEASURABLE_RATING.ENTITY_ID)
                     .from(MEASURABLE_RATING)
                     .join(MEASURABLE)
@@ -129,7 +128,7 @@ public class MeasurableRatingExtractor extends BaseDataExtractor {
                     .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
 
-            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = DSL
+            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = dsl
                     .selectDistinct(app.NAME.as("App Name"),
                             app.ASSET_CODE.as("App Code"),
                             app.ID.as("App Waltz Id"),

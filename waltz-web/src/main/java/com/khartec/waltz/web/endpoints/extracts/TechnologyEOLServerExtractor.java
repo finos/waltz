@@ -4,7 +4,6 @@ import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -41,7 +40,7 @@ public class TechnologyEOLServerExtractor extends BaseDataExtractor {
             EntityReference ref = getReference(request);
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(mkOpts(ref));
 
-            SelectConditionStep<Record> qry = DSL
+            SelectConditionStep<Record> qry = dsl
                     .selectDistinct(ORGANISATIONAL_UNIT.NAME.as("Org Unit"))
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(SERVER_INFORMATION.HOSTNAME.as("Host Name"),
