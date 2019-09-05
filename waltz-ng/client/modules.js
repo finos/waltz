@@ -62,6 +62,7 @@ import DataTypes from "./data-types";
 import Databases from "./databases";
 import DrillGrid from "./drill-grid";
 import DynamicSection from "./dynamic-section";
+import Embed from "./embed";
 import EndUserApps from "./end-user-apps";
 import Entity from "./entity";
 import EntityDiagrams from "./entity-diagrams";
@@ -167,6 +168,7 @@ const dependencies = [
     Databases(),
     DrillGrid(),
     DynamicSection(),
+    Embed(),
     EndUserApps(),
     Entity(),
     EntityDiagrams(),
