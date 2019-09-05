@@ -49,6 +49,7 @@ public class EnumValueDao {
                 .name(r.getDisplayName())
                 .description(r.getDescription())
                 .icon(r.getIconName())
+                .iconColor(r.getIconColor())
                 .position(r.getPosition())
                 .build();
 
