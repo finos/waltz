@@ -1,13 +1,40 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.jobs;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.jooq.DSLContext;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
 public class WaltzUtilities {
@@ -44,10 +71,50 @@ public class WaltzUtilities {
 
 
     public static String toId(String... ts) {
-        return String.join(
-                "_",
-                Stream.of(ts)
-                        .map(WaltzUtilities::toId)
-                        .collect(Collectors.toList()));
+        return Stream.of(ts)
+                .map(WaltzUtilities::toId)
+                .collect(Collectors.joining("_"));
     }
+
+
+    public static List<Long> getActiveAppIds(DSLContext dsl) {
+        return dsl
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
+                .fetch(APPLICATION.ID);
+    }
+
+
+
+    public static LogicalFlowDecoratorRecord mkLogicalFlowDecoratorRecord(long flowId, long dtId, String provenance) {
+        LogicalFlowDecoratorRecord decorator = new LogicalFlowDecoratorRecord();
+        decorator.setLogicalFlowId(flowId);
+        decorator.setDecoratorEntityKind(EntityKind.DATA_TYPE.name());
+        decorator.setDecoratorEntityId(dtId);
+        decorator.setProvenance(provenance);
+        decorator.setLastUpdatedAt(nowUtcTimestamp());
+        decorator.setLastUpdatedBy("admin");
+        decorator.setRating(AuthoritativenessRating.NO_OPINION.name());
+        return decorator;
+    }
+
+
+
+    public static LogicalFlowRecord mkLogicalFlowRecord(long sourceAppId, long targetAppId, String provenance) {
+        LogicalFlowRecord record = new LogicalFlowRecord();
+        record.setSourceEntityId(sourceAppId);
+        record.setTargetEntityId(targetAppId);
+        record.setSourceEntityKind(EntityKind.APPLICATION.name());
+        record.setTargetEntityKind(EntityKind.APPLICATION.name());
+        record.setCreatedBy("admin");
+        record.setCreatedAt(nowUtcTimestamp());
+        record.setLastUpdatedBy("admin");
+        record.setLastUpdatedAt(nowUtcTimestamp());
+        record.setProvenance(provenance);
+        record.setEntityLifecycleStatus(EntityLifecycleStatus.ACTIVE.name());
+        record.setIsRemoved(false);
+        return record;
+    }
+
 }
