@@ -34,4 +34,5 @@ public abstract class AppGroupDetail {
     public abstract AppGroup appGroup();
     public abstract List<AppGroupMember> members();
     public abstract List<EntityReference> applications();
+    public abstract List<EntityReference> organisationalUnits();
 }
