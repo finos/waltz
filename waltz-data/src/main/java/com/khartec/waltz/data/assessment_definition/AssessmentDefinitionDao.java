@@ -22,6 +22,7 @@ package com.khartec.waltz.data.assessment_definition;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import com.khartec.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.jooq.DSLContext;
@@ -56,6 +57,7 @@ public class AssessmentDefinitionDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadOnly(record.getIsReadonly())
                 .provenance(record.getProvenance())
+                .visibility(AssessmentVisibility.PRIMARY.valueOf(record.getVisibilty()))
                 .build();
     };
 
