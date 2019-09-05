@@ -46,7 +46,7 @@ public class LoadAll {
 //            new MeasurableGenerator("CAPABILITY"),
 //            new MeasurableGenerator("REGULATION"),
 //            new MeasurableRatingGenerator(),
-//            SKIP_SLOW ? null : new EntityStatisticGenerator(),
+////            SKIP_SLOW ? null : new EntityStatisticGenerator(),
 //            new AuthSourceGenerator(),
 //            new AssessmentGenerator(),
 //            new RoadmapGenerator(),
@@ -64,9 +64,9 @@ public class LoadAll {
 //            new EndUserAppInvolvmentGenerator(),
 //            new SurveyTemplateGenerator(),
 //            new SurveyRunGenerator(),
-//            new ChangeSetGenerator(),
-            new LicenceGenerator()
-//            new ChangeUnitGenerator()
+            new ChangeSetGenerator(),
+            new LicenceGenerator(),
+            new ChangeUnitGenerator()
     };
 
 
