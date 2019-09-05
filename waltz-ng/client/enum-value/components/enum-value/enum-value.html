@@ -3,10 +3,10 @@
     <waltz-icon name="{{ $ctrl.icon }}"
                 ng-if="$ctrl.showIcon">
     </waltz-icon>
-    <button ng-if="$ctrl.showIcon"
+    <span ng-if="$ctrl.showIcon"
             class="freshness-indicator"
             ng-style="$ctrl.style">
-    </button>
+    </span>
     <span ng-if="$ctrl.showPopover"
           ng-bind="$ctrl.name"
           uib-popover="{{ $ctrl.description }}"
