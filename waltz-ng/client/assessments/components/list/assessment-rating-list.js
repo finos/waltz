@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-list.html";
 
@@ -30,21 +30,35 @@ const bindings = {
 
 const initialState = {
     assessmentsWithRatings: [],
-    assessmentsWithoutRatings: []
+    assessmentsWithoutRatings: [],
+    showPrimaryOnly: true
 };
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
+    const filterAssessments = (primaryOnly) => {
         if (vm.assessments) {
-            const partitioned = _.partition(
-                vm.assessments,
+            const filtered = _.filter(vm.assessments, a =>  primaryOnly
+                ? a.definition.visibility === 'PRIMARY'
+                : true)
+
+            const valuePartitioned = _.partition(
+                filtered,
                 assessment => _.isNil(assessment.rating));
-            vm.assessmentsWithoutRatings = _.sortBy(partitioned[0], d => d.definition.name);
-            vm.assessmentsWithRatings = _.sortBy(partitioned[1], d => d.definition.name);
+            vm.assessmentsWithoutRatings = _.sortBy(valuePartitioned[0], d => d.definition.name);
+            vm.assessmentsWithRatings = _.sortBy(valuePartitioned[1], d => d.definition.name);
         }
+    };
+
+    vm.$onChanges = () => {
+        filterAssessments(vm.showPrimaryOnly);
+    };
+
+    vm.togglePrimaryOnly = () => {
+        vm.showPrimaryOnly = !vm.showPrimaryOnly;
+        filterAssessments(vm.showPrimaryOnly);
     };
 
 }

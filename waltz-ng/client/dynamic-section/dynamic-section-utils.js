@@ -20,7 +20,7 @@
 
 import {checkIsDynamicSection} from "../common/checks";
 
-export function sectionToTemplate(section) {
+export function sectionToTemplate(section, renderMode="standard") {
     try {
         checkIsDynamicSection(section);
     } catch (e) {
@@ -31,7 +31,7 @@ export function sectionToTemplate(section) {
 
     return `
         <waltz-dynamic-section parent-entity-ref="$ctrl.parentEntityRef" 
-                               class="waltz-dynamic-section ${tagName} waltz-dynamic-section-${section.id}"
+                               class="waltz-dynamic-section ${tagName} waltz-dynamic-section-render-mode-${renderMode} waltz-dynamic-section-${section.id}"
                                section="$ctrl.section"
                                on-remove="$ctrl.onRemove">
             <${tagName} parent-entity-ref="$ctrl.parentEntityRef" 

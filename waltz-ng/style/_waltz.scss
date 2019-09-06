@@ -112,12 +112,12 @@ html {
 }
 
 
-body {
+.waltz-body {
     color: $waltz-font-color;
     padding-top: 70px;
     background: $waltz-background-color;
     font-family: 'Hind', sans-serif;
-    margin-right: 12px;
+    margin-bottom: -70px;
 }
 
 

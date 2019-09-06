@@ -39,6 +39,7 @@ public class DemoSettingsGenerator implements SampleDataGenerator {
 
         List<SettingsRecord> records = newArrayList(
                 mkSetting(SettingsService.DEFAULT_ROLES_KEY, SystemRole.BOOKMARK_EDITOR.name()),
+                mkSetting("web.authentication", "waltz"),
                 mkSetting("ui.avatar.template.url", "https://gravatar.com/avatar/${id}?s=200&d=robohash&r=pg"),
                 mkSetting("ui.logo.overlay.text", "Demo"),
                 mkSetting("ui.logo.overlay.color", "#9c9"));

@@ -117,7 +117,7 @@ export default (module) => {
 
 
     function configServiceBroker($transitions, serviceBroker) {
-        $transitions.onEnter({}, (transition, state, opts) => {
+        $transitions.onBefore({}, (transition, state, opts) => {
 
             const promise = serviceBroker
                 .loadViewData(CORE_API.ClientCacheKeyStore.findAll)
