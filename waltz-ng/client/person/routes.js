@@ -53,7 +53,7 @@ const personHome = {
 };
 
 const personViewByEmployeeId = {
-    url: '/:empId',
+    url: '/{empId:string}',
     views: {'content@': PersonPage },
     resolve: {
         bouncer: personEmployeeIdBouncer
@@ -61,7 +61,7 @@ const personViewByEmployeeId = {
 };
 
 const personViewByPersonId = {
-    url: '/id/:id',
+    url: '/id/{id:int}',
     views: {'content@': PersonPage },
 };
 
