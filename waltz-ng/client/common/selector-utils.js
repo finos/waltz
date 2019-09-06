@@ -72,7 +72,7 @@ export function mkSelectionOptions(entityReference, scope, entityLifecycleStatus
     checkIsEntityRef(entityReference);
 
     return {
-        entityReference,
+        entityReference: { id: entityReference.id, kind: entityReference.kind }, // use minimal ref to increase cache hits in broker
         scope: scope || determineDownwardsScopeForKind(entityReference.kind),
         entityLifecycleStatuses
     };
