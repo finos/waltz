@@ -1,6 +1,6 @@
 <!--
   ~ Waltz - Enterprise Architecture
-  ~ Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -89,5 +89,54 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <!-- 4321: Create additional external ids table to store relationship between waltz entities with
+        more than one external systems -->
+    <changeSet id="20190906-4321-1"
+               author="davidwatkins73">
+        <comment>4321: Create additional external ids table to store relationship between waltz entities with more than one external systems</comment>
+        <createTable tableName="external_identifier">
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="system"
+                    type="${provenance.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="entity_id, entity_kind, system, external_id"
+                       constraintName="external_identifier_pkey"
+                       tableName="external_identifier"/>
+
+        <createIndex tableName="external_identifier"
+                     unique="false"
+                     indexName="idx_external_identifier_ext_id">
+            <column name="system"
+                    type="${provenance.type}"/>
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+
+        <createIndex tableName="external_identifier"
+                     unique="false"
+                     indexName="idx_external_identifier_ent_id">
+            <column name="entity_kind"
+                    type="${enum.type}"/>
+            <column name="entity_id"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+
 
 </databaseChangeLog>
