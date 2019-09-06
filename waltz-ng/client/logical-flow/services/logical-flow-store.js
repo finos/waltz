@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {checkIsEntityRef, checkIsIdSelector} from '../../common/checks'
+import _ from "lodash";
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks"
 
 export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/logical-flow`;
@@ -113,11 +113,11 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
-const serviceName = 'LogicalFlowStore';
+const serviceName = "LogicalFlowStore";
 
 export default {
     serviceName,
@@ -127,63 +127,63 @@ export default {
 export const LogicalFlowStore_API = {
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'find logical flows for a selector'
+        serviceFnName: "findBySelector",
+        description: "find logical flows for a selector"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'find logical flows involving a given entity'
+        serviceFnName: "findByEntityReference",
+        description: "find logical flows involving a given entity"
     },
     findBySourceAndTargetEntityReferences: {
         serviceName,
-        serviceFnName: 'findBySourceAndTargetEntityReferences',
-        description: 'find logical flows for the source and target entity references'
+        serviceFnName: "findBySourceAndTargetEntityReferences",
+        description: "find logical flows for the source and target entity references"
     },
     findUpstreamFlowsForEntityReferences: {
         serviceName,
-        serviceFnName: 'findUpstreamFlowsForEntityReferences',
-        description: 'findUpstreamFlowsForEntityReferences - given a list of entity reference returns all flows feeding any of those apps'
+        serviceFnName: "findUpstreamFlowsForEntityReferences",
+        description: "findUpstreamFlowsForEntityReferences - given a list of entity reference returns all flows feeding any of those apps"
     },
     calculateStats: {
         serviceName,
-        serviceFnName: 'calculateStats',
-        description: 'calculate statistics for flows'
+        serviceFnName: "calculateStats",
+        description: "calculate statistics for flows"
     },
     countByDataType: {
         serviceName,
-        serviceFnName: 'countByDataType',
-        description: 'summarizes flows by their data types'
+        serviceFnName: "countByDataType",
+        description: "summarizes flows by their data types"
     },
     removeFlow: {
         serviceName,
-        serviceFnName: 'removeFlow',
-        description: 'removes a single logical flow'
+        serviceFnName: "removeFlow",
+        description: "removes a single logical flow"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'retrieve a single logical flow (or null) given an id'
+        serviceFnName: "getById",
+        description: "retrieve a single logical flow (or null) given an id"
     },
     addFlow: {
         serviceName,
-        serviceFnName: 'addFlow',
-        description: 'adds a single logical flow'
+        serviceFnName: "addFlow",
+        description: "adds a single logical flow"
     },
     addFlows: {
         serviceName,
-        serviceFnName: 'addFlows',
-        description: 'adds a list of logical flows'
+        serviceFnName: "addFlows",
+        description: "adds a list of logical flows"
     },
     cleanupOrphans: {
         serviceName,
-        serviceFnName: 'cleanupOrphans',
-        description: 'mark flows as removed if either endpoint is missing'
+        serviceFnName: "cleanupOrphans",
+        description: "mark flows as removed if either endpoint is missing"
     },
     cleanupSelfReferences: {
         serviceName,
-        serviceFnName: 'cleanupSelfReferences',
-        description: 'mark flows as removed where the flow source and target are the same'
+        serviceFnName: "cleanupSelfReferences",
+        description: "mark flows as removed where the flow source and target are the same"
     },
 };
 

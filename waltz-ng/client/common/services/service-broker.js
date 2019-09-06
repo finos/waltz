@@ -87,7 +87,7 @@ function registerCacheRefreshListener(cacheRefreshListenersMap, cacheKey, cacheR
 
 function performChecks(target, targetParams, options) {
     checkIsServiceBrokerTarget(target);
-    checkIsArray(targetParams, 'targetParams must be an array');
+    checkIsArray(targetParams, "targetParams must be an array");
     checkIsServiceBrokerOptions(options);
 }
 
@@ -117,7 +117,7 @@ function loadData($injector,
         const promise = invokeServiceFunction(service, serviceName, serviceFnName, targetParams);
         cache.set(cacheKey, mkCacheValue(promise));
 
-        notifyListeners(cacheKey, cacheRefreshListenersMap, target, targetParams, 'REFRESH');
+        notifyListeners(cacheKey, cacheRefreshListenersMap, target, targetParams, "REFRESH");
     }
 
     // register cache refresh listener
@@ -222,7 +222,7 @@ function service($injector) {
 }
 
 
-service.$inject = ['$injector'];
+service.$inject = ["$injector"];
 
 
 export default service;
