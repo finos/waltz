@@ -17,24 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+import angular from "angular";
+import Routes from './routes';
 
+export default () => {
+    const module = angular.module("waltz.embed", []);
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+    module.config(Routes);
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableEnumValue.class)
-@JsonDeserialize(as = ImmutableEnumValue.class)
-public abstract class EnumValue implements
-        IconProvider,
-        DescriptionProvider,
-        NameProvider,
-        PositionProvider {
-
-    public abstract String type();
-    public abstract String key();
-    public abstract String iconColor();
-
-}
+    return module.name;
+};

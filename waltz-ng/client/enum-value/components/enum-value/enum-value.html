@@ -1,7 +1,12 @@
+
 <span class="waltz-enum-value">
     <waltz-icon name="{{ $ctrl.icon }}"
                 ng-if="$ctrl.showIcon">
     </waltz-icon>
+    <span ng-if="$ctrl.showIcon"
+            class="wev-icon"
+            ng-style="$ctrl.style">
+    </span>
     <span ng-if="$ctrl.showPopover"
           ng-bind="$ctrl.name"
           uib-popover="{{ $ctrl.description }}"

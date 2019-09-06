@@ -27,6 +27,7 @@ import {toMap} from "../map-utils";
 
 const displayNameService = new BaseLookupService();
 const iconNameService = new BaseLookupService();
+const iconColorService = new BaseLookupService();
 const descriptionService = new BaseLookupService();
 
 
@@ -85,6 +86,7 @@ function loadFromServer(involvementKindService,
                     displayNameService.register(type, toMap(xs, keyFn, x => x.name));
                     descriptionService.register(type, toMap(xs, keyFn, x => x.description));
                     iconNameService.register(type, toMap(xs, keyFn, x => x.icon));
+                    iconColorService.register(type, toMap(xs, keyFn, x => x.iconColor));
                 })
                 .value();
         });
@@ -95,6 +97,7 @@ export default (module) => {
     module
         .service("DisplayNameService", () => displayNameService)
         .service("IconNameService", () => iconNameService)
+        .service("IconColorService", () => iconColorService)
         .service("DescriptionService", () => descriptionService)
         .service("PreventNavigationService", preventNavigationService)
         .service("ServiceBroker", serviceBroker);
@@ -104,6 +107,7 @@ export default (module) => {
         displayNameService.register(type, toMap(xs, keyFn, x => x.name));
         descriptionService.register(type, toMap(xs, keyFn, x => x.description));
         iconNameService.register(type, toMap(xs, keyFn, x => x.icon));
+        iconColorService.register(type, toMap(xs, keyFn, x => x.iconColor));
     });
 
     loadFromServer.$inject = [
@@ -113,7 +117,7 @@ export default (module) => {
 
 
     function configServiceBroker($transitions, serviceBroker) {
-        $transitions.onEnter({}, (transition, state, opts) => {
+        $transitions.onBefore({}, (transition, state, opts) => {
 
             const promise = serviceBroker
                 .loadViewData(CORE_API.ClientCacheKeyStore.findAll)

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
@@ -32,16 +33,16 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.Date;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.currentDate;
@@ -64,6 +65,27 @@ public class JooqUtilities {
                 EntityKind.valueOf(record.getValue(kindField)),
                 record.getValue(idField),
                 record.getValue(nameField));
+    }
+
+
+    public static <T extends TableRecord<?>> Collector<T, Set<T>, Batch> batchInsertCollector(DSLContext dsl) {
+        return batchOperationCollector(dsl, dsl::batchInsert);
+    }
+
+
+    public static <T extends UpdatableRecord<?>> Collector<T, Set<T>, Batch> batchStoreCollector(DSLContext dsl) {
+        return batchOperationCollector(dsl, dsl::batchStore);
+    }
+
+
+    private static <T extends TableRecord<?>> Collector<T, Set<T>, Batch> batchOperationCollector(DSLContext dsl,
+                                                                                                  Function<Set<T>, Batch> operation) {
+        return Collector.of(
+                HashSet::new,
+                Set::add,
+                (s1, s2) -> union(s1, s2),
+                operation,
+                Collector.Characteristics.CONCURRENT);
     }
 
 

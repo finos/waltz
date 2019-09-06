@@ -59,6 +59,8 @@ public abstract class PhysicalFlow implements
 
     public abstract String transport();
 
+    public abstract String freshnessIndicator();
+
     public abstract Optional<Long> specificationDefinitionId();
 
     public abstract Criticality criticality();

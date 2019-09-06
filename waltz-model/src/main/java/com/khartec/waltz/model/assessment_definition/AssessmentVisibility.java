@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model;
+package com.khartec.waltz.model.assessment_definition;
 
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
-
-@Value.Immutable
-@JsonSerialize(as = ImmutableEnumValue.class)
-@JsonDeserialize(as = ImmutableEnumValue.class)
-public abstract class EnumValue implements
-        IconProvider,
-        DescriptionProvider,
-        NameProvider,
-        PositionProvider {
-
-    public abstract String type();
-    public abstract String key();
-    public abstract String iconColor();
-
+public enum AssessmentVisibility {
+    PRIMARY,
+    SECONDARY
 }
