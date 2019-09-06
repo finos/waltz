@@ -26,12 +26,14 @@ import template from "./dynamic-section-wrapper.html";
 const bindings = {
     parentEntityRef: "<",
     filters: "<",
+    renderMode: "@?",  // chromeless | standard (default)
     section: "<",
     onRemove: "<",
 };
 
 
 const initialState = {
+    renderMode: "standard",
     sectionScope: null
 };
 
@@ -47,7 +49,7 @@ function controller($element, $compile, $scope) {
         vm.sectionScope.onRemove = vm.onRemove;
         vm.sectionScope.canRemove = vm.canRemove;
 
-        const linkFn = $compile(sectionToTemplate(vm.section));
+        const linkFn = $compile(sectionToTemplate(vm.section, vm.renderMode));
         const content = linkFn(vm.sectionScope);
         $element.append(content);
     };
