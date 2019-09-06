@@ -17,24 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {initialiseData} from "../../common/index";
-import {dynamicSections} from '../../dynamic-section/dynamic-section-definitions';
-import template from './dyna-test-view.html';
+import _ from "lodash";
+import {initialiseData} from "../../common";
+import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
+import template from "./embed-view.html";
 
-const initialState = {
-    parentEntityRef: {
-        id: 645,
-        kind: 'MEASURABLE'
-    }
-};
+const initialState = {};
 
 function controller($stateParams) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        console.log('init', $stateParams);
-
         vm.entityRef = {
             kind: $stateParams.kind,
             id: $stateParams.id
@@ -46,14 +39,14 @@ function controller($stateParams) {
 
 
 controller.$inject = [
-    '$stateParams'
+    "$stateParams"
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "$ctrl"
 };
 
 
