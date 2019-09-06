@@ -70,6 +70,7 @@ public class PhysicalFlowDao {
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
                 .transport(record.getTransport())
+                .freshnessIndicator(record.getFreshnessIndicator())
                 .specificationDefinitionId(Optional.ofNullable(record.getSpecificationDefinitionId()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())

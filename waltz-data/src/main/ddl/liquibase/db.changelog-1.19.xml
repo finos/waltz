@@ -34,4 +34,60 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20190904-4301-1"
+               author="muzammilali">
+    <comment>4301: Added column icon_color in enum_value table to choose colored circle displayed with enum value</comment>
+        <addColumn tableName="enum_value">
+            <column name="icon_color"
+                    type="VARCHAR(64)"
+                    defaultValue="none">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20190904-4301-2"
+               author="muzammilali">
+        <comment>4301: Added enum values to represent freshness</comment>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="NEVER_OBSERVED"/>
+            <column name="display_name" value="Never Observed"/>
+            <column name="description" value="No communication observed"/>
+            <column name="icon_color" value="red"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="RECENTLY_OBSERVED"/>
+            <column name="display_name" value="Recently Observed"/>
+            <column name="description" value="The communication was observed recently"/>
+            <column name="icon_color" value="green"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="HISTORICALLY_OBSERVED"/>
+            <column name="display_name" value="Historically Observed"/>
+            <column name="description" value="No recent communication but there is some historic communication observed"/>
+            <column name="icon_color" value="orange"/>
+            <column name="position" value="0"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20190904-4301-3"
+               author="muzammilali">
+        <comment>4301: Added freshness indicator column to physical_flow table</comment>
+        <addColumn tableName="physical_flow">
+            <column name="freshness_indicator"
+                    type="${enum.type}"
+                    defaultValue="NEVER_OBSERVED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

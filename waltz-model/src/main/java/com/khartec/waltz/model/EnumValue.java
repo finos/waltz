@@ -35,5 +35,6 @@ public abstract class EnumValue implements
 
     public abstract String type();
     public abstract String key();
+    public abstract String iconColor();
 
 }

@@ -8,8 +8,8 @@ public enum EnumValueKind {
     PERSON_KIND("PersonKind"),
     SCENARIO_TYPE("ScenarioType"),
     CHANGE_INITIATIVE_LIFECYCLE_PHASE("changeInitiativeLifecyclePhase"),
-    PHYSICAL_FLOW_CRITICALITY("physicalFlowCriticality");
-
+    PHYSICAL_FLOW_CRITICALITY("physicalFlowCriticality"),
+    FRESHNESS_INDICATOR("FreshnessIndicator");
 
     private final String dbValue;
 

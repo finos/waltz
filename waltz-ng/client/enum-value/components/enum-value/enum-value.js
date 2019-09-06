@@ -35,13 +35,18 @@ const initialState = {
 };
 
 
-function controller(displayNameService, descriptionService, iconNameService) {
+function controller(displayNameService, descriptionService, iconNameService, iconColorService) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
         vm.name = displayNameService.lookup(vm.type, vm.key) || vm.key;
         vm.description = descriptionService.lookup(vm.type, vm.key);
         vm.icon = iconNameService.lookup(vm.type, vm.key);
+        vm.iconColor = iconColorService.lookup(vm.type, vm.key);
+
+        vm.style = {
+            "background-color" : vm.iconColor
+        };
     };
 
     vm.$onInit = () => refresh();
@@ -52,7 +57,8 @@ function controller(displayNameService, descriptionService, iconNameService) {
 controller.$inject = [
     'DisplayNameService',
     'DescriptionService',
-    'IconNameService'
+    'IconNameService',
+    'IconColorService'
 ];
 
 
