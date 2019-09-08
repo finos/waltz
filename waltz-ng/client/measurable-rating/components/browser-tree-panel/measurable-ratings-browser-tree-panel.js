@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -70,7 +70,11 @@ function prepareColumnDefs(measurableCategory) {
         {
             field: "rating.name",
             name: "Rating",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-rating-indicator-cell rating=\"row.entity.rating\" show-name=\"true\"></waltz-rating-indicator-cell></div>",
+            cellTemplate: `<div class="ui-grid-cell-contents">
+                <waltz-rating-indicator-cell rating="row.entity.rating"
+                                             show-description-popup="true" 
+                                             show-name="true">  
+                </waltz-rating-indicator-cell></div>`,
             width: "10%"
         },
         {
