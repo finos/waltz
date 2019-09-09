@@ -138,6 +138,7 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                         PHYSICAL_FLOW.TRANSPORT.as("Transport"),
                         PHYSICAL_FLOW.FREQUENCY.as("Frequency"),
                         PHYSICAL_FLOW.CRITICALITY.as("Criticality"),
+                        PHYSICAL_FLOW.FRESHNESS_INDICATOR.as("Observed"),
                         PHYSICAL_SPECIFICATION.DESCRIPTION.as("Description")
                 ).from(PHYSICAL_SPECIFICATION)
                 .join(PHYSICAL_FLOW)

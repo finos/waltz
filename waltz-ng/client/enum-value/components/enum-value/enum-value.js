@@ -22,10 +22,10 @@ import template from "./enum-value.html";
 
 
 const bindings = {
-    type: '<',
-    key: '<',
-    showIcon: '<?',
-    showPopover: '<?'
+    type: "<",
+    key: "<",
+    showIcon: "<?",
+    showPopover: "<?"
 };
 
 
@@ -45,7 +45,7 @@ function controller(displayNameService, descriptionService, iconNameService, ico
         vm.iconColor = iconColorService.lookup(vm.type, vm.key);
 
         vm.style = {
-            "background-color" : vm.iconColor
+            "color" : vm.iconColor
         };
     };
 
@@ -55,10 +55,10 @@ function controller(displayNameService, descriptionService, iconNameService, ico
 
 
 controller.$inject = [
-    'DisplayNameService',
-    'DescriptionService',
-    'IconNameService',
-    'IconColorService'
+    "DisplayNameService",
+    "DescriptionService",
+    "IconNameService",
+    "IconColorService"
 ];
 
 
@@ -71,5 +71,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEnumValue'
+    id: "waltzEnumValue"
 };
