@@ -26,7 +26,7 @@ const baseState = {
 
 
 const entityViewState = {
-    url: '/view/entity/:kind/:id?name',
+    url: '/view/entity/{kind:string}/{id:int}?name',
     views: { 'content@': ChangeLogView }
 };
 
