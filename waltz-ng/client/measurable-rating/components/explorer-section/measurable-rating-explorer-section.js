@@ -104,7 +104,8 @@ function prepareTableData(ratings = [],
 
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
-        <waltz-rating-indicator-cell rating="row.entity.rating" 
+        <waltz-rating-indicator-cell rating="row.entity.rating"
+                                     show-description-popup="true" 
                                      show-name="true">
         </waltz-rating-indicator-cell>
     </div>`;
