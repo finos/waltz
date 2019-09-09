@@ -21,11 +21,12 @@ import actorView from "./pages/actor-view/actor-view";
 
 
 const baseState = {
+    url: "actor"
 };
 
 
 const viewState = {
-    url: "actor/{id:int}",
+    url: "/{id:int}",
     views: { "content@": actorView }
 };
 
