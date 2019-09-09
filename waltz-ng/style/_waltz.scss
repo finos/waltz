@@ -117,7 +117,9 @@ html {
     padding-top: 70px;
     background: $waltz-background-color;
     font-family: 'Hind', sans-serif;
-    margin-bottom: -70px;
+    -webkit-box-shadow: 0px 150px 46px 16px rgba(228,231,240,1);
+    -moz-box-shadow: 0px 150px 46px 16px rgba(228,231,240,1);
+    box-shadow: 0px 150px 46px 16px rgba(228,231,240,1);
 }
 
 

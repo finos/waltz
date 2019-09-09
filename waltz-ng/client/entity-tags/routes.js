@@ -26,7 +26,7 @@ const base = {
 
 
 const explorerState = {
-    url: '/explorer/:tag',
+    url: '/explorer/{tag:string}',
     views: {'content@': tagExplorerView }
 };
 
