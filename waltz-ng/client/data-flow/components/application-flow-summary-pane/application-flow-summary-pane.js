@@ -26,6 +26,9 @@ import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
 import { nest } from "d3-collection";
 
 import template from './application-flow-summary-pane.html';
+import {tallyBy} from "../../../common/tally-utils";
+import {color} from "d3-color";
+import {amber, green, grey, red} from "../../../common/colors";
 
 
 const bindings = {
@@ -91,6 +94,25 @@ function calcStats(enrichedDecorators = []) {
     };
 }
 
+function getFreshnessSummaryConfig() {
+    return {
+        colorProvider: (d) => {
+            if (d.key === "RECENTLY_OBSERVED") {
+                return color(green);
+            } else if (d.key === "OBSERVED") {
+                return color(amber);
+            } else if (d.key === "NEVER_OBSERVED") {
+                return color(grey);
+            } else {
+                return color(red);
+            }
+        },
+        valueProvider: (d) => d.count,
+        idProvider: (d) => d.key,
+        labelProvider: d => _.capitalize(d.key.replace("_", " ")),
+        size: 40
+    };
+}
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -123,8 +145,18 @@ function controller($q, serviceBroker) {
 
                 vm.stats = calcStats(vm.enrichedDecorators);
             });
-    };
 
+        serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.findByEntityReference,
+                [vm.parentEntityRef])
+            .then(r => r.data)
+            .then(physicalFlows => {
+                vm.freshnessSummaryData = tallyBy(physicalFlows, "freshnessIndicator");
+                vm.freshnessSummaryConfig = getFreshnessSummaryConfig();
+            });
+
+    };
 
     const loadUnknownDataType = () => {
         return serviceBroker
