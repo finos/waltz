@@ -155,7 +155,7 @@ public class SurveyInstanceDao {
         record.setStatus(currentInstance.status().name());
         record.setDueDate(toSqlDate(currentInstance.dueDate()));
         record.setOriginalInstanceId(currentInstance.id().get());
-        record.setSubmittedAt(Timestamp.valueOf(currentInstance.submittedAt()));
+        record.setSubmittedAt((currentInstance.submittedAt() != null) ? Timestamp.valueOf(currentInstance.submittedAt()) : null);
         record.setSubmittedBy(currentInstance.submittedBy());
         record.setApprovedAt(ofNullable(currentInstance.approvedAt())
                 .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
