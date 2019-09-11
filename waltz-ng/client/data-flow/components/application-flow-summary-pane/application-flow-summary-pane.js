@@ -99,7 +99,7 @@ function getFreshnessSummaryConfig() {
         colorProvider: (d) => color(d.color),
         valueProvider: (d) => d.count,
         idProvider: (d) => d.key,
-        labelProvider: d => _.capitalize(d.key.replace("_", " ")),
+        labelProvider: d => d.title,
         size: 40
     };
 }
@@ -116,6 +116,10 @@ function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
 
     summaryData.map(d => {
         return d.color = enumValues[d.key] ? enumValues[d.key].data.iconColor : "none";
+    });
+
+    summaryData.map(d => {
+        return d.title = enumValues[d.key] ? enumValues[d.key].data.name : "";
     });
 
     return summaryData;
