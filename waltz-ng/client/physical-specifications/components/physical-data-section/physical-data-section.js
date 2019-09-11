@@ -19,16 +19,16 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
-import template from './physical-data-section.html';
+import {mkEntityLinkGridCell, mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import template from "./physical-data-section.html";
 
 
 const bindings = {
-    primaryRef: '<',
-    physicalFlows: '<',
-    specifications: '<',
-    logicalFlows: '<',
-    onInitialise: '<'
+    primaryRef: "<",
+    physicalFlows: "<",
+    specifications: "<",
+    logicalFlows: "<",
+    onInitialise: "<"
 };
 
 
@@ -69,8 +69,8 @@ function mkData(primaryRef,
 {
     if (!primaryRef) return [];
 
-    const specsById = _.keyBy(specifications, 'id');
-    const logicalById = _.keyBy(logicalFlows, 'id');
+    const specsById = _.keyBy(specifications, "id");
+    const logicalById = _.keyBy(logicalFlows, "id");
 
     const enrichFlow = (pf) => {
         return {
@@ -96,31 +96,33 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.produceColumnDefs = [
-        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
-        Object.assign(mkEntityLinkGridCell('Receiver(s)', 'logicalFlow.target', 'left'), { width: "15%" }),
-        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
-        { field: 'specification.description', displayName: 'Description', width: "23%" }
+        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), { width: "20%"} ),
+        { field: "specification.externalId", displayName: "Ext. Id", width: "10%" },
+        Object.assign(mkEntityLinkGridCell("Receiver(s)", "logicalFlow.target", "left"), { width: "15%" }),
+        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
+        { field: "specification.format", displayName: "Format", width: "8%", cellFilter: "toDisplayName:\"dataFormatKind\"" },
+        { field: "physicalFlow.transport", displayName: "Transport", width: "10%", cellFilter: "toDisplayName:\"TransportKind\"" },
+        { field: "physicalFlow.frequency", displayName: "Frequency", width: "10%", cellFilter: "toDisplayName:\"frequencyKind\"" },
+        { field: "physicalFlow.criticality", displayName: "Criticality", width: "10%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
+        { field: "specification.description", displayName: "Description", width: "18%" }
     ];
 
     vm.consumeColumnDefs = [
-        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
-        Object.assign(mkEntityLinkGridCell('Source', 'logicalFlow.source', 'left'), { width: "15%"} ),
-        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
-        { field: 'specification.description', displayName: 'Description', width: "23%" }
+        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), { width: "20%"} ),
+        { field: "specification.externalId", displayName: "Ext. Id", width: "10%" },
+        Object.assign(mkEntityLinkGridCell("Source", "logicalFlow.source", "left"), { width: "15%"} ),
+        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
+        { field: "specification.format", displayName: "Format", width: "8%", cellFilter: "toDisplayName:\"dataFormatKind\"" },
+        { field: "physicalFlow.transport", displayName: "Transport", width: "10%", cellFilter: "toDisplayName:\"TransportKind\"" },
+        { field: "physicalFlow.frequency", displayName: "Frequency", width: "10%", cellFilter: "toDisplayName:\"frequencyKind\"" },
+        { field: "physicalFlow.criticality", displayName: "Criticality", width: "10%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
+        { field: "specification.description", displayName: "Description", width: "16%" }
     ];
 
     vm.unusedSpecificationsColumnDefs = [
-        { field: 'name', displayName: 'Name' },
-        { field: 'format', displayName: 'Format', cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'description', displayName: 'Description' }
+        { field: "name", displayName: "Name" },
+        { field: "format", displayName: "Format", cellFilter: "toDisplayName:\"dataFormatKind\"" },
+        { field: "description", displayName: "Description" }
     ];
 
     vm.$onChanges = () => {
@@ -128,7 +130,7 @@ function controller() {
     };
 }
 
-controller.$inject = ['$scope'];
+controller.$inject = ["$scope"];
 
 
 const component = {

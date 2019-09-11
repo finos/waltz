@@ -21,31 +21,31 @@ const baseState = {
 };
 
 
-import PhysicalFlowView from './physical-flow-view';
-import PhysicalFlowRegistration from './physical-flow-registration';
+import PhysicalFlowView from "./physical-flow-view";
+import PhysicalFlowRegistration from "./physical-flow-registration";
 
 const viewState = {
-    url: 'physical-flow/{id:int}',
-    views: {'content@': PhysicalFlowView },
+    url: "physical-flow/{id:int}",
+    views: {"content@": PhysicalFlowView },
 };
 
 
 const registrationState = {
-    url: 'physical-flow/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}',
-    views: {'content@': PhysicalFlowRegistration },
+    url: "physical-flow/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}",
+    views: {"content@": PhysicalFlowRegistration },
 };
 
 
 function setup($stateProvider) {
 
     $stateProvider
-        .state('main.physical-flow', baseState)
-        .state('main.physical-flow.registration', registrationState)
-        .state('main.physical-flow.view', viewState);
+        .state("main.physical-flow", baseState)
+        .state("main.physical-flow.registration", registrationState)
+        .state("main.physical-flow.view", viewState);
 }
 
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

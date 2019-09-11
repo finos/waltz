@@ -29,14 +29,17 @@
  */
 export function mkEnumGridCell(columnHeading,
                                entityRefField,
-                               showIcon = false) {
+                               enumType,
+                               showIcon = false,
+                               showPopover = false) {
     return {
         field: entityRefField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <waltz-enum-value type="'AuthoritativenessRating'"
+                <waltz-enum-value type="'${enumType}'"
                                   show-icon="${showIcon}"
+                                  show-popover="${showPopover}"
                                   key="COL_FIELD">
                 </waltz-enum-value>
             </div>`

@@ -1,18 +1,19 @@
 
 <span class="waltz-enum-value">
-    <waltz-icon name="{{ $ctrl.icon }}"
-                ng-if="$ctrl.showIcon">
-    </waltz-icon>
-    <span ng-if="$ctrl.showIcon"
-            class="wev-icon"
-            ng-style="$ctrl.style">
+
+    <span ng-if="$ctrl.showIcon && $ctrl.icon"
+          ng-style="$ctrl.style">
+        <waltz-icon name="{{ $ctrl.icon }}">
+        </waltz-icon>
     </span>
+
     <span ng-if="$ctrl.showPopover"
           ng-bind="$ctrl.name"
           uib-popover="{{ $ctrl.description }}"
           popover-append-to-body="true"
           popover-trigger="mouseenter">
     </span>
+
     <span ng-if="!$ctrl.showPopover"
           ng-bind="$ctrl.name">
     </span>
