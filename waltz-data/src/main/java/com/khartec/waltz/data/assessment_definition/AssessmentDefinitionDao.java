@@ -57,7 +57,7 @@ public class AssessmentDefinitionDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadOnly(record.getIsReadonly())
                 .provenance(record.getProvenance())
-                .visibility(AssessmentVisibility.PRIMARY.valueOf(record.getVisibilty()))
+                .visibility(AssessmentVisibility.PRIMARY.valueOf(record.getVisibility()))
                 .build();
     };
 
