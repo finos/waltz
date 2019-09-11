@@ -114,13 +114,8 @@ function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
     const summaryData = tallyBy(producerOrConsumerPhysicalFlows,
         "freshnessIndicator");
 
-    summaryData.map(d => {
-        return d.color = enumValues[d.key] ? enumValues[d.key].data.iconColor : "none";
-    });
-
-    summaryData.map(d => {
-        return d.title = enumValues[d.key] ? enumValues[d.key].data.name : "";
-    });
+    _.each(summaryData, d => d.color = _.get(enumValues, [d.key, "data", "iconColor"], "none"));
+    _.each(summaryData, d => d.title = _.get(enumValues, [d.key, "data", "name"], "none"));
 
     return summaryData;
 }
@@ -165,9 +160,8 @@ function controller($q, serviceBroker) {
 
         const enumValuePromise = serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => {vm.summaryConfig =
-                indexByKeyForType(r.data, "FreshnessIndicator");
-            });
+            .then(r => vm.summaryConfig =
+                indexByKeyForType(r.data, "FreshnessIndicator"));
 
         $q.all([logicalFlowPromise, physicalFlowPromise, enumValuePromise])
             .then(([logicalFlows, physicalFlows]) => {
