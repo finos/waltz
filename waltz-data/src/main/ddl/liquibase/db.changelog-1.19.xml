@@ -137,9 +137,19 @@
         </createIndex>
     </changeSet>
 
+    <!-- 4331: Add primary key to 'end_user_application' table -->
+    <changeSet id="20190910-4331-1"
+               author="woodjes">
+        <comment>4331: Add primary key to 'end_user_application' table</comment>
+        <addPrimaryKey columnNames="id"
+                       constraintName="end_user_application_pkey"
+                       tableName="end_user_application"/>
+    </changeSet>
+
+    <!-- 4329: Add OBSERVED freshness indicator value and add icon color-->
     <changeSet id="20190910-4329-1"
                author="muzammilali">
-        <comment>4329: Added additional enum value represent freshness (OBSERVED) and update existing one</comment>
+        <comment>4329: Added additional enum value represent freshness (OBSERVED) and update color of existing one</comment>
 
         <insert tableName="enum_value">
             <column name="type" value="FreshnessIndicator"/>
@@ -164,6 +174,7 @@
 
     </changeSet>
 
+    <!-- 4329: Add icon to freshness indicator enum value-->
     <changeSet id="20190910-4329-2"
                author="muzammilali">
         <comment>4329: Added icon value for freshness indicators</comment>
