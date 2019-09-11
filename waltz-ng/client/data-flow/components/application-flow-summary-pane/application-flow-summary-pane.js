@@ -28,7 +28,7 @@ import { nest } from "d3-collection";
 import template from './application-flow-summary-pane.html';
 import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
-import {amber, green, grey, red} from "../../../common/colors";
+import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 
 
 const bindings = {
@@ -96,22 +96,29 @@ function calcStats(enrichedDecorators = []) {
 
 function getFreshnessSummaryConfig() {
     return {
-        colorProvider: (d) => {
-            if (d.key === "RECENTLY_OBSERVED") {
-                return color(green);
-            } else if (d.key === "OBSERVED") {
-                return color(amber);
-            } else if (d.key === "NEVER_OBSERVED") {
-                return color(grey);
-            } else {
-                return color(red);
-            }
-        },
+        colorProvider: (d) => color(d.color),
         valueProvider: (d) => d.count,
         idProvider: (d) => d.key,
         labelProvider: d => _.capitalize(d.key.replace("_", " ")),
         size: 40
     };
+}
+
+function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
+    const logicalFlowIds = logicalFlows
+        .map(lf => lf.id);
+
+    const producerOrConsumerPhysicalFlows = physicalFlows
+        .filter(pf => logicalFlowIds.includes(pf.logicalFlowId));
+
+    const summaryData = tallyBy(producerOrConsumerPhysicalFlows,
+        "freshnessIndicator");
+
+    summaryData.map(d => {
+        return d.color = enumValues[d.key] ? enumValues[d.key].data.iconColor : "none";
+    });
+
+    return summaryData;
 }
 
 function controller($q, serviceBroker) {
@@ -146,16 +153,27 @@ function controller($q, serviceBroker) {
                 vm.stats = calcStats(vm.enrichedDecorators);
             });
 
-        serviceBroker
+        const physicalFlowPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalFlowStore.findByEntityReference,
                 [vm.parentEntityRef])
-            .then(r => r.data)
-            .then(physicalFlows => {
-                vm.freshnessSummaryData = tallyBy(physicalFlows, "freshnessIndicator");
-                vm.freshnessSummaryConfig = getFreshnessSummaryConfig();
+            .then(r => r.data);
+
+        const enumValuePromise = serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => {vm.summaryConfig =
+                indexByKeyForType(r.data, "FreshnessIndicator");
             });
 
+        $q.all([logicalFlowPromise, physicalFlowPromise, enumValuePromise])
+            .then(([logicalFlows, physicalFlows]) => {
+                vm.freshnessSummaryData = getFreshnessSummaryData(
+                    logicalFlows,
+                    physicalFlows,
+                    vm.summaryConfig);
+
+                vm.freshnessSummaryConfig = getFreshnessSummaryConfig();
+            });
     };
 
     const loadUnknownDataType = () => {

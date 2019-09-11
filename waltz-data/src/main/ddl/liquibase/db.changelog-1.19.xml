@@ -137,6 +137,42 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="20190910-4329-1"
+               author="muzammilali">
+        <comment>4329: Added additional enum value represent freshness (OBSERVED) and update existing one</comment>
 
+        <insert tableName="enum_value">
+            <column name="type" value="FreshnessIndicator"/>
+            <column name="key" value="OBSERVED"/>
+            <column name="display_name" value="Observed"/>
+            <column name="description" value="Observed within a week"/>
+            <column name="icon_color" value="orange"/>
+            <column name="position" value="0"/>
+        </insert>
+
+        <update tableName="enum_value">
+            <column name="icon_color"
+                    value="red"/>
+            <where>[key] = 'HISTORICALLY_OBSERVED' AND [type] = 'FreshnessIndicator'</where>
+        </update>
+
+        <update tableName="enum_value">
+            <column name="icon_color"
+                    value="grey"/>
+            <where>[key] = 'NEVER_OBSERVED' AND [type] = 'FreshnessIndicator'</where>
+        </update>
+
+    </changeSet>
+
+    <changeSet id="20190910-4329-2"
+               author="muzammilali">
+        <comment>4329: Added icon value for freshness indicators</comment>
+
+        <update tableName="enum_value">
+            <column name="icon_name"
+                    value="circle"/>
+            <where>[type] = 'FreshnessIndicator'</where>
+        </update>
+    </changeSet>
 
 </databaseChangeLog>
