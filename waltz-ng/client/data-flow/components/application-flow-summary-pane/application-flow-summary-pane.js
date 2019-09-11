@@ -115,7 +115,7 @@ function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
         "freshnessIndicator");
 
     _.each(summaryData, d => d.color = _.get(enumValues, [d.key, "data", "iconColor"], "none"));
-    _.each(summaryData, d => d.title = _.get(enumValues, [d.key, "data", "name"], "none"));
+    _.each(summaryData, d => d.title = _.get(enumValues, [d.key, "data", "name"], ""));
 
     return summaryData;
 }
