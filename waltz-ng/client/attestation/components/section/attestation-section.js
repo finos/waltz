@@ -24,7 +24,6 @@ import template from "./attestation-section.html";
 
 const initialState = {
     attestations: [],
-    enableAttest: false,
     createType: null,
 };
 
@@ -63,11 +62,16 @@ function controller($q,
             .then(([runs, instances]) => {
                 vm.attestations = mkAttestationData(runs, instances);
 
-                vm.entityAttestations = (vm.attestations != null) ?  _.filter(vm.attestations,
-                    function(entityAttestation)
-                    { return entityAttestation.run.name === "Entity Attestation"
-                        && entityAttestation.instance.attestedAt == null})
-                    : null;
+                vm.logicalAttestations = _.filter(
+                    _.sortBy(vm.attestations, d => d.instance.attestedAt),
+                    d => d.run.attestedEntityKind === "LOGICAL_DATA_FLOW" && d.instance.attestedAt != null);
+
+                vm.physicalAttestations = _.filter(
+                    _.sortBy(vm.attestations, d => d.instance.attestedAt),
+                    d => d.run.attestedEntityKind === "PHYSICAL_FLOW" && d.instance.attestedAt != null);
+
+                vm.latestLogicalAttestation = _.findLast(vm.logicalAttestations);
+                vm.latestPhysicalAttestation = _.findLast(vm.physicalAttestations);
             });
     };
 
@@ -80,8 +84,6 @@ function controller($q,
             loadData();
         }
     };
-
-    vm.enableAttestToggle = () => vm.enableAttest = !vm.enableAttest;
 
     vm.setCreateType = (type) => vm.createType = type;
 
@@ -105,7 +107,6 @@ function controller($q,
                         .then(exec => vm.entityAttestationInstance = null, () => notification.error("Failed to attest flows"))
                         .then(() => {
                             notification.success("Attested successfully");
-                            vm.enableAttestToggle();
                             return loadData();
                         })
                 })
@@ -114,7 +115,6 @@ function controller($q,
     };
 
     vm.cancelAttestation = () => {
-        vm.enableAttestToggle();
         vm.setCreateType(null);
     }
 }
