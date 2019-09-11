@@ -34,9 +34,20 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20190004-4303-2"
+               author="kamransaleem">
+        <comment>4303: assessment visibility rename</comment>
+        <renameColumn columnDataType="${enum.type}"
+                      newColumnName="visibility"
+                      oldColumnName="visibilty"
+                      remarks="typo in name"
+                      tableName="assessment_definition" />
+    </changeSet>
+
+
     <changeSet id="20190904-4301-1"
                author="muzammilali">
-    <comment>4301: Added column icon_color in enum_value table to choose colored circle displayed with enum value</comment>
+        <comment>4301: Added column icon_color in enum_value table to choose colored circle displayed with enum value</comment>
         <addColumn tableName="enum_value">
             <column name="icon_color"
                     type="VARCHAR(64)"
