@@ -137,6 +137,13 @@
         </createIndex>
     </changeSet>
 
-
+    <!-- 4331: Add primary key to 'end_user_application' table -->
+    <changeSet id="20190910-4331-1"
+               author="woodjes">
+        <comment>4331: Add primary key to 'end_user_application' table</comment>
+        <addPrimaryKey columnNames="id"
+                       constraintName="end_user_application_pkey"
+                       tableName="end_user_application"/>
+    </changeSet>
 
 </databaseChangeLog>
