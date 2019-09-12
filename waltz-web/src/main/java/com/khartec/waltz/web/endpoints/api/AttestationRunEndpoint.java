@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationRun;
@@ -89,9 +90,12 @@ public class AttestationRunEndpoint implements Endpoint {
                         .getCreateSummary(readCreateCommand(req));
 
         DatumRoute<IdCommandResponse> attestationRunCreateRoute = (req, res) -> {
-            ensureUserHasAttestationAdminRights(req);
+            if(!readCreateCommand(req).selectionOptions().entityReference().kind().equals(EntityKind.APPLICATION)) {
+                ensureUserHasAttestationAdminRights(req);
+            };
+
             return attestationRunService
-                        .create(
+                    .create(
                             getUsername(req),
                             readCreateCommand(req));
         };
