@@ -58,17 +58,6 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef, [vm.parentEntityRef], { force: true })
             .then(r => r.data);
 
-        const sectionInfo = {
-            "LOGICAL_DATA_FLOW": {
-                name: "Logical Flow - latest attestation",
-                attestMessage:  "Attest logical flows"
-            },
-            "PHYSICAL_FLOW": {
-                name: "Physical Flow - latest attestation",
-                attestMessage:  "Attest physical flows"
-            }
-        };
-
         const sections = [
             {
                 type: "LOGICAL_DATA_FLOW",
