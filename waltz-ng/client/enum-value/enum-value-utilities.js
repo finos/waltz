@@ -32,7 +32,7 @@ import _ from "lodash";
 export default function indexByKeyForType(enums = [], type) {
     return _
         .chain(enums)
-        .filter(d => d.type = type)
+        .filter(d => d.type === type)
         .map(d => ({ key: d.key, name: d.name, data: d }))
         .keyBy("key")
         .value();
