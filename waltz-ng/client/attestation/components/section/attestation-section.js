@@ -58,20 +58,38 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef, [vm.parentEntityRef], { force: true })
             .then(r => r.data);
 
+        const sectionInfo = {
+            "LOGICAL_DATA_FLOW": {
+                name: "Logical Flow - latest attestation",
+                attestMessage:  "Attest logical flows"
+            },
+            "PHYSICAL_FLOW": {
+                name: "Physical Flow - latest attestation",
+                attestMessage:  "Attest physical flows"
+            },
+        };
+
         return $q.all([runsPromise, instancesPromise])
             .then(([runs, instances]) => {
+
                 vm.attestations = mkAttestationData(runs, instances);
 
-                vm.logicalAttestations = _.filter(
-                    _.sortBy(vm.attestations, d => d.instance.attestedAt),
-                    d => d.run.attestedEntityKind === "LOGICAL_DATA_FLOW" && d.instance.attestedAt != null);
+                vm.groupedAttestations = _
+                    .chain(vm.attestations)
+                    .filter(d => d.instance.attestedAt != null)
+                    .sortBy(d => d.instance.attestedAt)
+                    .groupBy(d => d.run.attestedEntityKind)
+                    .map((v, k) => {
 
-                vm.physicalAttestations = _.filter(
-                    _.sortBy(vm.attestations, d => d.instance.attestedAt),
-                    d => d.run.attestedEntityKind === "PHYSICAL_FLOW" && d.instance.attestedAt != null);
+                        const latestAttestation = _.findLast(v);
 
-                vm.latestLogicalAttestation = _.findLast(vm.logicalAttestations);
-                vm.latestPhysicalAttestation = _.findLast(vm.physicalAttestations);
+                        return Object.assign({}, {
+                            type: k,
+                            sectionInfo: sectionInfo[k],
+                            latestAttestation: latestAttestation
+                        });
+                    })
+                    .value();
             });
     };
 

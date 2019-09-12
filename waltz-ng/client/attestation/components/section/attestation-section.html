@@ -1,164 +1,78 @@
 <div>
+    <div class="row">
+        <br>
+        <div ng-if="$ctrl.createType !== null"
+             class="col-sm-12"
+             ng-include="'was-app-attest-confirmation'">
+        </div>
+
+        <div ng-if="$ctrl.createType === null"
+             ng-repeat="attestationInfo in $ctrl.groupedAttestations | orderBy: 'sectionInfo.name'"
+             class="col-sm-6"
+             ng-include="'was-latest-attestation-subsection'">
+        </div>
+    </div>
 
     <br>
 
-    <div ng-if="$ctrl.createType != null"
-         ng-include="'app-attest-confirmation'"></div>
-
-    <div ng-if="$ctrl.createType == null">
-        <div class="col-sm-6">
-            <waltz-sub-section name="Latest Logical Flow Attestation">
-                <content>
-                    <div class="waltz-sub-section-content">
-                        <table class="waltz-field-table waltz-field-table-border">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="70%">
-                            </colgroup>
-                            <tbody>
-                            <tr>
-                                <td class="wft-label">
-                                    <span> Name:
-                                    </span>
-                                </td>
-                                <td ng-bind="$ctrl.latestLogicalAttestation.run.name"></td>
-                            </tr>
-                            <tr>
-                                <td class="wft-label">
-                                    <span>Attested By:
-                                    </span>
-                                </td>
-                                <td ng-bind="$ctrl.latestLogicalAttestation.instance.attestedBy"></td>
-                            </tr>
-                            <tr>
-                                <td class="wft-label">
-                                    <span>Attested At: </span>
-                                </td>
-                                <td>
-                                    <waltz-from-now timestamp="$ctrl.latestLogicalAttestation.instance.attestedAt"
-                                                    days-only="true">
-                                    </waltz-from-now>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="waltz-sub-section-controls clickable">
-                        <a ng-click="$ctrl.setCreateType('LOGICAL_DATA_FLOW')">
-                            Attest flows
-                        </a>
-                    </div>
-                </content>
-            </waltz-sub-section>
+    <div class="row">
+        <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
+            <h4>Historical Attestations:</h4>
+            <table class="table table-striped table-condensed small">
+                <colgroup>
+                    <col width="16%">
+                    <col width="20%">
+                    <col width="16%">
+                    <col width="12%">
+                    <col width="12%">
+                    <col width="14%">
+                    <col width="10%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Attestation</th>
+                    <th>Description</th>
+                    <th>Target</th>
+                    <th>Issued</th>
+                    <th>Due</th>
+                    <th>Attested by</th>
+                    <th>Attested</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true">
+                    <td ng-bind="attestation.run.name">
+                    </td>
+                    <td ng-bind="attestation.run.description | truncate:150"
+                        uib-popover="{{ attestation.run.description }}"
+                        popover-class="waltz-popover-width-700"
+                        popover-append-to-body="true"
+                        popover-placement="right"
+                        popover-trigger="mouseenter">
+                    </td>
+                    <td>
+                        <waltz-attested-kind run="attestation.run"></waltz-attested-kind>
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.run.issuedOn"
+                                        days-only="true">
+                        </waltz-from-now>
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.run.dueDate"
+                                        days-only="true">
+                        </waltz-from-now>
+                    </td>
+                    <td ng-bind="attestation.instance.attestedBy">
+                    </td>
+                    <td>
+                        <waltz-from-now timestamp="attestation.instance.attestedAt">
+                        </waltz-from-now>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="col-sm-6">
-            <waltz-sub-section name="Latest Physical Flow Attestation">
-                <content>
-                    <div class="waltz-sub-section-content">
-                        <table class="waltz-field-table waltz-field-table-border">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="70%">
-                            </colgroup>
-                            <tbody>
-                            <tr>
-                                <td class="wft-label">
-                                    <span> Name:
-                                    </span>
-                                </td>
-                                <td ng-bind="$ctrl.latestPhysicalAttestation.run.name"></td>
-                            </tr>
-                            <tr>
-                                <td class="wft-label">
-                                    <span>Attested By:
-                                    </span>
-                                </td>
-                                <td ng-bind="$ctrl.latestPhysicalAttestation.instance.attestedBy"></td>
-                            </tr>
-                            <tr>
-                                <td class="wft-label">
-                                    <span>Attested At: </span>
-                                </td>
-                                <td>
-                                    <waltz-from-now timestamp="$ctrl.latestPhysicalAttestation.instance.attestedAt"
-                                                    days-only="true">
-                                    </waltz-from-now>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="waltz-sub-section-controls clickable">
-                        <a ng-click="$ctrl.setCreateType('PHYSICAL_FLOW')">
-                            Attest flows
-                        </a>
-                    </div>
-                </content>
-            </waltz-sub-section>
-        </div>
-        <br>
-        <br>
-    </div>
-    <div class="col-sm-12">
-        <br>
-        <hr>
-    </div>
-    <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
-        <h4>Historical Attestations:</h4>
-        <table class="table table-striped table-condensed small">
-            <colgroup>
-                <col width="16%">
-                <col width="20%">
-                <col width="16%">
-                <col width="12%">
-                <col width="12%">
-                <col width="14%">
-                <col width="10%">
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Attestation</th>
-                <th>Description</th>
-                <th>Target</th>
-                <th>Issued</th>
-                <th>Due</th>
-                <th>Attested by</th>
-                <th>Attested</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true">
-                <td ng-bind="attestation.run.name">
-                </td>
-                <td ng-bind="attestation.run.description | truncate:150"
-                    uib-popover="{{ attestation.run.description }}"
-                    popover-class="waltz-popover-width-700"
-                    popover-append-to-body="true"
-                    popover-placement="right"
-                    popover-trigger="mouseenter">
-                </td>
-                <td>
-                    <waltz-attested-kind run="attestation.run"></waltz-attested-kind>
-                </td>
-                <td>
-                    <waltz-from-now timestamp="attestation.run.issuedOn"
-                                    days-only="true">
-                    </waltz-from-now>
-                </td>
-                <td>
-                    <waltz-from-now timestamp="attestation.run.dueDate"
-                                    days-only="true">
-                    </waltz-from-now>
-                </td>
-                <td ng-bind="attestation.instance.attestedBy">
-                </td>
-                <td>
-                    <waltz-from-now timestamp="attestation.instance.attestedAt">
-                    </waltz-from-now>
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 
     <waltz-no-data ng-if="$ctrl.attestations.length == 0">
@@ -168,8 +82,57 @@
     </waltz-no-data>
 </div>
 
+
 <script type="text/ng-template"
-        id="app-attest-confirmation">
+        id="was-latest-attestation-subsection">
+    <waltz-sub-section name="{{attestationInfo.sectionInfo.name}}">
+        <content>
+            <div class="waltz-sub-section-content">
+                <table class="waltz-field-table waltz-field-table-border">
+                    <colgroup>
+                        <col width="30%">
+                        <col width="70%">
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <td class="wft-label">
+                                    <span> Name:
+                                    </span>
+                        </td>
+                        <td ng-bind="attestationInfo.latestAttestation.run.name"></td>
+                    </tr>
+                    <tr>
+                        <td class="wft-label">
+                                    <span>Attested By:
+                                    </span>
+                        </td>
+                        <td ng-bind="attestationInfo.latestAttestation.instance.attestedBy"></td>
+                    </tr>
+                    <tr>
+                        <td class="wft-label">
+                            <span>Attested At: </span>
+                        </td>
+                        <td>
+                            <waltz-from-now timestamp="attestationInfo.latestAttestation.instance.attestedAt"
+                                            days-only="false">
+                            </waltz-from-now>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="waltz-sub-section-controls clickable">
+                <a ng-bind="attestationInfo.sectionInfo.attestMessage"
+                   ng-click="$ctrl.setCreateType(attestationInfo.type)">
+                </a>
+            </div>
+        </content>
+    </waltz-sub-section>
+</script>
+
+
+<script type="text/ng-template"
+        id="was-app-attest-confirmation">
     <div class="waltz-attestation-confirmation">
         <div class="wac-header">
             <span class="wac-declaration">
