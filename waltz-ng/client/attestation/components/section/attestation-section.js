@@ -66,7 +66,7 @@ function controller($q,
             "PHYSICAL_FLOW": {
                 name: "Physical Flow - latest attestation",
                 attestMessage:  "Attest physical flows"
-            },
+            }
         };
 
         return $q.all([runsPromise, instancesPromise])
@@ -83,11 +83,11 @@ function controller($q,
 
                         const latestAttestation = _.findLast(v);
 
-                        return Object.assign({}, {
+                        return {
                             type: k,
                             sectionInfo: sectionInfo[k],
                             latestAttestation: latestAttestation
-                        });
+                        };
                     })
                     .value();
             });
@@ -110,31 +110,30 @@ function controller($q,
             serviceBroker
                 .execute(
                     CORE_API.AttestationRunStore.create, [mkCreateCommand(vm.parentEntityRef, vm.createType)])
-                .then(r => {
-                    return loadData();
-                })
+                .then(() => loadData())
                 .then(() => {
-                    vm.entityAttestationInstance = (vm.attestations != null) ?  _.find(vm.attestations,
-                        function(entityAttestation)
-                        { return entityAttestation.run.name === "Entity Attestation"
-                            && entityAttestation.instance.attestedAt == null
-                            && entityAttestation.run.attestedEntityKind === vm.createType })
+                    vm.entityAttestationInstance = vm.attestations != null
+                        ?  _.find(
+                            vm.attestations,
+                            entityAttestation => entityAttestation.run.name === "Entity Attestation"
+                                && entityAttestation.instance.attestedAt == null
+                                && entityAttestation.run.attestedEntityKind === vm.createType)
                         : null;
-                    serviceBroker
+                    return serviceBroker
                         .execute(CORE_API.AttestationInstanceStore.attestInstance, [vm.entityAttestationInstance.instance.id])
                         .then(exec => vm.entityAttestationInstance = null, () => notification.error("Failed to attest flows"))
                         .then(() => {
                             notification.success("Attested successfully");
                             return loadData();
-                        })
+                        });
                 })
-                .then(r => vm.setCreateType(null));
+                .then(() => vm.setCreateType(null));
         }
     };
 
     vm.cancelAttestation = () => {
         vm.setCreateType(null);
-    }
+    };
 }
 
 
