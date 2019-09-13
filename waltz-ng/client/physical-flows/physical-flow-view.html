@@ -30,6 +30,10 @@
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
                         Delete
                     </button>
+                    <button class="btn btn-xs"
+                            ng-click="ctrl.markFlowAsDuplicate()">
+                        MarkAsDuplicate
+                    </button>
                     <waltz-icon name="exclamation-circle"
                                 ng-if="! (ctrl.mentions | isEmpty)"
                                 class="small"
@@ -91,6 +95,38 @@
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
                                                  help-text="Data types referenced by the specification">
                     </waltz-data-type-usage-panel>
+
+                    <div ng-if="ctrl.displayPossibleDuplicatePhysicalFlows==true">
+                        DISPLAY
+<!--                        <waltz-physical-flow-table parent-entity-ref="ctrl.logicalFlowEntityRef"-->
+<!--                                                   on-row-select="$ctrl.selectRow">-->
+<!--                        </waltz-physical-flow-table>-->
+                        <div ng-if="ctrl.physicalFlows.length > 0" class="waltz-user-log-scroll">
+
+                            <table class="table small">
+                                <thead>
+                                <tr>
+                                    <th width="30%">Name</th>
+                                    <th width="30%"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="log in ctrl.physicalFlows">
+                                    <td>
+                                        <a ui-sref="main.physical-flow.view ({id: log.id})">
+                                    <span ng-bind="log.id">
+                                    </span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a ng-click="ctrl.mergePhysicalFlow(log.id)">merge</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 

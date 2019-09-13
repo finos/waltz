@@ -76,6 +76,11 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const mergeToAnotherPhysicalFlow = (idToBeDuplicated, duplicatedById) => {
+        return $http
+            .post(`${base}/mark-duplicate/id/${idToBeDuplicated}/duplicated-by/${duplicatedById}`)
+            .then(r => r.data);
+    };
 
     const create = (cmd) => {
         checkIsCreatePhysicalFlowCommand(cmd);

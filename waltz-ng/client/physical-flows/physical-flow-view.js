@@ -25,6 +25,7 @@ import template from "./physical-flow-view.html";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
+import {mkLinkGridCell} from "../common/grid-utils";
 
 
 const initialState = {
@@ -257,6 +258,26 @@ function controller($q,
                 .deleteById(flowId)
                 .then(r => handleDeleteFlowResponse(r));
         }
+    };
+
+    vm.markFlowAsDuplicate = () => {
+        vm.displayPossibleDuplicatePhysicalFlows = true;
+        serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.findByLogicalFlowId,
+                [ vm.logicalFlow.id ])
+            .then(r => {
+                vm.physicalFlows = r.data.filter(pf => pf.id !== vm.physicalFlow.id);
+            });
+
+        vm.logicalFlowEntityRef = toEntityRef(vm.logicalFlow, "LOGICAL_DATA_FLOW");
+
+    };
+
+    vm.mergePhysicalFlow = (physicalFlowId) => {
+        console.log("merging physicalFlow of ", physicalFlowId ," to physicalFLow ", vm.physicalFlow.id);
+        //TODO call the merge endpoint
+
     };
 
     vm.updateSpecDefinitionId = (newSpecDef) => {
