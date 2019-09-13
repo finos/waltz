@@ -7,7 +7,7 @@
         </div>
 
         <div ng-if="$ctrl.createType === null"
-             ng-repeat="attestationInfo in $ctrl.groupedAttestations | orderBy: 'sectionInfo.name'"
+             ng-repeat="attestationInfo in $ctrl.groupedAttestations | orderBy: 'section.name'"
              class="col-sm-6"
              ng-include="'was-latest-attestation-subsection'">
         </div>
@@ -85,10 +85,25 @@
 
 <script type="text/ng-template"
         id="was-latest-attestation-subsection">
-    <waltz-sub-section name="{{attestationInfo.sectionInfo.name}}">
+    <waltz-sub-section name="{{attestationInfo.section.name}}">
         <content>
             <div class="waltz-sub-section-content">
-                <table class="waltz-field-table waltz-field-table-border">
+
+                <div ng-if="!attestationInfo.latestAttestation"
+                     style="padding-bottom: 2px">
+                    <waltz-no-data>
+                        <message>
+                            Never attested,
+                            <a class="clickable"
+                               ng-click="$ctrl.setCreateType(attestationInfo.section.type)">
+                                attest now
+                            </a>
+                        </message>
+                    </waltz-no-data>
+                </div>
+
+                <table class="waltz-field-table waltz-field-table-border"
+                       ng-if="attestationInfo.latestAttestation">
                     <colgroup>
                         <col width="30%">
                         <col width="70%">
@@ -96,21 +111,21 @@
                     <tbody>
                     <tr>
                         <td class="wft-label">
-                                    <span> Name:
-                                    </span>
+                            <span> Name:
+                            </span>
                         </td>
                         <td ng-bind="attestationInfo.latestAttestation.run.name"></td>
                     </tr>
                     <tr>
                         <td class="wft-label">
-                                    <span>Attested By:
-                                    </span>
+                            <span>Attested by:
+                            </span>
                         </td>
                         <td ng-bind="attestationInfo.latestAttestation.instance.attestedBy"></td>
                     </tr>
                     <tr>
                         <td class="wft-label">
-                            <span>Attested At: </span>
+                            <span>Attested at: </span>
                         </td>
                         <td>
                             <waltz-from-now timestamp="attestationInfo.latestAttestation.instance.attestedAt"
@@ -121,9 +136,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="waltz-sub-section-controls clickable">
-                <a ng-bind="attestationInfo.sectionInfo.attestMessage"
-                   ng-click="$ctrl.setCreateType(attestationInfo.type)">
+            <div class="waltz-sub-section-controls clickable"
+                 ng-if="attestationInfo.latestAttestation">
+                <a ng-bind="attestationInfo.section.attestMessage"
+                   ng-click="$ctrl.setCreateType(attestationInfo.section.type)">
                 </a>
             </div>
         </content>

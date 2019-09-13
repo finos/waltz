@@ -58,34 +58,37 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef, [vm.parentEntityRef], { force: true })
             .then(r => r.data);
 
-        const sectionInfo = {
-            "LOGICAL_DATA_FLOW": {
+        const sections = [
+            {
+                type: "LOGICAL_DATA_FLOW",
                 name: "Logical Flow - latest attestation",
                 attestMessage:  "Attest logical flows"
             },
-            "PHYSICAL_FLOW": {
+            {
+                type: "PHYSICAL_FLOW",
                 name: "Physical Flow - latest attestation",
                 attestMessage:  "Attest physical flows"
             }
-        };
+        ];
 
         return $q.all([runsPromise, instancesPromise])
             .then(([runs, instances]) => {
 
                 vm.attestations = mkAttestationData(runs, instances);
 
-                vm.groupedAttestations = _
+                const attestationsByKind = _
                     .chain(vm.attestations)
                     .filter(d => d.instance.attestedAt != null)
                     .sortBy(d => d.instance.attestedAt)
                     .groupBy(d => d.run.attestedEntityKind)
-                    .map((v, k) => {
+                    .value();
 
-                        const latestAttestation = _.findLast(v);
-
+                vm.groupedAttestations = _
+                    .chain(sections)
+                    .map(s => {
+                        const latestAttestation = _.findLast(attestationsByKind[s.type]);
                         return {
-                            type: k,
-                            sectionInfo: sectionInfo[k],
+                            section: s,
                             latestAttestation: latestAttestation
                         };
                     })
