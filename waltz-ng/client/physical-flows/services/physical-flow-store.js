@@ -76,7 +76,7 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const mergeToAnotherPhysicalFlow = (idToBeDuplicated, duplicatedById) => {
+    const markAsDuplicate = (idToBeDuplicated, duplicatedById) => {
         return $http
             .post(`${base}/mark-duplicate/id/${idToBeDuplicated}/duplicated-by/${duplicatedById}`)
             .then(r => r.data);
@@ -142,6 +142,7 @@ export function store($http, baseApiUrl) {
         findByProducerEntityReference,
         findByConsumerEntityReference,
         findBySelector,
+        markAsDuplicate,
         getById,
         searchReports,
         create,
@@ -195,6 +196,11 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: 'findBySelector',
         description: 'executes findBySelector'
+    },
+    markAsDuplicate: {
+        serviceName,
+        serviceFnName: 'markAsDuplicate',
+        description: 'executes markAsDuplicate'
     },
     getById: {
         serviceName,

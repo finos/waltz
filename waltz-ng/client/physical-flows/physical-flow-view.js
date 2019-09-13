@@ -277,7 +277,11 @@ function controller($q,
     vm.mergePhysicalFlow = (physicalFlowId) => {
         console.log("merging physicalFlow of ", physicalFlowId ," to physicalFLow ", vm.physicalFlow.id);
         //TODO call the merge endpoint
-
+        serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.markAsDuplicate,
+                [ vm.physicalFlow.id, physicalFlowId ])
+            .then(notification.success("This flow has been marked marked as duplicate"));
     };
 
     vm.updateSpecDefinitionId = (newSpecDef) => {
