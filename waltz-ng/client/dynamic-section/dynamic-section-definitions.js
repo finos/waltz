@@ -369,5 +369,13 @@ export const dynamicSectionsByKind = {
         dynamicSections.bookmarksSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.changeLogSection
+    ],
+    "FLOW_DIAGRAM": [
+        dynamicSections.appsSection,
+        dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection,
+        dynamicSections.entityStatisticSummarySection,
+        dynamicSections.measurableRatingsBrowserSection,
+        dynamicSections.technologySummarySection
     ]
 };

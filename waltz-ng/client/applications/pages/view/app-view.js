@@ -32,8 +32,8 @@ const addToHistory = (historyStore, app) => {
     if (! app) { return; }
     historyStore.put(
         app.name,
-        'APPLICATION',
-        'main.app.view',
+        "APPLICATION",
+        "main.app.view",
         { id: app.id });
 };
 
@@ -61,29 +61,29 @@ function controller($stateParams,
     // -- BOOT --
     vm.$onInit = () => {
         const id = $stateParams.id;
-        const entityReference = { id, kind: 'APPLICATION' };
+        const entityReference = { id, kind: "APPLICATION" };
         dynamicSectionManager.initialise("APPLICATION");
         vm.parentEntityRef = entityReference;
         loadAll(id);
     };
 
     // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, 'APPLICATION');
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, 'APPLICATION');
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "APPLICATION");
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "APPLICATION");
 }
 
 
 controller.$inject = [
-    '$stateParams',
-    'DynamicSectionManager',
-    'ServiceBroker',
-    'HistoryStore'
+    "$stateParams",
+    "DynamicSectionManager",
+    "ServiceBroker",
+    "HistoryStore"
 ];
 
 
 export default  {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 

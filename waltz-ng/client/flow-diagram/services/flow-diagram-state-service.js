@@ -329,6 +329,7 @@ export function service(
             .all(promises)
             .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
                 state.detail.applicationsById = _.keyBy(applications, "id");
+                console.log(state)
                 restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
                 state.dirty = false;
             })

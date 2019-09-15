@@ -75,30 +75,21 @@ public class SetUtilities {
         return result;
     }
 
+
     /**
-     * Remove <code>ys</code> from <code>xs</code>
+     * Remove vararg of <code>ys's</code> from <code>xs</code>
      * @param xs
-     * @param ys
+     * @param yss
      * @param <T>
-     * @return
+     * @return xs without all members of yss
      */
-    public static <T> Set<T> minus(Set<T> xs, Set<T> ys) {
-        checkNotNull(xs, "xs cannot be null");
-        checkNotNull(ys, "ys cannot be null");
-
-        Set<T> working = new HashSet<>(xs);
-        working.removeAll(ys);
-        return working;
-    }
-
-
     public static <T> Set<T> minus(Set<T> xs, Set<T>... yss) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(yss, "yss cannot be null");
 
         Set<T> working = new HashSet<>(xs);
         ArrayList<Set<T>> sets = ListUtilities.newArrayList(yss);
-        sets.forEach(ys -> working.removeAll(ys));
+        sets.forEach(working::removeAll);
 
         return working;
     }

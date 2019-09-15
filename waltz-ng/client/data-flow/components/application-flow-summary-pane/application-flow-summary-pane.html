@@ -1,7 +1,7 @@
 <div class="waltz-application-flow-summary-pane" >
 
     <div class="row" style="padding-bottom: 20px">
-        <div ng-class="$ctrl.visibility.stats ? 'col-md-12' : 'col-md-6'">
+        <div class="col-md-12">
             <waltz-sub-section name="Authoritative Summary Stats">
 
                 <content>
@@ -31,8 +31,10 @@
 
             </waltz-sub-section>
         </div>
+    </div>
 
-        <div ng-if="!$ctrl.visibility.stats" class="col-md-6">
+    <div class="row">
+        <div class="col-md-12">
             <waltz-pie-table data="$ctrl.freshnessSummaryData"
                              config="$ctrl.freshnessSummaryConfig"
                              name="Physical flows by freshness indicator">
