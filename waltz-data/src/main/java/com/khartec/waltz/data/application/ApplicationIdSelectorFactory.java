@@ -181,14 +181,46 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private Select<Record1<Long>> mkForFlowDiagram(ApplicationIdSelectionOptions options) {
         ensureScopeIsExact(options);
 
-        Condition applicationConditions = mkApplicationConditions(options);
-        return DSL.select(flowDiagram.ENTITY_ID)
+        long diagramId = options.entityReference().id();
+
+        Condition logicalFlowInClause = LOGICAL_FLOW.ID.in(DSL
+                .select(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
+                .from(FLOW_DIAGRAM_ENTITY)
+                .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name())
+                        .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))));
+
+        Condition applicationConditions = DSL.trueCondition(); //mkApplicationConditions(options);
+
+        SelectConditionStep<Record1<Long>> directlyReferencedApps = DSL
+                .select(flowDiagram.ENTITY_ID)
                 .from(flowDiagram)
                 .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(flowDiagram.ENTITY_ID))
-                .where(flowDiagram.DIAGRAM_ID.eq(options.entityReference().id()))
+                .on(APPLICATION.ID.eq(flowDiagram.ENTITY_ID))
+                .where(flowDiagram.DIAGRAM_ID.eq(diagramId))
                 .and(flowDiagram.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(applicationConditions);
+
+        SelectConditionStep<Record1<Long>> appsViaSourcesOfFlows = DSL
+                .select(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID))
+                .where(logicalFlowInClause)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(applicationConditions);
+
+        SelectConditionStep<Record1<Long>> appsViaTargetsOfFlows = DSL
+                .select(LOGICAL_FLOW.TARGET_ENTITY_ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID))
+                .where(logicalFlowInClause)
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(applicationConditions);
+
+        return directlyReferencedApps
+                .unionAll(appsViaSourcesOfFlows)
+                .unionAll(appsViaTargetsOfFlows);
     }
 
 

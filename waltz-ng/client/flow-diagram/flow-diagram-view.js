@@ -22,16 +22,10 @@ import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
-import template from './flow-diagram-view.html';
+import template from "./flow-diagram-view.html";
 
 const initialState = {
     visibility: {},
-    appsSection: dynamicSections.appsSection,
-    bookmarksSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    entityStatisticSummarySection: dynamicSections.entityStatisticSummarySection,
-    measurableRatingsBrowserSection: dynamicSections.measurableRatingsBrowserSection,
-    technologySummarySection: dynamicSections.technologySummarySection
 };
 
 
@@ -53,7 +47,7 @@ function prepareDataForExport(flows = []) {
                 pf.transportName,
                 pf.frequencyName,
                 pf.specificationName,
-                _.join(_.map(pf.specificationDataTypes, 'dataTypeName'), ";")
+                _.join(_.map(pf.specificationDataTypes, "dataTypeName"), ";")
             ]);
         } else {
             return [[
@@ -76,97 +70,94 @@ function controller(
     $stateParams,
     $timeout,
     displayNameService,
+    dynamicSectionManager,
     flowDiagramStateService,
-    flowDiagramStore,
-    flowDiagramEntityStore,
-    logicalFlowStore,
-    physicalFlowStore,
-    physicalSpecificationStore,
     serviceBroker)
 {
     const vm = initialiseData(this, initialState);
-    const diagramId = $stateParams.id;
 
-    vm.entityReference = {
-        id: diagramId,
-        kind: 'FLOW_DIAGRAM'
+    vm.$onInit = () => {
+        const id = $stateParams.id;
+        const entityReference = { id, kind: "FLOW_DIAGRAM" };
+        dynamicSectionManager.initialise("FLOW_DIAGRAM");
+        vm.parentEntityRef = entityReference;
+
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: "EXACT"
+        };
+
+        flowDiagramStateService
+            .load(id)
+            .then(loadVisibility);
+
+        serviceBroker
+            .loadViewData(CORE_API.FlowDiagramStore.getById, [ id ])
+            .then(r => vm.diagram = r.data);
+
+        serviceBroker
+            .loadViewData(CORE_API.FlowDiagramEntityStore.findByDiagramId, [ id ])
+            .then(r => {
+                vm.nodes = _
+                    .chain(r.data)
+                    .map("entityReference")
+                    .filter(x => x.kind === "APPLICATION" || x.kind === "ACTOR")
+                    .sortBy("name")
+                    .value();
+            });
+
+        const physicalFlowPromise = serviceBroker
+            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [ selector ])
+            .then(r => r.data);
+
+        const physicalSpecPromise =  serviceBroker
+            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [ selector ])
+            .then(r => r.data);
+
+        const physicalSpecDataTypesPromise = serviceBroker
+            .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selector])
+            .then(result => result.data);
+
+        const logicalFlowPromise = serviceBroker
+            .loadViewData(CORE_API.LogicalFlowStore.findBySelector, [ selector ])
+            .then(r => r.data);
+
+        $q.all([logicalFlowPromise, physicalFlowPromise, physicalSpecPromise, physicalSpecDataTypesPromise])
+            .then(([logicalFlows, physicalFlows, physicalSpecs, physicalSpecDataTypes]) => {
+                const physicalSpecsById = _.keyBy(physicalSpecs, "id");
+                const physicalSpecDataTypesBySpecId =
+                    _.chain(physicalSpecDataTypes)
+                        .map(psdt => Object.assign(
+                            {},
+                            psdt,
+                            { dataTypeName: displayNameService.lookup("dataType", psdt.dataTypeId) }))
+                        .groupBy("specificationId")
+                        .value();
+                const enhancedPhysicalFlows = _.map(physicalFlows, pf => Object.assign(
+                    {},
+                    pf,
+                    {
+                        transportName: displayNameService.lookup("TransportKind", pf.transport),
+                        frequencyName: displayNameService.lookup("frequencyKind", pf.frequency),
+                        specificationName: physicalSpecsById[pf.specificationId]
+                            ? physicalSpecsById[pf.specificationId].name
+                            : "-",
+                        specificationDataTypes: physicalSpecDataTypesBySpecId[pf.specificationId] || []
+                    }));
+                const enhancedPhysicalFlowsByLogicalId = _.groupBy(enhancedPhysicalFlows, "logicalFlowId");
+
+                vm.flows = _.map(logicalFlows, f => {
+                    return {
+                        logicalFlow: f,
+                        physicalFlows: enhancedPhysicalFlowsByLogicalId[f.id] || [],
+                    }
+                });
+            });
+
     };
 
     const loadVisibility = () =>
         vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
-
-    flowDiagramStateService
-        .load(diagramId)
-        .then(loadVisibility);
-
-    flowDiagramStore
-        .getById(diagramId)
-        .then(d => vm.diagram = d);
-
-    flowDiagramEntityStore
-        .findByDiagramId(diagramId)
-        .then(xs => {
-            vm.nodes = _
-                .chain(xs)
-                .map('entityReference')
-                .filter(x => x.kind === 'APPLICATION' || x.kind === 'ACTOR')
-                .sortBy('name')
-                .value();
-        });
-
-    const selector = {
-        entityReference: { id: diagramId, kind: 'FLOW_DIAGRAM' },
-        scope: 'EXACT'
-    };
-
-    const physicalFlowPromise = physicalFlowStore
-        .findBySelector(selector);
-
-    const physicalSpecPromise = physicalSpecificationStore
-        .findBySelector(selector)
-        .then(xs => {
-            return xs;
-        });
-
-    const physicalSpecDataTypesPromise = serviceBroker
-        .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selector])
-        .then(result => result.data);
-
-    const logicalFlowPromise = logicalFlowStore
-        .findBySelector(selector);
-
-    $q.all([logicalFlowPromise, physicalFlowPromise, physicalSpecPromise, physicalSpecDataTypesPromise])
-        .then(([logicalFlows, physicalFlows, physicalSpecs, physicalSpecDataTypes]) => {
-            const physicalSpecsById = _.keyBy(physicalSpecs, 'id');
-            const physicalSpecDataTypesBySpecId =
-                _.chain(physicalSpecDataTypes)
-                    .map(psdt => Object.assign(
-                        {},
-                        psdt,
-                        { dataTypeName: displayNameService.lookup('dataType', psdt.dataTypeId) }))
-                    .groupBy('specificationId')
-                    .value();
-            const enhancedPhysicalFlows = _.map(physicalFlows, pf => Object.assign(
-                {},
-                pf,
-                {
-                    transportName: displayNameService.lookup('TransportKind', pf.transport),
-                    frequencyName: displayNameService.lookup('frequencyKind', pf.frequency),
-                    specificationName: physicalSpecsById[pf.specificationId]
-                                        ? physicalSpecsById[pf.specificationId].name
-                                        : "-",
-                    specificationDataTypes: physicalSpecDataTypesBySpecId[pf.specificationId] || []
-                }));
-            const enhancedPhysicalFlowsByLogicalId = _.groupBy(enhancedPhysicalFlows, 'logicalFlowId');
-
-            vm.flows = _.map(logicalFlows, f => {
-                return {
-                    logicalFlow: f,
-                    physicalFlows: enhancedPhysicalFlowsByLogicalId[f.id] || [],
-                }
-            });
-        });
-
 
     vm.clickHandlers =  {
         node: d => $timeout(
@@ -180,7 +171,7 @@ function controller(
     vm.toggleLayer = (layer) => {
         const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
         const cmd = {
-            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            command: currentlyVisible ? "HIDE_LAYER" : "SHOW_LAYER",
             payload: layer
         };
         flowDiagramStateService.processCommands([cmd]);
@@ -192,26 +183,27 @@ function controller(
         downloadTextFile(dataRows, ",", vm.diagram.name + "_flows.csv");
     };
 
+
+    // -- INTERACT --
+    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "FLOW_DIAGRAM");
+    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "FLOW_DIAGRAM");
+
 }
 
 controller.$inject = [
-    '$q',
-    '$stateParams',
-    '$timeout',
-    'DisplayNameService',
-    'FlowDiagramStateService',
-    'FlowDiagramStore',
-    'FlowDiagramEntityStore',
-    'LogicalFlowStore',
-    'PhysicalFlowStore',
-    'PhysicalSpecificationStore',
-    'ServiceBroker'
+    "$q",
+    "$stateParams",
+    "$timeout",
+    "DisplayNameService",
+    "DynamicSectionManager",
+    "FlowDiagramStateService",
+    "ServiceBroker"
 ];
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 export default view;

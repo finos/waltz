@@ -55,6 +55,7 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
             case ACTOR:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
+            case FLOW_DIAGRAM:
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
