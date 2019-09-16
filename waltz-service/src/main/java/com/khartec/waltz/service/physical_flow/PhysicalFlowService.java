@@ -33,6 +33,7 @@ import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.external_identifier.ExternalIdentifierService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -61,6 +62,7 @@ public class PhysicalFlowService {
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
+    private final ExternalIdentifierService externalIdentifierService;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
@@ -69,7 +71,8 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               PhysicalFlowSearchDao searchDao) {
+                               PhysicalFlowSearchDao searchDao,
+                               ExternalIdentifierService externalIdentifierService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
@@ -81,6 +84,7 @@ public class PhysicalFlowService {
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.searchDao = searchDao;
+        this.externalIdentifierService = externalIdentifierService;
     }
 
 
@@ -120,6 +124,16 @@ public class PhysicalFlowService {
 
     public PhysicalFlow getById(long id) {
         return physicalFlowDao.getById(id);
+    }
+
+    public int markDuplicate(long id, long duplicatedById) {
+        EntityReference entityRefToBeDuplicated = mkRef(PHYSICAL_FLOW, id);
+        EntityReference entityRefDuplicatedBy = mkRef(PHYSICAL_FLOW, duplicatedById);
+
+        externalIdentifierService.markEntityRefAsDuplicate(entityRefToBeDuplicated, entityRefDuplicatedBy);
+        int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(id, EntityLifecycleStatus.REMOVED.name());
+
+        return updateStatus;
     }
 
 
@@ -366,4 +380,5 @@ public class PhysicalFlowService {
                 throw new UnsupportedOperationException(errMsg);
         }
     }
+
 }

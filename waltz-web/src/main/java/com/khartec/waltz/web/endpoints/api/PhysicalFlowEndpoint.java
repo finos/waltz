@@ -111,6 +111,15 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "id",
                 ":id");
 
+        String markDuplicate = mkPath(
+                BASE_URL,
+                "mark-duplicate",
+                "id",
+                ":id",
+                "duplicated-by",
+                ":duplicated-by-id"
+        );
+
         String deletePath = mkPath(
                 BASE_URL,
                 ":id"
@@ -179,6 +188,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
 
+        DatumRoute<Integer> markDuplicateRoute =
+                (request, response) -> physicalFlowService
+                        .markDuplicate(getId(request), getLong(request,"duplicated-by-id"));
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByProducerEntityRefPath, findByProducerEntityRefRoute);
@@ -187,6 +200,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findByLogicalFlowIdPath, findByLogicalFlowIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
+
+
+        postForDatum(markDuplicate, markDuplicateRoute);
         postForDatum(createPath, this::createFlow);
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
         postForDatum(updateAttributePath, this::updateAttribute);
