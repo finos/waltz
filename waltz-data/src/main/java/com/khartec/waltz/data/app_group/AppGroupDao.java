@@ -32,6 +32,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,9 +40,11 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
 public class AppGroupDao {
@@ -190,18 +193,26 @@ public class AppGroupDao {
     }
 
 
-    public List<AppGroup> search(String terms, EntitySearchOptions options) {
-        checkNotNull(terms, "terms cannot be null");
+    public List<AppGroup> search(String query, EntitySearchOptions options) {
+        checkNotNull(query, "query cannot be null");
         checkNotNull(options, "options cannot be null");
 
-        Condition searchCondition = APPLICATION_GROUP.NAME.like("%" + terms + "%");
+        List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Condition searchCondition = terms.stream()
+                .map(term -> APPLICATION_GROUP.NAME.like("%" + term + "%"))
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
 
         Select<Record> publicGroups = dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
                     .and(searchCondition))
                     .and(notRemoved);
-
 
         Select<Record1<Long>> userGroupIds = DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
                 .from(APPLICATION_GROUP_MEMBER)
