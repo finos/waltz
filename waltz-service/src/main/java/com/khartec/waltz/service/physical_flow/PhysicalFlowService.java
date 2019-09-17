@@ -33,6 +33,7 @@ import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.external_identifier.ExternalIdentifierService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -61,6 +62,7 @@ public class PhysicalFlowService {
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
+    private final ExternalIdentifierService externalIdentifierService;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
@@ -69,7 +71,8 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationDao physicalSpecificationDao,
-                               PhysicalFlowSearchDao searchDao) {
+                               PhysicalFlowSearchDao searchDao,
+                               ExternalIdentifierService externalIdentifierService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
@@ -81,6 +84,7 @@ public class PhysicalFlowService {
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.searchDao = searchDao;
+        this.externalIdentifierService = externalIdentifierService;
     }
 
 
@@ -120,6 +124,17 @@ public class PhysicalFlowService {
 
     public PhysicalFlow getById(long id) {
         return physicalFlowDao.getById(id);
+    }
+
+
+    public boolean merge(long fromId, long toId) {
+        EntityReference toRef = mkRef(PHYSICAL_FLOW, toId);
+        EntityReference fromRef = mkRef(PHYSICAL_FLOW, fromId);
+
+        int moveCount = externalIdentifierService.merge(fromRef, toRef);
+        int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
+
+        return updateStatus + moveCount > 0;
     }
 
 
@@ -358,7 +373,7 @@ public class PhysicalFlowService {
             case "description":
                 return physicalFlowDao.updateDescription(flowId, command.value());
             case "entity_lifecycle_status":
-                return physicalFlowDao.updateEntityLifecycleStatus(flowId, command.value());
+                return physicalFlowDao.updateEntityLifecycleStatus(flowId, EntityLifecycleStatus.valueOf(command.value()));
             default:
                 String errMsg = String.format(
                         "Cannot update attribute %s on flow as unknown attribute name",
@@ -366,4 +381,5 @@ public class PhysicalFlowService {
                 throw new UnsupportedOperationException(errMsg);
         }
     }
+
 }

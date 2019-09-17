@@ -234,6 +234,12 @@ export const dynamicSections = {
         icon: "id-card-o",
         id: 100
     },
+    flowSpecDefinitionSection: {
+        componentId: "flow-spec-definition-section",
+        name: "Specification Definition",
+        icon: "file-code-o",
+        id: 110
+    }
 
 };
 
@@ -377,5 +383,15 @@ export const dynamicSectionsByKind = {
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.measurableRatingsBrowserSection,
         dynamicSections.technologySummarySection
+    ],
+    "PHYSICAL_FLOW": [
+        dynamicSections.bookmarksSection,
+        dynamicSections.changeLogSection,
+        dynamicSections.entityDiagramsSection,
+        dynamicSections.entityNamedNotesSection,
+        dynamicSections.flowSpecDefinitionSection,
+        dynamicSections.involvedPeopleSection,
+        dynamicSections.physicalFlowParticipantsSection
+
     ]
 };

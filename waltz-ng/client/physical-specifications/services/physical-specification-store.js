@@ -40,8 +40,15 @@ export function store($http, baseApiUrl) {
     };
 
 
-    const getById = (id) => $http
-        .get(`${base}/id/${id}`)
+    const findByLogicalFlow = (logicalFlowId) => {
+        return $http
+            .get(`${base}/logical-flow/${logicalFlowId}`)
+            .then(r => r.data);
+    };
+
+
+    const getById = (specificationId) => $http
+        .get(`${base}/id/${specificationId}`)
         .then(r => r.data);
 
 
@@ -50,14 +57,15 @@ export function store($http, baseApiUrl) {
         .then(r => r.data);
 
 
-    const deleteById = (id) => $http
-            .delete(`${base}/${id}`)
+    const deleteById = (specificationId) => $http
+            .delete(`${base}/${specificationId}`)
             .then(r => r.data);
 
 
     return {
         findByEntityReference,
         findBySelector,
+        findByLogicalFlow,
         getById,
         deleteById,
         search
@@ -66,38 +74,43 @@ export function store($http, baseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'PhysicalSpecificationStore';
+export const serviceName = "PhysicalSpecificationStore";
 
 
 export const PhysicalSpecificationStore_API = {
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'executes findByEntityReference'
+        serviceFnName: "findByEntityReference",
+        description: "executes findByEntityReference"
     },
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'executes findBySelector'
+        serviceFnName: "findBySelector",
+        description: "executes findBySelector"
+    },
+    findByLogicalFlow: {
+        serviceName,
+        serviceFnName: "findByLogicalFlow",
+        description: "executes findByLogicalFlow"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'executes getById'
+        serviceFnName: "getById",
+        description: "executes getById"
     },
     deleteById: {
         serviceName,
-        serviceFnName: 'deleteById',
-        description: 'executes deleteById'
+        serviceFnName: "deleteById",
+        description: "executes deleteById"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'executes search'
+        serviceFnName: "search",
+        description: "executes search"
     },
 };

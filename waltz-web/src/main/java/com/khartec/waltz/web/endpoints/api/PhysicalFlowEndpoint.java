@@ -111,10 +111,17 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "id",
                 ":id");
 
+        String mergePath = mkPath(
+                BASE_URL,
+                "merge",
+                "from",
+                ":fromId",
+                "to",
+                ":toId");
+
         String deletePath = mkPath(
                 BASE_URL,
-                ":id"
-                );
+                ":id");
 
         String searchReportsPath = mkPath(
                 BASE_URL,
@@ -179,6 +186,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
 
+        DatumRoute<Boolean> mergeRoute =
+                (request, response) -> physicalFlowService
+                        .merge(getLong(request, "fromId"), getLong(request,"toId"));
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByProducerEntityRefPath, findByProducerEntityRefRoute);
@@ -187,6 +198,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findByLogicalFlowIdPath, findByLogicalFlowIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
+
+
+        postForDatum(mergePath, mergeRoute);
         postForDatum(createPath, this::createFlow);
         postForDatum(updateSpecDefinitionIdPath, this::updateSpecDefinitionId);
         postForDatum(updateAttributePath, this::updateAttribute);

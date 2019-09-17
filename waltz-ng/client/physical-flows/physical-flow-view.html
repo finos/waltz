@@ -23,12 +23,17 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="ctrl.logicalFlow">
-            <waltz-section-actions>
+            <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
                 <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                     <button class="btn btn-xs btn-danger"
                             ng-disabled="! (ctrl.mentions | isEmpty)"
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
                         Delete
+                    </button>
+                    <button class="btn btn-xs btn-warning"
+                            ng-disabled="! (ctrl.mentions | isEmpty)"
+                            ng-click="ctrl.onShowMarkAsDuplicate()">
+                        Cleanup Duplicates
                     </button>
                     <waltz-icon name="exclamation-circle"
                                 ng-if="! (ctrl.mentions | isEmpty)"
@@ -40,52 +45,18 @@
                 </div>
             </waltz-section-actions>
 
+            <div class="row"
+                 style="padding-bottom: 12px"
+                 ng-if="ctrl.mode=== 'DUPLICATE'">
+                <div class="col-md-12"
+                     ng-include="'wpfv-dupe-sub-section'">
+                </div>
+            </div>
 
-            <div class="row">
+            <div class="row"
+                 ng-if="ctrl.mode==='OVERVIEW'">
                 <div class="col-md-7">
-                    <waltz-sub-section name="Overview">
-                        <content>
-                            <div class="waltz-sub-section-content">
-                                <div ng-if="! ctrl.visibility.overviewEditor">
-                                    <waltz-physical-flow-overview parent-entity-ref="ctrl.entityReference" class="waltz-highlight-if">
-                                    </waltz-physical-flow-overview>
-                                </div>
-                                <div ng-if="ctrl.visibility.overviewEditor"
-                                     class="waltz-highlight-if">
-                                    <waltz-physical-flow-editor parent-entity-ref="ctrl.entityReference">
-                                    </waltz-physical-flow-editor>
-                                </div>
-
-                            </div>
-                            <div class="waltz-sub-section-controls"
-                                 >
-
-                                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
-                                    <a ng-click="ctrl.visibility.overviewEditor = true"
-                                       ng-if="! ctrl.visibility.overviewEditor"
-                                       class="clickable">
-                                        Edit
-                                    </a>
-
-                                    <a ng-click="ctrl.visibility.overviewEditor = false"
-                                       ng-if="ctrl.visibility.overviewEditor"
-                                       class="clickable">
-                                        Done
-                                    </a>
-                                </span>
-                                <span>|</span>
-                                <span>
-                                    <waltz-entity-link entity-ref="{
-                                        kind: 'LOGICAL_DATA_FLOW',
-                                        id: ctrl.logicalFlow.id,
-                                        name: 'Go to logical flow'}">
-                                    </waltz-entity-link>
-                                </span>
-                            </div>
-
-                        </content>
-                    </waltz-sub-section>
-
+                    <div ng-include="'wpfv-overview'"></div>
                 </div>
                 <div class="col-md-5">
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
@@ -93,8 +64,6 @@
                     </waltz-data-type-usage-panel>
                 </div>
             </div>
-
-
 
             <div class="small text-muted"
                  style="padding-top: 8px"
@@ -110,72 +79,217 @@
 
     </div>
 
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation>
+        </waltz-dynamic-section-navigation>
+    </div>
+
     <br>
 
+    <waltz-dynamic-sections-view parent-entity-ref="ctrl.parentEntityRef">
+    </waltz-dynamic-sections-view>
 
-    <!--Entity Named Notes-->
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
-                                   section="ctrl.entityNamedNotesSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+</div>
 
 
-    <!-- SPEC DEFINITION -->
-    <waltz-section name="Specification Definition"
-                   icon="file-code-o"
-                   id="specification-definition-section"
-                   ng-if="ctrl.logicalFlow">
-        <waltz-section-actions>
-            <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <a ui-sref="main.physical-specification.view ({id: ctrl.specification.id})"
-                   class="btn btn-xs btn-primary">
-                    Manage
+<!-- TEMPLATES -->
+
+
+<script type="text/ng-template"
+        id="wpfv-dupe-sub-section">
+
+    <waltz-sub-section name="Mark as Duplicate"
+                       class="sub-section-warning">
+        <content>
+            <div style="padding:8px">
+                <div ng-if="ctrl.mergeTarget === null"
+                     ng-include="'wpfv-select-merge-target'">
+                </div>
+                <div ng-if="ctrl.mergeTarget !== null"
+                     ng-include="'wpfv-select-merge-direction'">
+                </div>
+            </div>
+            <div class="waltz-sub-section-controls">
+                <a ng-click="ctrl.onShowOverview()"
+                   class="clickable">
+                    Cancel
                 </a>
             </div>
-        </waltz-section-actions>
+        </content>
+    </waltz-sub-section>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <label>Current Definition</label>
-                <waltz-physical-spec-definition-panel spec-definition="ctrl.selectedSpecDefinition"
-                                                      logical-data-elements="ctrl.logicalDataElements"
-                                                      selectable-definitions="ctrl.selectableSpecDefinitions"
-                                                      on-definition-select="ctrl.updateSpecDefinitionId"
-                                                      on-update-field-description="ctrl.updateFieldDescription"
-                                                      on-update-logical-data-element="ctrl.updateLogicalDataElement">
-                    <no-data-message>
-                        <strong>No <i>active</i> definition</strong> for this physical specification.
-                    </no-data-message>
-                </waltz-physical-spec-definition-panel>
+</script>
+
+
+
+
+
+<script type="text/ng-template"
+        id="wpfv-select-merge-direction" >
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="margin: 8px">
+                <label>
+                    Left
+                    (<span ng-bind="ctrl.mergeTarget.physicalFlow.provenance"></span>)
+                </label>
+                <div style="border: 1px solid #eee; border-radius: 3px; padding: 6px;">
+                    <waltz-physical-flow-and-specification-detail physical-flow="ctrl.mergeTarget.physicalFlow"
+                                                                  specification="ctrl.mergeTarget.physicalSpec">
+                    </waltz-physical-flow-and-specification-detail>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-3">
+
+            <br>
+            <br>
+
+            <div class="text-center">
+                <button class="btn btn-sm btn-success"
+                        ng-click="ctrl.onMergePhysicalFlow(ctrl.mergeTarget.physicalFlow.id, ctrl.physicalFlow.id)">
+                    Keep right
+                    <waltz-icon name="arrow-right"></waltz-icon>
+                </button>
+
+                <br>
+                <br>
+
+                <button class="btn btn-sm btn-success"
+                        ng-click="ctrl.onMergePhysicalFlow(ctrl.physicalFlow.id, ctrl.mergeTarget.physicalFlow.id)">
+                    <waltz-icon name="arrow-left"></waltz-icon>
+                    Keep left
+                </button>
+
+                <br>
+                <br>
+
+                <a class="clickable"
+                        ng-click="ctrl.onClearMergeTarget()">
+                    <waltz-icon name="close"></waltz-icon>
+                    Select a different flow
+                </a>
+
+            </div>
+            <div class="small help-block">
+                Selecting an action will cause the target flow (the flow to be kept) to
+                'absorb' the source flow.  The source flow will be removed
+                however it's external identifiers will be re-pointed to the target
+                flow.
+            </div>
+
+        </div>
+        <div class="col-md-4">
+            <div class="margin: 8px">
+                <label>
+                    Right
+                    (<span ng-bind="ctrl.physicalFlow.provenance"></span>)
+                </label>
+                <div style="border: 1px solid #eee; border-radius: 3px; padding: 6px;">
+                    <waltz-physical-flow-and-specification-detail physical-flow="ctrl.physicalFlow"
+                                                                  specification="ctrl.specification">
+                    </waltz-physical-flow-and-specification-detail>
+                </div>
             </div>
         </div>
+    </div>
 
-    </waltz-section>
+    </div>
+
+</script>
+<script type="text/ng-template"
+        id="wpfv-select-merge-target" >
+    <div class="help-block">
+        To mark this flow as a duplicate, select the master flow
+        from the table below.  This flow will have it's external
+        id added to the master flow and this flow will be decommissioned.
+    </div>
+
+    <waltz-no-data ng-if="ctrl.potentialMergeTargets.length === 0">
+        <message>No other flows between these entities</message>
+    </waltz-no-data>
+
+    <div ng-if="ctrl.potentialMergeTargets.length > 0">
+        <input type="search"
+               class="form-control"
+               placeholder="Search for existing flow..."
+               ng-model="potentialTargetsSearchQuery">
+
+        <table class="table small">
+            <thead>
+            <tr>
+                <th width="40%">Name</th>
+                <th width="20%">Transport</th>
+                <th width="20%">Provenance</th>
+                <th width="20%">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="potentialTarget in ctrl.potentialMergeTargets | filter:potentialTargetsSearchQuery">
+                <td>
+                    <span ng-bind="potentialTarget.physicalSpec.name"></span>
+                </td>
+                <td>
+                    <span ng-bind="potentialTarget.physicalFlow.transport | toDisplayName:'TransportKind'"></span>
+                </td>
+                <td>
+                    <span ng-bind="potentialTarget.physicalFlow.provenance"></span>
+                </td>
+                <td>
+                    <a class="clickable"
+                       ng-click="ctrl.onSelectMergeTarget(potentialTarget)">
+                        De-duplicate
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
 
 
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
-                                   section="ctrl.entityDiagramsSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
+<script type="text/ng-template"
+        id="wpfv-overview" >
+    <waltz-sub-section name="Overview">
+        <content>
+            <div class="waltz-sub-section-content">
+                <div ng-if="! ctrl.visibility.overviewEditor">
+                    <waltz-physical-flow-overview parent-entity-ref="ctrl.parentEntityRef"
+                                                  class="waltz-highlight-if">
+                    </waltz-physical-flow-overview>
+                </div>
+                <div ng-if="ctrl.visibility.overviewEditor"
+                     class="waltz-highlight-if">
+                    <waltz-physical-flow-editor parent-entity-ref="ctrl.parentEntityRef">
+                    </waltz-physical-flow-editor>
+                </div>
 
+            </div>
+            <div class="waltz-sub-section-controls">
+                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                    <a ng-click="ctrl.visibility.overviewEditor = true"
+                       ng-if="! ctrl.visibility.overviewEditor"
+                       class="clickable">
+                        Edit
+                    </a>
 
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
-                                   section="ctrl.bookmarksSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
-
-
-    <waltz-dynamic-section-wrapper section="ctrl.physicalFlowParticipantsSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
-
-
-    <waltz-change-unit-section parent-entity-ref="ctrl.entityReference">
-    </waltz-change-unit-section>
-
-
-    <waltz-dynamic-section-wrapper ng-if="ctrl.logicalFlow"
-                                   section="ctrl.changeLogSection"
-                                   parent-entity-ref="ctrl.entityReference">
-    </waltz-dynamic-section-wrapper>
-</div>
+                    <a ng-click="ctrl.visibility.overviewEditor = false"
+                       ng-if="ctrl.visibility.overviewEditor"
+                       class="clickable">
+                        Done
+                    </a>
+                </span>
+                <span>|</span>
+                <span>
+                    <waltz-entity-link entity-ref="{
+                        kind: 'LOGICAL_DATA_FLOW',
+                        id: ctrl.logicalFlow.id,
+                        name: 'Go to logical flow'}">
+                    </waltz-entity-link>
+                </span>
+            </div>
+        </content>
+    </waltz-sub-section>
+</script>

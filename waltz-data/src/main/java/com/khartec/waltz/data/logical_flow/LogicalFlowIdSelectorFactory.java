@@ -35,7 +35,7 @@ import org.jooq.impl.DSL;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -111,7 +111,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
                 .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(options.entityReference().id()))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 
@@ -141,7 +141,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .where(sourceCondition.or(targetCondition))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 
@@ -154,7 +154,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                         .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(appId)
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 
@@ -176,7 +176,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
                     .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .and(SUPPLIER_APP.KIND.in(options.applicationKinds()).or(CONSUMER_APP.KIND.in(options.applicationKinds())))
-                .and(NOT_REMOVED)
+                .and(LOGICAL_NOT_REMOVED)
                 .and(supplierNotRemoved)
                 .and(consumerNotRemoved);
     }

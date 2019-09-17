@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 @Repository
@@ -53,7 +53,7 @@ public class ConnectionComplexityDao {
                     .eq(APPLICATION_KIND)
                     .and(LOGICAL_FLOW.TARGET_ENTITY_KIND
                             .eq(APPLICATION_KIND))
-                    .and(NOT_REMOVED);
+                    .and(LOGICAL_NOT_REMOVED);
 
     private static final SelectHavingStep<Record2<Long, Integer>> OUTBOUND_FLOWS =
             DSL.select(SOURCE_APP_FIELD, TARGET_COUNT_FIELD)
