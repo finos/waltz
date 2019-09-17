@@ -88,7 +88,7 @@ public class FlowLineageHarness {
         dsl.select(LOGICAL_FLOW.fields())
                 .select(SOURCE_NAME_FIELD)
                 .from(LOGICAL_FLOW)
-                .where(anyTargetMatches.and(LogicalFlowDao.NOT_REMOVED))
+                .where(anyTargetMatches.and(LogicalFlowDao.LOGICAL_NOT_REMOVED))
                 .forEach(System.out::println);
 
         dsl.select()

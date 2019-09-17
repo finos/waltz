@@ -23,12 +23,19 @@ import _ from "lodash";
 
 import template from "./physical-flow-view.html";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import {toEntityRef} from "../common/entity-utils";
+import {isRemoved, toEntityRef} from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
+import {mkLinkGridCell} from "../common/grid-utils";
+
+
+const modes = {
+    OVERVIEW: "OVERVIEW",
+    DUPLICATE: "DUPLICATE"
+};
 
 
 const initialState = {
-    logicalDataElements: [],
+    mode: modes.OVERVIEW,
     physicalFlow: null,
     selected: {
         entity: null,
@@ -36,17 +43,12 @@ const initialState = {
         outgoing: []
     },
     specification: null,
-    selectedSpecDefinition: {},
-    selectableSpecDefinitions: [],
     visibility: {
         diagramEditor: false,
         overviewEditor: false
     },
-    bookmarksSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    entityDiagramsSection: dynamicSections.entityDiagramsSection,
-    physicalFlowParticipantsSection: dynamicSections.physicalFlowParticipantsSection
+    potentialMergeTargets: [],
+    mergeTarget: null
 };
 
 
@@ -97,24 +99,6 @@ function navigateToLastView($state, historyStore) {
 }
 
 
-function getSelectedSpecDefinition(specDefinitions = [], selectedSpecDefId = null) {
-    if (selectedSpecDefId) {
-        const defsById = _.keyBy(specDefinitions, "id");
-        return defsById[selectedSpecDefId];
-    } else {
-        // find the active definition
-        return _.find(specDefinitions, d => d.status === "ACTIVE");
-    }
-}
-
-
-function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
-    if (selectedSpecDef) {
-        return _.filter(specDefinitions, sd => sd.id !== selectedSpecDef.id);
-    }
-
-    return specDefinitions;
-}
 
 
 function controller($q,
@@ -122,86 +106,54 @@ function controller($q,
                     $stateParams,
                     historyStore,
                     notification,
+                    dynamicSectionManager,
                     physicalFlowStore,
-                    physicalSpecDefinitionStore,
-                    physicalSpecDefinitionFieldStore,
-                    physicalSpecDefinitionSampleFileStore,
                     physicalSpecificationStore,
                     serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
-    const flowId = $stateParams.id;
-    vm.entityReference = {
-        id: flowId,
+    const entityReference = {
+        id: $stateParams.id,
         kind: "PHYSICAL_FLOW"
     };
 
 
-    // -- LOAD ---
+    vm.$onInit = () => {
+        dynamicSectionManager.initialise("PHYSICAL_FLOW");
+        vm.parentEntityRef = entityReference;
 
-    const physicalFlowPromise = serviceBroker
-        .loadViewData(
-            CORE_API.PhysicalFlowStore.getById,
-            [ flowId ])
-        .then(r => vm.physicalFlow = r.data);
-
-
-    physicalFlowPromise
-        .then(() => serviceBroker
+        const physicalFlowPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowStore.getById,
-                [vm.physicalFlow.logicalFlowId]))
-        .then(r => vm.logicalFlow = r.data);
-
-    const specPromise = physicalFlowPromise
-        .then(physicalFlow => serviceBroker
-            .loadViewData(
-                CORE_API.PhysicalSpecificationStore.getById,
-                [physicalFlow.specificationId]))
-        .then(r => {
-            vm.specification = r.data;
-            vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
-        });
-
-    // spec definitions
-    const loadSpecDefinitions = (force = false) => physicalSpecDefinitionStore
-        .findForSpecificationId(vm.physicalFlow.specificationId)
-        .then(specDefs => {
-            vm.selectedSpecDefinition.def = getSelectedSpecDefinition(specDefs, vm.physicalFlow.specificationDefinitionId);
-            vm.selectableSpecDefinitions = getSelectableSpecDefinitions(specDefs, vm.selectedSpecDefinition.def);
-        })
-        .then(() => {
-            if (vm.selectedSpecDefinition.def) {
-                const specDefFieldPromise = physicalSpecDefinitionFieldStore
-                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
-
-                const specDefSampleFilePromise = physicalSpecDefinitionSampleFileStore
-                    .findForSpecDefinitionId(vm.selectedSpecDefinition.def.id);
-
-                const selectionOptions = {
-                    scope: "EXACT",
-                    entityReference: { kind: "PHYSICAL_SPECIFICATION", id:vm.selectedSpecDefinition.def.specificationId }
-                };
-
-                const logicalElementsPromise = serviceBroker
-                    .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ], { force })
-                    .then(r => r.data);
-
-                $q.all([specDefFieldPromise, specDefSampleFilePromise, logicalElementsPromise])
-                    .then(([fields, file, logicalElements]) => {
-                        vm.selectedSpecDefinition.fields = fields;
-                        vm.selectedSpecDefinition.sampleFile = file;
-                        vm.logicalDataElements = logicalElements;
-                    });
-            }
-        });
-
-    specPromise
-        .then(() => loadSpecDefinitions())
-        .then(() => addToHistory(historyStore, vm.physicalFlow, vm.specification));
+                CORE_API.PhysicalFlowStore.getById,
+                [ vm.parentEntityRef.id ])
+            .then(r => vm.physicalFlow = r.data);
 
 
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.getById,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.logicalFlow = r.data);
+
+
+        physicalFlowPromise
+            .then(physicalFlow => serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalSpecificationStore.getById,
+                    [physicalFlow.specificationId]))
+            .then(r => {
+                vm.specification = r.data;
+                vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
+                addToHistory(historyStore, vm.physicalFlow, vm.specification);
+            });
+    };
+
+
+    // -- INTERACT ---
+
+    // -- INTERACT: delete
     const deleteSpecification = () => {
         physicalSpecificationStore.deleteById(vm.specification.id)
             .then(r => {
@@ -254,51 +206,80 @@ function controller($q,
     vm.deleteFlow = () => {
         if (confirm("Are you sure you want to delete this flow ?")) {
             physicalFlowStore
-                .deleteById(flowId)
+                .deleteById(vm.parentEntityRef.id)
                 .then(r => handleDeleteFlowResponse(r));
         }
     };
 
-    vm.updateSpecDefinitionId = (newSpecDef) => {
-        if (confirm("Are you sure you want to change the specification definition version used by this flow ?")) {
-            physicalFlowStore
-                .updateSpecDefinitionId(flowId, {
-                    newSpecDefinitionId: newSpecDef.id
-                })
-                .then(() => {
-                    vm.physicalFlow.specificationDefinitionId = newSpecDef.id;
-                    loadSpecDefinitions();
-                    notification.success("Specification definition version updated successfully");
-                });
+
+    // -- INTERACT: de-dupe
+    const loadPotentialMergeTargets = () => {
+        const potentialFlowsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalFlowStore.findByLogicalFlowId,
+                [ vm.logicalFlow.id ],
+                { force: true })
+            .then(r => r.data);
+
+        const potentialSpecsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PhysicalSpecificationStore.findByLogicalFlow,
+                [ vm.logicalFlow.id ])
+            .then(r => r.data);
+
+        $q.all([potentialFlowsPromise, potentialSpecsPromise])
+            .then(([flows, specs]) => {
+                const specsById = _.keyBy(specs, s => s.id);
+                vm.potentialMergeTargets = _
+                    .chain(flows)
+                    .reject(f => f.id === vm.parentEntityRef.id)
+                    .reject(isRemoved)
+                    .map(f => ({
+                        physicalFlow: f,
+                        physicalSpec: specsById[f.specificationId]
+                    }))
+                    .reject(d => d.physicalSpec === null)
+                    .orderBy(d => d.physicalSpec.name)
+                    .value();
+            });
+    };
+
+
+    vm.onShowMarkAsDuplicate = () => {
+        vm.mode = vm.mode === modes.DUPLICATE
+            ? vm.onShowOverview()
+            : modes.DUPLICATE;
+
+        loadPotentialMergeTargets();
+    };
+
+    vm.onSelectMergeTarget = (t) => {
+        vm.mergeTarget = t;
+    };
+
+    vm.onClearMergeTarget = () => {
+        vm.mergeTarget = null;
+    };
+
+    vm.onMergePhysicalFlow = (fromId, toId) => {
+        if (confirm("Are you sure you want to de-duplicate these flows ?")) {
+            serviceBroker
+                .loadViewData(
+                    CORE_API.PhysicalFlowStore.merge,
+                    [ fromId , toId ])
+                .then(notification.warning("Flow has been marked as duplicate"))
+                .then(() => $state.reload())
+        } else {
+            notification.info("De-duplication cancelled");
         }
     };
 
-    vm.updateFieldDescription = (change, fieldId) => {
-        const cmd = { newDescription: change.newVal };
-        serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
-            .then(result => {
-                if (result) {
-                    notification.success("Updated description for field");
-                    loadSpecDefinitions(true);
-                } else {
-                    notification.error("Could not update field description");
-                }
-            });
-    };
 
-    vm.updateLogicalDataElement = (change, fieldId) => {
-        const cmd = { newLogicalDataElement: change.newVal };
-        serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
-            .then(result => {
-                if (result) {
-                    notification.success("Updated logical data element for field");
-                    loadSpecDefinitions(true);
-                } else {
-                    notification.error("Could not update logical data element");
-                }
-            });
+
+    // -- INTERACT: other
+    vm.onShowOverview = () => {
+        vm.mergeTarget = null;
+        vm.mode = modes.OVERVIEW;
     };
 
 }
@@ -310,10 +291,8 @@ controller.$inject = [
     "$stateParams",
     "HistoryStore",
     "Notification",
+    "DynamicSectionManager",
     "PhysicalFlowStore",
-    "PhysicalSpecDefinitionStore",
-    "PhysicalSpecDefinitionFieldStore",
-    "PhysicalSpecDefinitionSampleFileStore",
     "PhysicalSpecificationStore",
     "ServiceBroker"
 ];

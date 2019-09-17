@@ -104,3 +104,7 @@ export function loadEntity(serviceBroker, entityRef) {
         .then(r => r.data);
 }
 
+
+export function isRemoved(entity) {
+    return entity.isRemoved || entity.entityLifecycleStatus === "REMOVED";
+}

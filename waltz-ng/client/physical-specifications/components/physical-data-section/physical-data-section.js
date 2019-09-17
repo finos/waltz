@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell, mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import template from "./physical-data-section.html";
+import {isRemoved} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -82,6 +83,7 @@ function mkData(primaryRef,
 
     const [consumes, produces] = _
         .chain(physicalFlows)
+        .reject(isRemoved)
         .map(enrichFlow)
         .reject(isIncomplete)
         .partition(_isConsumer(primaryRef))

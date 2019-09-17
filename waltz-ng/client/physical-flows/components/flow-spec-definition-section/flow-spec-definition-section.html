@@ -1,0 +1,27 @@
+<div>
+    <waltz-section-actions>
+        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+            <a ui-sref="main.physical-specification.view ({id: $ctrl.specification.id})"
+               class="btn btn-xs btn-primary">
+                Manage
+            </a>
+        </div>
+    </waltz-section-actions>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <label>Current Definition</label>
+            <waltz-physical-spec-definition-panel spec-definition="$ctrl.selectedSpecDefinition"
+                                                  logical-data-elements="$ctrl.logicalDataElements"
+                                                  selectable-definitions="$ctrl.selectableSpecDefinitions"
+                                                  on-definition-select="$ctrl.updateSpecDefinitionId"
+                                                  on-update-field-description="$ctrl.updateFieldDescription"
+                                                  on-update-logical-data-element="$ctrl.updateLogicalDataElement">
+                <no-data-message>
+                    <strong>No <i>active</i> definition</strong> for this physical specification.
+                </no-data-message>
+            </waltz-physical-spec-definition-panel>
+        </div>
+    </div>
+</div>
+
