@@ -2,6 +2,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
@@ -38,7 +39,7 @@ public class LicencesExtractor extends BaseDataExtractor {
             EntityReference entityRef = getEntityReference(request);
 
             ApplicationIdSelectionOptions selectionOptions = mkOpts(entityRef);
-            Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOptions);
+            Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(selectionOptions);
 
             SelectConditionStep<Record8<Long, String, String, String, String, Timestamp, String, String>> qry = dsl
                     .selectDistinct(LICENCE.ID.as("Licence Id"),
@@ -54,9 +55,8 @@ public class LicencesExtractor extends BaseDataExtractor {
                     .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_B).and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name())))
                     .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_A).and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name())))
-                    .where(APPLICATION.ID.in(appIds))
-                    .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"));
-
+                    .where(APPLICATION.ID.in(appIdSelector))
+                    .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name()));
 
             String filename = "licences";
 
