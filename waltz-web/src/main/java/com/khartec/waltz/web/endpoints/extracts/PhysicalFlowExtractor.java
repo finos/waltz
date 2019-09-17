@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -109,7 +109,7 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
 
         Condition isSourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
 
         Condition isProduces = isOwnerCondition.or(isSourceCondition);
 
@@ -121,7 +121,7 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
 
         Condition isConsumes = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
 
         return getQuery(SOURCE_NAME_AND_NAR_FIELDS, isConsumes);
     }

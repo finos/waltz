@@ -7,42 +7,48 @@ import com.khartec.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.common.SetUtilities.minus;
 
 @Service
 public class ExternalIdentifierService {
 
     private final ExternalIdentifierDao externalIdentifierDao;
 
+
     @Autowired
     public ExternalIdentifierService(ExternalIdentifierDao externalIdentifierDao) {
         this.externalIdentifierDao = externalIdentifierDao;
     }
 
-    public int markEntityRefAsDuplicate(EntityReference toBeDuplicated, EntityReference duplicatedBy) {
-        List<ExternalIdentifier> identifiersToBeDuplicated = externalIdentifierDao.findByEntityReference(toBeDuplicated);
-        List<ExternalIdentifier> identifiersDuplicatedBy = externalIdentifierDao.findByEntityReference(duplicatedBy);
 
-        Set<ExternalIdentifier> externalIdentifiersToBeCreated = identifiersToBeDuplicated
-                .stream()
-                .map(id -> updateEntityReference(id, duplicatedBy))
-                .filter(id -> !identifiersDuplicatedBy.contains(id))
-                .collect(Collectors.toSet());
-
-        int[] createResult = externalIdentifierDao.create(externalIdentifiersToBeCreated);
-        int[] deleteResult = externalIdentifierDao.delete(identifiersToBeDuplicated);
-
-        return IntStream.of(createResult).sum() + IntStream.of(deleteResult).sum();
+    public Set<ExternalIdentifier> findByEntityReference(EntityReference entityRef) {
+        return externalIdentifierDao.findByEntityReference(entityRef);
     }
 
-    private ExternalIdentifier updateEntityReference(ExternalIdentifier id, EntityReference duplicatedBy) {
-        return ImmutableExternalIdentifier.builder()
-                .entityReference(duplicatedBy)
-                .externalId(id.externalId())
-                .system(id.system())
-                .build();
+
+    public int merge(EntityReference fromRef,
+                     EntityReference toRef) {
+
+        Set<ExternalIdentifier> existingIdentifiersOnSource = findByEntityReference(fromRef);
+        Set<ExternalIdentifier> existingIdentifiersOnTarget = findByEntityReference(toRef);
+
+        Set<ExternalIdentifier> identifiersToCopyFromSource = map(
+                existingIdentifiersOnSource,
+                existingIdentifier -> ImmutableExternalIdentifier
+                        .copyOf(existingIdentifier)
+                        .withEntityReference(toRef));
+
+        Set<ExternalIdentifier> identifiersToCreate = minus(
+                identifiersToCopyFromSource,
+                existingIdentifiersOnTarget);
+
+        int[] createResult = externalIdentifierDao.create(identifiersToCreate);
+        int[] deleteResult = externalIdentifierDao.delete(existingIdentifiersOnSource);
+
+        return IntStream.of(createResult).sum() + IntStream.of(deleteResult).sum();
     }
 }

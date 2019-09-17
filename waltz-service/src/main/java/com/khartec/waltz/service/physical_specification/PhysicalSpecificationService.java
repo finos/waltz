@@ -148,4 +148,8 @@ public class PhysicalSpecificationService {
         changeLogService.write(logEntry);
     }
 
+
+    public Collection<PhysicalSpecification> findByLogicalFlow(long id) {
+        return specificationDao.findByLogicalFlow(id);
+    }
 }

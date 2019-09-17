@@ -12,73 +12,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
+import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.schema.tables.ExternalIdentifier.EXTERNAL_IDENTIFIER;
 
 @Repository
 public class ExternalIdentifierDao {
 
-
     private final DSLContext dsl;
 
-    @Autowired
-    public ExternalIdentifierDao(DSLContext dsl) {
-        this.dsl = dsl;
-    }
 
-
-    public int create(ExternalIdentifier externalIdentifier) {
+    private static final Function<ExternalIdentifier, ExternalIdentifierRecord> TO_RECORD_MAPPER = d -> {
         ExternalIdentifierRecord record = new ExternalIdentifierRecord();
-
-        record.setEntityId(externalIdentifier.entityReference().id());
-        record.setEntityKind(externalIdentifier.entityReference().kind().name());
-        record.setExternalId(externalIdentifier.externalId());
-        record.setSystem(externalIdentifier.system());
-
-        return record.store();
-    }
-
-
-    public int[] create(Set<ExternalIdentifier> externalIdentifiers) {
-        return dsl.batchInsert(convertToExternalIdentifierRecords(externalIdentifiers)).execute();
-    }
-
-
-    public List<ExternalIdentifier> findByEntityReference(EntityReference entityRef) {
-        return dsl
-                .select(EXTERNAL_IDENTIFIER.fields())
-                .from(EXTERNAL_IDENTIFIER)
-                .where(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(entityRef.id()))
-                .and(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(entityRef.kind().name()))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public int[] delete(List<ExternalIdentifier> externalIdentifiers) {
-        return dsl.batchDelete(convertToExternalIdentifierRecords(externalIdentifiers)).execute();
-
-    }
-
-
-    private Set<ExternalIdentifierRecord> convertToExternalIdentifierRecords(Collection<ExternalIdentifier> externalIdentifiers) {
-        return externalIdentifiers.stream()
-                .map(this::getExternalIdentifierRecord)
-                .collect(Collectors.toSet());
-    }
-
-
-    private ExternalIdentifierRecord getExternalIdentifierRecord(ExternalIdentifier externalIdentifier) {
-
-        ExternalIdentifierRecord record = new ExternalIdentifierRecord();
-        record.setEntityId(externalIdentifier.entityReference().id());
-        record.setEntityKind(externalIdentifier.entityReference().kind().name());
-        record.setExternalId(externalIdentifier.externalId());
-        record.setSystem(externalIdentifier.system());
+        record.setEntityId(d.entityReference().id());
+        record.setEntityKind(d.entityReference().kind().name());
+        record.setExternalId(d.externalId());
+        record.setSystem(d.system());
         return record;
-    }
+    };
+
 
     private static final RecordMapper<Record, ExternalIdentifier> TO_DOMAIN_MAPPER = r -> {
         ExternalIdentifierRecord record = r.into(EXTERNAL_IDENTIFIER);
@@ -88,4 +42,35 @@ public class ExternalIdentifierDao {
                 .system(record.getSystem())
                 .build();
     };
+
+
+    @Autowired
+    public ExternalIdentifierDao(DSLContext dsl) {
+        this.dsl = dsl;
+    }
+
+
+    public int[] create(Set<ExternalIdentifier> externalIdentifiers) {
+        return dsl
+                .batchInsert(map(externalIdentifiers, TO_RECORD_MAPPER))
+                .execute();
+    }
+
+
+    public Set<ExternalIdentifier> findByEntityReference(EntityReference entityRef) {
+        return dsl
+                .select(EXTERNAL_IDENTIFIER.fields())
+                .from(EXTERNAL_IDENTIFIER)
+                .where(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(entityRef.id()))
+                .and(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(entityRef.kind().name()))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int[] delete(Collection<ExternalIdentifier> externalIdentifiers) {
+        return dsl
+                .batchDelete(map(externalIdentifiers, TO_RECORD_MAPPER))
+                .execute();
+    }
+
 }

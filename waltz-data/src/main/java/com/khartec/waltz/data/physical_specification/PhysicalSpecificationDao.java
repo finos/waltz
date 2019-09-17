@@ -36,12 +36,12 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static com.khartec.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
@@ -79,6 +79,8 @@ public class PhysicalSpecificationDao {
                 .build();
     };
 
+    public static final Condition PHYSICAL_SPEC_NOT_REMOVED = PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse();
+
 
     private final DSLContext dsl;
 
@@ -97,11 +99,11 @@ public class PhysicalSpecificationDao {
 
         Condition isSourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
 
         Condition isTargetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
 
         return dsl.select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
@@ -111,9 +113,7 @@ public class PhysicalSpecificationDao {
                 .where(isOwnerCondition)
                 .or(isTargetCondition)
                 .or(isSourceCondition)
-                .fetch(TO_DOMAIN_MAPPER)
-                .stream()
-                .collect(Collectors.toSet());
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
@@ -142,7 +142,7 @@ public class PhysicalSpecificationDao {
                         .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
                         .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
                         .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
-                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
+                        .and(PHYSICAL_SPEC_NOT_REMOVED);
 
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
@@ -198,4 +198,17 @@ public class PhysicalSpecificationDao {
                 .execute();
     }
 
+
+    public Set<PhysicalSpecification> findByLogicalFlow(long id) {
+        return dsl
+                .select(PHYSICAL_SPECIFICATION.fields())
+                .select(owningEntityNameField)
+                .from(PHYSICAL_SPECIFICATION)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(id))
+                .and(PHYSICAL_FLOW_NOT_REMOVED)
+                .and(PHYSICAL_SPEC_NOT_REMOVED)
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }

@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.utils.IdUtilities.indexByOptId;
 import static com.khartec.waltz.model.utils.IdUtilities.toIds;
@@ -255,7 +255,7 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
         return DSL.select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .where(sourceCondition.or(targetCondition))
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 }

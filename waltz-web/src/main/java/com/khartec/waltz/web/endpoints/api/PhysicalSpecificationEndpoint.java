@@ -70,6 +70,11 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 BASE_URL,
                 "selector");
 
+        String findByLogicalFlowPath = mkPath(
+                BASE_URL,
+                "logical-flow",
+                ":id");
+
         String searchPath = mkPath(
                 BASE_URL,
                 "search",
@@ -89,6 +94,10 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         ListRoute<PhysicalSpecification> findByAppRoute =
                 (request, response) -> specificationService.findByEntityReference(getEntityReference(request));
 
+
+        ListRoute<PhysicalSpecification> findByLogicalFlowRoute =
+                (request, response) -> specificationService.findByLogicalFlow(getId(request));
+
         ListRoute<PhysicalSpecification> searchRoute =
                 (request, response) -> specificationService.search(
                         request.params("query"),
@@ -102,6 +111,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
 
         getForList(findByAppPath, findByAppRoute);
+        getForList(findByLogicalFlowPath, findByLogicalFlowRoute);
         getForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
 

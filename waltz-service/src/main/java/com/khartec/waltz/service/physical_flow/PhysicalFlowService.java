@@ -126,14 +126,15 @@ public class PhysicalFlowService {
         return physicalFlowDao.getById(id);
     }
 
-    public int markDuplicate(long id, long duplicatedById) {
-        EntityReference entityRefToBeDuplicated = mkRef(PHYSICAL_FLOW, id);
-        EntityReference entityRefDuplicatedBy = mkRef(PHYSICAL_FLOW, duplicatedById);
 
-        externalIdentifierService.markEntityRefAsDuplicate(entityRefToBeDuplicated, entityRefDuplicatedBy);
-        int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(id, EntityLifecycleStatus.REMOVED.name());
+    public boolean merge(long fromId, long toId) {
+        EntityReference toRef = mkRef(PHYSICAL_FLOW, toId);
+        EntityReference fromRef = mkRef(PHYSICAL_FLOW, fromId);
 
-        return updateStatus;
+        int moveCount = externalIdentifierService.merge(fromRef, toRef);
+        int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
+
+        return updateStatus + moveCount > 0;
     }
 
 
@@ -372,7 +373,7 @@ public class PhysicalFlowService {
             case "description":
                 return physicalFlowDao.updateDescription(flowId, command.value());
             case "entity_lifecycle_status":
-                return physicalFlowDao.updateEntityLifecycleStatus(flowId, command.value());
+                return physicalFlowDao.updateEntityLifecycleStatus(flowId, EntityLifecycleStatus.valueOf(command.value()));
             default:
                 String errMsg = String.format(
                         "Cannot update attribute %s on flow as unknown attribute name",

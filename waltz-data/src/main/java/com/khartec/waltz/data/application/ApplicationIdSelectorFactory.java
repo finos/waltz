@@ -39,7 +39,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.Tables.*;
@@ -431,7 +431,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(joinField))
                 .where(condition)
-                .and(NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 }

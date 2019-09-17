@@ -76,9 +76,9 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const markAsDuplicate = (idToBeDuplicated, duplicatedById) => {
+    const merge = (fromId, toId) => {
         return $http
-            .post(`${base}/mark-duplicate/id/${idToBeDuplicated}/duplicated-by/${duplicatedById}`)
+            .post(`${base}/merge/from/${fromId}/to/${toId}`)
             .then(r => r.data);
     };
 
@@ -142,7 +142,7 @@ export function store($http, baseApiUrl) {
         findByProducerEntityReference,
         findByConsumerEntityReference,
         findBySelector,
-        markAsDuplicate,
+        merge,
         getById,
         searchReports,
         create,
@@ -157,94 +157,94 @@ export function store($http, baseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'PhysicalFlowStore';
+export const serviceName = "PhysicalFlowStore";
 
 
 
 export const PhysicalFlowStore_API = {
     findBySpecificationId: {
         serviceName,
-        serviceFnName: 'findBySpecificationId',
-        description: 'executes findBySpecificationId'
+        serviceFnName: "findBySpecificationId",
+        description: "executes findBySpecificationId"
     },
     findByLogicalFlowId: {
         serviceName,
-        serviceFnName: 'findByLogicalFlowId',
-        description: 'executes findByLogicalFlowId'
+        serviceFnName: "findByLogicalFlowId",
+        description: "executes findByLogicalFlowId"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'executes findByEntityReference'
+        serviceFnName: "findByEntityReference",
+        description: "executes findByEntityReference"
     },
     findByProducerEntityReference: {
         serviceName,
-        serviceFnName: 'findByProducerEntityReference',
-        description: 'executes findByProducerEntityReference'
+        serviceFnName: "findByProducerEntityReference",
+        description: "executes findByProducerEntityReference"
     },
     findByConsumerEntityReference: {
         serviceName,
-        serviceFnName: 'findByConsumerEntityReference',
-        description: 'executes findByConsumerEntityReference'
+        serviceFnName: "findByConsumerEntityReference",
+        description: "executes findByConsumerEntityReference"
     },
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'executes findBySelector'
+        serviceFnName: "findBySelector",
+        description: "executes findBySelector"
     },
-    markAsDuplicate: {
+    merge: {
         serviceName,
-        serviceFnName: 'markAsDuplicate',
-        description: 'executes markAsDuplicate'
+        serviceFnName: "merge",
+        description: "merge [from, to]"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'executes getById'
+        serviceFnName: "getById",
+        description: "executes getById"
     },
     searchReports: {
         serviceName,
-        serviceFnName: 'searchReports',
-        description: 'executes searchReports'
+        serviceFnName: "searchReports",
+        description: "executes searchReports"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'executes create'
+        serviceFnName: "create",
+        description: "executes create"
     },
     deleteById: {
         serviceName,
-        serviceFnName: 'deleteById',
-        description: 'executes deleteById'
+        serviceFnName: "deleteById",
+        description: "executes deleteById"
     },
     updateSpecDefinitionId: {
         serviceName,
-        serviceFnName: 'updateSpecDefinitionId',
-        description: 'executes updateSpecDefinitionId'
+        serviceFnName: "updateSpecDefinitionId",
+        description: "executes updateSpecDefinitionId"
     },
     updateAttribute: {
         serviceName,
-        serviceFnName: 'updateAttribute',
-        description: 'executes updateAttribute'
+        serviceFnName: "updateAttribute",
+        description: "executes updateAttribute"
     },
     validateUpload: {
         serviceName,
-        serviceFnName: 'validateUpload',
-        description: 'executes validateUpload'
+        serviceFnName: "validateUpload",
+        description: "executes validateUpload"
     },
     upload: {
         serviceName,
-        serviceFnName: 'upload',
-        description: 'executes upload'
+        serviceFnName: "upload",
+        description: "executes upload"
     },
     cleanupOrphans: {
         serviceName,
-        serviceFnName: 'cleanupOrphans',
-        description: 'cleans up orphaned physical flows'
+        serviceFnName: "cleanupOrphans",
+        description: "cleans up orphaned physical flows"
     }
 };
