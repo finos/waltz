@@ -16,6 +16,11 @@
   ~ You should have received a copy of the GNU Lesser General Public License
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
+<style>
+    .licence-list-grid .waltz-grid {
+        height: 600px;
+    }
+</style>
 
 <waltz-page-header name="Licence Management"
                    small="List"
@@ -43,7 +48,8 @@
                 the organisation.  Applications that use unapproved licences may be a risk unless previously exempted.
             </blockquote>
 
-            <waltz-grid-with-search entries="$ctrl.licences"
+            <waltz-grid-with-search class="licence-list-grid"
+                                    entries="$ctrl.licences"
                                     column-defs="$ctrl.columnDefs"
                                     on-initialise="$ctrl.onGridInitialised">
             </waltz-grid-with-search>
