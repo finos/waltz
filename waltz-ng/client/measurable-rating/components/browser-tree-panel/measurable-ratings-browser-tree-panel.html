@@ -1,3 +1,11 @@
+
+<style ng-if="$ctrl.selectedMeasurable.description.length <= 500">
+    .mrbtp-grid .waltz-grid {
+        height: 400px;
+    }
+</style>
+
+
 <div>
     <div class="row">
         <div class="col-sm-6">
@@ -39,7 +47,8 @@
                     <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
                 </p>
 
-                <waltz-grid-with-search ng-if="$ctrl.tableData.length > 0"
+                <waltz-grid-with-search class="mrbtp-grid"
+                                        ng-if="$ctrl.tableData.length > 0"
                                         column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
                                         searchPlaceholderText="Search"
