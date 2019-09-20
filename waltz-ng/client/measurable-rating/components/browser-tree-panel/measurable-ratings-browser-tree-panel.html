@@ -43,10 +43,14 @@
                 </div>
 
                 <div ng-if="$ctrl.selectedMeasurable.description.length > 350">
-                    <a class="clickable small wmrbtp-button" ng-if="$ctrl.showMore == false" ng-click="$ctrl.toggleShow()">
+                    <a class="clickable small wmrbtp-button"
+                       ng-if="$ctrl.showMore == false"
+                       ng-click="$ctrl.toggleShow()">
                         Show more
                     </a>
-                    <a class="clickable small wmrbtp-button" ng-if="$ctrl.showMore == true" ng-click="$ctrl.toggleShow()">
+                    <a class="clickable small wmrbtp-button"
+                       ng-if="$ctrl.showMore == true"
+                       ng-click="$ctrl.toggleShow()">
                         Show less
                     </a>
                 </div>
