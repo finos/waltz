@@ -18,9 +18,9 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
 
 import template from "./logical-flows-boingy-graph.html";
 
@@ -112,17 +112,24 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
                          isolatedNode,
                          appIds = [],
                          flowDecorators = []) {
+
+    const scope = _.chain(filterOptions)
+        .map(d => d.scope)
+        .first()
+        .value();
+
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
-    const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
+    const scopeFilterFn = mkScopeFilterFn(appIds, scope);
     const isolatedNodeFilterFn = mkIsolatedNodeFilterFn(isolatedNode);
     return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedNodeFilterFn(f);
 }
 
 
 function buildDecoratorFilter(options = defaultFilterOptions) {
+    const datatypeIds = _.map(options, option => Number(option.type));
     return d => {
         const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
-        const matchesDataType = options.type === "ALL" || d.decoratorEntity.id === Number(options.type);
+        const matchesDataType = options.type === "ALL" || _.includes(datatypeIds, d.decoratorEntity.id);
         return isDataType && matchesDataType;
     };
 }
@@ -223,7 +230,16 @@ function controller($scope,
     };
 
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
-        vm.filterOptions = filterOptions;
+
+        const children = _.chain(vm.allDataTypes)
+            .filter(d => d.parentId === Number(filterOptions.type))
+            .map(d => { return {
+                type: d.id,
+                scope: filterOptions.scope
+            }})
+            .value();
+
+        vm.filterOptions = _.concat(filterOptions, children);
 
         if (! (vm.flows && vm.decorators)) return;
 
@@ -231,7 +247,7 @@ function controller($scope,
             vm.flows,
             vm.applications,
             vm.decorators,
-            filterOptions,
+            vm.filterOptions,
             vm.isolatedNode);
 
         vm.graphTweakers = prepareGraphTweakers(
