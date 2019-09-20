@@ -1,12 +1,4 @@
-
-<style ng-if="$ctrl.selectedMeasurable.description.length <= 500">
-    .mrbtp-grid .waltz-grid {
-        height: 400px;
-    }
-</style>
-
-
-<div>
+<div class="waltz-measurable-ratings-browser-tree-panel">
     <div class="row">
         <div class="col-sm-6">
             <waltz-measurable-ratings-browser rating-tallies="$ctrl.ratingTallies"
@@ -43,11 +35,24 @@
                         <span ng-bind="$ctrl.selectedMeasurable.name"></span>
                     </div>
                 </strong>
-                <p class="text-muted">
-                    <waltz-markdown text="$ctrl.selectedMeasurable.description"></waltz-markdown>
-                </p>
+                <div ng-class="{'wmrbtp-description': $ctrl.showMore == false && $ctrl.selectedMeasurable.description.length > 350}">
+                    <div ng-class="{'wmrbtp-description-fade': $ctrl.showMore == false && $ctrl.selectedMeasurable.description.length > 350}">
+                    </div>
+                    <waltz-markdown class="text-muted" text="$ctrl.selectedMeasurable.description"></waltz-markdown>
+                    <br>
+                </div>
 
-                <waltz-grid-with-search class="mrbtp-grid"
+                <div ng-if="$ctrl.selectedMeasurable.description.length > 350">
+                    <a class="clickable small wmrbtp-button" ng-if="$ctrl.showMore == false" ng-click="$ctrl.toggleShow()">
+                        Show more
+                    </a>
+                    <a class="clickable small wmrbtp-button" ng-if="$ctrl.showMore == true" ng-click="$ctrl.toggleShow()">
+                        Show less
+                    </a>
+                </div>
+                <br>
+
+                <waltz-grid-with-search class="wmrbtp-grid-tall"
                                         ng-if="$ctrl.tableData.length > 0"
                                         column-defs="$ctrl.columnDefs"
                                         entries="$ctrl.tableData"
