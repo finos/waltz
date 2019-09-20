@@ -17,26 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './dynamic-section.html';
+import template from "./dynamic-section.html";
 import {initialiseData} from "../../../common/index";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    section: '<',
-    onRemove: '<',
+    parentEntityRef: "<",
+    section: "<",
+    onRemove: "<",
 };
 
 const initialState = {
+    embedded: false,
+    backLink: {
+        state: "",
+        params: {}
+    }
 };
 
 
-function controller() {
-    initialiseData(this, initialState);
+function controller($state) {
+    const vm = initialiseData(this, initialState);
+    vm.embedded = _.startsWith($state.current.name, "embed");
+
+    vm.$onChanges = () => {
+        if (vm.parentEntityRef !== null) {
+            vm.backLink = {
+                state: kindToViewState(vm.parentEntityRef.kind),
+                params: { id: vm.parentEntityRef.id },
+            };
+        }
+    };
+
 }
 
 
 controller.$inject = [
+    "$state"
 ];
 
 
@@ -47,7 +65,7 @@ const component = {
     transclude: true
 };
 
-const id = 'waltzDynamicSection';
+const id = "waltzDynamicSection";
 
 
 export default {
