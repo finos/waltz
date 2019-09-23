@@ -176,6 +176,9 @@ function controller($element,
             }
         }
         evt.stopPropagation();
+        if(evt.keyCode === ENTER_KEYCODE) {
+            navigateToEntityIfResultContainsOnlyOne(_.chain(vm.results).values().flatten().value());
+        }
     };
 
     const onOverlayKeypress = (evt) => {
