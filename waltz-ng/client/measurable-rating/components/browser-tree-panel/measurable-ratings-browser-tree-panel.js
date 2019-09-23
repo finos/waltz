@@ -55,7 +55,8 @@ const initialState = {
         ratingDetail: false,
     },
     selectedMeasurable: null,
-    onLoadDetail: () => log("onLoadDetail")
+    onLoadDetail: () => log("onLoadDetail"),
+    showMore: false
 };
 
 
@@ -338,6 +339,8 @@ function controller($q, serviceBroker) {
         vm.activeCategory = c;
         vm.onMeasurableCategorySelect(c);
     };
+
+    vm.toggleShow = () => vm.showMore = !vm.showMore
 }
 
 
