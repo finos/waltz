@@ -44,13 +44,12 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.entity", baseState)
         .state("main.entity.ref", byRefState)
-        // .state("main.entity.extId", byExtIdState)
-        .state("main.entity.not-found", notFoundState)
+        .state("main.entity.not-found", notFoundState);
 }
 
 
 setup.$inject = [
-    "$stateProvider",
+    "$stateProvider"
 ];
 
 
