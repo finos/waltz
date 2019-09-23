@@ -160,6 +160,7 @@ function controller($element,
     function navigateToEntityIfResultContainsOnlyOne(results = []) {
         if (results.length === 1) {
             const result = results[0];
+            vm.visible = false;
             $state.go(
                 kindToViewState(result.kind),
                 { id: result.id });
