@@ -109,7 +109,6 @@ function controller($element,
         } else {
             vm.selectedCategory = c;
         }
-        navigateToEntityIfOnlyHaveOneResult(vm.results[c])
     };
 
 
@@ -158,7 +157,7 @@ function controller($element,
         vm.selectedCategory = null;
     };
 
-    function navigateToEntityIfOnlyHaveOneResult(results = []) {
+    function navigateToEntityIfResultContainsOnlyOne(results = []) {
         if (results.length === 1) {
             const result = results[0];
             $state.go(
