@@ -319,7 +319,6 @@ public class LogicalFlowDao {
     }
 
 
-    @Deprecated
     public List<LogicalFlow> findByFlowIds(Collection<Long> dataFlowIds) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.in(dataFlowIds))

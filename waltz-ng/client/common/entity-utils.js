@@ -90,7 +90,21 @@ function determineLoadByIdCall(kind) {
         case "CHANGE_INITIATIVE":
             return CORE_API.ChangeInitiativeStore.getById;
         default:
-            throw "Unsupported kind for loadEntity: " + kind;
+            throw "Unsupported kind for loadById: " + kind;
+    }
+}
+
+
+function determineLoadByExtIdCall(kind) {
+    switch (kind) {
+        case "APPLICATION":
+            return CORE_API.ApplicationStore.findByAssetCode;
+        case "MEASURABLE":
+            return CORE_API.MeasurableStore.findByExternalId;
+        case "PHYSICAL_FLOW":
+            return CORE_API.PhysicalFlowStore.findByExternalId;
+        default:
+            throw "Unsupported kind for loadByExtId: " + kind;
     }
 }
 
@@ -102,6 +116,18 @@ export function loadEntity(serviceBroker, entityRef) {
     return serviceBroker
         .loadViewData(remoteCall, [ entityRef.id ])
         .then(r => r.data);
+}
+
+
+export function loadByExtId(serviceBroker, kind, extId) {
+    try {
+        const remoteCall = determineLoadByExtIdCall(kind);
+        return serviceBroker
+            .loadViewData(remoteCall, [extId])
+            .then(r => r.data);
+    } catch (e) {
+        return Promise.reject(e);
+    }
 }
 
 

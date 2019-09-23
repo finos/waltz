@@ -19,14 +19,8 @@
 
 import _ from "lodash";
 import embedView from "./pages/embed-view";
-import {CORE_API} from "../common/services/core-api-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-
-
-const externalIdLookupMethods = {
-    APPLICATION: CORE_API.ApplicationStore.findByAssetCode,
-    MEASURABLE: CORE_API.MeasurableStore.findByExternalId
-};
+import {loadByExtId} from "../common/entity-utils";
 
 
 function resolveSection(sectionComponentId) {
@@ -45,15 +39,14 @@ function goToNotFound($state) {
 function bouncer($q, $state, $stateParams, serviceBroker) {
     const {kind, extId, sectionComponentId} = $stateParams;
     const section = resolveSection(sectionComponentId);
-    const lookupMethod = externalIdLookupMethods[kind];
-    if (!section || !lookupMethod) {
+    if (!section) {
         goToNotFound($state);
         return;
     }
 
-    serviceBroker.loadViewData(lookupMethod, [ extId] )
+    loadByExtId(serviceBroker, kind, extId)
         .then(r => {
-            const entity = _.first(r.data);
+            const entity = _.first(r);
             if (entity) {
                 const id = entity.id;
                 $state.go("embed.internal", {kind, id, sectionId: section.id}, { location: false });
