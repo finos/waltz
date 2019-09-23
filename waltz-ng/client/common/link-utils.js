@@ -26,26 +26,28 @@ import { toMap } from "./map-utils";
  * @type [ {<entityKind>, <uiState>}, ... ]
  */
 const stateKindTuples = [
-    {kind: "APPLICATION", state: "main.app.view"},
     {kind: "ACTOR", state: "main.actor.view"},
+    {kind: "APPLICATION", state: "main.app.view"},
     {kind: "APP_GROUP", state: "main.app-group.view"},
+    {kind: "CHANGE_INITIATIVE", state: "main.change-initiative.view"},
     {kind: "CHANGE_SET", state: "main.change-set.view"},
     {kind: "DATA_TYPE", state: "main.data-type.view"},
+    {kind: "ENTITY_STATISTIC", state: "main.entity-statistic.view"},
     {kind: "FLOW_DIAGRAM", state: "main.flow-diagram.view"},
+    {kind: "LICENCE", state: "main.licence.view"},
     {kind: "LOGICAL_DATA_ELEMENT", state: "main.logical-data-element.view"},
     {kind: "LOGICAL_DATA_FLOW", state: "main.logical-flow.view"},
     {kind: "MEASURABLE", state: "main.measurable.view"},
     {kind: "MEASURABLE_CATEGORY", state: "main.measurable-category.view"},
     {kind: "ORG_UNIT", state: "main.org-unit.view"},
-    {kind: "CHANGE_INITIATIVE", state: "main.change-initiative.view"},
-    {kind: "ENTITY_STATISTIC", state: "main.entity-statistic.view"},
     {kind: "PERSON", state: "main.person.id"},
     {kind: "PROCESS", state: "main.process.view"},
     {kind: "PHYSICAL_SPECIFICATION", state: "main.physical-specification.view"},
     {kind: "PHYSICAL_FLOW", state: "main.physical-flow.view"},
     {kind: "ROADMAP", state: "main.roadmap.view"},
     {kind: "SCENARIO", state: "main.scenario.view"},
-    {kind: "SERVER", state: "main.server.view"}
+    {kind: "SERVER", state: "main.server.view"},
+    {kind: "SERVER", state: "main.software-package.view"}
 ];
 
 

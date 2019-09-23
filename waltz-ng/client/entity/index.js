@@ -26,10 +26,13 @@ import entityHierarchyNavigator from "./components/entity-hierarchy-navigator/en
 import entityInvolvementEditor from "./components/entity-involvement-editor/entity-involvement-editor";
 import entitySelector from "./components/entity-selector/entity-selector";
 import relatedEntityEditor from "./components/related-entity-editor/related-entity-editor";
+import Routes from "./routes";
 
 
 export default () => {
     const module = angular.module("waltz.entity", []);
+
+    module.config(Routes);
 
     registerStore(module, EntitySearchStore);
 
