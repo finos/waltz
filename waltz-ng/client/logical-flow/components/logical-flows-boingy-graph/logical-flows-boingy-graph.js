@@ -23,6 +23,7 @@ import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
 
 import template from "./logical-flows-boingy-graph.html";
+import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 
 const bindings = {
     filters: "<",
@@ -126,10 +127,10 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
 
 
 function buildDecoratorFilter(options = defaultFilterOptions) {
-    const datatypeIds = _.map(options, option => Number(option.type));
+    const datatypeIds = _.map(options, option => (option.type === "ALL") ? "ALL" : Number(option.type));
     return d => {
         const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
-        const matchesDataType = options.type === "ALL" || _.includes(datatypeIds, d.decoratorEntity.id);
+        const matchesDataType = _.includes(datatypeIds, "ALL") || _.includes(datatypeIds, d.decoratorEntity.id);
         return isDataType && matchesDataType;
     };
 }
@@ -231,13 +232,16 @@ function controller($scope,
 
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
 
-        const children = _.chain(vm.allDataTypes)
-            .filter(d => d.parentId === Number(filterOptions.type))
-            .map(d => { return {
-                type: d.id,
-                scope: filterOptions.scope
-            }})
-            .value();
+        const dataTypes = buildHierarchies(vm.allDataTypes, true);
+        const node = findNode(dataTypes, Number(filterOptions.type));
+
+        const children = (node)
+            ? _.map(flattenChildren(node),
+                    d => { return {
+                        type: d.id,
+                        scope: filterOptions.scope
+                    }})
+            : [];
 
         vm.filterOptions = _.concat(filterOptions, children);
 
