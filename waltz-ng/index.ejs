@@ -56,6 +56,7 @@
 <body ng-app="waltz.app"
       ng-strict-di>
 
+
     <div id="page-loading">
         <div style="position: fixed; left: 50%; top: 50%; margin-top: -122px; margin-left: -150px;">
             <?xml version="1.0" encoding="utf-8"?>
@@ -120,7 +121,6 @@
 
     <div id="waltz-app"
          style="display:none;">
-        <waltz-common-svg-defs></waltz-common-svg-defs>
 
         <div ui-view="all">
             <div class="container-fluid waltz-body" >
@@ -145,6 +145,7 @@
             <!-- prevents page jumping caused by collapsing header -->
         </div>
     </div>
+    <waltz-common-svg-defs></waltz-common-svg-defs>
 </body>
 
 </html>
