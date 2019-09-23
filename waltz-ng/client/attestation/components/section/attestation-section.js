@@ -35,10 +35,13 @@ const bindings = {
 function mkAttestationData(attestationRuns = [], attestationInstances = []){
     const runsById = _.keyBy(attestationRuns, "id");
 
-    return _.map(attestationInstances, instance => ({
-        "instance": instance,
-        "run": runsById[instance.attestationRunId]
-    }));
+    return _.chain(attestationInstances)
+        .filter(instance => !_.isEmpty(runsById[instance.attestationRunId]))
+        .map(instance => { return {
+            "instance": instance,
+            "run": runsById[instance.attestationRunId]
+        }})
+        .value();
 }
 
 
