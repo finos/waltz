@@ -1,0 +1,38 @@
+<waltz-section name='Multiple matches' small="{{$ctrl.externalId}}">
+    <p class="help-block">
+        There are multiple matches for the external id:
+        <code ng-bind="$ctrl.externalId"></code>
+    </p>
+    <div>
+        <table class="table table-condensed">
+            <colgroup>
+                <col width="40%">
+                <col width="40%">
+                <col width="20%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Provenance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="c in $ctrl.choices track by c.id">
+                <td>
+                    <!--<pre ng-bind="match|json"></pre>-->
+                    <waltz-entity-link tooltip-placement="right"
+                                       entity-ref="c">
+                    </waltz-entity-link>
+                </td>
+                <td>
+                    <span ng-bind="c.description"></span>
+                </td>
+                <td>
+                    <span ng-bind="c.provenance"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</waltz-section>

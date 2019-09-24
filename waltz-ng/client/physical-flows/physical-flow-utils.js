@@ -75,6 +75,7 @@ export function removeEnrichments(o) {
  * @param logicals
  * @param specs
  * @param displayNameService
+ * @return Array<{ physical, logical, specification }>
  */
 export function combinePhysicalWithLogical(physicals = [],
                                     logicals = [] ,

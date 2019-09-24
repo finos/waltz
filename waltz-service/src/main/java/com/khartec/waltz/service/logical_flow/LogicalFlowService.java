@@ -117,6 +117,12 @@ public class LogicalFlowService {
     }
 
 
+    public Collection<LogicalFlow> findByIds(List<Long> ids) {
+        return logicalFlowDao.findByFlowIds(ids);
+
+    }
+
+
     public LogicalFlow getById(long flowId) {
         return logicalFlowDao.getByFlowId(flowId);
     }
@@ -362,4 +368,6 @@ public class LogicalFlowService {
 
         return logicalFlowDao.findUpstreamFlowsForEntityReferences(references);
     }
+
+
 }

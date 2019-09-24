@@ -74,6 +74,10 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/asset-code/${assetCode}`)
             .then(result => result.data);
 
+    const findByExternalId = (extId) => $http
+        .get(`${BASE}/external-id/${extId}`)
+            .then(result => result.data);
+
 
     return {
         getById,
@@ -83,6 +87,7 @@ export function store($http, BaseApiUrl) {
         findAll,
         findBySelector,
         findByAssetCode,
+        findByExternalId,
         countByOrganisationalUnit,
         registerNewApp,
         search,
