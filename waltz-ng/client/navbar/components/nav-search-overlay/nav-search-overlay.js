@@ -23,8 +23,10 @@ import {entity} from "../../../common/services/enums/entity";
 import {isDescendant} from "../../../common/browser-utils";
 
 import template from "./nav-search-overlay.html";
+import {kindToViewState} from "../../../common/link-utils";
 
 const ESCAPE_KEYCODE = 27;
+const ENTER_KEYCODE = 13;
 
 const bindings = {
     query: "@",
@@ -59,6 +61,7 @@ const initialState = {
 function controller($element,
                     $document,
                     $timeout,
+                    $state,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -154,6 +157,16 @@ function controller($element,
         vm.selectedCategory = null;
     };
 
+    function navigateToEntityIfResultContainsOnlyOne(results = []) {
+        if (results.length === 1) {
+            const result = results[0];
+            vm.visible = false;
+            $state.go(
+                kindToViewState(result.kind),
+                { id: result.id });
+        }
+    }
+
     vm.onKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
             if(vm.query) {
@@ -163,6 +176,9 @@ function controller($element,
             }
         }
         evt.stopPropagation();
+        if(evt.keyCode === ENTER_KEYCODE) {
+            navigateToEntityIfResultContainsOnlyOne(_.chain(vm.results).values().flatten().value());
+        }
     };
 
     const onOverlayKeypress = (evt) => {
@@ -182,6 +198,7 @@ controller.$inject = [
     "$element",
     "$document",
     "$timeout",
+    "$state",
     "ServiceBroker"
 ];
 
