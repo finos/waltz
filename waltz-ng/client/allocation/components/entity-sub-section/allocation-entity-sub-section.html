@@ -142,8 +142,8 @@
     <div ng-if="$ctrl.unallocated.length > 0"
          class="waess-table">
         <div class="row waess-header">
-            <div class="col-sm-8">
-                Measurable
+            <div class="col-sm-8"
+                 ng-bind="$ctrl.measurableCategory.name">
             </div>
             <div class="col-sm-4"
                  ng-if="$ctrl.editing">

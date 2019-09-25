@@ -11,6 +11,7 @@ import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifec
 const bindings = {
     entityReference: "<",
     scheme: "<",
+    measurableCategory: "<",
     allocations: "<",
     onSave: "<",
     onDismiss: "<",
