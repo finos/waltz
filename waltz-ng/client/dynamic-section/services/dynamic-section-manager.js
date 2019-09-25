@@ -18,11 +18,11 @@
  */
 
 import _ from "lodash";
-import {dynamicSectionsByKind, dynamicSections} from "../dynamic-section-definitions";
+import { dynamicSections, dynamicSectionsByKind } from "../dynamic-section-definitions";
 
 const sectionManagerSvc = {
     serviceName: "DynamicSectionManager",
-    service: ($location, $stateParams, localStorageService) => {
+    service: ($location, $state, $stateParams, accessLogStore, localStorageService) => {
         let available = [];
         let active = [];
         let kind = null;
@@ -103,6 +103,8 @@ const sectionManagerSvc = {
 
 
         function activate(d) {
+            const state = `${$state.current.name}|${d.componentId}`;
+            const infoPromise = accessLogStore.write(state, $stateParams);
             blat(
                 active,
                 _.concat([d], _.without(active, d)));
@@ -137,7 +139,9 @@ const sectionManagerSvc = {
 
 sectionManagerSvc.service.$inject = [
     "$location",
+    "$state",
     "$stateParams",
+    "AccessLogStore",
     "localStorageService"];
 
 
