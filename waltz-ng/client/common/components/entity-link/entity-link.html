@@ -1,22 +1,29 @@
 <!-- ng-href is used here so that the links get updated when entityRef changes -->
 <!-- eg: when used in a ui-grid cell template -->
-<a ng-if="$ctrl.viewUrl"
-   ng-href="{{ $ctrl.viewUrl }}"
-   ng-attr-target="{{ $ctrl.target }}"
-   class="waltz-visibility-parent">
+<span ng-if="$ctrl.entityRef">
+    <a ng-if="$ctrl.viewUrl"
+       ng-href="{{ $ctrl.viewUrl }}"
+       ng-attr-target="{{ $ctrl.target }}"
+       class="waltz-visibility-parent">
+
+        <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
+                                 icon-placement="{{$ctrl.iconPlacement}}"
+                                 tooltip-placement="{{$ctrl.tooltipPlacement}}">
+        </waltz-entity-icon-label>
+        <waltz-icon ng-if='$ctrl.target === "_blank"'
+                    class="waltz-visibility-child-30"
+                    name="external-link">
+        </waltz-icon>
+    </a>
 
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                              icon-placement="{{$ctrl.iconPlacement}}"
-                             tooltip-placement="{{$ctrl.tooltipPlacement}}">
+                             tooltip-placement="{{$ctrl.tooltipPlacement}}"
+                             ng-if="!$ctrl.viewUrl">
     </waltz-entity-icon-label>
-    <waltz-icon ng-if='$ctrl.target === "_blank"'
-                class="waltz-visibility-child-30"
-                name="external-link">
-    </waltz-icon>
-</a>
+</span>
 
-<waltz-entity-icon-label entity-ref="$ctrl.entityRef"
-                         icon-placement="{{$ctrl.iconPlacement}}"
-                         tooltip-placement="{{$ctrl.tooltipPlacement}}"
-                         ng-if="!$ctrl.viewUrl">
-</waltz-entity-icon-label>
+<span ng-if="!$ctrl.entityRef">
+    -
+</span>
+

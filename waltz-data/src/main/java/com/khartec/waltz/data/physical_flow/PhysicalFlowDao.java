@@ -20,10 +20,7 @@
 package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.data.enum_value.EnumValueDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.FrequencyKind;
 import com.khartec.waltz.model.physical_flow.ImmutablePhysicalFlow;
@@ -47,6 +44,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
@@ -111,6 +109,18 @@ public class PhysicalFlowDao {
 
     public List<PhysicalFlow> findByProducer(EntityReference ref) {
         return findByProducerEntityReferenceQuery(ref)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<PhysicalFlow> findByExternalId(String externalId) {
+        return dsl
+                .selectDistinct(PHYSICAL_FLOW.fields())
+                .from(PHYSICAL_FLOW)
+                .leftJoin(EXTERNAL_IDENTIFIER)
+                .on(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(PHYSICAL_FLOW.ID)
+                        .and(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .where(PHYSICAL_FLOW.EXTERNAL_ID.eq(externalId).or(EXTERNAL_IDENTIFIER.EXTERNAL_ID.eq(externalId)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

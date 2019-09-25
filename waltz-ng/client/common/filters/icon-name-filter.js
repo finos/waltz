@@ -23,7 +23,7 @@ function filter(iconNameService) {
 
 
 filter.$inject = [
-    'IconNameService'
+    "IconNameService"
 ];
 
 

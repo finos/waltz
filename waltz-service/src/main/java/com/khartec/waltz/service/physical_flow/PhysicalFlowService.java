@@ -127,6 +127,11 @@ public class PhysicalFlowService {
     }
 
 
+    public List<PhysicalFlow> findByExternalId(String externalId) {
+        return physicalFlowDao.findByExternalId(externalId);
+    }
+
+
     public boolean merge(long fromId, long toId) {
         EntityReference toRef = mkRef(PHYSICAL_FLOW, toId);
         EntityReference fromRef = mkRef(PHYSICAL_FLOW, fromId);

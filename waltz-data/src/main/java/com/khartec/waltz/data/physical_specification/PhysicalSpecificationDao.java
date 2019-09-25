@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -105,7 +106,8 @@ public class PhysicalSpecificationDao {
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
                 .and(LOGICAL_NOT_REMOVED);
 
-        return dsl.select(PHYSICAL_SPECIFICATION.fields())
+        return dsl
+                .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
                 .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
@@ -117,21 +119,35 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public PhysicalSpecification getById(long id) {
+    public Set<PhysicalSpecification> findByLogicalFlow(long id) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .where(PHYSICAL_SPECIFICATION.ID.eq(id))
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(id))
+                .and(PHYSICAL_FLOW_NOT_REMOVED)
+                .and(PHYSICAL_SPEC_NOT_REMOVED)
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
+        return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(ids))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+
+    public PhysicalSpecification getById(long id) {
+        return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+
     public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
-        return dsl
-                .select(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .where(PHYSICAL_SPECIFICATION.ID.in(selector))
+        return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -144,11 +160,7 @@ public class PhysicalSpecificationDao {
                         .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
                         .and(PHYSICAL_SPEC_NOT_REMOVED);
 
-        return dsl
-                .select(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .where(condition)
+        return basicSelectByCondition(condition)
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
@@ -159,7 +171,8 @@ public class PhysicalSpecificationDao {
                     val(true))
                 .otherwise(false).as("spec_used");
 
-        return dsl.select(specUsed)
+        return dsl
+                .select(specUsed)
                 .fetchOne(specUsed);
 
     }
@@ -199,16 +212,11 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public Set<PhysicalSpecification> findByLogicalFlow(long id) {
+    private SelectConditionStep<Record> basicSelectByCondition(Condition in) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(id))
-                .and(PHYSICAL_FLOW_NOT_REMOVED)
-                .and(PHYSICAL_SPEC_NOT_REMOVED)
-                .fetchSet(TO_DOMAIN_MAPPER);
+                .where(in);
     }
 }

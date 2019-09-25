@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
-import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
-import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
-import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import { calcComplexitySummary } from "../../../complexity/services/complexity-utilities";
+import { initialiseData } from "../../../common/index";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
+import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./person-summary.html";
 
@@ -54,15 +54,18 @@ function controller(serviceBroker) {
                 [ vm.parentEntityRef.id ])
             .then(r => {
                 vm.person = r.data;
-                return serviceBroker
-                    .loadAppData(
-                        CORE_API.OrgUnitStore.getById,
-                        [vm.person.organisationalUnitId]);
-            })
-            .then(r => vm.organisationalUnit = Object.assign(
-                {},
-                r.data,
-                { kind: "ORG_UNIT" }));
+
+                if(vm.person.organisationalUnitId) {
+                    return serviceBroker
+                        .loadAppData(
+                            CORE_API.OrgUnitStore.getById,
+                            [vm.person.organisationalUnitId])
+                        .then(r => vm.organisationalUnit = Object.assign(
+                            {},
+                            r.data,
+                            {kind: "ORG_UNIT"}));
+                }
+            });
 
         serviceBroker
             .loadViewData(
