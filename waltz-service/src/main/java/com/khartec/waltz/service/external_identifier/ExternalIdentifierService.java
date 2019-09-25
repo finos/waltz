@@ -1,6 +1,7 @@
 package com.khartec.waltz.service.external_identifier;
 
 import com.khartec.waltz.data.external_identifier.ExternalIdentifierDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
 import com.khartec.waltz.model.external_identifier.ImmutableExternalIdentifier;
@@ -27,6 +28,11 @@ public class ExternalIdentifierService {
 
     public Set<ExternalIdentifier> findByEntityReference(EntityReference entityRef) {
         return externalIdentifierDao.findByEntityReference(entityRef);
+    }
+
+
+    public Set<ExternalIdentifier> findByKind(EntityKind kind, String extId) {
+        return externalIdentifierDao.findByKind(kind, extId);
     }
 
 

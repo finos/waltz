@@ -182,7 +182,7 @@ public class ApplicationEndpoint implements Endpoint {
                 -> appService.findByAppIdSelector(readAppIdSelectionOptionsFromBody(request)));
 
         ListRoute<Application> findByAssetCodeRoute = ((request, response)
-                -> appService.findByAssetCode(request.params("assetCode")));
+                -> appService.findByAssetCode(request.splat()[0]));
 
         ListRoute<String> getAppTagsRoute = (request, response)
                 -> entityTagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, getId(request)));
@@ -196,7 +196,8 @@ public class ApplicationEndpoint implements Endpoint {
         postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
         getForList(mkPath(BASE_URL, "all"), findAllRoute);
         postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
-        getForList(mkPath(BASE_URL, "asset-code", ":assetCode"), findByAssetCodeRoute);
+        getForList(mkPath(BASE_URL, "asset-code", "*"), findByAssetCodeRoute);
+        getForList(mkPath(BASE_URL, "external-id", "*"), findByAssetCodeRoute);
     }
 
 }

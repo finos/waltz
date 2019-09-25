@@ -46,7 +46,9 @@ public abstract class PhysicalFlow implements
         LastAttestedProvider,
         EntityLifecycleStatusProvider,
         ExternalIdProvider,
-        WaltzEntity {
+        WaltzEntity,
+        EntityKindProvider
+{
 
     public abstract long logicalFlowId();
 
@@ -64,6 +66,11 @@ public abstract class PhysicalFlow implements
     public abstract Optional<Long> specificationDefinitionId();
 
     public abstract Criticality criticality();
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.PHYSICAL_FLOW;
+    }
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

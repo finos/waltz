@@ -35,6 +35,14 @@ export function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+
+    const findByIds = (ids = []) => {
+        return $http
+            .post(`${BASE}/ids`, ids)
+            .then(r => r.data);
+    };
+
+
     const findByEntityReference = (kind, id) => {
         const entityReference = _.isObject(kind)
             ? kind
@@ -97,6 +105,7 @@ export function store($http, BaseApiUrl) {
 
     return {
         findBySelector,
+        findByIds,
         findByEntityReference,
         findBySourceAndTargetEntityReferences,
         findUpstreamFlowsForEntityReferences,
@@ -125,6 +134,11 @@ export default {
 };
 
 export const LogicalFlowStore_API = {
+    findByIds: {
+        serviceName,
+        serviceFnName: "findByIds",
+        description: "find logical flows for a set of ids"
+    },
     findBySelector: {
         serviceName,
         serviceFnName: "findBySelector",

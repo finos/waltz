@@ -22,6 +22,7 @@ package com.khartec.waltz.data.application;
 
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.rating.RagRating;
@@ -42,6 +43,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static java.util.Optional.ofNullable;
 
@@ -237,12 +239,17 @@ public class ApplicationDao {
     }
 
 
-    public List<Application> findByAssetCode(String assetCode) {
-        checkNotNull(assetCode, "assetCode cannot be null");
+    public List<Application> findByAssetCode(String externalId) {
+        checkNotNull(externalId, "externalId cannot be null");
 
-        return dsl.select()
+        return dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
-                .where(APPLICATION.ASSET_CODE.eq(assetCode))
+                .leftJoin(EXTERNAL_IDENTIFIER)
+                .on(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(APPLICATION.ID)
+                        .and(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(APPLICATION.ASSET_CODE.eq(externalId)
+                        .or(EXTERNAL_IDENTIFIER.EXTERNAL_ID.eq(externalId)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

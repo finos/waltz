@@ -106,6 +106,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "logical-flow",
                 ":id");
 
+        String findByExternalIdPath = mkPath(
+                BASE_URL,
+                "external-id",
+                "*");
+
         String getByIdPath = mkPath(
                 BASE_URL,
                 "id",
@@ -173,6 +178,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                         .findByLogicalFlowId(
                                 getId(request));
 
+        ListRoute<PhysicalFlow> findByExternalIdRoute =
+                (request, response) -> physicalFlowService
+                        .findByExternalId(request.splat()[0]);
+
         ListRoute<PhysicalFlow> findBySelectorRoute =
                 (request, response) -> physicalFlowService
                         .findBySelector(readIdSelectionOptionsFromBody(request));
@@ -197,6 +206,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findByLogicalFlowIdPath, findByLogicalFlowIdRoute);
+        getForList(findByExternalIdPath, findByExternalIdRoute);
         getForList(searchReportsPath, searchReportsRoute);
 
 

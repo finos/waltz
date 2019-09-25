@@ -152,4 +152,9 @@ public class PhysicalSpecificationService {
     public Collection<PhysicalSpecification> findByLogicalFlow(long id) {
         return specificationDao.findByLogicalFlow(id);
     }
+
+
+    public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
+        return specificationDao.findByIds(ids);
+    }
 }
