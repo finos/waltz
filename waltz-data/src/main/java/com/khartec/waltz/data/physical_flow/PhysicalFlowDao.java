@@ -329,7 +329,8 @@ public class PhysicalFlowDao {
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
-                .where(dsl.renderInlined(isProducer));
+                .where(dsl.renderInlined(isProducer))
+                .and(PHYSICAL_FLOW_NOT_REMOVED);
     }
 
 
@@ -343,7 +344,8 @@ public class PhysicalFlowDao {
                 .from(PHYSICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
-                .where(dsl.renderInlined(matchesLogicalFlow));
+                .where(dsl.renderInlined(matchesLogicalFlow))
+                .and(PHYSICAL_FLOW_NOT_REMOVED);
     }
 
 
