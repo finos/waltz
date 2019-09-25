@@ -88,6 +88,12 @@ const sectionManagerSvc = {
                 mkStorageKey(),
                 _.map(toActivate, s => s.id));
 
+            // log component activations to access log
+            _.chain(toActivate)
+                .map(s => `${$state.current.name}|${s.componentId}`)
+                .forEach(state => accessLogStore.write(state, $stateParams))
+                .value();
+
             blat(active, toActivate);
         }
 
@@ -103,8 +109,8 @@ const sectionManagerSvc = {
 
 
         function activate(d) {
-            const state = `${$state.current.name}|${d.componentId}`;
-            const infoPromise = accessLogStore.write(state, $stateParams);
+            accessLogStore.write(`${$state.current.name}|${d.componentId}`, $stateParams);
+
             blat(
                 active,
                 _.concat([d], _.without(active, d)));
