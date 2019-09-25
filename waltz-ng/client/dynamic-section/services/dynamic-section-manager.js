@@ -18,11 +18,11 @@
  */
 
 import _ from "lodash";
-import {dynamicSectionsByKind, dynamicSections} from "../dynamic-section-definitions";
+import { dynamicSections, dynamicSectionsByKind } from "../dynamic-section-definitions";
 
 const sectionManagerSvc = {
     serviceName: "DynamicSectionManager",
-    service: ($location, $stateParams, localStorageService) => {
+    service: ($location, $state, $stateParams, accessLogStore, localStorageService) => {
         let available = [];
         let active = [];
         let kind = null;
@@ -88,6 +88,12 @@ const sectionManagerSvc = {
                 mkStorageKey(),
                 _.map(toActivate, s => s.id));
 
+            // log component activations to access log
+            _.chain(toActivate)
+                .map(s => `${$state.current.name}|${s.componentId}`)
+                .forEach(state => accessLogStore.write(state, $stateParams))
+                .value();
+
             blat(active, toActivate);
         }
 
@@ -103,6 +109,8 @@ const sectionManagerSvc = {
 
 
         function activate(d) {
+            accessLogStore.write(`${$state.current.name}|${d.componentId}`, $stateParams);
+
             blat(
                 active,
                 _.concat([d], _.without(active, d)));
@@ -137,7 +145,9 @@ const sectionManagerSvc = {
 
 sectionManagerSvc.service.$inject = [
     "$location",
+    "$state",
     "$stateParams",
+    "AccessLogStore",
     "localStorageService"];
 
 
