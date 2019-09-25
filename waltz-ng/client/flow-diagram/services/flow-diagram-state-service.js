@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {ifPresent} from "../../common";
-import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
+import { ifPresent } from "../../common";
+import { positionFor, toGraphFlow, toGraphId, toGraphNode } from "../flow-diagram-utils";
+import { toEntityRef } from "../../common/entity-utils";
 
 
 const initialState = {
@@ -305,6 +306,25 @@ export function service(
         return flowDiagramStore.updateDescription(state.diagramId, cmd);
     };
 
+    const addMissingEntityNodes = function (diagramId, entityNodes = [], applications = []) {
+        const appEntityIds = _.chain(entityNodes)
+            .filter(e => e.entityReference.kind === "APPLICATION")
+            .map(e => e.entityReference.id)
+            .value();
+
+
+        const missingEntityNodes = _.chain(applications)
+            .filter(a => !_.includes(appEntityIds, a.id))
+            .map(a => ({
+                diagramId,
+                entityReference: toEntityRef(a),
+                isNotable: false
+            }))
+            .value();
+
+        return [...entityNodes, ...missingEntityNodes];
+    };
+
     const load = (id) => {
         const diagramRef = { id: id, kind: "FLOW_DIAGRAM"};
         const diagramSelector = {
@@ -329,8 +349,8 @@ export function service(
             .all(promises)
             .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
                 state.detail.applicationsById = _.keyBy(applications, "id");
-                console.log(state)
-                restoreDiagram(processCommands, diagram, annotations, entityNodes, logicalFlows, physicalFlows);
+                const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
+                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
                 state.dirty = false;
             })
             .then(() => getState());
