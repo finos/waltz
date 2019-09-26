@@ -114,20 +114,15 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
                          appIds = [],
                          flowDecorators = []) {
 
-    const scope = _.chain(filterOptions)
-        .map(d => d.scope)
-        .first()
-        .value();
-
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
-    const scopeFilterFn = mkScopeFilterFn(appIds, scope);
+    const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
     const isolatedNodeFilterFn = mkIsolatedNodeFilterFn(isolatedNode);
     return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedNodeFilterFn(f);
 }
 
 
 function buildDecoratorFilter(options = defaultFilterOptions) {
-    const datatypeIds = _.map(options, option => (option.type === "ALL") ? "ALL" : Number(option.type));
+    const datatypeIds = _.map(options.type, id => (id === "ALL") ? "ALL" : Number(id));
     return d => {
         const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
         const matchesDataType = _.includes(datatypeIds, "ALL") || _.includes(datatypeIds, d.decoratorEntity.id);
@@ -236,14 +231,12 @@ function controller($scope,
         const node = findNode(dataTypes, Number(filterOptions.type));
 
         const children = (node)
-            ? _.map(flattenChildren(node),
-                    d => { return {
-                        type: d.id,
-                        scope: filterOptions.scope
-                    }})
+            ? _.map(flattenChildren(node),d => d.id)
             : [];
 
-        vm.filterOptions = _.concat(filterOptions, children);
+        vm.filterOptions = filterOptions;
+
+        vm.filterOptions.type = _.concat(filterOptions.type, children);
 
         if (! (vm.flows && vm.decorators)) return;
 
