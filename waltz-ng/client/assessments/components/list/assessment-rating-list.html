@@ -148,7 +148,13 @@
         <div>
             <div>
                 <strong ng-bind="item.ratingItem.name"></strong>
+                <div class="small"
+                     ng-if="item.ratingItem.description"
+                     ng-bind="item.ratingItem.description">
+                </div>
             </div>
+            <hr class="waltz-no-margins"
+                ng-if="item.rating.description">
             <span class="text-muted">
                 <waltz-markdown text="item.rating.description">
                 </waltz-markdown>
