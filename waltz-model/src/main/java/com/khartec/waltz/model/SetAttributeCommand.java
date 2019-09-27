@@ -30,6 +30,6 @@ import org.immutables.value.Value;
 public abstract class SetAttributeCommand implements Command, NameProvider {
 
     public abstract EntityReference entityReference();
-    public abstract String value();
+    public abstract Object value();
 
 }

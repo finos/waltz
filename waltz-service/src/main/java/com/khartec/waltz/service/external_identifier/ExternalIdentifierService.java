@@ -8,7 +8,9 @@ import com.khartec.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.SetUtilities.map;
@@ -56,5 +58,15 @@ public class ExternalIdentifierService {
         int[] deleteResult = externalIdentifierDao.delete(existingIdentifiersOnSource);
 
         return IntStream.of(createResult).sum() + IntStream.of(deleteResult).sum();
+    }
+
+    public int updateExternalIdentifiers(EntityReference entityRef, List<String> externalIds) {
+        Set<ExternalIdentifier> externalIdToRemove = findByEntityReference(entityRef)
+                .stream()
+                .filter(ei -> !externalIds.contains(ei.externalId()))
+                .collect(Collectors.toSet());
+
+        int[] deleteResult = externalIdentifierDao.delete(externalIdToRemove);
+        return IntStream.of(deleteResult).sum();
     }
 }
