@@ -51,6 +51,7 @@ import { EntityStatisticStore_API as EntityStatisticStore } from "../../entity-s
 import { EntityTagStore_API as EntityTagStore } from "../../entity-tags/services/entity-tag-store";
 import { EnumValueStore_API as EnumValueStore } from "../../enum-value/services/enum-value-store";
 import { EntitySvgDiagramStore_API as EntitySvgDiagramStore } from "../../entity-svg-diagram/services/entity-svg-diagram-store";
+import { ExternalIdentifierStore_API as ExternalIdentifierStore } from "../../external-identifier/services/external-identifier-store"
 import { FacetStore_API as FacetStore } from "../../facet/services/facet-store";
 import { FlowDiagramStore_API as FlowDiagramStore } from "../../flow-diagram/services/flow-diagram-store";
 import { FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore } from "../../flow-diagram/services/flow-diagram-annotation-store";
@@ -95,6 +96,7 @@ import { TechnologyStatisticsService_API as TechnologyStatisticsService } from "
 import { ThumbnailStore_API as ThumbnailStore } from "../../thumbnail/services/thumbnail-store";
 import { UserStore_API as UserStore } from "../../user/services/user-store";
 import { RoleStore_API as RoleStore } from "../../role/services/role-store";
+import {ExternalIdentifierStore_API} from "../../external-identifier/services/external-identifier-store";
 
 
 export const CORE_API = {
@@ -131,6 +133,7 @@ export const CORE_API = {
     EntityStatisticStore,
     EntityTagStore,
     EnumValueStore,
+    ExternalIdentifierStore,
     FacetStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,

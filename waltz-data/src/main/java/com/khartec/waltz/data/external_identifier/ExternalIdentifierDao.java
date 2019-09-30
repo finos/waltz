@@ -84,4 +84,12 @@ public class ExternalIdentifierDao {
                 .execute();
     }
 
+    public int delete(EntityReference entityRef, String externalId) {
+        return dsl.delete(EXTERNAL_IDENTIFIER)
+                .where(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(entityRef.kind().name()))
+                .and(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(entityRef.id()))
+                .and(EXTERNAL_IDENTIFIER.EXTERNAL_ID.eq(externalId))
+                .execute();
+    }
+
 }

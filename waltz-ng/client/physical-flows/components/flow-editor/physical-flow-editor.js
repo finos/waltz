@@ -43,6 +43,13 @@ function controller(notification, serviceBroker) {
                 [vm.parentEntityRef.id],
                 {force: true})
             .then(r => vm.physicalFlow = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.ExternalIdentifierStore.findByEntityReference,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => vm.externalIdentifiers = r.data);
     };
 
 
@@ -69,6 +76,22 @@ function controller(notification, serviceBroker) {
             })
             .catch(e => displayError(notification, "Could not update value", e))
     };
+
+    vm.removeExternalId = (externalId) => {
+        if (confirm(`Are you sure you want to delete externalId ${externalId}?`)) {
+            return serviceBroker
+                .execute(
+                    CORE_API.ExternalIdentifierStore.deleteById,
+                    [vm.parentEntityRef, encodeURIComponent(externalId)])
+                .then(() => {
+                    notification.success(`Deleted External Id ${externalId}`);
+                    return load();
+                })
+                .catch(e => displayError(notification, "Could not delete value", e))
+        }
+
+    };
+
 
     vm.onSaveCriticality = (value, ctx) => doSave('criticality', value);
     vm.onSaveFrequency = (value, ctx) => doSave('frequency', value);

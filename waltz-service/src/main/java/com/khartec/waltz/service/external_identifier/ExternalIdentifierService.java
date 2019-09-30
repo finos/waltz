@@ -69,4 +69,8 @@ public class ExternalIdentifierService {
         int[] deleteResult = externalIdentifierDao.delete(externalIdToRemove);
         return IntStream.of(deleteResult).sum();
     }
+
+    public int delete(EntityReference entityRef, String externalId) {
+        return externalIdentifierDao.delete(entityRef, externalId);
+    }
 }
