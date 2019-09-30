@@ -42,6 +42,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
@@ -68,7 +69,10 @@ public class PhysicalFlowDao {
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
                 .transport(record.getTransport())
-                .freshnessIndicator(record.getFreshnessIndicator())
+                .freshnessIndicator(readEnum(
+                        record.getFreshnessIndicator(),
+                        FreshnessIndicator.class,
+                        x -> FreshnessIndicator.NEVER_OBSERVED))
                 .specificationDefinitionId(Optional.ofNullable(record.getSpecificationDefinitionId()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
@@ -270,8 +274,8 @@ public class PhysicalFlowDao {
         record.setProvenance("waltz");
         record.setExternalId(flow.externalId().orElse(null));
 
-        record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
-        record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
+        record.setCreatedAt(flow.created().map(UserTimestamp::atTimestamp).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
+        record.setCreatedBy(flow.created().map(UserTimestamp::by).orElse(flow.lastUpdatedBy()));
 
         record.store();
         return record.getId();
