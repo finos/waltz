@@ -20,6 +20,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
@@ -38,9 +39,7 @@ import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -66,6 +65,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
     @Override
     public void register() {
         String attestInstancePath = mkPath(BASE_URL, "attest", ":id");
+        String attestEntityForUserPath = mkPath(BASE_URL, "attest-entity");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByRunIdPath = mkPath(BASE_URL, "run", ":id");
         String findUnattestedByUserPath = mkPath(BASE_URL, "unattested", "user");
@@ -99,8 +99,11 @@ public class AttestationInstanceEndpoint implements Endpoint {
             return attestationInstanceService.findPersonsByInstanceId(id);
         };
 
+        DatumRoute<Boolean> attestEntityForUserRoute =
+                (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req));
 
         postForDatum(attestInstancePath, attestInstanceRoute);
+        postForDatum(attestEntityForUserPath, attestEntityForUserRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findUnattestedByUserPath, findUnattestedByRecipientRoute);
         getForList(findAllByUserPath, findAllByRecipientRoute);
@@ -118,6 +121,11 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested orphan attestation cleanup", username);
         return attestationInstanceService.cleanupOrphans();
+    }
+
+
+    private AttestationRunCreateCommand readCreateCommand(Request req) throws java.io.IOException {
+        return readBody(req, AttestationRunCreateCommand.class);
     }
 
 }

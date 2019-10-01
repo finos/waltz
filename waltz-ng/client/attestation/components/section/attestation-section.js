@@ -113,26 +113,11 @@ function controller($q,
 
     vm.attestEntity = () => {
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
-            serviceBroker
-                .execute(
-                    CORE_API.AttestationRunStore.create, [mkCreateCommand(vm.parentEntityRef, vm.createType)])
+            return serviceBroker
+                .execute(CORE_API.AttestationInstanceStore.attestEntityForUser,
+                    [mkCreateCommand(vm.parentEntityRef, vm.createType)])
+                .then(() => notification.success("Attested successfully"))
                 .then(() => loadData())
-                .then(() => {
-                    vm.entityAttestationInstance = vm.attestations != null
-                        ?  _.find(
-                            vm.attestations,
-                            entityAttestation => entityAttestation.run.name === "Entity Attestation"
-                                && entityAttestation.instance.attestedAt == null
-                                && entityAttestation.run.attestedEntityKind === vm.createType)
-                        : null;
-                    return serviceBroker
-                        .execute(CORE_API.AttestationInstanceStore.attestInstance, [vm.entityAttestationInstance.instance.id])
-                        .then(exec => vm.entityAttestationInstance = null, () => notification.error("Failed to attest flows"))
-                        .then(() => {
-                            notification.success("Attested successfully");
-                            return loadData();
-                        });
-                })
                 .then(() => vm.setCreateType(null));
         }
     };
