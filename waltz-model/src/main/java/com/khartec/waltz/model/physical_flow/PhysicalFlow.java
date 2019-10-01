@@ -61,7 +61,10 @@ public abstract class PhysicalFlow implements
 
     public abstract String transport();
 
-    public abstract String freshnessIndicator();
+    @Value.Default
+    public FreshnessIndicator freshnessIndicator() {
+        return FreshnessIndicator.NEVER_OBSERVED;
+    }
 
     public abstract Optional<Long> specificationDefinitionId();
 
