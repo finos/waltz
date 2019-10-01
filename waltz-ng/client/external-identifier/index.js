@@ -19,9 +19,10 @@
 
 import angular from "angular";
 
-import { registerStores } from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 import * as ExternalIdentifierStore from "./services/external-identifier-store";
+import ExternalIdentifierPopover from "./components/external-identifier-popover";
 
 
 function setup() {
@@ -30,6 +31,7 @@ function setup() {
     registerStores(module, [
         ExternalIdentifierStore
     ]);
+    registerComponents(module, [ ExternalIdentifierPopover ]);
 
     return module.name;
 }

@@ -65,64 +65,14 @@
         </tr>
         <tr>
             <td class="wft-label">
-                <label>ExternalId</label>
+                <label>External Identifiers</label>
             </td>
             <td>
-                <span class="text-muted" ng-bind="$ctrl.physicalFlow.externalId"></span>
-            </td>
-        </tr>
-        <tr>
-            <td class="wft-label">
-                <label>Additional Identifiers</label>
-            </td>
-            <td>
-                <span class='waltz-clickable-definition'
-                      popover-trigger="focus"
-                      tabindex="99"
-                      [autoClose]="'outside'"
-                      popover-placement="right"
-                      popover-animation="true"
-                      popover-title="External Identifiers"
-                      uib-popover-template="'wpfe-popup-externalIdentifiers.html'">
-                    <a class="btn btn-xs waltz-visibility-child-30">
-                        <waltz-icon name="pencil"></waltz-icon>
-                        Edit
-                    </a>
-                </span>
+                <waltz-external-identifier-popover physical-flow="$ctrl.physicalFlow"
+                                                   editable=true>
+                </waltz-external-identifier-popover>
             </td>
         </tr>
     </table>
+
 </div>
-
-<!--  TEMPLATES -->
-<script type='text/ng-template' id='wpfe-popup-externalIdentifiers.html'>
-    <div>
-        <table class="table small">
-            <thead>
-                <tr>
-                    <th>External Id</th>
-                    <th>Provenance</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tr ng-repeat="item in $ctrl.externalIdentifiers">
-                <td>
-                    <span ng-bind="item.externalId"></span>
-                </td>
-                <td>
-                    <span ng-bind="item.system"></span>
-                </td>
-                <td>
-                    <span ng-click="$ctrl.removeExternalId(item.externalId)"
-                          popover-title="Delete">
-                        <waltz-icon name="trash"></waltz-icon>
-                    </span>
-                </td>
-            </tr>
-        </table>
-
-        <div class="text-muted small">
-            Remove the external id for this physical flow
-        </div>
-    </div>
-</script>
