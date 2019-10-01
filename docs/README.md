@@ -22,4 +22,4 @@ This work is licensed under a
 
 ----
 
-If you would like to contribute documentation see the [authoring] page for some guidance.
+If you would like to contribute documentation see the [Authoring](authoring.md) page for some guidance.
