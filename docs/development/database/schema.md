@@ -3,11 +3,11 @@
 ## Naming standards
 
 - Singular naming (e.g. `person` not `people`, `application` not `applications`)
-- Define tables in _Liquibase_
+- Define _everything_ in _Liquibase_
 - Use the types defined in `db.properties.xml` for defining ids, comments, enums etc.  
   - This allows us to be database independent, consistent and also make a bulk change if needed
 - Names should not exceed 30 chars
-  - In case we need to support Oracle
+  - (in case we need to support Oracle)
 - Index/Constraint(etc) names should be unique in the database
   - Restriction imposed by Postgres
 
