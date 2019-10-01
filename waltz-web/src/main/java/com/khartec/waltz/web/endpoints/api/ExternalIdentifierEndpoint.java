@@ -29,8 +29,6 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spark.Request;
-import spark.Response;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -67,12 +65,24 @@ public class ExternalIdentifierEndpoint implements Endpoint {
 
             EntityReference ref = getEntityReference(req);
             String externalId = req.params("externalId");
+            String system = req.params("system");
 
-            return externalIdentifierService.delete(ref, externalId);
+            return externalIdentifierService.delete(ref, externalId, system);
+        };
+
+        DatumRoute<Integer> createRoute = (req, resp) -> {
+            requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+
+            EntityReference ref = getEntityReference(req);
+            String externalId = req.params("externalId");
+
+            return externalIdentifierService.create(ref, externalId);
         };
 
         // delete
-        deleteForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", ":externalId"), deleteRoute);
+        deleteForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", ":externalId", ":system"), deleteRoute);
+
+        postForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", ":externalId"), createRoute);
 
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findForEntityReference);
     }

@@ -24,7 +24,6 @@ export function store($http, baseApiUrl) {
 
     const base = `${baseApiUrl}/external-identifier`;
 
-
     const findByEntityReference = (ref) => {
         checkIsEntityRef(ref);
         return $http
@@ -32,13 +31,18 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const deleteById = (ref, id) => $http
-            .delete(`${base}/entity/${ref.kind}/${ref.id}/${id}`)
+    const deleteExternalId = (ref, id, system) => $http
+            .delete(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}/${system}`)
+        .then(r => r.data);
+
+    const addExternalIdentifier = (ref, id) => $http
+        .post(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}`)
         .then(r => r.data);
 
     return {
         findByEntityReference,
-        deleteById
+        addExternalIdentifier,
+        deleteExternalId
     };
 }
 
@@ -59,9 +63,14 @@ export const ExternalIdentifierStore_API = {
         serviceFnName: "findByEntityReference",
         description: "executes findByEntityReference"
     },
-    deleteById: {
+    addExternalIdentifier: {
         serviceName,
-        serviceFnName: "deleteById",
-        description: "executes deleteById"
+        serviceFnName: "addExternalIdentifier",
+        description: "executes addExternalIdentifier"
+    },
+    deleteExternalId: {
+        serviceName,
+        serviceFnName: "deleteExternalId",
+        description: "executes deleteExternalId"
     }
 };

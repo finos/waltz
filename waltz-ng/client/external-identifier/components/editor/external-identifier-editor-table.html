@@ -1,0 +1,38 @@
+<div style="width: 100%;">
+    <table class="table table-condensed table-striped small">
+        <thead>
+        <tr>
+            <th>External Id</th>
+            <th>Provenance</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tr ng-repeat="item in $ctrl.externalIdentifiers">
+            <td>
+                <span ng-bind="item.externalId"></span>
+            </td>
+            <td>
+                <span ng-bind="item.system"></span>
+            </td>
+            <td ng-if="$ctrl.editable">
+                <span tooltip="Remove externalId" ng-click="$ctrl.removeExternalId(item)"
+                      popover-title="Delete">
+                    <waltz-icon name="trash" size="lg"></waltz-icon>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td><input type="text" ng-model="$ctrl.newExternalId"></td>
+            <td>
+                <button ng-click="$ctrl.addNewExternalId()">
+                    Add externalId
+                </button>
+<!--                <a ng-if="$ctrl.editable" ng-click="$ctrl.addNewExternalId()" class="btn btn-xs waltz-visibility-child-30">-->
+<!--                    <waltz-icon name="plus"></waltz-icon>-->
+<!--                    Add Another-->
+<!--                </a>-->
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</div>

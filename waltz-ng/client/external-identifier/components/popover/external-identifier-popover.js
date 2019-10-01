@@ -17,17 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../common/index";
+import {initialiseData} from "../../../common/index";
 import template from "./external-identifier-popover.html";
-import {CORE_API} from "../../common/services/core-api-utils";
-import {mkRef} from "../../common/entity-utils";
-import {nest} from "d3-collection";
-import {displayError} from "../../common/error-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkRef} from "../../../common/entity-utils";
 
 
 const bindings = {
-    physicalFlow: "<",
-    editable: "@"
+    physicalFlow: "<"
 };
 
 
@@ -40,14 +37,10 @@ function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const load = () => {
-        console.log("loading data", vm.physicalFlow);
-        // debugger
-        console.log("editable ", vm.editable);
         serviceBroker
             .loadViewData(
                 CORE_API.ExternalIdentifierStore.findByEntityReference,
-                [vm.entityRef],
-                {force: vm.editable === "true"})
+                [vm.entityRef])
             .then(r => vm.externalIdentifiers = r.data);
     };
 
@@ -56,22 +49,6 @@ function controller(notification, serviceBroker) {
             vm.entityRef = mkRef(vm.physicalFlow.kind, vm.physicalFlow.id);
             load();
         }
-    };
-
-
-    vm.removeExternalId = (externalId) => {
-        if (confirm(`Are you sure you want to delete externalId ${externalId}?`)) {
-            return serviceBroker
-                .execute(
-                    CORE_API.ExternalIdentifierStore.deleteById,
-                    [vm.entityRef, encodeURIComponent(externalId)])
-                .then(() => {
-                    notification.success(`Deleted External Id ${externalId}`);
-                    return load();
-                })
-                .catch(e => displayError(notification, "Could not delete value", e))
-        }
-
     };
 }
 

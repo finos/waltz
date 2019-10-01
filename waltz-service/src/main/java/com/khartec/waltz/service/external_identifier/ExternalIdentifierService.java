@@ -70,7 +70,25 @@ public class ExternalIdentifierService {
         return IntStream.of(deleteResult).sum();
     }
 
-    public int delete(EntityReference entityRef, String externalId) {
-        return externalIdentifierDao.delete(entityRef, externalId);
+    public int delete(EntityReference entityRef,
+                      String externalId,
+                      String provenance) {
+        ImmutableExternalIdentifier externalIdentifier = ImmutableExternalIdentifier
+                .builder()
+                .externalId(externalId)
+                .entityReference(entityRef)
+                .system(provenance)
+                .build();
+        return externalIdentifierDao.delete(externalIdentifier);
+    }
+
+    public int create(EntityReference entityRef, String externalId) {
+        ImmutableExternalIdentifier externalIdentifier = ImmutableExternalIdentifier
+                .builder()
+                .externalId(externalId)
+                .entityReference(entityRef)
+                .system("waltz")
+                .build();
+        return externalIdentifierDao.create(externalIdentifier);
     }
 }

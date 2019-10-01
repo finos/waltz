@@ -1,0 +1,40 @@
+<span ng-if="$ctrl.externalIdentifiers.length > 0">
+    <span class='waltz-clickable-definition'
+          popover-trigger="focus"
+          name="externalIdentifierPopup"
+          tabindex="99"
+          popover-class="waltz-popover-width-700"
+          popover-placement="right"
+          popover-animation="true"
+          popover-append-to-body="true"
+          popover-title="Additional External Identifiers"
+          uib-popover-template="'wpfe-popup-externalIdentifiers.html'">
+            <span ng-bind="$ctrl.physicalFlow.externalId"></span>
+    </span>
+</span>
+<span ng-if="$ctrl.externalIdentifiers.length == 0"
+      ng-bind="$ctrl.physicalFlow.externalId">
+</span>
+
+
+<!--  TEMPLATES -->
+<script type='text/ng-template' id='wpfe-popup-externalIdentifiers.html'>
+    <div style="width: 100%;">
+        <table class="table table-condensed table-striped small">
+            <thead>
+            <tr>
+                <th>External Id</th>
+                <th>Provenance</th>
+            </tr>
+            </thead>
+            <tr ng-repeat="item in $ctrl.externalIdentifiers">
+                <td>
+                    <span ng-bind="item.externalId"></span>
+                </td>
+                <td>
+                    <span ng-bind="item.system"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</script>
