@@ -21,15 +21,14 @@ package com.khartec.waltz.service.software_catalog;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
 import com.khartec.waltz.data.software_catalog.SoftwareUsageDao;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.*;
 import com.khartec.waltz.model.tally.Tally;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +37,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
-import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 
 @Service
 public class SoftwareCatalogService {
@@ -46,20 +44,17 @@ public class SoftwareCatalogService {
     private final SoftwarePackageDao softwarePackageDao;
     private final SoftwareUsageDao softwareUsageDao;
     private final ApplicationIdSelectorFactory factory = new ApplicationIdSelectorFactory();
-    private final DSLContext dsl;
 
 
     @Autowired
     public SoftwareCatalogService(SoftwarePackageDao softwarePackageDao,
-                                  SoftwareUsageDao softwareUsageDao,
-                                  DSLContext dsl) {
+                                  SoftwareUsageDao softwareUsageDao) {
 
         Checks.checkNotNull(softwarePackageDao, "softwarePackageDao cannot be null");
         Checks.checkNotNull(softwareUsageDao, "softwareUsageDao cannot be null");
 
         this.softwarePackageDao = softwarePackageDao;
         this.softwareUsageDao = softwareUsageDao;
-        this.dsl = dsl;
     }
 
 
@@ -78,26 +73,12 @@ public class SoftwareCatalogService {
     }
 
 
-    private List<Tally<String>> toTallies(Condition condition, Field groupingField) {
-        return dsl
-                .select(groupingField, DSL.count(groupingField))
-                .from(SOFTWARE_PACKAGE)
-                .innerJoin(SOFTWARE_USAGE)
-                .on(SOFTWARE_PACKAGE.ID.eq(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID))
-                .where(dsl.renderInlined(condition))
-                .groupBy(groupingField)
-                .fetch(JooqUtilities.TO_STRING_TALLY);
-    }
-
-
     public SoftwareSummaryStatistics calculateStatisticsForAppIdSelector(ApplicationIdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
-        Condition condition = SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector);
-
-        List<Tally<String>> vendorCounts = toTallies(condition, SOFTWARE_PACKAGE.VENDOR);
-        List<Tally<String>> maturityCounts = toTallies(condition, SOFTWARE_PACKAGE.MATURITY_STATUS);
+        List<Tally<String>> vendorCounts = softwarePackageDao.toTallies(appIdSelector, SOFTWARE_PACKAGE.VENDOR);
+        List<Tally<String>> maturityCounts = softwarePackageDao.toTallies(appIdSelector, SOFTWARE_PACKAGE.MATURITY_STATUS);
 
         return ImmutableSoftwareSummaryStatistics.builder()
                 .vendorCounts(vendorCounts)
