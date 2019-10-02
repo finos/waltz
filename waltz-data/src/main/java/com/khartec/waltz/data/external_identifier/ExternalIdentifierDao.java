@@ -57,9 +57,11 @@ public class ExternalIdentifierDao {
                 .execute();
     }
 
+
     public int create(ExternalIdentifier externalIdentifier) {
         return dsl.executeInsert(TO_RECORD_MAPPER.apply(externalIdentifier));
     }
+
 
     public Set<ExternalIdentifier> findByEntityReference(EntityReference entityRef) {
         return dsl
@@ -87,9 +89,9 @@ public class ExternalIdentifierDao {
                 .execute();
     }
 
+
     public int delete(ExternalIdentifier externalIdentifier) {
         return dsl.executeDelete(TO_RECORD_MAPPER.apply(externalIdentifier));
     }
-
 
 }

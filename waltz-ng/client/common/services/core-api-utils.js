@@ -96,7 +96,6 @@ import { TechnologyStatisticsService_API as TechnologyStatisticsService } from "
 import { ThumbnailStore_API as ThumbnailStore } from "../../thumbnail/services/thumbnail-store";
 import { UserStore_API as UserStore } from "../../user/services/user-store";
 import { RoleStore_API as RoleStore } from "../../role/services/role-store";
-import {ExternalIdentifierStore_API} from "../../external-identifier/services/external-identifier-store";
 
 
 export const CORE_API = {

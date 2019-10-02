@@ -41,10 +41,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
@@ -367,33 +368,23 @@ public class PhysicalFlowService {
         long flowId = command.entityReference().id();
         switch(command.name()) {
             case "criticality":
-                return physicalFlowDao.updateCriticality(flowId, Criticality.valueOf(getValueAsString(command)));
+                return physicalFlowDao.updateCriticality(flowId, Criticality.valueOf(command.value()));
             case "frequency":
-                return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(getValueAsString(command)));
+                return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(command.value()));
             case "transport":
-                return physicalFlowDao.updateTransport(flowId, getValueAsString(command));
+                return physicalFlowDao.updateTransport(flowId, command.value());
             case "basisOffset":
-                return physicalFlowDao.updateBasisOffset(flowId, Integer.parseInt(getValueAsString(command)));
+                return physicalFlowDao.updateBasisOffset(flowId, Integer.parseInt(command.value()));
             case "description":
-                return physicalFlowDao.updateDescription(flowId, getValueAsString(command));
+                return physicalFlowDao.updateDescription(flowId, command.value());
             case "entity_lifecycle_status":
-                return physicalFlowDao.updateEntityLifecycleStatus(flowId, EntityLifecycleStatus.valueOf(getValueAsString(command)));
-            case "external-identifiers":
-                checkTrue(command.value() instanceof List, "external identifiers should be a list");
-                return externalIdentifierService.updateExternalIdentifiers(
-                        command.entityReference(),
-                        (List) command.value());
+                return physicalFlowDao.updateEntityLifecycleStatus(flowId, EntityLifecycleStatus.valueOf(command.value()));
             default:
                 String errMsg = String.format(
                         "Cannot update attribute %s on flow as unknown attribute name",
                         command.name());
                 throw new UnsupportedOperationException(errMsg);
         }
-    }
-
-    private String getValueAsString(SetAttributeCommand command) {
-        checkTrue(command.value() instanceof String, "The attribute value should be string");
-        return command.value().toString();
     }
 
 }

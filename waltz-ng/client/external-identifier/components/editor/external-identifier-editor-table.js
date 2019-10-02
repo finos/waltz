@@ -40,9 +40,6 @@ function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const load = () => {
-        console.log("loading data", vm.physicalFlow);
-        // debugger
-        console.log("editable ", vm.editable);
         serviceBroker
             .loadViewData(
                 CORE_API.ExternalIdentifierStore.findByEntityReference,
@@ -62,7 +59,7 @@ function controller(notification, serviceBroker) {
         if (confirm(`Are you sure you want to delete externalId ${externalIdentifier.externalId}?`)) {
             return serviceBroker
                 .execute(
-                    CORE_API.ExternalIdentifierStore.deleteExternalId,
+                    CORE_API.ExternalIdentifierStore.deleteExternalIdentifier,
                     [vm.entityRef,
                         encodeURIComponent(externalIdentifier.externalId),
                         externalIdentifier.system
@@ -77,16 +74,17 @@ function controller(notification, serviceBroker) {
     };
 
     vm.addNewExternalId = () => {
-        console.log("adding new externalId ", vm.newExternalId);
-        return serviceBroker
-            .execute(
-                CORE_API.ExternalIdentifierStore.addExternalIdentifier,
-                [vm.entityRef, encodeURIComponent(vm.newExternalId)])
-            .then(() => {
-                notification.success(`Added External Id ${vm.newExternalId}`);
-                vm.newExternalId = null;
-                load();
-            })
+        if(!_.isEmpty(vm.newExternalId)) {
+            return serviceBroker
+                .execute(
+                    CORE_API.ExternalIdentifierStore.addExternalIdentifier,
+                    [vm.entityRef, encodeURIComponent(vm.newExternalId)])
+                .then(() => {
+                    notification.success(`Added External Id ${vm.newExternalId}`);
+                    vm.newExternalId = null;
+                    load();
+                })
+        }
     }
 }
 

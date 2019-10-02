@@ -55,10 +55,12 @@ public class ExternalIdentifierEndpoint implements Endpoint {
 
     @Override
     public void register() {
+
         ListRoute<ExternalIdentifier> findForEntityReference = (req, resp) -> {
             EntityReference ref = getEntityReference(req);
             return externalIdentifierService.findByEntityReference(ref);
         };
+
 
         DatumRoute<Integer> deleteRoute = (req, resp) -> {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
@@ -70,6 +72,7 @@ public class ExternalIdentifierEndpoint implements Endpoint {
             return externalIdentifierService.delete(ref, externalId, system);
         };
 
+
         DatumRoute<Integer> createRoute = (req, resp) -> {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
@@ -78,6 +81,7 @@ public class ExternalIdentifierEndpoint implements Endpoint {
 
             return externalIdentifierService.create(ref, externalId);
         };
+
 
         // delete
         deleteForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", ":externalId", ":system"), deleteRoute);

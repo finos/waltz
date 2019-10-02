@@ -8,17 +8,22 @@
           popover-animation="true"
           popover-append-to-body="true"
           popover-title="Additional External Identifiers"
-          uib-popover-template="'wpfe-popup-externalIdentifiers.html'">
-            <span ng-bind="$ctrl.physicalFlow.externalId"></span>
+          uib-popover-template="'weip-popup-externalIdentifiers.html'">
+        <span ng-if="$ctrl.physicalFlow.externalId"
+              ng-bind="$ctrl.physicalFlow.externalId">
+        </span>
+        <span ng-if="!$ctrl.physicalFlow.externalId" class="text-muted">
+            - ( {{$ctrl.externalIdentifiers.length}} additional identifier)
+        </span>
     </span>
 </span>
-<span ng-if="$ctrl.externalIdentifiers.length == 0"
-      ng-bind="$ctrl.physicalFlow.externalId">
+<span ng-if="$ctrl.externalIdentifiers.length == 0">
+    <span ng-bind="$ctrl.physicalFlow.externalId"></span>
 </span>
 
 
 <!--  TEMPLATES -->
-<script type='text/ng-template' id='wpfe-popup-externalIdentifiers.html'>
+<script type='text/ng-template' id='weip-popup-externalIdentifiers.html'>
     <div style="width: 100%;">
         <table class="table table-condensed table-striped small">
             <thead>

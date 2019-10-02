@@ -60,16 +60,6 @@ public class ExternalIdentifierService {
         return IntStream.of(createResult).sum() + IntStream.of(deleteResult).sum();
     }
 
-    public int updateExternalIdentifiers(EntityReference entityRef, List<String> externalIds) {
-        Set<ExternalIdentifier> externalIdToRemove = findByEntityReference(entityRef)
-                .stream()
-                .filter(ei -> !externalIds.contains(ei.externalId()))
-                .collect(Collectors.toSet());
-
-        int[] deleteResult = externalIdentifierDao.delete(externalIdToRemove);
-        return IntStream.of(deleteResult).sum();
-    }
-
     public int delete(EntityReference entityRef,
                       String externalId,
                       String provenance) {
@@ -81,6 +71,7 @@ public class ExternalIdentifierService {
                 .build();
         return externalIdentifierDao.delete(externalIdentifier);
     }
+
 
     public int create(EntityReference entityRef, String externalId) {
         ImmutableExternalIdentifier externalIdentifier = ImmutableExternalIdentifier

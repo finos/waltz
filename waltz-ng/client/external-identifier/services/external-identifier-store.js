@@ -31,8 +31,8 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const deleteExternalId = (ref, id, system) => $http
-            .delete(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}/${system}`)
+    const deleteExternalIdentifier = (ref, id, system) => $http
+        .delete(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}/${system}`)
         .then(r => r.data);
 
     const addExternalIdentifier = (ref, id) => $http
@@ -42,7 +42,7 @@ export function store($http, baseApiUrl) {
     return {
         findByEntityReference,
         addExternalIdentifier,
-        deleteExternalId
+        deleteExternalIdentifier
     };
 }
 
@@ -56,7 +56,6 @@ store.$inject = [
 export const serviceName = "ExternalIdentifierStore";
 
 
-
 export const ExternalIdentifierStore_API = {
     findByEntityReference: {
         serviceName,
@@ -68,9 +67,9 @@ export const ExternalIdentifierStore_API = {
         serviceFnName: "addExternalIdentifier",
         description: "executes addExternalIdentifier"
     },
-    deleteExternalId: {
+    deleteExternalIdentifier: {
         serviceName,
-        serviceFnName: "deleteExternalId",
-        description: "executes deleteExternalId"
+        serviceFnName: "deleteExternalIdentifier",
+        description: "executes deleteExternalIdentifier"
     }
 };
