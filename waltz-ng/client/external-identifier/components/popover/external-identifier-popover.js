@@ -29,7 +29,6 @@ const bindings = {
 
 
 const initialState = {
-    editable: false
 };
 
 

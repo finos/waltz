@@ -1,10 +1,10 @@
-<div style="width: 100%;">
+<div style="width: 50%;" ng-if="$ctrl.externalIdentifiers.length > 0">
     <table class="table table-condensed table-striped small">
         <thead>
         <tr>
             <th>External Id</th>
             <th>Provenance</th>
-            <th></th>
+            <th ng-if="$ctrl.editable"></th>
         </tr>
         </thead>
         <tr ng-repeat="item in $ctrl.externalIdentifiers">
@@ -21,7 +21,7 @@
                 </span>
             </td>
         </tr>
-        <tr>
+        <tr ng-if="$ctrl.editable">
             <td>
                 <input type="text" ng-model="$ctrl.newExternalId">
             </td>

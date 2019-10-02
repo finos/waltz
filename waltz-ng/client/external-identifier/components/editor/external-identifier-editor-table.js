@@ -26,7 +26,7 @@ import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     physicalFlow: "<",
-    editable: "@"
+    editable: "<"
 };
 
 
@@ -44,7 +44,7 @@ function controller(notification, serviceBroker) {
             .loadViewData(
                 CORE_API.ExternalIdentifierStore.findByEntityReference,
                 [vm.entityRef],
-                {force: vm.editable === "true"})
+                {force: vm.editable})
             .then(r => vm.externalIdentifiers = r.data);
     };
 
