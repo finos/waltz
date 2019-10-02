@@ -20,14 +20,13 @@
 package com.khartec.waltz.data.software_catalog;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
 import com.khartec.waltz.model.software_catalog.MaturityStatus;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
+import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
+import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 
 @Repository
 public class SoftwarePackageDao {
@@ -134,6 +134,21 @@ public class SoftwarePackageDao {
                 .from(SOFTWARE_PACKAGE)
                 .where(condition)
                 .fetch(TO_DOMAIN);
+    }
+
+
+    public List<Tally<String>> toTallies(Select<Record1<Long>> appIdSelector, Field groupingField) {
+
+        Condition condition = SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector);
+
+        return dsl
+                .select(groupingField, DSL.count(groupingField))
+                .from(SOFTWARE_PACKAGE)
+                .innerJoin(SOFTWARE_USAGE)
+                .on(SOFTWARE_PACKAGE.ID.eq(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID))
+                .where(dsl.renderInlined(condition))
+                .groupBy(groupingField)
+                .fetch(JooqUtilities.TO_STRING_TALLY);
     }
 
 }
