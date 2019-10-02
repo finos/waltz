@@ -69,7 +69,7 @@ public class ExternalIdentifierEndpoint implements Endpoint {
             String externalId = req.params("externalId");
             String system = req.params("system");
 
-            return externalIdentifierService.delete(ref, externalId, system);
+            return externalIdentifierService.delete(ref, externalId, system, getUsername(req));
         };
 
 
@@ -79,7 +79,7 @@ public class ExternalIdentifierEndpoint implements Endpoint {
             EntityReference ref = getEntityReference(req);
             String externalId = req.params("externalId");
 
-            return externalIdentifierService.create(ref, externalId);
+            return externalIdentifierService.create(ref, externalId, getUsername(req));
         };
 
 

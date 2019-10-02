@@ -84,6 +84,7 @@ function controller(notification, serviceBroker) {
                     vm.newExternalId = null;
                     load();
                 })
+                .catch(e => displayError(notification, "Could not add value", e))
         }
     }
 }
