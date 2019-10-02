@@ -266,13 +266,20 @@ public class DataTypeUsageDao {
                     UsageKind.ORIGINATOR.name(),
                     UsageKind.DISTRIBUTOR.name());
 
-            // clear usages
+            // clear calculated usages
             tx.deleteFrom(DATA_TYPE_USAGE)
                     .where(isCalculatedUsageKind)
                     .and(DATA_TYPE_USAGE.DESCRIPTION.eq(""))
                     .and(DATA_TYPE_USAGE.ENTITY_ID.in(idSelector))
                     .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(kind.name()))
                     .execute();
+
+            // clear usages where the datatype is not tied to an active logical flow
+            List<DataTypeUsageRecord> recordsToDelete = findAllNonActiveDataTypeUsages(tx, kind, idSelector);
+            tx.batchDelete(recordsToDelete)
+                    .execute();
+
+
 
             // mark commented usages inactive
             tx.update(DATA_TYPE_USAGE)
@@ -301,6 +308,59 @@ public class DataTypeUsageDao {
         return true;
 
     }
+
+
+    private List<DataTypeUsageRecord> findAllNonActiveDataTypeUsages(DSLContext tx,
+                                                                     EntityKind kind,
+                                                                     Select<Record1<Long>> idSelector) {
+        Field<String> entityKind = field("entity_kind", String.class);
+        Field<Long> entityId = field("entity_id", Long.class);
+        Field<Long> dataTypeId = field("data_type_id", Long.class);
+
+        SelectConditionStep<Record3<String, Long, Long>> logicalSourcesWithDataTypes = tx.select(
+                LOGICAL_FLOW.SOURCE_ENTITY_KIND.as(entityKind),
+                LOGICAL_FLOW.SOURCE_ENTITY_ID.as(entityId),
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.as(dataTypeId)
+        )
+        .from(LOGICAL_FLOW_DECORATOR)
+        .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+        .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+        .and(LOGICAL_FLOW.IS_REMOVED.isFalse().and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
+        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(idSelector))
+        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(kind.name()));
+
+
+        SelectConditionStep<Record3<String, Long, Long>> logicalTargetsWithDataTypes = tx.select(
+                LOGICAL_FLOW.TARGET_ENTITY_KIND.as(entityKind),
+                LOGICAL_FLOW.TARGET_ENTITY_ID.as(entityId),
+                LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.as(dataTypeId)
+        )
+        .from(LOGICAL_FLOW_DECORATOR)
+        .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+        .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+        .and(LOGICAL_FLOW.IS_REMOVED.isFalse().and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
+        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(idSelector))
+        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(kind.name()));
+
+        SelectOrderByStep<Record3<String, Long, Long>> refsWithActiveFlowDataTypes = logicalSourcesWithDataTypes
+                .union(logicalTargetsWithDataTypes);
+
+        SelectConditionStep<Record> dataTypeUsagesThatNeedDeleting = tx.select(DATA_TYPE_USAGE.fields())
+                .from(DATA_TYPE_USAGE)
+                .leftOuterJoin(refsWithActiveFlowDataTypes)
+                .on(DATA_TYPE_USAGE.ENTITY_KIND.eq(refsWithActiveFlowDataTypes.field(entityKind)))
+                .and(DATA_TYPE_USAGE.ENTITY_ID.eq(refsWithActiveFlowDataTypes.field(entityId)))
+                .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(refsWithActiveFlowDataTypes.field(dataTypeId)))
+                .where(refsWithActiveFlowDataTypes.field(entityId).isNull())
+                .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(kind.name()))
+                .and(DATA_TYPE_USAGE.ENTITY_ID.in(idSelector));
+
+        return dataTypeUsagesThatNeedDeleting
+                .fetch()
+                .map(r -> r.into(DATA_TYPE_USAGE));
+    }
+
+
 
     private void insertUsages(DSLContext tx,
                               Select<Record7<Long, String, Long, String, String, String, Boolean>> usagesSelector) {
