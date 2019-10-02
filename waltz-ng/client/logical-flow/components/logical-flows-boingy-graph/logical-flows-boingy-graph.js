@@ -18,11 +18,12 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
 
 import template from "./logical-flows-boingy-graph.html";
+import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 
 const bindings = {
     filters: "<",
@@ -112,6 +113,7 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
                          isolatedNode,
                          appIds = [],
                          flowDecorators = []) {
+
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
     const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
     const isolatedNodeFilterFn = mkIsolatedNodeFilterFn(isolatedNode);
@@ -120,9 +122,10 @@ function buildFlowFilter(filterOptions = defaultFilterOptions,
 
 
 function buildDecoratorFilter(options = defaultFilterOptions) {
+    const datatypeIds = _.map(options.type, id => (id === "ALL") ? "ALL" : Number(id));
     return d => {
         const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
-        const matchesDataType = options.type === "ALL" || d.decoratorEntity.id === Number(options.type);
+        const matchesDataType = _.includes(datatypeIds, "ALL") || _.includes(datatypeIds, d.decoratorEntity.id);
         return isDataType && matchesDataType;
     };
 }
@@ -223,7 +226,17 @@ function controller($scope,
     };
 
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
+
+        const dataTypes = buildHierarchies(vm.allDataTypes, true);
+        const node = findNode(dataTypes, Number(filterOptions.type));
+
+        const children = (node)
+            ? _.map(flattenChildren(node),d => d.id)
+            : [];
+
         vm.filterOptions = filterOptions;
+
+        vm.filterOptions.type = _.concat(filterOptions.type, children);
 
         if (! (vm.flows && vm.decorators)) return;
 
@@ -231,7 +244,7 @@ function controller($scope,
             vm.flows,
             vm.applications,
             vm.decorators,
-            filterOptions,
+            vm.filterOptions,
             vm.isolatedNode);
 
         vm.graphTweakers = prepareGraphTweakers(
