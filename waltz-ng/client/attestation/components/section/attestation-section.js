@@ -113,26 +113,11 @@ function controller($q,
 
     vm.attestEntity = () => {
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
-            serviceBroker
-                .execute(
-                    CORE_API.AttestationRunStore.create, [mkCreateCommand(vm.parentEntityRef, vm.createType)])
+            return serviceBroker
+                .execute(CORE_API.AttestationInstanceStore.attestEntityForUser,
+                    [mkCreateCommand(vm.parentEntityRef, vm.createType)])
+                .then(() => notification.success("Attested successfully"))
                 .then(() => loadData())
-                .then(() => {
-                    vm.entityAttestationInstance = vm.attestations != null
-                        ?  _.find(
-                            vm.attestations,
-                            entityAttestation => entityAttestation.run.name === "Entity Attestation"
-                                && entityAttestation.instance.attestedAt == null
-                                && entityAttestation.run.attestedEntityKind === vm.createType)
-                        : null;
-                    return serviceBroker
-                        .execute(CORE_API.AttestationInstanceStore.attestInstance, [vm.entityAttestationInstance.instance.id])
-                        .then(exec => vm.entityAttestationInstance = null, () => notification.error("Failed to attest flows"))
-                        .then(() => {
-                            notification.success("Attested successfully");
-                            return loadData();
-                        });
-                })
                 .then(() => vm.setCreateType(null));
         }
     };
@@ -145,22 +130,9 @@ function controller($q,
 
 function mkCreateCommand(parentEntityRef, entityKind){
 
-    const now = new Date(Date.now());
-    const sixMonthsAhead = new Date(now.getFullYear() , now.getMonth() + 6, now.getDate()).toISOString();
-
     return {
-        name: "Entity Attestation",
-        description: "Attests that all flows are present and correct for this entity",
-        selectionOptions: {
-            entityReference: parentEntityRef,
-            scope: "EXACT"
-        },
-        targetEntityKind: "APPLICATION",
-        attestedEntityKind: entityKind,
-        attestedEntityId: null,
-        involvementKindIds: null,
-        dueDate: sixMonthsAhead
-    };
+        entityReference: parentEntityRef,
+        attestedEntityKind: entityKind};
 }
 
 

@@ -21,26 +21,30 @@ package com.khartec.waltz.service.attestation;
 
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.first;
+import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 
 
 @Service
 public class AttestationInstanceService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AttestationInstanceService.class);
 
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationRunService attestationRunService;
@@ -124,4 +128,44 @@ public class AttestationInstanceService {
                 .build());
     }
 
+
+    public boolean attestForEntity(String username, AttestEntityCommand createCommand) throws Exception {
+
+        List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
+                .findForEntityByRecipient(
+                        createCommand,
+                        username,
+                        true);
+
+        if (notEmpty(instancesForEntityForUser)){
+            instancesForEntityForUser
+                    .forEach(attestation -> {
+                        try {
+                            Long instanceId = getInstanceId(attestation);
+                            attestInstance(instanceId, username);
+                        } catch (Exception e) {
+                            LOG.error("Failed to attest instance", e);
+                        }
+                    });
+
+            return true;
+        } else {
+            IdCommandResponse idCommandResponse = attestationRunService.createRunForEntity(username, createCommand);
+            Long runId = getRunId(idCommandResponse);
+
+            Long instanceId = getInstanceId(first(findByRunId(runId)));
+            return attestInstance(instanceId, username);
+        }
+    }
+
+    private Long getRunId(IdCommandResponse idCommandResponse) throws Exception {
+        return idCommandResponse.id()
+                        .orElseThrow(() -> new Exception("Unable to find attestation instance"));
+    }
+
+    private Long getInstanceId(AttestationInstance attestation) throws Exception {
+        return attestation
+                .id()
+                .orElseThrow(() -> new Exception("Unable to attest instance for this entity"));
+    }
 }

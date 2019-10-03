@@ -35,6 +35,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,10 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -235,12 +239,28 @@ public class AttestationRunService {
                     long instanceId = attestationInstanceDao.create(k);
 
                     // create recipients for the instance
-                    v.stream()
-                            .forEach(r -> attestationInstanceRecipientDao.create(instanceId, r.userId()));
+                    v.forEach(r -> attestationInstanceRecipientDao.create(instanceId, r.userId()));
                 }
         );
     }
 
 
+    public IdCommandResponse createRunForEntity(String username, AttestEntityCommand entityRunCreateCommand) {
+        return create(username, mkCreateCommand(entityRunCreateCommand));
+    }
 
+
+    private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
+        return ImmutableAttestationRunCreateCommand.builder()
+                .name("Entity Attestation")
+                .description("Attests that all flows are present and correct for this entity")
+                .targetEntityKind(EntityKind.APPLICATION)
+                .selectionOptions(mkOpts(createCommand.entityReference()))
+                .involvementKindIds(asSet())
+                .attestedEntityKind(createCommand.attestedEntityKind())
+                .attestedEntityId(empty())
+                .issuedOn(LocalDate.now())
+                .dueDate(LocalDate.now().plusMonths(6))
+                .build();
+    }
 }

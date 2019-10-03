@@ -23,6 +23,7 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.ImmutableAttestationInstance;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
@@ -38,8 +39,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE;
-import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE_RECIPIENT;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
@@ -195,5 +195,27 @@ public class AttestationInstanceDao {
                 .execute();
 
         return numberOfInstancesDeleted;
+    }
+
+
+    public List<AttestationInstance> findForEntityByRecipient(AttestEntityCommand command, String userId, boolean unattestedOnly) {
+        Condition maybeUnattestedOnlyCondition = unattestedOnly
+                ? ATTESTATION_INSTANCE.ATTESTED_AT.isNull()
+                : DSL.trueCondition();
+
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
+                .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
+                .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(command.attestedEntityKind().name())
+                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(command.entityReference().id()))
+                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(command.entityReference().kind().name())))
+                .and(maybeUnattestedOnlyCondition)
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }
