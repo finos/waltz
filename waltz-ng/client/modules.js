@@ -75,6 +75,7 @@ import EntityTags from "./entity-tags";
 import EnumValue from "./enum-value";
 import Examples from "./examples";
 import Extensions from "./extensions";
+import ExternalIdentifier from "./external-identifier";
 import Facet from "./facet";
 import FlowDiagram from "./flow-diagram";
 import Formly from "./formly";
@@ -181,6 +182,7 @@ const dependencies = [
     EnumValue(),
     Examples(),
     Extensions(),
+    ExternalIdentifier(),
     Facet(),
     FlowDiagram(),
     Formly(),

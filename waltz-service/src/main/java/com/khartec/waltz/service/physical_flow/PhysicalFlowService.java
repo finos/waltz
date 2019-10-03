@@ -132,13 +132,21 @@ public class PhysicalFlowService {
     }
 
 
-    public boolean merge(long fromId, long toId) {
+    public boolean merge(long fromId, long toId, String username) {
         EntityReference toRef = mkRef(PHYSICAL_FLOW, toId);
         EntityReference fromRef = mkRef(PHYSICAL_FLOW, fromId);
 
         int moveCount = externalIdentifierService.merge(fromRef, toRef);
         int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
 
+        if(updateStatus > 0) {
+            logChange(username,
+                    toRef,
+                    String.format("Merged physical flow %s to: %s",
+                            fromRef.id(),
+                            toRef.id()),
+                    Operation.UPDATE);
+        }
         return updateStatus + moveCount > 0;
     }
 
