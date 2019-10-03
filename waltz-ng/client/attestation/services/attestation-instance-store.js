@@ -27,6 +27,12 @@ export function store($http, baseApiUrl) {
             .post(`${base}/attest/${id}`);
     };
 
+    const attestEntityForUser = (cmd) => {
+        return $http
+            .post(`${base}/attest-entity`, cmd)
+            .then(r => r.data);
+    };
+
     const findByRunId = (id) => {
         return $http
             .get(`${base}/run/${id}`)
@@ -68,6 +74,7 @@ export function store($http, baseApiUrl) {
 
     return {
         attestInstance,
+        attestEntityForUser,
         findByRunId,
         findByUser,
         findHistoricalForPendingByUser,
@@ -92,6 +99,11 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: 'attestInstance',
         description: 'create an attestation'
+    },
+    attestEntityForUser: {
+        serviceName,
+        serviceFnName: 'attestEntityForUser',
+        description: 'attest existing/create new attestation for user'
     },
     findByRunId: {
         serviceName,
