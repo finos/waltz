@@ -19,8 +19,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
-import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
@@ -124,8 +124,8 @@ public class AttestationInstanceEndpoint implements Endpoint {
     }
 
 
-    private AttestationRunCreateCommand readCreateCommand(Request req) throws java.io.IOException {
-        return readBody(req, AttestationRunCreateCommand.class);
+    private AttestEntityCommand readCreateCommand(Request req) throws java.io.IOException {
+        return readBody(req, AttestEntityCommand.class);
     }
 
 }

@@ -130,22 +130,9 @@ function controller($q,
 
 function mkCreateCommand(parentEntityRef, entityKind){
 
-    const now = new Date(Date.now());
-    const sixMonthsAhead = new Date(now.getFullYear() , now.getMonth() + 6, now.getDate()).toISOString();
-
     return {
-        name: "Entity Attestation",
-        description: "Attests that all flows are present and correct for this entity",
-        selectionOptions: {
-            entityReference: parentEntityRef,
-            scope: "EXACT"
-        },
-        targetEntityKind: "APPLICATION",
-        attestedEntityKind: entityKind,
-        attestedEntityId: null,
-        involvementKindIds: null,
-        dueDate: sixMonthsAhead
-    };
+        entityReference: parentEntityRef,
+        attestedEntityKind: entityKind};
 }
 
 
