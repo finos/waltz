@@ -46,6 +46,7 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
+            case ACTOR:
             case APPLICATION:
                 // all physical flows where the app is a source or target
                 return mkForFlowEndpoint(options);
