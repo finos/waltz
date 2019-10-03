@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
+import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 @Service
@@ -148,11 +149,19 @@ public class DataTypeUsageService {
                 .map(r -> r.id())
                 .collect(Collectors.toSet());
 
-        if (isEmpty(appIds)) {
+        Set<Long> actorIds = refs
+                .stream()
+                .filter(r -> r.kind() == EntityKind.ACTOR)
+                .map(r -> r.id())
+                .collect(Collectors.toSet());
+
+        if (isEmpty(appIds) && isEmpty(actorIds)) {
             return true;
         } else {
-            Select<Record1<Long>> idSelector = convertApplicationIdsToIdSelector(appIds);
-            return dataTypeUsageDao.recalculateForAppIdSelector(idSelector);
+            Select<Record1<Long>> appIdSelector = convertApplicationIdsToIdSelector(appIds);
+            Select<Record1<Long>> actorIdSelector = convertActorIdsToIdSelector(actorIds);
+            return dataTypeUsageDao.recalculateForIdSelector(EntityKind.APPLICATION, appIdSelector) &&
+                    dataTypeUsageDao.recalculateForIdSelector(EntityKind.ACTOR, actorIdSelector);
         }
     }
 
@@ -161,6 +170,13 @@ public class DataTypeUsageService {
         return DSL.select(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(appIds));
+    }
+
+
+    private Select<Record1<Long>> convertActorIdsToIdSelector(Set<Long> actorIds) {
+        return DSL.select(ACTOR.ID)
+                .from(ACTOR)
+                .where(ACTOR.ID.in(actorIds));
     }
 
 }
