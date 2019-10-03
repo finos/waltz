@@ -22,7 +22,6 @@ import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 
 import * as ExternalIdentifierStore from "./services/external-identifier-store";
-import ExternalIdentifierPopover from "./components/popover/external-identifier-popover";
 import ExternalIdentifierEditorTable from "./components/editor/external-identifier-editor-table";
 
 
@@ -34,7 +33,6 @@ function setup() {
     ]);
 
     registerComponents(module, [
-        ExternalIdentifierPopover,
         ExternalIdentifierEditorTable
     ]);
 
