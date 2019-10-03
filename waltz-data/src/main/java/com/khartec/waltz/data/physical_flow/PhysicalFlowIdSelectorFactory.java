@@ -37,6 +37,9 @@ import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_F
 
 public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
 
+    public static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
+            .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()));
+
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
@@ -83,7 +86,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(PHYSICAL_FLOW.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()));
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
+                .and(PHYSICAL_FLOW_NOT_REMOVED);
     }
 
 
@@ -93,7 +97,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId));
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .and(PHYSICAL_FLOW_NOT_REMOVED);
     }
 
 

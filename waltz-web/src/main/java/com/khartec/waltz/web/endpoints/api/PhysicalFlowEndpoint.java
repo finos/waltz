@@ -197,7 +197,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         DatumRoute<Boolean> mergeRoute =
                 (request, response) -> physicalFlowService
-                        .merge(getLong(request, "fromId"), getLong(request,"toId"));
+                        .merge(getLong(request, "fromId"),
+                                getLong(request,"toId"),
+                                getUsername(request));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);

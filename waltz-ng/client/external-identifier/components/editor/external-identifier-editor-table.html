@@ -1,0 +1,45 @@
+<div style="width: 50%;">
+    <span ng-if="$ctrl.externalIdentifiers.length > 0">
+        <table class="table table-condensed table-striped small" style="margin-bottom:0;">
+            <thead>
+            <tr>
+                <th>External Id</th>
+                <th>Provenance</th>
+                <th ng-if="$ctrl.editable"></th>
+            </tr>
+            </thead>
+            <tr ng-repeat="item in $ctrl.externalIdentifiers">
+                <td>
+                    <span ng-bind="item.externalId"></span>
+                </td>
+                <td>
+                    <span ng-bind="item.system"></span>
+                </td>
+                <td ng-if="$ctrl.editable">
+                    <span title="Remove externalId"
+                          ng-click="$ctrl.removeExternalId(item)">
+                        <waltz-icon name="trash" size="lg"></waltz-icon>
+                    </span>
+                </td>
+            </tr>
+        </table>
+    </span>
+    <span ng-if="$ctrl.editable">
+        <table class="table table-condensed table-striped small">
+            <tr>
+                <td>
+                    <input type="text" ng-model="$ctrl.newExternalId">
+                </td>
+                <td>
+                    <button class="btn btn-xs btn-success"
+                            ng-click="$ctrl.addNewExternalId()">
+                        <waltz-icon name="check"></waltz-icon>
+                        Add externalId
+                    </button>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </span>
+</div>
