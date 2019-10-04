@@ -61,7 +61,7 @@ function controller(notification, serviceBroker) {
                 .execute(
                     CORE_API.ExternalIdentifierStore.deleteExternalIdentifier,
                     [vm.entityRef,
-                        encodeURIComponent(externalIdentifier.externalId),
+                        externalIdentifier.externalId,
                         externalIdentifier.system
                     ])
                 .then(() => {
@@ -78,7 +78,7 @@ function controller(notification, serviceBroker) {
             return serviceBroker
                 .execute(
                     CORE_API.ExternalIdentifierStore.addExternalIdentifier,
-                    [vm.entityRef, encodeURIComponent(vm.newExternalId)])
+                    [vm.entityRef, vm.newExternalId])
                 .then(() => {
                     notification.success(`Added External Id ${vm.newExternalId}`);
                     vm.newExternalId = null;
