@@ -66,27 +66,26 @@ public class ExternalIdentifierEndpoint implements Endpoint {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             EntityReference ref = getEntityReference(req);
-            String externalId = req.params("externalId");
             String system = req.params("system");
+            String externalId = req.splat()[0];
 
             return externalIdentifierService.delete(ref, externalId, system, getUsername(req));
         };
-
 
         DatumRoute<Integer> createRoute = (req, resp) -> {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
             EntityReference ref = getEntityReference(req);
-            String externalId = req.params("externalId");
+            String externalId = req.splat()[0];
 
             return externalIdentifierService.create(ref, externalId, getUsername(req));
         };
 
 
         // delete
-        deleteForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", ":externalId", ":system"), deleteRoute);
+        deleteForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", ":system", "externalId", "*"), deleteRoute);
 
-        postForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", ":externalId"), createRoute);
+        postForDatum(mkPath(BASE_URL, "entity", ":kind", ":id", "externalId", "*"), createRoute);
 
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findForEntityReference);
     }
