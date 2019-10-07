@@ -32,7 +32,7 @@ export function store($http, baseApiUrl) {
     };
 
     const deleteExternalIdentifier = (ref, id, system) => $http
-        .delete(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}/${system}`)
+        .delete(`${base}/entity/${ref.kind}/${ref.id}/${system}/externalId/${id}`)
         .then(r => r.data);
 
     const addExternalIdentifier = (ref, id) => $http
