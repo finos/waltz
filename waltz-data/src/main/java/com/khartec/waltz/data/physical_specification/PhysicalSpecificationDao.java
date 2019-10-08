@@ -212,6 +212,14 @@ public class PhysicalSpecificationDao {
     }
 
 
+    public int updateExternalId(long specificationId, String externalId) {
+        return dsl.update(PHYSICAL_SPECIFICATION)
+                .set(PHYSICAL_SPECIFICATION.EXTERNAL_ID, externalId)
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
+                .execute();
+    }
+
+
     private SelectConditionStep<Record> basicSelectByCondition(Condition in) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
