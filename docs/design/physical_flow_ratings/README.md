@@ -84,5 +84,5 @@ TBC
 
 ## Notes
 
-TBC
+Implementation tasks will be prefixed with `Flow Ratings` in the issue tracker.
 
