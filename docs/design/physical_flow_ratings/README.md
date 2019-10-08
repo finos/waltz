@@ -52,8 +52,10 @@ Combing the _category_ and _scheme_ will allow us to express basic facts such as
     - has _rating_ `Invest` for (business) `CIB`
   
 We can roll-up and aggregate these facts as they are recorded against _measurables_ within a hierarchical taxonomy.
+
 Increasing the information stored against _physical flows_ will allow for techniques such as lineage inference to 
-be leveraged as incoming and outgoing flows can be matched based upon their _measurable ratings_.
+be leveraged as incoming and outgoing flows can be matched upon their characteristics expressed via  _measurable ratings_ 
+and _data types_.
 
 
 ## Problems
