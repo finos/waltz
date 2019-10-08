@@ -66,6 +66,14 @@
             </p>
 
         </waltz-basic-info-tile>
-
+    </div>
+    <div class="col-sm-4">
+        <waltz-basic-info-tile name="Data Types">
+            <div style="text-align: left">
+                <waltz-tree-filter items="$ctrl.dataTypes"
+                                   on-select="$ctrl.onSelectDataType">
+                </waltz-tree-filter>
+            </div>
+        </waltz-basic-info-tile>
     </div>
 </div>

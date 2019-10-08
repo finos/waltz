@@ -25,7 +25,7 @@ import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
-
+import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 const bindings = {
     filters: "<",
@@ -162,40 +162,59 @@ function controller(serviceBroker) {
     };
 
     const loadSummaryStats = (parentEntityRef, filters) => {
-        const inboundPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [mkApplicationSelectionOptions(
-                    parentEntityRef,
-                    undefined,
-                    undefined,
-                    filters)]);
-        const outboundPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
-                [mkApplicationSelectionOptions(
-                    parentEntityRef,
-                    undefined,
-                    undefined,
-                    filters)]);
-        Promise.all([inboundPromise, outboundPromise]).then(xs => {
-            const [inboundStats, outboundStats] = xs.map(r => toStats(r.data));
-            drawPie(inboundStats, inboundOptions);
-            drawPie(outboundStats, outboundOptions);
-            vm.overallPercentageOfAuthoritiveSources = calculateOverallPercentage(inboundStats, outboundStats);
-            vm.visibility.chart = determineIfChartShouldBeVisible(inboundStats, outboundStats);
-            vm.inboundStats = inboundStats;
-            vm.outboundStats = outboundStats;
-        });
-    };
+        if (parentEntityRef) {
+            const inboundPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
+                    [mkApplicationSelectionOptions(
+                        parentEntityRef,
+                        undefined,
+                        undefined,
+                        filters)]);
+            const outboundPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
+                    [mkApplicationSelectionOptions(
+                        parentEntityRef,
+                        undefined,
+                        undefined,
+                        filters)]);
+            Promise.all([inboundPromise, outboundPromise])
+                .then(xs => xs.map(r => r.data))
+                .then(xs => {
+                    const [inboundStats, outboundStats] = xs.map(r => toStats(r));
+                    drawPie(inboundStats, inboundOptions);
+                    drawPie(outboundStats, outboundOptions);
+                    vm.overallPercentageOfAuthoritiveSources = calculateOverallPercentage(inboundStats, outboundStats);
+                    vm.visibility.chart = determineIfChartShouldBeVisible(inboundStats, outboundStats);
+                    vm.inboundStats = inboundStats;
+                    vm.outboundStats = outboundStats;
+                    return xs;
+                }).then(xs => {
+                    const [inboundDataTypes, outboundDataTypes] = xs;
+                    const extractDtIdsFn = (myDataTypes) => myDataTypes.map(e => e.decoratorEntityReference.id);
+                    const displayDataTypeIds = extractDtIdsFn(inboundDataTypes).concat(extractDtIdsFn(outboundDataTypes));
 
+                    return serviceBroker
+                    .loadAppData(CORE_API.DataTypeStore.findAll)
+                    .then(result => result.data)
+                    .then(dataTypes => dataTypes.map(e => Object.assign(e, {concrete: displayDataTypeIds.includes(e.id)})))
+                    .then(dataTypes => reduceToSelectedNodesOnly(dataTypes, displayDataTypeIds));
+                }).then(applicableDataTypes => {
+                    vm.dataTypes = applicableDataTypes
+                });
+        };
+    };
+    vm.onSelectDataType = (dt) => {
+        console.log("selected", dt);
+    };
     vm.$onInit = () => {
-        vm.parentEntityRef && loadSummaryStats(vm.parentEntityRef, vm.filters);
+        loadSummaryStats(vm.parentEntityRef, vm.filters);
     };
 
     vm.$onChanges = (changes) => {
         if (changes.filters) {
-            loadSummaryStats();
+            loadSummaryStats(vm.parentEntityRef, vm.filters);
         }
     };
 }
