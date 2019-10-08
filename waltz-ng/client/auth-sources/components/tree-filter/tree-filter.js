@@ -17,19 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import template from './tree-filter.html';
+import template from "./tree-filter.html";
 import {initialiseData} from "../../../common/index";
 import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import _ from "lodash";
 
 const bindings = {
-    onSelect: '<',
-    items: '<',
-    placeholder: '@?'
+    onSelect: "<",
+    items: "<",
+    placeholder: "@?"
 };
 
 const initialState = {
-    placeholder: 'Search...'
+    placeholder: "Search...",
+    editMode: false,
 };
 
 
@@ -61,6 +62,9 @@ function controller() {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
     };
+    vm.toggleTreeSelector = () => {
+        vm.editMode = !vm.editMode;
+    }
 }
 
 
@@ -71,4 +75,4 @@ export const component = {
 };
 
 
-export const id = 'waltzTreeFilter';
+export const id = "waltzTreeFilter";

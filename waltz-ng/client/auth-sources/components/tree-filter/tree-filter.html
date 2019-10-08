@@ -1,5 +1,9 @@
 <div class="row">
-
+    <div class="col-md-12">
+        Filters [<a ng-click="$ctrl.toggleTreeSelector()"><span>  <b>+</b>  </span></a>]
+    </div>
+</div>
+<div class="row" style="padding-top: 0.7em;" ng-if="$ctrl.editMode">
     <div class="col-md-6">
         <waltz-search-control on-query="$ctrl.doSearch"
                               min-characters='2'
@@ -7,22 +11,19 @@
                               placeholderText="Search Data Types">
         </waltz-search-control>
     </div>
-</div>
-
-<div class="row" style="padding-top: 0.7em;">
     <div class="col-md-12">
         <treecontrol class="tree-light"
                      tree-model="$ctrl.hierarchy"
                      order-by="'-name'"
                      options="$ctrl.treeOptions">
             <u ng-if="node.concrete"
-                  class="clickable"
-                  ng-click="$ctrl.onSelect(node)"
-                  ng-bind="node.name"
-                  uib-popover="{{node.description}}"
-                  popover-append-to-body="true"
-                  popover-placement="right"
-                  popover-trigger="mouseenter">
+               class="clickable"
+               ng-click="$ctrl.onSelect(node)"
+               ng-bind="node.name"
+               uib-popover="{{node.description}}"
+               popover-append-to-body="true"
+               popover-placement="right"
+               popover-trigger="mouseenter">
             </u>
             <span ng-if="!node.concrete"
                   ng-bind="node.name"
@@ -34,6 +35,4 @@
             </span>
         </treecontrol>
     </div>
-</div>
-
 </div>
