@@ -10,69 +10,63 @@
         </waltz-no-data>
     </div>
 
-    <div class="col-sm-8"
-         ng-show="$ctrl.visibility.chart">
-
+    <div class="col-sm-12" ng-show="$ctrl.visibility.chart">
         <waltz-basic-info-tile name="Authoritative Inbound / Outbound Summary">
+            <div class="row">
+                <div class="col-sm-8">
+                    <span id="wassp-inbound">
+                    </span>
+                            <span style="margin: 1.5em;">
+                        <table class="small waltz-mini-table"
+                               style="display: inline-table; vertical-align: top; margin-top: 0.6em">
+                            <thead>
+                            <tr>
+                                <th style="text-align: center;">Inbound</th>
+                                <th style="text-align: center;">Rating</th>
+                                <th style="text-align: center;">Outbound</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="row in $ctrl.rowInfo">
+                                <td style="text-align: center;">
+                                    <div ng-style="{ 'opacity' : $ctrl.inboundStats[row.rating] > 0 ? 1 : 0.3 }">
+                                        <div ng-bind="$ctrl.inboundStats[row.rating]"
+                                             style="border: 1px solid; padding: 1px; margin: 1px"
+                                             ng-style="row.style">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                                      show-icon="false"
+                                                      key="row.rating">
+                                    </waltz-enum-value>
+                                </td>
+                                <td style="text-align: center;">
+                                    <div ng-style="{ 'opacity' : $ctrl.outboundStats[row.rating] > 0 ? 1 : 0.3 }">
+                                        <div ng-bind="$ctrl.outboundStats[row.rating]"
+                                             style="border: 1px solid; padding: 1px; margin: 1px"
+                                             ng-style="row.style">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </span>
+                            <span id="wassp-outbound">
+                    </span>
 
-            <span id="wassp-inbound">
-            </span>
-
-            <span style="margin: 1.5em;">
-                <table class="small waltz-mini-table"
-                       style="display: inline-table; vertical-align: top; margin-top: 0.6em">
-                    <thead>
-                    <tr>
-                        <th style="text-align: center;">Inbound</th>
-                        <th style="text-align: center;">Rating</th>
-                        <th style="text-align: center;">Outbound</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="row in $ctrl.rowInfo">
-                        <td style="text-align: center;">
-                            <div ng-style="{ 'opacity' : $ctrl.inboundStats[row.rating] > 0 ? 1 : 0.3 }">
-                                <div ng-bind="$ctrl.inboundStats[row.rating]"
-                                     style="border: 1px solid; padding: 1px; margin: 1px"
-                                     ng-style="row.style">
-                                </div>
-                            </div>
-                        </td>
-                        <td style="text-align: center;">
-                            <waltz-enum-value type="'AuthoritativenessRating'"
-                                              show-icon="false"
-                                              key="row.rating">
-                            </waltz-enum-value>
-                        </td>
-                        <td style="text-align: center;">
-                            <div ng-style="{ 'opacity' : $ctrl.outboundStats[row.rating] > 0 ? 1 : 0.3 }">
-                                <div ng-bind="$ctrl.outboundStats[row.rating]"
-                                     style="border: 1px solid; padding: 1px; margin: 1px"
-                                     ng-style="row.style">
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </span>
-
-            <span id="wassp-outbound">
-            </span>
-
-            <p>Overall percentage of authorised sources =
-                <span ng-bind="$ctrl.overallPercentageOfAuthoritiveSources"></span>
-                %
-            </p>
-
-        </waltz-basic-info-tile>
-    </div>
-    <div class="col-sm-4">
-        <waltz-basic-info-tile name="Data Types">
-            <div style="text-align: left">
-                <waltz-tree-filter items="$ctrl.dataTypes"
-                                   on-select="$ctrl.onSelectDataType">
-                </waltz-tree-filter>
+                    <p>Overall percentage of authorised sources =
+                        <span ng-bind="$ctrl.overallPercentageOfAuthoritiveSources"></span>
+                        %
+                    </p>
+                </div>
+                <div class="col-sm-4">
+                    <waltz-tree-filter items="$ctrl.dataTypes"
+                                       on-filter-change="$ctrl.onTreeFilterChange">
+                    </waltz-tree-filter>
+                </div>
             </div>
         </waltz-basic-info-tile>
     </div>

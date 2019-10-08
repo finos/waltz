@@ -1,6 +1,15 @@
 <div class="row">
-    <div class="col-md-12">
-        Filters [<a ng-click="$ctrl.toggleTreeSelector()"><span>  <b>+</b>  </span></a>]
+</div>
+<div class="row">
+    <div class="col-md-12 waltz-tree-filter">
+        Applicable data types filter
+        <span ng-if="!$ctrl.selectedItems.length">All</span>
+        <span ng-repeat="selectedItem in $ctrl.selectedItems" class="wtf-filter-item">
+            <span ng-bind="selectedItem.name"></span><waltz-icon class="wtf-filter-delete clickable" name="close"
+                                                                 ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
+        </span>
+        [<a ng-click="$ctrl.toggleTreeSelector()"><span><waltz-icon name="arrow-up" ng-if="$ctrl.editMode"></waltz-icon><waltz-icon
+        name="arrow-down" ng-if="!$ctrl.editMode"></waltz-icon></span></a>]
     </div>
 </div>
 <div class="row" style="padding-top: 0.7em;" ng-if="$ctrl.editMode">
@@ -11,20 +20,22 @@
                               placeholderText="Search Data Types">
         </waltz-search-control>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12" style="text-align: left">
         <treecontrol class="tree-light"
                      tree-model="$ctrl.hierarchy"
                      order-by="'-name'"
                      options="$ctrl.treeOptions">
-            <u ng-if="node.concrete"
-               class="clickable"
-               ng-click="$ctrl.onSelect(node)"
-               ng-bind="node.name"
-               uib-popover="{{node.description}}"
-               popover-append-to-body="true"
-               popover-placement="right"
-               popover-trigger="mouseenter">
-            </u>
+            <span ng-if="node.concrete"
+                ng-click="$ctrl.onSelect(node)">
+                <span class="clickable"
+                      ng-bind="node.name"
+                      uib-popover="{{node.description}}"
+                      popover-append-to-body="true"
+                      popover-placement="right"
+                      popover-trigger="mouseenter">
+                </span>
+            </span>
+            <waltz-icon name="close" ng-if="$ctrl.isSelected(node)" ng-click="$ctrl.removeSelected(node.id)"></waltz-icon>
             <span ng-if="!node.concrete"
                   ng-bind="node.name"
                   style="cursor: not-allowed"

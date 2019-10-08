@@ -23,7 +23,7 @@ import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hi
 import _ from "lodash";
 
 const bindings = {
-    onSelect: "<",
+    onFilterChange: "<",
     items: "<",
     placeholder: "@?"
 };
@@ -31,6 +31,7 @@ const bindings = {
 const initialState = {
     placeholder: "Search...",
     editMode: false,
+    selectedItems: []
 };
 
 
@@ -45,8 +46,8 @@ function controller() {
 
     vm.$onChanges = () => {
         const items = _.map(vm.items, d => {
-            const concrete =  _.isUndefined(d.concrete) ? true : d.concrete;
-            return Object.assign({}, d, { concrete })
+            const concrete = _.isUndefined(d.concrete) ? true : d.concrete;
+            return Object.assign({}, d, {concrete})
         });
         vm.searchNodes = prepareSearchNodes(items);
         vm.hierarchy = prepareTree(items);
@@ -64,7 +65,30 @@ function controller() {
     };
     vm.toggleTreeSelector = () => {
         vm.editMode = !vm.editMode;
-    }
+    };
+    const sortByName = (items = []) => items.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1;
+        } else if (a.name > b.name) {
+            return 1;
+        } else {
+            return 0
+        }
+    });
+
+
+    vm.onSelect = (n) => {
+        console.log("node", n);
+        if (!vm.selectedItems.map(e => e.id).includes(n.id)) {
+            let oldItems = [...vm.selectedItems];
+            oldItems.push(n);
+            vm.selectedItems = sortByName(oldItems);
+        }
+    };
+    vm.removeSelected = (id) => {
+        vm.selectedItems = vm.selectedItems.filter(e => e.id !== id);
+    };
+    vm.isSelected = (n) => {return vm.selectedItems.map(e => e.id).includes(n.id)}
 }
 
 

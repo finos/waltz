@@ -1,0 +1,25 @@
+$waltz-keyword-color: #2e6d8e;
+$waltz-keyword-background-color: #e4edf4;
+$waltz-keyword-border-color: #c7cfd5;
+
+// -------
+.waltz-tree-filter {
+    text-align: left;
+    .wtf-filter-item {
+        display: inline-block;
+        padding: 2px 2px 0 4px;
+        margin: 3px 0px 3px 0;
+        white-space: nowrap;
+
+        color: $waltz-keyword-color;
+        background: $waltz-keyword-background-color;
+        border: 1px solid $waltz-keyword-border-color;
+        border-radius: 2px;
+        margin-right: 2px;
+    }
+
+    .wtf-filter-delete {
+        margin-right: 3px;
+        padding-left: 2px;
+    }
+}

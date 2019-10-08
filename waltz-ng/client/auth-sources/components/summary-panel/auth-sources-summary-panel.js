@@ -85,7 +85,7 @@ function toStats(data = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const drawPie = (rawStats, options) => {
@@ -103,9 +103,7 @@ function controller(serviceBroker) {
 
         const isEmpty = _.sum(_.values(rawStats)) === 0;
 
-        if (isEmpty) {
-            return;
-        } else {
+        if (isEmpty) {} else {
             const pieStats = _.map(rawStats, (value, key) => ({value, key}));
 
             const pieData = pie()
@@ -179,7 +177,7 @@ function controller(serviceBroker) {
                         undefined,
                         undefined,
                         filters)]);
-            Promise.all([inboundPromise, outboundPromise])
+            $q.all([inboundPromise, outboundPromise])
                 .then(xs => xs.map(r => r.data))
                 .then(xs => {
                     const [inboundStats, outboundStats] = xs.map(r => toStats(r));
@@ -203,10 +201,10 @@ function controller(serviceBroker) {
                 }).then(applicableDataTypes => {
                     vm.dataTypes = applicableDataTypes
                 });
-        };
+        }
     };
-    vm.onSelectDataType = (dt) => {
-        console.log("selected", dt);
+    vm.onTreeFilterChange = (filters) => {
+        console.log("filters", filters);
     };
     vm.$onInit = () => {
         loadSummaryStats(vm.parentEntityRef, vm.filters);
@@ -221,6 +219,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
