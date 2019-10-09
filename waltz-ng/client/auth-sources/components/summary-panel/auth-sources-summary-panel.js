@@ -103,7 +103,8 @@ function controller($q, serviceBroker) {
 
         const isEmpty = _.sum(_.values(rawStats)) === 0;
 
-        if (isEmpty) {} else {
+        if (isEmpty) {
+        } else {
             const pieStats = _.map(rawStats, (value, key) => ({value, key}));
 
             const pieData = pie()
@@ -159,7 +160,7 @@ function controller($q, serviceBroker) {
         return Number(overallPercentage).toFixed(2);
     };
 
-    const loadSummaryStats = (parentEntityRef, filters) => {
+    const loadSummaryStats = (parentEntityRef, filters, selectedItems=[]) => {
         if (parentEntityRef) {
             const inboundPromise = serviceBroker
                 .loadViewData(
@@ -180,7 +181,18 @@ function controller($q, serviceBroker) {
             $q.all([inboundPromise, outboundPromise])
                 .then(xs => xs.map(r => r.data))
                 .then(xs => {
-                    const [inboundStats, outboundStats] = xs.map(r => toStats(r));
+                    //in case user has chosen to selectively plot only some items then we feed them into display separately
+                    let filteredDataTypes = xs.map(r => {
+                        if (selectedItems && selectedItems.length){
+                            const reduceable = [...r].map(e => Object.assign({e}, {id :e.decoratorEntityReference.id}));
+                            const reduced = reduceToSelectedNodesOnly(reduceable, selectedItems).map(e => e.id);
+                            return r.filter(e => reduced.includes(e.decoratorEntityReference.id))
+                        }
+                        else {
+                            return r;
+                        }
+                    });
+                    const [inboundStats, outboundStats] = filteredDataTypes.map(r => toStats(r));
                     drawPie(inboundStats, inboundOptions);
                     drawPie(outboundStats, outboundOptions);
                     vm.overallPercentageOfAuthoritiveSources = calculateOverallPercentage(inboundStats, outboundStats);
@@ -194,17 +206,17 @@ function controller($q, serviceBroker) {
                     const displayDataTypeIds = extractDtIdsFn(inboundDataTypes).concat(extractDtIdsFn(outboundDataTypes));
 
                     return serviceBroker
-                    .loadAppData(CORE_API.DataTypeStore.findAll)
-                    .then(result => result.data)
-                    .then(dataTypes => dataTypes.map(e => Object.assign(e, {concrete: displayDataTypeIds.includes(e.id)})))
-                    .then(dataTypes => reduceToSelectedNodesOnly(dataTypes, displayDataTypeIds));
+                        .loadAppData(CORE_API.DataTypeStore.findAll)
+                        .then(result => result.data)
+                        .then(dataTypes => dataTypes.map(e => Object.assign(e, {concrete: displayDataTypeIds.includes(e.id)})))
+                        .then(dataTypes => reduceToSelectedNodesOnly(dataTypes, displayDataTypeIds));
                 }).then(applicableDataTypes => {
                     vm.dataTypes = applicableDataTypes
                 });
         }
     };
-    vm.onTreeFilterChange = (filters) => {
-        console.log("filters", filters);
+    vm.onTreeFilterChange = (selectedItems) => {
+        loadSummaryStats(vm.parentEntityRef, vm.filters, selectedItems);
     };
     vm.$onInit = () => {
         loadSummaryStats(vm.parentEntityRef, vm.filters);

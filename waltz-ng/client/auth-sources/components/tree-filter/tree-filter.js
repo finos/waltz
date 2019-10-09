@@ -31,7 +31,8 @@ const bindings = {
 const initialState = {
     placeholder: "Search...",
     editMode: false,
-    selectedItems: []
+    selectedItems: [],
+    expandedNodes: []
 };
 
 
@@ -78,17 +79,21 @@ function controller() {
 
 
     vm.onSelect = (n) => {
-        console.log("node", n);
         if (!vm.selectedItems.map(e => e.id).includes(n.id)) {
             let oldItems = [...vm.selectedItems];
             oldItems.push(n);
+            vm.expandedNodes.push(n);
             vm.selectedItems = sortByName(oldItems);
         }
+        vm.onFilterChange(vm.selectedItems.map(e => e.id));
     };
     vm.removeSelected = (id) => {
         vm.selectedItems = vm.selectedItems.filter(e => e.id !== id);
+        vm.onFilterChange(vm.selectedItems.map(e => e.id));
     };
-    vm.isSelected = (n) => {return vm.selectedItems.map(e => e.id).includes(n.id)}
+    vm.isSelected = (n) => {
+        return vm.selectedItems.map(e => e.id).includes(n.id)
+    }
 }
 
 

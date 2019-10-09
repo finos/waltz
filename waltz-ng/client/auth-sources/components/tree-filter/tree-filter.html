@@ -2,8 +2,8 @@
 </div>
 <div class="row">
     <div class="col-md-12 waltz-tree-filter">
-        Applicable data types filter
-        <span ng-if="!$ctrl.selectedItems.length">All</span>
+        Selected data types
+        <span ng-if="!$ctrl.selectedItems.length" class="wtf-filter-item">All</span>
         <span ng-repeat="selectedItem in $ctrl.selectedItems" class="wtf-filter-item">
             <span ng-bind="selectedItem.name"></span><waltz-icon class="wtf-filter-delete clickable" name="close"
                                                                  ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
@@ -21,10 +21,11 @@
         </waltz-search-control>
     </div>
     <div class="col-md-12" style="text-align: left">
-        <treecontrol class="tree-light"
+        <treecontrol class="tree-light waltz-tree-filter"
                      tree-model="$ctrl.hierarchy"
                      order-by="'-name'"
-                     options="$ctrl.treeOptions">
+                     options="$ctrl.treeOptions"
+                     expanded-nodes="$ctrl.expandedNodes">
             <span ng-if="node.concrete"
                 ng-click="$ctrl.onSelect(node)">
                 <span class="clickable"
