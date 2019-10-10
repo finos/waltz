@@ -21,9 +21,9 @@ package com.khartec.waltz.common;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static java.util.stream.Collectors.toSet;
 
 
 public class SetUtilities {
@@ -49,7 +49,7 @@ public class SetUtilities {
         if (xs == null || xs.isEmpty()) return new HashSet<>();
         return xs.stream()
                 .map(fn)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     public static <T> Set<T> union(Collection<T>... xss) {
@@ -59,7 +59,7 @@ public class SetUtilities {
         }
 
         Arrays.stream(xss)
-                .collect(Collectors.toSet());
+                .collect(toSet());
         return result;
     }
 
@@ -71,7 +71,7 @@ public class SetUtilities {
         }
 
         Arrays.stream(xss)
-                .collect(Collectors.toSet());
+                .collect(toSet());
         return result;
     }
 
@@ -117,7 +117,7 @@ public class SetUtilities {
                         return true;
                     }
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
 

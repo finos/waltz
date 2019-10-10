@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common/index";
-import { color } from "d3-color";
-import { amber, green, grey, red } from "../../../common/colors";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common/index";
+import {color} from "d3-color";
+import {amber, green, grey, red} from "../../../common/colors";
 import {
     findDeprecatedDataTypeIds,
     findNonConcreteDataTypeIds,
@@ -29,26 +29,32 @@ import {
 } from "../../../data-types/data-type-utils";
 
 import template from "./logical-flows-data-type-summary-pane.html";
+import {buildHierarchies, findNode} from "../../../common/hierarchy-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 
 const bindings = {
-    stats: "<"
+    stats: "<",
+    parentEntityRef: "<",
+    filters: "<"
 };
 
 
 const initialState = {
     visibility: {
         detail: false
-    }
+    },
+    displayBack: false,
 };
 
 function prepareSummary(counts = [], unknownId, direction, deprecatedDataTypeIds, nonConcreteDataTypeIds) {
     return _
         .chain(counts)
         .map(d => ({
-            typeId: d.dataType.id,
-            name: d.dataType.name,
-            count: d[direction] }))
+            typeId: d.dataTypeId,
+            name: d.dataTypeName,
+            count: (direction === "totalCount") ? d[direction] : d.logicalFlowMeasures[direction] }))
         .reduce((acc, d) => {
             if (d.typeId === Number(unknownId)) {
                 acc.UNKNOWN  += d.count;
@@ -69,31 +75,62 @@ function friendlyName(name) {
     return name.replace("_", " ");
 }
 
-function controller(displayNameService, logicalFlowUtilityService, serviceBroker) {
+function controller(displayNameService, logicalFlowUtilityService, serviceBroker, $q) {
     const vm = initialiseData(this, initialState);
 
-    const loadDataTypes = () => {
-        return serviceBroker.loadAppData(CORE_API.DataTypeStore.findAll);
+    const loadData = () => {
+        const dataTypePromise = serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.dataTypes = r.data);
+
+        const statsPromise = serviceBroker
+            .loadViewData(CORE_API.LogicalFlowDecoratorStore.findDataTypeStatsForEntity, [vm.selector])
+            .then(r => {
+                vm.summaryStats = _.map(
+                    r.data,
+                    stat =>
+                        Object.assign({},
+                            stat,
+                            {dataTypeName: displayNameService.lookup('dataType', stat.dataTypeId)}));
+            });
+
+
+        return $q
+            .all([dataTypePromise, statsPromise])
+            .then(() => {
+
+                vm.dataTypeHierarchy = buildHierarchies(vm.dataTypes, true);
+
+                vm.structuredStats = _.filter(vm.summaryStats,
+                        dt => _.includes(
+                            _.map(vm.dataTypeHierarchy,
+                                    node => node.id), dt.dataTypeId));
+
+            })
     };
 
     vm.$onChanges = () => {
 
-        if (! vm.stats) return;
+        if (vm.parentEntityRef) {
+            vm.selector = mkApplicationSelectionOptions(
+                vm.parentEntityRef,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
+        }
 
-        vm.enrichedDataTypeCounts = logicalFlowUtilityService.enrichDataTypeCounts(
-            vm.stats.dataTypeCounts,
-            displayNameService);
+        if (!vm.stats) return;
 
-        loadDataTypes()
-            .then(dt => {
-                const dataTypes = dt.data;
-                const unknownDataTypeId = findUnknownDataTypeId(dataTypes);
-                const deprecatedDataTypeIds = findDeprecatedDataTypeIds(dataTypes);
-                const nonConcreteDataTypeIds = findNonConcreteDataTypeIds(dataTypes);
+        loadData()
+            .then(() => {
+
+                const unknownDataTypeId = findUnknownDataTypeId(vm.dataTypes);
+                const deprecatedDataTypeIds = findDeprecatedDataTypeIds(vm.dataTypes);
+                const nonConcreteDataTypeIds = findNonConcreteDataTypeIds(vm.dataTypes);
 
                 if (unknownDataTypeId) {
                     vm.visibility.summaries = true;
-                    vm.summaryConfig =  {
+                    vm.overviewConfig =  {
                         colorProvider: (d) => {
                             if(d.key === "VALID") {
                                 return color(green);
@@ -108,21 +145,19 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                         valueProvider: (d) => d.count,
                         idProvider: (d) => d.key,
                         labelProvider: d => _.capitalize(d.key),
-                        size: 40
+                        size: 80
                     };
-
-                    vm.overviewConfig =  Object.assign({}, vm.summaryConfig, { size: 80 });
 
                     const summaries = [
                         { title: "Intra", prop: "intra"} ,
                         { title: "Inbound", prop: "inbound"} ,
                         { title: "Outbound", prop: "outbound"} ,
-                        { title: "All", prop: "total"}
+                        { title: "All", prop: "totalCount"}
                     ];
 
-                    vm.summaries= _.map(summaries, d => {
+                    vm.summaries =  _.map(summaries, d => {
                         return {
-                            summary: prepareSummary(vm.enrichedDataTypeCounts,
+                            summary: prepareSummary(vm.structuredStats,
                                 unknownDataTypeId,
                                 d.prop,
                                 deprecatedDataTypeIds,
@@ -133,6 +168,54 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
 
                 }
             });
+    };
+
+
+    vm.filterDataTypes = (dataTypeId) => {
+
+        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
+        const childIds = _.map(currentNode.children, d => d.id);
+
+        vm.structuredStats = (!_.isEmpty(childIds))
+            ?  _.filter(vm.summaryStats, stat => _.includes(childIds, stat.dataTypeId))
+            : vm.structuredStats;
+
+        vm.displayBack = true;
+
+    };
+
+
+    vm.displayForward = (dataTypeId) => {
+        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
+        return !_.isEmpty(currentNode.children);
+    };
+
+
+    vm.navigateToParent = () => {
+        const dataTypeId = _.head(_.map(vm.structuredStats, d => d.dataTypeId));
+
+        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
+        const parentNode = findNode(vm.dataTypeHierarchy, currentNode.parentId);
+
+        if (! parentNode) {
+            // can't go up, probably at root of tree already
+            return;
+        }
+        const grandparentNode = findNode(vm.dataTypeHierarchy, parentNode.parentId);
+
+        if (!_.isEmpty(grandparentNode)){
+
+            const parents = _.map(grandparentNode.children, d => d.id);
+
+            vm.structuredStats = _.filter(vm.summaryStats, stat => _.includes(parents, stat.dataTypeId));
+
+        } else {
+
+            loadData();
+
+            vm.displayBack = false;
+        }
+
     }
 }
 
@@ -141,6 +224,7 @@ controller.$inject = [
     "DisplayNameService",
     "LogicalFlowUtilityService",
     "ServiceBroker",
+    "$q"
 ];
 
 
@@ -151,9 +235,7 @@ const component = {
 };
 
 
-
-
 export default {
     component,
     id: "waltzLogicalFlowsDataTypeSummaryPane"
-}
+};

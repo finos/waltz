@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { determineStatMethod } from "../../logical-flow-utils";
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {determineStatMethod} from "../../logical-flow-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./logical-flows-tabgroup.html";
 

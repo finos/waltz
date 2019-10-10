@@ -28,24 +28,31 @@ import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSumma
 import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.inline;
+import static org.jooq.impl.DSL.when;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -81,6 +88,8 @@ public class LogicalFlowDecoratorDao {
 
     private final DSLContext dsl;
 
+    private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
+    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
 
     @Autowired
     public LogicalFlowDecoratorDao(DSLContext dsl) {
@@ -326,5 +335,43 @@ public class LogicalFlowDecoratorDao {
     }
 
 
+    public Map<Tuple2<Long, String>, List<Long>> dataTypesWithDirectionByAppIdSelector(Select<Record1<Long>> appIdSelector) {
+        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+
+        Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
+        Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
+        Field<Long> sourceAppId = sourceApp.field(0, Long.class);
+        Field<Long> targetAppId = targetApp.field(0, Long.class);
+        Field<String> flowTypeCase =
+                when(sourceAppId.isNotNull()
+                        .and(targetAppId.isNotNull()), inline("INTRA"))
+                        .when(sourceAppId.isNotNull(), inline("OUTBOUND"))
+                        .otherwise(inline("INBOUND"));
+        Field<String> flowType = DSL.field("flow_type", String.class);
+
+        Condition condition = sourceAppId
+                .isNotNull()
+                .or(targetAppId.isNotNull())
+                .and(lf.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
+                        .and(lf.IS_REMOVED.isFalse()));
+
+        return  dsl.select(
+                lfd.DECORATOR_ENTITY_ID,
+                flowTypeCase.as(flowType),
+                lf.ID)
+                .from(lf)
+                .innerJoin(lfd)
+                .on(lf.ID.eq(lfd.LOGICAL_FLOW_ID)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(inline(EntityKind.DATA_TYPE.name()))))
+                .leftJoin(sourceApp)
+                .on(sourceAppId.eq(lf.SOURCE_ENTITY_ID))
+                .leftJoin(targetApp)
+                .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
+                .where(dsl.renderInlined(condition))
+                .fetchGroups(
+                        k -> tuple(k.get(lfd.DECORATOR_ENTITY_ID), k.get(flowType)),
+                        v -> v.get(lf.ID));
+
+    }
 
 }
