@@ -44,7 +44,6 @@ import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,9 +63,11 @@ import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.*;
+import static com.khartec.waltz.model.FlowDirection.*;
 import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class LogicalFlowDecoratorService {
@@ -376,9 +377,9 @@ public class LogicalFlowDecoratorService {
 
         Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOptions);
 
-        Map<Tuple2<Long, String>, List<Long>> dataTypeIdAndflowTypeKeyToLogicalFlowIdListMap = logicalFlowDecoratorDao.dataTypesWithDirectionByAppIdSelector(appIds);
+        Map<Tuple2<Long, String>, List<Long>> dataTypeIdAndFlowTypeKeyToLogicalFlowIdsMap = logicalFlowDecoratorDao.dataTypesWithDirectionByAppIdSelector(appIds);
 
-        return findFlowIdsByDataTypeForParentsAndChildren(dataTypeIdAndflowTypeKeyToLogicalFlowIdListMap);
+        return findFlowIdsByDataTypeForParentsAndChildren(dataTypeIdAndFlowTypeKeyToLogicalFlowIdsMap);
     }
 
 
@@ -413,7 +414,9 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private ImmutableLogicalFlowDecoratorStat mkLogicalFlowDecoratorStat(DataType dt, Map<FlowDirection, Integer> typeToFlowCountMap, Set<Long> allFlowIds) {
+    private ImmutableLogicalFlowDecoratorStat mkLogicalFlowDecoratorStat(DataType dt,
+                                                                         Map<FlowDirection, Integer> typeToFlowCountMap,
+                                                                         Set<Long> allFlowIds) {
         return ImmutableLogicalFlowDecoratorStat
                 .builder()
                 .dataTypeId(dt.id().get())
@@ -426,9 +429,9 @@ public class LogicalFlowDecoratorService {
     private ImmutableLogicalFlowMeasures mkLogicalFlowMeasures(Map<FlowDirection, Integer> typeToFlowCountMap) {
         return ImmutableLogicalFlowMeasures
                 .builder()
-                .inbound(typeToFlowCountMap.get(FlowDirection.INBOUND))
-                .outbound(typeToFlowCountMap.get(FlowDirection.OUTBOUND))
-                .intra(typeToFlowCountMap.get(FlowDirection.INTRA))
+                .inbound(typeToFlowCountMap.get(INBOUND))
+                .outbound(typeToFlowCountMap.get(OUTBOUND))
+                .intra(typeToFlowCountMap.get(INTRA))
                 .build();
     }
 
@@ -438,7 +441,8 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private Map<FlowDirection, Integer> getTypeToFlowCountMap(Map<Tuple2<Long, String>, List<Long>> logicalFlowIdsByDataType, Set<Tuple2<Long, String>> allKeys) {
+    private Map<FlowDirection, Integer> getTypeToFlowCountMap(Map<Tuple2<Long, String>, List<Long>> logicalFlowIdsByDataType,
+                                                              Set<Tuple2<Long, String>> allKeys) {
 
         List<FlowDirection> directions = asList(FlowDirection.values());
 
@@ -452,13 +456,14 @@ public class LogicalFlowDecoratorService {
                             .flatMap(k -> logicalFlowIdsByDataType.get(k).stream())
                             .collect(Collectors.toSet());
 
-                    return Tuple.tuple(type, setOfFlows.size());
+                    return tuple(type, setOfFlows.size());
                 })
                 .collect(Collectors.toMap(k -> k.v1, v -> v.v2));
     }
 
 
-    private Set<Tuple2<Long, String>> filterKeySetByDataTypeId(Map<Tuple2<Long, String>, List<Long>> logicalFlowIdsByDataType, Set<Long> dataTypeIds) {
+    private Set<Tuple2<Long, String>> filterKeySetByDataTypeId(Map<Tuple2<Long, String>, List<Long>> logicalFlowIdsByDataType,
+                                                               Set<Long> dataTypeIds) {
         return logicalFlowIdsByDataType
                 .keySet()
                 .stream()
@@ -498,27 +503,27 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private static Set<DataType> getDescendants(Map<Optional<Long>, DataType> datatypesById, Long parent) {
-        return datatypesById
+    private static Set<DataType> getDescendants(Map<Optional<Long>, DataType> dataTypesById, Long parentId) {
+        return dataTypesById
                 .values()
                 .stream()
                 .filter(dt -> dt.parentId().isPresent()
-                        && dt.parentId().get().equals(parent))
+                        && dt.parentId().get().equals(parentId))
                 .collect(Collectors.toSet());
     }
 
 
-    private static Set<DataType> getParents(DataType dataType, Map<Optional<Long>, DataType> datatypesById) {
+    private static Set<DataType> getParents(DataType dataType, Map<Optional<Long>, DataType> dataTypesById) {
 
         Checks.checkNotNull(dataType, "starting datatype cannot be null");
 
         Set<DataType> parents = new HashSet<>(emptySet());
 
-        DataType parent = datatypesById.get(dataType.parentId());
+        DataType parent = dataTypesById.get(dataType.parentId());
 
         while (parent != null) {
             parents.add(parent);
-            parent = datatypesById.get(parent.parentId());
+            parent = dataTypesById.get(parent.parentId());
         }
 
         return parents;

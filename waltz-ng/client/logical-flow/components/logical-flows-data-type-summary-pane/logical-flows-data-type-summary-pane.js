@@ -29,7 +29,6 @@ import {
 } from "../../../data-types/data-type-utils";
 
 import template from "./logical-flows-data-type-summary-pane.html";
-import {buildHierarchies, findNode} from "../../../common/hierarchy-utils";
 import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
@@ -78,36 +77,56 @@ function friendlyName(name) {
 function controller(displayNameService, logicalFlowUtilityService, serviceBroker, $q) {
     const vm = initialiseData(this, initialState);
 
+    vm.prepareTable = (dtParent) => {
+        vm.detailTable = _
+            .chain(vm.typesWithStats)
+            .filter(dt => dt.dataType.parentId === _.get(dtParent, ["id"], null))
+            .sortBy(dt => dt.dataType.name)
+            .value();
+        vm.activeParent = dtParent;
+    };
+
+
+    vm.goUp = () => {
+        const grandParent = vm.activeParent
+            ? vm.dataTypesById[vm.activeParent.parentId]
+            : null;
+        vm.prepareTable(grandParent);
+    };
+
+
     const loadData = () => {
         const dataTypePromise = serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.dataTypes = r.data);
+            .then(r => r.data);
 
         const statsPromise = serviceBroker
             .loadViewData(CORE_API.LogicalFlowDecoratorStore.findDataTypeStatsForEntity, [vm.selector])
-            .then(r => {
-                vm.summaryStats = _.map(
-                    r.data,
-                    stat =>
-                        Object.assign({},
-                            stat,
-                            {dataTypeName: displayNameService.lookup('dataType', stat.dataTypeId)}));
-            });
-
+            .then(r => r.data);
 
         return $q
             .all([dataTypePromise, statsPromise])
-            .then(() => {
+            .then(([dataTypes, stats]) => {
 
-                vm.dataTypeHierarchy = buildHierarchies(vm.dataTypes, true);
+                const statsByDtId = _.keyBy(stats, "dataTypeId");
+                const dtsByParentId = _.groupBy(dataTypes, "parentId");
+                vm.dataTypes = dataTypes;
+                vm.dataTypesById = _.keyBy(dataTypes, "id");
+                vm.allStats = stats;
 
-                vm.structuredStats = _.filter(vm.summaryStats,
-                        dt => _.includes(
-                            _.map(vm.dataTypeHierarchy,
-                                    node => node.id), dt.dataTypeId));
+                vm.typesWithStats = _
+                    .chain(dataTypes)
+                    .reject(dt => _.isEmpty(statsByDtId[dt.id]))
+                    .map(dt => ({
+                        dataType: dt,
+                        hasChildren: !_.isEmpty(dtsByParentId[dt.id]),
+                        stats: statsByDtId[dt.id]}))
+                    .value();
 
-            })
+                vm.prepareTable(null);
+            });
     };
+
 
     vm.$onChanges = () => {
 
@@ -118,8 +137,6 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                 [entityLifecycleStatus.ACTIVE.key],
                 vm.filters);
         }
-
-        if (!vm.stats) return;
 
         loadData()
             .then(() => {
@@ -157,7 +174,8 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
 
                     vm.summaries =  _.map(summaries, d => {
                         return {
-                            summary: prepareSummary(vm.structuredStats,
+                            summary: prepareSummary(
+                                vm.allStats,
                                 unknownDataTypeId,
                                 d.prop,
                                 deprecatedDataTypeIds,
@@ -169,54 +187,6 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
                 }
             });
     };
-
-
-    vm.filterDataTypes = (dataTypeId) => {
-
-        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
-        const childIds = _.map(currentNode.children, d => d.id);
-
-        vm.structuredStats = (!_.isEmpty(childIds))
-            ?  _.filter(vm.summaryStats, stat => _.includes(childIds, stat.dataTypeId))
-            : vm.structuredStats;
-
-        vm.displayBack = true;
-
-    };
-
-
-    vm.displayForward = (dataTypeId) => {
-        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
-        return !_.isEmpty(currentNode.children);
-    };
-
-
-    vm.navigateToParent = () => {
-        const dataTypeId = _.head(_.map(vm.structuredStats, d => d.dataTypeId));
-
-        const currentNode = findNode(vm.dataTypeHierarchy, dataTypeId);
-        const parentNode = findNode(vm.dataTypeHierarchy, currentNode.parentId);
-
-        if (! parentNode) {
-            // can't go up, probably at root of tree already
-            return;
-        }
-        const grandparentNode = findNode(vm.dataTypeHierarchy, parentNode.parentId);
-
-        if (!_.isEmpty(grandparentNode)){
-
-            const parents = _.map(grandparentNode.children, d => d.id);
-
-            vm.structuredStats = _.filter(vm.summaryStats, stat => _.includes(parents, stat.dataTypeId));
-
-        } else {
-
-            loadData();
-
-            vm.displayBack = false;
-        }
-
-    }
 }
 
 
