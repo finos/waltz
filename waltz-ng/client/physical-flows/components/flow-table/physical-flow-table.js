@@ -64,7 +64,7 @@ function controller($q, serviceBroker) {
         { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
         { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%", cellFilter: 'toDisplayName:"TransportKind"' },
         { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "8%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
+        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "8%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
         { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
 
