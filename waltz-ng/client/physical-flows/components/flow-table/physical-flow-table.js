@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./physical-flow-table.html";
@@ -59,10 +59,11 @@ function controller($q, serviceBroker) {
 
     vm.columnDefs = [
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id', width: "10%" },
+        { field: 'specification.externalId', displayName: 'Ext. Id', width: "12%" },
+        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
         { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%", cellFilter: 'toDisplayName:"TransportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "8%", cellFilter: 'toDisplayName:"frequencyKind"' },
         { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "10%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
         { field: 'specification.description', displayName: 'Description', width: "23%" }
     ];
