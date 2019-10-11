@@ -22,17 +22,14 @@ package com.khartec.waltz.data.data_flow_decorator;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.FlowDirection;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -52,7 +49,6 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.inline;
 import static org.jooq.impl.DSL.when;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -335,11 +331,11 @@ public class LogicalFlowDecoratorDao {
     }
 
 
-    public Map<Tuple2<Long, String>, List<Long>> dataTypesWithDirectionByAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        checkNotNull(appIdSelector, "appIdSelector cannot be null");
+    public Map<DataTypeDirectionKey, List<Long>> logicalFlowIdsByTypeAndDirection(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
 
-        Table<Record1<Long>> sourceApp = appIdSelector.asTable("source_app");
-        Table<Record1<Long>> targetApp = appIdSelector.asTable("target_app");
+        Table<Record1<Long>> sourceApp = selector.asTable("source_app");
+        Table<Record1<Long>> targetApp = selector.asTable("target_app");
         Field<Long> sourceAppId = sourceApp.field(0, Long.class);
         Field<Long> targetAppId = targetApp.field(0, Long.class);
         Field<String> flowTypeCase =
@@ -369,9 +365,17 @@ public class LogicalFlowDecoratorDao {
                 .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(dsl.renderInlined(condition))
                 .fetchGroups(
-                        k -> tuple(k.get(lfd.DECORATOR_ENTITY_ID), k.get(flowType)),
+                        k -> mkDataTypeDirectionKey(k.get(lfd.DECORATOR_ENTITY_ID), FlowDirection.valueOf(k.get(flowType))),
                         v -> v.get(lf.ID));
 
+    }
+
+    private DataTypeDirectionKey mkDataTypeDirectionKey(Long dataTypeId, FlowDirection flowDirection) {
+        return ImmutableDataTypeDirectionKey
+                .builder()
+                .DatatypeId(dataTypeId)
+                .flowDirection(flowDirection)
+                .build();
     }
 
 }
