@@ -120,7 +120,7 @@ function controller($q,
                 notification.success('Specification definition created successfully');
                 loadSpecDefinitions(true);
                 vm.hideCreateSpecDefinition();
-            }, r => {
+                }, r => {
                 notification.error("Failed to create specification definition. Ensure that 'version' is unique");
             });
     };
