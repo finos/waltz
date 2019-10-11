@@ -140,12 +140,12 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroup> findRelatedByEntityReferenceAndUser(EntityReference ref, String userId) {
+    public List<AppGroup> findRelatedByEntityReference(EntityReference ref) {
         switch (ref.kind()) {
             case APPLICATION:
-                return appGroupDao.findRelatedByApplicationAndUser(ref.id(), userId);
+                return appGroupDao.findRelatedByApplicationId(ref.id());
             default:
-                return appGroupDao.findRelatedByEntityReferenceAndUser(ref, userId);
+                return appGroupDao.findRelatedByEntityReference(ref);
         }
     }
 
