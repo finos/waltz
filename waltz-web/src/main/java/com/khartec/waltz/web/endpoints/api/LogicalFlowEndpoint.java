@@ -74,6 +74,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String investmentStatusSummaryForEntityReferencesPath = mkPath(BASE_URL, "investment-status-summary", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findByIdsPath = mkPath(BASE_URL, "ids");
         String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
@@ -88,6 +89,9 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
+
+        DatumRoute<Map<String, Map<String, Integer>>> investmentStatus = (request, response)
+                -> logicalFlowService.investmentStatusSummary(getEntityReference(request));
 
         ListRoute<LogicalFlow> findBySelectorRoute = (request, response)
                 -> logicalFlowService.findBySelector(readAppIdSelectionOptionsFromBody(request));
@@ -109,6 +113,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
+        getForDatum(investmentStatusSummaryForEntityReferencesPath, investmentStatus);
         getForDatum(getByIdPath, getByIdRoute);
         postForList(findByIdsPath, findByIdsRoute);
         postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);

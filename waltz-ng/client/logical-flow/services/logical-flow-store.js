@@ -54,6 +54,19 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/entity/${entityReference.kind}/${entityReference.id}`)
             .then(result => result.data);
     };
+    const investmentStatusSummary = (kind, id) => {
+        const entityReference = _.isObject(kind)
+            ? kind
+            : { kind, id };
+
+        checkIsEntityRef(entityReference);
+
+        let url = `${BASE}/investment-status-summary/${entityReference.kind}/${entityReference.id}`;
+        console.log("URI", url);
+        return $http
+            .get(`${url}`)
+            .then(result => result.data);
+    };
 
 
     const findBySourceAndTargetEntityReferences = (sourceTargetReferences) => {
@@ -107,6 +120,7 @@ export function store($http, BaseApiUrl) {
         findBySelector,
         findByIds,
         findByEntityReference,
+        investmentStatusSummary,
         findBySourceAndTargetEntityReferences,
         findUpstreamFlowsForEntityReferences,
         calculateStats,
@@ -148,6 +162,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "findByEntityReference",
         description: "find logical flows involving a given entity"
+    },
+    investmentStatusSummary: {
+        serviceName,
+        serviceFnName: "investmentStatusSummary",
+        description: "executes investmentStatusSummary"
     },
     findBySourceAndTargetEntityReferences: {
         serviceName,

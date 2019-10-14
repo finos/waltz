@@ -48,6 +48,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -111,6 +112,9 @@ public class LogicalFlowService {
         return logicalFlowDao.findByEntityReference(ref);
     }
 
+    public Map<String, Map<String, Integer>> investmentStatusSummary(EntityReference ref) {
+        return logicalFlowDao.investmentStatusSummary(ref);
+    }
 
     public List<LogicalFlow> findBySourceAndTargetEntityReferences(List<Tuple2<EntityReference, EntityReference>> sourceAndTargets) {
         return logicalFlowDao.findBySourcesAndTargets(sourceAndTargets);
