@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from '../../../common';
+import {displayError} from "../../../common/error-utils";
 
 import template from './physical-spec-definition-section.html';
 
@@ -120,9 +121,8 @@ function controller($q,
                 notification.success('Specification definition created successfully');
                 loadSpecDefinitions(true);
                 vm.hideCreateSpecDefinition();
-                }, r => {
-                notification.error("Failed to create specification definition. Ensure that 'version' is unique");
-            });
+            })
+            .catch(e => displayError(notification, "Unable to create specification definition", e));
     };
 
     vm.deleteSpec = (specDef) => {

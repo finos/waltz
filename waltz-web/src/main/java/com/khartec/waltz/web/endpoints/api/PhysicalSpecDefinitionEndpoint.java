@@ -28,6 +28,7 @@ import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,10 +75,18 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
         DatumRoute<Long> createRoute = (req, res) -> {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
-            return specDefinitionService.create(
-                    getUsername(req),
-                    getId(req),
-                    readBody(req, PhysicalSpecDefinitionChangeCommand.class));
+
+            PhysicalSpecDefinitionChangeCommand physicalSpecDefinitionChangeCommand = readBody(req, PhysicalSpecDefinitionChangeCommand.class);
+
+            try {
+                return specDefinitionService.create(
+                        getUsername(req),
+                        getId(req),
+                        physicalSpecDefinitionChangeCommand);
+            } catch (DataAccessException e) {
+                throw new Exception("Cannot create physical specification definition with version that already exists");
+            }
+
         };
 
         DatumRoute<Boolean> updateStatusRoute = (req, res) -> {
