@@ -6,14 +6,16 @@
         </div>
         <span ng-if="!$ctrl.selectedItems.length" class="wtf-filter-item">All</span>
         <span ng-repeat="selectedItem in $ctrl.selectedItems" class="wtf-filter-item">
-            <span ng-bind="selectedItem.name"></span><waltz-icon class="wtf-filter-delete clickable" name="close"
-                                                                 ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
+            <span ng-bind="selectedItem.name"></span>
+            <waltz-icon class="wtf-filter-delete clickable"
+                        name="close"
+                        ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
         </span>
         <div style="padding-top: 10px">
-            <a ng-click="$ctrl.toggleTreeSelector()"><span>
+            <a ng-click="$ctrl.toggleTreeSelector()">
                 <span ng-if="!$ctrl.editMode">Change data types</span>
                 <span ng-if="$ctrl.editMode">Done</waltz-icon></span>
-            </span></a>
+            </a>
         </div>
     </div>
 </div>
@@ -34,7 +36,7 @@
                      order-by="'-name'"
                      options="$ctrl.treeOptions"
                      expanded-nodes="$ctrl.expandedNodes">
-            <span ng-if="node.concrete"
+            <span
                   ng-click="$ctrl.onSelect(node)">
                 <span class="clickable"
                       ng-bind="node.name"
@@ -46,14 +48,7 @@
             </span>
             <waltz-icon name="close" ng-if="$ctrl.isSelected(node)"
                         ng-click="$ctrl.removeSelected(node.id)"></waltz-icon>
-            <span ng-if="!node.concrete"
-                  ng-bind="node.name"
-                  style="cursor: not-allowed"
-                  uib-popover="{{node.description}}"
-                  popover-append-to-body="true"
-                  popover-placement="right"
-                  popover-trigger="mouseenter">
-            </span>
+
         </treecontrol>
     </div>
 </div>

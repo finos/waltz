@@ -32,14 +32,12 @@ const initialState = {
     placeholder: "Search...",
     editMode: false,
     selectedItems: [],
-    expandedNodes: []
 };
 
 
 function prepareTree(items = []) {
     return buildHierarchies(items, false);
 }
-
 
 function controller() {
 
@@ -64,10 +62,8 @@ function controller() {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
     };
-    vm.toggleTreeSelector = ($event) => {
+    vm.toggleTreeSelector = () => {
         vm.editMode = !vm.editMode;
-        $event.stopPropagation();
-        $event.preventDefault();
     };
     const sortByName = (items = []) => items.sort((a, b) => {
         if (a.name < b.name) {
@@ -79,19 +75,27 @@ function controller() {
         }
     });
 
-
     vm.onSelect = (n) => {
         if (!vm.selectedItems.map(e => e.id).includes(n.id)) {
-            let oldItems = [...vm.selectedItems];
-            oldItems.push(n);
-            vm.expandedNodes.push(n);
-            vm.selectedItems = sortByName(oldItems);
+            let newSelectedItems = [...vm.selectedItems];
+            newSelectedItems.push(n);
+            vm.selectedItems = sortByName(newSelectedItems);
         }
-        vm.onFilterChange(vm.selectedItems.map(e => e.id));
+        notifyListeners(vm.selectedItems);
+    };
+
+    const notifyListeners = (selectedItems) => {
+        const findChildren = (node, acc = []) => {
+            acc.push(node);
+            node.children.forEach(c => findChildren(c, acc));
+            return acc;
+        };
+        const expandedSelection = _.chain(selectedItems).flatMap(d => findChildren(d)).map(d => d.id).uniq().value();
+        vm.onFilterChange(expandedSelection);
     };
     vm.removeSelected = (id) => {
         vm.selectedItems = vm.selectedItems.filter(e => e.id !== id);
-        vm.onFilterChange(vm.selectedItems.map(e => e.id));
+        notifyListeners(vm.selectedItems);
     };
     vm.isSelected = (n) => {
         return vm.selectedItems.map(e => e.id).includes(n.id)
