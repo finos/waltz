@@ -1,4 +1,4 @@
-<div class="waltz-application-flow-summary-pane">
+<div class="waltz-application-flow-summary-pane" >
 
     <div class="row" style="padding-bottom: 20px">
         <div class="col-md-12">
@@ -10,8 +10,7 @@
                         </waltz-application-flow-summary-graph>
 
                         <p class="small help-block">
-                            Chart showing incoming vs outgoing flow decorations which are mapped to a known data type
-                            and then
+                            Chart showing incoming vs outgoing flow decorations which are mapped to a known data type and then
                             categorized by their authoritativeness.
                         </p>
 
@@ -33,47 +32,7 @@
             </waltz-sub-section>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <waltz-sub-section name="Investment Status Summary">
-                <content>
-                    <div style="padding: 8px">
-                        <table class="table table-condensed table-bordered">
-                            <thead>
-                            <tr>
-                                <td></td>
-                                <td>Upstream Sources</td>
-                                <td>Downstream Sources</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td style="background: #9ed18f">Invest</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("upstream_sources", "G")}}</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("downstream_sources", "G")}}</td>
-                            </tr>
-                            <tr>
-                                <td style="background: darkorange">Maintain</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("upstream_sources", "A")}}</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("downstream_sources", "A")}}</td>
-                            </tr>
-                            <tr>
-                                <td style="background: red">Disinvest</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("upstream_sources", "R")}}</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("downstream_sources", "R")}}</td>
-                            </tr>
-                            <tr>
-                                <td style="background: grey">Unknown</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("upstream_sources", "Z")}}</td>
-                                <td style="text-align: center">{{$ctrl.investmentStatusCount()("downstream_sources", "Z")}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </content>
-            </waltz-sub-section>
-        </div>
-    </div>
+
     <div class="row">
         <div class="col-md-12">
             <waltz-pie-table data="$ctrl.freshnessSummaryData"

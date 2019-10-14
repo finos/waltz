@@ -89,7 +89,7 @@ public class LogicalFlowDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
-                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(Timestamp::toLocalDateTime))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
                 .build();
@@ -105,11 +105,11 @@ public class LogicalFlowDao {
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
-        record.setLastAttestedAt(flow.lastAttestedAt().map(Timestamp::valueOf).orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
         record.setProvenance(flow.provenance());
         record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
-        record.setCreatedAt(flow.created().map(UserTimestamp::atTimestamp).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
-        record.setCreatedBy(flow.created().map(UserTimestamp::by).orElse(flow.lastUpdatedBy()));
+        record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
+        record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
         return record;
     };
 
@@ -135,58 +135,6 @@ public class LogicalFlowDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public Map<String, Map<String, Integer>> investmentStatusSummary(EntityReference ref) {
-        SelectConditionStep<Record> flowQuery = dsl.select(LOGICAL_FLOW.fields())
-                .select(SOURCE_NAME_FIELD.as("entity_kind"), TARGET_NAME_FIELD.as("entity_name"))
-                .from(LOGICAL_FLOW)
-                .where(isSourceOrTargetCondition(ref))
-                .and(LOGICAL_NOT_REMOVED);
-        Table<Record> lf = flowQuery.asTable("lf");
-        String downStreamRating = "downstream_rating";
-        String upstreamRating = "upstream_rating";
-        SelectConditionStep<Record> glfQuery = dsl
-                .select(lf.fields())
-                .select(
-                        DSL.field(dsl.select(APPLICATION.OVERALL_RATING).from(APPLICATION).where(APPLICATION.ID.eq(lf.field(LOGICAL_FLOW.TARGET_ENTITY_ID)))).as(upstreamRating),
-                        DSL.field(dsl.select(APPLICATION.OVERALL_RATING).from(APPLICATION).where(APPLICATION.ID.eq(lf.field(LOGICAL_FLOW.SOURCE_ENTITY_ID)))).as(downStreamRating)
-                )
-                .from(lf)
-                .where(
-                        // investment rating can only be found on apps
-                        lf.field(LOGICAL_FLOW.SOURCE_ENTITY_KIND).eq(EntityKind.APPLICATION.toString())
-                                .and(lf.field(LOGICAL_FLOW.TARGET_ENTITY_KIND).eq(EntityKind.APPLICATION.toString()))
-                );
-        Table<Record> glf = glfQuery.asTable("glf");
-        Field<String> upstream_rating = glf.field(upstreamRating, String.class);
-        Field<String> downstream_rating = glf.field(downStreamRating, String.class);
-        Field<Integer> upstream_rating_count = DSL.count(upstream_rating).as("upstream_rating_count");
-        Field<Integer> downstream_rating_count = DSL.count(downstream_rating).as("downstream_rating_count");
-        SelectHavingStep<Record4<String, Integer, String, Integer>> investmentStatusSummaryQuery = dsl.select(
-                upstream_rating,
-                upstream_rating_count,
-                downstream_rating,
-                downstream_rating_count
-        )
-                .from(glf)
-                .groupBy(upstream_rating, downstream_rating);
-        Map<String, Integer> upstreamRatings = new HashMap<>();
-        Map<String, Integer> downStreamRatings = new HashMap<>();
-        investmentStatusSummaryQuery.forEach(r -> {
-            ofNullable(r.get(upstream_rating)).ifPresent(e -> {
-                Integer ec = Optional.ofNullable(r.get(upstream_rating_count)).orElse(0) + upstreamRatings.getOrDefault(e, 0);
-                upstreamRatings.put(e, ec);
-            });
-            ofNullable(r.get(downstream_rating)).ifPresent(e -> {
-                Integer ec = Optional.ofNullable(r.get(downstream_rating_count)).orElse(0) + downStreamRatings.getOrDefault(e, 0);
-                downStreamRatings.put(e, ec);
-            });
-        });
-        return new HashMap<String, Map<String, Integer>>(){{
-            put("upstream_sources", upstreamRatings);
-            put("downstream_sources", downStreamRatings);
-        }};
-    }
-
 
     public LogicalFlow getBySourceAndTarget(EntityReference source, EntityReference target) {
         return baseQuery()
@@ -198,7 +146,7 @@ public class LogicalFlowDao {
 
 
     public List<LogicalFlow> findBySourcesAndTargets(List<Tuple2<EntityReference, EntityReference>> sourceAndTargets) {
-        if (sourceAndTargets.isEmpty()) {
+        if(sourceAndTargets.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -207,24 +155,27 @@ public class LogicalFlowDao {
                 .map(t -> isSourceCondition(t.v1)
                         .and(isTargetCondition(t.v2))
                         .and(LOGICAL_NOT_REMOVED))
-                .reduce(Condition::or)
+                .reduce((a, b) -> a.or(b))
                 .get();
 
-        return baseQuery()
+        List<LogicalFlow> fetch = baseQuery()
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
+
+        return fetch;
     }
 
 
     public Collection<LogicalFlow> findUpstreamFlowsForEntityReferences(List<EntityReference> references) {
 
-        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(EntityReference::kind, references);
+        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(ref -> ref.kind(), references);
 
         Condition anyTargetMatches = refsByKind
                 .entrySet()
                 .stream()
                 .map(entry -> LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(entry.getKey().name())
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(map(entry.getValue(), EntityReference::id)))).reduce(DSL.falseCondition(), Condition::or);
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(map(entry.getValue(), ref -> ref.id()))))
+                .collect(Collectors.reducing(DSL.falseCondition(), (acc, c) -> acc.or(c)));
 
         return baseQuery()
                 .where(anyTargetMatches)
@@ -264,14 +215,14 @@ public class LogicalFlowDao {
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target()))
                         .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
-                .reduce(Condition::or)
+                .reduce((a, b) -> a.or(b))
                 .get();
 
         List<LogicalFlow> removedFlows = baseQuery()
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
 
-        if (removedFlows.size() > 0) {
+        if(removedFlows.size() > 0) {
             restoreFlows(removedFlows, user);
         }
 
@@ -302,7 +253,6 @@ public class LogicalFlowDao {
      * Attempt to restore a flow.  The id is ignored and only source and target
      * are used. Return's true if the flow has been successfully restored or
      * false if no matching (removed) flow was found.
-     *
      * @param flow
      * @return
      */
@@ -333,7 +283,7 @@ public class LogicalFlowDao {
 
 
     private int restoreFlows(List<LogicalFlow> flows, String username) {
-        if (flows.isEmpty()) {
+        if(flows.isEmpty()) {
             return 0;
         }
 
@@ -342,7 +292,7 @@ public class LogicalFlowDao {
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target()))
                         .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
-                .reduce(Condition::or)
+                .reduce((a, b) -> a.or(b))
                 .get();
 
         return dsl.update(LOGICAL_FLOW)
@@ -456,7 +406,7 @@ public class LogicalFlowDao {
 
     private Condition isSourceCondition(EntityReference ref) {
         return LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
+                    .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
     }
 
     private SelectJoinStep<Record> baseQuery() {
