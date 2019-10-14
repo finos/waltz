@@ -13,7 +13,12 @@
     <div class="col-sm-12" ng-show="$ctrl.visibility.chart">
         <waltz-basic-info-tile name="Authoritative Inbound / Outbound Summary">
             <div class="row">
-                <div class="col-sm-8">
+                <div class="col-sm-3">
+                    <waltz-tree-filter items="$ctrl.dataTypes"
+                                       on-filter-change="$ctrl.onTreeFilterChange">
+                    </waltz-tree-filter>
+                </div>
+                <div class="col-sm-5">
                     <span id="wassp-inbound">
                     </span>
                             <span style="margin: 1.5em;">
@@ -61,11 +66,6 @@
                         <span ng-bind="$ctrl.overallPercentageOfAuthoritiveSources"></span>
                         %
                     </p>
-                </div>
-                <div class="col-sm-4">
-                    <waltz-tree-filter items="$ctrl.dataTypes"
-                                       on-filter-change="$ctrl.onTreeFilterChange">
-                    </waltz-tree-filter>
                 </div>
             </div>
         </waltz-basic-info-tile>

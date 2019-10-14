@@ -64,8 +64,10 @@ function controller() {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
     };
-    vm.toggleTreeSelector = () => {
+    vm.toggleTreeSelector = ($event) => {
         vm.editMode = !vm.editMode;
+        $event.stopPropagation();
+        $event.preventDefault();
     };
     const sortByName = (items = []) => items.sort((a, b) => {
         if (a.name < b.name) {
