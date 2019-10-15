@@ -25,7 +25,7 @@ import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
 import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
-
+import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 const bindings = {
     filters: "<",
@@ -101,12 +101,11 @@ function controller($q, serviceBroker) {
         const g = svg.append("g")
             .attr("transform", options.transform);
 
-        const isEmpty = _.sum(_.values(rawStats)) == 0;
+        const isEmpty = _.sum(_.values(rawStats)) === 0;
 
         if (isEmpty) {
-            return;
         } else {
-            const pieStats= _.map(rawStats, (value, key) => ({value, key}));
+            const pieStats = _.map(rawStats, (value, key) => ({value, key}));
 
             const pieData = pie()
                 .value(d => d.value)
@@ -130,84 +129,102 @@ function controller($q, serviceBroker) {
                 .attr("d", d => pieArc(d));
         }
     };
-
-    const determineIfChartShouldBeVisible = (p1, p2) => {
-        $q.all([p1, p2])
-            .then(() => {
-                const inCount = _.sum(_.values(vm.inboundStats));
-                const outCount = _.sum(_.values(vm.outboundStats));
-                vm.visibility.chart = (inCount + outCount) > 0;
-            });
+    const determineIfChartShouldBeVisible = (inboundStats, outboundStats) => {
+        const inCount = _.sum(_.values(inboundStats));
+        const outCount = _.sum(_.values(outboundStats));
+        return (inCount + outCount) > 0;
     };
 
-    const calculateOverallPercentage = (p1, p2) => {
-        $q.all([p1, p2])
-            .then(() => {
-                const sumOfPrimaryAndSecondaryValues = (map) => {
-                    return safeGetNumber(map, 'PRIMARY') + safeGetNumber(map, 'SECONDARY');
-                };
+    const calculateOverallPercentage = (inboundStats, outboundStats) => {
+        const sumOfPrimaryAndSecondaryValues = (map) => {
+            return safeGetNumber(map, "PRIMARY") + safeGetNumber(map, "SECONDARY");
+        };
 
-                const sumOfDiscouragedAndNoOpinionValues = (map) => {
-                    return safeGetNumber(map, 'DISCOURAGED') + safeGetNumber(map, 'NO_OPINION');
-                };
+        const sumOfDiscouragedAndNoOpinionValues = (map) => {
+            return safeGetNumber(map, "DISCOURAGED") + safeGetNumber(map, "NO_OPINION");
+        };
 
-                const safeGetNumber = (map, key) => {
-                    const value = map[key];
-                    return _.isNumber(value) && !_.isNaN(value) ? value : 0;
-                };
+        const safeGetNumber = (map, key) => {
+            const value = map[key];
+            return _.isNumber(value) && !_.isNaN(value) ? value : 0;
+        };
 
-                const sumRasNonRas = sumOfPrimaryAndSecondaryValues(vm.inboundStats)
-                                        + sumOfPrimaryAndSecondaryValues(vm.outboundStats);
+        const sumRasNonRas = sumOfPrimaryAndSecondaryValues(inboundStats)
+            + sumOfPrimaryAndSecondaryValues(outboundStats);
 
-                const sumOfAll = sumRasNonRas
-                                   + sumOfDiscouragedAndNoOpinionValues(vm.inboundStats)
-                                    + sumOfDiscouragedAndNoOpinionValues(vm.outboundStats)
+        const sumOfAll = sumRasNonRas
+            + sumOfDiscouragedAndNoOpinionValues(inboundStats)
+            + sumOfDiscouragedAndNoOpinionValues(outboundStats);
 
-                const overallPercentage = sumOfAll !== 0 ? sumRasNonRas / sumOfAll * 100 : 0;
-                vm.overallPercentageOfAuthoritiveSources = Number(overallPercentage).toFixed(2);
-            });
+        const overallPercentage = sumOfAll !== 0 ? sumRasNonRas / sumOfAll * 100 : 0;
+        return Number(overallPercentage).toFixed(2);
     };
 
-    const loadSummaryStats = () => {
-        if(! vm.parentEntityRef) return;
+    const loadSummaryStats = (parentEntityRef, filters, selectedItems=[]) => {
+        if (parentEntityRef) {
+            const inboundPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
+                    [mkApplicationSelectionOptions(
+                        parentEntityRef,
+                        undefined,
+                        undefined,
+                        filters)]);
+            const outboundPromise = serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
+                    [mkApplicationSelectionOptions(
+                        parentEntityRef,
+                        undefined,
+                        undefined,
+                        filters)]);
+            $q.all([inboundPromise, outboundPromise])
+                .then(xs => xs.map(r => r.data))
+                .then(xs => {
+                    //in case user has chosen to selectively plot only some items then we feed them into display separately
+                    let filteredDataTypes = xs.map(r => {
+                        if (selectedItems && selectedItems.length){
+                            const reduceable = [...r].map(e => Object.assign({e}, {id :e.decoratorEntityReference.id}));
+                            const reduced = reduceToSelectedNodesOnly(reduceable, selectedItems).map(e => e.id);
+                            return r.filter(e => reduced.includes(e.decoratorEntityReference.id))
+                        }
+                        else {
+                            return r;
+                        }
+                    });
+                    const [inboundStats, outboundStats] = filteredDataTypes.map(r => toStats(r));
+                    drawPie(inboundStats, inboundOptions);
+                    drawPie(outboundStats, outboundOptions);
+                    vm.overallPercentageOfAuthoritiveSources = calculateOverallPercentage(inboundStats, outboundStats);
+                    vm.visibility.chart = determineIfChartShouldBeVisible(inboundStats, outboundStats);
+                    vm.inboundStats = inboundStats;
+                    vm.outboundStats = outboundStats;
+                    return xs;
+                }).then(xs => {
+                    const [inboundDataTypes, outboundDataTypes] = xs;
+                    const extractDtIdsFn = (myDataTypes) => myDataTypes.map(e => e.decoratorEntityReference.id);
+                    const displayDataTypeIds = extractDtIdsFn(inboundDataTypes).concat(extractDtIdsFn(outboundDataTypes));
 
-        const inboundPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                [ mkApplicationSelectionOptions(
-                    vm.parentEntityRef,
-                    undefined,
-                    undefined,
-                    vm.filters) ])
-            .then(r => {
-                vm.inboundStats = toStats(r.data);
-                drawPie(vm.inboundStats, inboundOptions);
-            });
-
-        const outboundPromise = serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
-                [ mkApplicationSelectionOptions(
-                    vm.parentEntityRef,
-                    undefined,
-                    undefined,
-                    vm.filters) ])
-            .then(r => {
-                vm.outboundStats = toStats(r.data);
-                drawPie(vm.outboundStats, outboundOptions);
-            });
-
-        determineIfChartShouldBeVisible(inboundPromise, outboundPromise);
-        calculateOverallPercentage(inboundPromise, outboundPromise);
+                    return serviceBroker
+                        .loadAppData(CORE_API.DataTypeStore.findAll)
+                        .then(result => result.data)
+                        .then(dataTypes => dataTypes.map(e => Object.assign(e, {concrete: displayDataTypeIds.includes(e.id)})))
+                        .then(dataTypes => reduceToSelectedNodesOnly(dataTypes, displayDataTypeIds));
+                }).then(applicableDataTypes => {
+                    vm.dataTypes = applicableDataTypes
+                });
+        }
     };
-
+    vm.onTreeFilterChange = (selectedItems) => {
+        loadSummaryStats(vm.parentEntityRef, vm.filters, selectedItems);
+    };
     vm.$onInit = () => {
-        loadSummaryStats();
+        loadSummaryStats(vm.parentEntityRef, vm.filters);
     };
 
     vm.$onChanges = (changes) => {
-        if(changes.filters) {
-            loadSummaryStats();
+        if (changes.filters) {
+            loadSummaryStats(vm.parentEntityRef, vm.filters);
         }
     };
 }
