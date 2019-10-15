@@ -48,6 +48,14 @@ export function store($http,
     };
 
 
+    const findDataTypeStatsForEntity = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/datatype-stats`, selector)
+            .then(result => result.data);
+    };
+
+
     /**
      * where command like:
      *    {
@@ -61,7 +69,7 @@ export function store($http,
      */
     const updateDecorators = (command) => {
         return $http
-            .post(`${BASE}/${command.flowId}`, command)
+            .post(`${BASE}/update/flow/${command.flowId}`, command)
             .then(r => r.data);
     };
 
@@ -79,7 +87,7 @@ export function store($http,
      */
     const updateDecoratorsBatch = (commands) => {
         return $http
-            .post(`${BASE}/batch`, commands);
+            .post(`${BASE}/update/batch`, commands);
     };
 
 
@@ -117,6 +125,7 @@ export function store($http,
         findBySelectorAndKind,
         findBySelector,
         findByFlowIdsAndKind,
+        findDataTypeStatsForEntity,
         updateDecorators,
         updateDecoratorsBatch,
         summarizeInboundBySelector,
@@ -149,6 +158,11 @@ export const LogicalFlowDecoratorStore_API = {
         serviceName,
         serviceFnName: 'findByFlowIdsAndKind',
         description: 'executes findByFlowIdsAndKind - arg1: [flowIds], arg2: decoratorKind'
+    },
+    findDataTypeStatsForEntity: {
+        serviceName,
+        serviceFnName: 'findDataTypeStatsForEntity',
+        description: 'executes findDataTypeStatsForEntity'
     },
     updateDecorators: {
         serviceName,

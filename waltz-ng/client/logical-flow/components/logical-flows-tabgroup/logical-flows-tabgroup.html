@@ -14,7 +14,10 @@
                         </waltz-flow-cloud-diagram>
                     </div>
                     <div class="col-sm-12 col-md-8">
-                        <waltz-logical-flows-data-type-summary-pane stats="$ctrl.stats">
+                        <waltz-logical-flows-data-type-summary-pane
+                            stats="$ctrl.stats"
+                            parent-entity-ref="$ctrl.parentEntityRef"
+                            filters="$ctrl.filters">
                         </waltz-logical-flows-data-type-summary-pane>
                     </div>
                 </div>
