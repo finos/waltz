@@ -24,8 +24,8 @@ import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -55,7 +55,7 @@ import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
 @Service
-public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>> {
+public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
@@ -71,7 +71,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
 
 
-    public Select<Record1<Long>> apply(ApplicationIdSelectionOptions options) {
+    public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
@@ -107,7 +107,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForSoftwarePackage(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForSoftwarePackage(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
@@ -121,7 +121,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForScenario(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForScenario(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
@@ -135,7 +135,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForServer(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForServer(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
@@ -149,7 +149,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForActor(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long actorId = options.entityReference().id();
 
@@ -178,7 +178,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForFlowDiagram(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
         long diagramId = options.entityReference().id();
@@ -224,7 +224,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForMeasurable(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
         Select<Record1<Long>> measurableSelector = measurableIdSelectorFactory.apply(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
@@ -240,13 +240,13 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForApplication(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
         checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given an APPLICATION ref");
         return DSL.select(DSL.val(options.entityReference().id()));
     }
 
 
-    private Select<Record1<Long>> mkForEntityRelationship(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForEntityRelationship(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
         Condition applicationConditions = mkApplicationConditions(options);
@@ -275,7 +275,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private SelectConditionStep<Record1<Long>> mkForOrgUnit(ApplicationIdSelectionOptions options) {
+    private SelectConditionStep<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
 
         ImmutableIdSelectionOptions ouSelectorOptions = ImmutableIdSelectionOptions.builder()
                 .entityReference(options.entityReference())
@@ -294,7 +294,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    public static SelectOrderByStep<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
+    public static SelectOrderByStep<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
         if (options.scope() != EXACT) {
             throw new UnsupportedOperationException(
                     "App Groups are not hierarchical therefore ignoring requested scope of: " + options.scope());
@@ -330,7 +330,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForPerson(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
         switch (options.scope()) {
             case EXACT:
                 return mkForSinglePerson(options);
@@ -345,7 +345,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPersonReportees(IdSelectionOptions options) {
 
         Select<Record1<String>> emp = DSL
                 .select(person.EMPLOYEE_ID)
@@ -372,7 +372,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForSinglePerson(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForSinglePerson(IdSelectionOptions options) {
 
         Select<Record1<String>> employeeId = DSL
                 .select(person.EMPLOYEE_ID)
@@ -391,7 +391,7 @@ public class ApplicationIdSelectorFactory implements Function<ApplicationIdSelec
     }
 
 
-    private Select<Record1<Long>> mkForDataType(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 
         Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)

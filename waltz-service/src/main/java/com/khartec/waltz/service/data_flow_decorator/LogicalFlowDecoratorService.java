@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -164,8 +164,7 @@ public class LogicalFlowDecoratorService {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
-                ApplicationIdSelectionOptions appOptions = mkOpts(options);
-                return findByAppIdSelector(appOptions);
+                return findByAppIdSelector(options);
             case DATA_TYPE:
                 return findByDataTypeIdSelector(options);
             default:
@@ -252,7 +251,7 @@ public class LogicalFlowDecoratorService {
         Collection decorators = ratingsCalculator.calculate(unrated);
         int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
 
-        List<LogicalFlow> effectedFlows = logicalFlowDao.findByFlowIds(map(actions, a -> a.flowId()));
+        List<LogicalFlow> effectedFlows = logicalFlowDao.findByFlowIds(map(actions, UpdateDataFlowDecoratorsAction::flowId));
 
         List<EntityReference> effectedEntities = effectedFlows
                 .stream()
@@ -266,14 +265,14 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public List<DecoratorRatingSummary> summarizeInboundForSelector(ApplicationIdSelectionOptions options) {
+    public List<DecoratorRatingSummary> summarizeInboundForSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.summarizeInboundForSelector(selector);
     }
 
 
-    public List<DecoratorRatingSummary> summarizeOutboundForSelector(ApplicationIdSelectionOptions options) {
+    public List<DecoratorRatingSummary> summarizeOutboundForSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.summarizeOutboundForSelector(selector);
@@ -294,7 +293,7 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private Collection<LogicalFlowDecorator> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    private Collection<LogicalFlowDecorator> findByAppIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return logicalFlowDecoratorDao.findByAppIdSelector(selector);
@@ -372,7 +371,7 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public Set<LogicalFlowDecoratorStat> findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions selectionOptions) {
+    public Set<LogicalFlowDecoratorStat> findFlowsByDatatypeForEntity(IdSelectionOptions selectionOptions) {
 
         Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOptions);
 

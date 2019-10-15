@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -90,7 +90,7 @@ public class LogicalFlowEndpoint implements Endpoint {
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
 
         ListRoute<LogicalFlow> findBySelectorRoute = (request, response)
-                -> logicalFlowService.findBySelector(readAppIdSelectionOptionsFromBody(request));
+                -> logicalFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlow> findByIdsRoute = (request, response)
                 -> logicalFlowService.findByIds(readIdsFromBody(request));
@@ -101,7 +101,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         };
 
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
-                -> logicalFlowService.calculateStats(readAppIdSelectionOptionsFromBody(request));
+                -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));

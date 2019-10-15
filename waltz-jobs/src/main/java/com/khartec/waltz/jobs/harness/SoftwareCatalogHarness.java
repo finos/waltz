@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
@@ -41,7 +40,7 @@ public class SoftwareCatalogHarness {
                 .id(20L)
                 .build();
 
-        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(ref, HierarchyQueryScope.CHILDREN);
+        IdSelectionOptions options = IdSelectionOptions.mkOpts(ref, HierarchyQueryScope.CHILDREN);
 
         SoftwareSummaryStatistics stats = softwareCatalogService.calculateStatisticsForAppIdSelector(options);
         System.out.println("stats:"+stats);

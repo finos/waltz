@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -39,7 +39,7 @@ public class MeasurableRatingExporterHarness {
 
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(
+        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(IdSelectionOptions.mkOpts(
                 mkRef(EntityKind.ORG_UNIT, 10L),
                 HierarchyQueryScope.CHILDREN));
 //

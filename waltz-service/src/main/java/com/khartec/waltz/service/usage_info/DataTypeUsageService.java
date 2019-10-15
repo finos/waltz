@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,6 @@ import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.tally.Tally;
@@ -66,7 +65,7 @@ public class DataTypeUsageService {
     }
 
 
-    public List<DataTypeUsage> findForAppIdSelector(EntityKind kind, ApplicationIdSelectionOptions options) {
+    public List<DataTypeUsage> findForAppIdSelector(EntityKind kind, IdSelectionOptions options) {
         return dataTypeUsageDao.findForIdSelector(
                 kind,
                 appIdSelectorFactor.apply(options));
@@ -91,8 +90,7 @@ public class DataTypeUsageService {
 
     public List<Tally<String>> findUsageStatsForDataTypeSelector(IdSelectionOptions idSelectionOptions) {
         Select<Record1<Long>> dataTypeIdSelector = dataTypeIdSelectorFactory.apply(idSelectionOptions);
-        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(idSelectionOptions);
-        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector, appOptions);
+        return dataTypeUsageDao.findUsageStatsForDataTypeSelector(dataTypeIdSelector, idSelectionOptions);
     }
 
 
@@ -106,7 +104,7 @@ public class DataTypeUsageService {
      * @return
      */
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind usageKind,
-                                                                                       ApplicationIdSelectionOptions options) {
+                                                                                       IdSelectionOptions options) {
         checkNotNull(usageKind, "usageKind cannot be null");
         checkNotNull(options, "options cannot be null");
 
@@ -122,7 +120,7 @@ public class DataTypeUsageService {
 
         Collection<UsageInfo> base = CollectionUtilities.map(
                 dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeId),
-                dtu -> dtu.usage());
+                DataTypeUsage::usage);
 
         SystemChangeSet<UsageInfo, UsageKind> changeSet = mkChangeSet(
                 SetUtilities.fromCollection(base),
@@ -146,13 +144,13 @@ public class DataTypeUsageService {
         Set<Long> appIds = refs
                 .stream()
                 .filter(r -> r.kind() == EntityKind.APPLICATION)
-                .map(r -> r.id())
+                .map(EntityReference::id)
                 .collect(Collectors.toSet());
 
         Set<Long> actorIds = refs
                 .stream()
                 .filter(r -> r.kind() == EntityKind.ACTOR)
-                .map(r -> r.id())
+                .map(EntityReference::id)
                 .collect(Collectors.toSet());
 
         if (isEmpty(appIds) && isEmpty(actorIds)) {

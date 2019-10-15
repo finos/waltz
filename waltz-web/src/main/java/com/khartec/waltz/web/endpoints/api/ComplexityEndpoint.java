@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ public class ComplexityEndpoint implements Endpoint {
         String rebuildPath = mkPath(BASE_URL, "rebuild");
 
         DatumRoute<ComplexityRating> getForAppRoute = (request, response) -> service.getForApp(getId(request));
-        ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readAppIdSelectionOptionsFromBody(request));
+        ListRoute<ComplexityRating> findForAppIdSelectorRoute = (request, response) -> service.findForAppIdSelector(readIdSelectionOptionsFromBody(request));
         DatumRoute<Integer> rebuildRoute = (request, response) -> service.rebuild();
 
         getForDatum(getForAppPath, getForAppRoute);

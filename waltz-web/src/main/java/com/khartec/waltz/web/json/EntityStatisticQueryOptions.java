@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ package com.khartec.waltz.web.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableEntityStatisticQueryOptions.class)
 public abstract class EntityStatisticQueryOptions {
 
-    public abstract ApplicationIdSelectionOptions selector();
+    public abstract IdSelectionOptions selector();
     public abstract List<Long> statisticIds();
 
 }

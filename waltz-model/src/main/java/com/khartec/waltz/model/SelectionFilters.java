@@ -17,16 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.common.exception;
+package com.khartec.waltz.model;
 
-public class DuplicateKeyException extends RuntimeException {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.application.ApplicationKind;
+import org.immutables.value.Value;
 
-    public DuplicateKeyException(String message) {
-        super(message);
-    }
+import java.util.Set;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableSelectionFilters.class)
+@JsonDeserialize(as = ImmutableSelectionFilters.class)
+public abstract class SelectionFilters {
 
-    public DuplicateKeyException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public abstract Set<ApplicationKind> omitApplicationKinds();
+
 }

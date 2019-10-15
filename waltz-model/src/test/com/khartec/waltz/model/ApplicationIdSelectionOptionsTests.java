@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package com.khartec.waltz.model;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;
 import org.junit.Assert;

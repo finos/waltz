@@ -29,7 +29,7 @@ import {
 } from "../../../data-types/data-type-utils";
 
 import template from "./logical-flows-data-type-summary-pane.html";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 
@@ -131,7 +131,7 @@ function controller(displayNameService, logicalFlowUtilityService, serviceBroker
     vm.$onChanges = () => {
 
         if (vm.parentEntityRef) {
-            vm.selector = mkApplicationSelectionOptions(
+            vm.selector = mkSelectionOptions(
                 vm.parentEntityRef,
                 undefined,
                 [entityLifecycleStatus.ACTIVE.key],

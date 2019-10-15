@@ -19,9 +19,9 @@
 import _ from "lodash";
 import {initialiseData, isEmpty} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./complexity-section.html";
 
@@ -59,7 +59,7 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
-        vm.selector = mkApplicationSelectionOptions(
+        vm.selector = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             [entityLifecycleStatus.ACTIVE.key],

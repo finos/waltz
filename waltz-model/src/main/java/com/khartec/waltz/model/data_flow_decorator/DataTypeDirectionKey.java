@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,14 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableDataTypeDirectionKey.class)
 @JsonDeserialize(as = ImmutableDataTypeDirectionKey.class)
 public abstract class DataTypeDirectionKey {
+
+    public static DataTypeDirectionKey mkKey(Long dataTypeId, FlowDirection flowDirection) {
+        return ImmutableDataTypeDirectionKey
+                .builder()
+                .DatatypeId(dataTypeId)
+                .flowDirection(flowDirection)
+                .build();
+    }
 
     public abstract Long DatatypeId();
     public abstract FlowDirection flowDirection();

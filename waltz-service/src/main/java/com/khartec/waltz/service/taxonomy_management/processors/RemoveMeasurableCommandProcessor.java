@@ -1,9 +1,29 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.service.taxonomy_management.processors;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
+import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.taxonomy_management.*;
@@ -123,7 +143,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         Set<EntityReference> refs = flowDiagramEntityService
                 .findForEntitySelector(selectionOptions)
                 .stream()
-                .map(e -> e.entityReference())
+                .map(FlowDiagramEntity::entityReference)
                 .collect(Collectors.toSet());
 
         addToPreview(
@@ -139,7 +159,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
                                             IdSelectionOptions selectionOptions) {
         addToPreview(
                 preview,
-                map(involvementService.findByGenericEntitySelector(selectionOptions), r -> r.entityReference()),
+                map(involvementService.findByGenericEntitySelector(selectionOptions), Involvement::entityReference),
                 Severity.ERROR,
                 "Involvements (links to people) associated to this item (or it's children) will be removed");
     }
@@ -150,7 +170,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         Collection<Bookmark> bookmarks = bookmarkService.findByBookmarkIdSelector(selectionOptions);
         addToPreview(
                 preview,
-                map(bookmarks, r -> r.entityReference()),
+                map(bookmarks, Bookmark::entityReference),
                 Severity.ERROR,
                 "Bookmarks associated to this item (or it's children) will be removed");
     }
@@ -158,10 +178,10 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     private void previewAppMappingRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                            IdSelectionOptions selectionOptions) {
-        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(ApplicationIdSelectionOptions.mkOpts(selectionOptions));
+        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(selectionOptions);
         addToPreview(
                 preview,
-                map(ratings, r -> r.entityReference()),
+                map(ratings, MeasurableRating::entityReference),
                 Severity.ERROR,
                 "Application ratings associated to this item (or it's children) will be removed");
     }
@@ -169,7 +189,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     private void previewChildNodeRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                           IdSelectionOptions selectionOptions) {
-        Set<EntityReference> childRefs = map(measurableService.findByMeasurableIdSelector(selectionOptions), m -> m.entityReference());
+        Set<EntityReference> childRefs = map(measurableService.findByMeasurableIdSelector(selectionOptions), Measurable::entityReference);
         addToPreview(
                 preview,
                 minus(childRefs, asSet(selectionOptions.entityReference())),
@@ -200,9 +220,11 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc());
     }
 
+
     private int removeEntityRelationshipsDiagrams(IdSelectionOptions selectionOptions) {
         return entityRelationshipService.deleteForGenericEntitySelector(selectionOptions);
     }
+
 
     private int removeFlowDiagrams(IdSelectionOptions selectionOptions) {
         return flowDiagramEntityService.deleteForEntitySelector(selectionOptions);

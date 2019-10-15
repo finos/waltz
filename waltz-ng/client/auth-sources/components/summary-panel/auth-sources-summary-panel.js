@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {arc, pie} from "d3-shape";
 import {select} from "d3-selection";
 import {authoritativeRatingColorScale} from "../../../common/colors";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 const bindings = {
@@ -162,22 +162,22 @@ function controller($q, serviceBroker) {
 
     const loadSummaryStats = (parentEntityRef, filters, selectedItems=[]) => {
         if (parentEntityRef) {
+            const selectionOptions = mkSelectionOptions(
+                parentEntityRef,
+                undefined,
+                undefined,
+                filters);
+
             const inboundPromise = serviceBroker
                 .loadViewData(
                     CORE_API.LogicalFlowDecoratorStore.summarizeInboundBySelector,
-                    [mkApplicationSelectionOptions(
-                        parentEntityRef,
-                        undefined,
-                        undefined,
-                        filters)]);
+                    [selectionOptions]);
+
             const outboundPromise = serviceBroker
                 .loadViewData(
                     CORE_API.LogicalFlowDecoratorStore.summarizeOutboundBySelector,
-                    [mkApplicationSelectionOptions(
-                        parentEntityRef,
-                        undefined,
-                        undefined,
-                        filters)]);
+                    [selectionOptions]);
+
             $q.all([inboundPromise, outboundPromise])
                 .then(xs => xs.map(r => r.data))
                 .then(xs => {

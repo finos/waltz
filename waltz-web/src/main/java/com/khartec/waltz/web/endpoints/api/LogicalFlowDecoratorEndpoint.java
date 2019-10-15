@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
@@ -86,13 +87,13 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findByIdSelectorAndKind(
-                                readAppIdSelectionOptionsFromBody(request),
+                                readIdSelectionOptionsFromBody(request),
                                 getKind(request));
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findBySelector(
-                                readAppIdSelectionOptionsFromBody(request));
+                                readIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlowDecorator> findByFlowIdsAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
@@ -101,18 +102,18 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
         ListRoute<DecoratorRatingSummary> summarizeInboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeInboundForSelector(
-                        readAppIdSelectionOptionsFromBody(request));
+                        readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeOutboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeOutboundForSelector(
-                        readAppIdSelectionOptionsFromBody(request));
+                        readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForAllRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeForAll();
 
         ListRoute<LogicalFlowDecoratorStat> findDatatypeStatsForEntityRoute =
                 (request, response) -> {
-                    ApplicationIdSelectionOptions selectionOptions = readAppIdSelectionOptionsFromBody(request);
+                    IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
                     return logicalFlowDecoratorService.findFlowsByDatatypeForEntity(selectionOptions);
                 };
 

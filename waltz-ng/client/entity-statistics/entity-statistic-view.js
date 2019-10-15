@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { entityLifecycleStatuses, resetData } from "../common";
-import { kindToViewState } from "../common/link-utils";
-import { mkApplicationSelectionOptions } from "../common/selector-utils";
-import { hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload } from "./utilities";
-import { dynamicSections } from "../dynamic-section/dynamic-section-definitions";
-import { CORE_API } from "../common/services/core-api-utils";
+import {entityLifecycleStatuses, resetData} from "../common";
+import {kindToViewState} from "../common/link-utils";
+import {mkSelectionOptions} from "../common/selector-utils";
+import {hasRelatedDefinitions, navigateToStatistic} from "./utilities";
+import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 import template from "./entity-statistic-view.html";
@@ -61,7 +61,7 @@ function mkHistory(history = [], current) {
 
 
 function mkStatisticSelector(entityRef, filters) {
-    const selector = mkApplicationSelectionOptions(
+    const selector = mkSelectionOptions(
         entityRef,
         undefined,
         [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED],

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -352,9 +352,9 @@ public class LogicalFlowDecoratorDao {
                         .and(lf.IS_REMOVED.isFalse()));
 
         return  dsl.select(
-                lfd.DECORATOR_ENTITY_ID,
-                flowTypeCase.as(flowType),
-                lf.ID)
+                    lfd.DECORATOR_ENTITY_ID,
+                    flowTypeCase.as(flowType),
+                    lf.ID)
                 .from(lf)
                 .innerJoin(lfd)
                 .on(lf.ID.eq(lfd.LOGICAL_FLOW_ID)
@@ -365,17 +365,12 @@ public class LogicalFlowDecoratorDao {
                 .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(dsl.renderInlined(condition))
                 .fetchGroups(
-                        k -> mkDataTypeDirectionKey(k.get(lfd.DECORATOR_ENTITY_ID), FlowDirection.valueOf(k.get(flowType))),
+                        k -> DataTypeDirectionKey.mkKey(
+                                k.get(lfd.DECORATOR_ENTITY_ID),
+                                FlowDirection.valueOf(k.get(flowType))),
                         v -> v.get(lf.ID));
 
     }
 
-    private DataTypeDirectionKey mkDataTypeDirectionKey(Long dataTypeId, FlowDirection flowDirection) {
-        return ImmutableDataTypeDirectionKey
-                .builder()
-                .DatatypeId(dataTypeId)
-                .flowDirection(flowDirection)
-                .build();
-    }
 
 }
