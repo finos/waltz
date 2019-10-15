@@ -39,7 +39,7 @@
 
         <hikari.version>2.6.3</hikari.version>
         <immutables.version>2.7.5</immutables.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.0.pr1</jackson.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.9.9</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
