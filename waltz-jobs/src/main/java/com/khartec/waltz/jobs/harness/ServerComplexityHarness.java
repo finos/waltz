@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.complexity.ComplexityRatingService;
@@ -50,7 +50,7 @@ public class ServerComplexityHarness {
         EntityReference entityReference = EntityReference.mkRef(EntityKind.PERSON, 63);
 
         List<ComplexityRating> complexity = FunctionUtilities.time("complexity",
-                () -> complexityService.findForAppIdSelector(ApplicationIdSelectionOptions.mkOpts(entityReference, HierarchyQueryScope.CHILDREN)));
+                () -> complexityService.findForAppIdSelector(IdSelectionOptions.mkOpts(entityReference, HierarchyQueryScope.CHILDREN)));
 
 
     }

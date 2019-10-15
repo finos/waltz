@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
@@ -93,10 +92,10 @@ public class DataTypeUsageEndpoint implements Endpoint {
                 -> dataTypeUsageService.findForDataTypeSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<Tally<String>> findUsageStatsForDataTypeSelectorRoute = (request, response)
-                -> dataTypeUsageService.findUsageStatsForDataTypeSelector(readAppIdSelectionOptionsFromBody(request));
+                -> dataTypeUsageService.findUsageStatsForDataTypeSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<DataTypeUsage> findForSelectorRoute = (request, response)
-                -> dataTypeUsageService.findForAppIdSelector(EntityKind.APPLICATION, readAppIdSelectionOptionsFromBody(request));
+                -> dataTypeUsageService.findForAppIdSelector(EntityKind.APPLICATION, readIdSelectionOptionsFromBody(request));
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findForDataTypeSelectorPath, findForDataTypeSelectorRoute);
@@ -111,7 +110,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
     private Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeSelectorRoute(Request request,
                                                                                            Response response) throws IOException
     {
-        ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
         UsageKind usageKind = readEnum(request,
                 "usage-kind",
                 UsageKind.class,
@@ -167,7 +166,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                             EntityReference ref,
                             Long dataTypeId,
                             Collection<UsageInfo> inserts) {
-        Collection<UsageKind> kinds = CollectionUtilities.map(inserts, u -> u.kind());
+        Collection<UsageKind> kinds = CollectionUtilities.map(inserts, UsageInfo::kind);
         String message = "Added usage kind/s: " + kinds + " for data type: " + dataTypeId;
         logChange(user, ref, message);
     }
@@ -177,7 +176,7 @@ public class DataTypeUsageEndpoint implements Endpoint {
                             EntityReference ref,
                             Long dataTypeId,
                             Collection<UsageInfo> updates) {
-        Collection<UsageKind> kinds = CollectionUtilities.map(updates, u -> u.kind());
+        Collection<UsageKind> kinds = CollectionUtilities.map(updates, UsageInfo::kind);
         String message = "Updated usage kind/s: " + kinds + " for data type: " + dataTypeId;
         logChange(user, ref, message);
     }

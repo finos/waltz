@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.data.server_information.search.ServerInformationSearchDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
@@ -80,7 +80,7 @@ public class ServerInformationService {
     }
 
 
-    public ServerSummaryStatistics calculateStatsForAppSelector(ApplicationIdSelectionOptions options) {
+    public ServerSummaryStatistics calculateStatsForAppSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = selectorFactory.apply(options);
         return serverInformationDao.calculateStatsForAppSelector(selector);
     }

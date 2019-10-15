@@ -20,7 +20,7 @@
 
 import {getParents} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
 import {hierarchyQueryScope} from '../../../common/services/enums/hierarchy-query-scope';
 import {lifecycleStatus} from '../../../common/services/enums/lifecycle-status';
 
@@ -37,7 +37,7 @@ function controller(serviceBroker) {
     const vm = this;
 
     const loadAll = () => {
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             vm.parentEntityRef,
             hierarchyQueryScope.CHILDREN.key,
             [lifecycleStatus.ACTIVE.key],

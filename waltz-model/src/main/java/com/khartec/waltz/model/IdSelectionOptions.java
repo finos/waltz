@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ package com.khartec.waltz.model;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.model.application.ApplicationKind;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -41,6 +42,11 @@ public abstract class IdSelectionOptions {
     @Value.Default
     public Set<EntityLifecycleStatus> entityLifecycleStatuses() {
         return SetUtilities.fromArray(EntityLifecycleStatus.ACTIVE);
+    }
+
+    @Value.Default
+    public SelectionFilters filters() {
+        return ImmutableSelectionFilters.builder().build();
     }
 
     public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope) {
@@ -76,5 +82,19 @@ public abstract class IdSelectionOptions {
                 return CHILDREN;
         }
 
+    }
+
+
+    public static void main(String[] args) {
+        ImmutableIdSelectionOptions opts = ImmutableIdSelectionOptions
+                .builder()
+                .entityReference(EntityReference.mkRef(EntityKind.APPLICATION, 1L))
+                .scope(EXACT)
+                .filters(ImmutableSelectionFilters
+                        .builder()
+                        .addOmitApplicationKinds(ApplicationKind.IN_HOUSE)
+                        .build())
+                .build();
+        System.out.println(opts);
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -67,7 +65,7 @@ public class MeasurableEndpoint implements Endpoint {
                 -> measurableService.findMeasurablesRelatedToEntity(getEntityReference(request));
 
         ListRoute<Measurable> findByMeasurableIdSelectorRoute = (request, response)
-                -> measurableService.findByMeasurableIdSelector(readAppIdSelectionOptionsFromBody(request));
+                -> measurableService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<Measurable> searchRoute = (request, response)
                 -> measurableService.search(request.params("query"));

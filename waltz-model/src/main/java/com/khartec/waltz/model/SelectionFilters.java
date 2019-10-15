@@ -17,21 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.web.json;
+package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationKind;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.util.Set;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableEntityStatisticQueryOptions.class)
-@JsonDeserialize(as = ImmutableEntityStatisticQueryOptions.class)
-public abstract class EntityStatisticQueryOptions {
+@JsonSerialize(as = ImmutableSelectionFilters.class)
+@JsonDeserialize(as = ImmutableSelectionFilters.class)
+public abstract class SelectionFilters {
 
-    public abstract IdSelectionOptions selector();
-    public abstract List<Long> statisticIds();
+    public abstract Set<ApplicationKind> omitApplicationKinds();
 
 }

@@ -24,7 +24,6 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -34,6 +33,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.List;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AppGroupHarness {
@@ -48,7 +48,7 @@ public class AppGroupHarness {
         ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
 
         EntityReference grp5 = mkRef(EntityKind.APP_GROUP, 5);
-        Select<Record1<Long>> selector = appSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(grp5));
+        Select<Record1<Long>> selector = appSelectorFactory.apply(mkOpts(grp5));
 
         System.out.println(dsl.render(selector));
         List<Application> apps = applicationDao.findByAppIdSelector(selector);

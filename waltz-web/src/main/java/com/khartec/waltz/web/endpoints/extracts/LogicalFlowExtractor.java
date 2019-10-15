@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readAppIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static spark.Spark.post;
 
 
@@ -63,14 +63,14 @@ public class LogicalFlowExtractor extends BaseDataExtractor {
     @Override
     public void register() {
         post(mkPath("data-extract", "logical-flows"), (request, response) -> {
-            ApplicationIdSelectionOptions options = readAppIdSelectionOptionsFromBody(request);
+            IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
             SelectConditionStep<Record> qry = prepareQuery(dsl, options);
             return writeExtract("logical-flows", qry, request, response);
         });
     }
 
 
-    private SelectConditionStep<Record> prepareQuery(DSLContext dsl, ApplicationIdSelectionOptions options) {
+    private SelectConditionStep<Record> prepareQuery(DSLContext dsl, IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 

@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +56,10 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
     private void registerExtractForAll(String path) {
         post(path, (request, response) -> {
-            ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             SelectConditionStep<Record> qry = prepareQuery(
                     DSL.trueCondition(),
-                    applicationIdSelectionOptions);
+                    idSelectionOptions);
 
             return writeExtract(
                     "all_allocations",
@@ -75,7 +75,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
             long measurableCategoryId = getLong(request, "measurableCategoryId");
 
-            ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+            IdSelectionOptions applicationIdSelectionOptions = readIdSelectionOptionsFromBody(request);
 
             Record1<String> fileName = dsl
                     .select(DSL.concat(MEASURABLE_CATEGORY.NAME, "_all_allocations"))
@@ -101,7 +101,7 @@ public class AllocationsExtractor extends BaseDataExtractor{
 
             long schemeId = getLong(request, "schemeId");
 
-            ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+            IdSelectionOptions applicationIdSelectionOptions = readIdSelectionOptionsFromBody(request);
 
             Record2<String, String> fileNameInfoRow = dsl
                     .select(MEASURABLE_CATEGORY.NAME, ALLOCATION_SCHEME.NAME)
@@ -128,8 +128,8 @@ public class AllocationsExtractor extends BaseDataExtractor{
     // -- HELPER ----
 
     private SelectConditionStep<Record> prepareQuery(Condition additionalCondition,
-                                                     ApplicationIdSelectionOptions applicationIdSelectionOptions) {
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
+                                                     IdSelectionOptions idSelectionOptions) {
+        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
         SelectSelectStep<Record> reportColumns = dsl
                 .select(APPLICATION.NAME.as("Application Name"),
                         APPLICATION.ID.as("Application Waltz Id"),

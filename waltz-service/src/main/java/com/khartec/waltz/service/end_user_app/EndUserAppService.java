@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,10 @@
 
 package com.khartec.waltz.service.end_user_app;
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationKind;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
@@ -54,12 +52,8 @@ public class EndUserAppService {
 
 
     @Deprecated
-    public List<EndUserApplication> findByOrganisationalUnitSelector(ApplicationIdSelectionOptions options) {
+    public List<EndUserApplication> findByOrganisationalUnitSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
-        if(!options.applicationKinds().contains(ApplicationKind.EUC)) {
-            // to account for EUC not being selection on the filters
-            return ListUtilities.newArrayList();
-        }
         Select<Record1<Long>> selector = orgUnitIdSelectorFactory.apply(options);
         return time("EUAS.findByOrganisationalUnitSelector", () -> endUserAppDao.findByOrganisationalUnitSelector(selector));
     }
@@ -70,12 +64,8 @@ public class EndUserAppService {
     }
 
 
-    public List<EndUserApplication> findBySelector(ApplicationIdSelectionOptions options) {
+    public List<EndUserApplication> findBySelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
-        if(!options.applicationKinds().contains(ApplicationKind.EUC)) {
-            // to account for EUC not being selection on the filters
-            return ListUtilities.newArrayList();
-        }
         Select<Record1<Long>> selector = endUserAppIdSelectorFactory.apply(options);
         return time("EUAS.findBySelector", () -> endUserAppDao.findBySelector(selector));
     }

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 import {entityLifecycleStatuses, resetData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions} from "../../common/selector-utils";
+import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../common/selector-utils";
 
 import template from "./entity-statistic-summary-section.html";
 
@@ -44,7 +44,7 @@ function controller(serviceBroker) {
 
     const loadStatTallies = (definition) => {
         vm.loading = true;
-        const selectionOptions = mkApplicationSelectionOptions(
+        const selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             [

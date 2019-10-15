@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,8 +23,8 @@ import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.data_type_usage.ImmutableDataTypeUsage;
 import com.khartec.waltz.model.tally.Tally;
@@ -48,6 +48,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.limit;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
@@ -137,14 +138,14 @@ public class DataTypeUsageDao {
 
 
     public List<Tally<String>> findUsageStatsForDataTypeSelector(Select<Record1<Long>> dataTypeIdSelector,
-                                                                 ApplicationIdSelectionOptions options) {
+                                                                 IdSelectionOptions options) {
         return dsl.select(DATA_TYPE_USAGE.USAGE_KIND, DSL.count())
                 .from(DATA_TYPE_USAGE)
                 .innerJoin(APPLICATION)
                     .on(APPLICATION.ID.eq(DATA_TYPE_USAGE.ENTITY_ID)
                             .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(DATA_TYPE_USAGE.DATA_TYPE_ID.in(dataTypeIdSelector))
-                .and(APPLICATION.KIND.in(options.applicationKinds()))
+                .and(APPLICATION.KIND.notIn(options.filters().omitApplicationKinds()))
                 .groupBy(DATA_TYPE_USAGE.USAGE_KIND)
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
@@ -525,7 +526,7 @@ public class DataTypeUsageDao {
 
     public Map<Long, Collection<EntityReference>> findForUsageKindByDataTypeIdSelector(UsageKind kind,
                                                                                        Select<Record1<Long>> dataTypeIdSelector,
-                                                                                       ApplicationIdSelectionOptions options) {
+                                                                                       IdSelectionOptions options) {
         Result<Record3<Long, Long, String>> records = dsl
                 .select(dt.ID, dtu.ENTITY_ID, app.NAME)
                 .from(dtu)
@@ -534,12 +535,12 @@ public class DataTypeUsageDao {
                 .where(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(dt.ID.in(dataTypeIdSelector))
                 .and(dtu.USAGE_KIND.eq(kind.name()))
-                .and(app.KIND.in(options.applicationKinds()))
+                .and(app.KIND.notIn(options.filters().omitApplicationKinds()))
                 .fetch();
 
         return MapUtilities.groupBy(
-                r -> r.value1(),
-                r -> EntityReference.mkRef(EntityKind.APPLICATION, r.value2(), r.value3()),
+                Record3::value1,
+                r -> mkRef(EntityKind.APPLICATION, r.value2(), r.value3()),
                 records);
     }
 

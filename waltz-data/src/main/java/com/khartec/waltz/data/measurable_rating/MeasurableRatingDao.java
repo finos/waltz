@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,7 @@ package com.khartec.waltz.data.measurable_rating;
 
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -52,6 +49,7 @@ import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.data.JooqUtilities.TO_LONG_TALLY;
+import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -167,16 +165,14 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRating> findByMeasurableIdSelector(Select<Record1<Long>> selector,
-                                                             Set<EntityLifecycleStatus> entityLifecycleStatuses,
-                                                             Set<ApplicationKind> applicationKinds) {
+                                                             IdSelectionOptions options) {
         checkNotNull(selector, "selector cannot be null");
 
         SelectConditionStep<Record> qry = mkBaseQuery()
                 .innerJoin(APPLICATION)
                 .on(APP_JOIN_CONDITION)
                 .where(MEASURABLE_RATING.MEASURABLE_ID.in(selector))
-                .and(APPLICATION.KIND.in(applicationKinds))
-                .and(mkLifecycleStatusCondition(entityLifecycleStatuses));
+                .and(mkApplicationConditions(options));
 
         return qry
                 .fetch(TO_DOMAIN_MAPPER);
@@ -276,13 +272,6 @@ public class MeasurableRatingDao {
 
 
     // --- utils
-
-    private Condition mkLifecycleStatusCondition(Set<EntityLifecycleStatus> entityLifecycleStatuses) {
-        return entityLifecycleStatuses.isEmpty()
-                ? DSL.trueCondition()
-                : APPLICATION.ENTITY_LIFECYCLE_STATUS.in(EnumUtilities.names(entityLifecycleStatuses));
-    }
-
 
     private SelectJoinStep<Record> mkBaseQuery() {
         return dsl

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,7 @@
  */
 
 
-import _ from "lodash";
-import { checkIsEntityRef } from "./checks";
+import {checkIsEntityRef} from "./checks";
 
 export function determineDownwardsScopeForKind(kind) {
     switch (kind) {
@@ -43,18 +42,6 @@ export function determineDownwardsScopeForKind(kind) {
 }
 
 
-/**
- * Replaced by `determineDownwardsScopeForKind`:
- * TODO: remove in 1.19
- * @deprecated
- * @param kind
- */
-export function getDefaultScopeForEntityKind(kind) {
-    console.log("Deprecated call to getDefaultScopeForEntityKind", kind);
-    return determineDownwardsScopeForKind(kind);
-}
-
-
 export function determineUpwardsScopeForKind(kind) {
     switch (kind) {
         case "ORG_UNIT":
@@ -68,33 +55,42 @@ export function determineUpwardsScopeForKind(kind) {
 }
 
 
-export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"]) {
+/**
+ * Helper method to construct valid IdSelectionOption instances.
+ * @param entityReference
+ * @param scope
+ * @param entityLifecycleStatuses
+ * @param filters
+ * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
+ */
+export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}) {
     checkIsEntityRef(entityReference);
 
     return {
         entityReference: { id: entityReference.id, kind: entityReference.kind }, // use minimal ref to increase cache hits in broker
         scope: scope || determineDownwardsScopeForKind(entityReference.kind),
-        entityLifecycleStatuses
+        entityLifecycleStatuses,
+        filters
     };
 }
 
 
+/**
+ * @deprecated use mkSelectionOptions instead, this method now  just calls that one.
+ * TODO: Remove in 1.23
+ *
+ * @param entityReference
+ * @param scope
+ * @param entityLifecycleStatuses
+ * @param filters
+ * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
+ */
 export function mkApplicationSelectionOptions(entityReference,
                                               scope,
                                               entityLifecycleStatuses = ["ACTIVE"],
                                               filters = {}) {
 
-    const appKinds = _.get(filters, "APPLICATION.applicationKind");
-    const filteredApplicationKinds = appKinds
-        ? _.chain(appKinds)
-            .pickBy((v, k) => v === true)
-            .keys()
-            .value()
-        : undefined;
-
-    const options = mkSelectionOptions(entityReference, scope, entityLifecycleStatuses);
-    return Object.assign(
-        {},
-        options,
-        { applicationKinds: filteredApplicationKinds });
+    console.log("Calls to mkApplicationSelectionOptions are deprecated, calling mkSelectionOptions instead");
+    // debugger;
+    return mkSelectionOptions(entityReference, scope, entityLifecycleStatuses, filters);
 }

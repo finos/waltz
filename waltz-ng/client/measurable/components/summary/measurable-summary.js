@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import {
 } from "../../../common/hierarchy-utils";
 import {kindToViewState} from "../../../common/link-utils";
 import {entityLifecycleStatus as EntityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -62,7 +62,7 @@ function controller(serviceBroker, $state) {
 
     const loadAll = () => {
 
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             undefined,

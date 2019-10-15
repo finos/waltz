@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package com.khartec.waltz.service.database_information;
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.database_information.DatabaseInformationDao;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-//import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
 
 @Service
 public class DatabaseInformationService {
@@ -51,12 +50,12 @@ public class DatabaseInformationService {
         return databaseInformationDao.findByApplicationId(id);
     }
 
-    public Map<Long, List<DatabaseInformation>> findByApplicationSelector(ApplicationIdSelectionOptions options) {
+    public Map<Long, List<DatabaseInformation>> findByApplicationSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         return databaseInformationDao.findByAppSelector(factory.apply(options));
     }
 
-    public DatabaseSummaryStatistics calculateStatsForAppIdSelector(ApplicationIdSelectionOptions options) {
+    public DatabaseSummaryStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
         Checks.checkNotNull(options, "options cannot be null");
         return databaseInformationDao.calculateStatsForAppSelector(factory.apply(options));
     }

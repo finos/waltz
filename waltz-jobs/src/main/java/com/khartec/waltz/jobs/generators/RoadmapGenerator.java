@@ -1,18 +1,35 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.*;
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.data.roadmap.RoadmapDao;
 import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
 import com.khartec.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.jobs.WaltzUtilities;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.roadmap.Roadmap;
@@ -31,7 +48,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.ListUtilities.filter;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.ObjectUtilities.any;
 import static com.khartec.waltz.common.RandomUtilities.randomIntBetween;
@@ -111,10 +127,9 @@ public class RoadmapGenerator implements SampleDataGenerator {
             Map<AxisOrientation, Collection<ScenarioAxisItem>> byOrientation = groupBy(ScenarioAxisItem::axisOrientation, axisItems);
 
             IdSelectionOptions options = mkOpts(scenario.entityReference());
-            ApplicationIdSelectionOptions appOpts = ApplicationIdSelectionOptions.mkOpts(options);
             Map<Long, Collection<MeasurableRating>> ratingsByMeasurableId = groupBy(
                     MeasurableRating::measurableId,
-                    measurableRatingService.findByMeasurableIdSelector(appOpts));
+                    measurableRatingService.findByMeasurableIdSelector(options));
 
             List<ScenarioRatingItemRecord> scenarioRatingItems = IntStream
                     .range(0, randomIntBetween(10, 300))

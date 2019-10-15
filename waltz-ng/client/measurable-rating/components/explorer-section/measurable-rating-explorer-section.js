@@ -18,11 +18,11 @@
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkLinkGridCell } from "../../../common/grid-utils";
-import { mkRatingSchemeColorScale } from "../../../common/colors";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkRatingSchemeColorScale} from "../../../common/colors";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./measurable-rating-explorer-section.html";
 
@@ -170,7 +170,7 @@ function controller($q, serviceBroker) {
     };
 
     const loadData = () => {
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             undefined,
@@ -223,7 +223,7 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => loadData()
         .then(() => processData());
 
-    vm.$onChanges = (c) => loadData()
+    vm.$onChanges = () => loadData()
         .then(() => processData());
 
     vm.onGridInitialise = (cfg) =>
