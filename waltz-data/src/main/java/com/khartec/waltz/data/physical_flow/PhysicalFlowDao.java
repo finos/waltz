@@ -389,6 +389,15 @@ public class PhysicalFlowDao {
     }
 
 
+    public int updateExternalId(long flowId, String externalId) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.EXTERNAL_ID, externalId)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
+
+
     public int updateTransport(long flowId, String transport) {
         Condition enumValueExists = EnumValueDao.mkExistsCondition(EnumValueKind.TRANSPORT_KIND, transport);
         return dsl
