@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.common.exception;
 
-public class DuplicateKeyException extends Exception {
+public class DuplicateKeyException extends RuntimeException {
 
     public DuplicateKeyException(String message) {
         super(message);
