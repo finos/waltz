@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import { initialiseData } from "../../../common";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
 import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";

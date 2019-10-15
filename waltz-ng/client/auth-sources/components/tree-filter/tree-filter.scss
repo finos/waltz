@@ -17,19 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "./basic-info-tile";
-@import "./change-timeline";
-@import "./column-mapper/column-mapper";
-@import "./keyword-list";
-@import "./markdown";
-@import "./no-data";
-@import "./overlay-panel";
-@import "./page-header/page-header";
-@import "./pie/pie";
-@import "./pie/pie-segment-table";
-@import "./search";
-@import "./section";
-@import "./sub-section";
-@import "./simple-stack-chart";
-@import "./yq-select";
-@import "../auth-sources/components/tree-filter/tree-filter";
+$waltz-keyword-color: #2e6d8e;
+$waltz-keyword-background-color: #e4edf4;
+$waltz-keyword-border-color: #c7cfd5;
+
+// -------
+.waltz-tree-filter {
+    text-align: left;
+    .wtf-filter-item {
+        display: inline-block;
+        padding: 2px 2px 0 4px;
+        margin: 3px 0px 3px 0;
+        white-space: nowrap;
+
+        color: $waltz-keyword-color;
+        background: $waltz-keyword-background-color;
+        border: 1px solid $waltz-keyword-border-color;
+        border-radius: 2px;
+        margin-right: 2px;
+    }
+
+    .wtf-filter-delete {
+        margin-right: 3px;
+        padding-left: 2px;
+    }
+
+    .tree-selected {
+        font-weight: unset !important;
+    }
+}

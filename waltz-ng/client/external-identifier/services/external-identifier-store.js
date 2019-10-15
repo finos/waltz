@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ export function store($http, baseApiUrl) {
     };
 
     const deleteExternalIdentifier = (ref, id, system) => $http
-        .delete(`${base}/entity/${ref.kind}/${ref.id}/externalId/${id}/${system}`)
+        .delete(`${base}/entity/${ref.kind}/${ref.id}/${system}/externalId/${id}`)
         .then(r => r.data);
 
     const addExternalIdentifier = (ref, id) => $http

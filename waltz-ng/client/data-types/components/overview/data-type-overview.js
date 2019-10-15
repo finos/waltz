@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -20,7 +19,7 @@
 
 import {getParents} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {hierarchyQueryScope} from '../../../common/services/enums/hierarchy-query-scope';
 import {lifecycleStatus} from '../../../common/services/enums/lifecycle-status';
 

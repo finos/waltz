@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,9 @@
 package com.khartec.waltz.data.physical_specification.search;
 
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -41,6 +42,8 @@ import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
+import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 @Repository
@@ -64,13 +67,23 @@ public class PhysicalSpecificationSearchDao {
 
         Condition likeName = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
         Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.DESCRIPTION, terms);
+        Condition likeExternalIdentifier = mkBasicTermSearch(PHYSICAL_SPECIFICATION.EXTERNAL_ID, terms)
+                .or(mkBasicTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
+
+        Condition searchFilter = likeName.or(likeDesc).or(likeExternalIdentifier);
+
 
         SelectQuery<Record> query = dsl
-                .select(PHYSICAL_SPECIFICATION.fields())
+                .selectDistinct(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .where(likeName)
-                .or(likeDesc)
+                .leftOuterJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .leftOuterJoin(EXTERNAL_IDENTIFIER)
+                .on(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())
+                    .and(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(PHYSICAL_FLOW.ID)))
+                .where(PHYSICAL_SPECIFICATION.IS_REMOVED.eq(false))
+                .and(searchFilter)
                 .orderBy(PHYSICAL_SPECIFICATION.NAME)
                 .limit(options.limit())
                 .getQuery();
@@ -91,7 +104,7 @@ public class PhysicalSpecificationSearchDao {
                 });
 
         results.sort(mkRelevancyComparator(
-                ps -> ps.name(),
+                NameProvider::name,
                 terms.get(0)));
 
         return results;

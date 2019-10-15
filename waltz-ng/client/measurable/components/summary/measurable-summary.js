@@ -24,15 +24,10 @@ import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
 import template from "./measurable-summary.html";
 import {initialiseData} from "../../../common/index";
-import {
-    findNode,
-    flattenChildren,
-    getParents,
-    populateParents
-} from "../../../common/hierarchy-utils";
+import {findNode, flattenChildren, getParents, populateParents} from "../../../common/hierarchy-utils";
 import {kindToViewState} from "../../../common/link-utils";
 import {entityLifecycleStatus as EntityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {

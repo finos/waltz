@@ -23,7 +23,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {calcWorkingTotal, determineChangeType, updateDirtyFlags, validateItems} from "../../allocation-utilities";
 import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 

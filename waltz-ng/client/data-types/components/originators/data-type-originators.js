@@ -21,7 +21,7 @@ import _ from "lodash";
 
 import {initialiseData} from "../../../common"
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-type-originators.html";
 

@@ -19,7 +19,7 @@
 
 import {entityLifecycleStatuses, resetData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../common/selector-utils";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 import template from "./entity-statistic-summary-section.html";
 

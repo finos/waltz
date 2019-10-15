@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { calcComplexitySummary } from "../../../complexity/services/complexity-utilities";
-import { initialiseData } from "../../../common/index";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions, mkSelectionOptions} from "../../../common/selector-utils";
-import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
+import {initialiseData} from "../../../common/index";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./person-summary.html";
 

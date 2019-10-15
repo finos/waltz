@@ -42,16 +42,26 @@
 
     <div ng-if="$ctrl.visibility.detail"
          class="waltz-fade-if">
-        <table class="table table-condensed small table-striped">
+        <table class="table table-condensed small table-striped table-hover">
             <colgroup>
-                <col width="40%">
+                <col width="5%">
+                <col width="35%">
                 <col width="15%">
                 <col width="15%">
                 <col width="15%">
                 <col width="15%">
             </colgroup>
             <thead>
-            <tr>
+            <tr ng-class="{'clickable': $ctrl.activeParent}"
+                ng-click="$ctrl.goUp()">
+                <th>
+                    <span title="Go to {{$ctrl.activeParent.name}}">
+                        <waltz-icon ng-if="$ctrl.activeParent"
+                                    name="share"
+                                    flip="horizontal">
+                        </waltz-icon>
+                    </span>
+                </th>
                 <th>Category</th>
                 <th style="text-align:right;">Intra</th>
                 <th style="text-align:right;">Inbound</th>
@@ -60,39 +70,32 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="row in $ctrl.enrichedDataTypeCounts | orderBy:'dataType.name'">
+            <tr ng-repeat="row in $ctrl.detailTable"
+                ng-class="{ 'clickable': row.hasChildren}"
+                class="waltz-visibility-parent"
+                ng-click="row.hasChildren && $ctrl.prepareTable(row.dataType)">
                 <td>
-                    <span ng-bind="row.dataType.name"></span>
-                </td>
-                <td align="right" style="padding-right: 0.2em">
-                    <span ng-bind="row.intra"></span>
-                </td>
-                <td align="right" style="padding-right: 0.2em">
-                    <span ng-bind="row.inbound"></span>
-                </td>
-                <td align="right" style="padding-right: 0.2em">
-                    <span ng-bind="row.outbound"></span>
-                </td>
-                <td align="right" style="padding-right: 0.2em">
-                    <span ng-bind="row.total"></span>
-                </td>
-            </tr>
-            </tbody>
-            <tbody ng-if="$ctrl.visibility.summaries">
-            <tr>
-                <td>
-                    Valid / Unknown / Deprecated / Non concrete
-                </td>
-                <td align="right"
-                    ng-repeat="summary in $ctrl.summaries">
-                    <span uib-popover-template="'wlft-summary-popup.html'"
-                         popover-placement="bottom"
-                         popver-append-to-body="true"
-                         popover-trigger="mouseenter">
-                        <waltz-pie data="summary.summary"
-                                   config="$ctrl.summaryConfig">
-                        </waltz-pie>
+                    <span class="waltz-visibility-child-30">
+                        <waltz-icon name="share"
+                                    ng-if="row.hasChildren">
+                        </waltz-icon>
                     </span>
+                </td>
+                <td>
+                    <span ng-bind="row.dataType.name">
+                    </span>
+                </td>
+                <td align="right" style="padding-right: 0.2em">
+                    <span ng-bind="row.stats.logicalFlowMeasures.intra"></span>
+                </td>
+                <td align="right" style="padding-right: 0.2em">
+                    <span ng-bind="row.stats.logicalFlowMeasures.inbound"></span>
+                </td>
+                <td align="right" style="padding-right: 0.2em">
+                    <span ng-bind="row.stats.logicalFlowMeasures.outbound"></span>
+                </td>
+                <td align="right" style="padding-right: 0.2em">
+                    <span ng-bind="row.stats.totalCount"></span>
                 </td>
             </tr>
             </tbody>
