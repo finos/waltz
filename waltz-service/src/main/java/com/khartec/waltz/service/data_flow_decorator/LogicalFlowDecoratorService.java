@@ -20,22 +20,26 @@
 package com.khartec.waltz.service.data_flow_decorator;
 
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
+import com.khartec.waltz.model.data_flow_decorator.*;
+import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -52,9 +56,17 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.*;
+import static com.khartec.waltz.model.FlowDirection.*;
 import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class LogicalFlowDecoratorService {
@@ -64,6 +76,7 @@ public class LogicalFlowDecoratorService {
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final DataTypeUsageService dataTypeUsageService;
+    private final DataTypeDao dataTypeDao;
     private final LogicalFlowDao logicalFlowDao;
     private final ChangeLogService changeLogService;
 
@@ -72,18 +85,25 @@ public class LogicalFlowDecoratorService {
     public LogicalFlowDecoratorService(LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                                        LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                        DataTypeUsageService dataTypeUsageService,
+                                       DataTypeDao dataTypeDao,
                                        LogicalFlowDao logicalFlowDao,
+                                       LogicalFlowService logicalFlowService,
+                                       LogicalFlowStatsDao logicalFlowStatsDao,
                                        ChangeLogService changeLogService) {
 
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
         checkNotNull(ratingsCalculator, "ratingsCalculator cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
+        checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
+        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
+        checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.ratingsCalculator = ratingsCalculator;
         this.dataTypeUsageService = dataTypeUsageService;
+        this.dataTypeDao = dataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
         this.changeLogService = changeLogService;
     }
@@ -351,4 +371,160 @@ public class LogicalFlowDecoratorService {
         return ListUtilities.newArrayList(sourceCL, targetCL);
     }
 
+
+    public Set<LogicalFlowDecoratorStat> findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions selectionOptions) {
+
+        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(selectionOptions);
+
+        Map<DataTypeDirectionKey, List<Long>> dataTypeIdAndFlowTypeKeyToLogicalFlowIdsMap = logicalFlowDecoratorDao.logicalFlowIdsByTypeAndDirection(appIds);
+
+        return findFlowIdsByDataTypeForParentsAndChildren(dataTypeIdAndFlowTypeKeyToLogicalFlowIdsMap);
+    }
+
+
+    private Set<LogicalFlowDecoratorStat> findFlowIdsByDataTypeForParentsAndChildren(Map<DataTypeDirectionKey, List<Long>> logicalFlowIdsByDataType) {
+
+        List<DataType> dataTypes = dataTypeDao.findAll();
+        Map<Optional<Long>, DataType> dataTypesById = indexBy(IdProvider::id, dataTypes);
+
+        return dataTypes
+                .stream()
+                .map(dt -> {
+
+                    DataType exactDataType = dataTypesById.get(dt.id());
+                    Set<DataTypeDirectionKey> keysForDatatype = filterKeySetByDataTypeId(logicalFlowIdsByDataType, asSet(dt.id().get()));
+
+                    Set<DataType> parentDataTypes = getParents(exactDataType, dataTypesById);
+                    Set<DataTypeDirectionKey> keysForParents = filterKeySetByDataTypeId(logicalFlowIdsByDataType, getIds(parentDataTypes));
+
+                    Set<DataType> childDataTypes = getChildren(exactDataType, dataTypesById);
+                    Set<DataTypeDirectionKey> keysForChildren = filterKeySetByDataTypeId(logicalFlowIdsByDataType, getIds(childDataTypes));
+
+                    Set<DataTypeDirectionKey> allKeys = union(keysForDatatype, keysForParents, keysForChildren);
+                    Set<Long> allFlowIds = getFlowsFromKeys(logicalFlowIdsByDataType, allKeys);
+
+                    Map<FlowDirection, Integer> typeToFlowCountMap = getTypeToFlowCountMap(logicalFlowIdsByDataType, allKeys);
+
+                    return mkLogicalFlowDecoratorStat(dt, typeToFlowCountMap, allFlowIds);
+
+                })
+                .filter(r -> r.totalCount() > 0)
+                .collect(Collectors.toSet());
+    }
+
+
+    private ImmutableLogicalFlowDecoratorStat mkLogicalFlowDecoratorStat(DataType dt,
+                                                                         Map<FlowDirection, Integer> typeToFlowCountMap,
+                                                                         Set<Long> allFlowIds) {
+        return ImmutableLogicalFlowDecoratorStat
+                .builder()
+                .dataTypeId(dt.id().get())
+                .logicalFlowMeasures(mkLogicalFlowMeasures(typeToFlowCountMap))
+                .totalCount(allFlowIds.size())
+                .build();
+    }
+
+
+    private ImmutableLogicalFlowMeasures mkLogicalFlowMeasures(Map<FlowDirection, Integer> typeToFlowCountMap) {
+        return ImmutableLogicalFlowMeasures
+                .builder()
+                .inbound(typeToFlowCountMap.get(INBOUND))
+                .outbound(typeToFlowCountMap.get(OUTBOUND))
+                .intra(typeToFlowCountMap.get(INTRA))
+                .build();
+    }
+
+
+    private static Set<Long> getIds(Set<DataType> dataTypes) {
+        return SetUtilities.map(dataTypes, dataType -> dataType.id().get());
+    }
+
+
+    private Map<FlowDirection, Integer> getTypeToFlowCountMap(Map<DataTypeDirectionKey, List<Long>> logicalFlowIdsByDataType,
+                                                              Set<DataTypeDirectionKey> allKeys) {
+
+        List<FlowDirection> directions = asList(FlowDirection.values());
+
+        return directions
+                .stream()
+                .map(type -> {
+
+                    Set<Long> setOfFlows = allKeys
+                            .stream()
+                            .filter(k -> k.flowDirection().equals(type))
+                            .flatMap(k -> logicalFlowIdsByDataType.get(k).stream())
+                            .collect(Collectors.toSet());
+
+                    return tuple(type, setOfFlows.size());
+                })
+                .collect(Collectors.toMap(k -> k.v1, v -> v.v2));
+    }
+
+
+    private Set<DataTypeDirectionKey> filterKeySetByDataTypeId(Map<DataTypeDirectionKey, List<Long>> logicalFlowIdsByDataType,
+                                                               Set<Long> dataTypeIds) {
+        return logicalFlowIdsByDataType
+                .keySet()
+                .stream()
+                .filter(k -> dataTypeIds.contains(k.DatatypeId()))
+                .collect(Collectors.toSet());
+    }
+
+
+    private static Set<Long> getFlowsFromKeys(Map<DataTypeDirectionKey, List<Long>> flowIdsByDataTypeId,
+                                                 Set<DataTypeDirectionKey> keys) {
+        Set<Long> flowIds = new HashSet<>();
+        for (DataTypeDirectionKey key : keys) {
+            List<Long> flowIdsForType = flowIdsByDataTypeId.getOrDefault(key, emptyList());
+            flowIds.addAll(flowIdsForType);
+        }
+        return flowIds;
+    }
+
+
+    private static Set<DataType> getChildren(DataType dataType, Map<Optional<Long>, DataType> datatypesById) {
+
+        Set<DataType> children = new HashSet<>(emptySet());
+
+        Long parent = dataType.id().orElse(null);
+
+        Set<DataType> descendants = getDescendants(datatypesById, parent);
+
+        children.addAll(descendants);
+
+        descendants
+                .forEach(dt -> {
+                    Set<DataType> grandchildren = getChildren(dt, datatypesById);
+                    children.addAll(grandchildren);
+                });
+
+        return children;
+    }
+
+
+    private static Set<DataType> getDescendants(Map<Optional<Long>, DataType> dataTypesById, Long parentId) {
+        return dataTypesById
+                .values()
+                .stream()
+                .filter(dt -> dt.parentId().isPresent()
+                        && dt.parentId().get().equals(parentId))
+                .collect(Collectors.toSet());
+    }
+
+
+    private static Set<DataType> getParents(DataType dataType, Map<Optional<Long>, DataType> dataTypesById) {
+
+        Checks.checkNotNull(dataType, "starting datatype cannot be null");
+
+        Set<DataType> parents = new HashSet<>(emptySet());
+
+        DataType parent = dataTypesById.get(dataType.parentId());
+
+        while (parent != null) {
+            parents.add(parent);
+            parent = dataTypesById.get(parent.parentId());
+        }
+
+        return parents;
+    }
 }
