@@ -107,11 +107,7 @@ public class AppGroupDao {
     }
 
 
-    public List<AppGroup> findRelatedByApplicationAndUser(long appId, String userId) {
-        SelectConditionStep<Record1<Long>> groupsByUser = dsl
-                .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
-                .from(APPLICATION_GROUP_MEMBER)
-                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+    public List<AppGroup> findRelatedByApplicationId(long appId) {
 
         SelectConditionStep<Record1<Long>> groupsFromAppGroupEntry = dsl
                 .select(APPLICATION_GROUP_ENTRY.GROUP_ID)
@@ -134,19 +130,14 @@ public class AppGroupDao {
 
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
-                .where((APPLICATION_GROUP.ID.in(appGroups)
-                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
-                        .or(APPLICATION_GROUP.ID.in(groupsByUser))))
+                .where(APPLICATION_GROUP.ID.in(appGroups)
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
                 .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
 
 
-    public List<AppGroup> findRelatedByEntityReferenceAndUser(EntityReference ref, String userId) {
-        SelectConditionStep<Record1<Long>> groupsByUser = DSL
-                .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
-                .from(APPLICATION_GROUP_MEMBER)
-                .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
+    public List<AppGroup> findRelatedByEntityReference(EntityReference ref) {
 
         Condition joinOnA = APPLICATION_GROUP.ID.eq(ENTITY_RELATIONSHIP.ID_A)
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APP_GROUP.name()));
@@ -158,15 +149,13 @@ public class AppGroupDao {
         Condition bMatchesEntity = ENTITY_RELATIONSHIP.ID_B.eq(ref.id())
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()));
 
-        Condition isVisibleToUser = APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                .or(APPLICATION_GROUP.ID.in(groupsByUser));
-
         SelectConditionStep<Record1<Long>> qry = dsl
                 .selectDistinct(APPLICATION_GROUP.ID)
                 .from(APPLICATION_GROUP)
                 .join(ENTITY_RELATIONSHIP)
                 .on(joinOnA.or(joinOnB))
-                .where((aMatchesEntity.or(bMatchesEntity)).and(isVisibleToUser))
+                .where((aMatchesEntity.or(bMatchesEntity))
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
                 .and(notRemoved);
 
         return dsl.selectFrom(APPLICATION_GROUP)
