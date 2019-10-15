@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
@@ -28,11 +29,13 @@ import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -78,14 +81,18 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
 
             PhysicalSpecDefinitionChangeCommand physicalSpecDefinitionChangeCommand = readBody(req, PhysicalSpecDefinitionChangeCommand.class);
 
-            try {
-                return specDefinitionService.create(
-                        getUsername(req),
-                        getId(req),
-                        physicalSpecDefinitionChangeCommand);
-            } catch (DataAccessException e) {
-                throw new Exception("Cannot create physical specification definition with version that already exists");
+            long physicalSpecificationId = getId(req);
+
+            Set<String> existingVersions = map(specDefinitionService.findForSpecification(physicalSpecificationId), d -> d.version());
+
+            if (existingVersions.contains(physicalSpecDefinitionChangeCommand.version())) {
+                throw new DuplicateKeyException("Cannot create physical specification definition with version that already exists");
             }
+
+            return specDefinitionService.create(
+                        getUsername(req),
+                        physicalSpecificationId,
+                        physicalSpecDefinitionChangeCommand);
 
         };
 

@@ -137,7 +137,7 @@ public class Main {
         });
 
         exception(DuplicateKeyException.class, (e, req, res) -> {
-            String message = "Duplicate detected";
+            String message = "Duplicate detected: " + e.getMessage();
             LOG.error(message, e);
             reportException(
                     500,
@@ -146,6 +146,7 @@ public class Main {
                     res,
                     LOG);
         });
+
 
         exception(InsufficientPrivelegeException.class, (e, req, resp) ->
            reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
