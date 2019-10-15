@@ -29,6 +29,7 @@ import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.command.CommandResponse;
 import com.khartec.waltz.model.command.ImmutableCommandResponse;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -156,5 +157,17 @@ public class PhysicalSpecificationService {
 
     public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
         return specificationDao.findByIds(ids);
+    }
+
+    public int updateExternalId(Long id, String sourceExtId) {
+        return specificationDao.updateExternalId(id, sourceExtId);
+    }
+
+    public boolean isUsed(Long specificationId) {
+        return specificationDao.isUsed(specificationId);
+    }
+
+    public Long create(ImmutablePhysicalSpecification specification) {
+        return specificationDao.create(specification);
     }
 }

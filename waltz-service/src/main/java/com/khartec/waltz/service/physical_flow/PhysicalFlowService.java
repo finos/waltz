@@ -22,7 +22,6 @@ package com.khartec.waltz.service.physical_flow;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -32,10 +31,12 @@ import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.external_identifier.ExternalIdentifierService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
 public class PhysicalFlowService {
 
     private final PhysicalFlowDao physicalFlowDao;
-    private final PhysicalSpecificationDao physicalSpecificationDao;
+    private final PhysicalSpecificationService physicalSpecificationService;
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
@@ -74,19 +75,19 @@ public class PhysicalFlowService {
     public PhysicalFlowService(ChangeLogService changeLogService,
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
-                               PhysicalSpecificationDao physicalSpecificationDao,
+                               PhysicalSpecificationService physicalSpecificationService,
                                PhysicalFlowSearchDao searchDao,
                                ExternalIdentifierService externalIdentifierService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
-        checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
+        checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(searchDao, "searchDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowDao = physicalDataFlowDao;
-        this.physicalSpecificationDao = physicalSpecificationDao;
+        this.physicalSpecificationService = physicalSpecificationService;
         this.searchDao = searchDao;
         this.externalIdentifierService = externalIdentifierService;
     }
@@ -142,9 +143,17 @@ public class PhysicalFlowService {
 
         int moveCount = externalIdentifierService.merge(fromRef, toRef);
 
-        copyExternalIdFromFlowAndSpecification(username, toRef, fromRef);
+        PhysicalFlow sourcePhysicalFlow = physicalFlowDao.getById(fromRef.id());
+        copyExternalIdFromFlowAndSpecification(username, toRef, sourcePhysicalFlow);
 
         int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
+
+        physicalSpecificationService.delete(
+                ImmutablePhysicalSpecificationDeleteCommand
+                        .builder()
+                        .specificationId(sourcePhysicalFlow.specificationId())
+                        .build(),
+                username);
 
         if(updateStatus > 0) {
             logChange(username,
@@ -158,8 +167,9 @@ public class PhysicalFlowService {
     }
 
 
-    private void copyExternalIdFromFlowAndSpecification(String username, EntityReference toRef, EntityReference fromRef) {
-        PhysicalFlow sourcePhysicalFlow = physicalFlowDao.getById(fromRef.id());
+    private void copyExternalIdFromFlowAndSpecification(String username,
+                                                        EntityReference toRef,
+                                                        PhysicalFlow sourcePhysicalFlow) {
         PhysicalFlow targetPhysicalFlow = physicalFlowDao.getById(toRef.id());
 
         Set<String> externalIdentifiers =
@@ -179,18 +189,18 @@ public class PhysicalFlowService {
                     }
                 });
 
-        PhysicalSpecification sourceSpec = physicalSpecificationDao.getById(sourcePhysicalFlow.specificationId());
+        PhysicalSpecification sourceSpec = physicalSpecificationService.getById(sourcePhysicalFlow.specificationId());
 
         sourceSpec
                 .externalId()
                 .ifPresent(sourceExtId -> {
-                    PhysicalSpecification targetSpec = physicalSpecificationDao
+                    PhysicalSpecification targetSpec = physicalSpecificationService
                             .getById(targetPhysicalFlow.specificationId());
 
                     if(isEmpty(targetSpec.externalId())) {
                         targetSpec.id()
                                 .ifPresent(id ->
-                                        physicalSpecificationDao.updateExternalId(id, sourceExtId));
+                                        physicalSpecificationService.updateExternalId(id, sourceExtId));
                     } else if(!externalIdentifiers.contains(sourceExtId)) {
                         externalIdentifierService.create(toRef, sourceExtId, username);
                     }
@@ -219,13 +229,13 @@ public class PhysicalFlowService {
                 commandOutcome = CommandOutcome.FAILURE;
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
-                isSpecificationUnused = !physicalSpecificationDao.isUsed(physicalFlow.specificationId());
+                isSpecificationUnused = !physicalSpecificationService.isUsed(physicalFlow.specificationId());
                 isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
 
             // log changes against source and target entities
             if (commandOutcome == CommandOutcome.SUCCESS) {
-                PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
+                PhysicalSpecification specification = physicalSpecificationService.getById(physicalFlow.specificationId());
 
                 String flowRemovalMessage = String.format(
                         "Physical flow: %s, from: %s, to: %s removed.",
@@ -282,7 +292,7 @@ public class PhysicalFlowService {
         long specId = command
                 .specification()
                 .id()
-                .orElseGet(() -> physicalSpecificationDao.create(ImmutablePhysicalSpecification
+                .orElseGet(() -> physicalSpecificationService.create(ImmutablePhysicalSpecification
                         .copyOf(command.specification())
                         .withLastUpdatedBy(username)
                         .withLastUpdatedAt(now)
