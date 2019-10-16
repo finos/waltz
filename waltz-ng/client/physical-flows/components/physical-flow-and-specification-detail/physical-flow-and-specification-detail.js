@@ -11,7 +11,7 @@ const bindings = {
 
 
 const initialState = {
-    tags: ["hello"]
+    tags: []
 };
 
 
