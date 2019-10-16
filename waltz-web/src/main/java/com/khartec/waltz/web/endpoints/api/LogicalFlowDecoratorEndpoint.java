@@ -20,7 +20,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
