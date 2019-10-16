@@ -416,12 +416,12 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         .attr("transform",  (d, i) => `translate(0, ${ scale(d.id) })`)
         .attr("opacity", 1);
 
-    if (tweakers.icon) {
+    if (tweakers.pfIcon) {
         labels
             .merge(newLabels)
             .select(".wsat-icon")
-            .attr("fill", d => tweakers.icon(d).color)
-            .text((d) => tweakers.icon(d).code || "");
+            .attr("fill", d => tweakers.pfIcon(d).color)
+            .text((d) => tweakers.pfIcon(d).code || "");
     }
 
     if(tweakers.cuIcon) {

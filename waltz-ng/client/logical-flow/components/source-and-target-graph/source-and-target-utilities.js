@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import * as _ from "lodash";
+import _ from "lodash";
 import * as colors from "../../../common/colors";
+import {refToString} from "../../../common/entity-utils";
 
 const iconCodes = {
     // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)
@@ -83,44 +84,45 @@ export function mkTweakers(tweakers = {},
                     logicalFlows = [],
                     changeUnits = []) {
 
-    const toIdentifier = (entRef) => `${entRef.kind}/${entRef.id}`;
+    const logicalFlowsById = _.keyBy(logicalFlows, d => d.id);
+    const physicalFlowsById = _.keyBy(physicalFlows, d => d.id);
 
-    const logicalFlowsById = _.keyBy(logicalFlows, "id");
-    const physicalFlowsById = _.keyBy(physicalFlows, "id");
-
-
-    const countPhysicalFlows = (direction) =>
+    const countPhysicalFlows = (nodeSelectionFn) =>
         _.countBy(physicalFlows, pf => {
             const logicalFlow = logicalFlowsById[pf.logicalFlowId];
             return logicalFlow
-                ? toIdentifier(logicalFlow[direction])
+                ? refToString(nodeSelectionFn(logicalFlow))
                 : null;
         });
 
-    const sourceCounts = countPhysicalFlows("source");
-    const targetCounts = countPhysicalFlows("target");
+    const pfSourceCounts = countPhysicalFlows(lf => lf.source);
+    const pfTargetCounts = countPhysicalFlows(lf => lf.target);
 
     const physicalFlowChangeUnits = _.filter(
         changeUnits,
         cu => cu.subjectEntity.kind = "PHYSICAL_FLOW");
 
     // now count change units for apps
-    const countChangeUnits = (direction) => _.countBy(physicalFlowChangeUnits, (cu) => {
+    const countChangeUnits = (nodeSelectionFn) => _.countBy(physicalFlowChangeUnits, (cu) => {
         const physicalFlow = physicalFlowsById[cu.subjectEntity.id];
-        const logicalFlow = logicalFlowsById[physicalFlow.logicalFlowId];
-        return logicalFlow
-            ? toIdentifier(logicalFlow[direction])
-            : null;
+        if (physicalFlow) {
+            const logicalFlow = logicalFlowsById[physicalFlow.logicalFlowId];
+            return logicalFlow
+                ? refToString(nodeSelectionFn(logicalFlow))
+                : null;
+        } else {
+            return null;
+        }
     });
 
-    const cuSourceCounts = countChangeUnits("source");
-    const cuTargetCounts = countChangeUnits("target");
+    const cuSourceCounts = countChangeUnits(lf => lf.source);
+    const cuTargetCounts = countChangeUnits(lf => lf.target);
 
-    tweakers.source.icon = (appRef) => toIcon(sourceCounts[toIdentifier(appRef)]);
-    tweakers.target.icon = (appRef) => toIcon(targetCounts[toIdentifier(appRef)]);
+    tweakers.source.pfIcon = (appRef) => toIcon(pfSourceCounts[refToString(appRef)]);
+    tweakers.target.pfIcon = (appRef) => toIcon(pfTargetCounts[refToString(appRef)]);
 
-    tweakers.source.cuIcon = (appRef) => toCUIcon(cuSourceCounts[toIdentifier(appRef)]);
-    tweakers.target.cuIcon = (appRef) => toCUIcon(cuTargetCounts[toIdentifier(appRef)]);
+    tweakers.source.cuIcon = (appRef) => toCUIcon(cuSourceCounts[refToString(appRef)]);
+    tweakers.target.cuIcon = (appRef) => toCUIcon(cuTargetCounts[refToString(appRef)]);
 
     return Object.assign({} , tweakers);
 }
