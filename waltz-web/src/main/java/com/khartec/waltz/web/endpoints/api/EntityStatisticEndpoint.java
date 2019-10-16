@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.Duration;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -78,7 +78,7 @@ public class EntityStatisticEndpoint implements Endpoint {
 
 
     private TallyPack<String> calculateStatTallyRoute(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions idSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
         RollupKind rollupKind = extractRollupKind(request);
         Long statisticId = getId(request);
         return entityStatisticService.calculateStatTally(statisticId, rollupKind, idSelectionOptions);
@@ -86,7 +86,7 @@ public class EntityStatisticEndpoint implements Endpoint {
 
 
     private List<TallyPack<String>> calculateHistoricStatTallyRoute(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions idSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
         RollupKind rollupKind = extractRollupKind(request);
         Duration duration = EnumUtilities.readEnum(request.queryParams("duration"), Duration.class, s -> Duration.MONTH);
         Long statisticId = getId(request);
@@ -129,10 +129,10 @@ public class EntityStatisticEndpoint implements Endpoint {
                 -> entityStatisticService.findStatisticsForEntity(getEntityReference(request), true);
 
         ListRoute<EntityStatisticValue> findStatValuesForAppSelectorRoute = (request, response)
-                -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readAppIdSelectionOptionsFromBody(request));
+                -> entityStatisticService.getStatisticValuesForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
         ListRoute<Application> findStatAppsForAppSelectorRoute = (request, response)
-                -> entityStatisticService.getStatisticAppsForAppIdSelector(getLong(request, "statId"), readAppIdSelectionOptionsFromBody(request));
+                -> entityStatisticService.getStatisticAppsForAppIdSelector(getLong(request, "statId"), readIdSelectionOptionsFromBody(request));
 
         DatumRoute<ImmediateHierarchy<EntityStatisticDefinition>> getRelatedStatDefinitionsRoute = (request, response)
                 -> entityStatisticService.getRelatedStatDefinitions(getLong(request, "statId"), true);

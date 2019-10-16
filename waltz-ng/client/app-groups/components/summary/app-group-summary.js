@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import {enrichServerStats} from "../../../server-info/services/server-utilities"
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
@@ -71,7 +71,7 @@ function controller($q, serviceBroker, userService) {
 
 
     const loadAll = () => {
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             vm.parentEntityRef,
             hierarchyQueryScope.EXACT.key,
             [entityLifecycleStatus.ACTIVE.key],

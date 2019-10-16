@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -386,6 +386,15 @@ public class PhysicalFlowDao {
 
     public int updateFrequency(long flowId, FrequencyKind frequencyKind) {
         return updateEnum(flowId, PHYSICAL_FLOW.FREQUENCY, frequencyKind.name());
+    }
+
+
+    public int updateExternalId(long flowId, String externalId) {
+        return dsl
+                .update(PHYSICAL_FLOW)
+                .set(PHYSICAL_FLOW.EXTERNAL_ID, externalId)
+                .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .execute();
     }
 
 

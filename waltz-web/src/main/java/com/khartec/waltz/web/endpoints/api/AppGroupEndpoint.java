@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -107,9 +107,7 @@ public class AppGroupEndpoint implements Endpoint {
                 appGroupService.findPrivateGroupsByOwner(getUsername(request));
 
         ListRoute<AppGroup> findRelatedGroupsByEntityReferenceRoute = (request, response) ->
-                appGroupService.findRelatedByEntityReferenceAndUser(
-                        getEntityReference(request),
-                        getUsername(request));
+                appGroupService.findRelatedByEntityReference(getEntityReference(request));
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);

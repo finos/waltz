@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,9 @@
  */
 
 import _ from "lodash";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { determineStatMethod } from "../../logical-flow-utils";
-import { entityLifecycleStatus } from '../../../common/services/enums/entity-lifecycle-status';
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {determineStatMethod} from "../../logical-flow-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./logical-flows-tabgroup-section.html";
 
@@ -70,7 +70,7 @@ function controller(serviceBroker) {
     vm.$onChanges = (changes) => {
 
         if (vm.parentEntityRef) {
-            vm.selector = mkApplicationSelectionOptions(
+            vm.selector = mkSelectionOptions(
                 vm.parentEntityRef,
                 undefined,
                 [entityLifecycleStatus.ACTIVE.key],

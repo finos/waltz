@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,8 +27,8 @@ import com.khartec.waltz.data.entity_statistic.EntityStatisticSummaryDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.EntityStatistic;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
 import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
@@ -91,21 +91,21 @@ public class EntityStatisticService {
     }
 
 
-    public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, ApplicationIdSelectionOptions options) {
+    public List<EntityStatisticValue> getStatisticValuesForAppIdSelector(long statisticId, IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         return valueDao.getStatisticValuesForAppIdSelector(statisticId, appIdSelector);
     }
 
 
-    public List<Application> getStatisticAppsForAppIdSelector(long statisticId, ApplicationIdSelectionOptions options) {
+    public List<Application> getStatisticAppsForAppIdSelector(long statisticId, IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = factory.apply(options);
 
         return valueDao.getStatisticAppsForAppIdSelector(statisticId, appIdSelector);
     }
 
 
-    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, ApplicationIdSelectionOptions options) {
+    public List<TallyPack<String>> findStatTallies(List<Long> statisticIds, IdSelectionOptions options) {
         Checks.checkNotNull(statisticIds, "statisticIds cannot be null");
         Checks.checkNotNull(options, "options cannot be null");
 
@@ -135,7 +135,7 @@ public class EntityStatisticService {
     }
 
 
-    public TallyPack<String> calculateStatTally(Long statisticId, RollupKind rollupKind, ApplicationIdSelectionOptions options) {
+    public TallyPack<String> calculateStatTally(Long statisticId, RollupKind rollupKind, IdSelectionOptions options) {
         Checks.checkNotNull(statisticId, "statisticId cannot be null");
         Checks.checkNotNull(options, "options cannot be null");
         Checks.checkNotNull(rollupKind, "rollupKind cannot be null");
@@ -159,7 +159,7 @@ public class EntityStatisticService {
 
     public List<TallyPack<String>> calculateHistoricStatTally(Long statisticId,
                                                               RollupKind rollupKind,
-                                                              ApplicationIdSelectionOptions options,
+                                                              IdSelectionOptions options,
                                                               Duration duration) {
         Checks.checkNotNull(statisticId, "statisticId cannot be null");
         Checks.checkNotNull(rollupKind, "rollupKind cannot be null");

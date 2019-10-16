@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ public class ServerInformationEndpoint implements Endpoint {
                 -> serverInformationService.getByHostname(request.params("hostname"));
 
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
-                -> serverInformationService.calculateStatsForAppSelector(readAppIdSelectionOptionsFromBody(request));
+                -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);

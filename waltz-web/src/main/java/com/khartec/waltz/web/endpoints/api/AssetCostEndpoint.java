@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;
 import com.khartec.waltz.model.cost.Cost;
@@ -84,25 +84,25 @@ public class AssetCostEndpoint implements Endpoint {
 
 
     private List<Tuple2<Long, BigDecimal>> calcCombinedAmountsForSelectorRoute(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.calculateCombinedAmountsForSelector(selectorOptions);
     }
 
 
     private Cost calculateTotalCostForAppSelectorRoute(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.calculateTotalCostForAppSelector(selectorOptions);
     }
 
 
     private List<ApplicationCost> findAppCostsByAppIds(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.findAppCostsByAppIds(selectorOptions);
     }
 
 
     private List<ApplicationCost> findTopAppCostsByAppIds(Request request, Response response) throws IOException {
-        ApplicationIdSelectionOptions selectorOptions = readAppIdSelectionOptionsFromBody(request);
+        IdSelectionOptions selectorOptions = readIdSelectionOptionsFromBody(request);
         return assetCostService.findTopAppCostsByAppIds(selectorOptions, getLimit(request).orElse(10));
     }
 

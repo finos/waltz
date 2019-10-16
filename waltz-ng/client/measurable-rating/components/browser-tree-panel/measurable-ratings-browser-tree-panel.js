@@ -20,7 +20,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
@@ -222,27 +222,25 @@ function controller($q, serviceBroker) {
     };
 
     const loadBaseData = () => {
-        vm.selector = mkApplicationSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptions(vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
 
-        const promise = $q.all([
+        return $q.all([
             loadMeasurableCategories(serviceBroker, vm),
             loadMeasurables(serviceBroker, vm.selector, vm),
             loadRatingSchemes(serviceBroker, vm),
             loadMeasurableRatings(serviceBroker, vm.selector, vm),
             loadApps(serviceBroker, vm.selector, vm)
         ]);
-
-        return promise;
     };
 
 
     const loadRatings = () => {
         clearDetail();
 
-        vm.selector = mkApplicationSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptions(vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);

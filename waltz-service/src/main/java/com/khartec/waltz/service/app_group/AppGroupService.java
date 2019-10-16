@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -140,12 +140,12 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroup> findRelatedByEntityReferenceAndUser(EntityReference ref, String userId) {
+    public List<AppGroup> findRelatedByEntityReference(EntityReference ref) {
         switch (ref.kind()) {
             case APPLICATION:
-                return appGroupDao.findRelatedByApplicationAndUser(ref.id(), userId);
+                return appGroupDao.findRelatedByApplicationId(ref.id());
             default:
-                return appGroupDao.findRelatedByEntityReferenceAndUser(ref, userId);
+                return appGroupDao.findRelatedByEntityReference(ref);
         }
     }
 

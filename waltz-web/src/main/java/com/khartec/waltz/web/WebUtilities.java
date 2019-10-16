@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,6 @@ import com.khartec.waltz.common.EnumUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
@@ -282,10 +281,6 @@ public class WebUtilities {
         return readBody(request, IdSelectionOptions.class);
     }
 
-
-    public static ApplicationIdSelectionOptions readAppIdSelectionOptionsFromBody(Request request) throws java.io.IOException {
-        return readBody(request, ApplicationIdSelectionOptions.class);
-    }
 
 
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,13 +19,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
+import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,21 +77,23 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         String findByIdSelectorAndKindPath = mkPath(BASE_URL, "selector", "kind", ":kind");
         String findByIdSelectorPath = mkPath(BASE_URL, "selector");
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
-        String updateDecoratorsPath = mkPath(BASE_URL, ":flowId");
-        String updateDecoratorsBatchPath = mkPath(BASE_URL, "batch");
+        String updateDecoratorsPath = mkPath(BASE_URL, "update", "flow", ":flowId");
+        String updateDecoratorsBatchPath = mkPath(BASE_URL, "update", "batch");
         String summarizeInboundPath = mkPath(BASE_URL, "summarize-inbound");
         String summarizeOutboundPath = mkPath(BASE_URL, "summarize-outbound");
+        String findDataTypeStatsForEntityPath = mkPath(BASE_URL, "datatype-stats");
+
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findByIdSelectorAndKind(
-                                readAppIdSelectionOptionsFromBody(request),
+                                readIdSelectionOptionsFromBody(request),
                                 getKind(request));
 
         ListRoute<LogicalFlowDecorator> findByIdSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService
                         .findBySelector(
-                                readAppIdSelectionOptionsFromBody(request));
+                                readIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlowDecorator> findByFlowIdsAndKindRoute =
                 (request, response) -> logicalFlowDecoratorService
@@ -97,14 +102,20 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
         ListRoute<DecoratorRatingSummary> summarizeInboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeInboundForSelector(
-                        readAppIdSelectionOptionsFromBody(request));
+                        readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeOutboundForSelectorRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeOutboundForSelector(
-                        readAppIdSelectionOptionsFromBody(request));
+                        readIdSelectionOptionsFromBody(request));
 
         ListRoute<DecoratorRatingSummary> summarizeForAllRoute =
                 (request, response) -> logicalFlowDecoratorService.summarizeForAll();
+
+        ListRoute<LogicalFlowDecoratorStat> findDatatypeStatsForEntityRoute =
+                (request, response) -> {
+                    IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+                    return logicalFlowDecoratorService.findFlowsByDatatypeForEntity(selectionOptions);
+                };
 
         postForList(
                 findByIdSelectorAndKindPath,
@@ -137,6 +148,10 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
         postForList(
                 updateDecoratorsPath,
                 this::updateDecoratorsRoute);
+
+        postForList(
+                findDataTypeStatsForEntityPath,
+                findDatatypeStatsForEntityRoute);
     }
 
 

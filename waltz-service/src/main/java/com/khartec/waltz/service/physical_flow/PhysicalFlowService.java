@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
+import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
@@ -44,9 +45,12 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
@@ -137,6 +141,9 @@ public class PhysicalFlowService {
         EntityReference fromRef = mkRef(PHYSICAL_FLOW, fromId);
 
         int moveCount = externalIdentifierService.merge(fromRef, toRef);
+
+        copyExternalIdFromFlowAndSpecification(username, toRef, fromRef);
+
         int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
 
         if(updateStatus > 0) {
@@ -148,6 +155,46 @@ public class PhysicalFlowService {
                     Operation.UPDATE);
         }
         return updateStatus + moveCount > 0;
+    }
+
+
+    private void copyExternalIdFromFlowAndSpecification(String username, EntityReference toRef, EntityReference fromRef) {
+        PhysicalFlow sourcePhysicalFlow = physicalFlowDao.getById(fromRef.id());
+        PhysicalFlow targetPhysicalFlow = physicalFlowDao.getById(toRef.id());
+
+        Set<String> externalIdentifiers =
+                externalIdentifierService.findByEntityReference(toRef)
+                .stream()
+                .map(ExternalIdentifier::externalId)
+                .collect(Collectors.toSet());
+
+        sourcePhysicalFlow
+                .externalId()
+                .ifPresent(sourceExtId -> {
+                    if(isEmpty(targetPhysicalFlow.externalId())) {
+                        physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
+                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                        externalIdentifierService.create(toRef, sourceExtId, username);
+                        externalIdentifiers.add(sourceExtId);
+                    }
+                });
+
+        PhysicalSpecification sourceSpec = physicalSpecificationDao.getById(sourcePhysicalFlow.specificationId());
+
+        sourceSpec
+                .externalId()
+                .ifPresent(sourceExtId -> {
+                    PhysicalSpecification targetSpec = physicalSpecificationDao
+                            .getById(targetPhysicalFlow.specificationId());
+
+                    if(isEmpty(targetSpec.externalId())) {
+                        targetSpec.id()
+                                .ifPresent(id ->
+                                        physicalSpecificationDao.updateExternalId(id, sourceExtId));
+                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                        externalIdentifierService.create(toRef, sourceExtId, username);
+                    }
+                });
     }
 
 

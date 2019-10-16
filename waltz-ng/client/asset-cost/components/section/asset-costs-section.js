@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./asset-costs-section.html";
 
@@ -60,7 +60,7 @@ function controller(serviceBroker,
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findTopAppCostsByAppIdSelector,
-                [ mkApplicationSelectionOptions(
+                [ mkSelectionOptions(
                     vm.parentEntityRef,
                     undefined,
                     [entityLifecycleStatus.ACTIVE.key],
@@ -73,7 +73,7 @@ function controller(serviceBroker,
         serviceBroker
             .loadViewData(
                 CORE_API.AssetCostStore.findAppCostsByAppIdSelector,
-                [ mkApplicationSelectionOptions(
+                [ mkSelectionOptions(
                     vm.parentEntityRef,
                     undefined,
                     [entityLifecycleStatus.ACTIVE.key],

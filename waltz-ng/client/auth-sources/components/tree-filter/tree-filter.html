@@ -1,0 +1,73 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="row">
+    <div class="col-md-12 waltz-tree-filter">
+        <div>
+            This section is showing the authoritativeness rating of the data sources. You can interactively change the
+            selection by changing the data types below.
+        </div>
+        <span ng-if="!$ctrl.selectedItems.length" class="wtf-filter-item">All</span>
+        <span ng-repeat="selectedItem in $ctrl.selectedItems" class="wtf-filter-item">
+            <span ng-bind="selectedItem.name"></span>
+            <waltz-icon class="wtf-filter-delete clickable"
+                        name="close"
+                        ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
+        </span>
+        <div style="padding-top: 10px">
+            <a ng-click="$ctrl.toggleTreeSelector()">
+                <span ng-if="!$ctrl.editMode">Change data types</span>
+                <span ng-if="$ctrl.editMode">Done</waltz-icon></span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row" ng-if="$ctrl.editMode">
+    <div class="col-md-12"><br></div>
+    <div class="col-md-6">
+        <div style="padding-left: 20px;padding-bottom: 5px">
+            <waltz-search-control on-query="$ctrl.doSearch"
+                                  min-characters='2'
+                                  delay="200"
+                                  placeholderText="Search Data Types">
+            </waltz-search-control>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <treecontrol class="tree-light waltz-tree-filter"
+                     tree-model="$ctrl.hierarchy"
+                     order-by="'-name'"
+                     options="$ctrl.treeOptions"
+                     expanded-nodes="$ctrl.expandedNodes">
+            <span
+                  ng-click="$ctrl.onSelect(node)">
+                <span class="clickable"
+                      ng-bind="node.name"
+                      uib-popover="{{node.description}}"
+                      popover-append-to-body="true"
+                      popover-placement="right"
+                      popover-trigger="mouseenter">
+                </span>
+            </span>
+            <waltz-icon name="close" ng-if="$ctrl.isSelected(node)"
+                        ng-click="$ctrl.removeSelected(node.id)"></waltz-icon>
+
+        </treecontrol>
+    </div>
+</div>

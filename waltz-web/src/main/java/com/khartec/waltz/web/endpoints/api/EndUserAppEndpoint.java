@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -52,7 +52,7 @@ public class EndUserAppEndpoint implements Endpoint {
         String countByOrgUnitPath = mkPath(BASE_URL, "count-by", "org-unit");
 
         ListRoute<EndUserApplication> findBySelectorRoute = (request, response)
-                -> endUserAppService.findBySelector(readAppIdSelectionOptionsFromBody(request));
+                -> endUserAppService.findBySelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<Tally<Long>> countByOrgUnitRoute = (request, response) -> endUserAppService.countByOrgUnitId();
 
