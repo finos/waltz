@@ -106,6 +106,12 @@ function controller() {
         vm.newVal = entity;
     };
 
+    vm.onKeyDown = (event) => {
+        if (event.ctrlKey && event.keyCode === 13) {  // ctrl + enter
+            vm.save();
+        }
+    };
+
 }
 
 

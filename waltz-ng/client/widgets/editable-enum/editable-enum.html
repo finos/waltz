@@ -22,7 +22,8 @@
 
     <!-- EDIT -->
     <form class='form-inline'
-           ng-if='$ctrl.visibility.editor'>
+          ng-keydown="$ctrl.onKeyDown($event)"
+          ng-if='$ctrl.visibility.editor'>
         <select ng-model="$ctrl.currentVal"
                 ng-options="item.code as item.name for item in $ctrl.enumValues"
                 class="form-control">

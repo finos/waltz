@@ -54,6 +54,13 @@ function controller() {
         const values = _.map(vm.working, "text");
         vm.onSave(values);
     };
+
+    vm.onKeyDown = (event) => {
+        if (event.ctrlKey && event.keyCode === 13) {  // ctrl + enter
+            vm.save();
+            vm.onCancel();
+        }
+    };
 }
 
 

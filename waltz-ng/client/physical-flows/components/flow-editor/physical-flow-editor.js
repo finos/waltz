@@ -24,17 +24,19 @@ import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
+    visibility: {
+        tagEditor: false
+    }
 };
 
 
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
 
     const load = () => {
         serviceBroker
@@ -43,18 +45,35 @@ function controller(notification, serviceBroker) {
                 [vm.parentEntityRef.id],
                 {force: true})
             .then(r => vm.physicalFlow = r.data);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityTagStore.findTagsByEntityRef,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => vm.tags = r.data);
     };
-
 
     vm.$onInit = () => load();
 
-
     const mkCommand = (name, value) => {
         return {
-            entityReference: toEntityRef(vm.physicalFlow, 'PHYSICAL_FLOW'),
+            entityReference: vm.parentEntityRef,
             name,
             value
         };
+    };
+
+    // -- TAGS ---
+    const saveTags = (tags = []) => {
+        return serviceBroker
+            .execute(
+                CORE_API.EntityTagStore.update,
+                [vm.parentEntityRef, tags])
+            .then(r => {
+                notification.success("Updated Tags");
+                return load();
+            })
+            .catch(e => displayError(notification, "Could not update tags", e));
     };
 
     const doSave = (name, value) => {
@@ -64,23 +83,29 @@ function controller(notification, serviceBroker) {
                 CORE_API.PhysicalFlowStore.updateAttribute,
                 [ vm.physicalFlow.id, cmd ])
             .then(r => {
-                notification.success('Updated');
+                notification.success(`Updated ${name}`);
                 return load();
             })
-            .catch(e => displayError(notification, "Could not update value", e))
+            .catch(e => displayError(notification, `Could not update ${name} value`, e))
     };
 
-    vm.onSaveCriticality = (value, ctx) => doSave('criticality', value);
-    vm.onSaveFrequency = (value, ctx) => doSave('frequency', value);
-    vm.onSaveTransport = (value, ctx) => doSave('transport', value);
-    vm.onSaveBasisOffset = (value, ctx) => doSave('basisOffset', value.newVal);
-    vm.onSaveDescription = (value, ctx) => doSave('description', value.newVal);
+
+    vm.onSaveCriticality = (value, ctx) => doSave("criticality", value);
+    vm.onSaveFrequency = (value, ctx) => doSave("frequency", value);
+    vm.onSaveTransport = (value, ctx) => doSave("transport", value);
+    vm.onSaveBasisOffset = (value, ctx) => doSave("basisOffset", value.newVal);
+    vm.onSaveDescription = (value, ctx) => doSave("description", value.newVal);
+    vm.onSaveTags = (tags) => saveTags(tags);
+    vm.onShowTagEditor = () => vm.visibility.tagEditor = true;
+    vm.onDismissTagEditor = () => vm.visibility.tagEditor = false;
+
 }
 
 
+
 controller.$inject = [
-    'Notification',
-    'ServiceBroker'
+    "Notification",
+    "ServiceBroker"
 ];
 
 
@@ -93,5 +118,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowEditor'
+    id: "waltzPhysicalFlowEditor"
 };

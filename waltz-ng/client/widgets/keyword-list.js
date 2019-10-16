@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../common';
-import template from './keyword-list.html';
+import {initialiseData} from "../common";
+import template from "./keyword-list.html";
 
 
 /**
@@ -29,13 +29,13 @@ import template from './keyword-list.html';
  */
 
 const bindings = {
-    keywords: '<',
-    onSelect: '&?'
+    keywords: "<",
+    onSelect: "&?"
 };
 
 const transclude = {
-    empty: '?empty',
-    last: '?last'
+    empty: "?empty",
+    last: "?last"
 };
 
 

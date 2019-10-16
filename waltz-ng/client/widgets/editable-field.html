@@ -25,6 +25,7 @@
         </span>
 
         <span ng-bind="$ctrl.emptyLabel"
+              class="text-muted italics"
               ng-if="$ctrl.newVal == null">
         </span>
 
@@ -48,11 +49,13 @@
         <div ng-if="$ctrl.fieldType === 'text'">
             <input type="text"
                    ng-model="$ctrl.newVal"
+                   ng-keydown="$ctrl.onKeyDown($event)"
                    class="form-control input-sm">
         </div>
 
         <div ng-if="$ctrl.fieldType === 'textarea'">
             <textarea ng-model="$ctrl.newVal"
+                      ng-keydown="$ctrl.onKeyDown($event)"
                       class="form-control input-sm">
             </textarea>
         </div>
