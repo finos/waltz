@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,6 @@ import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
@@ -285,7 +284,7 @@ public class LogicalFlowService {
      * @param options determines which flows are in-scope for this calculation
      * @return statistics about the in-scope flows
      */
-    public LogicalFlowStatistics calculateStats(ApplicationIdSelectionOptions options) {
+    public LogicalFlowStatistics calculateStats(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APP_GROUP:
             case CHANGE_INITIATIVE:
@@ -300,7 +299,7 @@ public class LogicalFlowService {
     }
 
 
-    private LogicalFlowStatistics calculateStatsForAppIdSelector(ApplicationIdSelectionOptions options) {
+    private LogicalFlowStatistics calculateStatsForAppIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
 
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);

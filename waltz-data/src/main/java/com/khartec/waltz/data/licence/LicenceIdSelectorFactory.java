@@ -24,7 +24,6 @@ import com.khartec.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -60,8 +59,7 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
-                ApplicationIdSelectionOptions appSelectionOptions = ApplicationIdSelectionOptions.mkOpts(options);
-                Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(appSelectionOptions);
+                Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(options);
                 return mkFromAppSelector(appSelector);
             default:
                 String msg = String.format(

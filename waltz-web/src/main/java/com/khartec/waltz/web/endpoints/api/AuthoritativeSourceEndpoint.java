@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -95,10 +95,10 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
                 -> authoritativeSourceService.findByApplicationId(getId(request));
 
         ListRoute<NonAuthoritativeSource> findNonAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findNonAuthSources(readAppIdSelectionOptionsFromBody(request));
+                -> authoritativeSourceService.findNonAuthSources(readIdSelectionOptionsFromBody(request));
 
         ListRoute<AuthoritativeSource> findAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findAuthSources(readAppIdSelectionOptionsFromBody(request));
+                -> authoritativeSourceService.findAuthSources(readIdSelectionOptionsFromBody(request));
 
         ListRoute<AuthoritativeSource> findAllRoute = (request, response)
                 -> authoritativeSourceService.findAll();

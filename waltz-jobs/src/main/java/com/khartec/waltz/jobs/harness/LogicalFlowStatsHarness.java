@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
@@ -36,7 +36,7 @@ public class LogicalFlowStatsHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
 
-        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
+        IdSelectionOptions options = IdSelectionOptions.mkOpts(
                 EntityReference.mkRef(EntityKind.ORG_UNIT, 50L),
                 HierarchyQueryScope.CHILDREN);
 

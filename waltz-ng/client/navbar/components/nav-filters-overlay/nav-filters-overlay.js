@@ -86,7 +86,6 @@ function controller($element,
         }
     };
 
-
     const loadFacets = (stateName, id) => {
         if(areFiltersVisible(stateName)) {
             if(viewStateToKind(stateName).toString() === "ENTITY_STATISTIC"){
@@ -152,20 +151,14 @@ function controller($element,
 
 
     vm.filterChanged = () => {
-        // we need to convert the simple internal structures to the more complex filterOptions object structure
-
-        const appKindFilterOptions = _.reduce(
-            vm.appKindFilterOptions,
-            (acc, opt) => {
-                acc[opt.kind] = opt.selected;
-                return acc;
-            },
-            {});
         const filterOptions = {
-            APPLICATION: {
-                applicationKind: appKindFilterOptions
-            }
+            omitApplicationKinds: _
+                .chain(vm.appKindFilterOptions)
+                .reject(d => d.selected)
+                .map(d => d.kind)
+                .value()
         };
+
         $rootScope.$broadcast(FILTER_CHANGED_EVENT, filterOptions);
     };
 

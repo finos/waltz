@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
 import static com.khartec.waltz.schema.Tables.COMPLEXITY_SCORE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readAppIdSelectionOptionsFromBody;
+import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static spark.Spark.post;
 
 
@@ -55,7 +55,7 @@ public class ComplexityExtractor extends BaseDataExtractor {
 
         String path = mkPath("data-extract", "complexity", "all");
         post(path, (request, response) -> {
-            ApplicationIdSelectionOptions applicationIdSelectionOptions = readAppIdSelectionOptionsFromBody(request);
+            IdSelectionOptions applicationIdSelectionOptions = readIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
 
             SelectConditionStep<Record4<String, String, String, BigDecimal>> qry = dsl

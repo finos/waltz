@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
@@ -128,7 +127,10 @@ public class AuthoritativeSourceService {
 
     public int update(AuthoritativeSourceUpdateCommand command, String username) {
         int updateCount = authoritativeSourceDao.update(command);
-        AuthoritativeSource updatedAuthSource = getById(command.id().get());
+        long authSourceId = command
+                .id()
+                .orElseThrow(() -> new IllegalArgumentException("cannot update an auth source without an id"));
+        AuthoritativeSource updatedAuthSource = getById(authSourceId);
         ratingCalculator.update(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
         logUpdate(command, username);
         return updateCount;
@@ -202,26 +204,24 @@ public class AuthoritativeSourceService {
 
     public List<NonAuthoritativeSource> findNonAuthSources(IdSelectionOptions options) {
         Condition customSelectionCriteria;
-        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
-
         switch(options.entityReference().kind()) {
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector.selector())
-                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
+                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
 
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector.selector())
-                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
+                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
 
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(appOptions);
+                customSelectionCriteria = mkConsumerSelectionCondition(options);
                 break;
 
             default:
@@ -235,13 +235,11 @@ public class AuthoritativeSourceService {
     public List<AuthoritativeSource> findAuthSources(IdSelectionOptions options) {
         Condition customSelectionCriteria;
 
-        ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
-
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(orgUnitSelector.selector())
-                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
+                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
@@ -250,13 +248,13 @@ public class AuthoritativeSourceService {
                         .from(DATA_TYPE)
                         .where(DATA_TYPE.ID.in(dataTypeSelector.selector()));
                 customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector)
-                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.in(appOptions.applicationKinds()));
+                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(appOptions);
+                customSelectionCriteria = mkConsumerSelectionCondition(options);
                 break;
             default:
                 throw new UnsupportedOperationException("Cannot calculate auth sources for ref" + options.entityReference());
@@ -269,7 +267,7 @@ public class AuthoritativeSourceService {
 
     // -- HELPERS
 
-    private Condition mkConsumerSelectionCondition(ApplicationIdSelectionOptions options) {
+    private Condition mkConsumerSelectionCondition(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
         return AuthoritativeSourceDao.CONSUMER_APP.ID.in(appIdSelector);
     }

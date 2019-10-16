@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,8 +22,10 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.asset_cost.AssetCostDao;
 import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import org.jooq.DSLContext;
@@ -32,6 +34,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AssetCostHarness {
@@ -50,7 +54,7 @@ public class AssetCostHarness {
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        ApplicationIdSelectionOptions appIdSelectionOptions = ApplicationIdSelectionOptions.mkOpts(
+        IdSelectionOptions options = mkOpts(
                 ImmutableEntityReference.builder()
                         .id(5600)
                         .kind(EntityKind.ORG_UNIT)
@@ -58,7 +62,7 @@ public class AssetCostHarness {
                 HierarchyQueryScope.CHILDREN);
 
 
-        List<Tuple2<Long, BigDecimal>> costs = service.calculateCombinedAmountsForSelector(appIdSelectionOptions);
+        List<Tuple2<Long, BigDecimal>> costs = service.calculateCombinedAmountsForSelector(options);
         System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 
 

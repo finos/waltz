@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package com.khartec.waltz.data.end_user_app;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.schema.tables.EndUserApplication;
 import com.khartec.waltz.schema.tables.Involvement;
@@ -44,7 +44,7 @@ import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
-public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelectionOptions, Select<Record1<Long>>>  {
+public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>>  {
 
     private static final Logger LOG = LoggerFactory.getLogger(EndUserAppIdSelectorFactory.class);
 
@@ -57,7 +57,7 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
 
 
     @Override
-    public Select<Record1<Long>> apply(ApplicationIdSelectionOptions options) {
+    public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
@@ -71,9 +71,9 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
     }
 
 
-    private Select<Record1<Long>> mkForOrgUnit(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
 
-        if (!options.applicationKinds().contains(ApplicationKind.EUC)) {
+        if (eucOmitted(options)) {
             return mkEmptySelect();
         }
 
@@ -86,7 +86,7 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
     }
 
 
-    private Select<Record1<Long>> mkForPerson(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
         switch (options.scope()) {
             case EXACT:
                 return mkForSinglePerson(options);
@@ -101,9 +101,9 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
     }
 
 
-    private Select<Record1<Long>> mkForSinglePerson(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForSinglePerson(IdSelectionOptions options) {
 
-        if (!options.applicationKinds().contains(ApplicationKind.EUC)) {
+        if (eucOmitted(options)) {
             return mkEmptySelect();
         }
 
@@ -119,9 +119,9 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
     }
 
 
-    private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPersonReportees(IdSelectionOptions options) {
 
-        if (!options.applicationKinds().contains(ApplicationKind.EUC)) {
+        if (eucOmitted(options)) {
             return mkEmptySelect();
         }
 
@@ -140,6 +140,11 @@ public class EndUserAppIdSelectorFactory implements Function<ApplicationIdSelect
                 .innerJoin(eua)
                 .on(eua.ID.eq(involvement.ENTITY_ID))
                 .where(condition);
+    }
+
+
+    private boolean eucOmitted(IdSelectionOptions options) {
+        return options.filters().omitApplicationKinds().contains(ApplicationKind.EUC);
     }
 
 

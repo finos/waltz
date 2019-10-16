@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.entity_statistic.RollupKind;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.DIConfiguration;
@@ -67,7 +66,7 @@ GROUP BY outcome;
                 .forEach(System.out::println);
 
 */
-        ApplicationIdSelectionOptions selectionOptions = ApplicationIdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 70), HierarchyQueryScope.CHILDREN);
+        IdSelectionOptions selectionOptions = IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 70), HierarchyQueryScope.CHILDREN);
 
         // count by value
         List<TallyPack<String>> countByValueTallyPacks = service.calculateHistoricStatTally(10100L, RollupKind.COUNT_BY_ENTITY, selectionOptions, Duration.WEEK);

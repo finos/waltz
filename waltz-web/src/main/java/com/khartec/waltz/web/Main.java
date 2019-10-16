@@ -27,6 +27,7 @@ import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
 import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
+import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -137,7 +138,7 @@ public class Main {
         });
 
         exception(DuplicateKeyException.class, (e, req, res) -> {
-            String message = "Duplicate detected";
+            String message = "Duplicate detected: " + e.getMessage();
             LOG.error(message, e);
             reportException(
                     500,
@@ -147,8 +148,21 @@ public class Main {
                     LOG);
         });
 
+
         exception(InsufficientPrivelegeException.class, (e, req, resp) ->
            reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
+
+
+        exception(DataAccessException.class, (e, req, resp) -> {
+                    String message = "Exception: " + e.getCause().getMessage();
+                    LOG.error(message, e);
+                    reportException(
+                            500,
+                            e.sqlState(),
+                            message,
+                            resp,
+                            LOG);
+        });
 
 
         exception(Exception.class, (e, req, res) -> {

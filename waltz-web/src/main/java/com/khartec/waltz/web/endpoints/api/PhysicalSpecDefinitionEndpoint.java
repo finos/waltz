@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
@@ -31,7 +32,10 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -74,10 +78,22 @@ public class PhysicalSpecDefinitionEndpoint implements Endpoint {
         DatumRoute<Long> createRoute = (req, res) -> {
             requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
+
+            PhysicalSpecDefinitionChangeCommand physicalSpecDefinitionChangeCommand = readBody(req, PhysicalSpecDefinitionChangeCommand.class);
+
+            long physicalSpecificationId = getId(req);
+
+            Set<String> existingVersions = map(specDefinitionService.findForSpecification(physicalSpecificationId), d -> d.version());
+
+            if (existingVersions.contains(physicalSpecDefinitionChangeCommand.version())) {
+                throw new DuplicateKeyException("Cannot create physical specification definition with version that already exists");
+            }
+
             return specDefinitionService.create(
-                    getUsername(req),
-                    getId(req),
-                    readBody(req, PhysicalSpecDefinitionChangeCommand.class));
+                        getUsername(req),
+                        physicalSpecificationId,
+                        physicalSpecDefinitionChangeCommand);
+
         };
 
         DatumRoute<Boolean> updateStatusRoute = (req, res) -> {

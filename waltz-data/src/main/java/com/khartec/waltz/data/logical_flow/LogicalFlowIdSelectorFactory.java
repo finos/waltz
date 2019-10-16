@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,6 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.schema.tables.Application;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -66,10 +65,9 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
-                ApplicationIdSelectionOptions appOptions = ApplicationIdSelectionOptions.mkOpts(options);
-                return wrapAppIdSelector(appOptions);
+                return wrapAppIdSelector(options);
             case DATA_TYPE:
-                return mkForDataType(ApplicationIdSelectionOptions.mkOpts(options));
+                return mkForDataType(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
@@ -129,7 +127,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
 
 
 
-    private Select<Record1<Long>> wrapAppIdSelector(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> wrapAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
         Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector)
@@ -138,7 +136,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        return DSL.select(LOGICAL_FLOW.ID)
+        return DSL
+                .select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .where(sourceCondition.or(targetCondition))
                 .and(LOGICAL_NOT_REMOVED);
@@ -158,11 +157,16 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDataType(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 
         Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
         Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
+
+        Condition appKindFilterConditions = options.filters().omitApplicationKinds().isEmpty()
+                ? DSL.trueCondition()
+                : SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds())
+                    .or(CONSUMER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
 
         return DSL.select(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                 .from(LOGICAL_FLOW_DECORATOR)
@@ -175,10 +179,10 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
                     .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
-                .and(SUPPLIER_APP.KIND.in(options.applicationKinds()).or(CONSUMER_APP.KIND.in(options.applicationKinds())))
                 .and(LOGICAL_NOT_REMOVED)
                 .and(supplierNotRemoved)
-                .and(consumerNotRemoved);
+                .and(consumerNotRemoved)
+                .and(appKindFilterConditions);
     }
 
 
