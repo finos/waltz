@@ -86,8 +86,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(PHYSICAL_FLOW.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
-                .and(PHYSICAL_FLOW_NOT_REMOVED);
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()));
     }
 
 
