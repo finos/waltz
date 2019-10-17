@@ -148,7 +148,7 @@ public class PhysicalFlowService {
 
         int updateStatus = physicalFlowDao.updateEntityLifecycleStatus(fromId, EntityLifecycleStatus.REMOVED);
 
-        physicalSpecificationService.delete(
+        physicalSpecificationService.markRemovedIfUnused(
                 ImmutablePhysicalSpecificationDeleteCommand
                         .builder()
                         .specificationId(sourcePhysicalFlow.specificationId())

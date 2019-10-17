@@ -88,7 +88,7 @@ public class PhysicalSpecificationService {
     }
 
 
-    public CommandResponse<PhysicalSpecificationDeleteCommand> delete(PhysicalSpecificationDeleteCommand command, String username) {
+    public CommandResponse<PhysicalSpecificationDeleteCommand> markRemovedIfUnused(PhysicalSpecificationDeleteCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
         CommandOutcome commandOutcome = CommandOutcome.SUCCESS;
@@ -100,7 +100,7 @@ public class PhysicalSpecificationService {
             commandOutcome = CommandOutcome.FAILURE;
             responseMessage = "Specification not found";
         } else {
-            int deleteCount = specificationDao.delete(command.specificationId());
+            int deleteCount = specificationDao.markRemovedIfUnused(command.specificationId());
 
             if (deleteCount == 0) {
                 commandOutcome = CommandOutcome.FAILURE;

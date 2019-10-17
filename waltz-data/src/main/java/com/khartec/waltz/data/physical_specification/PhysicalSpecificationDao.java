@@ -205,7 +205,7 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public int delete(long specId) {
+    public int markRemovedIfUnused(long specId) {
         return dsl.update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.IS_REMOVED, true)
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
