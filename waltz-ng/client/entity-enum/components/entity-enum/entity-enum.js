@@ -21,6 +21,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./entity-enum.html";
+import {mkChunks} from "../../../common/list-utils";
 
 
 const bindings = {
@@ -32,15 +33,6 @@ const initialState = {
     numColumns: 2,
     chunkedEntries: []
 };
-
-
-function mkChunks(entries, chunkSize) {
-    const chunkedEntries = [];
-    for (let i = 0; i < entries.length; i += chunkSize) {
-        chunkedEntries.push(entries.slice(i, i + chunkSize));
-    }
-    return chunkedEntries;
-}
 
 
 function controller($q, serviceBroker) {
