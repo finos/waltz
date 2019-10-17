@@ -55,11 +55,11 @@ function controller($q) {
 
     vm.updateDescription = (change, f) => {
         if (_.isEmpty(change.newVal)) return $q.reject("Too short");
-        return invokeFunction(vm.onUpdateFieldDescription, change, f.id);
+        return invokeFunction(vm.onUpdateFieldDescription, change, f);
     };
 
     vm.updateLogicalElement = (change, f) => {
-        return invokeFunction(vm.onUpdateLogicalDataElement, change, f.id);
+        return invokeFunction(vm.onUpdateLogicalDataElement, change, f);
     };
 }
 
