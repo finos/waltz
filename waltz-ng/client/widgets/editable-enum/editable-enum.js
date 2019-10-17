@@ -40,9 +40,11 @@ const initialState = {
 };
 
 
-function controller(displayNameService, enumValueService) {
+function controller($element,
+                    $timeout,
+                    displayNameService,
+                    enumValueService) {
     const vm = initialiseData(this, initialState);
-
 
     vm.$onChanges = () => {
         vm.currentVal = vm.initialVal;
@@ -56,6 +58,11 @@ function controller(displayNameService, enumValueService) {
 
     vm.onEdit = () => {
         vm.visibility.editor = true;
+        $timeout(() => {
+            const input = $element.find("select")[0];
+            input.focus();
+        });
+
     };
 
     vm.doCancel = () => {
@@ -79,9 +86,17 @@ function controller(displayNameService, enumValueService) {
         return vm.currentVal !== null && vm.currentVal !== vm.initialVal;
     };
 
+    vm.onKeyDown = (event) => {
+        if (event.ctrlKey && event.keyCode === 13) {  // ctrl + enter
+            vm.doSave();
+        }
+    };
+
 }
 
 controller.$inject = [
+    "$element",
+    "$timeout",
     "DisplayNameService",
     "EnumValueService"
 ];

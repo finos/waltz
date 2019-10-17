@@ -30,7 +30,6 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.*;
@@ -63,7 +62,6 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.FlowDirection.*;
-import static com.khartec.waltz.model.application.ApplicationIdSelectionOptions.mkOpts;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -133,7 +131,7 @@ public class LogicalFlowDecoratorService {
             case APP_GROUP:
             case ORG_UNIT:
             case PERSON:
-                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(ApplicationIdSelectionOptions.mkOpts(options));
+                Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
                 return logicalFlowDecoratorDao.findByEntityIdSelectorAndKind(
                         APPLICATION,
                         selector,
