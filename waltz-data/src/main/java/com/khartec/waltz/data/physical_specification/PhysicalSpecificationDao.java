@@ -118,7 +118,7 @@ public class PhysicalSpecificationDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-
+    //Also includes removed physical flows
     public Set<PhysicalSpecification> findByLogicalFlow(long id) {
         return dsl
                 .select(PHYSICAL_SPECIFICATION.fields())
@@ -147,7 +147,9 @@ public class PhysicalSpecificationDao {
 
 
     public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
-        return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(selector))
+        return basicSelectByCondition(
+                PHYSICAL_SPECIFICATION.ID.in(selector)
+                        .and(PHYSICAL_SPEC_NOT_REMOVED))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
