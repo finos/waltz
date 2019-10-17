@@ -177,3 +177,30 @@ export function invokeFunction(fn) {
     return null;
 }
 
+const getElemHierarchy = (elem) => {
+    // Set up a parent array
+    const parents = [elem];
+    // Push each parent element to the array
+    for ( ; elem && elem !== document; elem = elem.parentNode ) {
+        parents.push(elem);
+    }
+    // Return our parent array
+    return parents;
+};
+
+const getWaltzTagNames = (elem) => {
+    if (! elem) {
+        const msg = "Usage: Inspect an item on the page. "
+            + "From the elements view, select 'store as global variable'. "
+            + "This will create a temp variable, use this to call this method e.g. getWaltzTagNames(temp1)";
+        console.log(msg);
+        return [];
+    }
+    return _
+        .chain(getElemHierarchy(elem))
+        .map(e => e.localName)
+        .filter(n => n.startsWith("waltz"))
+        .value();
+};
+
+global.getWaltzTagNames = getWaltzTagNames;

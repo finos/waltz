@@ -20,7 +20,7 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
@@ -30,6 +30,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.model.EntityKind.APP_GROUP;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class DataTypeUsageStatsHarness {
@@ -41,8 +42,8 @@ public class DataTypeUsageStatsHarness {
 
 //        ApplicationIdSelectionOptions applicationIdSelectionOptions = ctx.getBean(ApplicationIdSelectionOptions.class);
 //        Set<LogicalFlowDecoratorStat> flowsByDatatypeForEntity = logicalFlowDecoratorService.findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions.mkOpts(mkRef(APPLICATION, 20506)));
-        Set<LogicalFlowDecoratorStat> flowsByDatatypeForAppGroup = logicalFlowDecoratorService.findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions.mkOpts(mkRef(APP_GROUP, 433)));
-        Set<LogicalFlowDecoratorStat> flowsByDatatypeForCriticAppsAppGroup = logicalFlowDecoratorService.findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions.mkOpts(mkRef(APP_GROUP, 491)));
+        Set<LogicalFlowDecoratorStat> flowsByDatatypeForAppGroup = logicalFlowDecoratorService.findFlowsByDatatypeForEntity(IdSelectionOptions.mkOpts(mkRef(APP_GROUP, 433)));
+        Set<LogicalFlowDecoratorStat> flowsByDatatypeForCriticAppsAppGroup = logicalFlowDecoratorService.findFlowsByDatatypeForEntity(IdSelectionOptions.mkOpts(mkRef(APP_GROUP, 491)));
 
 
 //        System.out.println(flowsByDatatypeForEntity);
@@ -52,10 +53,10 @@ public class DataTypeUsageStatsHarness {
         for(int i = 0; i < 5; i++) {
             Set<LogicalFlowDecoratorStat> timeJessTest = FunctionUtilities.time(
                     "jess" + i,
-                    () -> logicalFlowDecoratorService.findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions.mkOpts(mkRef(APP_GROUP, 433))));
+                    () -> logicalFlowDecoratorService.findFlowsByDatatypeForEntity(mkOpts(mkRef(APP_GROUP, 433))));
             FunctionUtilities.time(
                     "crit"+i,
-                    () -> logicalFlowDecoratorService.findFlowsByDatatypeForEntity(ApplicationIdSelectionOptions.mkOpts(mkRef(APP_GROUP, 491))));
+                    () -> logicalFlowDecoratorService.findFlowsByDatatypeForEntity(mkOpts(mkRef(APP_GROUP, 491))));
 //            FunctionUtilities.time(
 //                    "group"+i,
 //                    () -> logicalFlowDecoratorService.findFlowsByDatatypeForEntity(mkRef(ORG_UNIT, 95)));

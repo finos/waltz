@@ -43,7 +43,10 @@
 
 <hr>
 
+<!-- FLOW -->
 <div class="small">
+
+    <!-- FREQUENCY -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Frequency:
@@ -52,6 +55,9 @@
             <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'frequencyKind'"></span>
         </div>
     </div>
+
+
+    <!-- FRESHNESS INDICATOR -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Observation:
@@ -65,6 +71,8 @@
         </div>
     </div>
 
+
+    <!-- BASIS OFFSET -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Basis Offset:
@@ -74,11 +82,31 @@
         </div>
     </div>
 
+
+    <!-- TAGS -->
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Tags:
+        </div>
+        <div class="col-sm-10">
+            <waltz-keyword-list keywords="$ctrl.tags"
+                                on-select="$ctrl.tagSelected(keyword)">
+                <empty>
+                    <i class="text-muted">
+                        No tags defined
+                    </i>
+                </empty>
+            </waltz-keyword-list>
+        </div>
+    </div>
+
+
     <!-- Entity Enum -->
     <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
     </waltz-entity-enum>
 
 
+    <!-- DESC -->
     <div class="row" ng-if="$ctrl.physicalFlow.description">
         <div class="col-sm-2 waltz-display-field-label">
             Description
@@ -88,6 +116,9 @@
             </waltz-markdown>
         </div>
     </div>
+
+
+    <!-- EXT ID -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             External Identifier
@@ -97,6 +128,9 @@
             </span>
         </div>
     </div>
+
+
+    <!-- ADDITIONAL EXT IDs -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Additional External Id
