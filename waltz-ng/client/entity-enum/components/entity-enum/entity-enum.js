@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,10 +21,11 @@ import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./entity-enum.html";
+import {mkChunks} from "../../../common/list-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -32,15 +33,6 @@ const initialState = {
     numColumns: 2,
     chunkedEntries: []
 };
-
-
-function mkChunks(entries, chunkSize) {
-    const chunkedEntries = [];
-    for (var i = 0; i < entries.length; i += chunkSize) {
-        chunkedEntries.push(entries.slice(i, i + chunkSize));
-    }
-    return chunkedEntries;
-}
 
 
 function controller($q, serviceBroker) {
@@ -62,18 +54,18 @@ function controller($q, serviceBroker) {
 
             $q.all([definitionsPromise, valuesPromise])
                 .then(([defs, vals]) => {
-                    const valsByDefId = _.keyBy(vals, 'definitionId');
+                    const valsByDefId = _.keyBy(vals, "definitionId");
 
                     const entries = _.chain(defs)
                         .map(d => ({
                             definition: d,
                             value: valsByDefId[d.id] || {enumValueKey: "-"}
                         }))
-                        .sortBy(o => [o.definition.position, o.definition.id])
+                        .sortBy(["definition.position", "definition.id"])
                         .value();
 
                     vm.chunkedEntries = mkChunks(entries, vm.numColumns);
-            });
+                });
 
         }
     };
@@ -81,8 +73,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -95,5 +87,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntityEnum'
+    id: "waltzEntityEnum"
 };

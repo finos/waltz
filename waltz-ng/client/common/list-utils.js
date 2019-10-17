@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -103,7 +103,7 @@ export function move(array, idx, delta) {
  */
 export function mkChunks(entries = [], chunkSize) {
     const chunkedEntries = [];
-    for (var i = 0; i < entries.length; i += chunkSize) {
+    for (let i = 0; i < entries.length; i += chunkSize) {
         chunkedEntries.push(entries.slice(i, i + chunkSize));
     }
     return chunkedEntries;
