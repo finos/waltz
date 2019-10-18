@@ -74,11 +74,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 BASE_URL,
                 "ids");
 
-        String findByLogicalFlowPath = mkPath(
-                BASE_URL,
-                "logical-flow",
-                ":id");
-
         String searchPath = mkPath(
                 BASE_URL,
                 "search",
@@ -102,10 +97,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         ListRoute<PhysicalSpecification> findByIdsRoute =
                 (request, response) -> specificationService.findByIds(readIdsFromBody(request));
 
-
-        ListRoute<PhysicalSpecification> findByLogicalFlowRoute =
-                (request, response) -> specificationService.findByLogicalFlow(getId(request));
-
         ListRoute<PhysicalSpecification> searchRoute =
                 (request, response) -> specificationService.search(
                         request.params("query"),
@@ -120,7 +111,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForList(findByIdsPath, findByIdsRoute);
 
         getForList(findByAppPath, findByAppRoute);
-        getForList(findByLogicalFlowPath, findByLogicalFlowRoute);
         postForList(findByIdsPath, findByIdsRoute);
         getForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);

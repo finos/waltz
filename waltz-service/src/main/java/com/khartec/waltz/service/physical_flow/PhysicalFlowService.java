@@ -115,11 +115,6 @@ public class PhysicalFlowService {
     }
 
 
-    public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
-        return physicalFlowDao.findByLogicalFlowId(logicalFlowId);
-    }
-
-
     public Collection<PhysicalFlow> findBySelector(IdSelectionOptions idSelectionOptions) {
         Select<Record1<Long>> selector = physicalFlowIdSelectorFactory.apply(idSelectionOptions);
         return physicalFlowDao.findBySelector(selector);

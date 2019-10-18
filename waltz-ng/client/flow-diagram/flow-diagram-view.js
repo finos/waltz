@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData} from "../common";
+import {allEntityLifecycleStatuses, initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
@@ -87,6 +87,12 @@ function controller(
             scope: "EXACT"
         };
 
+        const selectorWithAllLifeCycleStatuses = {
+            entityReference: vm.parentEntityRef,
+            scope: "EXACT",
+            entityLifecycleStatuses: allEntityLifecycleStatuses
+        };
+
         flowDiagramStateService
             .load(id)
             .then(loadVisibility);
@@ -107,11 +113,11 @@ function controller(
             });
 
         const physicalFlowPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [ selector ])
+            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [ selectorWithAllLifeCycleStatuses ])
             .then(r => r.data);
 
         const physicalSpecPromise =  serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [ selector ])
+            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [ selectorWithAllLifeCycleStatuses ])
             .then(r => r.data);
 
         const physicalSpecDataTypesPromise = serviceBroker

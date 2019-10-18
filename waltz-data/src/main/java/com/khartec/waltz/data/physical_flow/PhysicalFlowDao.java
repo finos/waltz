@@ -154,11 +154,6 @@ public class PhysicalFlowDao {
     }
 
 
-    public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
-        return findByCondition(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId));
-    }
-
-
     public List<PhysicalFlow> findBySelector(Select<Record1<Long>> selector) {
         return findByCondition(PHYSICAL_FLOW.ID.in(selector));
     }

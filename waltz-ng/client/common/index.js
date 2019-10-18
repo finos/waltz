@@ -35,6 +35,7 @@ export const entityLifecycleStatuses = {
     REMOVED: "REMOVED"
 };
 
+export const allEntityLifecycleStatuses = Object.values(entityLifecycleStatuses);
 
 export function notEmpty(xs) {
     return ! _.isEmpty(xs);
