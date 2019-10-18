@@ -20,7 +20,6 @@ import _ from "lodash";
 import {allEntityLifecycleStatuses, initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
-import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 import template from "./flow-diagram-view.html";
 
