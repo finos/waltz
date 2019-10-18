@@ -102,4 +102,78 @@
     </changeSet>
 
 
+    <changeSet id="20191019-4442-10"
+               author="davidwatkins73">
+        <comment>4442: fk between survey question and survey template</comment>
+        <addForeignKeyConstraint baseTableName="survey_question"
+                                 baseColumnNames="survey_template_id"
+                                 constraintName="survey_question_template_fk"
+                                 referencedTableName="survey_template"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191019-4442-20"
+               author="davidwatkins73">
+        <comment>4442: fk between survey question response and survey question (cleanup)</comment>
+        <delete tableName="survey_question_response">
+            <where>question_id not in (select id from survey_question)</where>
+        </delete>
+    </changeSet>
+
+    <changeSet id="20191019-4442-30"
+               author="davidwatkins73">
+        <comment>4442: fk between survey question response and survey question</comment>
+        <addForeignKeyConstraint baseTableName="survey_question_response"
+                                 baseColumnNames="question_id"
+                                 constraintName="survey_q_resp_survey_q_fk"
+                                 referencedTableName="survey_question"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191019-4442-40"
+               author="davidwatkins73">
+        <comment>4442: fk between survey question response and survey instance (cleanup)</comment>
+        <delete tableName="survey_question_response">
+            <where>survey_instance_id not in (select id from survey_instance)</where>
+        </delete>
+    </changeSet>
+
+    <changeSet id="20191019-4442-50"
+               author="davidwatkins73">
+        <comment>4442: fk between survey question response and survey instance</comment>
+        <addForeignKeyConstraint baseTableName="survey_question_response"
+                                 baseColumnNames="survey_instance_id"
+                                 constraintName="survey_q_resp_survey_inst_fk"
+                                 referencedTableName="survey_instance"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191019-4442-60"
+               author="davidwatkins73">
+        <comment>4442: adding external id to survey question table</comment>
+        <addColumn tableName="survey_question">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191019-4442-70"
+               author="davidwatkins73">
+        <comment>4442: adding unique index on survey question (ext_id + template)</comment>
+        <createIndex tableName="survey_question"
+                     unique="true"
+                     indexName="idx_survey_q_tmpl_id_ext_id">
+            <column name="survey_template_id"
+                    type="${id.type}"/>
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
+    </changeSet>
+
+
 </databaseChangeLog>
