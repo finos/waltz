@@ -62,5 +62,44 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="20191017-3685-4a"
+               dbms="mssql,postgresql"
+               author="davidwatkins73">
+        <comment>3685: backup measurables</comment>
+        <sql>
+            select *
+            into measurable_1_21
+            from measurable;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191017-3685-5"
+               author="davidwatkins73">
+        <comment>3685: cleanup orphan measurables</comment>
+        <delete tableName="measurable">
+            <where>measurable_category_id not in (select id from measurable_category)</where>
+        </delete>
+    </changeSet>
+
+    <changeSet id="20191017-3685-6"
+               author="davidwatkins73">
+        <comment>3685: fk between measurable and measurable category</comment>
+        <addForeignKeyConstraint baseTableName="measurable"
+                                 baseColumnNames="measurable_category_id"
+                                 constraintName="measurable_measurable_ctgry_fk"
+                                 referencedTableName="measurable_category"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-7"
+               author="davidwatkins73">
+        <comment>3685: fk between measurable parent and measurable</comment>
+        <addForeignKeyConstraint baseTableName="measurable"
+                                 baseColumnNames="parent_id"
+                                 constraintName="measurable_measurable_parent_fk"
+                                 referencedTableName="measurable"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 
 </databaseChangeLog>
