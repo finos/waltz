@@ -229,6 +229,7 @@ public class PhysicalFlowService {
                 commandOutcome = CommandOutcome.FAILURE;
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
+                externalIdentifierService.delete(mkRef(PHYSICAL_FLOW, physicalFlow.id().get()));
                 isSpecificationUnused = !physicalSpecificationService.isUsed(physicalFlow.specificationId());
                 isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
