@@ -1,0 +1,105 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.21.xml">
+
+    <changeSet id="20191017-3685-1"
+               author="davidwatkins73">
+        <comment>3685: fk between rating_scheme_item and rating_scheme</comment>
+        <addForeignKeyConstraint baseTableName="rating_scheme_item"
+                                 baseColumnNames="scheme_id"
+                                 constraintName="rating_scheme_item_rating_scheme_fk"
+                                 referencedTableName="rating_scheme"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-2"
+               author="davidwatkins73">
+        <comment>3685: fk between measurable_category and rating_scheme</comment>
+        <addForeignKeyConstraint baseTableName="measurable_category"
+                                 baseColumnNames="rating_scheme_id"
+                                 constraintName="measurable_category_rating_scheme_fk"
+                                 referencedTableName="rating_scheme"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-3"
+               author="davidwatkins73">
+        <comment>3685: fk between roadmap and rating_scheme</comment>
+        <addForeignKeyConstraint baseTableName="roadmap"
+                                 baseColumnNames="rating_scheme_id"
+                                 constraintName="roadmap_rating_scheme_fk"
+                                 referencedTableName="rating_scheme"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-4"
+               author="davidwatkins73">
+        <comment>3685: fk between assessment definition and rating_scheme</comment>
+        <addForeignKeyConstraint baseTableName="assessment_definition"
+                                 baseColumnNames="rating_scheme_id"
+                                 constraintName="assessment_defn_rating_schm_fk"
+                                 referencedTableName="rating_scheme"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-4a"
+               dbms="mssql,postgresql"
+               author="davidwatkins73">
+        <comment>3685: backup measurables</comment>
+        <sql>
+            select *
+            into measurable_1_21
+            from measurable;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191017-3685-5"
+               author="davidwatkins73">
+        <comment>3685: cleanup orphan measurables</comment>
+        <delete tableName="measurable">
+            <where>measurable_category_id not in (select id from measurable_category)</where>
+        </delete>
+    </changeSet>
+
+    <changeSet id="20191017-3685-6"
+               author="davidwatkins73">
+        <comment>3685: fk between measurable and measurable category</comment>
+        <addForeignKeyConstraint baseTableName="measurable"
+                                 baseColumnNames="measurable_category_id"
+                                 constraintName="measurable_measurable_ctgry_fk"
+                                 referencedTableName="measurable_category"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191017-3685-7"
+               author="davidwatkins73">
+        <comment>3685: fk between measurable parent and measurable</comment>
+        <addForeignKeyConstraint baseTableName="measurable"
+                                 baseColumnNames="parent_id"
+                                 constraintName="measurable_measurable_parent_fk"
+                                 referencedTableName="measurable"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
+</databaseChangeLog>
