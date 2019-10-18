@@ -180,6 +180,7 @@ public class PhysicalFlowService {
 
         sourcePhysicalFlow
                 .externalId()
+                .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
                     if(isEmpty(targetPhysicalFlow.externalId())) {
                         physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
@@ -193,6 +194,7 @@ public class PhysicalFlowService {
 
         sourceSpec
                 .externalId()
+                .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
                     PhysicalSpecification targetSpec = physicalSpecificationService
                             .getById(targetPhysicalFlow.specificationId());
