@@ -133,9 +133,7 @@ public class PhysicalSpecificationDao {
 
 
     public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
-        return basicSelectByCondition(
-                PHYSICAL_SPECIFICATION.ID.in(selector)
-                        .and(PHYSICAL_SPEC_NOT_REMOVED))
+        return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
