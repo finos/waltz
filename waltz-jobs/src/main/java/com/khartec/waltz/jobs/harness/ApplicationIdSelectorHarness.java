@@ -23,18 +23,18 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.conf.Settings;
-import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;
+
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 /**
  * Created by dwatkins on 13/05/2016.
@@ -49,7 +49,7 @@ public class ApplicationIdSelectorHarness {
 
         ApplicationService applicationService = ctx.getBean(ApplicationService.class);
 
-        ApplicationIdSelectionOptions options = ApplicationIdSelectionOptions.mkOpts(
+        IdSelectionOptions options = mkOpts(
                 EntityReference.mkRef(EntityKind.DATA_TYPE, 5000L),
                 HierarchyQueryScope.CHILDREN);
 

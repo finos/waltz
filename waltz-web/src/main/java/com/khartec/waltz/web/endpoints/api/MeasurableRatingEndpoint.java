@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -82,10 +82,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.findForEntity(getEntityReference(request));
 
         ListRoute<MeasurableRating> findByMeasurableSelectorRoute = (request, response)
-                -> measurableRatingService.findByMeasurableIdSelector(readAppIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRating> findByAppSelectorRoute = (request, response)
-                -> measurableRatingService.findByAppIdSelector(readAppIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRating> findByCategoryRoute = (request, response)
                 -> measurableRatingService.findByCategory(getId(request));
@@ -94,10 +94,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 -> measurableRatingService.tallyByMeasurableCategoryId(getId(request));
 
         ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
-                -> measurableRatingService.statsByAppSelector(readAppIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.statsByAppSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<MeasurableRatingTally> statsForRelatedMeasurableRoute = (request, response)
-                -> measurableRatingService.statsForRelatedMeasurable(readAppIdSelectionOptionsFromBody(request));
+                -> measurableRatingService.statsForRelatedMeasurable(readIdSelectionOptionsFromBody(request));
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,6 @@ import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
@@ -91,14 +90,14 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findByMeasurableIdSelector(ApplicationIdSelectionOptions options) {
+    public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
-        return measurableRatingDao.findByMeasurableIdSelector(selector, options.entityLifecycleStatuses(), options.applicationKinds());
+        return measurableRatingDao.findByMeasurableIdSelector(selector, options);
     }
 
 
-    public Collection<MeasurableRating> findByAppIdSelector(ApplicationIdSelectionOptions options) {
+    public Collection<MeasurableRating> findByAppIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.findByApplicationIdSelector(selector);
@@ -184,7 +183,7 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRatingTally> statsByAppSelector(ApplicationIdSelectionOptions options) {
+    public List<MeasurableRatingTally> statsByAppSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.statsByAppSelector(selector);

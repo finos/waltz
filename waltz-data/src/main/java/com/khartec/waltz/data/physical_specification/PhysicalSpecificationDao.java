@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -155,7 +155,9 @@ public class PhysicalSpecificationDao {
 
     public boolean isUsed(long id) {
         Field<Boolean> specUsed = DSL.when(
-                    exists(selectFrom(PHYSICAL_FLOW).where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))),
+                    exists(selectFrom(PHYSICAL_FLOW)
+                            .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
+                            .and(PHYSICAL_FLOW_NOT_REMOVED)),
                     val(true))
                 .otherwise(false).as("spec_used");
 
@@ -191,14 +193,16 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public int delete(long specId) {
-        return dsl.deleteFrom(PHYSICAL_SPECIFICATION)
+    public int markRemovedIfUnused(long specId) {
+        return dsl.update(PHYSICAL_SPECIFICATION)
+                .set(PHYSICAL_SPECIFICATION.IS_REMOVED, true)
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
                 .and(notExists(selectFrom(PHYSICAL_FLOW)
-                                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specId))))
+                        .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specId))
+                        .and(PHYSICAL_FLOW_NOT_REMOVED))
+                )
                 .execute();
     }
-
 
     public int updateExternalId(long specificationId, String externalId) {
         return dsl.update(PHYSICAL_SPECIFICATION)

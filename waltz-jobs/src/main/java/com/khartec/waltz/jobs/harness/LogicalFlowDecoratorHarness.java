@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ package com.khartec.waltz.jobs.harness;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
@@ -38,12 +38,12 @@ public class LogicalFlowDecoratorHarness {
 
         LogicalFlowDecoratorService service = ctx.getBean(LogicalFlowDecoratorService.class);
 
-        List<DecoratorRatingSummary> inboundSummaries = service.summarizeInboundForSelector(ApplicationIdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
+        List<DecoratorRatingSummary> inboundSummaries = service.summarizeInboundForSelector(IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
         inboundSummaries.forEach(s -> System.out.println(String.format("%d %s: %d", s.decoratorEntityReference().id(), s.rating().name(), s.count())));
 
         System.out.println("--------");
 
-        List<DecoratorRatingSummary> outboundSummaries = service.summarizeOutboundForSelector(ApplicationIdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
+        List<DecoratorRatingSummary> outboundSummaries = service.summarizeOutboundForSelector(IdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 290L), HierarchyQueryScope.CHILDREN));
         outboundSummaries.forEach(s -> System.out.println(String.format("%d %s: %d", s.decoratorEntityReference().id(), s.rating().name(), s.count())));
     }
 

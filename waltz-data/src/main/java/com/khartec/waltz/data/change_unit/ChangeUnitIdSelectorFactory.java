@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,6 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -66,8 +65,7 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
 
 
     private Select<Record1<Long>> mkByAppSelector(IdSelectionOptions options) {
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory
-                .apply(ApplicationIdSelectionOptions.mkOpts(options));
+        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(options);
 
         Condition sourceRef = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appSelector));

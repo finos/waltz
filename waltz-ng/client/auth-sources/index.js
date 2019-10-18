@@ -1,7 +1,7 @@
 
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import * as NonAuthSourcesPanel from './components/non-auth-sources-panel/non-au
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
 import * as TreePicker from './components/tree-picker/tree-picker';
+import * as TreeFilter from './components/tree-filter/tree-filter';
 import {registerComponents, registerStore} from '../common/module-utils';
 import RatingIndicator from './directives/rating-indicator';
 
@@ -42,12 +43,15 @@ export default () => {
         authSourcesStore);
     registerComponents(
         module,
-        [   AuthSourceEditorPanel,
+        [
+            AuthSourceEditorPanel,
             AuthSourcesTable,
             AuthSourcesSection,
             AuthSourcesSummaryPanel,
             TreePicker,
-            NonAuthSourcesPanel ]);
+            TreeFilter,
+            NonAuthSourcesPanel
+        ]);
 
     return module.name;
 };

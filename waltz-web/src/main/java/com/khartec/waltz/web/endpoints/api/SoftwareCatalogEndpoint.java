@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public class SoftwareCatalogEndpoint implements Endpoint {
                 service.makeCatalogForAppIds(readIdsFromBody(request));
 
         DatumRoute<SoftwareSummaryStatistics> calculateStatsForAppIdSelectorRoute = (request, response)
-                -> service.calculateStatisticsForAppIdSelector(readAppIdSelectionOptionsFromBody(request));
+                -> service.calculateStatisticsForAppIdSelector(readIdSelectionOptionsFromBody(request));
 
 
         getForDatum(mkPath(BASE_URL, "package-id", ":id"), this::getByPackageIdRoute);

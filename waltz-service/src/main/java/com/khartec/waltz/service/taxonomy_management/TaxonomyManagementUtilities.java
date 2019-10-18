@@ -1,10 +1,30 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.measurable.Measurable;
+import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
 import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
@@ -16,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 public class TaxonomyManagementUtilities {
 
@@ -52,11 +73,11 @@ public class TaxonomyManagementUtilities {
 
     public static Set<EntityReference> findCurrentRatingMappings(MeasurableRatingService measurableRatingService,
                                                                  TaxonomyChangeCommand cmd) {
-        ApplicationIdSelectionOptions selectionOptions = ApplicationIdSelectionOptions.mkOpts(cmd.primaryReference(), HierarchyQueryScope.EXACT);
+        IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.EXACT);
         return measurableRatingService
                 .findByMeasurableIdSelector(selectionOptions)
                 .stream()
-                .map(r -> r.entityReference())
+                .map(MeasurableRating::entityReference)
                 .collect(Collectors.toSet());
     }
 

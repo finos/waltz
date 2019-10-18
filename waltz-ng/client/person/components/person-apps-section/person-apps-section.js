@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,12 +18,12 @@
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common/index";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { downloadTextFile } from "../../../common/file-utils";
-import { mkApplicationSelectionOptions } from "../../../common/selector-utils";
-import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
-import { lifecycleStatus } from "../../../common/services/enums/lifecycle-status";
+import {initialiseData} from "../../../common/index";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {downloadTextFile} from "../../../common/file-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {lifecycleStatus} from "../../../common/services/enums/lifecycle-status";
 
 import template from "./person-apps-section.html";
 
@@ -99,7 +99,7 @@ function controller(serviceBroker) {
     }
 
     function loadITManagedApps(entityReference) {
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             entityReference,
             hierarchyQueryScope.CHILDREN.key,
             [lifecycleStatus.ACTIVE.key],
@@ -114,7 +114,7 @@ function controller(serviceBroker) {
     }
 
     function loadEndUserManagedApps(entityReference) {
-        const selector = mkApplicationSelectionOptions(
+        const selector = mkSelectionOptions(
             entityReference,
             undefined,
             undefined,
@@ -167,7 +167,7 @@ function controller(serviceBroker) {
         if(changes.filters) {
             loadAll();
         }
-        vm.selector = mkApplicationSelectionOptions(
+        vm.selector = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             undefined,

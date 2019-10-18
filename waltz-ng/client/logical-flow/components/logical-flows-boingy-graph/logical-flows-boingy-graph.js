@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,8 @@
 
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkApplicationSelectionOptions} from "../../../common/selector-utils";
-import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
@@ -140,7 +140,7 @@ function calculateFlowData(allFlows = [],
     const decoratorFilterFn = buildDecoratorFilter(filterOptions);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
-    const appIds = _.map(applications, "id");
+    const appIds = _.map(applications, d => d.id);
     const flowFilterFn = buildFlowFilter(filterOptions, isolatedNode, appIds, decorators);
     const flows = _.filter(allFlows, flowFilterFn);
 
@@ -272,9 +272,9 @@ function controller($scope,
         vm.isolate(node);
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         if (vm.parentEntityRef) {
-            vm.selector = mkApplicationSelectionOptions(
+            vm.selector = mkSelectionOptions(
                 vm.parentEntityRef,
                 undefined,
                 [entityLifecycleStatus.ACTIVE.key],

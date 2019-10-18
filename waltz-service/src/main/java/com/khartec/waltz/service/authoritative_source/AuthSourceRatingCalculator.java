@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
@@ -42,6 +42,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.stream.Collectors.toList;
 
 
@@ -103,7 +104,7 @@ public class AuthSourceRatingCalculator {
                 dataType.id().get(),
                 vantageRef);
 
-        ApplicationIdSelectionOptions selectorOptions = ApplicationIdSelectionOptions.mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
+        IdSelectionOptions selectorOptions = mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
 
         Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao

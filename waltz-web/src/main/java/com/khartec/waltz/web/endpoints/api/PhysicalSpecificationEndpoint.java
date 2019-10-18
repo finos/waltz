@@ -129,6 +129,6 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 .specificationId(specId)
                 .build();
 
-        return specificationService.delete(deleteCommand, username);
+        return specificationService.markRemovedIfUnused(deleteCommand, username);
     }
 }

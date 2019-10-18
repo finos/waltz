@@ -26,7 +26,6 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -49,24 +48,22 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case PERSON:
-                return mkForPerson(ApplicationIdSelectionOptions.mkOpts(options));
+                return mkForPerson(options);
             case MEASURABLE_CATEGORY:
                 return mkForMeasurableCategory(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
-            case ACTOR:
-                return mkForDirectEntityKind(options);
-            case APPLICATION:
-                return mkForDirectEntityKind(options);
             case APP_GROUP:
-                ApplicationIdSelectionOptions appIdSelectionOptions = ApplicationIdSelectionOptions.mkOpts(options);
-                return mkForAppGroup(appIdSelectionOptions);
+                return mkForAppGroup(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case SCENARIO:
                 return mkForScenario(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
+            case ACTOR:
+            case APPLICATION:
+                return mkForDirectEntityKind(options);
             default:
                 throw new UnsupportedOperationException(format(
                         "Cannot create measurable selector from kind: %s",
@@ -75,7 +72,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForPerson(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
         switch (options.scope()) {
             case CHILDREN:
                 return mkForPersonReportees(options);
@@ -88,7 +85,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForPersonReportees(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForPersonReportees(IdSelectionOptions options) {
 
         Select<Record1<String>> emp = DSL.select(PERSON.EMPLOYEE_ID)
                 .from(PERSON)
@@ -140,7 +137,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForAppGroup(ApplicationIdSelectionOptions options) {
+    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
 
         Select<Record1<Long>> validAppIdsInGroup = ApplicationIdSelectorFactory.mkForAppGroup(options);
@@ -166,12 +163,6 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    /**
-     * Returns all measurables liked to entities listed in the diagram
-     *
-     * @param options
-     * @return
-     */
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate flow diagram based selectors with exact scopes");
         long diagramId = options.entityReference().id();

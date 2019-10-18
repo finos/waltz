@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.complexity.ComplexityScoreDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.complexity.ComplexityScore;
@@ -89,7 +89,7 @@ public class ComplexityRatingService {
      * @param options
      * @return
      */
-    public List<ComplexityRating> findForAppIdSelector(ApplicationIdSelectionOptions options) {
+    public List<ComplexityRating> findForAppIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
         return complexityScoreDao.findForAppIdSelector(appIdSelector);
     }
