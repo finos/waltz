@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,45 +19,45 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common/index";
-import template from './survey-template-edit.html';
+import template from "./survey-template-edit.html";
 
 
 const initialState = {
     editingQuestion: false,
     questionFieldTypes: [{
-        name: 'Text',
-        value: 'TEXT'
+        name: "Text",
+        value: "TEXT"
     },{
-        name: 'Text Area',
-        value: 'TEXTAREA'
+        name: "Text Area",
+        value: "TEXTAREA"
     },{
-        name: 'Number',
-        value: 'NUMBER'
+        name: "Number",
+        value: "NUMBER"
     },{
-        name: 'Boolean',
-        value: 'BOOLEAN'
+        name: "Boolean",
+        value: "BOOLEAN"
     },{
-        name: 'Date',
-        value: 'DATE'
+        name: "Date",
+        value: "DATE"
     },{
-        name: 'Dropdown',
-        value: 'DROPDOWN'
+        name: "Dropdown",
+        value: "DROPDOWN"
     },{
-        name: 'Application',
-        value: 'APPLICATION'
+        name: "Application",
+        value: "APPLICATION"
     },{
-        name: 'Person',
-        value: 'PERSON'
+        name: "Person",
+        value: "PERSON"
     }],
     selectedQuestionInfo: {},
     surveyQuestionInfos: [],
     surveyTemplate: {},
     targetEntityKinds: [{
-        name: 'Application',
-        value: 'APPLICATION'
+        name: "Application",
+        value: "APPLICATION"
     },{
-        name: 'Change Initiative',
-        value: 'CHANGE_INITIATIVE'
+        name: "Change Initiative",
+        value: "CHANGE_INITIATIVE"
     }]
 };
 
@@ -87,7 +87,7 @@ function controller($stateParams,
                 description: vm.surveyTemplate.description,
                 targetEntityKind: vm.surveyTemplate.targetEntityKind
             })
-            .then(updateCount => notification.success('Survey template updated successfully'));
+            .then(updateCount => notification.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
@@ -102,7 +102,8 @@ function controller($stateParams,
                 surveyTemplateId: vm.id,
                 isMandatory: false,
                 allowComment: false,
-                position: (currentMaxPos || 0) + 10
+                position: (currentMaxPos || 0) + 10,
+                externalId: null
             },
             dropdownEntries: []
         };
@@ -123,7 +124,7 @@ function controller($stateParams,
         surveyQuestionStore
             .create(qi)
             .then(() => {
-                notification.success('Survey question created successfully');
+                notification.success("Survey question created successfully");
                 loadQuestions();
                 vm.cancelQuestionForm();
             });
@@ -133,7 +134,7 @@ function controller($stateParams,
         surveyQuestionStore
             .update(qi)
             .then(() => {
-                notification.success('Survey question updated successfully');
+                notification.success("Survey question updated successfully");
                 loadQuestions();
                 vm.cancelQuestionForm();
             });
@@ -144,7 +145,7 @@ function controller($stateParams,
             surveyQuestionStore
                 .deleteQuestion(qi.question.id)
                 .then(() => {
-                    notification.success('Survey question deleted successfully');
+                    notification.success("Survey question deleted successfully");
                     loadQuestions();
                     vm.cancelQuestionForm();
                 });
@@ -165,16 +166,16 @@ function controller($stateParams,
 
 
 controller.$inject = [
-    '$stateParams',
-    'Notification',
-    'SurveyQuestionStore',
-    'SurveyTemplateStore'
+    "$stateParams",
+    "Notification",
+    "SurveyQuestionStore",
+    "SurveyTemplateStore"
 ];
 
 
 const page = {
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     template
 };
 
