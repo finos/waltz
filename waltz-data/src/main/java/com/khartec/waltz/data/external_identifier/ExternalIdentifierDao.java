@@ -94,4 +94,10 @@ public class ExternalIdentifierDao {
         return dsl.executeDelete(TO_RECORD_MAPPER.apply(externalIdentifier));
     }
 
+    public int delete(EntityReference entityRef) {
+        return dsl.deleteFrom(EXTERNAL_IDENTIFIER)
+                .where(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(entityRef.kind().name()))
+                .and(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(entityRef.id()))
+                .execute();
+    }
 }

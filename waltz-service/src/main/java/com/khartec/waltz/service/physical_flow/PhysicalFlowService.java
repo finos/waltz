@@ -180,6 +180,7 @@ public class PhysicalFlowService {
 
         sourcePhysicalFlow
                 .externalId()
+                .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
                     if(isEmpty(targetPhysicalFlow.externalId())) {
                         physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
@@ -193,6 +194,7 @@ public class PhysicalFlowService {
 
         sourceSpec
                 .externalId()
+                .filter(id -> !isEmpty(id))
                 .ifPresent(sourceExtId -> {
                     PhysicalSpecification targetSpec = physicalSpecificationService
                             .getById(targetPhysicalFlow.specificationId());
@@ -229,6 +231,7 @@ public class PhysicalFlowService {
                 commandOutcome = CommandOutcome.FAILURE;
                 responseMessage = "This flow cannot be deleted as it is being used in a lineage";
             } else {
+                externalIdentifierService.delete(mkRef(PHYSICAL_FLOW, physicalFlow.id().get()));
                 isSpecificationUnused = !physicalSpecificationService.isUsed(physicalFlow.specificationId());
                 isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
             }
