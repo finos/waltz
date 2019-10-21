@@ -56,13 +56,6 @@ export function store($http, baseApiUrl) {
     };
 
 
-    const findByLogicalFlowId = (id) => {
-        return $http
-            .get(`${base}/logical-flow/${id}`)
-            .then(r => r.data);
-    };
-
-
     const findByExternalId = (extId) => {
         return $http
             .get(`${base}/external-id/${extId}`)
@@ -145,7 +138,6 @@ export function store($http, baseApiUrl) {
 
     return {
         findBySpecificationId,
-        findByLogicalFlowId,
         findByExternalId,
         findByEntityReference,
         findByProducerEntityReference,
@@ -180,11 +172,6 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: "findBySpecificationId",
         description: "executes findBySpecificationId"
-    },
-    findByLogicalFlowId: {
-        serviceName,
-        serviceFnName: "findByLogicalFlowId",
-        description: "executes findByLogicalFlowId"
     },
     findByEntityReference: {
         serviceName,

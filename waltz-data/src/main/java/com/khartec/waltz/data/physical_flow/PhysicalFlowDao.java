@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,11 +153,6 @@ public class PhysicalFlowDao {
     }
 
 
-    public Collection<PhysicalFlow> findByLogicalFlowId(long logicalFlowId) {
-        return findByCondition(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId));
-    }
-
-
     public List<PhysicalFlow> findBySelector(Select<Record1<Long>> selector) {
         return findByCondition(PHYSICAL_FLOW.ID.in(selector));
     }
@@ -214,6 +208,7 @@ public class PhysicalFlowDao {
 
     /**
      * Returns the flow in the database that matches the parameter based on all attributes except possibly id
+     *
      * @param flow the physical flow to match against
      * @return matching flow or null
      */

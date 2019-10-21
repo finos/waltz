@@ -22,7 +22,7 @@ import _ from "lodash";
 
 import template from "./flow-diagrams-panel-view.html";
 
-import { initialiseData } from "../../../../common/index";
+import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
 import { CORE_API } from "../../../../common/services/core-api-utils";
 import { mkSelectionOptions } from "../../../../common/selector-utils";
 import { dyamicSectionNavigationDefaultOffset } from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
@@ -198,7 +198,7 @@ function controller($element,
             .map('id')
             .value();
 
-        const diagramSelector = mkSelectionOptions(vm.parentEntityRef);
+        const diagramSelector = mkSelectionOptions(vm.parentEntityRef, "EXACT", allEntityLifecycleStatuses);
 
         const flowPromise = serviceBroker
             .loadViewData(
@@ -229,7 +229,6 @@ function controller($element,
                     .keyBy(cu => cu.subjectEntity.id)
                     .value();
 
-                console.log('change units: ', changeUnits);
                 const flowData = _
                     .chain(physicalFlowIds)
                     .map(flowId => {
@@ -242,7 +241,7 @@ function controller($element,
                             physicalSpecification,
                             changeUnit
                         };})
-                    .orderBy('physicalSpecification.name')
+                    .orderBy("physicalSpecification.name")
                     .value();
 
                 vm.contextPopup.entityReference = logicalFlow.data;
