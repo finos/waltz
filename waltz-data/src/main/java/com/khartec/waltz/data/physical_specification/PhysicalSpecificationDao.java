@@ -119,20 +119,6 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public Set<PhysicalSpecification> findByLogicalFlow(long id) {
-        return dsl
-                .select(PHYSICAL_SPECIFICATION.fields())
-                .select(owningEntityNameField)
-                .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(id))
-                .and(PHYSICAL_FLOW_NOT_REMOVED)
-                .and(PHYSICAL_SPEC_NOT_REMOVED)
-                .fetchSet(TO_DOMAIN_MAPPER);
-    }
-
-
     public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
         return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(ids))
                 .fetch(TO_DOMAIN_MAPPER);
