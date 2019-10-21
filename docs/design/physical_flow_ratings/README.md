@@ -1,6 +1,6 @@
 # Physical Flow Ratings in Waltz
 
-## Status: DESIGN
+## Status: DESIGN  (Possibly targeting Q1/2 2020)
 
 ## Terminology
 This section is intended to define what specific terms mean in the remainder of this document
@@ -8,9 +8,9 @@ This section is intended to define what specific terms mean in the remainder of 
 - **Logical Flow**, abstractly describes all flows between two entities (typically apps) 
 - **Physical Flow**, a specific instance of a _logical flow_
 - **Physical Specification**, details of what is being transferred in a _physical flow_
-- **Data Types**, hierarchical structure reperesenting all types of data within the organization
+- **Data Types**, hierarchical structure representing all types of data within the organization
 - **Measurable Category**, (aka _Taxonomy_) 
-- **Measurables**, hierarchical structure repesenting items in a _measurable category_ 
+- **Measurables**, hierarchical structure representing items in a _measurable category_ 
 - **Rating Scheme / Item**, used to describe the relationship between entities (typically apps) and _measurables_
 - **Measurable Rating**, the actual linkage of an entity to a _measurable_ using a _rating scheme item_
 
@@ -22,7 +22,7 @@ feature will extend the support to include physical flows.
 
 ## Motivation
 There is interest in being able to better describe physical flows in terms of existing (and new) _measurable categories_.
-One compelling case is to be able to introduce a _Regulatory_ category which descibes a hierarchy of regulations and their 
+One compelling case is to be able to introduce a _Regulatory_ category which describes a hierarchy of regulations and their 
 constituent parts, for example:
 
 - _Basel III_
@@ -34,7 +34,7 @@ constituent parts, for example:
     - _Pillar 2_
       - _Risk management and supervision_
     - _Pillar 3_
-      - _Market Disicpline_
+      - _Market Discipline_
   - _Liquidity_
     - _Global liquidity standard and supervisory monitoring_
 
@@ -64,7 +64,7 @@ and _data types_.
 
 Waltz currently has no support for storing _measurable ratings_ against _physical flows_.
 
-On the backend the the exising `measurable_rating` table does support storing non-application ratings however the API 
+On the backend the the existing `measurable_rating` table does support storing non-application ratings however the API 
 layer will not aggregate them correctly at present.
 
 The user interface will need to be redesigned to show flows instead of applications.  
@@ -87,4 +87,8 @@ TBC
 ## Notes
 
 Implementation tasks will be prefixed with `Flow Ratings` in the issue tracker.
+
+![Conceptual Diagram](images/physical_flow_ratings.png)
+
+Diagram [Source](images/physical_flow_ratings.gv)
 

@@ -54,11 +54,46 @@
         </tr>
         <tr>
             <td class="wft-label">
+                <label>Tags</label>
+            </td>
+            <td>
+                <waltz-keyword-list ng-if="!$ctrl.visibility.tagEditor"
+                                    keywords="$ctrl.tags"
+                                    on-select="$ctrl.tagSelected(keyword)">
+                    <last>
+                        <span class="small">
+                            <a ng-click="$ctrl.onShowTagEditor()"
+                               class="clickable">
+                                update
+                            </a>
+                        </span>
+                    </last>
+                    <empty>
+                        <i class="text-muted">
+                            No tags defined,
+                            <a class="clickable"
+                               ng-click="$ctrl.onShowTagEditor()">
+                                add one.
+                            </a>
+                        </i>
+                    </empty>
+                </waltz-keyword-list>
+
+                <waltz-keyword-edit ng-if="$ctrl.visibility.tagEditor"
+                                    keywords="$ctrl.tags"
+                                    on-save="$ctrl.onSaveTags"
+                                    on-cancel="$ctrl.onDismissTagEditor">
+                </waltz-keyword-edit>
+            </td>
+        </tr>
+        <tr>
+            <td class="wft-label">
                 <label>Description</label>
             </td>
             <td>
                 <waltz-editable-field on-save="$ctrl.onSaveDescription"
                                       field-type="textarea"
+                                      empty-label="Not provided"
                                       initial-val="$ctrl.physicalFlow.description">
                 </waltz-editable-field>
             </td>

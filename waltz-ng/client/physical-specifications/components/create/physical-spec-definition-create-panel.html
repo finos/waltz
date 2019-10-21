@@ -175,7 +175,7 @@ Field2&#9;DATE&#9;description for field 2
         <div class="form-group" style="padding-top: 10px">
             <div class="col-sm-offset-3 col-sm-9">
                 <button type="button"
-                        ng-disabled="specDefForm.$invalid || $ctrl.specDefFields.hasErrors"
+                        ng-disabled="specDefForm.$invalid || $ctrl.specDefFields.hasErrors || $ctrl.specDefinition.def.status == null"
                         ng-click="$ctrl.submit()"
                         class="btn btn-success">
                     Submit

@@ -1,6 +1,8 @@
 <span>
     <span ng-if="$ctrl.keywords.length == 0">
-        <div ng-transclude="empty"></div>
+        <div ng-transclude="empty">
+            -
+        </div>
     </span>
 
     <ul ng-if="$ctrl.keywords.length > 0"
