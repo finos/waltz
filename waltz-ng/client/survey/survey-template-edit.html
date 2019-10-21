@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
     <waltz-page-header icon="wpforms"
                        name="Survey Template"
@@ -212,6 +231,26 @@
                     </div>
                 </div>
 
+
+                <div class="form-group">
+                    <label for="qExternalId"
+                           class="col-sm-2 control-label">
+                        External Id
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               id="qExternalId"
+                               placeholder="Question identifier (useful for reporting)"
+                               ng-model="ctrl.selectedQuestionInfo.question.externalId" />
+                        <div class='small text-muted'>
+                            Reporting on surveys using generated identifiers (or using free-text names) is
+                            brittle.  Using an external identifier alleviates this problem and allows for
+                            a question to be consistently identified even across survey template versions.
+                            Note: external identifiers must be unique within a template.
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group" style="padding-top: 10px">
                     <div class="col-sm-offset-2 col-sm-10">
                         <span ng-if="ctrl.selectedQuestionInfo.question.id">
@@ -255,14 +294,15 @@
             <div class="col-sm-12">
                 <table class="table table-hover">
                     <colgroup>
-                        <col width="13%">
-                        <col width="25%">
-                        <col width="13%">
-                        <col width="24%">
                         <col width="10%">
-                        <col width="13%">
-                        <col width="8%">
-                        <col width="4%">
+                        <col width="15%">
+                        <col width="10%">
+                        <col width="15%">
+                        <col width="10%">
+                        <col width="10%">
+                        <col width="10%">
+                        <col width="10%">
+                        <col width="10%">
                     </colgroup>
                     <thead>
                     <tr>
@@ -273,6 +313,8 @@
                         <th>Mandatory</th>
                         <th>Allow Comment</th>
                         <th>Position</th>
+                        <th>External Id</th>
+                        <th/>
                     </tr>
                     </thead>
                     <tr ng-repeat="qi in ctrl.surveyQuestionInfos | orderBy:'question.position'">
@@ -292,6 +334,7 @@
                             </waltz-boolean-renderer>
                         </td>
                         <td><span ng-bind="qi.question.position"></span></td>
+                        <td><span ng-bind="qi.question.externalId||'-'"></span></td>
                         <td><a ng-click="ctrl.showEditQuestionForm(qi)"
                                class="btn btn-xs waltz-visibility-child-30">
                             <waltz-icon name="pencil"></waltz-icon>
