@@ -18,7 +18,7 @@
  */
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import template from './physical-spec-definition-panel.html';
+import template from "./physical-spec-definition-panel.html";
 
 
 const bindings = {

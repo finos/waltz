@@ -19,7 +19,6 @@
 import template from "./physical-flow-editor.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 
 

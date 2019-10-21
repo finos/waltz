@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 import {displayError} from "../../../common/error-utils";
 
-import template from './physical-spec-definition-section.html';
+import template from "./physical-spec-definition-section.html";
 
 
 const bindings = {
