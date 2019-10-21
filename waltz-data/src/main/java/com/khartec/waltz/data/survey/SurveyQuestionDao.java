@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.data.survey;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
@@ -53,6 +54,7 @@ public class SurveyQuestionDao {
                 .position(record.getPosition())
                 .isMandatory(record.getIsMandatory())
                 .allowComment(record.getAllowComment())
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .build();
     };
 
@@ -67,7 +69,9 @@ public class SurveyQuestionDao {
         record.setPosition(question.position());
         record.setIsMandatory(question.isMandatory());
         record.setAllowComment(question.allowComment());
-
+        record.setExternalId(question.externalId()
+                .filter(StringUtilities::notEmpty)
+                .orElse(null));
         return record;
     };
 

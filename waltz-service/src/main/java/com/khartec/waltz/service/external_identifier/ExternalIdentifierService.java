@@ -93,6 +93,10 @@ public class ExternalIdentifierService {
         return deleteResult;
     }
 
+    public int delete(EntityReference entityRef) {
+        return externalIdentifierDao.delete(entityRef);
+    }
+
 
     public int create(EntityReference entityRef,
                       String externalId,

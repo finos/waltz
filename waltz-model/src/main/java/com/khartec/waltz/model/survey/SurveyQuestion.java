@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ package com.khartec.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.ExternalIdProvider;
 import com.khartec.waltz.model.IdProvider;
 import org.immutables.value.Value;
 
@@ -30,7 +31,9 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyQuestion.class)
 @JsonDeserialize(as = ImmutableSurveyQuestion.class)
-public abstract class SurveyQuestion implements IdProvider {
+public abstract class SurveyQuestion implements
+        IdProvider,
+        ExternalIdProvider {
 
     public abstract Long surveyTemplateId();
     public abstract String questionText();

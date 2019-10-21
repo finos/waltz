@@ -70,10 +70,6 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
 
         long serverId = options.entityReference().id();
 
-        Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
-                ? DSL.trueCondition()
-                : PHYSICAL_FLOW.IS_REMOVED.isFalse().and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
-
         return DSL
                 .select(PHYSICAL_FLOW.SPECIFICATION_ID)
                 .from(PHYSICAL_FLOW)
@@ -83,10 +79,9 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 .on(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID.eq(PHYSICAL_FLOW.ID))
                 .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
                 .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
-                .and(lifecycleCondition);
+                .and(getLifecycleCondition(options));
 
     }
-
 
 
     private Select<Record1<Long>> mkForLogicalElement(IdSelectionOptions options) {
@@ -109,7 +104,9 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         Select<Record1<Long>> flowSelector = physicalFlowIdSelectorFactory.apply(options);
-        Condition condition = PHYSICAL_FLOW.ID.in(flowSelector);
+        Condition condition =
+                PHYSICAL_FLOW.ID.in(flowSelector)
+                .and(getLifecycleCondition(options));
         return selectViaPhysicalFlowJoin(condition);
     }
 
@@ -126,7 +123,9 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long logicalFlowId = options.entityReference().id();
-        Condition matchOnLogicalFlowId = PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId);
+        Condition matchOnLogicalFlowId =
+                PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId)
+                .and(getLifecycleCondition(options));
         return selectViaPhysicalFlowJoin(matchOnLogicalFlowId);
     }
 
@@ -140,4 +139,11 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 .where(condition);
     }
 
+
+    private Condition getLifecycleCondition(IdSelectionOptions options) {
+        return options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+                ? DSL.trueCondition()
+                : PHYSICAL_FLOW.IS_REMOVED.isFalse()
+                .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
+    }
 }

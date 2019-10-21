@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from "../../../common";
+import {allEntityLifecycleStatuses, initialiseData} from "../../../common";
 import template from "./flow-diagram-editor.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
@@ -166,10 +166,11 @@ function preparePhysicalFlowPopup(
 {
     const selector = {
         entityReference: { id: logicalFlow.id, kind: logicalFlow.kind },
-        scope: "EXACT"
+        scope: "EXACT",
+        entityLifecycleStatuses: allEntityLifecycleStatuses
     };
 
-    const physFlowPromise = physicalFlowStore.findByLogicalFlowId(logicalFlow.id);
+    const physFlowPromise = physicalFlowStore.findBySelector(selector);
     const physSpecPromise = physicalSpecificationStore.findBySelector(selector);
 
     return $q

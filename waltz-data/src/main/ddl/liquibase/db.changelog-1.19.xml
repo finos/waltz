@@ -160,7 +160,7 @@
     <!-- 4329: Add OBSERVED freshness indicator value and add icon color-->
     <changeSet id="20190910-4329-1"
                author="muzammilali"
-               dbms="mysql,postgres">
+               dbms="mysql,postgresql">
         <comment>4329: Added additional enum value represent freshness (OBSERVED) and update color of existing one</comment>
 
         <insert tableName="enum_value">
@@ -217,7 +217,7 @@
     <!-- 4329: Add icon to freshness indicator enum value-->
     <changeSet id="20190910-4329-2"
                author="muzammilali"
-               dbms="mysql,postgres">
+               dbms="mysql,postgresql">
         <comment>4329: Added icon value for freshness indicators</comment>
 
         <update tableName="enum_value">

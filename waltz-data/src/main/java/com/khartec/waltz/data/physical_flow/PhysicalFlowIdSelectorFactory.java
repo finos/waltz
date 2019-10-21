@@ -37,7 +37,7 @@ import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_F
 
 public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
 
-    public static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
+    private static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
             .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()));
 
     @Override
@@ -62,10 +62,6 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         long serverId = options.entityReference().id();
 
-        Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
-            ? DSL.trueCondition()
-            : PHYSICAL_FLOW.IS_REMOVED.isFalse();
-
         return DSL
                 .select(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID)
                 .from(PHYSICAL_FLOW_PARTICIPANT)
@@ -73,7 +69,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID))
                 .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
                 .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
-                .and(lifecycleCondition);
+                .and(getLifecycleCondition(options));
     }
 
 
@@ -87,7 +83,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(PHYSICAL_FLOW.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
                 .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
-                .and(PHYSICAL_FLOW_NOT_REMOVED);
+                .and(getLifecycleCondition(options));
     }
 
 
@@ -98,7 +94,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
-                .and(PHYSICAL_FLOW_NOT_REMOVED);
+                .and(getLifecycleCondition(options));
     }
 
 
@@ -111,4 +107,10 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
     }
 
+
+    private Condition getLifecycleCondition(IdSelectionOptions options) {
+        return options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+                ? DSL.trueCondition()
+                : PHYSICAL_FLOW_NOT_REMOVED;
+    }
 }
