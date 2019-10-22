@@ -54,11 +54,11 @@
                     <input
                         type="checkbox"
                         data-ux="tree-node-{{node.id}}"
-                        ng-model="$ctrl.checkedMap[node.id]"
-                        ng-disabled="!$ctrl.checkedMap[node.id] && !node.concrete"
-                        ng-click="$ctrl.onClickNode(node.id)">
+                        ng-checked="$ctrl.checkedMap[node.id]"
+                        ng-disabled="node.disable">
 
                 <ng-transclude>
+<!--                    <span ng-if="node.disabled && $ctrl.checkedMap[node.id]"></span>-->
                     <span ng-bind="node.name"></span>
                 </ng-transclude>
             </span>
