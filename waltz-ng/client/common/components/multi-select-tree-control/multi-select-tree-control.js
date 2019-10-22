@@ -105,6 +105,28 @@ function controller() {
         invokeFunction(vm.onClick, node.id);
     };
 
+    vm.onClickNode = (id) => {
+        console.log('click - 1. clicked on datatype id' + id + 'value in the checked map is ' + vm.checkedMap[id]);
+        if(vm.checkedMap[id]){
+            vm.onNodeUncheck(id);
+            // vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
+            // vm.onCheck()
+            // vm.checkedMap[id]=false;
+            console.log(`click - 2 after node unchecked : checked=${vm.checkedMap[id]}`)
+        } else {
+            // vm.checkedMap[id]=true;
+            vm.onNodeCheck(id);
+            // vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
+            console.log(`click - 2 fter node checked : checked=${vm.checkedMap[id]}`)
+        }
+
+    };
+
+    vm.isChecked = (id) => {
+        // console.log(`checkvalue for `)
+        return vm.checkedMap[id];
+    };
+
     vm.onNodeCheck = (id) => {
         invokeFunction(vm.onCheck, id);
         haltEvent();

@@ -134,6 +134,7 @@ function controller(serviceBroker) {
     vm.typeUnchecked = (id) => {
         vm.onDirty(true);
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+        console.log(`3.selector - type_Unchecked ${id}: checkItemIds ${vm.checkedItemIds}`)
     };
 
     vm.typeChecked = (id) => {
@@ -148,6 +149,7 @@ function controller(serviceBroker) {
         }
         vm.onDirty(true);
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+        console.log(`3.selector - type_checked ${id}: checkItemIds ${vm.checkedItemIds}`)
     };
 
     vm.save = () => {
