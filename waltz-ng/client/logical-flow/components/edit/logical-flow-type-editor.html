@@ -29,24 +29,30 @@
             </h4>
 
             <!-- DATA TYPE OPTIONS -->
-            <waltz-multi-select-tree-control items="$ctrl.allDataTypes"
-                                             on-click="$ctrl.toggleTypeChecked"
-                                             on-check="$ctrl.typeChecked"
-                                             on-uncheck="$ctrl.typeUnchecked"
-                                             checked-item-ids="$ctrl.checkedItemIds"
-                                             expanded-item-ids="$ctrl.expandedItemIds">
-                <strong ng-bind="node.name"
-                        uib-popover-template="'wlfte-popup.html'"
-                        popover-popup-delay="300"
-                        popover-append-to-body="true"
-                        popover-trigger="mouseenter">
-                </strong>
-            </waltz-multi-select-tree-control>
+            Point1.
+<!--            <waltz-multi-select-tree-control items="$ctrl.allDataTypes"-->
+<!--                                             on-click="$ctrl.toggleTypeChecked"-->
+<!--                                             on-check="$ctrl.typeChecked"-->
+<!--                                             on-uncheck="$ctrl.typeUnchecked"-->
+<!--                                             checked-item-ids="$ctrl.checkedItemIds"-->
+<!--                                             expanded-item-ids="$ctrl.expandedItemIds">-->
+<!--                <strong ng-bind="node.name"-->
+<!--                        ng-style="$ctrl.isNonConcreteAndSelected(node) && {'color': 'red', 'font-style': 'italic'}"-->
+
+<!--                        popover-popup-delay="300"-->
+<!--                        popover-append-to-body="true"-->
+<!--                        popover-trigger="mouseenter">-->
+<!--                </strong>-->
+<!--            </waltz-multi-select-tree-control>-->
+            <waltz-data-type-usage-selector parent-entity-ref="$ctrl.logicalFlowEntityRef"
+                                            on-dirty="$ctrl.onDirty"
+                                            on-register-save="$ctrl.registerSaveFn">
+            </waltz-data-type-usage-selector>
 
             <!-- ACTIONS -->
             <div class="pull-right">
                 <button class="btn btn-success"
-                        ng-disabled="! $ctrl.canSave()"
+                        ng-disabled="! $ctrl.isDirty"
                         data-ux="logical-flow-type-editor-apply"
                         ng-click="$ctrl.save()">
                     Apply

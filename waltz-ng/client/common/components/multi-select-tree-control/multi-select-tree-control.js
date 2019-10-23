@@ -87,7 +87,7 @@ function controller() {
         equality: (a, b) => a && b && a.id === b.id,
         multiSelection: false,
         isSelectable: (node) => {
-            return !_.get(node, "disable", true);
+            return !_.get(node, "disable", false);
         }
     };
 

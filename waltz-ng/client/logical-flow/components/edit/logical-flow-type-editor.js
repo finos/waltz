@@ -21,6 +21,8 @@ import _ from "lodash";
 import {notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./logical-flow-type-editor.html";
+import {enrichDataTypes} from "../../../data-types/data-type-utils";
+import {mkRef, toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -42,16 +44,18 @@ const initialState = {
     expandedItemIds: [],
     originalSelectedItemIds: [],
     saving: false,
+    isDirty:false,
     onSave: (x) => console.log("lfte: default onSave()", x),
     onDelete: (x) => console.log("lfte: default onDelete()", x),
     onCancel: (x) => console.log("lfte: default onCancel()", x),
     onDirty: (x) => console.log("lfte: default onDirty()", x)
 };
 
-
-function isDirty(selectedIds = [], originalSelectedIds = []) {
-    return !_.isEqual(selectedIds.sort(), originalSelectedIds.sort());
-}
+//
+// function isDirty(selectedIds = [], originalSelectedIds = []) {
+//     console.log (`is dirty =>  selectedIds ${selectedIds} - original ids ${originalSelectedIds}`);
+//     //return !_.isEqual(selectedIds.sort(), originalSelectedIds.sort());
+// }
 
 
 function anySelected(selectedIds = []) {
@@ -92,6 +96,7 @@ function controller(serviceBroker) {
 
     const refresh = () => {
         vm.title = mkTitle(vm.flow);
+        vm.logicalFlowEntityRef = toEntityRef(vm.flow, "LOGICAL_DATA_FLOW");
         vm.checkedItemIds = mkSelectedTypeIds(vm.decorators);
         vm.originalSelectedItemIds = mkSelectedTypeIds(vm.decorators);
         vm.expandedItemIds = mkSelectedTypeIds(vm.decorators);
@@ -101,8 +106,8 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
-                vm.allDataTypes = r.data;
-                vm.allDataTypesById = _.keyBy(r.data, "id");
+                vm.allDataTypes = enrichDataTypes(r.data, vm.checkedItemIds);
+                vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
                 refresh();
             });
     };
@@ -119,10 +124,18 @@ function controller(serviceBroker) {
             .then(() => vm.saving = false);
     };
 
+
+    vm.onDirty = (dirtyFlag) => {
+        vm.isDirty = dirtyFlag;
+    };
+
+    vm.registerSaveFn = (saveFn) => {
+        vm.save = saveFn;
+    };
+
     vm.delete = () => vm.onDelete(vm.flow);
     vm.cancel = () => vm.onCancel();
-    vm.onChange = () => vm.onDirty(isDirty(vm.checkedItemIds, vm.originalSelectedItemIds));
-    vm.canSave = () => isDirty(vm.checkedItemIds, vm.originalSelectedItemIds)
+    vm.canSave = () => vm.isDirty
                         && anySelected(vm.checkedItemIds)
                         && !vm.saving;
     vm.anySelected = () => anySelected(vm.checkedItemIds);

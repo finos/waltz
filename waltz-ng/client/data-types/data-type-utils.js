@@ -37,3 +37,12 @@ export function findNonConcreteDataTypeIds(dataTypes = []) {
     return _.filter(dataTypes, dt => !dt.concrete)
             .map(dt => dt.id);
 }
+
+export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
+    return _.map(dataTypes,
+        d => _.extend({
+            disable:
+                    !selectedDataTypeIds.includes(d.id)
+                    && !d.concrete },
+            d));
+}
