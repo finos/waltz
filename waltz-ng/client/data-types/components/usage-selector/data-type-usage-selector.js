@@ -22,6 +22,7 @@ import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
+import {enrichDataTypes} from "../../data-type-utils";
 
 
 const bindings = {
@@ -86,12 +87,7 @@ function controller(serviceBroker) {
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
-        vm.allDataTypes = _.map(vm.allDataTypes,
-                d => _.extend({disable:
-                        !vm.checkedItemIds.includes(d.id)
-                        && !d.concrete},
-                    d));
-
+        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
         vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
     };
 
@@ -140,8 +136,10 @@ function controller(serviceBroker) {
     vm.typeUnchecked = (id) => {
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
         vm.onDirty(vm.hasAnyChanges() && vm.anySelected());
+        //set disable flag of selected non concrete to true
         if(!vm.allDataTypesById[id].concrete) {
             _.find(vm.allDataTypes, { id: id}).disable = true;
+            vm.allDataTypesById[id].disable = true;
         }
     };
 
@@ -168,7 +166,6 @@ function controller(serviceBroker) {
     };
 
     vm.save = () => {
-        console.log('data type usage - SAVE ');
         let promise = null;
         if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION") {
             const updateCommand = mkSpecDataTypeUpdateCommand(
@@ -187,7 +184,6 @@ function controller(serviceBroker) {
             promise = serviceBroker
                 .execute(CORE_API.LogicalFlowDecoratorStore.updateDecorators, [updateCommand]);
         }
-        console.log('data usage - save completed');
         return promise
             .then(result => loadDataTypes(true))
             .then(() => {

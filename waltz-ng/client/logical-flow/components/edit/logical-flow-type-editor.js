@@ -18,11 +18,8 @@
  */
 
 import _ from "lodash";
-import {notEmpty} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./logical-flow-type-editor.html";
-import {enrichDataTypes} from "../../../data-types/data-type-utils";
-import {mkRef, toEntityRef} from "../../../common/entity-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {

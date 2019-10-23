@@ -23,7 +23,7 @@ import _ from "lodash";
 export function findUnknownDataTypeId(dataTypes = []) {
     const unknownDataType = _.find(dataTypes, dt => dt.unknown);
     if (! unknownDataType) {
-        throw 'Unknown data type not found!'
+        throw "Unknown data type not found!"
     }
     return unknownDataType.id;
 }

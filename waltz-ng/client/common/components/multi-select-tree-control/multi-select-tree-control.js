@@ -120,14 +120,6 @@ function controller() {
         return !node.concrete && vm.checkedItemIds.includes(node.id);
     };
 
-    vm.popoverText = (node) => {
-        if (vm.isNonConcreteAndSelected(node)) {
-            return "Warning - [This item is not concrete and should not be selected.] "
-            + node.description;
-        }
-        return node.description;
-    };
-
     vm.$onChanges = changes => {
         if(changes) {
             vm.hierarchy = buildHierarchies(vm.items, false);
