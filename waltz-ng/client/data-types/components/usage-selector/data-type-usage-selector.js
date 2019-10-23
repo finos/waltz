@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
@@ -138,8 +138,8 @@ function controller(serviceBroker) {
     };
 
     vm.typeUnchecked = (id) => {
-        vm.onDirty(true);
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+        vm.onDirty(vm.hasAnyChanges() && vm.anySelected());
         if(!vm.allDataTypesById[id].concrete) {
             _.find(vm.allDataTypes, { id: id}).disable = true;
         }
@@ -155,11 +155,20 @@ function controller(serviceBroker) {
             }
             dt = parent;
         }
-        vm.onDirty(true);
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+        vm.onDirty(vm.hasAnyChanges());
+    };
+
+    vm.anySelected = () => {
+        return notEmpty(vm.checkedItemIds);
+    };
+
+    vm.hasAnyChanges = () => {
+        return !_.isEqual(vm.checkedItemIds.sort(), vm.originalSelectedItemIds.sort());
     };
 
     vm.save = () => {
+        console.log('data type usage - SAVE ');
         let promise = null;
         if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION") {
             const updateCommand = mkSpecDataTypeUpdateCommand(
@@ -178,6 +187,7 @@ function controller(serviceBroker) {
             promise = serviceBroker
                 .execute(CORE_API.LogicalFlowDecoratorStore.updateDecorators, [updateCommand]);
         }
+        console.log('data usage - save completed');
         return promise
             .then(result => loadDataTypes(true))
             .then(() => {
