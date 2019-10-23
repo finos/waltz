@@ -46,7 +46,7 @@
         <jgrapht.version>1.2.0</jgrapht.version>
         <jool.version>0.9.12</jool.version>
         <junit.version>4.12</junit.version>
-        <jwt.version>3.8.1</jwt.version>
+        <jwt.version>3.8.3</jwt.version>
         <logback.version>1.2.3</logback.version>
         <pcollections.version>2.1.2</pcollections.version>
         <poi.version>3.15</poi.version>
