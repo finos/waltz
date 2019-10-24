@@ -22,10 +22,7 @@ import _ from "lodash";
 
 
 import template from "./physical-flow-view.html";
-import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import {isRemoved, toEntityRef} from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
-import {mkLinkGridCell} from "../common/grid-utils";
 
 
 const modes = {
@@ -214,17 +211,22 @@ function controller($q,
 
     // -- INTERACT: de-dupe
     const loadPotentialMergeTargets = () => {
+        const selector = {
+            entityReference: { id: vm.logicalFlow.id, kind: "LOGICAL_DATA_FLOW" },
+            scope: "EXACT"
+        };
+
         const potentialFlowsPromise = serviceBroker
             .loadViewData(
-                CORE_API.PhysicalFlowStore.findByLogicalFlowId,
-                [ vm.logicalFlow.id ],
+                CORE_API.PhysicalFlowStore.findBySelector,
+                [ selector ],
                 { force: true })
             .then(r => r.data);
 
         const potentialSpecsPromise = serviceBroker
             .loadViewData(
-                CORE_API.PhysicalSpecificationStore.findByLogicalFlow,
-                [ vm.logicalFlow.id ])
+                CORE_API.PhysicalSpecificationStore.findBySelector,
+                [ selector ])
             .then(r => r.data);
 
         $q.all([potentialFlowsPromise, potentialSpecsPromise])
@@ -233,7 +235,6 @@ function controller($q,
                 vm.potentialMergeTargets = _
                     .chain(flows)
                     .reject(f => f.id === vm.parentEntityRef.id)
-                    .reject(isRemoved)
                     .map(f => ({
                         physicalFlow: f,
                         physicalSpec: specsById[f.specificationId]
