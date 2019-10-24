@@ -91,8 +91,12 @@ function controller() {
         }
     };
 
+    vm.hasAnyChild = (node) => {
+        return node.children && node.children.length > 0;
+    };
+
     vm.onNodeClick = (node) => {
-        if (node.children && node.children.length > 0) {
+        if (vm.hasAnyChild(node)) {
             const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
             if (idx === -1) {
                 // add

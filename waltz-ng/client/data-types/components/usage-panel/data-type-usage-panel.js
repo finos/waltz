@@ -91,6 +91,8 @@ function controller(notification, serviceBroker, userService) {
     };
 
     vm.onSave = () => {
+        if(!vm.isDirty)
+            return;
         if (vm.save) {
             vm.save()
                 .then(() => {
