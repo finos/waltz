@@ -25,6 +25,7 @@ import {toEntityRef} from "../../../common/entity-utils";
 const bindings = {
     flow: "<",
     onDelete: "<",
+    onReload: "<",
     onCancel: "<"
 };
 
@@ -33,6 +34,7 @@ const initialState = {
     flow: null,
     isDirty:false,
     onDelete: (x) => console.log("lfte: default onDelete()", x),
+    onReload: (x) => console.log("lfte: default onReload()", x),
     onCancel: (x) => console.log("lfte: default onCancel()", x)
 };
 
@@ -70,6 +72,7 @@ function controller(notification) {
                 .then(() => {
                     notification.success("Data types updated successfully");
                     vm.cancel(); //clear edit session
+                    vm.onReload();
                 });
         } else {
             console.log("onSave - no impl");
