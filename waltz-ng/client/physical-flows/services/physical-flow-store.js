@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef, checkIsIdSelector, checkIsCreatePhysicalFlowCommand} from "../../common/checks";
+import {checkIsCreatePhysicalFlowCommand, checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 
 export function store($http, baseApiUrl) {

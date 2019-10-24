@@ -23,11 +23,11 @@ import _ from "lodash";
 import template from "./flow-diagrams-panel-view.html";
 
 import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
-import { CORE_API } from "../../../../common/services/core-api-utils";
-import { mkSelectionOptions } from "../../../../common/selector-utils";
-import { dyamicSectionNavigationDefaultOffset } from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
-import { pageHeaderDefaultOffset } from "../../../../widgets/page-header/page-header";
-import { displayError } from "../../../../common/error-utils";
+import {CORE_API} from "../../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../../common/selector-utils";
+import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
+import {displayError} from "../../../../common/error-utils";
 
 const bindings = {
     parentEntityRef: '<',
