@@ -39,9 +39,10 @@ export function findNonConcreteDataTypeIds(dataTypes = []) {
 }
 
 export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
-    function addDisableProperty(datatype) {
-        datatype.disable = !selectedDataTypeIds.includes(datatype.id) && !datatype.concrete;
+    const enrich = (datatype) => {
+        datatype.disable = !selectedDataTypeIds.includes(datatype.id)
+            && !datatype.concrete;
         return datatype;
-    }
-    return _.map(dataTypes, d => addDisableProperty(d));
+    };
+    return _.map(dataTypes, enrich);
 }
