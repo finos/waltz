@@ -165,6 +165,14 @@ function controller(serviceBroker) {
         return !_.isEqual(vm.checkedItemIds.sort(), vm.originalSelectedItemIds.sort());
     };
 
+    vm.$onChanges = () => {
+        loadDataTypes()
+            .then(() => {
+                postLoadActions();
+                vm.onDirty(false);
+            });
+    };
+
     vm.save = () => {
         let promise = null;
         if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION") {
