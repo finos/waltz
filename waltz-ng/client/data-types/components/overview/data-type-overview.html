@@ -24,18 +24,23 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <waltz-apps-by-investment-pie applications="$ctrl.apps"
-                                                          size="70">
+                                                          size="70"
+                                                          class="clickable"
+                                                          waltz-jump-to="apps-section">
                             </waltz-apps-by-investment-pie>
                         </div>
 
                         <div class="col-sm-4">
                             <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
-                                                               size="70">
+                                                               size="70"
+                                                               class="clickable"
+                                                               waltz-jump-to="apps-section">
                             </waltz-apps-by-lifecycle-phase-pie>
                         </div>
 
                         <div class="col-sm-4">
-                            <waltz-basic-info-tile waltz-jump-to="data-type-usage-section"
+                            <waltz-basic-info-tile waltz-jump-to="data-type-flow-section"
+                                                   class="clickable"
                                                    icon="crosshairs"
                                                    name="Data Type Usage">
                                 <br>
