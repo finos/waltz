@@ -154,8 +154,7 @@ public class AppGroupDao {
                 .from(APPLICATION_GROUP)
                 .join(ENTITY_RELATIONSHIP)
                 .on(joinOnA.or(joinOnB))
-                .where((aMatchesEntity.or(bMatchesEntity))
-                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
+                .where((aMatchesEntity.or(bMatchesEntity)))
                 .and(notRemoved);
 
         return dsl.selectFrom(APPLICATION_GROUP)
