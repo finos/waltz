@@ -51,17 +51,12 @@
                  options="$ctrl.treeOptions">
 
             <span>
-                <input type="checkbox"
-                       data-ux="tree-node-{{node.id}}"
-                       checked
-                       ng-if="$ctrl.checkedMap[node.id]"
-                       ng-disabled="!node.concrete && !node.unknown"
-                       ng-click="$ctrl.onNodeUncheck(node.id)">
-                <input type="checkbox"
-                       data-ux="tree-node-{{node.id}}"
-                       ng-if="!$ctrl.checkedMap[node.id]"
-                       ng-disabled="!node.concrete"
-                       ng-click="$ctrl.onNodeCheck(node.id)">
+                    <input
+                        type="checkbox"
+                        data-ux="tree-node-{{node.id}}"
+                        ng-checked="$ctrl.checkedMap[node.id]"
+                        ng-disabled="node.disable">
+
                 <ng-transclude>
                     <span ng-bind="node.name"></span>
                 </ng-transclude>

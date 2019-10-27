@@ -26,7 +26,6 @@ import * as PhysicalSpecDefinitionStore from "./services/physical-spec-definitio
 import * as PhysicalSpecDefinitionSampleFileStore from "./services/physical-spec-definition-sample-file-store";
 
 import DataTypeList from "./components/data-type/physical-spec-data-type-list";
-import DataTypeSection from "./components/data-type/physical-spec-data-type-section";
 import PhysicalSpecDefinitionSection from "./components/spec-definition-section/physical-spec-definition-section";
 import Routes from './routes';
 import PhysicalDataSection from './components/physical-data-section/physical-data-section';
@@ -46,7 +45,6 @@ function setup() {
 
     registerComponents(module, [
         DataTypeList,
-        DataTypeSection,
         PhysicalSpecDefinitionSection
     ]);
 

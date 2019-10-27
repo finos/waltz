@@ -87,12 +87,16 @@ function controller() {
         equality: (a, b) => a && b && a.id === b.id,
         multiSelection: false,
         isSelectable: (node) => {
-            return _.get(node, "concrete", true);
+            return !_.get(node, "disable", false);
         }
     };
 
+    vm.hasAnyChild = (node) => {
+        return node.children && node.children.length > 0;
+    };
+
     vm.onNodeClick = (node) => {
-        if (node.children && node.children.length > 0) {
+        if (vm.hasAnyChild(node)) {
             const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
             if (idx === -1) {
                 // add
@@ -116,8 +120,12 @@ function controller() {
         haltEvent();
     };
 
+    vm.isNonConcreteAndSelected = (node) => {
+        return !node.concrete && vm.checkedItemIds.includes(node.id);
+    };
+
     vm.$onChanges = changes => {
-        if(changes.items) {
+        if(changes) {
             vm.hierarchy = buildHierarchies(vm.items, false);
             vm.searchNodes = prepareSearchNodes(vm.items);
         }

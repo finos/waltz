@@ -28,27 +28,17 @@
                 <waltz-entity-icon-label entity-ref="$ctrl.flow.target"></waltz-entity-icon-label>
             </h4>
 
-            <!-- DATA TYPE OPTIONS -->
-            <waltz-multi-select-tree-control items="$ctrl.allDataTypes"
-                                             on-click="$ctrl.toggleTypeChecked"
-                                             on-check="$ctrl.typeChecked"
-                                             on-uncheck="$ctrl.typeUnchecked"
-                                             checked-item-ids="$ctrl.checkedItemIds"
-                                             expanded-item-ids="$ctrl.expandedItemIds">
-                <strong ng-bind="node.name"
-                        uib-popover-template="'wlfte-popup.html'"
-                        popover-popup-delay="300"
-                        popover-append-to-body="true"
-                        popover-trigger="mouseenter">
-                </strong>
-            </waltz-multi-select-tree-control>
+            <waltz-data-type-usage-selector parent-entity-ref="$ctrl.logicalFlowEntityRef"
+                                            on-dirty="$ctrl.onDirty"
+                                            on-register-save="$ctrl.registerSaveFn">
+            </waltz-data-type-usage-selector>
 
             <!-- ACTIONS -->
             <div class="pull-right">
                 <button class="btn btn-success"
-                        ng-disabled="! $ctrl.canSave()"
+                        ng-disabled="! $ctrl.isDirty"
                         data-ux="logical-flow-type-editor-apply"
-                        ng-click="$ctrl.save()">
+                        ng-click="$ctrl.onSave()">
                     Apply
                 </button>
                 <button class="btn btn-danger"
@@ -63,18 +53,4 @@
 
         </div>
     </div>
-
-    <script type="text/ng-template"
-            id="wlfte-popup.html">
-        <strong ng-bind="node.name"></strong>
-        <p class="small text-muted"
-           ng-bind="node.description">
-        </p>
-        <div class="alert alert-warning small" ng-if="!node.concrete">
-            Direct mappings have been disabled for this data type.
-            <span ng-if="$ctrl.checkedItemIds.indexOf(node.id) > -1">
-                Please remove this mapping by selecting a more specific sub type.
-            </span>
-        </div>
-    </script>
 </div>
