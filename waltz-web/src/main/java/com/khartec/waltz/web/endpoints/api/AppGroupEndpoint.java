@@ -107,7 +107,7 @@ public class AppGroupEndpoint implements Endpoint {
                 appGroupService.findPrivateGroupsByOwner(getUsername(request));
 
         ListRoute<AppGroup> findRelatedGroupsByEntityReferenceRoute = (request, response) ->
-                appGroupService.findRelatedByEntityReference(getEntityReference(request));
+                appGroupService.findRelatedByEntityReference(getEntityReference(request), getUsername(request));
 
         ListRoute<AppGroupSubscription> subscribeRoute = (request, response) -> {
             long groupId = getId(request);

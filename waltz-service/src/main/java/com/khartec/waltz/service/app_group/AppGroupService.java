@@ -140,13 +140,23 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroup> findRelatedByEntityReference(EntityReference ref) {
+    public List<AppGroup> findRelatedByEntityReference(EntityReference ref, String username) {
+        List<AppGroup> relatedAppGroups;
         switch (ref.kind()) {
             case APPLICATION:
-                return appGroupDao.findRelatedByApplicationId(ref.id());
+                relatedAppGroups = appGroupDao.findRelatedByApplicationId(ref.id());
             default:
-                return appGroupDao.findRelatedByEntityReference(ref);
+                relatedAppGroups = appGroupDao.findRelatedByEntityReference(ref);
         }
+
+        List<AppGroup> privateGroupsByOwner = findPrivateGroupsByOwner(username);
+
+        return relatedAppGroups
+                .stream()
+                .filter(g ->
+                        g.appGroupKind().equals(AppGroupKind.PUBLIC) ||
+                                privateGroupsByOwner.contains(g))
+                .collect(Collectors.toList());
     }
 
 
