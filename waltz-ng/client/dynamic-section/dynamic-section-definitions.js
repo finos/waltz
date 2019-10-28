@@ -337,6 +337,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.measurableRatingsBrowserSection
     ],
     "DATA_TYPE": [
+        dynamicSections.appsSection,
         dynamicSections.entityNamedNotesSection,
         dynamicSections.bookmarksSection,
         dynamicSections.involvedPeopleSection,
