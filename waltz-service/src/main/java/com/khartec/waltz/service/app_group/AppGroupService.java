@@ -144,8 +144,8 @@ public class AppGroupService {
 
         List<AppGroup> relatedAppGroups =
                 (ref.kind() == EntityKind.APPLICATION)
-                        ? appGroupDao.findRelatedByEntityReference(ref)
-                        : appGroupDao.findRelatedByApplicationId(ref.id());
+                        ? appGroupDao.findRelatedByApplicationId(ref.id())
+                        : appGroupDao.findRelatedByEntityReference(ref);
 
         List<AppGroup> privateGroupsByOwner = findPrivateGroupsByOwner(username);
 

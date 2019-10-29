@@ -130,8 +130,7 @@ public class AppGroupDao {
 
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
-                .where(APPLICATION_GROUP.ID.in(appGroups)
-                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())))
+                .where(APPLICATION_GROUP.ID.in(appGroups))
                 .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
