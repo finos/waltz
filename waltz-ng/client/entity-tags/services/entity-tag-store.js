@@ -35,6 +35,10 @@ export function store($http, base) {
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(x => x.data);
 
+    const findTagsByEntityKind = (entityKind) => $http
+        .get(`${BASE}/tags-by-kind/${entityKind}`)
+        .then(x => x.data);
+
     const update = (entityRef, tags = []) => {
         checkIsEntityRef(entityRef);
         checkIsStringList(tags);
@@ -48,6 +52,7 @@ export function store($http, base) {
         findAllTags,
         findByTag,
         findTagsByEntityRef,
+        findTagsByEntityKind,
         update
     };
 }
@@ -77,6 +82,11 @@ export const EntityTagStore_API = {
         serviceName,
         serviceFnName: 'findTagsByEntityRef',
         description: 'executes findTagsByEntityRef'
+    },
+    findTagsByEntityKind: {
+        serviceName,
+        serviceFnName: 'findTagsByEntityKind',
+        description: 'executes findTagsByEntityKind'
     },
     update: {
         serviceName,

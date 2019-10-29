@@ -20,6 +20,7 @@
 package com.khartec.waltz.service.entity_tag;
 
 import com.khartec.waltz.data.entity_tag.EntityTagDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,5 +64,9 @@ public class EntityTagService {
         checkNotNull(tags, "tags cannot be null");
         entityTagDao.updateTags(ref, tags, username);
         return findTagsForEntityReference(ref);
+    }
+
+    public List<String> findTagsForEntityKind(EntityKind entityKind) {
+        return entityTagDao.findTagsForEntityKind(entityKind);
     }
 }

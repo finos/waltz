@@ -127,4 +127,13 @@ public class EntityTagDao {
                 .batchInsert(records)
                 .execute();
     }
+
+    public List<String> findTagsForEntityKind(EntityKind entityKind) {
+        return dsl.selectDistinct(ENTITY_TAG.TAG)
+                .from(ENTITY_TAG)
+                .where(ENTITY_TAG.ENTITY_KIND.eq(entityKind.name()))
+                .orderBy(ENTITY_TAG.TAG.asc())
+                .fetch(ENTITY_TAG.TAG);
+
+    }
 }
