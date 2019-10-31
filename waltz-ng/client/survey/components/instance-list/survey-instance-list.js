@@ -88,11 +88,16 @@ function controller($q, serviceBroker) {
         }
     };
 
-    vm.getSurveyCount = (type) => {
+    vm.getSurveyTabMessage = (type) => {
+
+        const surveyType = (type === "CURRENT") ? " current " : " archived ";
+
         if (_.isEmpty(vm.surveys[type])){
-            return vm.archivedSurveyCount = "No";
+            return "No" + surveyType + "surveys";
+        } else if (vm.surveys[type].length === 1) {
+            return "1" + surveyType + "survey"
         } else {
-            return vm.archivedSurveyCount = vm.surveys[type].length
+            return vm.surveys[type].length + surveyType + "surveys";
         }
     }
 

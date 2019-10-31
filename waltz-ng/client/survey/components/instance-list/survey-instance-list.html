@@ -15,7 +15,7 @@
                      select="$ctrl.showTab(0)"
                      disable="$ctrl.surveys['CURRENT'] | isEmpty"
                      heading="Current"
-                     uib-popover="{{$ctrl.getSurveyCount('CURRENT')}} current surveys"
+                     uib-popover="{{$ctrl.getSurveyTabMessage('CURRENT')}}"
                      popover-append-to-body="true"
                      popover-popup-delay="300"
                      popover-trigger="mouseenter">
@@ -32,7 +32,7 @@
                      select="$ctrl.showTab(1)"
                      disable="$ctrl.surveys['ARCHIVE'] | isEmpty"
                      heading="Archive"
-                     uib-popover="{{$ctrl.getSurveyCount('ARCHIVE')}} archived surveys"
+                     uib-popover="{{$ctrl.getSurveyTabMessage('ARCHIVE')}}"
                      popover-append-to-body="true"
                      popover-popup-delay="300"
                      popover-trigger="mouseenter">
