@@ -129,7 +129,7 @@ function controller($state, serviceBroker, notification) {
             [ vm.parentEntityRef, tags ])
         .then(r => {
             notification.success(successMessage);
-            vm.tags = r.data
+            vm.tags = r.data;
         })
         .catch(e => displayError(notification, "Could not update tags", e));
 }
