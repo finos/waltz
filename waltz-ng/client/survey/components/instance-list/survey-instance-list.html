@@ -14,7 +14,11 @@
             <uib-tab index="0"
                      select="$ctrl.showTab(0)"
                      disable="$ctrl.surveys['CURRENT'] | isEmpty"
-                     heading="Current">
+                     heading="Current"
+                     uib-popover="{{$ctrl.getSurveyCount('CURRENT')}} current surveys"
+                     popover-append-to-body="true"
+                     popover-popup-delay="300"
+                     popover-trigger="mouseenter">
 
                 <div ng-if="$ctrl.visibility.dataTab == 0" style="padding-top: 1em;">
                     <ng-include src="'sil-table.html'"
@@ -27,7 +31,11 @@
             <uib-tab index="1"
                      select="$ctrl.showTab(1)"
                      disable="$ctrl.surveys['ARCHIVE'] | isEmpty"
-                     heading="Archive">
+                     heading="Archive"
+                     uib-popover="{{$ctrl.getSurveyCount('ARCHIVE')}} archived surveys"
+                     popover-append-to-body="true"
+                     popover-popup-delay="300"
+                     popover-trigger="mouseenter">
 
                 <div ng-if="$ctrl.visibility.dataTab == 1" style="padding-top: 1em;">
                     <ng-include src="'sil-table.html'"

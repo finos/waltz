@@ -82,12 +82,19 @@ function controller($q, serviceBroker) {
                     [vm.parentEntityRef],
                     { force: true })
                 .then(r => r.data);
-
             $q.all([runsPromise, instancesPromise])
                 .then(([runs, instances]) =>
                     vm.surveys = mkTableData(runs, instances));
         }
     };
+
+    vm.getSurveyCount = (type) => {
+        if (_.isEmpty(vm.surveys[type])){
+            return vm.archivedSurveyCount = "No";
+        } else {
+            return vm.archivedSurveyCount = vm.surveys[type].length
+        }
+    }
 
 }
 
