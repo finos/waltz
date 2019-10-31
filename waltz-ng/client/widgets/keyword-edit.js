@@ -55,7 +55,17 @@ function controller(serviceBroker) {
 
     vm.save = () => {
         const values = _.map(vm.working, "text");
-        vm.onSave(values);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityTagStore.findTagsByEntityKind,
+                [vm.entityKind], {force : true})
+            .then(r => {
+                const diff = _.difference(values, r.data);
+                const message = _.isEmpty(diff)
+                    ? "Updated Tags" : `New Tag [${diff}] added`;
+                vm.onSave(values, message);
+            });
+
     };
 
     vm.onKeyDown = (event) => {
@@ -74,8 +84,7 @@ function controller(serviceBroker) {
         return serviceBroker
             .loadViewData(
                 CORE_API.EntityTagStore.findTagsByEntityKind,
-                [vm.entityKind],
-                {force: false})
+                [vm.entityKind])
             .then(r => filterTags(r.data));
     };
 }

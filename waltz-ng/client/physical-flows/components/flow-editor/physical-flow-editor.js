@@ -45,6 +45,7 @@ function controller(notification, serviceBroker) {
                 [vm.parentEntityRef.id],
                 {force: true})
             .then(r => vm.physicalFlow = r.data);
+
         serviceBroker
             .loadViewData(
                 CORE_API.EntityTagStore.findTagsByEntityRef,
@@ -64,13 +65,13 @@ function controller(notification, serviceBroker) {
     };
 
     // -- TAGS ---
-    const saveTags = (tags = []) => {
+    const saveTags = (tags = [], successMessage) => {
         return serviceBroker
             .execute(
                 CORE_API.EntityTagStore.update,
                 [vm.parentEntityRef, tags])
-            .then(r => {
-                notification.success("Updated Tags");
+            .then(() => {
+                notification.success(successMessage);
                 return load();
             })
             .catch(e => displayError(notification, "Could not update tags", e));
@@ -95,7 +96,7 @@ function controller(notification, serviceBroker) {
     vm.onSaveTransport = (value, ctx) => doSave("transport", value);
     vm.onSaveBasisOffset = (value, ctx) => doSave("basisOffset", value.newVal);
     vm.onSaveDescription = (value, ctx) => doSave("description", value.newVal);
-    vm.onSaveTags = (tags) => saveTags(tags);
+    vm.onSaveTags = (tags, successMessage) => saveTags(tags, successMessage);
     vm.onShowTagEditor = () => vm.visibility.tagEditor = true;
     vm.onDismissTagEditor = () => vm.visibility.tagEditor = false;
 
