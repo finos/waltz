@@ -230,6 +230,10 @@ function controller($q,
 
     // INTERACTIVE FUNCTIONS
 
+    vm.onReload = () => {
+        reload();
+    };
+
     vm.cancel = () => {
         vm.selectedCounterpart = null;
         vm.selectedDecorators = null;

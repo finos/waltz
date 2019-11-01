@@ -23,7 +23,7 @@ import _ from "lodash";
 export function findUnknownDataTypeId(dataTypes = []) {
     const unknownDataType = _.find(dataTypes, dt => dt.unknown);
     if (! unknownDataType) {
-        throw 'Unknown data type not found!'
+        throw "Unknown data type not found!"
     }
     return unknownDataType.id;
 }
@@ -36,4 +36,13 @@ export function findDeprecatedDataTypeIds(dataTypes = []) {
 export function findNonConcreteDataTypeIds(dataTypes = []) {
     return _.filter(dataTypes, dt => !dt.concrete)
             .map(dt => dt.id);
+}
+
+export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
+    const enrich = (datatype) => {
+        datatype.disable = !selectedDataTypeIds.includes(datatype.id)
+            && !datatype.concrete;
+        return datatype;
+    };
+    return _.map(dataTypes, enrich);
 }
