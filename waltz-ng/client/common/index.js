@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import { nest } from "d3-collection";
+import {nest} from "d3-collection";
 
 
 export const formats = {

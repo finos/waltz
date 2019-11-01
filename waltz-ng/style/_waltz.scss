@@ -437,3 +437,9 @@ a[disabled="disabled"] {
     padding: 0px;
     margin: 0px;
 }
+
+.waltz-entity-removed {
+    font-style: italic;
+    color: #AAA;
+    text-decoration: line-through rgba(125, 125, 125, 0.3);
+}

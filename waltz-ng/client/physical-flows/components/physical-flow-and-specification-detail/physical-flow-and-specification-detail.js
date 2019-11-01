@@ -1,7 +1,7 @@
 import template from "./physical-flow-and-specification-detail.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, toEntityRef} from "../../../common/entity-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {

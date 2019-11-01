@@ -22,13 +22,19 @@
         </thead>
         <tbody>
         <tr ng-repeat="flow in $ctrl.flows | filter: $ctrl.qry"
-            class="waltz-visibility-parent">
+            class="waltz-visibility-parent"
+            ng-class="{
+                        'waltz-entity-removed':flow.physicalFlow.entityLifecycleStatus === 'REMOVED',
+                      }">
             <td>
                 <label>
                     <input type="checkbox"
                            id="flow_${flow.physicalFlow.id}"
                            ng-model="flow.used">
-                    <span ng-bind="flow.specification.name">
+                    <span ng-bind="flow.specification.name"
+                          ng-class="{
+                            'waltz-entity-removed':flow.physicalFlow.entityLifecycleStatus === 'REMOVED',
+                          }">
                     </span>
                 </label>
             </td>
