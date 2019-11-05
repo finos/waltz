@@ -18,7 +18,7 @@
  */
 
 
-import { checkIsEntityRef } from "../../common/checks";
+import {checkIsEntityRef} from "../../common/checks";
 
 export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/change-unit`;
@@ -38,11 +38,9 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/change-set/${id}`)
         .then(result => result.data);
 
-
     const findBySelector = (options) => $http
         .post(`${BASE}/selector`, options)
         .then(result => result.data);
-
 
     const updateExecutionStatus = (cmd) => {
         return $http
@@ -62,7 +60,7 @@ export function store($http, BaseApiUrl) {
 
 store.$inject = [
     "$http",
-    "BaseApiUrl",
+    "BaseApiUrl"
 ];
 
 
@@ -95,5 +93,6 @@ export const ChangeUnitStore_API = {
         serviceFnName: "updateExecutionStatus",
         description: "updates the execution status of a change unit"
     }
+
 };
 

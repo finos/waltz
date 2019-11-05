@@ -17,13 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {registerStore} from "../../common/module-utils";
-
-import * as changeUnitStore from "./change-unit-store";
-import * as changeUnitViewService from "./change-unit-view-service";
+package com.khartec.waltz.model.change_unit;
 
 
-export default (module) => {
-    registerStore(module, changeUnitStore);
-    registerStore(module, changeUnitViewService);
-};
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import org.immutables.value.Value;
+
+import java.util.Optional;
+
+
+@Value.Immutable
+@JsonSerialize(as = ImmutablePhysicalFlowChangeUnitDetail.class)
+@JsonDeserialize(as = ImmutablePhysicalFlowChangeUnitDetail.class)
+public abstract class PhysicalFlowChangeUnitDetail extends ChangeUnitDetail {
+
+    public abstract Optional<PhysicalSpecification> physicalSpecification();
+    public abstract LogicalFlow logicalFlow();
+
+}

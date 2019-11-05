@@ -30,6 +30,7 @@ import org.jooq.Select;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -58,9 +59,22 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
                 return mkByAppSelector(options);
             case PHYSICAL_FLOW:
                 return mkForDirectEntity(options);
+            case CHANGE_SET:
+                return mkForChangeSet(options);
             default:
                 throw new UnsupportedOperationException("Cannot create Change Unit selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForChangeSet(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        checkTrue(
+                options.entityReference().kind() == EntityKind.CHANGE_SET,
+                "Selection options must be for Change Set");
+        return DSL
+                .select(CHANGE_UNIT.ID)
+                .from(CHANGE_UNIT)
+                .where(CHANGE_UNIT.CHANGE_SET_ID.eq(options.entityReference().id()));
     }
 
 

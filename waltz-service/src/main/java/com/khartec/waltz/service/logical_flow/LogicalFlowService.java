@@ -122,6 +122,11 @@ public class LogicalFlowService {
     }
 
 
+    public Collection<LogicalFlow> findAllFlowsByIds(List<Long> ids) {
+        return logicalFlowDao.findAllFlowsByIds(ids);
+    }
+
+
     public LogicalFlow getById(long flowId) {
         return logicalFlowDao.getByFlowId(flowId);
     }

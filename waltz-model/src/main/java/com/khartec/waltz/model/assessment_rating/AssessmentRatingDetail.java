@@ -17,13 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {registerStore} from "../../common/module-utils";
+package com.khartec.waltz.model.assessment_rating;
 
-import * as changeUnitStore from "./change-unit-store";
-import * as changeUnitViewService from "./change-unit-view-service";
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.rating.RagName;
+import org.immutables.value.Value;
 
 
-export default (module) => {
-    registerStore(module, changeUnitStore);
-    registerStore(module, changeUnitViewService);
-};
+@Value.Immutable
+@JsonSerialize(as = ImmutableAssessmentRatingDetail.class)
+@JsonDeserialize(as = ImmutableAssessmentRatingDetail.class)
+public abstract class AssessmentRatingDetail {
+
+    public abstract AssessmentRating assessmentRating();
+    public abstract RagName rating();
+}

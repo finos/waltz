@@ -327,6 +327,13 @@ public class LogicalFlowDao {
     }
 
 
+    public List<LogicalFlow> findAllFlowsByIds(Collection<Long> dataFlowIds) {
+        return baseQuery()
+                .where(LOGICAL_FLOW.ID.in(dataFlowIds))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<LogicalFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
                 .where(LOGICAL_FLOW.ID.in(flowIdSelector))
