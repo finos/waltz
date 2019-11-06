@@ -57,7 +57,7 @@
                 <label>Tags</label>
             </td>
             <td>
-                <waltz-keyword-list ng-if="!$ctrl.visibility.tagEditor"
+                <waltz-tag-list ng-if="!$ctrl.visibility.tagEditor"
                                     keywords="$ctrl.tags"
                                     on-select="$ctrl.tagSelected(keyword)">
                     <last>
@@ -77,15 +77,14 @@
                             </a>
                         </i>
                     </empty>
-                </waltz-keyword-list>
+                </waltz-tag-list>
 
-                <waltz-keyword-edit ng-if="$ctrl.visibility.tagEditor"
+                <waltz-tag-edit ng-if="$ctrl.visibility.tagEditor"
                                     keywords="$ctrl.tags"
                                     on-save="$ctrl.onSaveTags"
                                     on-cancel="$ctrl.onDismissTagEditor"
-                                    auto-complete="true"
                                     entity-kind="$ctrl.parentEntityRef.kind">
-                </waltz-keyword-edit>
+                </waltz-tag-edit>
             </td>
         </tr>
         <tr>

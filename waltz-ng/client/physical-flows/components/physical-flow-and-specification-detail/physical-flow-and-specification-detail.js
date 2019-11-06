@@ -1,7 +1,7 @@
 import template from "./physical-flow-and-specification-detail.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkRef, toEntityRef} from "../../../common/entity-utils";
+import {toEntityRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -22,7 +22,7 @@ function controller(serviceBroker) {
         if (vm.physicalFlow) {
             serviceBroker
                 .loadViewData(
-                    CORE_API.EntityTagStore.findTagsByEntityRef,
+                    CORE_API.TagStore.findTagsByEntityRef,
                     [toEntityRef(vm.physicalFlow)],
                     { force: true })
                 .then(r => vm.tags = r.data);

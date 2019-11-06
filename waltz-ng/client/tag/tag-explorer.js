@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -18,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import {nest} from 'd3-collection'
-import template from './tag-explorer.html';
+import _ from "lodash";
+import {nest} from "d3-collection"
+import template from "./tag-explorer.html";
 
-function controller($stateParams, entityTagStore) {
+function controller($stateParams, tagStore) {
 
     const vm = this;
     vm.tagSets = [];
 
     const addTagSet = (selectedTag) => {
-        entityTagStore
+        tagStore
             .findByTag(selectedTag)
             .then(r => {
                 const tagSet = {
@@ -46,7 +45,7 @@ function controller($stateParams, entityTagStore) {
         vm.tagSets = _.reject(vm.tagSets, ts => ts === selectedTagSet);
     };
 
-    entityTagStore
+    tagStore
         .findAllTags()
         .then(r => {
             vm.tags = r;
@@ -58,13 +57,13 @@ function controller($stateParams, entityTagStore) {
     addTagSet($stateParams.tag);
 }
 
-controller.$inject = ['$stateParams', 'EntityTagStore'];
+controller.$inject = ["$stateParams", "TagStore"];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

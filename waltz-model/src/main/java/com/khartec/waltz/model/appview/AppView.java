@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import com.khartec.waltz.model.tag.Tag;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.List;
 public abstract class AppView {
 
     public abstract Application app();
-    public abstract List<String> tags();
+    public abstract List<Tag> tags();
     public abstract List<String> aliases();
     public abstract OrganisationalUnit organisationalUnit();
     public abstract ComplexityRating complexity();

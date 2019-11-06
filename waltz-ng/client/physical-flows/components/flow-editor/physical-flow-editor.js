@@ -19,7 +19,6 @@
 import template from "./physical-flow-editor.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 
 
@@ -48,7 +47,7 @@ function controller(notification, serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.EntityTagStore.findTagsByEntityRef,
+                CORE_API.TagStore.findTagsByEntityRef,
                 [vm.parentEntityRef],
                 {force: true})
             .then(r => vm.tags = r.data);
@@ -68,7 +67,7 @@ function controller(notification, serviceBroker) {
     const saveTags = (tags = [], successMessage) => {
         return serviceBroker
             .execute(
-                CORE_API.EntityTagStore.update,
+                CORE_API.TagStore.update,
                 [vm.parentEntityRef, tags])
             .then(() => {
                 notification.success(successMessage);

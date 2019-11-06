@@ -33,8 +33,8 @@ const explorerState = {
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.entity-tag', base)
-        .state('main.entity-tag.explorer', explorerState);
+        .state('main.tag', base)
+        .state('main.tag.explorer', explorerState);
 }
 
 

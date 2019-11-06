@@ -2,11 +2,21 @@
 
     <tags-input class="bootstrap"
                 ng-model="$ctrl.working"
+                display-property="name"
                 replace-spaces-with-dashes="false"
                 on-tag-added="$ctrl.save()"
                 on-tag-removed="$ctrl.save()"
                 ng-keydown="$ctrl.onKeyDown($event)"
                 placeholder="Edit">
+
+        <auto-complete
+            source="$ctrl.loadExistingTags($query)"
+            min-length="0"
+            load-on-focus="true"
+            load-on-empty="true"
+            max-results-to-show="10">
+        </auto-complete>
+
     </tags-input>
 
     <div style='margin-top: 4px'>

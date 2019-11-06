@@ -175,5 +175,100 @@
         </modifySql>
     </changeSet>
 
+    <changeSet id="20191101-4469-1"
+               author="alimuza">
+        <comment>4469: created new table for Tag</comment>
+        <createTable tableName="tag">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="tag_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20191101-4469-2"
+               author="alimuza">
+        <comment>4469: created index for name an target kind</comment>
+        <createIndex indexName="idx_tag_target_kind"
+                     tableName="tag"
+                     unique="true">
+            <column name="name" type="${name.type}"/>
+            <column name="target_kind" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20191101-4469-3"
+               author="alimuza">
+        <comment>4469: Added tag_usage table to show association of tags and entities</comment>
+        <createTable tableName="tag_usage">
+            <column name="tag_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20191101-4469-4"
+               author="alimuza">
+        <comment>4469: added primary key to tag_usage table</comment>
+        <addPrimaryKey columnNames="tag_id, entity_id, entity_kind"
+                       constraintName="tag_usage_pkey"
+                       tableName="tag_usage"/>
+    </changeSet>
+
+    <changeSet id="20191101-4469-5"
+               author="alimuza"
+               dbms="mssql,mysql,postgresql,h2">
+        <comment>4469: copy data from entity_tag table to tag table</comment>
+       <sql>
+           INSERT INTO tag (name, target_kind)
+           SELECT distinct tag, entity_kind
+           FROM entity_tag
+       </sql>
+    </changeSet>
+
+    <changeSet id="20191101-4469-6"
+               author="alimuza"
+               dbms="mssql,mysql,postgresql,h2">
+        <comment>4469: copy data from entity_tag table to tag_usage table</comment>
+        <sql>
+            INSERT INTO tag_usage (tag_id, entity_id, entity_kind, created_by, created_at, provenance)
+            SELECT distinct tag.id, entity_id, entity_kind, last_updated_by, last_updated_at, provenance
+            FROM entity_tag
+            JOIN tag ON (tag.name = entity_tag.tag)
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

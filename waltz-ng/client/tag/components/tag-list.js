@@ -17,20 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import {registerStores} from "../common/module-utils";
-import * as EntityTagStore from './services/entity-tag-store';
-import Routes from './routes';
+import {initialiseData} from "../../common";
+import template from "./tag-list.html";
 
 
-export default () => {
+/**
+ * @name waltz-keyword-list
+ *
+ * @description
+ * This component ...
+ */
 
-    const module = angular.module('waltz.entity-tags', []);
-
-    module
-        .config(Routes);
-
-    registerStores(module, [EntityTagStore]);
-
-    return module.name;
+const bindings = {
+    keywords: "<",
+    onSelect: "&?"
 };
+
+const transclude = {
+    empty: "?empty",
+    last: "?last"
+};
+
+
+const initialState = {};
+
+
+function controller() {
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
+
+    vm.$onChanges = (c) => {
+    };
+
+
+}
+
+
+controller.$inject = [];
+
+
+const component = {
+    template,
+    transclude,
+    bindings,
+    controller
+};
+
+
+export default component;

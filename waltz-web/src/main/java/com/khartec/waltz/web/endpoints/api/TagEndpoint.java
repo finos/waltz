@@ -21,7 +21,8 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.service.entity_tag.EntityTagService;
+import com.khartec.waltz.model.tag.Tag;
+import com.khartec.waltz.service.tag.TagService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,48 +37,48 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
-public class EntityTagEndpoint implements Endpoint {
+public class TagEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "entity-tag");
-    private final EntityTagService entityTagService;
+    private static final String BASE_URL = mkPath("api", "tag");
+    private final TagService tagService;
 
 
     @Autowired
-    public EntityTagEndpoint(EntityTagService entityTagService) {
-        checkNotNull(entityTagService, "entityTagService cannot be null");
-        this.entityTagService = entityTagService;
+    public TagEndpoint(TagService tagService) {
+        checkNotNull(tagService, "tagService cannot be null");
+        this.tagService = tagService;
     }
 
     @Override
     public void register() {
-        ListRoute<String> findAllTagsRoute = (request, response)
-                -> entityTagService.findAllTags();
+        ListRoute<Tag> findAllTagsRoute = (request, response)
+                -> tagService.findAllTags();
 
         ListRoute<EntityReference> findByTagRoute = (request, response)
-                -> entityTagService.findByTag(request.body());
+                -> tagService.findByTag(request.params("tag"));
 
-        ListRoute<String> updateRoute = (req, resp) -> {
+        ListRoute<Tag> updateRoute = (req, resp) -> {
             String username = getUsername(req);
             EntityReference ref = getEntityReference(req);
             List<String> tags = readStringsFromBody(req);
-            return entityTagService.updateTags(ref, tags, username);
+            return tagService.updateTags(ref, tags, username);
         };
 
-        ListRoute<String> findTagsForEntityReference = (req, resp) -> {
+        ListRoute<Tag> findTagsForEntityReference = (req, resp) -> {
             EntityReference ref = getEntityReference(req);
-            return entityTagService.findTagsForEntityReference(ref);
+            return tagService.findTagsForEntityReference(ref);
         };
 
-        ListRoute<String> findTagsForEntityKind = (req, resp) -> {
+        ListRoute<Tag> findTagsForEntityKind = (req, resp) -> {
             EntityKind entityKind = getKind(req);
-            return entityTagService.findTagsForEntityKind(entityKind);
+            return tagService.findTagsForEntityKind(entityKind);
         };
 
-        getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
-        postForList(mkPath(BASE_URL, "tags"), findByTagRoute);
+        getForList(mkPath(BASE_URL), findAllTagsRoute);
+        getForList(mkPath(BASE_URL, ":tag"), findByTagRoute);
         postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
-        getForList(mkPath(BASE_URL, "tags-by-kind", ":kind"), findTagsForEntityKind);
+        getForList(mkPath(BASE_URL, "target-kind", ":kind"), findTagsForEntityKind);
     }
 
 }
