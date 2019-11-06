@@ -74,7 +74,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="flow in ctrl.physicalFlows">
+                <tr ng-repeat="flow in ctrl.physicalFlows"
+                    ng-class="{
+                                'waltz-entity-removed':flow.entityLifecycleStatus === 'REMOVED',
+                              }">
                     <td>
                         <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
                            class="clickable"

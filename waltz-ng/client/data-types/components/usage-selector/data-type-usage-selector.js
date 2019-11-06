@@ -18,16 +18,17 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
+import {enrichDataTypes} from "../../data-type-utils";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    onDirty: '<',
-    onRegisterSave: '<'
+    parentEntityRef: "<",
+    onDirty: "<",
+    onRegisterSave: "<"
 };
 
 
@@ -37,13 +38,13 @@ const initialState = {
     checkedItemIds: [],
     originalSelectedItemIds: [],
     expandedItemIds: [],
-    onDirty: (d) => console.log('dtus:onDirty - default impl', d),
-    onRegisterSave: (f) => console.log('dtus:onRegisterSave - default impl', f)
+    onDirty: (d) => console.log("dtus:onDirty - default impl", d),
+    onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
 
 
 function mkSelectedTypeIds(dataTypes = []) {
-    return _.map(dataTypes, 'dataTypeId');
+    return _.map(dataTypes, "dataTypeId");
 }
 
 
@@ -62,12 +63,12 @@ function mkSpecDataTypeUpdateCommand(specificationId, selectedIds = [], original
 function mkFlowDataTypeDecoratorsUpdateCommand(flowId, selectedIds = [], originalIds = []) {
     const addedDecorators = _.chain(selectedIds)
         .difference(originalIds)
-        .map(id => ({kind: 'DATA_TYPE', id}))
+        .map(id => ({kind: "DATA_TYPE", id}))
         .value();
 
     const removedDecorators = _.chain(originalIds)
         .difference(selectedIds)
-        .map(id => ({kind: 'DATA_TYPE', id}))
+        .map(id => ({kind: "DATA_TYPE", id}))
         .value();
 
     return {
@@ -86,14 +87,16 @@ function controller(serviceBroker) {
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
+        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
+        vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
     };
 
     const loadDataTypes = (force = false) => {
         const selectorOptions = {
             entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
+            scope: "EXACT"
         };
-        const promise = vm.parentEntityRef.kind == 'PHYSICAL_SPECIFICATION'
+        const promise = vm.parentEntityRef.kind == "PHYSICAL_SPECIFICATION"
             ? serviceBroker
                 .loadViewData(
                     CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
@@ -121,7 +124,6 @@ function controller(serviceBroker) {
         .loadAppData(CORE_API.DataTypeStore.findAll)
         .then(result => {
             vm.allDataTypes = result.data;
-            vm.allDataTypesById = _.keyBy(result.data, 'id');
         });
 
 
@@ -132,8 +134,13 @@ function controller(serviceBroker) {
     };
 
     vm.typeUnchecked = (id) => {
-        vm.onDirty(true);
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+        vm.onDirty(vm.hasAnyChanges() && vm.anySelected());
+        //set disable flag of selected non concrete to true
+        if(!vm.allDataTypesById[id].concrete) {
+            _.find(vm.allDataTypes, { id: id}).disable = true;
+            vm.allDataTypesById[id].disable = true;
+        }
     };
 
     vm.typeChecked = (id) => {
@@ -141,18 +148,34 @@ function controller(serviceBroker) {
         let dt = vm.allDataTypesById[id];
         while (dt) {
             const parent = vm.allDataTypesById[dt.parentId];
-            if (_.get(parent, 'concrete', true) === false) {
+            if (_.get(parent, "concrete", true) === false) {
                 vm.typeUnchecked(parent.id);
             }
             dt = parent;
         }
-        vm.onDirty(true);
         vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
+        vm.onDirty(vm.hasAnyChanges());
+    };
+
+    vm.anySelected = () => {
+        return notEmpty(vm.checkedItemIds);
+    };
+
+    vm.hasAnyChanges = () => {
+        return !_.isEqual(vm.checkedItemIds.sort(), vm.originalSelectedItemIds.sort());
+    };
+
+    vm.$onChanges = () => {
+        loadDataTypes()
+            .then(() => {
+                postLoadActions();
+                vm.onDirty(false);
+            });
     };
 
     vm.save = () => {
         let promise = null;
-        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION') {
+        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION") {
             const updateCommand = mkSpecDataTypeUpdateCommand(
                 vm.parentEntityRef.id,
                 vm.checkedItemIds,
@@ -160,7 +183,7 @@ function controller(serviceBroker) {
 
             promise = serviceBroker
                 .execute(CORE_API.PhysicalSpecDataTypeStore.save, [vm.parentEntityRef.id, updateCommand]);
-        } else if(vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW') {
+        } else if(vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW") {
             const updateCommand = mkFlowDataTypeDecoratorsUpdateCommand(
                 vm.parentEntityRef.id,
                 vm.checkedItemIds,
@@ -188,7 +211,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -198,6 +221,6 @@ export default {
         bindings,
         controller
     },
-    id: 'waltzDataTypeUsageSelector'
+    id: "waltzDataTypeUsageSelector"
 };
 

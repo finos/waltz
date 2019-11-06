@@ -87,7 +87,10 @@
         </waltz-no-data>
 
         <table class="table table-condesed small">
-            <tr ng-repeat="flow in $ctrl.contextPopup.entity.physical">
+            <tr ng-repeat="flow in $ctrl.contextPopup.entity.physical"
+                ng-class="{
+                            'waltz-entity-removed':flow.physicalFlow.entityLifecycleStatus === 'REMOVED',
+                          }">
                 <td>
                     <span ng-if="flow.changeUnit">
                         <waltz-icon name="hourglass-2"

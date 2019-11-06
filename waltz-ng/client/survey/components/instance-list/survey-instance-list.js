@@ -82,12 +82,24 @@ function controller($q, serviceBroker) {
                     [vm.parentEntityRef],
                     { force: true })
                 .then(r => r.data);
-
             $q.all([runsPromise, instancesPromise])
                 .then(([runs, instances]) =>
                     vm.surveys = mkTableData(runs, instances));
         }
     };
+
+    vm.getSurveyTabMessage = (type) => {
+
+        const surveyType = (type === "CURRENT") ? " current " : " archived ";
+
+        if (_.isEmpty(vm.surveys[type])){
+            return "No" + surveyType + "surveys";
+        } else if (vm.surveys[type].length === 1) {
+            return "1" + surveyType + "survey"
+        } else {
+            return vm.surveys[type].length + surveyType + "surveys";
+        }
+    }
 
 }
 
