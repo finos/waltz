@@ -97,17 +97,17 @@
         <div ng-if="$ctrl.selected.types.length > 0" class="wsatp-data-types">
             <ul class="list-inline">
                 <li ng-repeat='type in $ctrl.selected.types'>
-                    <a ui-sref="main.data-type.view ({id: type.id})">
-                        <span class="label"
-                              ng-class="{
-                                'label-success' : type.rating == 'PRIMARY',
-                                'label-warning' : type.rating == 'SECONDARY',
-                                'label-danger' : type.rating == 'DISCOURAGED',
-                                'label-default' : type.rating == 'NO_OPINION',
-                              }"
-                              ng-bind="type.id | toDisplayName:'dataType'">
-                        </span>
-                    </a>
+                    <waltz-entity-link class="label wsatp-data-types"
+                                       ng-class="{ 'label-success' : type.rating == 'PRIMARY',
+                                                   'label-warning' : type.rating == 'SECONDARY',
+                                                   'label-danger' : type.rating == 'DISCOURAGED',
+                                                   'label-default' : type.rating == 'NO_OPINION'}"
+                                       entity-ref="{kind: 'DATA_TYPE',
+                                                    id: type.id,
+                                                    name: type.name}"
+                                       icon-placement="none"
+                                       tooltip-placement="none">
+                    </waltz-entity-link>
                 </li>
             </ul>
         </div>

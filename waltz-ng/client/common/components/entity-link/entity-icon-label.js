@@ -107,6 +107,15 @@ const entityLoaders = {
                 value: ci.endDate
             }
         ])
+    },
+    "DATA_TYPE": {
+        method: CORE_API.DataTypeStore.getDataTypeById,
+        mkProps: (dt) => ([
+            {
+                name: "Code",
+                value: dt.code || "n/a"
+            }
+    ])
     }
 };
 
