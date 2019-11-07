@@ -176,7 +176,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-1"
-               author="alimuza">
+               author="muzammilali">
         <comment>4469: created new table for Tag</comment>
         <createTable tableName="tag">
             <column name="id"
@@ -198,7 +198,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-2"
-               author="alimuza">
+               author="muzammilali">
         <comment>4469: created index for name an target kind</comment>
         <createIndex indexName="idx_tag_target_kind"
                      tableName="tag"
@@ -209,7 +209,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-3"
-               author="alimuza">
+               author="muzammilali">
         <comment>4469: Added tag_usage table to show association of tags and entities</comment>
         <createTable tableName="tag_usage">
             <column name="tag_id"
@@ -241,7 +241,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-4"
-               author="alimuza">
+               author="muzammilali">
         <comment>4469: added primary key to tag_usage table</comment>
         <addPrimaryKey columnNames="tag_id, entity_id, entity_kind"
                        constraintName="tag_usage_pkey"
@@ -249,8 +249,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-5"
-               author="alimuza"
-               dbms="mssql,mysql,postgresql,h2">
+               author="muzammilali">
         <comment>4469: copy data from entity_tag table to tag table</comment>
        <sql>
            INSERT INTO tag (name, target_kind)
@@ -260,8 +259,7 @@
     </changeSet>
 
     <changeSet id="20191101-4469-6"
-               author="alimuza"
-               dbms="mssql,mysql,postgresql,h2">
+               author="muzammilali">
         <comment>4469: copy data from entity_tag table to tag_usage table</comment>
         <sql>
             INSERT INTO tag_usage (tag_id, entity_id, entity_kind, created_by, created_at, provenance)
