@@ -24,7 +24,7 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 Org | Notes
 --- | ---
 ![DB Logo](https://www.gps-data-team.com/poi/icons/DB-DE.bmp "Deutsche Bank") Deutsche Bank | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) 
-NatWest Markets | [press release](https://www.natwestmarkets.com/natwest-markets/about-us/Media/NatWest-Markets-to-expand-open-source-coding.html)
+NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)
 
 ## Technology Stack
 

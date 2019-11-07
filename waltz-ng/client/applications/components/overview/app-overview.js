@@ -23,6 +23,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 import template from "./app-overview.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -44,7 +45,7 @@ const initialState = {
 };
 
 
-function controller($state, serviceBroker) {
+function controller($state, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     function loadApp() {
@@ -122,17 +123,22 @@ function controller($state, serviceBroker) {
             [ vm.parentEntityRef, aliases ])
         .then(r =>  vm.aliases = r.data);
 
-    vm.saveTags = (tags = []) => serviceBroker
+    vm.saveTags = (tags = [], successMessage) => serviceBroker
         .execute(
             CORE_API.EntityTagStore.update,
             [ vm.parentEntityRef, tags ])
-        .then(r => vm.tags = r.data);
+        .then(r => {
+            notification.success(successMessage);
+            vm.tags = r.data;
+        })
+        .catch(e => displayError(notification, "Could not update tags", e));
 }
 
 
 controller.$inject = [
     "$state",
     "ServiceBroker",
+    "Notification"
 ];
 
 

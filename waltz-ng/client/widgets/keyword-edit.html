@@ -1,4 +1,5 @@
 <div style="border-radius: 3px; border: 1px solid rgb(238, 238, 238); background-color: rgb(250, 250, 250); padding: 10px;">
+
     <tags-input class="bootstrap"
                 ng-model="$ctrl.working"
                 replace-spaces-with-dashes="false"
@@ -6,6 +7,16 @@
                 on-tag-removed="$ctrl.save()"
                 ng-keydown="$ctrl.onKeyDown($event)"
                 placeholder="Edit">
+
+        <auto-complete
+            ng-if="$ctrl.autoComplete"
+            source="$ctrl.loadExistingTags($query)"
+            min-length="0"
+            load-on-focus="true"
+            load-on-empty="true"
+            max-results-to-show="10">
+        </auto-complete>
+
     </tags-input>
 
     <div style='margin-top: 4px'>

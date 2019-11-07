@@ -64,6 +64,27 @@ const entityLoaders = {
             }
         ])
     },
+    "CHANGE_INITIATIVE": {
+        method: CORE_API.ChangeInitiativeStore.getById,
+        mkProps: (ci, displayNameService) => ([
+            {
+                name: "External Id",
+                value: ci.externalId|| "?"
+            }, {
+                name: "Kind",
+                value: displayNameService.lookup("changeInitiative", ci.changeInitiativeKind, "?")
+            }, {
+                name: "Lifecycle",
+                value: displayNameService.lookup("changeInitiativeLifecyclePhase", ci.lifecyclePhase, "?")
+            }, {
+                name: "Start",
+                value: ci.startDate
+            }, {
+                name: "End",
+                value: ci.endDate
+            }
+        ])
+    },
     "PERSON": {
         method: CORE_API.PersonStore.getById,
         mkProps: (person, displayNameService, serviceBroker) => {
@@ -87,26 +108,42 @@ const entityLoaders = {
                 orgUnitName];
         }
     },
-    "CHANGE_INITIATIVE": {
-        method: CORE_API.ChangeInitiativeStore.getById,
-        mkProps: (ci, displayNameService) => ([
-            {
-                name: "External Id",
-                value: ci.externalId|| "?"
-            }, {
-                name: "Kind",
-                value: displayNameService.lookup("changeInitiative", ci.changeInitiativeKind, "?")
-            }, {
-                name: "Lifecycle",
-                value: displayNameService.lookup("changeInitiativeLifecyclePhase", ci.lifecyclePhase, "?")
-            }, {
-                name: "Start",
-                value: ci.startDate
-            }, {
-                name: "End",
-                value: ci.endDate
-            }
-        ])
+    "PHYSICAL_FLOW": {
+        method: CORE_API.PhysicalFlowStore.getById,
+        mkProps: (flow, displayNameService, serviceBroker) => {
+            const specificationFormat = {
+                name: "Format",
+                value: "-"
+            };
+
+            serviceBroker
+                .loadViewData(CORE_API.PhysicalSpecificationStore.getById, [flow.specificationId])
+                .then(r => {
+                    specificationFormat.value = displayNameService.lookup("dataFormatKind", r.data.format, "?");
+                    flow.name = r.data.name;
+                    flow.description = flow.description || r.data.description;
+                });
+
+            return [
+                {
+                    name: "External Id",
+                    value: flow.externalId
+                }, {
+                    name: "Criticality",
+                    value: displayNameService.lookup("criticality", flow.criticality, "?")
+                }, {
+                    name: "Transport",
+                    value: displayNameService.lookup("TransportKind", flow.transport, "?")
+                }, {
+                    name: "Frequency",
+                    value: displayNameService.lookup("frequencyKind", flow.frequency, "?")
+                },
+                specificationFormat,
+                {
+                    name: "Provenance",
+                    value: flow.provenance
+                }];
+        }
     },
     "DATA_TYPE": {
         method: CORE_API.DataTypeStore.getDataTypeById,
@@ -115,7 +152,7 @@ const entityLoaders = {
                 name: "Code",
                 value: dt.code || "n/a"
             }
-    ])
+        ])
     }
 };
 

@@ -82,7 +82,9 @@
                 <waltz-keyword-edit ng-if="$ctrl.visibility.tagEditor"
                                     keywords="$ctrl.tags"
                                     on-save="$ctrl.onSaveTags"
-                                    on-cancel="$ctrl.onDismissTagEditor">
+                                    on-cancel="$ctrl.onDismissTagEditor"
+                                    auto-complete="true"
+                                    entity-kind="$ctrl.parentEntityRef.kind">
                 </waltz-keyword-edit>
             </td>
         </tr>

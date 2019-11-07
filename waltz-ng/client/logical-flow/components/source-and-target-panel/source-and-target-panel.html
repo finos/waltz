@@ -96,7 +96,8 @@
         <strong>Data Types</strong>
         <div ng-if="$ctrl.selected.types.length > 0" class="wsatp-data-types">
             <ul class="list-inline">
-                <li ng-repeat='type in $ctrl.selected.types'>
+                <li ng-repeat='type in $ctrl.selected.types'
+                    style="padding-bottom: 2px">
                     <waltz-entity-link class="label wsatp-data-types"
                                        ng-class="{ 'label-success' : type.rating == 'PRIMARY',
                                                    'label-warning' : type.rating == 'SECONDARY',
@@ -106,7 +107,7 @@
                                                     id: type.id,
                                                     name: type.name}"
                                        icon-placement="none"
-                                       tooltip-placement="none">
+                                       tooltip-placement="top">
                     </waltz-entity-link>
                 </li>
             </ul>

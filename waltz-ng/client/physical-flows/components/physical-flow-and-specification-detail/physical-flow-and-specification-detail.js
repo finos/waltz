@@ -23,7 +23,8 @@ function controller(serviceBroker) {
             serviceBroker
                 .loadViewData(
                     CORE_API.EntityTagStore.findTagsByEntityRef,
-                    [toEntityRef(vm.physicalFlow)])
+                    [toEntityRef(vm.physicalFlow)],
+                    { force: true })
                 .then(r => vm.tags = r.data);
         }
     }
