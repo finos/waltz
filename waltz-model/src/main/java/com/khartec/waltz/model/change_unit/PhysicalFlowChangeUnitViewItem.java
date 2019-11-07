@@ -30,9 +30,9 @@ import java.util.Optional;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalFlowChangeUnitDetail.class)
-@JsonDeserialize(as = ImmutablePhysicalFlowChangeUnitDetail.class)
-public abstract class PhysicalFlowChangeUnitDetail extends ChangeUnitDetail {
+@JsonSerialize(as = ImmutablePhysicalFlowChangeUnitViewItem.class)
+@JsonDeserialize(as = ImmutablePhysicalFlowChangeUnitViewItem.class)
+public abstract class PhysicalFlowChangeUnitViewItem extends ChangeUnitViewItem {
 
     public abstract Optional<PhysicalSpecification> physicalSpecification();
     public abstract LogicalFlow logicalFlow();

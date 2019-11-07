@@ -32,7 +32,8 @@ const bindings = {
 
 
 const initialState = {
-    selectedChangeUnit: null
+    selectedChangeUnit: null,
+    physicalFlowColumnDefs: preparePhysicalFlowColumnDefs()
 };
 
 
@@ -47,24 +48,35 @@ function mkExecutionStatusUpdateCommand(cu, targetStatus) {
 }
 
 
+function mkAssessmentValuesString(changeUnit) {
+    const ratingNames = _
+        .chain(changeUnit.assessments)
+        .map(a => a.ratingDefinition.name)
+        .uniq()
+        .join(", ")
+        .value();
+
+    return ratingNames || "n/a";
+}
+
+
 function controller(notification, serviceBroker, $q) {
     const vm = initialiseData(this, initialState);
 
     const loadData = (force = false) => {
-
-        const physicalChangeUnitPromise = serviceBroker
-            .loadViewData(CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
+        const physicalFlowChangeUnitPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
                 [vm.parentEntityRef.id])
-            .then(r => vm.physicalFlowChangeUnits = r.data)
-            .then(() =>  _.forEach(vm.physicalFlowChangeUnits, cu => {
+            .then(r => {
+                const extendChangeUnitWithRatings = cu =>
+                    Object.assign({}, cu, { assessmentValues: mkAssessmentValuesString(cu) });
 
-                const ratingNames = _.uniq(_.flatMap(cu.assessments, changeUnit => changeUnit.rating.name));
-                return cu.toDisplayAssessments = (ratingNames.length > 0) ? ratingNames.join(", ") : "n/a";
-            }))
-            .then(() => vm.physicalFlowColumnDefs = preparePhysicalFlowColumnDefs());
+                vm.physicalFlowChangeUnits =_.map(r.data, extendChangeUnitWithRatings);
+            });
 
-
-        return $q.all([physicalChangeUnitPromise])
+        return $q
+            .all([physicalFlowChangeUnitPromise])
             .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
     };
 
@@ -147,7 +159,7 @@ function preparePhysicalFlowColumnDefs() {
             width: "15%"
         },
         {
-            field: "toDisplayAssessments",
+            field: "assessmentValues",
             name: "Assessments",
             width: "20%"
         }

@@ -20,25 +20,22 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitDetail;
+import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import com.khartec.waltz.service.change_unit.ChangeUnitViewService;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static java.lang.Long.parseLong;
 
 
 @Service
 public class ChangeUnitViewEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChangeUnitViewEndpoint.class);
     private static final String BASE_URL = mkPath("api", "change-unit-view");
 
     private final ChangeUnitViewService service;
@@ -56,8 +53,8 @@ public class ChangeUnitViewEndpoint implements Endpoint {
 
         String findByChangeSetIdForTypePath = mkPath(BASE_URL, "id", ":id", "physical-flow");
 
-        ListRoute<PhysicalFlowChangeUnitDetail> findByChangeSetIdForTypeRoute = (request, response) ->
-                service.findPhysicalFlowChangeUnitsByChangeSetId(parseLong(request.params("id")));
+        ListRoute<PhysicalFlowChangeUnitViewItem> findByChangeSetIdForTypeRoute = (request, response) ->
+                service.findPhysicalFlowChangeUnitsByChangeSetId(WebUtilities.getId(request));
 
         getForList(findByChangeSetIdForTypePath, findByChangeSetIdForTypeRoute);
     }

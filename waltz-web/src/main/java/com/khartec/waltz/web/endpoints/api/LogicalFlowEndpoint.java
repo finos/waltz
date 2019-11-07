@@ -93,7 +93,7 @@ public class LogicalFlowEndpoint implements Endpoint {
                 -> logicalFlowService.findBySelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<LogicalFlow> findByIdsRoute = (request, response)
-                -> logicalFlowService.findByIds(readIdsFromBody(request));
+                -> logicalFlowService.findActiveByFlowIds(readIdsFromBody(request));
 
         ListRoute<LogicalFlow> findUpstreamFlowsForEntityReferencesRoute = (request, response) -> {
             EntityReference[] refs = readBody(request, EntityReference[].class);

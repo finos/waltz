@@ -282,28 +282,6 @@ public class LogicalFlowDao {
     }
 
 
-    private int restoreFlows(List<LogicalFlow> flows, String username) {
-        if(flows.isEmpty()) {
-            return 0;
-        }
-
-        Condition condition = flows
-                .stream()
-                .map(t -> isSourceCondition(t.source())
-                        .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
-                .reduce((a, b) -> a.or(b))
-                .get();
-
-        return dsl.update(LOGICAL_FLOW)
-                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
-                .set(LOGICAL_FLOW.IS_REMOVED, false)
-                .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
-                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
-                .where(condition)
-                .execute();
-    }
-
 
     public LogicalFlow getByFlowId(long dataFlowId) {
         return baseQuery()
@@ -319,18 +297,13 @@ public class LogicalFlowDao {
     }
 
 
-    public List<LogicalFlow> findByFlowIds(Collection<Long> dataFlowIds) {
-        return baseQuery()
-                .where(LOGICAL_FLOW.ID.in(dataFlowIds))
-                .and(LOGICAL_NOT_REMOVED)
-                .fetch(TO_DOMAIN_MAPPER);
+    public List<LogicalFlow> findActiveByFlowIds(Collection<Long> dataFlowIds) {
+        return findByFlowIdsWithCondition(dataFlowIds, LOGICAL_NOT_REMOVED);
     }
 
 
-    public List<LogicalFlow> findAllFlowsByIds(Collection<Long> dataFlowIds) {
-        return baseQuery()
-                .where(LOGICAL_FLOW.ID.in(dataFlowIds))
-                .fetch(TO_DOMAIN_MAPPER);
+    public List<LogicalFlow> findAllByFlowIds(Collection<Long> dataFlowIds) {
+        return findByFlowIdsWithCondition(dataFlowIds, DSL.trueCondition());
     }
 
 
@@ -422,5 +395,38 @@ public class LogicalFlowDao {
                 .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
                 .from(LOGICAL_FLOW);
     }
+
+
+    private List<LogicalFlow> findByFlowIdsWithCondition(Collection<Long> dataFlowIds, Condition condition) {
+        return baseQuery()
+                .where(LOGICAL_FLOW.ID.in(dataFlowIds))
+                .and(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    private int restoreFlows(List<LogicalFlow> flows, String username) {
+        if(flows.isEmpty()) {
+            return 0;
+        }
+
+        Condition condition = flows
+                .stream()
+                .map(t -> isSourceCondition(t.source())
+                        .and(isTargetCondition(t.target()))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
+                .reduce((a, b) -> a.or(b))
+                .get();
+
+        return dsl.update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
+                .set(LOGICAL_FLOW.IS_REMOVED, false)
+                .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
+                .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
+                .where(condition)
+                .execute();
+    }
+
+
 
 }

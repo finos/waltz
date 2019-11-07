@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.service.change_unit;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -27,8 +26,8 @@ import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
 import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRatingDetail;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.ImmutablePhysicalFlowChangeUnitDetail;
-import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitDetail;
+import com.khartec.waltz.model.change_unit.ImmutablePhysicalFlowChangeUnitViewItem;
+import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
@@ -47,9 +46,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.Collections.emptySet;
@@ -91,13 +90,13 @@ public class ChangeUnitViewService {
     }
 
 
-    public Collection<PhysicalFlowChangeUnitDetail> findPhysicalFlowChangeUnitsByChangeSetId(long changeSetId){
+    public Set<PhysicalFlowChangeUnitViewItem> findPhysicalFlowChangeUnitsByChangeSetId(long changeSetId){
 
         IdSelectionOptions idSelectionOptions = mkOpts(mkRef(EntityKind.CHANGE_SET, changeSetId), HierarchyQueryScope.EXACT);
 
         Collection<PhysicalFlow> physicalFlows = physicalFlowService.findBySelector(idSelectionOptions);
         Collection<PhysicalSpecification> physicalSpecs = physicalSpecificationService.findByIds(map(physicalFlows, PhysicalFlow::specificationId));
-        Collection<LogicalFlow> logicalFlows = logicalFlowService.findAllFlowsByIds(map(physicalFlows, PhysicalFlow::logicalFlowId));
+        Collection<LogicalFlow> logicalFlows = logicalFlowService.findAllByFlowIds(map(physicalFlows, PhysicalFlow::logicalFlowId));
         List<AssessmentRating> assessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(EntityKind.CHANGE_UNIT, idSelectionOptions);
 
         Map<Long, RagName> ratingSchemeItemsById = indexBy(ratingSchemeService.getAllRatingSchemeItems(), item -> item.id().get());
@@ -120,11 +119,13 @@ public class ChangeUnitViewService {
                     Long changeUnitId = cu.id().get();
                     Collection<AssessmentRating> assessmentRatingsForChangeUnit = assessmentRatingsByEntityId.getOrDefault(changeUnitId, emptySet());
 
-                    Set<AssessmentRatingDetail> assessmentRatingDetailForChangeUnit = (assessmentRatingsForChangeUnit.size() > 0)
-                            ? SetUtilities.map(assessmentRatingsForChangeUnit, rating -> mkAssessmentDefinitionDetail(rating, ratingSchemeItemsById.get(rating.ratingId())))
-                            : emptySet();
+                    Set<AssessmentRatingDetail> assessmentRatingDetailForChangeUnit = map(
+                            assessmentRatingsForChangeUnit,
+                            rating -> mkAssessmentDefinitionDetail(
+                                    rating,
+                                    ratingSchemeItemsById.get(rating.ratingId())));
 
-                    return (PhysicalFlowChangeUnitDetail) ImmutablePhysicalFlowChangeUnitDetail.builder()
+                    return ImmutablePhysicalFlowChangeUnitViewItem.builder()
                             .changeUnit(cu)
                             .physicalSpecification(spec)
                             .logicalFlow(logicalFlow)
@@ -134,10 +135,11 @@ public class ChangeUnitViewService {
                 .collect(toSet());
     }
 
-    private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RagName ratingDetail) {
-        return ImmutableAssessmentRatingDetail.builder()
+    private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RagName ratingDefinition) {
+        return ImmutableAssessmentRatingDetail
+                .builder()
                 .assessmentRating(assessmentRating)
-                .rating(ratingDetail)
+                .ratingDefinition(ratingDefinition)
                 .build();
     }
 }

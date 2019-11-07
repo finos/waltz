@@ -19,7 +19,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitDetail;
+import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.change_unit.ChangeUnitViewService;
 import org.jooq.tools.json.ParseException;
@@ -36,7 +36,7 @@ public class ChangeSetHarness {
 
         ChangeUnitViewService service = ctx.getBean(ChangeUnitViewService.class);
 
-        Collection<PhysicalFlowChangeUnitDetail> physical_flow_change_set = service.findPhysicalFlowChangeUnitsByChangeSetId(2);
+        Collection<PhysicalFlowChangeUnitViewItem> physical_flow_change_set = service.findPhysicalFlowChangeUnitsByChangeSetId(2);
         System.out.println(physical_flow_change_set);
     }
 }

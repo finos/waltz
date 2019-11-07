@@ -31,5 +31,5 @@ import org.immutables.value.Value;
 public abstract class AssessmentRatingDetail {
 
     public abstract AssessmentRating assessmentRating();
-    public abstract RagName rating();
+    public abstract RagName ratingDefinition();
 }
