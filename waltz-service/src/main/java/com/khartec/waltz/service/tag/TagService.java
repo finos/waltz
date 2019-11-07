@@ -37,9 +37,6 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
 
-/**
- * Tags for applications
- */
 @Service
 public class TagService {
 
