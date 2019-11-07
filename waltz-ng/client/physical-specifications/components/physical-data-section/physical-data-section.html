@@ -1,32 +1,50 @@
 <div>
 
     <div class="row"
-         ng-if="$ctrl.produces.length > 0">
-
+         ng-if="$ctrl.filteredFlows.length > 0">
         <div class="col-md-12">
-            <strong>Produces (<span ng-bind="$ctrl.produces.length"></span>)</strong>
+            <strong>
+                <span ng-bind="$ctrl.header"></span>
+                (<span ng-bind="$ctrl.filteredFlows.length"></span>)
+            </strong>
 
-            <waltz-grid-with-search column-defs="$ctrl.produceColumnDefs"
-                        entries="$ctrl.produces"
-                        class="small">
+            <div class="btn-group pull-right"
+                 role="group">
+                <button type="button"
+                        class="btn btn-default"
+                        uib-btn-radio="'ALL'"
+                        ng-model="$ctrl.selectedFilter"
+                        ng-click="$ctrl.changeFilter('ALL')">
+                    All
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    uib-btn-radio="'PRODUCES'"
+                    ng-model="$ctrl.selectedFilter"
+                    ng-click="$ctrl.changeFilter('PRODUCES')">
+                    Produces
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    uib-btn-radio="'CONSUMES'"
+                    ng-model="$ctrl.selectedFilter"
+                    ng-click="$ctrl.changeFilter('CONSUMES')">
+                    Consumes
+                </button>
+            </div>
+
+            <br><br>
+
+            <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                    entries="$ctrl.filteredFlows"
+                                    search-control-min-rows="0"
+                                    class="small">
             </waltz-grid-with-search>
             <hr>
         </div>
     </div>
-
-    <div class="row"
-         ng-if="$ctrl.consumes.length > 0">
-        <div class="col-md-12">
-            <strong>Consumes (<span ng-bind="$ctrl.consumes.length"></span>)</strong>
-
-            <waltz-grid-with-search column-defs="$ctrl.consumeColumnDefs"
-                                    entries="$ctrl.consumes"
-                                    class="small">
-            </waltz-grid-with-search>
-        </div>
-    </div>
-
-
 
 
     <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
@@ -47,24 +65,22 @@
 
     <div class="row"
          ng-hide="$ctrl.unusedSpecifications | isEmpty">
-
         <br>
-
         <div class="col-md-12">
             <strong>Unused Specifications</strong>
             <small class="text-muted">
                 Specifications which have been registered, but are not sent to any consumers.
             </small>
-
             <br><br>
-
             <waltz-grid column-defs="$ctrl.unusedSpecificationsColumnDefs"
                         row-data="$ctrl.unusedSpecifications"
                         class="small">
             </waltz-grid>
         </div>
     </div>
+
     <br/>
+
     <div class="waltz-sub-section-controls">
         <waltz-data-extract-link name="Produces"
                                  styling="link"

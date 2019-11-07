@@ -19,7 +19,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkEntityLinkGridCell, mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import {mkEntityLinkGridCell, mkEnumGridCell} from "../../../common/grid-utils";
 import template from "./physical-data-section.html";
 import {isRemoved} from "../../../common/entity-utils";
 
@@ -34,10 +34,12 @@ const bindings = {
 
 
 const initialState = {
+    header: "All Flows",
     primaryRef: null,  // entityReference
     physicalFlows: [],
     logicalFlows: [],
     specifications: [],
+    selectedFilter: "ALL",
     onInitialise: (e) => {}
 };
 
@@ -49,11 +51,23 @@ const initialState = {
  */
 const isIncomplete = f => !f.logicalFlow ||  !f.specification;
 
+/**
+ * Takes a entityReference and returns a new function which takes an
+ * enriched flow and returns true if the entity is producing the flow
+ * or false if not
+ * @param entityRef
+ * @private
+ */
+const _isProducer = (entityRef) => (f) => {
+    const source = f.logicalFlow.source;
+    return source.id === entityRef.id && source.kind === entityRef.kind;
+};
+
 
 /**
  * Takes a entityReference and returns a new function which takes an
  * enriched flow and returns true if the entity is consuming the flow
- * or false if it is producing the flow
+ * or false if not
  * @param entityRef
  * @private
  */
@@ -62,11 +76,13 @@ const _isConsumer = (entityRef) => (f) => {
     return target.id === entityRef.id && target.kind === entityRef.kind;
 };
 
+const _allFlows = (entityRef) => (f) => true;
 
 function mkData(primaryRef,
                 specifications = { produces: [], consumes: [] },
                 physicalFlows = [],
-                logicalFlows = [])
+                logicalFlows = [],
+                filter = _allFlows)
 {
     if (!primaryRef) return [];
 
@@ -75,21 +91,21 @@ function mkData(primaryRef,
 
     const enrichFlow = (pf) => {
         return {
-            physicalFlow: pf,
+            physicalFlow: Object.assign({}, pf, {name: _.get(specsById[pf.specificationId], 'name')}),
             logicalFlow: logicalById[pf.logicalFlowId],
             specification: specsById[pf.specificationId]
         };
     };
 
-    const [consumes, produces] = _
+    const filteredFlows = _
         .chain(physicalFlows)
         .reject(isRemoved)
         .map(enrichFlow)
         .reject(isIncomplete)
-        .partition(_isConsumer(primaryRef))
+        .filter(filter(primaryRef))
         .value();
 
-    return { consumes, produces };
+    return { filteredFlows };
 }
 
 
@@ -97,28 +113,18 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    vm.produceColumnDefs = [
-        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), { width: "20%"} ),
-        { field: "specification.externalId", displayName: "Ext. Id", width: "10%" },
-        Object.assign(mkEntityLinkGridCell("Receiver(s)", "logicalFlow.target", "left"), { width: "15%" }),
-        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
-        { field: "specification.format", displayName: "Format", width: "8%", cellFilter: "toDisplayName:\"dataFormatKind\"" },
-        { field: "physicalFlow.transport", displayName: "Transport", width: "10%", cellFilter: "toDisplayName:\"TransportKind\"" },
-        { field: "physicalFlow.frequency", displayName: "Frequency", width: "10%", cellFilter: "toDisplayName:\"frequencyKind\"" },
-        { field: "physicalFlow.criticality", displayName: "Criticality", width: "10%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
-        { field: "specification.description", displayName: "Description", width: "18%" }
-    ];
-
-    vm.consumeColumnDefs = [
-        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), { width: "20%"} ),
-        { field: "specification.externalId", displayName: "Ext. Id", width: "10%" },
+    vm.columnDefs = [
+        Object.assign(mkEntityLinkGridCell("Name", "physicalFlow", "left"), { width: "25%"} ),
+        { field: "specification.externalId", displayName: "Ext. Id", width: "5%" },
         Object.assign(mkEntityLinkGridCell("Source", "logicalFlow.source", "left"), { width: "15%"} ),
+        Object.assign(mkEntityLinkGridCell("Target", "logicalFlow.target", "left"), { width: "15%" }),
         Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
-        { field: "specification.format", displayName: "Format", width: "8%", cellFilter: "toDisplayName:\"dataFormatKind\"" },
-        { field: "physicalFlow.transport", displayName: "Transport", width: "10%", cellFilter: "toDisplayName:\"TransportKind\"" },
-        { field: "physicalFlow.frequency", displayName: "Frequency", width: "10%", cellFilter: "toDisplayName:\"frequencyKind\"" },
-        { field: "physicalFlow.criticality", displayName: "Criticality", width: "10%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
-        { field: "specification.description", displayName: "Description", width: "16%" }
+        { field: "physicalFlow.criticality", displayName: "Criticality", width: "5%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
+        { field: "specification.description", displayName: "Description", width: "25%" },
+        // hidden columns - for local filtering
+        { field: "specification.format", displayName: "Format", visible:false, cellFilter: "toDisplayName:\"dataFormatKind\"" },
+        { field: "physicalFlow.transport", displayName: "Transport", visible:false, cellFilter: "toDisplayName:\"TransportKind\"" },
+        { field: "physicalFlow.frequency", displayName: "Frequency", visible:false, cellFilter: "toDisplayName:\"frequencyKind\"" }
     ];
 
     vm.unusedSpecificationsColumnDefs = [
@@ -128,8 +134,25 @@ function controller() {
     ];
 
     vm.$onChanges = () => {
-        Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows));
+        Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _allFlows));
     };
+
+    vm.changeFilter = (str) => {
+        switch (str) {
+            case "ALL":
+                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _allFlows));
+                vm.header = "All Flows";
+                break;
+            case "PRODUCES":
+                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _isProducer));
+                vm.header = "Produces";
+                break;
+            case "CONSUMES":
+                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _isConsumer));
+                vm.header = "Consumes";
+                break;
+        }
+    }
 }
 
 controller.$inject = ["$scope"];

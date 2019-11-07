@@ -105,7 +105,7 @@ public class PhysicalFlowDao {
         Select<Record> producedFlows = findByProducerEntityReferenceQuery(ref);
 
         return consumedFlows
-                .unionAll(producedFlows)
+                .union(producedFlows)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -322,23 +322,18 @@ public class PhysicalFlowDao {
 
 
     private Select<Record> findByProducerEntityReferenceQuery(EntityReference producer) {
-        Condition isOwner = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(producer.id())
-                .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(producer.kind().name()));
-
         Condition isSender = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(producer.id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(producer.kind().name()))
                 .and(LOGICAL_NOT_REMOVED);
 
-        Condition isProducer = isOwner.or(isSender);
-
         return dsl
-                .select(PHYSICAL_FLOW.fields())
+                .selectDistinct(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
                 .innerJoin(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
-                .where(dsl.renderInlined(isProducer))
+                .where(dsl.renderInlined(isSender))
                 .and(PHYSICAL_FLOW_NOT_REMOVED);
     }
 
@@ -349,7 +344,7 @@ public class PhysicalFlowDao {
                 .and(LOGICAL_NOT_REMOVED);
 
         return dsl
-                .select(PHYSICAL_FLOW.fields())
+                .selectDistinct(PHYSICAL_FLOW.fields())
                 .from(PHYSICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
