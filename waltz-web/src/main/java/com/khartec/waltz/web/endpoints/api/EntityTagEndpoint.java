@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.service.entity_tag.EntityTagService;
 import com.khartec.waltz.web.ListRoute;
@@ -67,10 +68,16 @@ public class EntityTagEndpoint implements Endpoint {
             return entityTagService.findTagsForEntityReference(ref);
         };
 
+        ListRoute<String> findTagsForEntityKind = (req, resp) -> {
+            EntityKind entityKind = getKind(req);
+            return entityTagService.findTagsForEntityKind(entityKind);
+        };
+
         getForList(mkPath(BASE_URL, "tags"), findAllTagsRoute);
         postForList(mkPath(BASE_URL, "tags"), findByTagRoute);
         postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
+        getForList(mkPath(BASE_URL, "tags-by-kind", ":kind"), findTagsForEntityKind);
     }
 
 }

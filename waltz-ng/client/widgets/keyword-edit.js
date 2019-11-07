@@ -21,6 +21,7 @@ import angular from "angular";
 import _ from "lodash";
 import {initialiseData} from "../common";
 import template from "./keyword-edit.html";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 /**
@@ -34,14 +35,16 @@ import template from "./keyword-edit.html";
 const bindings = {
     onCancel: "<",
     onSave: "<",
-    keywords: "<"
+    keywords: "<",
+    autoComplete: "<",
+    entityKind: "<"
 };
 
 
 const initialState = {};
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
@@ -52,7 +55,17 @@ function controller() {
 
     vm.save = () => {
         const values = _.map(vm.working, "text");
-        vm.onSave(values);
+        serviceBroker
+            .loadViewData(
+                CORE_API.EntityTagStore.findTagsByEntityKind,
+                [vm.entityKind], {force : true})
+            .then(r => {
+                const diff = _.difference(values, r.data);
+                const message = _.isEmpty(diff)
+                    ? "Updated Tags" : `New Tag [${diff}] added`;
+                vm.onSave(values, message);
+            });
+
     };
 
     vm.onKeyDown = (event) => {
@@ -61,10 +74,23 @@ function controller() {
             vm.onCancel();
         }
     };
+
+    vm.loadExistingTags = (query) => {
+        const filterTags = (availableTags) => {
+            return _.filter(availableTags,
+                tag => tag.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        };
+
+        return serviceBroker
+            .loadViewData(
+                CORE_API.EntityTagStore.findTagsByEntityKind,
+                [vm.entityKind])
+            .then(r => filterTags(r.data));
+    };
 }
 
 
-controller.$inject = [];
+controller.$inject = [ "ServiceBroker" ];
 
 
 const component = {
