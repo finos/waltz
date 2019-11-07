@@ -87,9 +87,10 @@
                                     <tbody>
                                     <tr ng-repeat="manager in ctrl.managers">
                                         <td>
-                                            <a ui-sref='main.profile.view ({userId: manager.userId})'
-                                               ng-bind="manager.displayName">
-                                            </a>
+                                            <waltz-entity-link entity-ref="manager"
+                                                               icon-placement="none"
+                                                               tooltip-placement="left">
+                                            </waltz-entity-link>
                                         </td>
                                     </tr>
                                     </tbody>
@@ -106,9 +107,10 @@
                                     <tbody>
                                     <tr ng-repeat="direct in ctrl.directs">
                                         <td>
-                                            <a ui-sref='main.profile.view ({userId: direct.userId})'
-                                               ng-bind="direct.displayName">
-                                            </a>
+                                            <waltz-entity-link entity-ref="direct"
+                                                               icon-placement="none"
+                                                               tooltip-placement="left">
+                                            </waltz-entity-link>
                                         </td>
                                     </tr>
                                     </tbody>

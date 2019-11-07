@@ -17,20 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from "lodash";
+import {initialiseData} from "../common";
+
+
 const bindings = {
-    text: "<"
+    text: "<",
+    context: "<?"
+};
+
+
+const initialState = {
+    variables: {}
 };
 
 
 const template = `
     <span ng-if="$ctrl.text" 
           class="waltz-markdown" 
-          markdown-to-html="$ctrl.text">
+          markdown-to-html="$ctrl.markdown">
     </span>`;
 
 
+function interpolate(templateFn, context = {}, templateStr = "") {
+    try {
+        return templateFn(context);
+    } catch (e) {
+        console.log("Failed to interpolate template with context", { context, templateStr })
+    }
+}
+
+
+function controller() {
+    const vm = initialiseData(this, initialState);
+
+    let templateFn = () => "";
+
+    vm.$onChanges = (c) => {
+        templateFn = _.template(vm.text, { variable: "ctx"});
+        vm.markdown = _.isEmpty(vm.context) ? vm.text : interpolate(templateFn, vm.context, vm.text);
+    };
+}
+
+
+/**
+ * This component will attempt to render the given `text` binding as markdown.  Using the optional
+ * context object allows for simple interpolation of variables.  For example:
+ *
+ * ```
+ *  <waltz-markdown text="'## Hello Simple bindings: ${ ctx.msg } / ${ctx.a.b}'"
+ *                  context="{ msg: 'bob!', a: { b: 2 } }">
+ *  </waltz-markdown>
+ * ```
+ *
+ * If variables are provided the interpolation is provided by the lodash `_.template` function.
+ *
+ * @type {{bindings: {text: string, context: string}, controller: controller, template: string}}
+ */
 const component = {
     bindings,
+    controller,
     template
 };
 

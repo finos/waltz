@@ -19,6 +19,43 @@
             <div class="col-sm-6">
                 <h1>Spacer</h1>
             </div>
+
+            <waltz-markdown text="'## Hello Simple bindings ${ ctx.msg } = ${ctx.a.b} / ${ctx.a.c || 3}'"
+                            context="{ msg: 'bob!', a: { b: 2 } }">
+            </waltz-markdown>
+
+            <waltz-markdown text="'## Hello Missing ${ ctx.msg }'"
+                            context="{ a: { b: 2 } }">
+            </waltz-markdown>
+
+            <waltz-markdown text="'## Hello No bindings'"
+                            context="{ a: { b: 2 } }">
+            </waltz-markdown>
+
+            <waltz-markdown text="'## Hello No Vars'">
+            </waltz-markdown>
+
+            <waltz-markdown text="'## Hello Missing nested ${ctx.foo.baa}'"
+                            context="{g: 491, a:2}">
+            </waltz-markdown>
+
+
+            <br>
+
+
+            <waltz-markdown text="'[Group link](http://int1.waltz.intranet.db.com/waltz-dev2/app-group/${ctx.g})'"
+                            context="{g: 491}">
+            </waltz-markdown>
+
+
+
+            <waltz-markdown text="'## Hello Updateable ${ ctx.msg }'"
+                            context="$ctrl.myVars">
+            </waltz-markdown>
+
+            <button ng-click="$ctrl.changeVars()">
+                Click me
+            </button>
         </div>
 
     </waltz-section>
