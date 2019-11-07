@@ -250,6 +250,17 @@
 
     <changeSet id="20191101-4469-5"
                author="muzammilali">
+        <comment>4469: added foreign key for tag in tag_usage table</comment>
+        <addForeignKeyConstraint baseTableName="tag_usage"
+                                 baseColumnNames="tag_id"
+                                 constraintName="tag_usage_tag_id_fk"
+                                 referencedTableName="tag"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20191101-4469-6"
+               author="muzammilali">
         <comment>4469: copy data from entity_tag table to tag table</comment>
        <sql>
            INSERT INTO tag (name, target_kind)
@@ -258,7 +269,7 @@
        </sql>
     </changeSet>
 
-    <changeSet id="20191101-4469-6"
+    <changeSet id="20191101-4469-7"
                author="muzammilali">
         <comment>4469: copy data from entity_tag table to tag_usage table</comment>
         <sql>
