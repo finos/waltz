@@ -18,12 +18,13 @@
  */
 
 import _ from "lodash";
-import { initialiseData, invokeFunction, termSearch } from "../../../common";
+import {initialiseData, invokeFunction, termSearch} from "../../../common";
 import template from "./grid-with-search.html";
 
 const bindings = {
     columnDefs: "<",
     entries: "<",
+    searchControlMinRows: "<?",
     searchPlaceholderText: "@",
     scopeProvider: "<?",
     onInitialise: "<",
@@ -39,7 +40,9 @@ const initialState = {
     filteredEntries: [],
     scopeProvider: null,
     searchFields: [],
+    searchControlMinRows: 10,
     searchPlaceholderText: "Search...",
+    searchQuery: null,
     onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),
     onChange: (gridApi) => {}
 };
@@ -58,13 +61,14 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        vm.filteredEntries = vm.entries;
+        vm.filterEntries(vm.searchQuery);
         vm.searchFields = mkSearchFields(vm.columnDefs);
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
 
 
     vm.filterEntries = query => {
+        vm.searchQuery = query;
         vm.filteredEntries = termSearch(vm.entries, query, vm.searchFields);
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
