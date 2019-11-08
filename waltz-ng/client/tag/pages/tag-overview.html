@@ -9,6 +9,13 @@
 
     <div class="row">
         <div class="col-md-8">
+            here
+            <span ng-if="ctrl.tag.name=='PHYSICAL_FLOW'">
+                <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
+                </waltz-physical-flow-section>
+            </span>
+
+
             <waltz-section name="{{ tag.name }}"
                            small="( {{tagSet.refs.length }} )"
                            icon="tag"

@@ -21,6 +21,7 @@
 import template from "./tag-overview.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
+import {mkRef} from "../../common/entity-utils";
 
 function controller($stateParams, serviceBroker) {
 
@@ -34,7 +35,11 @@ function controller($stateParams, serviceBroker) {
         .loadViewData(
             CORE_API.TagStore.getTagsWithUsageById,
             [ id ])
-        .then(r => vm.tag = r.data);
+        .then(r => {
+            vm.tag = r.data;
+            vm.entityReference = mkRef(vm.tag, "TAG");
+            console.log('data ', vm.tag);
+        });
 
 }
 
