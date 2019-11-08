@@ -35,7 +35,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
-import static com.khartec.waltz.schema.tables.EntityTag.ENTITY_TAG;
 import static com.khartec.waltz.schema.tables.Tag.TAG;
 import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
 import static java.util.Collections.emptyList;
@@ -80,8 +79,8 @@ public class TagDao {
                 .where(TAG.NAME.equalIgnoreCase(tag))
                 .orderBy(TAG_USAGE.ENTITY_ID)
                 .fetch(r -> EntityReference.mkRef(
-                        EntityKind.valueOf(r.getValue(ENTITY_TAG.ENTITY_KIND)),
-                        r.getValue(ENTITY_TAG.ENTITY_ID),
+                        EntityKind.valueOf(r.getValue(TAG_USAGE.ENTITY_KIND)),
+                        r.getValue(TAG_USAGE.ENTITY_ID),
                         r.getValue(ENTITY_NAME_FIELD)));
     }
 
