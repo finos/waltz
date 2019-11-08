@@ -107,7 +107,7 @@ public class RatingSchemeDAO {
     }
 
 
-    private List<RagName> fetchItems(Condition itemCondition) {
+    public List<RagName> fetchItems(Condition itemCondition) {
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)
                 .where(itemCondition)

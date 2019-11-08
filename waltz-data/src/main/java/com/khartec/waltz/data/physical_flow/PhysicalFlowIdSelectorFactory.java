@@ -30,6 +30,7 @@ import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.schema.Tables.CHANGE_UNIT;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
@@ -52,6 +53,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForFlowDiagram(options);
             case SERVER:
                 return mkForServer(options);
+            case CHANGE_SET:
+                return mkForChangeSet(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
@@ -94,6 +97,18 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .and(getLifecycleCondition(options));
+    }
+
+
+    private Select<Record1<Long>> mkForChangeSet(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(CHANGE_UNIT).on(PHYSICAL_FLOW.ID.eq(CHANGE_UNIT.SUBJECT_ENTITY_ID)
+                        .and(CHANGE_UNIT.SUBJECT_ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .where(CHANGE_UNIT.CHANGE_SET_ID.eq(options.entityReference().id()))
                 .and(getLifecycleCondition(options));
     }
 

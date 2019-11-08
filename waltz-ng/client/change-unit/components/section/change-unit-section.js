@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { executionStatus } from "../../../common/services/enums/execution-status";
-import { displayError } from "../../../common/error-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {executionStatus} from "../../../common/services/enums/execution-status";
+import {displayError} from "../../../common/error-utils";
 
 import template from "./change-unit-section.html";
+import * as _ from "lodash";
 
 
 const bindings = {
@@ -30,7 +31,10 @@ const bindings = {
 };
 
 
-const initialState = {};
+const initialState = {
+    selectedChangeUnit: null,
+    physicalFlowColumnDefs: preparePhysicalFlowColumnDefs()
+};
 
 
 function mkExecutionStatusUpdateCommand(cu, targetStatus) {
@@ -44,24 +48,36 @@ function mkExecutionStatusUpdateCommand(cu, targetStatus) {
 }
 
 
-function controller(notification, serviceBroker) {
+function mkAssessmentValuesString(changeUnit) {
+    const ratingNames = _
+        .chain(changeUnit.assessments)
+        .map(a => a.ratingDefinition.name)
+        .uniq()
+        .join(", ")
+        .value();
+
+    return ratingNames || "n/a";
+}
+
+
+function controller(notification, serviceBroker, $q) {
     const vm = initialiseData(this, initialState);
 
     const loadData = (force = false) => {
-        let cuPromise = null;
-        if(vm.parentEntityRef.kind === "CHANGE_SET") {
-            //load for change set id
-            cuPromise = serviceBroker
-                .loadViewData(CORE_API.ChangeUnitStore.findByChangeSetId, [vm.parentEntityRef.id], {force})
-                .then(r => r.data);
-        } else {
-            // load by subject ref
-            cuPromise = serviceBroker
-                .loadViewData(CORE_API.ChangeUnitStore.findBySubjectRef, [vm.parentEntityRef], {force})
-                .then(r => r.data);
-        }
-        return cuPromise
-            .then(changeUnits => vm.changeUnits = changeUnits);
+        const physicalFlowChangeUnitPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
+                [vm.parentEntityRef.id])
+            .then(r => {
+                const extendChangeUnitWithRatings = cu =>
+                    Object.assign({}, cu, { assessmentValues: mkAssessmentValuesString(cu) });
+
+                vm.physicalFlowChangeUnits =_.map(r.data, extendChangeUnitWithRatings);
+            });
+
+        return $q
+            .all([physicalFlowChangeUnitPromise])
+            .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
     };
 
 
@@ -99,12 +115,62 @@ function controller(notification, serviceBroker) {
                 .catch(e => displayError(notification, "Failed to discard change unit", e));
         }
     };
+
+
+    vm.onSelect = (row) => {
+
+        if (!_.isEmpty(row)) {
+            vm.selectedChangeUnit = row.changeUnit
+        } else {
+            vm.selectedChangeUnit = null;
+        }
+    }
+
+}
+
+
+function preparePhysicalFlowColumnDefs() {
+    return [
+        {
+            field: "changeUnit.action",
+            name: "Action",
+            width: "10%",
+            cellFilter: "toDisplayName:'changeAction'"
+        },
+        {
+            field: "changeUnit.executionStatus",
+            name: "Status",
+            width: "10%",
+            cellFilter: "toDisplayName:'executionStatus'"
+        },
+        {
+            field: "physicalSpecification.name",
+            name: "Physical Specification",
+            width: "30%"
+        },
+        {
+            field: "logicalFlow.source.name",
+            name: "Source",
+            width: "15%"
+        },
+        {
+            field: "logicalFlow.target.name",
+            name: "Target",
+            width: "15%"
+        },
+        {
+            field: "assessmentValues",
+            name: "Assessments",
+            width: "20%"
+        }
+    ];
 }
 
 
 controller.$inject = [
     "Notification",
-    "ServiceBroker"
+    "ServiceBroker",
+    "$q"
 ];
 
 

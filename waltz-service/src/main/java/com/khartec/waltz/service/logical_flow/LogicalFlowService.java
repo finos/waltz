@@ -116,9 +116,14 @@ public class LogicalFlowService {
     }
 
 
-    public Collection<LogicalFlow> findByIds(List<Long> ids) {
-        return logicalFlowDao.findByFlowIds(ids);
+    public Collection<LogicalFlow> findActiveByFlowIds(Collection<Long> ids) {
+        return logicalFlowDao.findActiveByFlowIds(ids);
 
+    }
+
+
+    public Collection<LogicalFlow> findAllByFlowIds(Collection<Long> ids) {
+        return logicalFlowDao.findAllByFlowIds(ids);
     }
 
 

@@ -20,11 +20,14 @@
 package com.khartec.waltz.service.rating_scheme;
 
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.rating.RatingScheme;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class RatingSchemeService {
@@ -43,5 +46,7 @@ public class RatingSchemeService {
     public RatingScheme getById(long id) {
         return ratingSchemeDAO.getById(id);
     }
+
+    public List<RagName> getAllRatingSchemeItems() {return ratingSchemeDAO.fetchItems(DSL.trueCondition()); }
 
 }

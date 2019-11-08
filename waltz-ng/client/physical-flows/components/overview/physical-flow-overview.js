@@ -100,8 +100,11 @@ function controller(serviceBroker) {
 
     };
 
-    vm.$onInit = () => {
-        load();
+
+    vm.$onChanges = (change) => {
+        if(change.parentEntityRef && vm.parentEntityRef) {
+            load();
+        }
     };
 
 }

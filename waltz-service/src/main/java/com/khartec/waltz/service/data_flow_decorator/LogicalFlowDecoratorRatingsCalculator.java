@@ -135,7 +135,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
     private List<LogicalFlow> loadFlows(Collection<LogicalFlowDecorator> decorators) {
         Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
-        return logicalFlowDao.findByFlowIds(dataFlowIds);
+        return logicalFlowDao.findActiveByFlowIds(dataFlowIds);
     }
 
 
