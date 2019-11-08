@@ -30,7 +30,7 @@ function personEmployeeIdBouncer($state, $stateParams, serviceBroker) {
         .then(r => r.data)
         .then(person => {
             if (person) {
-                return $state.go("main.person.id", {id: person.id});
+                return $state.go("main.person.id", {id: person.id}, { location: "replace"});
             } else {
                 console.log(`Cannot find corresponding person: ${empId}`);
             }

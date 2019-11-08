@@ -19,6 +19,43 @@
 
 import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
+import {initialiseData} from "../common";
+import {mkEntityLinkGridCell} from "../common/grid-utils";
+
+const columnDefs = [
+    mkEntityLinkGridCell("Entity", "surveyEntity", "left", "right"),
+    {
+        field: "status",
+        cellFilter: "toDisplayName:'surveyInstanceStatus'"
+    }, {
+        field: "dueDate",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents"> 
+                <waltz-from-now timestamp="COL_FIELD"
+                                days-only="true">
+                </waltz-from-now>
+            </div>`
+    }, {
+        field: "submittedBy",
+    }, {
+        field: "approvedBy",
+    }, {
+        field: "id",
+        name: "Actions",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <a class='clickable'
+                   ui-sref="main.survey.instance.response.view ({id: COL_FIELD })">
+                    Show survey
+                </a> 
+            </div>`
+    }
+];
+
+
+const initialState = {
+    columnDefs
+};
 
 
 function controller($stateParams,
@@ -28,7 +65,7 @@ function controller($stateParams,
                     surveyTemplateStore) {
 
     const id = $stateParams.id;
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const loadSurveyRun = () => surveyRunStore
         .getById(id)
@@ -42,7 +79,7 @@ function controller($stateParams,
     const loadInstances = () => {
         surveyInstanceStore
             .findForSurveyRun(id)
-            .then(xs => vm.surveyInstances = xs);
+            .then(xs => vm.surveyInstances = _.sortBy(xs, d => _.toLower(d.surveyEntity.name)));
     };
 
     loadSurveyRun();
@@ -50,19 +87,19 @@ function controller($stateParams,
 
     vm.updateDueDate = (newVal) => {
         if (!newVal) {
-            notification.error('Due date cannot be blank');
+            notification.error("Due date cannot be blank");
         } else {
-            if (confirm('This will update the due date of all the instances under this run. ' +
-                    'Are you sure you want to continue?')) {
+            if (confirm("This will update the due date of all the instances under this run. " +
+                    "Are you sure you want to continue?")) {
                 surveyRunStore.updateDueDate(id, {
-                    newDateVal: timeFormat('%Y-%m-%d')(newVal)
+                    newDateVal: timeFormat("%Y-%m-%d")(newVal)
                 })
                     .then(r => {
-                            notification.success('Survey run due date updated successfully');
-                            loadSurveyRun();
-                            loadInstances();
-                        },
-                        r => notification.error('Failed to update survey run due date')
+                        notification.success("Survey run due date updated successfully");
+                        loadSurveyRun();
+                        loadInstances();
+                    },
+                        r => notification.error("Failed to update survey run due date")
                     );
             }
         }
@@ -70,18 +107,18 @@ function controller($stateParams,
 }
 
 controller.$inject = [
-    '$stateParams',
-    'Notification',
-    'SurveyInstanceStore',
-    'SurveyRunStore',
-    'SurveyTemplateStore',
+    "$stateParams",
+    "Notification",
+    "SurveyInstanceStore",
+    "SurveyRunStore",
+    "SurveyTemplateStore",
 ];
 
 
 const page = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 

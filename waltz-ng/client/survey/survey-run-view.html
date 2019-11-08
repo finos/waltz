@@ -35,38 +35,12 @@
             </waltz-data-extract-link>
         </waltz-section-actions>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Entity</th>
-                <th>Status</th>
-                <th>Due</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="instance in ctrl.surveyInstances">
-                <td>
-                    <waltz-entity-link entity-ref="instance.surveyEntity">
-                    </waltz-entity-link>
-                </td>
-                <td>
-                    <span ng-bind="instance.status | toDisplayName:'surveyInstanceStatus'">
-                    </span>
-                </td>
-                <td>
-                    <waltz-from-now timestamp="instance.dueDate"
-                                    days-only="true">
-                    </waltz-from-now>
-                </td>
-                <td>
-                    <a class='clickable'
-                       ui-sref="main.survey.instance.response.view ({id: instance.id })">
-                        Show survey
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+        <waltz-grid-with-search ng-if="ctrl.surveyInstances.length > 0"
+                                column-defs="ctrl.columnDefs"
+                                entries="ctrl.surveyInstances"
+                                search-placeholder-text="Search...">
+        </waltz-grid-with-search>
+
     </waltz-section>
 </div>
