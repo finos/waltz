@@ -150,7 +150,7 @@ public class PhysicalSpecificationService {
     }
 
 
-    public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
+    public Collection<PhysicalSpecification> findByIds(Collection<Long> ids) {
         return specificationDao.findByIds(ids);
     }
 
