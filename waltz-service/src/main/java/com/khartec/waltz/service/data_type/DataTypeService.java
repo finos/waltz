@@ -56,6 +56,11 @@ public class DataTypeService {
     }
 
 
+    public DataType getDataTypeById(long dataTypeId) {
+        return dataTypeDao.getById(dataTypeId);
+    }
+
+
     public Collection<DataType> search(String query) {
         return searchDao.search(query, EntitySearchOptions.mkForEntity(EntityKind.DATA_TYPE));
     }

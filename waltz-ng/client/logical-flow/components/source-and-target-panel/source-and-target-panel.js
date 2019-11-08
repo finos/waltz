@@ -78,14 +78,15 @@ function filterByType(typeId, flows = [], decorators = []) {
 
 
 // flowId -> [ { id (typeId), rating }... ]
-function mkTypeInfo(decorators = []) {
+function mkTypeInfo(decorators = [], dataTypes) {
     return _.chain(decorators)
         .filter({ decoratorEntity: { kind: "DATA_TYPE" }})
         .groupBy(d => d.dataFlowId)
         .mapValues(xs => _.map(xs, x => {
             return {
                 id: x.decoratorEntity.id,
-                rating: x.rating
+                rating: x.rating,
+                name: _.get(dataTypes, x.decoratorEntity.id).name
             };
         }))
         .value();
@@ -157,6 +158,11 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
 
     vm.showAll = () => vm.filteredFlowData = resetFilter();
 
+    vm.$onInit = () => {
+        serviceBroker.loadViewData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
+    };
+
     vm.$onChanges = (changes) => {
 
         if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
@@ -168,7 +174,7 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
         const logicalFlowsById = _.keyBy(vm.logicalFlows, "id");
 
         function select(entity, type, logicalFlowId, evt) {
-            const typeInfoByFlowId = mkTypeInfo(vm.decorators);
+            const typeInfoByFlowId = mkTypeInfo(vm.decorators, vm.dataTypes);
             const types = typeInfoByFlowId[logicalFlowId] || [];
             const logicalFlow = logicalFlowsById[logicalFlowId];
             const physicalFlows = calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, logicalFlowId);
