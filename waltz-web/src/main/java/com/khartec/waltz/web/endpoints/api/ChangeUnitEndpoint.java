@@ -99,12 +99,10 @@ public class ChangeUnitEndpoint implements Endpoint {
         };
 
 
-
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findBySubjectRefPath, findBySubjectRefRoute);
         getForList(findByChangeSetIdPath, findByChangeSetIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
-
         postForDatum(updateExecutionStatusPath, updateExecutionStatusRoute);
     }
 

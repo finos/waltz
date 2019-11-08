@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,27 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.appview;
+package com.khartec.waltz.model.change_unit;
+
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.complexity.ComplexityRating;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.tag.Tag;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.util.Optional;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableAppView.class)
-@JsonDeserialize(as = ImmutableAppView.class)
-public abstract class AppView {
+@JsonSerialize(as = ImmutablePhysicalFlowChangeUnitViewItem.class)
+@JsonDeserialize(as = ImmutablePhysicalFlowChangeUnitViewItem.class)
+public abstract class PhysicalFlowChangeUnitViewItem extends ChangeUnitViewItem {
 
-    public abstract Application app();
-    public abstract List<Tag> tags();
-    public abstract List<String> aliases();
-    public abstract OrganisationalUnit organisationalUnit();
-    public abstract ComplexityRating complexity();
+    public abstract Optional<PhysicalSpecification> physicalSpecification();
+    public abstract LogicalFlow logicalFlow();
+
 }

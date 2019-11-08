@@ -249,7 +249,8 @@ public class LogicalFlowDecoratorService {
         Collection decorators = ratingsCalculator.calculate(unrated);
         int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
 
-        List<LogicalFlow> effectedFlows = logicalFlowDao.findByFlowIds(map(actions, UpdateDataFlowDecoratorsAction::flowId));
+        List<LogicalFlow> effectedFlows = logicalFlowDao.findActiveByFlowIds(
+                map(actions, UpdateDataFlowDecoratorsAction::flowId));
 
         List<EntityReference> effectedEntities = effectedFlows
                 .stream()

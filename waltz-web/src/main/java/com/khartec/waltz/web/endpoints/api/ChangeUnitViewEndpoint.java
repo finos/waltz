@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,41 +19,44 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.appview.AppView;
-import com.khartec.waltz.service.app_view.AppViewService;
-import com.khartec.waltz.web.DatumRoute;
+
+import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
+import com.khartec.waltz.service.change_unit.ChangeUnitViewService;
+import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+
 
 @Service
-public class AppViewEndpoint implements Endpoint {
+public class ChangeUnitViewEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "app-view");
+    private static final String BASE_URL = mkPath("api", "change-unit-view");
 
-    private final AppViewService appViewService;
-
+    private final ChangeUnitViewService service;
 
     @Autowired
-    public AppViewEndpoint(AppViewService appViewService) {
-        checkNotNull(appViewService, "appViewService must not be null");
+    public ChangeUnitViewEndpoint(ChangeUnitViewService service) {
+        checkNotNull(service, "service cannot be null");
 
-        this.appViewService = appViewService;
+        this.service = service;
     }
 
 
     @Override
     public void register() {
-        String getByIdPath = mkPath(BASE_URL, ":id");
 
-        DatumRoute<AppView> getByIdRoute = (request, response) -> appViewService.getAppView(getId(request));
+        String findByChangeSetIdForTypePath = mkPath(BASE_URL, "id", ":id", "physical-flow");
 
-        getForDatum(getByIdPath, getByIdRoute);
+        ListRoute<PhysicalFlowChangeUnitViewItem> findByChangeSetIdForTypeRoute = (request, response) ->
+                service.findPhysicalFlowChangeUnitsByChangeSetId(WebUtilities.getId(request));
+
+        getForList(findByChangeSetIdForTypePath, findByChangeSetIdForTypeRoute);
     }
 
 }

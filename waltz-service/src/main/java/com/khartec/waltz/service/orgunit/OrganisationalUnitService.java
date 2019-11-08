@@ -76,7 +76,7 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> findByIds(Long... ids) {
-        return time("OUS.findByIds", () -> dao.findByIds(ids));
+        return time("OUS.findActiveByFlowIds", () -> dao.findByIds(ids));
     }
 
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.service.app_view;
 
-import org.junit.Test;
+export function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/change-unit-view`;
 
+    const findPhysicalFlowChangeUnitsByChangeSetId = (id) => $http
+        .get(`${BASE}/id/${id}/physical-flow`)
+        .then(result => result.data);
 
-public class AppViewServiceTest {
-
-    @Test
-    public void foo() {
-
-
-    }
+    return {
+        findPhysicalFlowChangeUnitsByChangeSetId
+    };
 }
+
+
+store.$inject = [
+    "$http",
+    "BaseApiUrl",
+];
+
+
+export const serviceName = "ChangeUnitViewService";
+
+export const ChangeUnitViewService_API = {
+    findPhysicalFlowChangeUnitsByChangeSetId: {
+        serviceName,
+        serviceFnName: "findPhysicalFlowChangeUnitsByChangeSetId",
+        description: "find physical flow change units for change set"
+    }
+};
+
