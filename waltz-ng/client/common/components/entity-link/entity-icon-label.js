@@ -117,7 +117,7 @@ const entityLoaders = {
             };
 
             serviceBroker
-                .loadViewData(CORE_API.PhysicalSpecificationStore.getById, [ flow.specificationId ])
+                .loadViewData(CORE_API.PhysicalSpecificationStore.getById, [flow.specificationId])
                 .then(r => {
                     specificationFormat.value = displayNameService.lookup("dataFormatKind", r.data.format, "?");
                     flow.name = r.data.name;
@@ -131,7 +131,7 @@ const entityLoaders = {
                 }, {
                     name: "Criticality",
                     value: displayNameService.lookup("criticality", flow.criticality, "?")
-                },{
+                }, {
                     name: "Transport",
                     value: displayNameService.lookup("TransportKind", flow.transport, "?")
                 }, {
@@ -144,8 +144,16 @@ const entityLoaders = {
                     value: flow.provenance
                 }];
         }
+    },
+    "DATA_TYPE": {
+        method: CORE_API.DataTypeStore.getDataTypeById,
+        mkProps: (dt) => ([
+            {
+                name: "Code",
+                value: dt.code || "n/a"
+            }
+        ])
     }
-
 };
 
 

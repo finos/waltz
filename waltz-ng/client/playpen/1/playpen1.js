@@ -32,6 +32,13 @@ function controller($element, $q, serviceBroker) {
 
     vm.$onInit = () => {
     };
+
+    vm.myVars = {};
+
+    let x = 0;
+    vm.changeVars = () => {
+        vm.myVars = { msg: "Hello " + (x ++ ) };
+    };
 }
 
 controller.$inject = [];

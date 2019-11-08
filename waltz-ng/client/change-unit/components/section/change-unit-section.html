@@ -3,10 +3,19 @@
 
         <div ng-if="$ctrl.changeUnits.length > 0"
              style="padding: 20px;">
-            <div class="row"
-                 ng-repeat="cu in $ctrl.changeUnits">
 
-                <waltz-sub-section name="{{ cu.name }} ({{cu.externalId}})">
+            <div class="row">
+                <h4>Physical Flows</h4>
+                <waltz-grid-with-search column-defs="$ctrl.physicalFlowColumnDefs"
+                                        entries="$ctrl.physicalFlowChangeUnits"
+                                        search-placeholder-text="Search physical flow change units"
+                                        on-row-select="$ctrl.onSelect">
+                </waltz-grid-with-search>
+                <br>
+            </div>
+
+            <div class="row">
+                <waltz-sub-section ng-if="$ctrl.selectedChangeUnit" name="{{ $ctrl.selectedChangeUnit.name }} ({{$ctrl.selectedChangeUnit.externalId}})">
                     <content>
                         <div class="waltz-sub-section-content">
                             <div class="row">
@@ -17,7 +26,7 @@
                                         </div>
 
                                         <div class="col-sm-10">
-                                            <div ng-bind="cu.description"></div>
+                                            <div ng-bind="$ctrl.selectedChangeUnit.description"></div>
                                         </div>
                                     </div>
 
@@ -26,7 +35,7 @@
                                             Action
                                         </div>
                                         <div class="col-sm-10">
-                                            <span ng-bind="cu.action | toDisplayName:'changeAction'"></span>
+                                            <span ng-bind="$ctrl.selectedChangeUnit.action | toDisplayName:'changeAction'"></span>
                                             </span>
                                         </div>
                                     </div>
@@ -36,7 +45,7 @@
                                             Status
                                         </div>
                                         <div class="col-sm-10">
-                                            <span ng-bind="cu.executionStatus | toDisplayName:'executionStatus'"></span>
+                                            <span ng-bind="$ctrl.selectedChangeUnit.executionStatus | toDisplayName:'executionStatus'"></span>
                                             </span>
                                         </div>
                                     </div>
@@ -46,18 +55,18 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <!-- Assessment Ratings -->
-                                            <waltz-assessment-rating-sub-section parent-entity-ref="cu">
+                                            <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.selectedChangeUnit">
                                             </waltz-assessment-rating-sub-section>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-7">
-                                    <div ng-if="cu.subjectEntity.kind === 'PHYSICAL_FLOW' && cu.action !== 'MODIFY'"
+                                    <div ng-if="$ctrl.selectedChangeUnit.subjectEntity.kind === 'PHYSICAL_FLOW' && $ctrl.selectedChangeUnit.action !== 'MODIFY'"
                                          ng-include="'cus-physical-flow-overview'">
                                     </div>
 
-                                    <div ng-if="cu.action === 'MODIFY'"
+                                    <div ng-if="$ctrl.selectedChangeUnit.action === 'MODIFY'"
                                          ng-include="'cus-attribute-change'">
                                     </div>
                                 </div>
@@ -65,7 +74,7 @@
 
                             <div class="row">
                                 <div class="col-md-5">
-                                    <waltz-last-updated entity="cu" class="small text-muted">
+                                    <waltz-last-updated entity="$ctrl.selectedChangeUnit" class="small text-muted">
                                     </waltz-last-updated>
                                 </div>
                             </div>
@@ -75,17 +84,17 @@
                         <div class="waltz-sub-section-controls">
 
                             <span waltz-has-role="CHANGE_SET_EDITOR"
-                                  ng-if="cu.executionStatus === 'PENDING'">
+                                  ng-if="$ctrl.selectedChangeUnit.executionStatus === 'PENDING'">
                                 <span>|</span>
-                                <a ng-click="$ctrl.completeChangeUnit(cu)"
+                                <a ng-click="$ctrl.completeChangeUnit($ctrl.selectedChangeUnit)"
                                    class="clickable">
                                     Complete
                                 </a>
                             </span>
 
                             <span waltz-has-role="CHANGE_SET_EDITOR"
-                                  ng-if="cu.executionStatus === 'PENDING'">
-                                <a ng-click="$ctrl.discardChangeUnit(cu)"
+                                  ng-if="$ctrl.selectedChangeUnit.executionStatus === 'PENDING'">
+                                <a ng-click="$ctrl.discardChangeUnit($ctrl.selectedChangeUnit)"
                                    class="clickable">
                                     Discard
                                 </a>
@@ -119,7 +128,7 @@
     <waltz-sub-section name="Details">
         <content>
             <div class="waltz-sub-section-content">
-                <waltz-physical-flow-overview parent-entity-ref="cu.subjectEntity"
+                <waltz-physical-flow-overview parent-entity-ref="$ctrl.selectedChangeUnit.subjectEntity"
                                               class="waltz-highlight-if">
                 </waltz-physical-flow-overview>
             </div>
@@ -128,7 +137,7 @@
                 <span>
                     <waltz-entity-link entity-ref="{
                         kind: 'PHYSICAL_FLOW',
-                        id: cu.subjectEntity.id,
+                        id: $ctrl.selectedChangeUnit.subjectEntity.id,
                         name: 'Go to physical flow'}">
                     </waltz-entity-link>
                 </span>
@@ -145,7 +154,7 @@
     <waltz-sub-section name="Details">
         <content>
             <div class="waltz-sub-section-content">
-                <waltz-attribute-change-panel change-unit="cu"
+                <waltz-attribute-change-panel change-unit="$ctrl.selectedChangeUnit"
                                               class="waltz-highlight-if">
                 </waltz-attribute-change-panel>
             </div>
@@ -153,8 +162,8 @@
             <div class="waltz-sub-section-controls">
                 <span>
                     <waltz-entity-link entity-ref="{
-                        kind: cu.subjectEntity.kind,
-                        id: cu.subjectEntity.id,
+                        kind: $ctrl.selectedChangeUnit.subjectEntity.kind,
+                        id: $ctrl.selectedChangeUnit.subjectEntity.id,
                         name: 'Go to physical flow'
                       }">
                     </waltz-entity-link>

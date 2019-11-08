@@ -58,9 +58,19 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
                 return mkByAppSelector(options);
             case PHYSICAL_FLOW:
                 return mkForDirectEntity(options);
+            case CHANGE_SET:
+                return mkForChangeSet(options);
             default:
                 throw new UnsupportedOperationException("Cannot create Change Unit selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForChangeSet(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .select(CHANGE_UNIT.ID)
+                .from(CHANGE_UNIT)
+                .where(CHANGE_UNIT.CHANGE_SET_ID.eq(options.entityReference().id()));
     }
 
 

@@ -119,7 +119,7 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public Collection<PhysicalSpecification> findByIds(List<Long> ids) {
+    public Collection<PhysicalSpecification> findByIds(Collection<Long> ids) {
         return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(ids))
                 .fetch(TO_DOMAIN_MAPPER);
     }

@@ -17,14 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {registerStores} from "../../common/module-utils";
 
-import * as changeUnitStore from "./change-unit-store";
-import * as changeUnitViewService from "./change-unit-view-service";
+export function store($http, BaseApiUrl) {
+    const BASE = `${BaseApiUrl}/change-unit-view`;
+
+    const findPhysicalFlowChangeUnitsByChangeSetId = (id) => $http
+        .get(`${BASE}/id/${id}/physical-flow`)
+        .then(result => result.data);
+
+    return {
+        findPhysicalFlowChangeUnitsByChangeSetId
+    };
+}
 
 
-export default (module) => {
-    registerStores(module, [
-        changeUnitStore,
-        changeUnitViewService ]);
+store.$inject = [
+    "$http",
+    "BaseApiUrl",
+];
+
+
+export const serviceName = "ChangeUnitViewService";
+
+export const ChangeUnitViewService_API = {
+    findPhysicalFlowChangeUnitsByChangeSetId: {
+        serviceName,
+        serviceFnName: "findPhysicalFlowChangeUnitsByChangeSetId",
+        description: "find physical flow change units for change set"
+    }
 };
+
