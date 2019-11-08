@@ -1,0 +1,34 @@
+<div>
+
+    <waltz-page-header name="{{ ctrl.tag.name }}" icon="tags">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Tag Overview</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="row">
+        <div class="col-md-8">
+            <waltz-section name="{{ tag.name }}"
+                           small="( {{tagSet.refs.length }} )"
+                           icon="tag"
+                           ng-repeat="tagSet in ctrl.tagSets">
+
+                <ul>
+                    <li ng-repeat="refGroup in tagSet.refsByKind">
+                        <h4 ng-bind="refGroup.key | toDisplayName:'entity'"></h4>
+                        <ul>
+                            <li ng-repeat="ref in refGroup.values">
+                                <waltz-entity-link entity-ref="ref"></waltz-entity-link>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </waltz-section>
+        </div>
+    </div>
+
+
+
+
+</div>

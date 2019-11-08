@@ -17,37 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tagExplorerView from './tag-explorer';
-import tagOverview from './pages/tag-overview';
+
+import template from "./tag-overview.html";
+import {initialiseData} from "../../common";
+import {CORE_API} from "../../common/services/core-api-utils";
+
+function controller($stateParams, serviceBroker) {
 
 
-const base = {
-    url: 'tags'
-};
+    console.log('1. new tag page');
+    const vm = initialiseData(this);
+    const id = $stateParams.id;
+    const entityReference = { id, kind: "TAG" };
 
+    serviceBroker
+        .loadViewData(
+            CORE_API.TagStore.getTagsWithUsageById,
+            [ id ])
+        .then(r => vm.tag = r.data);
 
-const explorerState = {
-    url: '/explorer/{tag:string}',
-    views: {'content@': tagExplorerView }
-};
-
-const viewState = {
-    url: '/id/{id:int}',
-    views: {'content@': tagOverview }
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state('main.tag', base)
-        .state('main.tag.explorer', explorerState)
-        .state('main.tag.overview', viewState);
 }
 
-
-setup.$inject = [
-    '$stateProvider'
-];
+controller.$inject = ["$stateParams", "ServiceBroker"];
 
 
-export default setup;
+export default {
+    template,
+    controller,
+    controllerAs: "ctrl",
+    bindToController: true,
+    scope: {}
+};
+

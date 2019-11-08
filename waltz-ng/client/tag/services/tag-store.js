@@ -30,6 +30,10 @@ export function store($http, base) {
         .get(`${BASE}/${tag}`)
         .then(x => x.data);
 
+    const getTagsWithUsageById = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(x => x.data);
+
     const findTagsByEntityRef = (ref) => $http
         .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
         .then(x => x.data);
@@ -50,6 +54,7 @@ export function store($http, base) {
     return {
         findAllTags,
         findByTag,
+        getTagsWithUsageById,
         findTagsByEntityRef,
         findTagsByEntityKind,
         update
@@ -76,6 +81,11 @@ export const TagStore_API = {
         serviceName,
         serviceFnName: 'findByTag',
         description: 'executes findByTag'
+    },
+    getTagsWithUsageById: {
+        serviceName,
+        serviceFnName: 'getTagsWithUsageById',
+        description: 'executes getTagsWithUsageById'
     },
     findTagsByEntityRef: {
         serviceName,

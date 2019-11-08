@@ -23,6 +23,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.tag.Tag;
 import com.khartec.waltz.service.tag.TagService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -57,6 +57,9 @@ public class TagEndpoint implements Endpoint {
         ListRoute<EntityReference> findByTagRoute = (request, response)
                 -> tagService.findByTag(request.params("tag"));
 
+        DatumRoute<Tag> getByIdRoute = (req, res) ->
+             tagService.getTagWithUsageById(getId(req));
+
         ListRoute<Tag> updateRoute = (req, resp) -> {
             String username = getUsername(req);
             EntityReference ref = getEntityReference(req);
@@ -76,9 +79,10 @@ public class TagEndpoint implements Endpoint {
 
         getForList(mkPath(BASE_URL), findAllTagsRoute);
         getForList(mkPath(BASE_URL, ":tag"), findByTagRoute);
-        postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
+        getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
         getForList(mkPath(BASE_URL, "target-kind", ":kind"), findTagsForEntityKind);
+        postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
     }
 
 }
