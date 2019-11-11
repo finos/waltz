@@ -19,8 +19,9 @@
 
 import angular from "angular";
 import _ from "lodash";
-import {initialiseData} from "../common";
-import template from "./keyword-edit.html";
+import {initialiseData} from "../../common";
+import template from "./tag-edit.html";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 /**
@@ -34,14 +35,15 @@ import template from "./keyword-edit.html";
 const bindings = {
     onCancel: "<",
     onSave: "<",
-    keywords: "<"
+    keywords: "<",
+    entityKind: "<"
 };
 
 
 const initialState = {};
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
@@ -51,17 +53,44 @@ function controller() {
     };
 
     vm.save = () => {
-        const values = _.map(vm.working, "text");
-        vm.onSave(values);
+        const values = _.map(vm.working, "name");
+        serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKind,
+                [vm.entityKind], {force : true})
+            .then(r => {
+                const diff = _.difference(values, _.map(r.data, d => d.name));
+                const message = _.isEmpty(diff)
+                    ? "Updated Tags" : `New Tag [${diff}] created`;
+                vm.onSave(values, message);
+            });
+
     };
 
     vm.onKeyDown = (event) => {
-        if (event.ctrlKey && event.keyCode === 13) {  // ctrl + enter
+        if (event.ctrlKey && event.keyCode === 13) {
+            // ctrl + enter
             vm.save();
             vm.onCancel();
         }
     };
+
+    vm.loadExistingTags = (query) => {
+        const filterTags = (availableTags) => {
+            return _.filter(availableTags,
+                tag => tag.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        };
+
+        return serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKind,
+                [vm.entityKind])
+            .then(r => filterTags(r.data));
+    };
 }
+
+
+controller.$inject = [ "ServiceBroker" ];
 
 
 const component = {

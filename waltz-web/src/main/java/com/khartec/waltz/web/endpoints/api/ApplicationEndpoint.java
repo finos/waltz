@@ -26,10 +26,11 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.tag.Tag;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.entity_tag.EntityTagService;
+import com.khartec.waltz.service.tag.TagService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
@@ -61,20 +62,20 @@ public class ApplicationEndpoint implements Endpoint {
 
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
-    private final EntityTagService entityTagService;
+    private final TagService tagService;
 
 
     @Autowired
     public ApplicationEndpoint(ApplicationService appService,
                                ChangeLogService changeLogService,
-                               EntityTagService entityTagService) {
+                               TagService tagService) {
         checkNotNull(appService, "appService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(entityTagService, "appTagService cannot be null");
+        checkNotNull(tagService, "appTagService cannot be null");
 
         this.appService = appService;
         this.changeLogService = changeLogService;
-        this.entityTagService = entityTagService;
+        this.tagService = tagService;
     }
 
 
@@ -184,8 +185,8 @@ public class ApplicationEndpoint implements Endpoint {
         ListRoute<Application> findByAssetCodeRoute = ((request, response)
                 -> appService.findByAssetCode(request.splat()[0]));
 
-        ListRoute<String> getAppTagsRoute = (request, response)
-                -> entityTagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, getId(request)));
+        ListRoute<Tag> getAppTagsRoute = (request, response)
+                -> tagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, getId(request)));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);

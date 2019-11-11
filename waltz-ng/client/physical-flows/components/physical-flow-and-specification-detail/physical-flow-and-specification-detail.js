@@ -22,7 +22,7 @@ function controller(serviceBroker) {
         if (vm.physicalFlow) {
             serviceBroker
                 .loadViewData(
-                    CORE_API.EntityTagStore.findTagsByEntityRef,
+                    CORE_API.TagStore.findTagsByEntityRef,
                     [toEntityRef(vm.physicalFlow)],
                     { force: true })
                 .then(r => vm.tags = r.data);

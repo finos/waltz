@@ -40,9 +40,9 @@
                 <br>
                 <ul class="waltz-keyword-list">
                     <li ng-repeat="tag in ctrl.tags | filter:tagQuery"
-                        ng-bind="tag"
+                        ng-bind="tag.name"
                         class="clickable"
-                        ng-click="ctrl.addTagSet(tag)">
+                        ng-click="ctrl.addTagSet(tag.name)">
                     </li>
                 </ul>
             </waltz-section>

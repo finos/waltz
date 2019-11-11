@@ -23,7 +23,6 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
 import com.khartec.waltz.data.entity_alias.EntityAliasDao;
-import com.khartec.waltz.data.entity_tag.EntityTagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -31,6 +30,7 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.service.tag.TagService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class ApplicationService {
 
 
     private final ApplicationDao applicationDao;
-    private final EntityTagDao entityTagDao;
+    private final TagService tagService;
     private final EntityAliasDao entityAliasDao;
     private final ApplicationSearchDao appSearchDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -61,16 +61,16 @@ public class ApplicationService {
 
     @Autowired
     public ApplicationService(ApplicationDao appDao,
-                              EntityTagDao entityTagDao,
+                              TagService tagService,
                               EntityAliasDao entityAliasDao,
                               ApplicationSearchDao appSearchDao) {
         checkNotNull(appDao, "appDao must not be null");
-        checkNotNull(entityTagDao, "entityTagDao must not be null");
+        checkNotNull(tagService, "tagService must not be null");
         checkNotNull(entityAliasDao, "entityAliasDao must not be null");
         checkNotNull(appSearchDao, "appSearchDao must not be null");
 
         this.applicationDao = appDao;
-        this.entityTagDao = entityTagDao;
+        this.tagService = tagService;
         this.entityAliasDao = entityAliasDao;
         this.appSearchDao = appSearchDao;
     }
@@ -125,7 +125,7 @@ public class ApplicationService {
             entityAliasDao.updateAliases(entityReference,
                     request.aliases());
 
-            entityTagDao.updateTags(entityReference, request.tags(), username);
+            tagService.updateTags(entityReference, request.tags(), username);
         }
 
         return response;
