@@ -41,6 +41,7 @@ import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
 
 
 public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
@@ -74,9 +75,27 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForPhysicalSpecification(options);
             case SERVER:
                 return mkForServer(options);
+            case TAG:
+                return mkForTag(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long tagId = options.entityReference().id();
+
+        return DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(TAG_USAGE)
+                .on(TAG_USAGE.ENTITY_ID.eq(PHYSICAL_FLOW.ID)
+                        .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .where(TAG_USAGE.TAG_ID.eq(tagId))
+                .and(mkLifecycleStatusCondition(options));
     }
 
 

@@ -8,34 +8,19 @@
     </waltz-page-header>
 
     <div class="row">
-        <div class="col-md-8">
-            here
-            <span ng-if="ctrl.tag.name=='PHYSICAL_FLOW'">
-                <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
+        <div class="col-md-12">
+            <span ng-if="ctrl.tag.targetKind=='PHYSICAL_FLOW'">
+                <waltz-physical-flow-section
+                    parent-entity-ref="ctrl.entityReference"
+                    optional-column-defs="ctrl.physicalFlowColumnDefs">
                 </waltz-physical-flow-section>
             </span>
+            <span ng-if="ctrl.tag.targetKind=='APPLICATION'">
+                <waltz-simple-app-table
+                    parent-entity-ref="ctrl.entityReference">
+                </waltz-simple-app-table>
 
-
-            <waltz-section name="{{ tag.name }}"
-                           small="( {{tagSet.refs.length }} )"
-                           icon="tag"
-                           ng-repeat="tagSet in ctrl.tagSets">
-
-                <ul>
-                    <li ng-repeat="refGroup in tagSet.refsByKind">
-                        <h4 ng-bind="refGroup.key | toDisplayName:'entity'"></h4>
-                        <ul>
-                            <li ng-repeat="ref in refGroup.values">
-                                <waltz-entity-link entity-ref="ref"></waltz-entity-link>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </waltz-section>
+            </span>
         </div>
     </div>
-
-
-
-
 </div>

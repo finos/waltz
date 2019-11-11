@@ -58,7 +58,7 @@ public class TagEndpoint implements Endpoint {
                 -> tagService.findByTag(request.params("tag"));
 
         DatumRoute<Tag> getByIdRoute = (req, res) ->
-             tagService.getTagWithUsageById(getId(req));
+             tagService.getById(getId(req));
 
         ListRoute<Tag> updateRoute = (req, resp) -> {
             String username = getUsername(req);

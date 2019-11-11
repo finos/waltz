@@ -22,15 +22,14 @@ import template from "./tag-list.html";
 
 
 /**
- * @name waltz-keyword-list
+ * @name waltz-tag-list
  *
  * @description
  * This component ...
  */
 
 const bindings = {
-    keywords: "<",
-    onSelect: "&?"
+    keywords: "<"
 };
 
 const transclude = {
@@ -42,19 +41,21 @@ const transclude = {
 const initialState = {};
 
 
-function controller() {
+function controller($state) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
 
-    vm.$onChanges = (c) => {
-    };
-
-
+    vm.onTagSelect = (tag) => {
+        const params = { id: tag.id };
+        $state.go("main.tag.overview", params);
+    }
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    "$state"
+];
 
 
 const component = {

@@ -21,26 +21,30 @@
 import template from "./tag-overview.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {mkRef} from "../../common/entity-utils";
+import {mkEnumGridCell, mkLinkGridCell} from "../../common/grid-utils";
 
 function controller($stateParams, serviceBroker) {
 
-
-    console.log('1. new tag page');
     const vm = initialiseData(this);
     const id = $stateParams.id;
-    const entityReference = { id, kind: "TAG" };
+
+    vm.entityReference = { id, kind: "TAG" };
 
     serviceBroker
         .loadViewData(
             CORE_API.TagStore.getTagsWithUsageById,
             [ id ])
-        .then(r => {
-            vm.tag = r.data;
-            vm.entityReference = mkRef(vm.tag, "TAG");
-            console.log('data ', vm.tag);
-        });
+        .then(r => vm.tag = r.data);
 
+    vm.physicalFlowColumnDefs = [
+        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), {width: "15%"}),
+        Object.assign(mkLinkGridCell("Source App", `${"logicalFlow.source"}.name`, `${"logicalFlow.source"}.id`, "main.app.view"), {width: "10%"}),
+        Object.assign(mkLinkGridCell("Target App", `${"logicalFlow.target"}.name`, `${"logicalFlow.target"}.id`, "main.app.view"), {width: "10%"}),
+        { field: 'specification.externalId', displayName: 'Ext. Id' },
+        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), {width: "8%"}),
+        { field: 'flow.frequency', displayName: 'Frequency', width: "10%" },
+        { field: 'specification.description', displayName: 'Description'}
+    ];
 }
 
 controller.$inject = ["$stateParams", "ServiceBroker"];

@@ -23,7 +23,6 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.tag.TagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.tag.ImmutableTag;
 import com.khartec.waltz.model.tag.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,12 +106,7 @@ public class TagService {
         tagDao.createTagUsage(ref, username, tagId);
     }
 
-    public Tag getTagWithUsageById(long id) {
-        Tag tag = tagDao.getById(id);
-        return ImmutableTag
-                .builder()
-                .from(tag)
-                .tagUsages(tagDao.getTagUsageByTagId(id))
-                .build();
+    public Tag getById(long id) {
+        return tagDao.getById(id);
     }
 }

@@ -101,9 +101,22 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForPerson(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
+            case TAG:
+                return mkForTag(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
+        Condition applicationConditions = mkApplicationConditions(options);
+        return DSL.select(TAG_USAGE.ENTITY_ID)
+                .from(TAG_USAGE)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(TAG_USAGE.ENTITY_ID))
+                .where(TAG_USAGE.TAG_ID.eq(options.entityReference().id()))
+                .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(applicationConditions);
     }
 
 

@@ -23,9 +23,7 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.tag.ImmutableTag;
-import com.khartec.waltz.model.tag.ImmutableTagUsage;
 import com.khartec.waltz.model.tag.Tag;
-import com.khartec.waltz.model.tag.TagUsage;
 import com.khartec.waltz.schema.tables.records.TagRecord;
 import com.khartec.waltz.schema.tables.records.TagUsageRecord;
 import org.jooq.*;
@@ -173,37 +171,11 @@ public class TagDao {
                 .build();
     };
 
-    private static final RecordMapper<Record, TagUsage> TO_TAG_USAGE_DOMAIN_MAPPER = r -> {
-        TagUsageRecord record = r.into(TagUsageRecord.class);
-
-        return ImmutableTagUsage.builder()
-                .tagId(record.getTagId())
-                .createdAt(record.getCreatedAt().toLocalDateTime())
-                .createdBy(record.getCreatedBy())
-                .provenance(record.getProvenance())
-                .entityReference(mkRef(
-                        EntityKind.valueOf(r.getValue(TAG_USAGE.ENTITY_KIND)),
-                        r.getValue(TAG_USAGE.ENTITY_ID),
-                        r.getValue(ENTITY_NAME_FIELD)))
-                .build();
-    };
-
     public Tag getById(long id) {
         return dsl
                 .select(TAG.fields())
                 .from(TAG)
                 .where(TAG.ID.eq(id))
                 .fetchOne(TO_TAG_DOMAIN_MAPPER);
-    }
-
-    public List<TagUsage> getTagUsageByTagId(long tagId) {
-        return dsl
-                .select(TAG_USAGE.fields())
-                .select(ENTITY_NAME_FIELD)
-                .from(TAG)
-                .join(TAG_USAGE)
-                .on(TAG_USAGE_JOIN_CONDITION)
-                .where(TAG.ID.eq(tagId))
-                .fetch(TO_TAG_USAGE_DOMAIN_MAPPER);
     }
 }

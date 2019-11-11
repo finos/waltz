@@ -25,28 +25,31 @@ import template from "./physical-flow-table.html";
 
 const bindings = {
     parentEntityRef: '<',
-    onInitialise: '<'
+    onInitialise: '<',
+    optionalColumnDefs: '<'
 };
 
 
 const initialState = {
-    columnDefs: [],
-    tableData: [],
+    tableData: []
 };
 
 
 function mkData(primaryRef,
                 specifications = [],
-                physicalFlows = [])
+                physicalFlows = [],
+                logicalFLows = [])
 {
     if (!primaryRef) return [];
 
     const specsById = _.keyBy(specifications, 'id');
+    const logicalFlowsById = _.keyBy(logicalFLows, 'id');
 
     const enrichFlow = (pf) => {
         return {
             physicalFlow: pf,
-            specification: specsById[pf.specificationId]
+            specification: specsById[pf.specificationId],
+            logicalFlow: logicalFlowsById[pf.logicalFlowId]
         };
     };
 
@@ -56,17 +59,18 @@ function mkData(primaryRef,
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    vm.columnDefs = [
+    const defaultColumnDefs = [
         Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id', width: "12%" },
+        { field: 'specification.externalId', displayName: 'Ext. Id'},
         Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
-        { field: 'specification.format', displayName: 'Format', width: "8%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "10%", cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "8%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.criticality', displayName: 'Criticality', width: "8%", cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
-        { field: 'specification.description', displayName: 'Description', width: "23%" }
+        { field: 'specification.format', displayName: 'Format', cellFilter: 'toDisplayName:"dataFormatKind"' },
+        { field: 'physicalFlow.transport', displayName: 'Transport', cellFilter: 'toDisplayName:"TransportKind"' },
+        { field: 'physicalFlow.frequency', displayName: 'Frequency', cellFilter: 'toDisplayName:"frequencyKind"' },
+        { field: 'physicalFlow.criticality', displayName: 'Criticality', cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
+        { field: 'specification.description', displayName: 'Description', }
     ];
+
+    vm.columnDefs = vm.optionalColumnDefs == null ? defaultColumnDefs : vm.optionalColumnDefs;
 
     vm.$onInit = () => {
         vm.selector = {
@@ -81,11 +85,27 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [vm.selector])
             .then(r => r.data);
 
-        $q.all([flowPromise, specPromise])
-            .then(([flows, specs]) => {
-                vm.tableData = mkData(vm.parentEntityRef, specs, flows);
-            });
+        loadTableData(flowPromise, specPromise);
+
     };
+
+    function loadTableData(flowPromise, specPromise) {
+        if (vm.parentEntityRef.kind === "TAG") {
+            const logicalFlowPromise = serviceBroker
+                .loadViewData(CORE_API.LogicalFlowStore.findBySelector, [vm.selector])
+                .then(r => r.data);
+
+            $q.all([flowPromise, specPromise, logicalFlowPromise])
+                .then(([physicalFlows, specs, logicalFlows]) => {
+                    vm.tableData = mkData(vm.parentEntityRef, specs, physicalFlows, logicalFlows);
+                });
+        } else {
+            $q.all([flowPromise, specPromise])
+                .then(([physicalFlows, specs]) => {
+                    vm.tableData = mkData(vm.parentEntityRef, specs, physicalFlows);
+                });
+        }
+    }
 
     vm.$onChanges = (changes) => {
     };
