@@ -1,0 +1,15 @@
+<waltz-section name="Applications"
+               icon="desktop"
+               id="simple-app-table-section"
+               collapsible="false">
+    <div>
+        <waltz-app-table applications="$ctrl.apps">
+        </waltz-app-table>
+        <waltz-no-data ng-if="$ctrl.apps.length == 0">
+            <message>
+                There are <strong>no application </strong>
+                associations.
+            </message>
+        </waltz-no-data>
+    </div>
+</waltz-section>
