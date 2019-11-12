@@ -18,7 +18,8 @@
  */
 
 import tagExplorerView from './tag-explorer';
-import tagOverview from './pages/tag-overview';
+import tagApplicationView from './pages/tag-application-view';
+import tagPhysicalFlowView from './pages/tag-physical-flow-view';
 
 
 const base = {
@@ -31,9 +32,15 @@ const explorerState = {
     views: {'content@': tagExplorerView }
 };
 
-const viewState = {
-    url: '/id/{id:int}',
-    views: {'content@': tagOverview }
+
+const appViewState = {
+    url: '/id/{id:int}/application',
+    views: {'content@': tagApplicationView }
+};
+
+const physicalFlowViewState = {
+    url: '/id/{id:int}/physical_flow',
+    views: {'content@': tagPhysicalFlowView }
 };
 
 
@@ -41,7 +48,8 @@ function setup($stateProvider) {
     $stateProvider
         .state('main.tag', base)
         .state('main.tag.explorer', explorerState)
-        .state('main.tag.overview', viewState);
+        .state('main.tag.application', appViewState)
+        .state('main.tag.physical_flow', physicalFlowViewState);
 }
 
 

@@ -17,53 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from "./tag-application-view.html";
 import {initialiseData} from "../../common";
-import template from "./tag-list.html";
+import {CORE_API} from "../../common/services/core-api-utils";
 
+function controller($stateParams, serviceBroker) {
 
-/**
- * @name waltz-tag-list
- *
- * @description
- * This component ...
- */
+    const vm = initialiseData(this);
+    const id = $stateParams.id;
 
-const bindings = {
-    keywords: "<"
-};
+    vm.entityReference = { id, kind: "TAG" };
 
-const transclude = {
-    empty: "?empty",
-    last: "?last"
-};
-
-
-const initialState = {};
-
-
-function controller($state) {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.onTagSelect = (tag) => {
-        const params = { id: tag.id };
-        $state.go(`main.tag.${tag.targetKind.toLowerCase()}`, params);
-    }
+    serviceBroker
+        .loadViewData(
+            CORE_API.TagStore.getTagsWithUsageById,
+            [ id ])
+        .then(r => vm.tag = r.data);
 }
 
-
-controller.$inject = [
-    "$state"
-];
+controller.$inject = ["$stateParams", "ServiceBroker"];
 
 
-const component = {
+export default {
     template,
-    transclude,
-    bindings,
-    controller
+    controller,
+    controllerAs: "ctrl",
+    bindToController: true,
+    scope: {}
 };
 
-
-export default component;

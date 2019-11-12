@@ -32,9 +32,11 @@ import org.jooq.Select;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -77,9 +79,16 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForServer(options);
             case TAG:
                 return mkForTag(options);
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given an LOGICAL_DATA_FLOW ref");
+        return DSL.select(DSL.val(options.entityReference().id()));
     }
 
     private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {

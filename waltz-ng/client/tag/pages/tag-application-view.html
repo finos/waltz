@@ -1,0 +1,16 @@
+<div>
+
+    <waltz-page-header name="{{ ctrl.tag.name }}" icon="tags">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Tag Overview</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-simple-app-table parent-entity-ref="ctrl.entityReference">
+            </waltz-simple-app-table>
+        </div>
+    </div>
+</div>

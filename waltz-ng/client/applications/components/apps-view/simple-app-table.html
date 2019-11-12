@@ -3,8 +3,10 @@
                id="simple-app-table-section"
                collapsible="false">
     <div>
-        <waltz-app-table applications="$ctrl.apps">
-        </waltz-app-table>
+        <span ng-if="$ctrl.apps.length > 0">
+                <waltz-app-table applications="$ctrl.apps">
+                </waltz-app-table>
+        </span>
         <waltz-no-data ng-if="$ctrl.apps.length == 0">
             <message>
                 There are <strong>no application </strong>
