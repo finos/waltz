@@ -21,7 +21,7 @@
 import template from "./tag-overview.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {mkEnumGridCell, mkLinkGridCell} from "../../common/grid-utils";
+import {columnDef} from "../../physical-specifications/physical-flow-table-utilities";
 
 function controller($stateParams, serviceBroker) {
 
@@ -37,13 +37,13 @@ function controller($stateParams, serviceBroker) {
         .then(r => vm.tag = r.data);
 
     vm.physicalFlowColumnDefs = [
-        Object.assign(mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"), {width: "15%"}),
-        Object.assign(mkLinkGridCell("Source App", `${"logicalFlow.source"}.name`, `${"logicalFlow.source"}.id`, "main.app.view"), {width: "10%"}),
-        Object.assign(mkLinkGridCell("Target App", `${"logicalFlow.target"}.name`, `${"logicalFlow.target"}.id`, "main.app.view"), {width: "10%"}),
-        { field: 'specification.externalId', displayName: 'Ext. Id' },
-        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), {width: "8%"}),
-        { field: 'flow.frequency', displayName: 'Frequency', width: "10%" },
-        { field: 'specification.description', displayName: 'Description'}
+        columnDef.name,
+        columnDef.source,
+        columnDef.target,
+        columnDef.extId,
+        columnDef.observation,
+        columnDef.frequency,
+        columnDef.description
     ];
 }
 

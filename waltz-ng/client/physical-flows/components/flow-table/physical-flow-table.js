@@ -22,6 +22,7 @@ import {mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./physical-flow-table.html";
+import {withWidth, columnDef, fetchData} from "../../../physical-specifications/physical-flow-table-utilities";
 
 const bindings = {
     parentEntityRef: '<',
@@ -34,80 +35,26 @@ const initialState = {
     tableData: []
 };
 
-
-function mkData(primaryRef,
-                specifications = [],
-                physicalFlows = [],
-                logicalFLows = [])
-{
-    if (!primaryRef) return [];
-
-    const specsById = _.keyBy(specifications, 'id');
-    const logicalFlowsById = _.keyBy(logicalFLows, 'id');
-
-    const enrichFlow = (pf) => {
-        return {
-            physicalFlow: pf,
-            specification: specsById[pf.specificationId],
-            logicalFlow: logicalFlowsById[pf.logicalFlowId]
-        };
-    };
-
-    return _.map(physicalFlows, enrichFlow);
-}
-
-
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
     const defaultColumnDefs = [
-        Object.assign(mkLinkGridCell('Name', 'specification.name', 'physicalFlow.id', 'main.physical-flow.view'), { width: "20%"} ),
-        { field: 'specification.externalId', displayName: 'Ext. Id'},
-        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
-        { field: 'specification.format', displayName: 'Format', cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.criticality', displayName: 'Criticality', cellFilter: 'toDisplayName:"physicalFlowCriticality"' },
-        { field: 'specification.description', displayName: 'Description', }
+        withWidth(columnDef.name, "20%"),
+        columnDef.extId,
+        columnDef.observation,
+        columnDef.format,
+        columnDef.transport,
+        columnDef.frequency,
+        columnDef.criticality,
+        columnDef.description
     ];
 
     vm.columnDefs = vm.optionalColumnDefs == null ? defaultColumnDefs : vm.optionalColumnDefs;
 
     vm.$onInit = () => {
-        vm.selector = {
-            entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
-        };
+        vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
+            .then(data => vm.tableData = data);
 
-        const flowPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalFlowStore.findBySelector, [vm.selector])
-            .then(r => r.data);
-        const specPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecificationStore.findBySelector, [vm.selector])
-            .then(r => r.data);
-
-        loadTableData(flowPromise, specPromise);
-
-    };
-
-    function loadTableData(flowPromise, specPromise) {
-        if (vm.parentEntityRef.kind === "TAG") {
-            const logicalFlowPromise = serviceBroker
-                .loadViewData(CORE_API.LogicalFlowStore.findBySelector, [vm.selector])
-                .then(r => r.data);
-
-            $q.all([flowPromise, specPromise, logicalFlowPromise])
-                .then(([physicalFlows, specs, logicalFlows]) => {
-                    vm.tableData = mkData(vm.parentEntityRef, specs, physicalFlows, logicalFlows);
-                });
-        } else {
-            $q.all([flowPromise, specPromise])
-                .then(([physicalFlows, specs]) => {
-                    vm.tableData = mkData(vm.parentEntityRef, specs, physicalFlows);
-                });
-        }
-    }
-
-    vm.$onChanges = (changes) => {
     };
 
     vm.onGridInitialise = (api) => {
