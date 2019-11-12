@@ -67,7 +67,7 @@ function controller($state, serviceBroker, notification) {
     function loadTags() {
         serviceBroker
             .loadViewData(
-                CORE_API.EntityTagStore.findTagsByEntityRef,
+                CORE_API.TagStore.findTagsByEntityRef,
                 [vm.parentEntityRef])
             .then(r => vm.tags = r.data);
     }
@@ -112,9 +112,9 @@ function controller($state, serviceBroker, notification) {
     vm.dismissAliasEditor = () =>  vm.visibility.aliasEditor = false;
     vm.dismissTagEditor = () => vm.visibility.tagEditor = false;
 
-    vm.tagSelected = (keyword) => {
-        const params = { tag: keyword };
-        $state.go("main.entity-tag.explorer", params);
+    vm.tagSelected = (tag) => {
+        const params = { tag: tag.name };
+        $state.go("main.tag.explorer", params);
     };
 
     vm.saveAliases = (aliases = []) => serviceBroker
@@ -125,7 +125,7 @@ function controller($state, serviceBroker, notification) {
 
     vm.saveTags = (tags = [], successMessage) => serviceBroker
         .execute(
-            CORE_API.EntityTagStore.update,
+            CORE_API.TagStore.update,
             [ vm.parentEntityRef, tags ])
         .then(r => {
             notification.success(successMessage);

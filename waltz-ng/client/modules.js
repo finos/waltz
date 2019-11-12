@@ -71,7 +71,7 @@ import EntityNamedNote from "./entity-named-note";
 import EntityRelationship from "./entity-relationship";
 import EntityStatistics from "./entity-statistics";
 import EntitySvgDiagram from "./entity-svg-diagram";
-import EntityTags from "./entity-tags";
+import Tag from "./tag";
 import EnumValue from "./enum-value";
 import Examples from "./examples";
 import Extensions from "./extensions";
@@ -178,7 +178,7 @@ const dependencies = [
     EntityRelationship(),
     EntityStatistics(),
     EntitySvgDiagram(),
-    EntityTags(),
+    Tag(),
     EnumValue(),
     Examples(),
     Extensions(),

@@ -17,20 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import {registerStores} from "../common/module-utils";
-import * as EntityTagStore from './services/entity-tag-store';
-import Routes from './routes';
+import tagExplorerView from './tag-explorer';
 
 
-export default () => {
-
-    const module = angular.module('waltz.entity-tags', []);
-
-    module
-        .config(Routes);
-
-    registerStores(module, [EntityTagStore]);
-
-    return module.name;
+const base = {
+    url: 'tags'
 };
+
+
+const explorerState = {
+    url: '/explorer/{tag:string}',
+    views: {'content@': tagExplorerView }
+};
+
+
+function setup($stateProvider) {
+    $stateProvider
+        .state('main.tag', base)
+        .state('main.tag.explorer', explorerState);
+}
+
+
+setup.$inject = [
+    '$stateProvider'
+];
+
+
+export default setup;

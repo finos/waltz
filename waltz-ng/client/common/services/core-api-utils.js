@@ -49,7 +49,7 @@ import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../en
 import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../entity-relationship/services/entity-relationship-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
-import {EntityTagStore_API as EntityTagStore} from "../../entity-tags/services/entity-tag-store";
+import { TagStore_API as TagStore } from "../../tag/services/tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {ExternalIdentifierStore_API as ExternalIdentifierStore} from "../../external-identifier/services/external-identifier-store"
@@ -132,7 +132,7 @@ export const CORE_API = {
     EntityRelationshipStore,
     EntitySearchStore,
     EntityStatisticStore,
-    EntityTagStore,
+    TagStore,
     EnumValueStore,
     ExternalIdentifierStore,
     FacetStore,

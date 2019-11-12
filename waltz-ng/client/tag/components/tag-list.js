@@ -17,26 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.appview;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.complexity.ComplexityRating;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import org.immutables.value.Value;
-
-import java.util.List;
+import {initialiseData} from "../../common";
+import template from "./tag-list.html";
 
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableAppView.class)
-@JsonDeserialize(as = ImmutableAppView.class)
-public abstract class AppView {
+/**
+ * @name waltz-keyword-list
+ *
+ * @description
+ * This component ...
+ */
 
-    public abstract Application app();
-    public abstract List<String> tags();
-    public abstract List<String> aliases();
-    public abstract OrganisationalUnit organisationalUnit();
-    public abstract ComplexityRating complexity();
+const bindings = {
+    keywords: "<",
+    onSelect: "&?"
+};
+
+const transclude = {
+    empty: "?empty",
+    last: "?last"
+};
+
+
+const initialState = {};
+
+
+function controller() {
+    const vm = this;
+
+    vm.$onInit = () => initialiseData(vm, initialState);
+
+    vm.$onChanges = (c) => {
+    };
+
+
 }
+
+
+controller.$inject = [];
+
+
+const component = {
+    template,
+    transclude,
+    bindings,
+    controller
+};
+
+
+export default component;

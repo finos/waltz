@@ -47,7 +47,7 @@ function controller(notification, serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.EntityTagStore.findTagsByEntityRef,
+                CORE_API.TagStore.findTagsByEntityRef,
                 [vm.parentEntityRef],
                 {force: true})
             .then(r => vm.tags = r.data);
@@ -67,7 +67,7 @@ function controller(notification, serviceBroker) {
     const saveTags = (tags = [], successMessage) => {
         return serviceBroker
             .execute(
-                CORE_API.EntityTagStore.update,
+                CORE_API.TagStore.update,
                 [vm.parentEntityRef, tags])
             .then(() => {
                 notification.success(successMessage);
