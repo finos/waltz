@@ -1,0 +1,18 @@
+<div>
+        <div class="col-md-12">
+            <waltz-section name="All Tags">
+                <input class="form-control"
+                       type="search"
+                       placeholder="Search...."
+                       ng-model="tagQuery">
+                <br>
+                <ul class="waltz-keyword-list">
+                    <li ng-repeat="tag in ctrl.tags | filter:tagQuery"
+                        ng-bind="tag.name"
+                        class="clickable"
+                        ng-click="ctrl.onTagSelect(tag)">
+                    </li>
+                </ul>
+            </waltz-section>
+        </div>
+</div>

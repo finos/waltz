@@ -1,5 +1,4 @@
 <div>
-
     <waltz-page-header name="{{ ctrl.tag.name }}" icon="tags">
         <ol class="waltz-breadcrumbs">
             <li><a ui-sref="main">Home</a></li>
@@ -9,8 +8,6 @@
 
     <div class="row">
         <div class="col-md-12">
-            <waltz-simple-app-table parent-entity-ref="ctrl.entityReference">
-            </waltz-simple-app-table>
             <div class="waltz-sub-section-controls">
                 <waltz-data-extract-link name="Applications"
                                          styling="link"
@@ -20,12 +17,20 @@
                 </waltz-data-extract-link>
                 <span class="text-muted"> Download Applications :  </span>
             </div>
+            <waltz-simple-app-table parent-entity-ref="ctrl.entityReference">
+            </waltz-simple-app-table>
         </div>
     </div>
 
-    <div>
+    <div class="row">
+        <waltz-all-tags target-kind="{{ ctrl.tag.targetKind }}">
+        </waltz-all-tags>
+    </div>
+
+    <div class="row">
         <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
                                        parent-entity-ref="ctrl.entityReference">
         </waltz-dynamic-section-wrapper>
     </div>
+
 </div>

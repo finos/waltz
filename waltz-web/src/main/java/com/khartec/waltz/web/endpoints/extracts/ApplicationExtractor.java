@@ -44,6 +44,7 @@ public class ApplicationExtractor extends BaseDataExtractor {
             String fileName = String.format("application-for-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
                     idSelectionOptions.entityReference().id());
+            LOG.debug("extracted applications for entity ref {}", idSelectionOptions.entityReference());
             return writeExtract(fileName, qry, request, response);
         });
     }

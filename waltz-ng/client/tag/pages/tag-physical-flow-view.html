@@ -9,11 +9,6 @@
 
     <div class="row">
         <div class="col-md-12">
-                <waltz-physical-flow-section
-                    parent-entity-ref="ctrl.entityReference"
-                    optional-column-defs="ctrl.physicalFlowColumnDefs">
-                </waltz-physical-flow-section>
-
             <div class="waltz-sub-section-controls">
                 <waltz-data-extract-link name="PhysicalFlows"
                                          styling="link"
@@ -23,9 +18,17 @@
                                          request-body="ctrl.selectorOptions">
                 </waltz-data-extract-link>
             </div>
+            <waltz-physical-flow-section
+                    parent-entity-ref="ctrl.entityReference"
+                    optional-column-defs="ctrl.physicalFlowColumnDefs">
+            </waltz-physical-flow-section>
         </div>
     </div>
-    <br/>
+
+    <div class="row">
+        <waltz-all-tags target-kind="{{ ctrl.tag.targetKind }}">
+        </waltz-all-tags>
+    </div>
 
     <div>
         <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"

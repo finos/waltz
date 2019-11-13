@@ -23,6 +23,7 @@ import * as TagStore from "./services/tag-store";
 import Routes from "./routes";
 import TagList from "./components/tag-list";
 import TagEdit from "./components/tag-edit";
+import AllTags from "./components/all-tags";
 
 
 export default () => {
@@ -34,7 +35,8 @@ export default () => {
 
     module
         .component("waltzTagList",  TagList )
-        .component("waltzTagEdit",  TagEdit );
+        .component("waltzTagEdit",  TagEdit )
+        .component("waltzAllTags",  AllTags);
 
     registerStores(module, [TagStore]);
 
