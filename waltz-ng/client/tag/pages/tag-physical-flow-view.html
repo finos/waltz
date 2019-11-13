@@ -9,18 +9,10 @@
 
     <div class="row">
         <div class="col-md-12">
-            <span ng-if="ctrl.tag.targetKind=='PHYSICAL_FLOW'">
                 <waltz-physical-flow-section
                     parent-entity-ref="ctrl.entityReference"
                     optional-column-defs="ctrl.physicalFlowColumnDefs">
                 </waltz-physical-flow-section>
-            </span>
-            <span ng-if="ctrl.tag.targetKind=='APPLICATION'">
-                <waltz-simple-app-table
-                    parent-entity-ref="ctrl.entityReference">
-                </waltz-simple-app-table>
-
-            </span>
         </div>
     </div>
 </div>

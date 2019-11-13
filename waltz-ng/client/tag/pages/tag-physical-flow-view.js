@@ -18,7 +18,7 @@
  */
 
 
-import template from "./tag-overview.html";
+import template from "./tag-physical-flow-view.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {columnDef} from "../../physical-specifications/physical-flow-table-utilities";

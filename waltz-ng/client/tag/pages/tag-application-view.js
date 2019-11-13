@@ -20,10 +20,15 @@
 import template from "./tag-application-view.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
+import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
+
+const initialState = {
+    bookmarksSection: dynamicSections.bookmarksSection
+};
 
 function controller($stateParams, serviceBroker) {
 
-    const vm = initialiseData(this);
+    const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
 
     vm.entityReference = { id, kind: "TAG" };

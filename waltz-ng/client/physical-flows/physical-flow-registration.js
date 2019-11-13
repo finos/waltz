@@ -26,6 +26,7 @@ import template from './physical-flow-registration.html';
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
 import {removeEnrichments} from "./physical-flow-utils";
+import {columnDef, withWidth} from "../physical-specifications/physical-flow-table-utilities";
 
 
 const initialState = {
@@ -86,13 +87,12 @@ function controller(
     preventNavigationService.setupWarningDialog($scope, () => isDirty());
 
     vm.similarFlowDefs = [
-        { field: 'specification.name', displayName: 'Name', width: "10%" },
-        { field: 'specification.format', displayName: 'Format', width: "10%", cellFilter: 'toDisplayName:"dataFormatKind"' },
-        { field: 'physicalFlow.transport', displayName: 'Transport', width: "14%", cellFilter: 'toDisplayName:"TransportKind"' },
-        { field: 'physicalFlow.frequency', displayName: 'Frequency', width: "10%", cellFilter: 'toDisplayName:"frequencyKind"' },
-        { field: 'physicalFlow.basisOffset', displayName: 'Basis', width: "10%", cellFilter: 'toBasisOffset' },
-        { field: 'specification.description', displayName: 'Description' }
-
+        withWidth(columnDef.name, "10%"),
+        withWidth(columnDef.format, "10%"),
+        withWidth(columnDef.transport, "14%"),
+        withWidth(columnDef.frequency, "10%"),
+        withWidth(columnDef.basisOffset, "10%"),
+        columnDef.description
     ];
 
 
