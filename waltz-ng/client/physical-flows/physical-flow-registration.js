@@ -26,7 +26,7 @@ import template from './physical-flow-registration.html';
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
 import {removeEnrichments} from "./physical-flow-utils";
-import {columnDef, withWidth} from "../physical-specifications/physical-flow-table-utilities";
+import {columnDef, withWidth} from "../physical-flow/physical-flow-table-utilities";
 
 
 const initialState = {

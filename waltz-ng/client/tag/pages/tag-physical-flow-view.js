@@ -17,15 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import template from "./tag-physical-flow-view.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {columnDef} from "../../physical-specifications/physical-flow-table-utilities";
+import {columnDef} from "../../physical-flow/physical-flow-table-utilities";
+import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
+
+const initialState = {
+    bookmarksSection: dynamicSections.bookmarksSection
+};
 
 function controller($stateParams, serviceBroker) {
 
-    const vm = initialiseData(this);
+    const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
 
     vm.entityReference = { id, kind: "TAG" };

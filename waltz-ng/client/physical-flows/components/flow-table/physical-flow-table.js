@@ -22,7 +22,7 @@ import {mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./physical-flow-table.html";
-import {withWidth, columnDef, fetchData} from "../../../physical-specifications/physical-flow-table-utilities";
+import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-flow-table-utilities";
 
 const bindings = {
     parentEntityRef: '<',
