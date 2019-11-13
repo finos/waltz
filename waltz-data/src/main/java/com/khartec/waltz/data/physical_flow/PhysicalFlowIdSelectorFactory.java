@@ -140,7 +140,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Condition getLifecycleCondition(IdSelectionOptions options) {
+    public Condition getLifecycleCondition(IdSelectionOptions options) {
         return options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
                 ? DSL.trueCondition()
                 : PHYSICAL_FLOW_NOT_REMOVED;

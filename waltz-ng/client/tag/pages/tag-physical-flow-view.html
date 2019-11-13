@@ -13,8 +13,19 @@
                     parent-entity-ref="ctrl.entityReference"
                     optional-column-defs="ctrl.physicalFlowColumnDefs">
                 </waltz-physical-flow-section>
+
+            <div class="waltz-sub-section-controls">
+                <waltz-data-extract-link name="PhysicalFlows"
+                                         styling="link"
+                                         filename="physical-flow.csv"
+                                         extract="physical-flows/by-selector"
+                                         method="POST"
+                                         request-body="ctrl.selectorOptions">
+                </waltz-data-extract-link>
+            </div>
         </div>
     </div>
+    <br/>
 
     <div>
         <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"

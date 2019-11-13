@@ -21,8 +21,11 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
+import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.schema.tables.PhysicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +39,18 @@ import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static spark.Spark.post;
 
 
 @Service
 public class PhysicalFlowExtractor extends BaseDataExtractor {
 
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
+
     private static List<Field> RECEIVER_NAME_AND_NAR_FIELDS;
     private static List<Field> SOURCE_NAME_AND_NAR_FIELDS;
+    private static List<Field> SOURCE_AND_TARGET_NAME_AND_NAR;
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -78,6 +83,8 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
         RECEIVER_NAME_AND_NAR_FIELDS = ListUtilities.asList(
                 TARGET_NAME_FIELD.as("Receiver"),
                 targetAssetCodeField.as("Receiver Asset Code"));
+
+        SOURCE_AND_TARGET_NAME_AND_NAR = ListUtilities.concat(SOURCE_NAME_AND_NAR_FIELDS, RECEIVER_NAME_AND_NAR_FIELDS);
     }
 
 
@@ -98,6 +105,21 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
             EntityReference ref = getEntityReference(request);
             SelectConditionStep<?> qry = prepareConsumesQuery(ref);
             return writeExtract("physical-flows-consumes-" + ref.id(), qry, request, response);
+        });
+
+        post(mkPath("data-extract", "physical-flows", "by-selector"), (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            Select<Record1<Long>> idSelector = physicalFlowIdSelectorFactory.apply(idSelectionOptions);
+            Condition condition =
+                    PhysicalFlow.PHYSICAL_FLOW.ID.in(idSelector)
+                            .and(physicalFlowIdSelectorFactory.getLifecycleCondition(idSelectionOptions));
+            SelectConditionStep<?> qry = getQuery(
+                    SOURCE_AND_TARGET_NAME_AND_NAR,
+                    condition);
+            String fileName = String.format("physical-flows-for-%s-%s",
+                    idSelectionOptions.entityReference().kind().name().toLowerCase(),
+                    idSelectionOptions.entityReference().id());
+            return writeExtract(fileName, qry, request, response);
         });
     }
 

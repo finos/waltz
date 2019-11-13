@@ -17,12 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
 import { initialiseData } from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./simple-app-table.html";
 
@@ -44,21 +41,11 @@ function controller($scope,
     vm.$onInit = () => {
         const selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
-            "EXACT",
-            [entityLifecycleStatus.ACTIVE.key],
-            vm.filters);
+            "EXACT");
 
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
             .then(r => vm.apps = r.data);
-    };
-
-    vm.$onChanges = (changes) => {
-        console.log('==========> onChnages');
-    };
-
-    vm.onInitialise = (cfg) => {
-        vm.export = () => cfg.exportFn("apps.csv");
     };
 }
 

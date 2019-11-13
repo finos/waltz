@@ -22,23 +22,28 @@ import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {columnDef} from "../../physical-flow/physical-flow-table-utilities";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection
 };
 
 function controller($stateParams, serviceBroker) {
-
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
 
-    vm.entityReference = { id, kind: "TAG" };
+    vm.entityReference = {id, kind: "TAG"};
+    vm.selectorOptions = mkSelectionOptions(
+        vm.entityReference,
+        "EXACT");
 
-    serviceBroker
-        .loadViewData(
-            CORE_API.TagStore.getTagsWithUsageById,
-            [ id ])
-        .then(r => vm.tag = r.data);
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.getTagsWithUsageById,
+                [id])
+            .then(r => vm.tag = r.data);
+    };
 
     vm.physicalFlowColumnDefs = [
         columnDef.name,
