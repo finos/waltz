@@ -39,7 +39,7 @@ function controller($stateParams, serviceBroker) {
 
     serviceBroker
         .loadViewData(
-            CORE_API.TagStore.getTagsWithUsageById,
+            CORE_API.TagStore.getTagById,
             [ id ])
         .then(r => vm.tag = r.data);
 }

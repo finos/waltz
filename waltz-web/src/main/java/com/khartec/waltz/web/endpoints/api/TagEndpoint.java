@@ -51,12 +51,6 @@ public class TagEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        ListRoute<Tag> findAllTagsRoute = (request, response)
-                -> tagService.findAllTags();
-
-        ListRoute<EntityReference> findByTagRoute = (request, response)
-                -> tagService.findByTag(request.params("tag"));
-
         DatumRoute<Tag> getByIdRoute = (req, res) ->
              tagService.getById(getId(req));
 
@@ -77,8 +71,6 @@ public class TagEndpoint implements Endpoint {
             return tagService.findTagsForEntityKind(entityKind);
         };
 
-        getForList(mkPath(BASE_URL), findAllTagsRoute);
-        getForList(mkPath(BASE_URL, ":tag"), findByTagRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
         getForList(mkPath(BASE_URL, "target-kind", ":kind"), findTagsForEntityKind);

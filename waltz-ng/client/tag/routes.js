@@ -17,19 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tagExplorerView from './tag-explorer';
 import tagApplicationView from './pages/tag-application-view';
 import tagPhysicalFlowView from './pages/tag-physical-flow-view';
 
 
 const base = {
     url: 'tags'
-};
-
-
-const explorerState = {
-    url: '/explorer/{tag:string}',
-    views: {'content@': tagExplorerView }
 };
 
 
@@ -47,7 +40,6 @@ const physicalFlowViewState = {
 function setup($stateProvider) {
     $stateProvider
         .state('main.tag', base)
-        .state('main.tag.explorer', explorerState)
         .state('main.tag.application', appViewState)
         .state('main.tag.physical_flow', physicalFlowViewState);
 }

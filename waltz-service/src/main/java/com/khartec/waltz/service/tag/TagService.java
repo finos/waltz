@@ -49,16 +49,6 @@ public class TagService {
     }
 
 
-    @Deprecated
-    public List<Tag> findAllTags() {
-        return tagDao.findAllTags();
-    }
-
-    @Deprecated
-    public List<EntityReference> findByTag(String tag) {
-        return tagDao.findByTag(tag);
-    }
-
     public List<Tag> findTagsForEntityReference(EntityReference reference) {
         return tagDao.findTagsForEntityReference(reference);
     }
@@ -66,6 +56,11 @@ public class TagService {
 
     public List<Tag> findTagsForEntityKind(EntityKind entityKind) {
         return tagDao.findTagsForEntityKind(entityKind);
+    }
+
+
+    public Tag getById(long id) {
+        return tagDao.getById(id);
     }
 
     public List<Tag> updateTags(EntityReference ref, Collection<String> tags, String username) {
@@ -104,9 +99,5 @@ public class TagService {
                 : tagDao.createTag(ref.kind(), tag);
 
         tagDao.createTagUsage(ref, username, tagId);
-    }
-
-    public Tag getById(long id) {
-        return tagDao.getById(id);
     }
 }
