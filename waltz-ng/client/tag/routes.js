@@ -26,9 +26,12 @@ const base = {
     url: "tags"
 };
 
+const idState = {
+    url: "/id/{id:int}"
+};
 
 const bouncerState = {
-    url: "/id/{id:int}",
+    url: "/overview",
     resolve: {
         bouncer
     }
@@ -48,9 +51,10 @@ const physicalFlowViewState = {
 function setup($stateProvider) {
     $stateProvider
         .state("main.tag", base)
-        .state("main.tag.view", bouncerState)
-        .state("main.tag.view.application", appViewState)
-        .state("main.tag.view.physical_flow", physicalFlowViewState);
+        .state("main.tag.id", idState)
+        .state("main.tag.id.view", bouncerState)
+        .state("main.tag.id.application", appViewState)
+        .state("main.tag.id.physical_flow", physicalFlowViewState);
 }
 
 function bouncer($state, $stateParams, serviceBroker) {
@@ -62,7 +66,7 @@ function bouncer($state, $stateParams, serviceBroker) {
             [ id ])
         .then(r => {
             const tag = r.data;
-            $state.go(`main.tag.view.${tag.targetKind.toLowerCase()}`, {id: id}, { location: false });
+            $state.go(`main.tag.id.${tag.targetKind.toLowerCase()}`, {id: id}, { location: false });
         });
 }
 

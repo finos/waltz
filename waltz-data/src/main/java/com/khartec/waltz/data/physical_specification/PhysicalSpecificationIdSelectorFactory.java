@@ -61,13 +61,13 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
             case SERVER:
                 return mkForServer(options);
             case TAG:
-                return mkForTag(options);
+                return mkForTagBasedOnPhysicalFlowTags(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
     }
 
-    private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForTagBasedOnPhysicalFlowTags(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long tagId = options.entityReference().id();
 
@@ -80,7 +80,6 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 .join(PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .where(TAG_USAGE.TAG_ID.eq(tagId))
-                .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
                 .and(getLifecycleCondition(options));
     }
 

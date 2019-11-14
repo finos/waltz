@@ -78,7 +78,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             case SERVER:
                 return mkForServer(options);
             case TAG:
-                return mkForTag(options);
+                return mkForTagBasedOnPhysicalFlowTags(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalFlow(options);
             default:
@@ -91,9 +91,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL.select(DSL.val(options.entityReference().id()));
     }
 
-    private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForTagBasedOnPhysicalFlowTags(IdSelectionOptions options) {
         ensureScopeIsExact(options);
-        long tagId = options.entityReference().id();
 
         return DSL
                 .select(LOGICAL_FLOW.ID)
@@ -103,7 +102,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(TAG_USAGE)
                 .on(TAG_USAGE.ENTITY_ID.eq(PHYSICAL_FLOW.ID)
                         .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
-                .where(TAG_USAGE.TAG_ID.eq(tagId))
+                .where(TAG_USAGE.TAG_ID.eq(options.entityReference().id()))
                 .and(mkLifecycleStatusCondition(options));
     }
 

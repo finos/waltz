@@ -24,9 +24,9 @@ import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-f
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
-    parentEntityRef: '<',
-    onInitialise: '<',
-    optionalColumnDefs: '<'
+    parentEntityRef: "<",
+    onInitialise: "<",
+    optionalColumnDefs: "<"
 };
 
 
@@ -53,6 +53,7 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => {
         vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
             .then(data => vm.tableData = data);
+
         vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             "EXACT");
@@ -64,7 +65,7 @@ function controller($q, serviceBroker) {
     };
 
     vm.exportGrid = () => {
-        vm.gridApi.exportFn('physical_flows.csv');
+        vm.gridApi.exportFn("physical_flows.csv");
     };
 
     invokeFunction(vm.onInitialise, {export: vm.exportGrid });
@@ -72,8 +73,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker',
+    "$q",
+    "ServiceBroker",
 ];
 
 

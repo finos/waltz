@@ -71,9 +71,9 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .select(TAG_USAGE.ENTITY_ID)
                 .from(TAG_USAGE)
                 .join(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID))
+                .on(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)
+                        .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
                 .where(TAG_USAGE.TAG_ID.eq(tagId))
-                .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
                 .and(getLifecycleCondition(options));
     }
 
