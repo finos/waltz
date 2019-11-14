@@ -48,7 +48,7 @@ function controller($state) {
 
     vm.onTagSelect = (tag) => {
         const params = { id: tag.id };
-        $state.go(`main.tag.${tag.targetKind.toLowerCase()}`, params);
+        $state.go(`main.tag.view.${tag.targetKind.toLowerCase()}`, params);
     }
 }
 

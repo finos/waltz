@@ -48,7 +48,7 @@ const stateKindTuples = [
     {kind: "SCENARIO", state: "main.scenario.view"},
     {kind: "SERVER", state: "main.server.view"},
     {kind: "SOFTWARE", state: "main.software-package.view"},
-    {kind: "TAG", state: ""}
+    {kind: "TAG", state: "main.tag.view"}
 ];
 
 

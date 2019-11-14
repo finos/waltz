@@ -17,36 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tagApplicationView from './pages/tag-application-view';
-import tagPhysicalFlowView from './pages/tag-physical-flow-view';
+import tagApplicationView from "./pages/tag-application-view";
+import tagPhysicalFlowView from "./pages/tag-physical-flow-view";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const base = {
-    url: 'tags'
+    url: "tags"
 };
 
 
+const bouncerState = {
+    url: "/id/{id:int}",
+    resolve: {
+        bouncer
+    }
+};
+
 const appViewState = {
-    url: '/id/{id:int}/application',
-    views: {'content@': tagApplicationView }
+    url: "/application",
+    views: {"content@": tagApplicationView }
 };
 
 const physicalFlowViewState = {
-    url: '/id/{id:int}/physical_flow',
-    views: {'content@': tagPhysicalFlowView }
+    url: "/physical_flow",
+    views: {"content@": tagPhysicalFlowView }
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.tag', base)
-        .state('main.tag.application', appViewState)
-        .state('main.tag.physical_flow', physicalFlowViewState);
+        .state("main.tag", base)
+        .state("main.tag.view", bouncerState)
+        .state("main.tag.view.application", appViewState)
+        .state("main.tag.view.physical_flow", physicalFlowViewState);
 }
 
+function bouncer($state, $stateParams, serviceBroker) {
+    const id = $stateParams.id;
+
+    serviceBroker
+        .loadViewData(
+            CORE_API.TagStore.getTagById,
+            [ id ])
+        .then(r => {
+            const tag = r.data;
+            $state.go(`main.tag.view.${tag.targetKind.toLowerCase()}`, {id: id}, { location: false });
+        });
+}
 
 setup.$inject = [
-    '$stateProvider'
+    "$stateProvider"
+];
+
+bouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
