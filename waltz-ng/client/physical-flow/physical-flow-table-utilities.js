@@ -33,7 +33,7 @@ export const columnDef = {
     description: { field: "specification.description", displayName: "Description"},
     source: mkLinkGridCell("Source App", "logicalFlow.source.name", "logicalFlow.source.id", "main.app.view"),
     target: mkLinkGridCell("Target App", "logicalFlow.target.name", "logicalFlow.target.id", "main.app.view"),
-    basisOffset: { field: "physicalFlow.basisOffset", displayName: "Basis", width: "10%", cellFilter: "toBasisOffset" }
+    basisOffset: { field: "physicalFlow.basisOffset", displayName: "Basis", cellFilter: "toBasisOffset" }
 };
 
 export function withWidth(name, width) {

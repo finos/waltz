@@ -84,7 +84,8 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                 TARGET_NAME_FIELD.as("Receiver"),
                 targetAssetCodeField.as("Receiver Asset Code"));
 
-        SOURCE_AND_TARGET_NAME_AND_NAR = ListUtilities.concat(SOURCE_NAME_AND_NAR_FIELDS, RECEIVER_NAME_AND_NAR_FIELDS);
+        SOURCE_AND_TARGET_NAME_AND_NAR = ListUtilities
+                .concat(SOURCE_NAME_AND_NAR_FIELDS, RECEIVER_NAME_AND_NAR_FIELDS);
     }
 
 

@@ -2,8 +2,8 @@ import template from "./physical-flow-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    optionalColumnDefs: '<'
+    parentEntityRef: "<",
+    optionalColumnDefs: "<"
 };
 
 
@@ -24,5 +24,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowSection'
+    id: "waltzPhysicalFlowSection"
 };

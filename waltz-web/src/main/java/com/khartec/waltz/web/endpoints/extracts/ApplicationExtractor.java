@@ -2,8 +2,6 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.SelectorUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.Application;
 import org.jooq.*;
@@ -12,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.APPLICATION;
+import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
-import static spark.Spark.get;
 import static spark.Spark.post;
 
 
