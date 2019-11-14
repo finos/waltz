@@ -9,16 +9,6 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="waltz-sub-section-controls">
-                <waltz-data-extract-link name="PhysicalFlows"
-                                         styling="link"
-                                         filename="physical-flow.csv"
-                                         extract="physical-flows/by-selector"
-                                         method="POST"
-                                         request-body="ctrl.selectorOptions">
-                </waltz-data-extract-link>
-                <span class="text-muted"> Download :  </span>
-            </div>
             <waltz-physical-flow-section
                     parent-entity-ref="ctrl.entityReference"
                     optional-column-defs="ctrl.physicalFlowColumnDefs">

@@ -39,12 +39,12 @@ function controller($scope,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const selectorOptions = mkSelectionOptions(
+        vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             "EXACT");
 
         serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selectorOptions])
             .then(r => vm.apps = r.data);
     };
 }

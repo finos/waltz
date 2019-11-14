@@ -22,7 +22,6 @@ import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {columnDef} from "../../physical-flow/physical-flow-table-utilities";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
-import {mkSelectionOptions} from "../../common/selector-utils";
 
 const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection
@@ -33,9 +32,6 @@ function controller($stateParams, serviceBroker) {
     const id = $stateParams.id;
 
     vm.entityReference = {id, kind: "TAG"};
-    vm.selectorOptions = mkSelectionOptions(
-        vm.entityReference,
-        "EXACT");
 
     vm.$onInit = () => {
         serviceBroker

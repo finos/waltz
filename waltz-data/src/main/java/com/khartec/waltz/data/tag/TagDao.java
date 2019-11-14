@@ -62,11 +62,20 @@ public class TagDao {
 
 
     public List<Tag> findTagsForEntityKind(EntityKind entityKind) {
+        Table<Record2<Long, Integer>> tagUsage =
+                DSL.select(TAG_USAGE.TAG_ID.as("tagId"),
+                        DSL.count(TAG_USAGE.ENTITY_ID).as("usageCount"))
+                .from(TAG_USAGE)
+                .groupBy(TAG_USAGE.TAG_ID)
+                .asTable();
+
         return dsl
                 .select(TAG.fields())
                 .from(TAG)
+                .join(tagUsage)
+                .on(tagUsage.field("tagId", TAG.ID.getDataType()).eq(TAG.ID))
                 .where(TAG.TARGET_KIND.eq(entityKind.name()))
-                .orderBy(TAG.NAME.asc())
+                .orderBy(tagUsage.field("usageCount").desc())
                 .fetch(TO_TAG_DOMAIN_MAPPER);
     }
 

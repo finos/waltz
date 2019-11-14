@@ -5,6 +5,17 @@
                                 on-initialise="$ctrl.onGridInitialise"
                                 class="small">
         </waltz-grid-with-search>
+
+        <div class="waltz-sub-section-controls">
+            <waltz-data-extract-link name="PhysicalFlows"
+                                     styling="link"
+                                     filename="physical-flow.csv"
+                                     extract="physical-flows/by-selector"
+                                     method="POST"
+                                     request-body="$ctrl.selectorOptions">
+            </waltz-data-extract-link>
+            <span class="text-muted"> Download :  </span>
+        </div>
     </div>
 
     <waltz-no-data ng-if="$ctrl.tableData.length == 0">

@@ -16,13 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from "lodash";
+
 import {initialiseData, invokeFunction} from "../../../common";
-import {mkEnumGridCell, mkLinkGridCell} from "../../../common/grid-utils";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./physical-flow-table.html";
 import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-flow-table-utilities";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: '<',
@@ -54,6 +53,9 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => {
         vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
             .then(data => vm.tableData = data);
+        vm.selectorOptions = mkSelectionOptions(
+            vm.parentEntityRef,
+            "EXACT");
 
     };
 
