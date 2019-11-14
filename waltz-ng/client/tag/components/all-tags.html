@@ -7,10 +7,10 @@
                        ng-model="tagQuery">
                 <br>
                 <ul class="waltz-keyword-list">
-                    <li ng-repeat="tag in ctrl.tags | filter:tagQuery"
+                    <li ng-repeat="tag in $ctrl.tags | filter:tagQuery"
                         ng-bind="tag.name"
                         class="wkl-keyword clickable"
-                        ng-click="ctrl.onTagSelect(tag)">
+                        ng-click="$ctrl.onTagSelect(tag)">
                     </li>
                 </ul>
             </waltz-section>

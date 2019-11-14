@@ -49,9 +49,6 @@ controller.$inject = [ "ServiceBroker", "$state" ];
 export default {
     template,
     bindings,
-    controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    id: "waltzAllTags"
+    controller
 };
 
