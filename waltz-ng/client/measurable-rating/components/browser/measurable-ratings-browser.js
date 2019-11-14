@@ -74,7 +74,16 @@ function combineRatingTallies(r1, r2) {
 
 
 function toRatingsSummaryObj(ratings = []) {
-    const counts = _.countBy(ratings, 'rating');
+
+    const counts = _.chain(ratings)
+        .groupBy(r => r.rating)
+        .mapValues(r => {
+
+            const countsForRating = _.map(_.values(r), r => r.count);
+            return _.sum(countsForRating);
+        })
+        .value();
+
     const total = _.sum(_.values(counts));
     return Object.assign({}, counts, { total });
 }
