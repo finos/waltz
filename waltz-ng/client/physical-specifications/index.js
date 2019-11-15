@@ -32,7 +32,6 @@ import PhysicalDataSection from './components/physical-data-section/physical-dat
 import PhysicalSpecDefinitionCreatePanel from './components/create/physical-spec-definition-create-panel';
 import PhysicalSpecificationOverview from './components/overview/physical-specification-overview';
 import PhysicalSpecificationConsumers from './components/specification-consumers/physical-specification-consumers';
-import PhysicalSpecificationMentions from './components/mentions/physical-specification-mentions';
 import PhysicalSpecDefintionPanel from './components/spec-definition/physical-spec-definition-panel';
 
 
@@ -53,7 +52,6 @@ function setup() {
         .component('waltzPhysicalSpecDefinitionCreatePanel', PhysicalSpecDefinitionCreatePanel)
         .component('waltzPhysicalSpecificationOverview', PhysicalSpecificationOverview)
         .component('waltzPhysicalSpecificationConsumers', PhysicalSpecificationConsumers)
-        .component('waltzPhysicalSpecificationMentions', PhysicalSpecificationMentions)
         .component('waltzPhysicalSpecDefinitionPanel', PhysicalSpecDefintionPanel);
 
     registerStores(module, [

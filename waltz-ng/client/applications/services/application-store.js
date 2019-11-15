@@ -27,11 +27,6 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const getAppTagsById = (id) => $http
-        .get(`${BASE}/id/${id}/tags`)
-        .then(result => result.data);
-
-
     const countByOrganisationalUnit = () => $http
         .get(`${BASE}/count-by/org-unit`)
         .then(result => result.data);
@@ -81,7 +76,6 @@ export function store($http, BaseApiUrl) {
 
     return {
         getById,
-        getAppTagsById,
         findRelatedById,
         findByIds,
         findAll,
@@ -110,11 +104,6 @@ export const ApplicationStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "retrieve a single app (or null) given an id"
-    },
-    getAppTagsById: {
-        serviceName,
-        serviceFnName: "getAppTagsById",
-        description: "find tags for the given app"
     },
     findRelatedById: {
         serviceName,

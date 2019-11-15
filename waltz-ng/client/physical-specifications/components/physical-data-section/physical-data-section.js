@@ -19,9 +19,9 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkEntityLinkGridCell, mkEnumGridCell} from "../../../common/grid-utils";
 import template from "./physical-data-section.html";
 import {isRemoved} from "../../../common/entity-utils";
+import {columnDef, withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
@@ -114,17 +114,13 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.columnDefs = [
-        Object.assign(mkEntityLinkGridCell("Name", "physicalFlow", "left"), { width: "25%"} ),
-        { field: "specification.externalId", displayName: "Ext. Id", width: "5%" },
-        Object.assign(mkEntityLinkGridCell("Source", "logicalFlow.source", "left"), { width: "15%"} ),
-        Object.assign(mkEntityLinkGridCell("Target", "logicalFlow.target", "left"), { width: "15%" }),
-        Object.assign(mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true), { width: "10%"}),
-        { field: "physicalFlow.criticality", displayName: "Criticality", width: "5%", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
-        { field: "specification.description", displayName: "Description", width: "25%" },
-        // hidden columns - for local filtering
-        { field: "specification.format", displayName: "Format", visible:false, cellFilter: "toDisplayName:\"dataFormatKind\"" },
-        { field: "physicalFlow.transport", displayName: "Transport", visible:false, cellFilter: "toDisplayName:\"TransportKind\"" },
-        { field: "physicalFlow.frequency", displayName: "Frequency", visible:false, cellFilter: "toDisplayName:\"frequencyKind\"" }
+        withWidth(columnDef.name, "25%"),
+        withWidth(columnDef.extId, "5%"),
+        columnDef.source,
+        columnDef.target,
+        columnDef.observation,
+        columnDef.criticality,
+        columnDef.description
     ];
 
     vm.unusedSpecificationsColumnDefs = [

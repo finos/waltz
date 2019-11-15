@@ -17,70 +17,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, invokeFunction} from "../../../common";
-
-import template from "./physical-flow-table.html";
-import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-flow-table-utilities";
+import { initialiseData } from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+
+import template from "./simple-app-table.html";
+
 
 const bindings = {
-    parentEntityRef: "<",
-    onInitialise: "<",
-    optionalColumnDefs: "<"
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
-    tableData: []
+    apps: []
 };
 
-function controller($q, serviceBroker) {
+
+function controller($scope,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const defaultColumnDefs = [
-        withWidth(columnDef.name, "20%"),
-        columnDef.extId,
-        columnDef.observation,
-        columnDef.format,
-        columnDef.transport,
-        columnDef.frequency,
-        columnDef.criticality,
-        columnDef.description
-    ];
-
-    vm.columnDefs = vm.optionalColumnDefs == null ? defaultColumnDefs : vm.optionalColumnDefs;
-
     vm.$onInit = () => {
-        vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
-            .then(data => vm.tableData = data);
-
         vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             "EXACT");
 
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selectorOptions])
+            .then(r => vm.apps = r.data);
     };
-
-    vm.onGridInitialise = (api) => {
-        vm.gridApi = api;
-    };
-
-    vm.exportGrid = () => {
-        vm.gridApi.exportFn("physical_flows.csv");
-    };
-
-    invokeFunction(vm.onInitialise, {export: vm.exportGrid });
 }
 
 
 controller.$inject = [
-    "$q",
-    "ServiceBroker",
+    "$scope",
+    "ServiceBroker"
 ];
 
 
 const component = {
-    bindings,
     template,
+    bindings,
     controller
 };
 

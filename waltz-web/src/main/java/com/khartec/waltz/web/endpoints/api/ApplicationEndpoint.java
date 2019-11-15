@@ -62,7 +62,6 @@ public class ApplicationEndpoint implements Endpoint {
 
     private final ApplicationService appService;
     private final ChangeLogService changeLogService;
-    private final TagService tagService;
 
 
     @Autowired
@@ -75,7 +74,6 @@ public class ApplicationEndpoint implements Endpoint {
 
         this.appService = appService;
         this.changeLogService = changeLogService;
-        this.tagService = tagService;
     }
 
 
@@ -185,14 +183,11 @@ public class ApplicationEndpoint implements Endpoint {
         ListRoute<Application> findByAssetCodeRoute = ((request, response)
                 -> appService.findByAssetCode(request.splat()[0]));
 
-        ListRoute<Tag> getAppTagsRoute = (request, response)
-                -> tagService.findTagsForEntityReference(mkRef(EntityKind.APPLICATION, getId(request)));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
-        getForList(mkPath(BASE_URL, "id", ":id", "tags"), getAppTagsRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id", "related"), findRelatedRoute);
         postForList(mkPath(BASE_URL, "by-ids"), findByIdsRoute);
         getForList(mkPath(BASE_URL, "all"), findAllRoute);

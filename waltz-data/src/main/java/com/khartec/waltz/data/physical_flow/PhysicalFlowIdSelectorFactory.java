@@ -31,6 +31,7 @@ import org.jooq.impl.DSL;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.Tables.CHANGE_UNIT;
+import static com.khartec.waltz.schema.Tables.TAG_USAGE;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
@@ -55,9 +56,25 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForServer(options);
             case CHANGE_SET:
                 return mkForChangeSet(options);
+            case TAG:
+                return mkForTag(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
+    }
+
+    private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long tagId = options.entityReference().id();
+
+        return DSL
+                .select(TAG_USAGE.ENTITY_ID)
+                .from(TAG_USAGE)
+                .join(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)
+                        .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .where(TAG_USAGE.TAG_ID.eq(tagId))
+                .and(getLifecycleCondition(options));
     }
 
 
@@ -123,7 +140,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Condition getLifecycleCondition(IdSelectionOptions options) {
+    public Condition getLifecycleCondition(IdSelectionOptions options) {
         return options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
                 ? DSL.trueCondition()
                 : PHYSICAL_FLOW_NOT_REMOVED;
