@@ -30,50 +30,50 @@
                                entities="['CHANGE_INITIATIVE']">
     </waltz-source-data-overlay>
 
-    <div class="row"
-         ng-if="$ctrl.changeInitiatives.length > 0">
-
-        <div class="col-sm-8">
-            <span ng-if="$ctrl.gridOptions.data.length > 0">
+    <div ng-if="$ctrl.changeInitiatives.length > 0">
+        <div class="row" ng-if="$ctrl.gridOptions.data.length > 0">
+            <div class="col-sm-8">
                 <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
                                         entries="$ctrl.gridOptions.data"
                                         scope-provider="$ctrl"
                                         search-fields="['searchableStr']"
                                         search-placeholder-text="Search...">
                 </waltz-grid-with-search>
-            </span>
-            <waltz-no-data ng-if="$ctrl.gridOptions.data.length == 0">
-                <message>
-                    No active Change Initiatives found [click on the link below to view the inactive Change Initiatives]
-                </message>
-            </waltz-no-data>
-            <br>
-            <span>
-                <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
-                   class="clickable no-text-select">
-                    <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
-                    phase:
-                    <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
-                </a>
-            </span>
+            </div>
+            <div class="col-sm-4">
+                <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"
+                                                      help-text="{{$ctrl.filterHelpText}}"
+                                                      selected-summary="$ctrl.selectedAssessmentSummary"
+                                                      selected-rating="$ctrl.selectedAssessmentRating"
+                                                      on-select-summary="$ctrl.onSelectAssessmentSummary"
+                                                      on-select-segment="$ctrl.onSelectAssessmentRating">
+                </waltz-assessment-rating-summary-pies>
+            </div>
         </div>
-
-        <div class="col-sm-4">
-            <waltz-assessment-rating-summary-pies summaries="$ctrl.assessmentSummaries"
-                                                  help-text="{{$ctrl.filterHelpText}}"
-                                                  selected-summary="$ctrl.selectedAssessmentSummary"
-                                                  selected-rating="$ctrl.selectedAssessmentRating"
-                                                  on-select-summary="$ctrl.onSelectAssessmentSummary"
-                                                  on-select-segment="$ctrl.onSelectAssessmentRating">
-            </waltz-assessment-rating-summary-pies>
+        <div class="row"
+             ng-if="$ctrl.gridOptions.data.length == 0">
+            <div class="col-sm-12">
+                <waltz-no-data >
+                    <message>
+                        No active Change Initiatives found [click on the link below to view the inactive Change
+                        Initiatives]
+                    </message>
+                </waltz-no-data>
+            </div>
         </div>
-
+        <br>
+        <div>
+            <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
+               class="clickable no-text-select">
+                <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
+                phase:
+                <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+            </a>
+        </div>
     </div>
-
     <waltz-no-data ng-if="$ctrl.changeInitiatives.length == 0">
         <message>
             No associated Change Initiatives found
         </message>
     </waltz-no-data>
-
 </div>
