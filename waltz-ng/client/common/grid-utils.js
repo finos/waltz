@@ -77,6 +77,35 @@ export function mkEntityLinkGridCell(columnHeading,
 
 
 /**
+ * Creates a column def to render an entity icon and label
+ *
+ * eg: usage: mkEntityLabelGridCell('Source', 'source', 'none')
+ *
+ * @param columnHeading  column display name
+ * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
+ * @param iconPlacement  icon position, allowed values: left, right, none
+ * @param tooltipPlacement  position of tooltip, allowed values are: left, right, bottom, top
+ * @returns {{field: *, displayName: *, cellTemplate: string}}
+ */
+export function mkEntityLabelGridCell(columnHeading,
+                                     entityRefField,
+                                     iconPlacement = "left",
+                                     tooltipPlacement = "top") {
+    return {
+        field: entityRefField + ".name",
+        displayName: columnHeading,
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-entity-icon-label entity-ref="row.entity.${entityRefField}"
+                                         tooltip-placement="${tooltipPlacement}" 
+                                         icon-placement="${iconPlacement}">
+                </waltz-entity-icon-label>
+            </div>`
+    };
+}
+
+
+/**
  * Creates a column def to render a link with an id parameter
  *
  * @param columnHeading  column display name

@@ -43,7 +43,7 @@ function interpolate(templateFn, context = {}, templateStr = "") {
     try {
         return templateFn(context);
     } catch (e) {
-        console.log("Failed to interpolate template with context", { context, templateStr })
+        console.log("Failed to interpolate template with context", { context, templateStr, e })
     }
 }
 
@@ -70,7 +70,7 @@ function controller() {
  *  </waltz-markdown>
  * ```
  *
- * If variables are provided the interpolation is provided by the lodash `_.template` function.
+ * If variables are provided the interpolation is performed by the lodash `_.template` function.
  *
  * @type {{bindings: {text: string, context: string}, controller: controller, template: string}}
  */

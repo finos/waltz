@@ -11,31 +11,35 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <waltz-markdown text="$ctrl.surveyRun.description">
+            <waltz-markdown text="$ctrl.surveyRun.description"
+                            context="{
+                                instance: $ctrl.surveyInstance,
+                                entity: $ctrl.subject
+                            }">
             </waltz-markdown>
         </div>
     </div>
     <br />
 
-    <!-- SUBJECT / STATUS -->
+    <!-- STATUS / RESPONSE -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-status'"></div>
         <div ng-include="'wsis-response-version'"></div>
     </div>
 
-    <!-- EXT_ID / VERSION -->
+    <!-- ISSUED / APPROVED -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-issued-date'"></div>
         <div ng-include="'wsis-approval'"></div>
     </div>
 
-    <!-- DUE / ISSUED -->
+    <!-- SUBJECT / DUE -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-subject'"></div>
         <div ng-include="'wsis-due-date'"></div>
     </div>
 
-    <!-- SUBMITTED / APPROVED BY -->
+    <!-- EXTERNAL_ID / SUBMITTED -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-subject-ext-id'"></div>
         <div ng-include="'wsis-submitted-date'"></div>
