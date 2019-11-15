@@ -12,26 +12,20 @@
 
 .wdfd-node {
     .wdfd-glyph {
-        fill-opacity: 0.4;
+        fill-opacity: 0.6;
     }
 
     text {
-        fill: #555;
+        fill: #333;
         font-size: x-small;
-        stroke-opacity: 0.4;
+        stroke-opacity: 0.6;
     }
 
     &:hover {
         cursor: pointer;
 
-        .wdfd-glyph {
-            fill-opacity: 0.9;
-        }
-
         text {
-            stroke-opacity: 0.9;
             font-weight: 700;
-            fill: #333;
             stroke: 1px solid white;
             font-size: medium;
         }
