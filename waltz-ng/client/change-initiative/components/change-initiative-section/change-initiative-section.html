@@ -34,12 +34,19 @@
          ng-if="$ctrl.changeInitiatives.length > 0">
 
         <div class="col-sm-8">
-            <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
-                                    entries="$ctrl.gridOptions.data"
-                                    scope-provider="$ctrl"
-                                    search-fields="['searchableStr']"
-                                    search-placeholder-text="Search...">
-            </waltz-grid-with-search>
+            <span ng-if="$ctrl.gridOptions.data.length > 0">
+                <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
+                                        entries="$ctrl.gridOptions.data"
+                                        scope-provider="$ctrl"
+                                        search-fields="['searchableStr']"
+                                        search-placeholder-text="Search...">
+                </waltz-grid-with-search>
+            </span>
+            <waltz-no-data ng-if="$ctrl.gridOptions.data.length == 0">
+                <message>
+                    No active Change Initiatives found [click on the link below to view the inactive Change Initiatives]
+                </message>
+            </waltz-no-data>
             <br>
             <span>
                 <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
