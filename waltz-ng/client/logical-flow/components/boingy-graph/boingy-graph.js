@@ -1,3 +1,18 @@
+import {refToString} from "../../../common/entity-utils";
+import {initialiseData} from "../../../common";
+import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
+import {event, select} from "d3-selection";
+import {forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
+import {drag} from "d3-drag";
+import {symbol, symbolWye} from "d3-shape";
+import {zoom, zoomIdentity} from "d3-zoom";
+import "d3-selection-multi";
+import _ from "lodash";
+
+import {scalePow} from "d3-scale";
+
+import template from "./boingy-graph.html";
+
 forceCenter/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017 Waltz open source project
@@ -17,19 +32,6 @@ forceCenter/*
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common";
-import { lineWithArrowPath, responsivefy } from "../../../common/d3-utils";
-import { event, select } from "d3-selection";
-import { forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY } from "d3-force";
-import { drag } from "d3-drag";
-import { symbol, symbolWye } from "d3-shape";
-import { zoom, zoomIdentity } from "d3-zoom";
-import "d3-selection-multi";
-import _ from "lodash";
-
-
-import template from "./boingy-graph.html";
-
 const width = 800;
 const height = 500;
 
@@ -39,11 +41,18 @@ const bindings = {
     tweakers: "<"
 };
 
-
 const initialState = {
     zoomEnabled: false
 };
 
+const opacityScale = scalePow()
+    .exponent(0.01)
+    .range([0.4, 1])
+    .clamp(true);
+
+const nodeSizeScale = scalePow()
+    .range([5, 10])
+    .clamp(true);
 
 const DEFAULT_TWEAKER = {
     enter: (selection) => selection,
@@ -111,8 +120,7 @@ function addNodeCircle(selection) {
     selection
         .filter(d => d.kind === "APPLICATION")
         .append("circle")
-        .attr("class", "wdfd-glyph")
-        .attr("r", 6);
+        .attr("class", "wdfd-glyph");
 
     selection
         .filter(d => d.kind === "ACTOR")
@@ -174,9 +182,49 @@ function drawNodes(nodes = [], holder, tweakers = DEFAULT_TWEAKER) {
         .call(tweakers.exit)
         .remove();
 
-    return nodeSelection
+    const allNodes = nodeSelection
         .merge(newNodes);
 
+    allNodes
+        .select("text")
+        .attr("opacity", d => opacityScale(d.flowCount));
+
+    allNodes
+        .select("circle")
+        .attr("opacity", d => opacityScale(d.flowCount))
+        .attr("r", d => nodeSizeScale(d.flowCount));
+
+    allNodes
+        .select("path")
+        .attr("opacity", d => opacityScale(d.flowCount))
+        .attr("r", d => nodeSizeScale(d.flowCount));
+
+    const setOpacity = (selection, opacity) => {
+        selection
+            .selectAll("text, circle, path")
+            .attr("opacity", opacity);
+        return selection;
+    };
+
+    allNodes.on("mouseenter.opacityHover",
+        function (d) {
+            const selection = select(this);
+            setOpacity(selection, 1);
+            selection
+                .select("circle")
+                .attr("r", nodeSizeScale(d.flowCount) + 2);
+            return selection;
+        })
+        .on("mouseout.opacityHover", function (d) {
+            const selection = select(this);
+            setOpacity(selection, opacityScale(d.flowCount));
+            selection
+                .select("circle")
+                .attr("r", nodeSizeScale(d.flowCount));
+            return selection;
+        });
+
+    return allNodes;
 }
 
 
@@ -241,6 +289,28 @@ function draw(data = [],
 }
 
 
+function enrichData(data = []) {
+    const flows = data.flows;
+    const flowCounts = _.chain(flows)
+        .flatMap(f => [f.source, f.target])
+        .countBy(refToString)
+        .value();
+
+    const maxFlowCount = _.max(_.values(flowCounts));
+
+    opacityScale.domain([1, maxFlowCount]);
+    nodeSizeScale.domain([1, maxFlowCount]);
+
+    const enrichedEntities = _
+        .chain(data.entities)
+        .map(n => Object.assign(n, { flowCount: flowCounts[refToString(n)]}))
+        .orderBy(d => d.flowCount)
+        .value();
+
+    return Object.assign(data, { entities: enrichedEntities });
+}
+
+
 function controller($timeout, $element) {
     const vm = initialiseData(this, initialState);
 
@@ -250,7 +320,8 @@ function controller($timeout, $element) {
     const parts = setup(vizElem);
 
     const debouncedDraw = _.debounce(() => {
-        draw(vm.data, parts, vm.tweakers);
+        const enrichedData = enrichData(vm.data);
+        draw(enrichedData, parts, vm.tweakers);
         simulation.alpha(0.4).restart();
     }, 250);
 
