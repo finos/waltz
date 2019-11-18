@@ -31,6 +31,7 @@ import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.schema.Tables.TAG_USAGE;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
@@ -59,9 +60,27 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 return mkForSpecification(options);
             case SERVER:
                 return mkForServer(options);
+            case TAG:
+                return mkForTagBasedOnPhysicalFlowTags(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: "+options);
         }
+    }
+
+    private Select<Record1<Long>> mkForTagBasedOnPhysicalFlowTags(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        long tagId = options.entityReference().id();
+
+        return DSL
+                .select(PHYSICAL_SPECIFICATION.ID)
+                .from(TAG_USAGE)
+                .join(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)
+                        .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .join(PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .where(TAG_USAGE.TAG_ID.eq(tagId))
+                .and(getLifecycleCondition(options));
     }
 
 

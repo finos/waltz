@@ -47,7 +47,8 @@ const stateKindTuples = [
     {kind: "ROADMAP", state: "main.roadmap.view"},
     {kind: "SCENARIO", state: "main.scenario.view"},
     {kind: "SERVER", state: "main.server.view"},
-    {kind: "SOFTWARE", state: "main.software-package.view"}
+    {kind: "SOFTWARE", state: "main.software-package.view"},
+    {kind: "TAG", state: "main.tag.id.view"}
 ];
 
 
@@ -58,8 +59,8 @@ const kindsToViewStateMap = toMap(
 
 
 const viewStateToKindMap = _.assign(
-    toMap(stateKindTuples, 
-          t => t.state, 
+    toMap(stateKindTuples,
+          t => t.state,
           t => t.kind),
     { "main.person.view": "PERSON" });
 

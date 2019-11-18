@@ -112,11 +112,6 @@ function controller($state, serviceBroker, notification) {
     vm.dismissAliasEditor = () =>  vm.visibility.aliasEditor = false;
     vm.dismissTagEditor = () => vm.visibility.tagEditor = false;
 
-    vm.tagSelected = (tag) => {
-        const params = { tag: tag.name };
-        $state.go("main.tag.explorer", params);
-    };
-
     vm.saveAliases = (aliases = []) => serviceBroker
         .execute(
             CORE_API.AliasStore.update,

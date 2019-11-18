@@ -22,12 +22,8 @@ import {checkIsEntityRef, checkIsStringList} from "../../common/checks";
 export function store($http, base) {
     const BASE = `${base}/tag`;
 
-    const findAllTags = () => $http
-        .get(BASE)
-        .then(x => x.data);
-
-    const findByTag = (tag) => $http
-        .get(`${BASE}/${tag}`)
+    const getTagById = (id) => $http
+        .get(`${BASE}/id/${id}`)
         .then(x => x.data);
 
     const findTagsByEntityRef = (ref) => $http
@@ -48,8 +44,7 @@ export function store($http, base) {
     };
 
     return {
-        findAllTags,
-        findByTag,
+        getTagById,
         findTagsByEntityRef,
         findTagsByEntityKind,
         update
@@ -67,15 +62,10 @@ export const serviceName = 'TagStore';
 
 
 export const TagStore_API = {
-    findAllTags: {
+    getTagById: {
         serviceName,
-        serviceFnName: 'findAllTags',
-        description: 'executes findAllTags'
-    },
-    findByTag: {
-        serviceName,
-        serviceFnName: 'findByTag',
-        description: 'executes findByTag'
+        serviceFnName: 'getTagById',
+        description: 'executes getTagById'
     },
     findTagsByEntityRef: {
         serviceName,
@@ -94,4 +84,3 @@ export const TagStore_API = {
     }
 };
 
-export default store;

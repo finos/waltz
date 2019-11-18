@@ -17,28 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from "./all-tags.html";
+import {CORE_API} from "../../common/services/core-api-utils";
 
-import {registerStores} from "../common/module-utils";
-import * as TagStore from "./services/tag-store";
-import Routes from "./routes";
-import TagList from "./components/tag-list";
-import TagEdit from "./components/tag-edit";
-import AllTags from "./components/all-tags";
-
-
-export default () => {
-
-    const module = angular.module("waltz.tags", []);
-
-    module
-        .config(Routes);
-
-    module
-        .component("waltzTagList",  TagList )
-        .component("waltzTagEdit",  TagEdit )
-        .component("waltzAllTags",  AllTags);
-
-    registerStores(module, [TagStore]);
-
-    return module.name;
+const bindings = {
+    targetKind: "@"
 };
+
+
+function controller(serviceBroker, $state) {
+    const vm = this;
+
+    vm.$onChanges = () => {
+        if(vm.targetKind) {
+            serviceBroker
+                .loadViewData(
+                    CORE_API.TagStore.findTagsByEntityKind,
+                    [ vm.targetKind ])
+                .then(r => vm.tags = r.data);
+        }
+    };
+
+    vm.onTagSelect = (tag) => {
+        const params = { id: tag.id };
+        $state.go(`main.tag.id.${tag.targetKind.toLowerCase()}`, params);
+    }
+}
+
+controller.$inject = [ "ServiceBroker", "$state" ];
+
+export default {
+    template,
+    bindings,
+    controller
+};
+

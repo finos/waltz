@@ -1,0 +1,28 @@
+<waltz-section name="Applications"
+               icon="desktop"
+               id="simple-app-table-section"
+               collapsible="false">
+    <div>
+        <div ng-if="$ctrl.apps.length > 0">
+            <span>
+                    <waltz-app-table applications="$ctrl.apps">
+                    </waltz-app-table>
+            </span>
+            <div class="waltz-sub-section-controls">
+                <waltz-data-extract-link name="Applications"
+                                         styling="link"
+                                         extract="application/by-selector"
+                                         method="POST"
+                                         request-body="$ctrl.selectorOptions">
+                </waltz-data-extract-link>
+                <span class="text-muted"> Download :  </span>
+            </div>
+        </div>
+        <waltz-no-data ng-if="$ctrl.apps.length == 0">
+            <message>
+                There are <strong>no application </strong>
+                associations.
+            </message>
+        </waltz-no-data>
+    </div>
+</waltz-section>

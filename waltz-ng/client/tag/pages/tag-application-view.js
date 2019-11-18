@@ -17,53 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import template from "./tag-application-view.html";
 import {initialiseData} from "../../common";
-import template from "./tag-list.html";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
-
-/**
- * @name waltz-tag-list
- *
- * @description
- * This component ...
- */
-
-const bindings = {
-    keywords: "<"
+const initialState = {
+    bookmarksSection: dynamicSections.bookmarksSection
 };
 
-const transclude = {
-    empty: "?empty",
-    last: "?last"
-};
+function controller($stateParams, serviceBroker) {
 
+    const vm = initialiseData(this, initialState);
+    const id = $stateParams.id;
 
-const initialState = {};
+    vm.entityReference = { id, kind: "TAG" };
 
-
-function controller($state) {
-    const vm = this;
-
-    vm.$onInit = () => initialiseData(vm, initialState);
-
-    vm.onTagSelect = (tag) => {
-        const params = { id: tag.id };
-        $state.go(`main.tag.id.${tag.targetKind.toLowerCase()}`, params);
-    }
+    serviceBroker
+        .loadViewData(
+            CORE_API.TagStore.getTagById,
+            [ id ])
+        .then(r => vm.tag = r.data);
 }
 
-
-controller.$inject = [
-    "$state"
-];
+controller.$inject = ["$stateParams", "ServiceBroker"];
 
 
-const component = {
+export default {
     template,
-    transclude,
-    bindings,
-    controller
+    controller,
+    controllerAs: "ctrl",
+    bindToController: true,
+    scope: {}
 };
 
-
-export default component;
