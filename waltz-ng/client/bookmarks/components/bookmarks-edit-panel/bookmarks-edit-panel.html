@@ -59,6 +59,9 @@
                 </td>
                 <td>
                     <span ng-bind="bookmark.url"></span>
+                    <span ng-if="bookmark.isRestricted">
+                        <waltz-icon name="lock"></waltz-icon>
+                    </span>
                 </td>
                 <td>
                     <span ng-bind="bookmark.description"></span>
