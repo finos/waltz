@@ -97,6 +97,10 @@ export const lifecyclePhaseColorScale = scaleOrdinal()
     .domain(["PRODUCTION", "CONCEPTUAL", "DEVELOPMENT", "RETIRED"])
     .range([gold, blue, green, grey]);
 
+export const attestationStatusColorScale = scaleOrdinal()
+    .domain(["ATTESTED", "NEVER_ATTESTED"])
+    .range([green, grey]);
+
 
 export const criticalityColorScale = scaleOrdinal()
     .domain(["LOW", "MEDIUM", "HIGH", "VERY_HIGH", "NONE", "UNKNOWN"])

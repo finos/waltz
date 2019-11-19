@@ -44,5 +44,14 @@ function addAttestationSection() {
         id: 10001
     };
 
+    dynamicSections.dbAttestationSummarySection = {
+        componentId: "attestation-summary-section",
+        name: "Attestations",
+        icon: "check-square-o",
+        id: 10005
+    };
+
     dynamicSectionsByKind["APPLICATION"].push(dynamicSections.dbAttestationSection);
+
+    dynamicSectionsByKind["PERSON"].push(dynamicSections.dbAttestationSummarySection);
 }

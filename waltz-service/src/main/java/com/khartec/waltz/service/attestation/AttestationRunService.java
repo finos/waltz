@@ -27,6 +27,7 @@ import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.email.EmailService;
@@ -249,6 +250,12 @@ public class AttestationRunService {
         return create(username, mkCreateCommand(entityRunCreateCommand));
     }
 
+
+    public Collection<AttestationRun> findByIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = mkIdSelector(EntityKind.ATTESTATION, options);
+        return attestationRunDao.findByIdSelector(selector);
+
+    }
 
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
         return ImmutableAttestationRunCreateCommand.builder()
