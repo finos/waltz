@@ -18,7 +18,12 @@ module.exports = {
         //pathinfo: false  // https://webpack.js.org/guides/build-performance/#output-without-path-info
     },
     resolve: {
-        symlinks: false
+        symlinks: false,
+        alias: {
+            svelte: path.resolve("node_modules", "svelte")
+        },
+        extensions: [".mjs", ".js", ".svelte"],
+        mainFields: ["svelte", "browser", "module", "main"]
     },
     optimization: {
         runtimeChunk: "single",
@@ -65,6 +70,21 @@ module.exports = {
     ],
     module: {
         rules: [
+            {
+                test: /\.mjs$/,
+                include: /node_modules/,
+                type: "javascript/auto",
+            },
+            {
+                test: /\.svelte$/,
+                use: {
+                    loader: "svelte-loader",
+                    options: {
+                        emitCss: false,
+                        hotReload: true
+                    }
+                }
+            },
             {
                 test: /\.jsx?$/,
                 use: ["babel-loader"],

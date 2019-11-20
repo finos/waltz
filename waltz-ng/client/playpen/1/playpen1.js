@@ -20,6 +20,7 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
+import App from './App.svelte';
 
 const initData = {
 
@@ -31,6 +32,18 @@ function controller($element, $q, serviceBroker) {
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
+        setTimeout(() => {
+            const targ = document.querySelector("#svelte-app");
+            console.log({targ})
+            const app = new App({
+                target: targ,
+                props: {
+                    name: 'world',
+                    serviceBroker
+                }
+            });
+        }, 10)
+
     };
 
     vm.myVars = {};
@@ -41,7 +54,7 @@ function controller($element, $q, serviceBroker) {
     };
 }
 
-controller.$inject = [];
+controller.$inject = ["$element", "$q", "ServiceBroker"];
 
 const view = {
     template,
