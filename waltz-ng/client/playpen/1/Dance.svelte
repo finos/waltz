@@ -12,7 +12,7 @@
     }
 
     async function loadViaSB() {
-        console.log({serviceBroker, id});
+        console.log("...")
         let p = await serviceBroker.loadViewData(
             CORE_API.ApplicationStore.getById,
             [id]);
@@ -38,7 +38,7 @@
 {#await promise}
     <h1 class="zzz">Snooze</h1>
 {:then v}
-    <h1 class="yay">Hello {console.log(v) || v.name}, {v.applicationKind}!</h1>
+    <h1 class="yay">Hello {v.name}, {v.applicationKind}!</h1>
 {:catch err}
     <h1 class="boo">Oh no</h1>
     <pre>{err}</pre>

@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
 
     <waltz-page-header name="Playpen"
@@ -10,15 +29,35 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Real Data">
+    <waltz-section name="As view code">
         <div class="row">
             <div class="col-sm-12">
                 <div id="svelte-app">
-
                 </div>
             </div>
+        </div>
 
+    </waltz-section>
 
+    <waltz-section name="As view code2">
+        <waltz-svelte-component component="$ctrl.app">
+        </waltz-svelte-component>
+        </div>
+
+    </waltz-section>
+
+    <waltz-section name="As component">
+        <div class="row">
+            <div class="col-sm-12">
+                <button ng-click="$ctrl.ref = $ctrl.ref1">Ref 1</button>
+                <button ng-click="$ctrl.ref = $ctrl.ref2">Ref 2</button>
+                <button ng-click="$ctrl.ref = $ctrl.ref3">Ref 3</button>
+                <button ng-click="$ctrl.ref = $ctrl.ref4">Ref 4</button>
+
+                <waltz-svelte-component component="$ctrl.testWidget"
+                                        primary-entity-ref="$ctrl.ref">
+                </waltz-svelte-component>
+            </div>
         </div>
 
     </waltz-section>

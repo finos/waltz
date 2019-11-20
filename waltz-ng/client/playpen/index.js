@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import playpenView4 from "./4/playpen4";
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
+import SvelteComponent from "./svelte-component";
 
 export default () => {
 
@@ -62,7 +63,7 @@ export default () => {
         }
     ]);
 
-    registerComponents(module, []);
+    registerComponents(module, [SvelteComponent]);
     return module.name;
 
 };
