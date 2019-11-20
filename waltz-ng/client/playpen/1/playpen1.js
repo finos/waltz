@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,11 +20,18 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import App from './App.svelte';
+import App from "./App.svelte";
+import {mkRef} from "../../common/entity-utils";
+import testWidget from "./TestWidget.svelte";
 
 const initData = {
-
-
+    ref: mkRef("APPLICATION", 18),
+    ref1: mkRef("APPLICATION", 12),
+    ref2: mkRef("APPLICATION", 22),
+    ref3: mkRef("APPLICATION", 212),
+    ref4: mkRef("APPLICATION", 122),
+    testWidget,
+    app: App
 };
 
 function controller($element, $q, serviceBroker) {
@@ -34,16 +41,15 @@ function controller($element, $q, serviceBroker) {
     vm.$onInit = () => {
         setTimeout(() => {
             const targ = document.querySelector("#svelte-app");
-            console.log({targ})
+            console.log({targ});
             const app = new App({
                 target: targ,
                 props: {
-                    name: 'world',
+                    name: "world",
                     serviceBroker
                 }
             });
-        }, 10)
-
+        }, 10);
     };
 
     vm.myVars = {};
