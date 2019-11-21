@@ -292,6 +292,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20191119-4486-1"
+               author="muzammilali">
+        <comment>4486: added invalidated at to the attestation_run table</comment>
+        <addColumn tableName="attestation_run">
+            <column name="invalidated_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
     <changeSet id="20191119-4084-1"
                author="davidwatkins73">
         <comment>4084: Alloc scheme, add unique index on category + name</comment>
