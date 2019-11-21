@@ -327,9 +327,6 @@ function controller($state, serviceBroker, userService, notification) {
 
     // -- LIFECYCLE
 
-    vm.$onInit = () => {
-    };
-
     vm.$onChanges = (changes) => {
         if (vm.instanceId) {
             reload();

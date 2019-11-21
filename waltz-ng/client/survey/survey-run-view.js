@@ -20,11 +20,21 @@
 import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../common";
-import {mkEntityLinkGridCell} from "../common/grid-utils";
+import {mkEntityLabelGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 
 const columnDefs = [
-    mkEntityLinkGridCell("Entity", "surveyEntity", "left", "right"),
+    mkEntityLabelGridCell("Entity", "surveyEntity", "left", "right"),
     {
+        field: "id",
+        name: "Actions",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <a class='clickable'
+                   ui-sref="main.survey.instance.response.view ({id: COL_FIELD })">
+                    Show survey
+                </a>
+            </div>`
+    }, {
         field: "status",
         cellFilter: "toDisplayName:'surveyInstanceStatus'"
     }, {
@@ -39,16 +49,6 @@ const columnDefs = [
         field: "submittedBy",
     }, {
         field: "approvedBy",
-    }, {
-        field: "id",
-        name: "Actions",
-        cellTemplate: `
-            <div class="ui-grid-cell-contents">
-                <a class='clickable'
-                   ui-sref="main.survey.instance.response.view ({id: COL_FIELD })">
-                    Show survey
-                </a> 
-            </div>`
     }
 ];
 

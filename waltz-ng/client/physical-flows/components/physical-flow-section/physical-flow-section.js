@@ -1,24 +1,14 @@
-import {initialiseData} from "../../../common";
-
 import template from "./physical-flow-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
+    optionalColumnDefs: "<"
 };
 
 
-const initialState = {};
-
-
 function controller() {
-    const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-    };
-
-    vm.$onChanges = (changes) => {
-    };
+    const vm = this;
 }
 
 
@@ -34,5 +24,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowSection'
+    id: "waltzPhysicalFlowSection"
 };

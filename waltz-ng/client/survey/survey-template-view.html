@@ -98,6 +98,14 @@
                    name="Questions"
                    small="( {{ ctrl.questionInfos.length }} )">
 
+        <input type="search"
+               class="form-control"
+               placeholder="Search..."
+               ng-model-options="{ debounce: 200 }"
+               ng-model="ctrl.qry">
+
+        <br>
+
         <div class="row">
             <div class="col-sm-12">
                 <table class="table table-condensed table-striped">
@@ -123,7 +131,7 @@
                         <th>External Id</th>
                     </tr>
                     </thead>
-                    <tr ng-repeat="qi in ctrl.questionInfos | orderBy:'position'">
+                    <tr ng-repeat="qi in ctrl.questionInfos | filter:ctrl.qry | orderBy:'position'">
                         <td><span ng-bind="qi.question.sectionName"></span></td>
                         <td><span ng-bind="qi.question.questionText"></span></td>
                         <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>

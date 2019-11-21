@@ -280,4 +280,27 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20191118-4492-1"
+               author="kearash1">
+        <comment>4492: support for restricted bookmarks</comment>
+        <addColumn tableName="bookmark">
+            <column name="is_restricted"
+                    defaultValueBoolean="false"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191119-4486-1"
+               author="muzammilali">
+        <comment>4486: added invalidated at to the attestation_run table</comment>
+        <addColumn tableName="attestation_run">
+            <column name="invalidated_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

@@ -34,6 +34,7 @@ import AppsByLifecyclePhasePie from './components/apps-by-lifecycle-phase-pie';
 import AppsSection from './components/apps-section/apps-section';
 import AppSummary from './components/app-summary';
 import AppTable from './components/app-table';
+import SimpleAppTable from './components/apps-view/simple-app-table';
 
 export default () => {
 
@@ -54,7 +55,8 @@ export default () => {
         .component('waltzAppsByLifecyclePhasePie', AppsByLifecyclePhasePie)
         .component('waltzAppsSection', AppsSection)
         .component('waltzAppSummary', AppSummary)
-        .component('waltzAppTable', AppTable);
+        .component('waltzAppTable', AppTable)
+        .component('waltzSimpleAppTable', SimpleAppTable);
 
     registerComponents(module, [
         AppCostsSection,

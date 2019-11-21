@@ -90,7 +90,9 @@
             </h4>
 
             <div ng-repeat="qi in groupedQuestion.questionInfos">
-                <div class="row wsirv-response-row">
+                <div class="row wsirv-response-row"
+                     data-question-ext-id="{{qi.question.externalId}}"
+                     data-question-id="{{qi.question.id}}">
                     <div class="col-sm-5">
                         <div ng-bind="qi.question.questionText"
                              style="text-align: right;"

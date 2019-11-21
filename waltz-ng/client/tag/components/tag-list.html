@@ -7,11 +7,11 @@
 
     <ul ng-if="$ctrl.keywords.length > 0"
         class="waltz-keyword-list">
-        <li ng-repeat="keyword in $ctrl.keywords | orderBy"
-            ng-click="$ctrl.onSelect({keyword: keyword})"
+        <li ng-repeat="tag in $ctrl.keywords | orderBy"
+            ng-click="$ctrl.onTagSelect(tag)"
             class="wkl-keyword"
-            ng-class="{ 'clickable': $ctrl.onSelect }">
-            <span ng-bind="keyword.name"></span>
+            ng-class="{ 'clickable': $ctrl.onTagSelect }">
+            <span ng-bind="tag.name"></span>
         </li>
 
         <li class="wkl-last waltz-visibility-parent">

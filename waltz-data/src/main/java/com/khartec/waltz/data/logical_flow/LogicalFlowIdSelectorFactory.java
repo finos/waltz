@@ -32,15 +32,18 @@ import org.jooq.Select;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
 
 
 public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
@@ -74,9 +77,33 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForPhysicalSpecification(options);
             case SERVER:
                 return mkForServer(options);
+            case TAG:
+                return mkForTagBasedOnPhysicalFlowTags(options);
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+        checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given an LOGICAL_DATA_FLOW ref");
+        return DSL.select(DSL.val(options.entityReference().id()));
+    }
+
+    private Select<Record1<Long>> mkForTagBasedOnPhysicalFlowTags(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        return DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(TAG_USAGE)
+                .on(TAG_USAGE.ENTITY_ID.eq(PHYSICAL_FLOW.ID)
+                        .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
+                .where(TAG_USAGE.TAG_ID.eq(options.entityReference().id()))
+                .and(mkLifecycleStatusCondition(options));
     }
 
 
