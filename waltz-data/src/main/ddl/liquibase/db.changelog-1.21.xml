@@ -346,4 +346,15 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="20191119-4419-4"
+               author="davidwatkins73">
+        <comment>4419: involvement to person fk</comment>
+        <addForeignKeyConstraint constraintName="inv_to_person_fk"
+                                 baseTableName="involvement"
+                                 baseColumnNames="employee_id"
+                                 referencedTableName="person"
+                                 referencedColumnNames="employee_id"/>
+    </changeSet>
+
+
 </databaseChangeLog>
