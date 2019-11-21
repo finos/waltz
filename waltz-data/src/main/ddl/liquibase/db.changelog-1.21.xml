@@ -356,5 +356,28 @@
                                  referencedColumnNames="employee_id"/>
     </changeSet>
 
+    <changeSet id="20191119-4264-1-a"
+               dbms="mssql"
+               author="davidwatkins73">
+        <comment>4264: ensure name is accurate for role 'CHANGE_SET_EDITOR'</comment>
+
+        <sql>
+            update role
+            set name='Change Set Editor'
+            where [key]='CHANGE_SET_EDITOR'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191119-4264-1-b"
+               dbms="postgresql"
+               author="davidwatkins73">
+        <comment>4264: ensure name is accurate for role 'CHANGE_SET_EDITOR'</comment>
+
+        <sql>
+            update role
+            set name='Change Set Editor'
+            where key='CHANGE_SET_EDITOR'
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>
