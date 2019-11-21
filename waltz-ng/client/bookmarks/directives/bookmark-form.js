@@ -34,6 +34,10 @@ function controller($scope) {
         this.bookmark.isPrimary = !this.bookmark.isPrimary;
     };
 
+    this.toggleRestricted = () => {
+        this.bookmark.isRestricted = !this.bookmark.isRestricted;
+    };
+
 
     this.submit = () => {
         if (!this.onSubmit || !this.onSubmit()) {

@@ -84,6 +84,13 @@
                                      url="{{ bookmark.url }}"
                                      show-url="true">
                 </waltz-external-link>
+
+                <waltz-icon ng-if='bookmark.isRestricted'
+                            uib-popover="Security permissions apply to this link, you may not have access"
+                            popover-trigger="mouseenter"
+                            name="lock">
+                </waltz-icon>
+
                 <div>
                     <div ng-if="bookmark.description"
                          class="text-muted small">
