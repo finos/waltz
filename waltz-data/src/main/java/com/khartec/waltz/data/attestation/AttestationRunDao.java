@@ -19,6 +19,8 @@
 
 package com.khartec.waltz.data.attestation;
 
+import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -34,6 +36,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
@@ -221,5 +224,30 @@ public class AttestationRunDao {
         return dsl.select(entityCount)
                 .from(idSelector)
                 .fetchOne(r -> r.get(entityCount));
+    }
+
+    public int updateModifiedDate(Set<EntityReference> attestedEntityRefs, EntityKind attestedEntityKind) {
+        Condition condition = ATTESTATION_INSTANCE.PARENT_ENTITY_ID
+                .in(SetUtilities
+                        .map(attestedEntityRefs, EntityReference::id));
+
+        SelectConditionStep<Record1<Long>> runIds = DSL
+                .select(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID)
+                .from(ATTESTATION_INSTANCE)
+                .where(condition);
+
+        return updateModifiedDateWithCondition(ATTESTATION_RUN.ID.in(runIds), attestedEntityKind);
+    }
+
+    private int updateModifiedDateWithCondition(Condition condition, EntityKind attestedEntityKind) {
+        return dsl.update(ATTESTATION_RUN)
+                .set(ATTESTATION_RUN.LAST_MODIFIED_DATE, DateTimeUtilities.nowUtcTimestamp())
+                .where(condition)
+                .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(attestedEntityKind.name()))
+                .execute();
+    }
+
+    public int updateModifiedDate(Select<Record1<Long>> selector, EntityKind attestedEntityKind) {
+        return updateModifiedDateWithCondition(ATTESTATION_RUN.ID.in(selector), attestedEntityKind);
     }
 }

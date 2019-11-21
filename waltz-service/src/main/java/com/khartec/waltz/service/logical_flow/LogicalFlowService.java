@@ -34,6 +34,7 @@ import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.tally.TallyPack;
+import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -57,6 +58,8 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -71,6 +74,7 @@ public class LogicalFlowService {
     private final ChangeLogService changeLogService;
     private final DataTypeService dataTypeService;
     private final DataTypeUsageService dataTypeUsageService;
+    private final AttestationRunService attestationRunService;
     private final DBExecutorPoolInterface dbExecutorPool;
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
@@ -84,6 +88,7 @@ public class LogicalFlowService {
     public LogicalFlowService(ChangeLogService changeLogService,
                               DataTypeService dataTypeService,
                               DataTypeUsageService dataTypeUsageService,
+                              AttestationRunService attestationRunService,
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               LogicalFlowDao logicalFlowDao,
@@ -99,6 +104,7 @@ public class LogicalFlowService {
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
         this.dataTypeUsageService = dataTypeUsageService;
+        this.attestationRunService = attestationRunService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
@@ -179,6 +185,12 @@ public class LogicalFlowService {
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
         attemptToAddUnknownDecoration(logicalFlow, username);
 
+        attestationRunService.invalidateAttestation(
+                SetUtilities.asSet(
+                        addCmd.source(),
+                        addCmd.target()),
+                LOGICAL_DATA_FLOW);
+
         return logicalFlow;
     }
 
@@ -240,6 +252,12 @@ public class LogicalFlowService {
                         .build())
                 .collect(toList());
 
+        Set<EntityReference> sourceOrTargetApps = union(
+                map(addCmds, AddLogicalFlowCommand::source),
+                map(addCmds, AddLogicalFlowCommand::target));
+
+        System.out.println("LogicalFlowService.addFlows ::: Invalidating Attestations");
+        attestationRunService.invalidateAttestation(sourceOrTargetApps, LOGICAL_DATA_FLOW);
         return logicalFlowDao.addFlows(flowsToAdd, username);
     }
 
@@ -279,6 +297,7 @@ public class LogicalFlowService {
                 Operation.REMOVE);
 
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+        attestationRunService.invalidateAttestation(affectedEntityRefs, LOGICAL_DATA_FLOW);
 
         return deleted;
     }

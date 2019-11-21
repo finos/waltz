@@ -1,5 +1,6 @@
 package com.khartec.waltz.data.attestation;
 
+import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
@@ -13,11 +14,13 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 public class AttestationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {
 
     private static final Condition ATTESTATION_INSTANCE_CONDITION = ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID);
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -26,6 +29,10 @@ public class AttestationIdSelectorFactory implements Function<IdSelectionOptions
         switch (ref.kind()) {
             case PERSON:
                 return mkForPerson(options);
+            case PHYSICAL_FLOW:
+                return mkForLogicalFlow(options);
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
 //            case APP_GROUP:
 //                return mkForAppGroup(options);
             default:
@@ -33,9 +40,25 @@ public class AttestationIdSelectorFactory implements Function<IdSelectionOptions
         }
     }
 
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+
+        return DSL.select(ATTESTATION_RUN.ID)
+                .from(ATTESTATION_RUN)
+                .join(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE_CONDITION)
+                .leftOuterJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)))
+                .leftOuterJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.isNotNull().or(LOGICAL_FLOW.TARGET_ENTITY_ID.isNotNull()));
+    }
+
     private Select<Record1<Long>> mkForPerson(IdSelectionOptions options) {
         ensureScopeIsExact(options);
 
+        // TODO consider including recipient as a reference
         return DSL.select(ATTESTATION_RUN.ID)
                 .from(ATTESTATION_RUN)
                 .join(ATTESTATION_INSTANCE)

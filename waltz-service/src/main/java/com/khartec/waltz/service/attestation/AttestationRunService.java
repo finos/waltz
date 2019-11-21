@@ -27,7 +27,6 @@ import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.email.EmailService;
@@ -245,6 +244,19 @@ public class AttestationRunService {
         );
     }
 
+//    public int invalidateAttestation(EntityReference associatedEntityRef, EntityKind attestedEntityKind) {
+//        return attestationRunDao.updateModifiedDate(SetUtilities.asSet(associatedEntityRef), attestedEntityKind);
+//    }
+
+    public int invalidateAttestation(Set<EntityReference> associatedEntityRef,
+                                     EntityKind affectedEntityKind) {
+        return attestationRunDao.updateModifiedDate(associatedEntityRef, affectedEntityKind);
+    }
+
+//    public int invalidateAttestation(Select<Record1<Long>> selector) {
+//        return attestationRunDao.updateModifiedDate(selector);
+//    }
+
 
     public IdCommandResponse createRunForEntity(String username, AttestEntityCommand entityRunCreateCommand) {
         return create(username, mkCreateCommand(entityRunCreateCommand));
@@ -254,7 +266,6 @@ public class AttestationRunService {
     public Collection<AttestationRun> findByIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = mkIdSelector(EntityKind.ATTESTATION, options);
         return attestationRunDao.findByIdSelector(selector);
-
     }
 
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
@@ -270,4 +281,5 @@ public class AttestationRunService {
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
     }
+
 }
