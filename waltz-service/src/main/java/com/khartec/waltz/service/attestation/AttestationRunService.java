@@ -250,7 +250,7 @@ public class AttestationRunService {
 
     public int invalidateAttestation(Set<EntityReference> associatedEntityRef,
                                      EntityKind affectedEntityKind) {
-        return attestationRunDao.updateModifiedDate(associatedEntityRef, affectedEntityKind);
+        return attestationRunDao.invalidateAttestations(associatedEntityRef, affectedEntityKind);
     }
 
 //    public int invalidateAttestation(Select<Record1<Long>> selector) {

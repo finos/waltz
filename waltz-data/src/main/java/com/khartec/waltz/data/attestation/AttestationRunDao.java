@@ -226,7 +226,7 @@ public class AttestationRunDao {
                 .fetchOne(r -> r.get(entityCount));
     }
 
-    public int updateModifiedDate(Set<EntityReference> attestedEntityRefs, EntityKind attestedEntityKind) {
+    public int invalidateAttestations(Set<EntityReference> attestedEntityRefs, EntityKind attestedEntityKind) {
         Condition condition = ATTESTATION_INSTANCE.PARENT_ENTITY_ID
                 .in(SetUtilities
                         .map(attestedEntityRefs, EntityReference::id));
@@ -236,18 +236,19 @@ public class AttestationRunDao {
                 .from(ATTESTATION_INSTANCE)
                 .where(condition);
 
-        return updateModifiedDateWithCondition(ATTESTATION_RUN.ID.in(runIds), attestedEntityKind);
+        return invalidateAttestations(ATTESTATION_RUN.ID.in(runIds), attestedEntityKind);
     }
 
-    private int updateModifiedDateWithCondition(Condition condition, EntityKind attestedEntityKind) {
+    private int invalidateAttestations(Condition condition, EntityKind attestedEntityKind) {
         return dsl.update(ATTESTATION_RUN)
-                .set(ATTESTATION_RUN.LAST_MODIFIED_DATE, DateTimeUtilities.nowUtcTimestamp())
+                .set(ATTESTATION_RUN.INVALIDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .where(condition)
                 .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(attestedEntityKind.name()))
+                .and(ATTESTATION_RUN.INVALIDATED_AT.isNull())
                 .execute();
     }
 
-    public int updateModifiedDate(Select<Record1<Long>> selector, EntityKind attestedEntityKind) {
-        return updateModifiedDateWithCondition(ATTESTATION_RUN.ID.in(selector), attestedEntityKind);
+    public int invalidateAttestations(Select<Record1<Long>> selector, EntityKind attestedEntityKind) {
+        return invalidateAttestations(ATTESTATION_RUN.ID.in(selector), attestedEntityKind);
     }
 }
