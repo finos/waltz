@@ -19,8 +19,6 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
@@ -35,7 +33,6 @@ import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.external_identifier.ExternalIdentifierService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
@@ -71,9 +68,7 @@ public class PhysicalFlowService {
     private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowSearchDao searchDao;
     private final ExternalIdentifierService externalIdentifierService;
-    private final AttestationRunService attestationRunService;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
     @Autowired
@@ -82,7 +77,7 @@ public class PhysicalFlowService {
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationService physicalSpecificationService,
                                PhysicalFlowSearchDao searchDao,
-                               ExternalIdentifierService externalIdentifierService, AttestationRunService attestationRunService) {
+                               ExternalIdentifierService externalIdentifierService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
@@ -95,7 +90,6 @@ public class PhysicalFlowService {
         this.physicalSpecificationService = physicalSpecificationService;
         this.searchDao = searchDao;
         this.externalIdentifierService = externalIdentifierService;
-        this.attestationRunService = attestationRunService;
     }
 
 
@@ -163,9 +157,6 @@ public class PhysicalFlowService {
                             fromRef.id(),
                             toRef.id()),
                     Operation.UPDATE);
-
-//            attestationRunService.invalidateAttestation(toRef);
-//            attestationRunService.invalidateAttestation(fromRef);
         }
         return updateStatus + moveCount > 0;
     }
@@ -243,7 +234,6 @@ public class PhysicalFlowService {
             // log changes against source and target entities
             if (commandOutcome == CommandOutcome.SUCCESS) {
                 PhysicalSpecification specification = physicalSpecificationService.getById(physicalFlow.specificationId());
-                invalidateAttestation(logicalFlow);
 
                 String flowRemovalMessage = String.format(
                         "Physical flow: %s, from: %s, to: %s removed.",
@@ -286,13 +276,6 @@ public class PhysicalFlowService {
                 .isSpecificationUnused(isSpecificationUnused)
                 .isLastPhysicalFlow(isLastPhysicalFlow)
                 .build();
-    }
-
-    private void invalidateAttestation(LogicalFlow logicalFlow) {
-        attestationRunService
-                .invalidateAttestation(SetUtilities
-                                .asSet(logicalFlow.source(), logicalFlow.target()),
-                        PHYSICAL_FLOW);
     }
 
 
@@ -338,8 +321,6 @@ public class PhysicalFlowService {
         }
 
         long physicalFlowId = physicalFlowDao.create(flow);
-
-        invalidateAttestation(logicalFlow);
 
         logChange(username,
                 logicalFlow.source(),

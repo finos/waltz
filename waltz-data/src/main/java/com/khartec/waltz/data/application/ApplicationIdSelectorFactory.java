@@ -103,8 +103,6 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForSoftwarePackage(options);
             case TAG:
                 return mkForTag(options);
-            case PHYSICAL_FLOW:
-                return mkForPhysicalFlow(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
@@ -191,18 +189,6 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .union(targetAppIds);
     }
 
-    private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
-
-        long physicalFlowId = options.entityReference().id();
-
-        Condition logicalFlowInClause = LOGICAL_FLOW.ID.in(DSL
-                .select(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.ID.eq(physicalFlowId)));
-
-        return getAppViaLogicalFlowSourceAndTarget(logicalFlowInClause);
-    }
 
     private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
         ensureScopeIsExact(options);
@@ -226,18 +212,14 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .and(flowDiagram.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(applicationConditions);
 
-        return getAppViaLogicalFlowSourceAndTarget(logicalFlowInClause);
-    }
-
-    private Select<Record1<Long>> getAppViaLogicalFlowSourceAndTarget(Condition logicalFlowInClause) {
-
         SelectConditionStep<Record1<Long>> appsViaSourcesOfFlows = DSL
                 .select(LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .from(LOGICAL_FLOW)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID))
                 .where(logicalFlowInClause)
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(applicationConditions);
 
         SelectConditionStep<Record1<Long>> appsViaTargetsOfFlows = DSL
                 .select(LOGICAL_FLOW.TARGET_ENTITY_ID)
@@ -245,9 +227,11 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID))
                 .where(logicalFlowInClause)
-                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(applicationConditions);
 
-        return appsViaSourcesOfFlows
+        return directlyReferencedApps
+                .unionAll(appsViaSourcesOfFlows)
                 .unionAll(appsViaTargetsOfFlows);
     }
 

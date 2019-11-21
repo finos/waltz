@@ -244,19 +244,6 @@ public class AttestationRunService {
         );
     }
 
-//    public int invalidateAttestation(EntityReference associatedEntityRef, EntityKind attestedEntityKind) {
-//        return attestationRunDao.updateModifiedDate(SetUtilities.asSet(associatedEntityRef), attestedEntityKind);
-//    }
-
-    public int invalidateAttestation(Set<EntityReference> associatedEntityRef,
-                                     EntityKind affectedEntityKind) {
-        return attestationRunDao.invalidateAttestations(associatedEntityRef, affectedEntityKind);
-    }
-
-//    public int invalidateAttestation(Select<Record1<Long>> selector) {
-//        return attestationRunDao.updateModifiedDate(selector);
-//    }
-
 
     public IdCommandResponse createRunForEntity(String username, AttestEntityCommand entityRunCreateCommand) {
         return create(username, mkCreateCommand(entityRunCreateCommand));
@@ -281,5 +268,4 @@ public class AttestationRunService {
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
     }
-
 }
