@@ -78,7 +78,7 @@ function controller(serviceBroker) {
                 [vm.selector])
             .then(r => {
                 vm.authSources = r.data;
-            })
+            });
     };
 
     vm.$onInit = () => {
