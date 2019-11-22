@@ -192,7 +192,9 @@ public class AttestationRunDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
-                .where(ATTESTATION_RUN.ID.in(selector))
+                .innerJoin(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_INSTANCE.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -224,31 +226,5 @@ public class AttestationRunDao {
         return dsl.select(entityCount)
                 .from(idSelector)
                 .fetchOne(r -> r.get(entityCount));
-    }
-
-    public int invalidateAttestations(Set<EntityReference> attestedEntityRefs, EntityKind attestedEntityKind) {
-        Condition condition = ATTESTATION_INSTANCE.PARENT_ENTITY_ID
-                .in(SetUtilities
-                        .map(attestedEntityRefs, EntityReference::id));
-
-        SelectConditionStep<Record1<Long>> runIds = DSL
-                .select(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID)
-                .from(ATTESTATION_INSTANCE)
-                .where(condition);
-
-        return invalidateAttestations(ATTESTATION_RUN.ID.in(runIds), attestedEntityKind);
-    }
-
-    private int invalidateAttestations(Condition condition, EntityKind attestedEntityKind) {
-        return dsl.update(ATTESTATION_RUN)
-                .set(ATTESTATION_RUN.INVALIDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .where(condition)
-                .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(attestedEntityKind.name()))
-                .and(ATTESTATION_RUN.INVALIDATED_AT.isNull())
-                .execute();
-    }
-
-    public int invalidateAttestations(Select<Record1<Long>> selector, EntityKind attestedEntityKind) {
-        return invalidateAttestations(ATTESTATION_RUN.ID.in(selector), attestedEntityKind);
     }
 }

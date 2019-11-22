@@ -54,4 +54,6 @@ function addAttestationSection() {
     dynamicSectionsByKind["APPLICATION"].push(dynamicSections.dbAttestationSection);
 
     dynamicSectionsByKind["PERSON"].push(dynamicSections.dbAttestationSummarySection);
+    dynamicSectionsByKind["ORG_UNIT"].push(dynamicSections.dbAttestationSummarySection);
+    dynamicSectionsByKind["APP_GROUP"].push(dynamicSections.dbAttestationSummarySection);
 }

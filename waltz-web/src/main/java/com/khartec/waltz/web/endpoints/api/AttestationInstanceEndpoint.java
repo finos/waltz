@@ -72,6 +72,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findAllByUserPath = mkPath(BASE_URL, "all", "user");
         String findHistoricalForPendingByUserPath = mkPath(BASE_URL, "historical", "user");
         String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
         DatumRoute<Boolean> attestInstanceRoute =
@@ -99,6 +100,9 @@ public class AttestationInstanceEndpoint implements Endpoint {
             return attestationInstanceService.findPersonsByInstanceId(id);
         };
 
+        ListRoute<AttestationInstance> findBySelectorRoute = ((request, response)
+                -> attestationInstanceService.findByIdSelector(readIdSelectionOptionsFromBody(request)));
+
         DatumRoute<Boolean> attestEntityForUserRoute =
                 (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req));
 
@@ -110,6 +114,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForList(findHistoricalForPendingByUserPath, findHistoricalForPendingByRecipientRoute);
         getForList(findByRunIdPath, findByRunIdRoute);
         getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
     }
 

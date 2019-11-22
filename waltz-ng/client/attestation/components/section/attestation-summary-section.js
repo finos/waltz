@@ -21,7 +21,12 @@ function controller($q,
     vm.$onInit = () => {
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef, "EXACT");
 
-        const attestationPromise = serviceBroker
+        const attestationInstancePromise = serviceBroker
+            .loadViewData(CORE_API.AttestationInstanceStore.findBySelector,
+                [selectionOptions])
+            .then(r => r.data);
+
+        const attestationRunPromise = serviceBroker
             .loadViewData(CORE_API.AttestationRunStore.findBySelector,
                 [selectionOptions])
             .then(r => r.data);
@@ -31,15 +36,15 @@ function controller($q,
                 [selectionOptions])
             .then(r => r.data);
 
-        $q.all([attestationPromise, appPromise])
-            .then(([attestations, applications]) => {
-                vm.attestations = attestations;
+        $q.all([attestationInstancePromise, attestationRunPromise, appPromise])
+            .then(([attestationInstances, attestationRuns, applications]) => {
+                vm.attestationRuns = attestationRuns;
+                vm.attestationInstances = attestationInstances
                 vm.applications = applications;
                 vm.summaryData = {
-                    logical: prepareSummaryData(applications, attestations, entity.APPLICATION.key, entity.LOGICAL_DATA_FLOW.key),
-                    physical: prepareSummaryData(applications, attestations, entity.APPLICATION.key, entity.PHYSICAL_FLOW.key)
+                    logical: prepareSummaryData(applications, attestationRuns, attestationInstances, entity.LOGICAL_DATA_FLOW.key),
+                    physical: prepareSummaryData(applications, attestationRuns, attestationInstances, entity.PHYSICAL_FLOW.key)
                 };
-                vm.config.size = 70;
             });
     };
 

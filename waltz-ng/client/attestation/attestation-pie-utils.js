@@ -26,32 +26,48 @@ export const attestationPieConfig = {
     labelProvider: (d) => attestationStatus[d.key] ? attestationStatus[d.key].name : "Unknown"
 };
 
+/**
+ * Returns count of applications for each attested category specified in the config
+ * @param applications: all applications subjected for aggregation
+ * @param attestationRuns: attestationRun for the applications
+ * @param attestationInstances: all attestationInstances for the applications
+ * @param attestedEntityKind: Entity Kind against which attestation data needs to be collected
+ * **/
+export function prepareSummaryData(applications = [],
+                                   attestationRuns = [],
+                                   attestationInstances = [],
+                                   attestedEntityKind) {
 
-export function prepareSummaryData(entities = [], attestations = [], filterByEntityKind, attestedEntityKind) {
-    const attestationsByAppId =
-        _.chain(attestations)
-        .filter(att =>
-            att.selectionOptions.entityReference.kind === filterByEntityKind
-            && att.attestedEntityKind === attestedEntityKind)
-        .keyBy(att => att.selectionOptions.entityReference.id)
+    const attestedRunIdsFilteredByEntityKind =
+        _.chain(attestationRuns)
+            .filter(d => d.attestedEntityKind === attestedEntityKind)
+            .map(d => d.id)
+            .value();
+
+    const attestedAppIds = getAttestedAppIds(attestationInstances, attestedRunIdsFilteredByEntityKind);
+
+    const applicationsWithAttestationFlag =
+        _.map(applications, app => addAttestedStatus(app, attestedAppIds));
+    // console.log('application with attestation flag ', attestedAppIds, applicationsWithAttestationFlag);
+
+    return toKeyCounts(applicationsWithAttestationFlag, a => a.isAttested);
+
+    function addAttestedStatus(app, attestedAppIds) {
+        return _.extend(app,
+            {isAttested: _.includes(attestedAppIds, app.id) ? "ATTESTED" : "NEVER_ATTESTED"});
+
+    }
+}
+
+function getAttestedAppIds(attestationInstances, attestedRunIds) {
+    return _.chain(attestationInstances)
+        .filter(instance => isAttested(instance)
+            && _.includes(attestedRunIds, instance.attestationRunId))
+        .map(instance => instance.parentEntity.id)
+        .uniq()
         .value();
 
-    const allApps =
-        _.map(entities, app =>
-            _.extend(app,
-            {isAttested: getAttestedStatus(attestationsByAppId, app)}));
-    const entityCountByAttestation = toKeyCounts(allApps, a => a.isAttested);
-    //following is not necesary if don't display keys with count 0
-    return _.map(_.keys(attestationStatus), key =>
-        Object.assign({key: key, count: getAttestationCount(entityCountByAttestation, key)}));
-}
-
-function getAttestedStatus(attestationsByAppId, app) {
-    return _.has(attestationsByAppId, app.id) ? "ATTESTED" : "NEVER_ATTESTED";
-}
-
-function getAttestationCount(data, key) {
-    const obj = _.find(data, d => d.key === key);
-    return obj != null? obj.count : 0;
-
+    function isAttested(instance) {
+        return instance.attestedAt != null;
+    }
 }
