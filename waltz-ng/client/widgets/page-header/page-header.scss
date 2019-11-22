@@ -1,3 +1,22 @@
+/*!
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @import "../../../style/_variables";
 @import "../../../style/_util";
 
@@ -10,9 +29,8 @@
 
 .waltz-page-header.wph-free {
     padding: 6px 6px 6px 16px;
-    border-top-left-radius: 10px;
+    border-radius: 3px;
     height: 80px;
-    border-top-right-radius: 10px;
     margin-bottom: 12px;
     border: 1px solid $waltz-border-color-lighter;
 
@@ -29,7 +47,7 @@
     overflow: hidden;
     position: fixed;
     top: 50px;
-    left: 0px;
+    left: 0;
     z-index: 999;
     border-bottom: 2px solid $waltz-border-color-lighter;
     opacity: 0;
