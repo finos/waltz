@@ -39,7 +39,7 @@ const initialState = {
 
 
 function isPrimary(a) {
-    return a.definition.visibility !== "PRIMARY";
+    return a.definition.visibility === "PRIMARY";
 }
 
 
@@ -61,7 +61,7 @@ function controller() {
     };
 
     vm.$onChanges = () => {
-        vm.visibility.showPrimaryToggle = _.some(vm.assessments, isPrimary);
+        vm.visibility.showPrimaryToggle = _.some(vm.assessments, a => !isPrimary(a));
         filterAssessments(vm.showPrimaryOnly);
     };
 
