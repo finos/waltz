@@ -31,8 +31,16 @@ const bindings = {
 const initialState = {
     assessmentsWithRatings: [],
     assessmentsWithoutRatings: [],
-    showPrimaryOnly: true
+    showPrimaryOnly: true,
+    visibility: {
+        showPrimaryToggle: false
+    }
 };
+
+
+function isPrimary(a) {
+    return a.definition.visibility !== "PRIMARY";
+}
 
 
 function controller() {
@@ -41,8 +49,8 @@ function controller() {
     const filterAssessments = (primaryOnly) => {
         if (vm.assessments) {
             const filtered = _.filter(vm.assessments, a =>  primaryOnly
-                ? a.definition.visibility === 'PRIMARY'
-                : true)
+                ? isPrimary(a)
+                : true);
 
             const valuePartitioned = _.partition(
                 filtered,
@@ -53,6 +61,7 @@ function controller() {
     };
 
     vm.$onChanges = () => {
+        vm.visibility.showPrimaryToggle = _.some(vm.assessments, isPrimary);
         filterAssessments(vm.showPrimaryOnly);
     };
 
