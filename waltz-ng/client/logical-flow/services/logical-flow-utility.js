@@ -22,23 +22,22 @@ import {authoritativeRatingColorScale} from "../../common/colors";
 
 
 function pickWorst(ratings = []) {
-    const sortedByBadness = [ 'DISCOURAGED', 'SECONDARY', 'PRIMARY', 'NO_OPINION' ];
+    const sortedByBadness = [ "DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION" ];
     const worst = _.find(sortedByBadness, x => _.includes(ratings, x));
 
-    return worst || 'NO_OPINION';
+    return worst || "NO_OPINION";
 }
 
 
 export default [
     () => {
-
         const buildGraphTweakers = (appIds = [], decorators = []) => {
 
-            const decoratorsByFlowId = _.groupBy(decorators, 'dataFlowId');
+            const decoratorsByFlowId = _.groupBy(decorators, "dataFlowId");
             const calcRating = (d) => {
                 const flowId = d.data.id;
                 const flowDecorators = decoratorsByFlowId[flowId] || [];
-                const ratings = _.map(flowDecorators, 'rating');
+                const ratings = _.map(flowDecorators, "rating");
                 return pickWorst(ratings);
             };
 
@@ -46,9 +45,8 @@ export default [
                 node : {
                     enter: (selection) => {
                         selection
-                            .classed('wdfd-intra-node', d => _.includes(appIds, d.id))
-                            .classed('wdfd-extra-node', d => ! _.includes(appIds, d.id))
-                            .on('dblclick.unfix', d => { d.fx = null; d.fy = null; })
+                            .classed("wdfd-intra-node", d => _.includes(appIds, d.id))
+                            .classed("wdfd-extra-node", d => ! _.includes(appIds, d.id))
                     },
                     update: _.identity,
                     exit: _.identity
@@ -56,18 +54,18 @@ export default [
                 link : {
                     update: (selection) => {
                         return selection
-                            .attr('stroke', d => {
+                            .attr("stroke", d => {
                                 const rating = calcRating(d);
                                 return authoritativeRatingColorScale(rating);
                             })
-                            .attr('fill', d => {
+                            .attr("fill", d => {
                                 const rating = calcRating(d);
                                 return authoritativeRatingColorScale(rating).brighter();
                             });
                     },
                     enter: (selection) => {
                         return selection
-                            .attr('stroke-width', 1.5);
+                            .attr("stroke-width", 1.5);
 
                     },
                     exit: _.identity
@@ -82,7 +80,7 @@ export default [
                     const enriched = {
                         dataType: {
                             id: dc.entityReference.id,
-                            name: displayNameService.lookup('dataType', dc.entityReference.id)
+                            name: displayNameService.lookup("dataType", dc.entityReference.id)
                         },
                         inbound: 0,
                         outbound: 0,

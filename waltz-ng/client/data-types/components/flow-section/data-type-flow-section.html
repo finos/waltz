@@ -1,102 +1,25 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
     <div class="row">
-        <div class="col-sm-4">
-            <div>
-                <div class="waltz-paragraph text-muted small">
-                    Use this panel to configure this view:
-                </div>
-
-                <h5>
-                    <waltz-icon name="filter"></waltz-icon>
-                    Authoritative Rating
-                </h5>
-
-                <div class="waltz-flow-filter-options-overlay waltz-paragraph small"
-                     style="padding-bottom: 4px; margin-left: 1em;">
-                    Select one of the following ratings:
-
-                    <div>
-                        <div>
-                            <label>
-                                <input type="checkbox"
-                                       ng-model='$ctrl.filterOptions.showPrimary'
-                                       ng-change="$ctrl.filterChanged()">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'PRIMARY'">
-                                </waltz-enum-value>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label>
-                                <input type="checkbox"
-                                       ng-model='$ctrl.filterOptions.showSecondary'
-                                       ng-change="$ctrl.filterChanged()">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'SECONDARY'">
-                                </waltz-enum-value>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label>
-                                <input type="checkbox"
-                                       ng-model='$ctrl.filterOptions.showDiscouraged'
-                                       ng-change="$ctrl.filterChanged()">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'DISCOURAGED'">
-                                </waltz-enum-value>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label style="border-bottom: 1px dotted #ccc; margin-bottom: 4px; padding-bottom: 4px;">
-                                <input type="checkbox"
-                                       ng-model='$ctrl.filterOptions.showNoOpinion'
-                                       ng-change="$ctrl.filterChanged()">
-                                <waltz-enum-value type="'AuthoritativenessRating'"
-                                                  show-icon="false"
-                                                  key="'NO_OPINION'">
-                                </waltz-enum-value>
-                            </label>
-                        </div>
-
-                        <a class="clickable"
-                           ng-click="$ctrl.showAll()">
-                            <strong>Show All Flows</strong>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div ng-if="$ctrl.selectedApp">
-                <hr>
-                <h4 ng-bind="$ctrl.selectedApp.name"></h4>
-
-                <a ui-sref="main.app.view ({ id: $ctrl.selectedApp.id })">
-                    More &raquo;
-                </a>
-
-                <waltz-app-centric-flow-table app="$ctrl.selectedApp"
-                                              flows="$ctrl.flowData.flows"
-                                              decorators="$ctrl.flowData.decorators"
-                                              data-data-types="$ctrl.dataTypes"
-                                              on-select="$ctrl.refocusApp">
-                </waltz-app-centric-flow-table>
-            </div>
-
-        </div>
-        <div class="col-sm-8">
-            <div ng-if="$ctrl.flowData.entities.length == 0">
-                <div class="alert alert-warning">
-                    <strong>No data to show</strong> given the current filter options.
-                </div>
-            </div>
-
-
+        <div class="col-sm-12">
             <div ng-if="$ctrl.flowData.entities.length >= 200 && !$ctrl.visibility.ignoreLimits">
                 <div class="alert alert-warning">
                     This graph will have <strong>too many nodes</strong> to render smoothly.
@@ -111,18 +34,95 @@
                 </div>
             </div>
 
-            <div ng-if="$ctrl.flowData.flows.length > 0">
-                <div ng-if="$ctrl.flowData.entities.length < 200  || $ctrl.visibility.ignoreLimits"
-                     style="border: 1px solid #ccc">
-                    <waltz-logical-flow-diagram data="$ctrl.flowData"
-                                                tweakers="$ctrl.graphTweakers">
-                    </waltz-logical-flow-diagram>
-                    <div class="small text-muted">
-                        Dragging nodes will pin them.  Double click to unpin.
-                    </div>
+            <div ng-if="$ctrl.flowData.entities.length < 200  || $ctrl.visibility.ignoreLimits">
+
+                <!-- BOINGY -->
+                <waltz-logical-flow-diagram data="$ctrl.flowData"
+                                            tweakers="$ctrl.graphTweakers">
+                    <filter-control>
+                       <div ng-include="'wdtfs-filter-control'"></div>
+                    </filter-control>
+                </waltz-logical-flow-diagram>
+
+                <div class="small text-muted">
+                    Dragging nodes will pin them.  Double click to unpin.
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+
+<!-- FILTER CONTROL -->
+<script type="text/ng-template"
+        id="wdtfs-filter-control">
+    <div class="waltz-paragraph text-muted small">
+        Use this panel to configure this view:
+    </div>
+
+    <h5>
+        <waltz-icon name="filter"></waltz-icon>
+        Authoritative Rating
+    </h5>
+
+    <div class="waltz-flow-filter-options-overlay waltz-paragraph small"
+         style="padding-bottom: 4px; margin-left: 1em;">
+        Select one of the following ratings:
+
+        <div>
+            <div>
+                <label>
+                    <input type="checkbox"
+                           ng-model='$ctrl.filterOptions.showPrimary'
+                           ng-change="$ctrl.filterChanged()">
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'PRIMARY'">
+                    </waltz-enum-value>
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <input type="checkbox"
+                           ng-model='$ctrl.filterOptions.showSecondary'
+                           ng-change="$ctrl.filterChanged()">
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'SECONDARY'">
+                    </waltz-enum-value>
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    <input type="checkbox"
+                           ng-model='$ctrl.filterOptions.showDiscouraged'
+                           ng-change="$ctrl.filterChanged()">
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'DISCOURAGED'">
+                    </waltz-enum-value>
+                </label>
+            </div>
+
+            <div>
+                <label style="border-bottom: 1px dotted #ccc; margin-bottom: 4px; padding-bottom: 4px;">
+                    <input type="checkbox"
+                           ng-model='$ctrl.filterOptions.showNoOpinion'
+                           ng-change="$ctrl.filterChanged()">
+                    <waltz-enum-value type="'AuthoritativenessRating'"
+                                      show-icon="false"
+                                      key="'NO_OPINION'">
+                    </waltz-enum-value>
+                </label>
+            </div>
+
+            <a class="clickable"
+               ng-click="$ctrl.showAll()">
+                <strong>Show All Flows</strong>
+            </a>
+        </div>
+    </div>
+</script>

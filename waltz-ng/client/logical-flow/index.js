@@ -1,7 +1,7 @@
 
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import LogicalFlowUtility from "./services/logical-flow-utility";
 
 export default () => {
 
-    const module = angular.module('waltz.logical.flow', []);
+    const module = angular.module("waltz.logical.flow", []);
 
     module
         .config(Routes);
@@ -41,7 +41,7 @@ export default () => {
     registerStore(module, LogicalFlowStore);
 
     module
-        .service('LogicalFlowUtilityService', LogicalFlowUtility);
+        .service("LogicalFlowUtilityService", LogicalFlowUtility);
 
     return module.name;
 };

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,16 +34,19 @@ import {refToString} from "../../../common/entity-utils";
 import template from "./boingy-graph.html";
 
 const width = 800;
-const height = 500;
+const height = 400;
 
 
 const bindings = {
-    data: "<",
+    data: "<", // { decorators: [], entities: [], flows: [] }
     tweakers: "<"
 };
 
 const initialState = {
-    zoomEnabled: false
+    zoomEnabled: false,
+    selectedNode: null,
+    showFilters: false,
+    showIsolated: false
 };
 
 const opacityScale = scalePow()
@@ -132,7 +135,10 @@ function addNodeCircle(selection) {
 }
 
 
-function drawNodes(nodes = [], holder, tweakers = DEFAULT_TWEAKER) {
+function drawNodes(nodes,
+                   holder,
+                   tweakers = DEFAULT_TWEAKER,
+                   onSelectNode) {
 
     function dragStarted(d) {
         if (!event.active) {
@@ -168,6 +174,7 @@ function drawNodes(nodes = [], holder, tweakers = DEFAULT_TWEAKER) {
         .append("g")
         .classed("wdfd-node", true)
         .on("dblclick.unfix", d => { d.fx = null; d.fy = null })
+        .on("click.node-selected", onSelectNode)
         .call(drag()
             .on("start", dragStarted)
             .on("drag", dragged)
@@ -231,10 +238,10 @@ function drawNodes(nodes = [], holder, tweakers = DEFAULT_TWEAKER) {
 
 function setup(vizElem) {
     const svg = vizElem
-        .append('svg')
+        .append("svg")
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [-width / 2, -height / 2, width, height]);
+        .attr("viewBox", [-width / 2, -height / 1.3, width * 1.3, height * 1.3]);
 
     const destroyResizeListener = responsivefy(svg);
 
@@ -248,10 +255,10 @@ function setup(vizElem) {
 }
 
 
-
 function draw(data = [],
               parts,
-              tweakers = {}) {
+              tweakers = {},
+              onSelectNode = () => {}) {
 
     const linkTweakers = _.defaults(tweakers.link, DEFAULT_TWEAKER);
     const nodeTweakers = _.defaults(tweakers.node, DEFAULT_TWEAKER);
@@ -267,7 +274,8 @@ function draw(data = [],
     const nodeSelection = drawNodes(
         nodes,
         parts.svg.select(".nodes"),
-        nodeTweakers);
+        nodeTweakers,
+        onSelectNode);
 
     const ticked = () => {
         nodeSelection
@@ -316,14 +324,14 @@ function controller($timeout, $element) {
     const vm = initialiseData(this, initialState);
 
     const vizElem = select($element[0])
-        .select('.viz');
+        .select(".viz");
 
     const parts = setup(vizElem);
 
     const debouncedDraw = _.debounce(() => {
         const enrichedData = enrichData(vm.data);
-        draw(enrichedData, parts, vm.tweakers);
-        simulation.alpha(0.4).restart();
+        draw(enrichedData, parts, vm.tweakers, onSelectNode);
+        simulation.alphaTarget(0.2).restart();
     }, 250);
 
     vm.$onChanges = (changes) => {
@@ -373,13 +381,18 @@ function controller($timeout, $element) {
         vm.zoomEnabled = false;
     };
 
-    vm.resetSimulation = () => {
+    function unPinAll() {
         _.forEach(vm.data.entities, d => {
             d.x = null;
             d.y = null;
             d.fx = null;
             d.fy = null;
         });
+    }
+
+    vm.resetSimulation = () => {
+        unPinAll();
+        vm.showIsolated = false;
 
         vizElem
             .select("svg")
@@ -388,6 +401,65 @@ function controller($timeout, $element) {
             .call(myZoom.transform, zoomIdentity);
 
         debouncedDraw();
+    };
+
+    // not registered as a method on `vm` as will be invoked via d3 handler code...
+    function onSelectNode(node) {
+        $timeout(() => {
+            vm.onHideFilters();
+            if (vm.selectedNode === node) {
+                vm.onDeselectNode();
+            } else {
+                vm.selectedNode = node;
+            }
+        }, 0);
+    }
+
+    vm.onDeselectNode = () => {
+        vm.selectedNode = null;
+    };
+
+    vm.onHideFilters = () => {
+        vm.showFilters = false;
+        vm.filtersEnabled = false;
+    };
+
+    vm.onShowFilters = () => {
+        vm.onDeselectNode();
+        vm.showFilters = true;
+        vm.filtersEnabled = true;
+    };
+
+    vm.onUndoIsolate = () => {
+        vm.showIsolated = false;
+
+        const enrichedData = enrichData(vm.data);
+        draw(enrichedData, parts, vm.tweakers, onSelectNode);
+        simulation.alphaTarget(0.2).restart();
+    };
+
+    vm.onIsolate = () => {
+        vm.showIsolated = true;
+        unPinAll();
+        const entitiesByRef = _.keyBy(vm.data.entities, refToString);
+
+        const flowFilter = f => f.source.id === vm.selectedNode.id || f.target.id === vm.selectedNode.id;
+        const flows = _.filter(vm.data.flows, flowFilter);
+        const entities = _.chain(flows)
+            .flatMap(f => [refToString(f.source), refToString(f.target)])
+            .uniq()
+            .map(r => entitiesByRef[r])
+            .value();
+
+        const isolatedData = {
+            flows,
+            entities,
+            decorators: vm.data.decorators
+        };
+
+        const enrichedData = enrichData(isolatedData);
+        draw(enrichedData, parts, vm.tweakers, onSelectNode);
+        simulation.alphaTarget(0.2).restart();
     };
 }
 
@@ -398,7 +470,11 @@ controller.$inject = ["$timeout", "$element"];
 const component = {
     bindings,
     template,
-    controller
+    controller,
+    transclude: {
+        "filterControl": "?filterControl",
+        "selectedControl": "?selectedControl"
+    }
 };
 
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,9 +38,23 @@ const initialState = {
 };
 
 
+function buildHierarchyWithUsageEnrichment(vm) {
+    const usedTypeIds = _.map(vm.usedTypes, "id");
+    const enrichedDataTypes = _.map(
+        vm.allDataTypes,
+        dt => Object.assign({}, dt, {isUsed: _.includes(usedTypeIds, dt.id)}));
+    const hierarchy = buildHierarchies(enrichedDataTypes, false);
+    return hierarchy;
+}
+
 function controller(serviceBroker) {
     const vm = _.defaults(this, initialState);
 
+    function loadDataTypes() {
+        return serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(r => vm.allDataTypes = r.data);
+    }
     vm.onShowAll= () => {
         vm.selectedType = "ALL";
         vm.visibility.tree = false;
@@ -56,17 +70,18 @@ function controller(serviceBroker) {
         vm.notifyChanges()
     };
 
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.allDataTypes = r.data);
-    };
-
     vm.$onChanges = () => {
-        vm.notifyChanges();
-        const usedTypeIds = _.map(vm.usedTypes, "id");
-        const enrichedDataTypes = _.map(vm.allDataTypes, dt => Object.assign({}, dt, { isUsed: _.includes(usedTypeIds, dt.id) }));
-        vm.hierarchy = buildHierarchies(enrichedDataTypes, false);
+        if (_.isEmpty(vm.usedTypes)) {
+            return;
+        } else {
+            loadDataTypes()
+                .then(() => {
+                    const hierarchy = buildHierarchyWithUsageEnrichment(vm);
+                    vm.hierarchy = hierarchy;
+                    vm.notifyChanges();
+                });
+        }
+
     };
 
     vm.notifyChanges = () => {
