@@ -56,7 +56,6 @@ const initialState = {
     usedDataTypes: [],
     filterOptions: defaultFilterOptions,
     options: defaultOptions,
-    optionsVisible: false,
     visibility: {
         boingyEverShown: false,
         ignoreLimits: false,
@@ -165,12 +164,6 @@ function controller($scope,
                     logicalFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
-
-    function unpinAll() {
-        _.forEach(
-            vm.filteredFlowData.entities,
-            d => { d.fx = null; d.fy = null; });
-    }
 
     const loadDetail = () => {
         vm.visibility.loadingFlows = true;

@@ -20,33 +20,17 @@
 <div>
     <div class="row">
         <div class="col-sm-12">
-            <div ng-if="$ctrl.flowData.entities.length >= 200 && !$ctrl.visibility.ignoreLimits">
-                <div class="alert alert-warning">
-                    This graph will have <strong>too many nodes</strong> to render smoothly.
-                    Use the configure button too limit the amount of data to show.  Alternatively
-                    the data is available via the 'Table' tab.
 
-                    <br>
+            <!-- BOINGY -->
+            <waltz-logical-flow-diagram data="$ctrl.flowData"
+                                        tweakers="$ctrl.graphTweakers">
+                <filter-control>
+                   <div ng-include="'wdtfs-filter-control'"></div>
+                </filter-control>
+            </waltz-logical-flow-diagram>
 
-                    If you still want to see the graph click
-                    <a class="clickable" ng-click="$ctrl.visibility.ignoreLimits = true">here</a>
-                    - however be aware that your machine may struggle.
-                </div>
-            </div>
-
-            <div ng-if="$ctrl.flowData.entities.length < 200  || $ctrl.visibility.ignoreLimits">
-
-                <!-- BOINGY -->
-                <waltz-logical-flow-diagram data="$ctrl.flowData"
-                                            tweakers="$ctrl.graphTweakers">
-                    <filter-control>
-                       <div ng-include="'wdtfs-filter-control'"></div>
-                    </filter-control>
-                </waltz-logical-flow-diagram>
-
-                <div class="small text-muted">
-                    Dragging nodes will pin them.  Double click to unpin.
-                </div>
+            <div class="small text-muted">
+                Dragging nodes will pin them.  Double click to unpin.
             </div>
 
         </div>

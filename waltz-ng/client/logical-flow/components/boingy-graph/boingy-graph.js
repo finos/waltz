@@ -33,8 +33,8 @@ import {refToString} from "../../../common/entity-utils";
 
 import template from "./boingy-graph.html";
 
-const width = 800;
-const height = 400;
+const width = 900;
+const height = 600;
 
 
 const bindings = {
@@ -46,7 +46,9 @@ const initialState = {
     zoomEnabled: false,
     selectedNode: null,
     showFilters: false,
-    showIsolated: false
+    showIsolated: false,
+    showManyNodesWarning: true,
+    overrideManyNodesWarning: false
 };
 
 const opacityScale = scalePow()
@@ -241,7 +243,7 @@ function setup(vizElem) {
         .append("svg")
         .attr("width", width)
         .attr("height", height)
-        .attr("viewBox", [-width / 2, -height / 1.3, width * 1.3, height * 1.3]);
+        .attr("viewBox", [-width / 2, -height / 2, width, height]);
 
     const destroyResizeListener = responsivefy(svg);
 
@@ -293,7 +295,6 @@ function draw(data = [],
         .force("link")
         .links(links);
 
-
     return simulation;
 }
 
@@ -328,16 +329,23 @@ function controller($timeout, $element) {
 
     const parts = setup(vizElem);
 
-    const debouncedDraw = _.debounce(() => {
-        const enrichedData = enrichData(vm.data);
-        draw(enrichedData, parts, vm.tweakers, onSelectNode);
-        simulation.alphaTarget(0.2).restart();
+    const debouncedDraw = _.debounce((data) => {
+        const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > 200 ;
+        $timeout(() => vm.showManyNodesWarning = tooManyNodes);
+
+        if (tooManyNodes) {
+            draw({entities: [], flows: []}, parts);
+        } else {
+            const enrichedData = enrichData(data);
+            draw(enrichedData, parts, vm.tweakers, onSelectNode);
+            simulation.alphaTarget(0.2).restart();
+        }
     }, 250);
 
     vm.$onChanges = (changes) => {
         if (changes.data) {
             // we draw using async to prevent clientWidth reporting '0'
-            $timeout(debouncedDraw);
+            $timeout(() => debouncedDraw(vm.data));
         }
     };
 
@@ -400,7 +408,7 @@ function controller($timeout, $element) {
             .duration(750)
             .call(myZoom.transform, zoomIdentity);
 
-        debouncedDraw();
+        debouncedDraw(vm.data);
     };
 
     // not registered as a method on `vm` as will be invoked via d3 handler code...
@@ -432,10 +440,7 @@ function controller($timeout, $element) {
 
     vm.onUndoIsolate = () => {
         vm.showIsolated = false;
-
-        const enrichedData = enrichData(vm.data);
-        draw(enrichedData, parts, vm.tweakers, onSelectNode);
-        simulation.alphaTarget(0.2).restart();
+        debouncedDraw(vm.data);
     };
 
     vm.onIsolate = () => {
@@ -457,9 +462,12 @@ function controller($timeout, $element) {
             decorators: vm.data.decorators
         };
 
-        const enrichedData = enrichData(isolatedData);
-        draw(enrichedData, parts, vm.tweakers, onSelectNode);
-        simulation.alphaTarget(0.2).restart();
+        debouncedDraw(isolatedData);
+    };
+
+    vm.onOverrideManyNodesWarning = () => {
+        vm.overrideManyNodesWarning = true;
+        debouncedDraw(vm.data);
     };
 }
 

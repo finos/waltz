@@ -26,27 +26,8 @@
 
     <!-- GRAPH -->
     <div class="col-sm-12">
-
-        <!-- TOO MUCH DATA -->
-        <div ng-if="$ctrl.filteredFlowData.entities.length >= 400 && !$ctrl.visibility.ignoreLimits">
-            <div class="alert alert-warning">
-                <waltz-icon name="warning" size="lg"></waltz-icon>
-                This graph will have <strong>too many nodes</strong> to render smoothly.
-                Use the configure button too limit the amount of data to show.  Alternatively
-                the data is available via the 'Table' tab.
-
-                <br>
-
-                If you still want to see the graph click
-                <a class="clickable" ng-click="$ctrl.visibility.ignoreLimits = true">
-                    here
-                </a>
-                - however be aware that your machine may struggle.
-            </div>
-        </div>
-
         <!-- BOINGY -->
-        <div ng-if="$ctrl.filteredFlowData.entities.length < 400  || $ctrl.visibility.ignoreLimits">
+        <div>
 
             <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
                                         tweakers="$ctrl.graphTweakers">
