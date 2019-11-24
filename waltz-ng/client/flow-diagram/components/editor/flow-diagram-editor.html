@@ -1,22 +1,45 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div class="waltz-flow-diagram-editor">
 
     <!-- EDITOR -->
     <div class="row">
         <div class="col-md-12">
             <h4>
-                <waltz-editable-field type="text"
+                <waltz-editable-field field-type="text"
                                       on-save="$ctrl.onSaveTitle"
                                       save-label="Save"
                                       initial-val="$ctrl.title">
                 </waltz-editable-field>
-                <waltz-editable-field type="text"
+            </h4>
+            <div>
+                <waltz-editable-field field-type="markdown"
                                       on-save="$ctrl.onSaveDescription"
                                       save-label="Save"
                                       initial-val="$ctrl.description"
                                       empty-label="No description provided"
-                                      class="small text-muted">
+                                      class="text-muted">
                 </waltz-editable-field>
-            </h4>
+            </div>
+
+            <br>
 
             <div>
                 <button class="btn btn-xs btn-success"
