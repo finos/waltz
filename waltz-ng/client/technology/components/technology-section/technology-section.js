@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,35 +20,51 @@
 import _ from "lodash";
 import { perhaps, termSearch } from "../../../common";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkLinkGridCell } from '../../../common/grid-utils';
+import { mkLinkGridCell } from "../../../common/grid-utils";
 
-import template from './technology-section.html';
+import template from "./technology-section.html";
 import { mkSelectionOptions } from "../../../common/selector-utils";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
-const EOL_CELL_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-icon ng-if="COL_FIELD" name="power-off"></waltz-icon></div>';
+function mkEndOfLifeCell(title, dateField, flagField) {
+    return {
+        field: dateField,
+        displayName: title,
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <span ng-bind="row.entity.${dateField}"></span> 
+                <waltz-icon ng-if="row.entity.${flagField}" 
+                            name="power-off">
+                </waltz-icon>
+            </div>`
+    };
+}
 
-const MATURITY_STATUS_TEMPLATE = '<div class="ui-grid-cell-contents"> <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status></div>';
+
+const MATURITY_STATUS_TEMPLATE = `
+    <div class="ui-grid-cell-contents"> 
+        <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status>
+    </div>`;
 
 
 function mkBooleanColumnFilter(uiGridConstants) {
     return {
         type: uiGridConstants.filter.SELECT,
         selectOptions: [
-            {value: 'true', label: 'Yes'},
-            {value: 'false', label: 'No'}
+            {value: "true", label: "Yes"},
+            {value: "false", label: "No"}
         ]
     };
 }
 
 
 function isEndOfLife(endOfLifeStatus) {
-    return endOfLifeStatus === 'END_OF_LIFE';
+    return endOfLifeStatus === "END_OF_LIFE";
 }
 
 
@@ -72,41 +88,29 @@ function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "
 function prepareServerGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell('Host', 'hostname', 'id', 'main.server.view'),
-        { field: 'environment' },
+        mkLinkGridCell("Host", "hostname", "id", "main.server.view"),
+        { field: "environment" },
         {
-            field: 'virtual',
-            displayName: 'Virtual',
+            field: "virtual",
+            displayName: "Virtual",
             width: "5%",
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: `
                 <div class="ui-grid-cell-contents"> 
-                    <waltz-icon ng-if="COL_FIELD" name="check"></waltz-icon>
+                    <waltz-icon ng-if="COL_FIELD" 
+                                name="check">
+                    </waltz-icon>
                 </div>`
         },
-        { field: 'operatingSystem', displayName: 'OS' },
-        { field: 'operatingSystemVersion', displayName: 'Version' },
-        { field: 'location' },
-        { field: 'country' },
+        { field: "operatingSystem", displayName: "OS" },
+        { field: "operatingSystemVersion", displayName: "Version" },
+        { field: "location" },
+        { field: "country" },
+        mkEndOfLifeCell("h/w EOL On", "hardwareEndOfLifeDate", "isHwEndOfLife"),
+        mkEndOfLifeCell("OS EOL On", "operatingSystemEndOfLifeDate", "isOperatingSystemEndOfLife"),
         {
-            field: 'isHwEndOfLife',
-            displayName: 'h/w EOL',
-            width: "6%",
-            filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: EOL_CELL_TEMPLATE
-        },
-        { field: 'hardwareEndOfLifeDate', displayName: 'h/w EOL On' },
-        {
-            field: 'isOperatingSystemEndOfLife',
-            displayName: 'OS EOL',
-            width: "6%",
-            filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: EOL_CELL_TEMPLATE
-        },
-        { field: 'operatingSystemEndOfLifeDate', displayName: 'OS EOL On' },
-        {
-            field: 'lifecycleStatus',
-            displayName: 'Lifecycle',
+            field: "lifecycleStatus",
+            displayName: "Lifecycle",
             cellFilter: "toDisplayName:'lifecycleStatus'"
         }
     ];
@@ -114,7 +118,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "server.csv");
     return _.extend(baseTable, {
         columnDefs,
-        rowTemplate: '<div ng-class="{\'bg-danger\': row.entity.isHwEndOfLife || row.entity.isOperatingSystemEndOfLife}"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>'
+        rowTemplate: "<div ng-class=\"{'bg-danger': row.entity.isHwEndOfLife || row.entity.isOperatingSystemEndOfLife}\"><div ng-repeat=\"col in colContainer.renderedColumns track by col.colDef.name\" class=\"ui-grid-cell\" ui-grid-cell></div></div>"
     });
 }
 
@@ -122,23 +126,16 @@ function prepareServerGridOptions($animate, uiGridConstants) {
 function prepareDatabaseGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        { field: 'instanceName', displayName: 'Instance' },
-        { field: 'databaseName', displayName: 'Database' },
-        { field: 'environment' },
-        { field: 'dbmsVendor', displayName: 'Vendor' },
-        { field: 'dbmsName', displayName: 'Product Name' },
-        { field: 'dbmsVersion', displayName: 'Version' },
+        { field: "instanceName", displayName: "Instance" },
+        { field: "databaseName", displayName: "Database" },
+        { field: "environment" },
+        { field: "dbmsVendor", displayName: "Vendor" },
+        { field: "dbmsName", displayName: "Product Name" },
+        { field: "dbmsVersion", displayName: "Version" },
+        mkEndOfLifeCell("EOL", "endOfLifeDate", "isEndOfLife"),
         {
-            field: 'isEndOfLife',
-            displayName: 'EOL',
-            width: "5%",
-            filter: mkBooleanColumnFilter(uiGridConstants),
-            cellTemplate: EOL_CELL_TEMPLATE
-        },
-        { field: 'endOfLifeDate', displayName: 'EOL On' },
-        {
-            field: 'lifecycleStatus',
-            displayName: 'Lifecycle',
+            field: "lifecycleStatus",
+            displayName: "Lifecycle",
             cellFilter: "toDisplayName:'lifecycleStatus'"
         }
     ];
@@ -146,7 +143,7 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "database.csv");
     return _.extend(baseTable, {
         columnDefs,
-        rowTemplate: '<div ng-class="{\'bg-danger\': row.entity.isEndOfLife}"><div ng-repeat="col in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ui-grid-cell></div></div>'
+        rowTemplate: "<div ng-class=\"{'bg-danger': row.entity.isEndOfLife}\"><div ng-repeat=\"col in colContainer.renderedColumns track by col.colDef.name\" class=\"ui-grid-cell\" ui-grid-cell></div></div>"
     });
 }
 
@@ -154,9 +151,9 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
 function prepareLicenceGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell('Name', 'name', 'id', 'main.licence.view'),
-        { field: 'externalId', displayName: 'External Id' },
-        { field: 'approvalStatus', displayName: 'Approval Status', cellFilter: "toDisplayName:'ApprovalStatus'"},
+        mkLinkGridCell("Name", "name", "id", "main.licence.view"),
+        { field: "externalId", displayName: "External Id" },
+        { field: "approvalStatus", displayName: "Approval Status", cellFilter: "toDisplayName:'ApprovalStatus'"},
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "licences.csv");
@@ -169,12 +166,12 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
 function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell('Name', 'name', 'id', 'main.software-package.view'),
-        { field: 'externalId', displayName: 'External Id' },
-        { field: 'version', displayName: 'Version'},
-        { field: 'description', displayName: 'Description'},
-        { field: 'maturityStatus', displayName: 'Maturity Status', cellTemplate: MATURITY_STATUS_TEMPLATE},
-        { field: 'notable', displayName: 'Notable'},
+        mkLinkGridCell("Name", "name", "id", "main.software-package.view"),
+        { field: "externalId", displayName: "External Id" },
+        { field: "version", displayName: "Version"},
+        { field: "description", displayName: "Description"},
+        { field: "maturityStatus", displayName: "Maturity Status", cellTemplate: MATURITY_STATUS_TEMPLATE},
+        { field: "notable", displayName: "Notable"},
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "software.csv");
@@ -300,10 +297,10 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    '$animate',
-    'uiGridConstants',
-    'ServiceBroker'
+    "$q",
+    "$animate",
+    "uiGridConstants",
+    "ServiceBroker"
 ];
 
 
@@ -314,7 +311,7 @@ const component = {
 };
 
 export default {
-    id: 'waltzTechnologySection',
+    id: "waltzTechnologySection",
     component
 };
 
