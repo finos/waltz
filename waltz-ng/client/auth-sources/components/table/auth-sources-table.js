@@ -179,7 +179,6 @@ function controller($q, serviceBroker, enumValueService) {
     };
 
     vm.$onChanges = (changes) => {
-        console.log("oc", { changes })
         if(vm.authSources) {
             loadAll();
         }

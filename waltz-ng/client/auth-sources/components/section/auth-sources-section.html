@@ -31,6 +31,7 @@
                                entities="['AUTHORITATIVE_SOURCE']">
     </waltz-source-data-overlay>
 
+    <!-- TABS -->
     <div class="waltz-tabs">
         <input type="radio"
                ng-repeat-start="tab in $ctrl.tabDefinitions"
@@ -43,13 +44,11 @@
                ng-repeat-end>
         </label>
 
-        <!-- tab content -->
+        <!-- TAB_CONTENT -->
         <div ng-include="$ctrl.activeTab().template"
              class="wt-tab wt-active">
         </div>
     </div>
-
-    <pre ng-bind="$ctrl.selectedTabName | json"></pre>
 
 
     <!-- ABOUT -->
