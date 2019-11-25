@@ -1,0 +1,77 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!-- HEADER -->
+<h4>
+    <waltz-entity-link entity-ref="$ctrl.entityRef"
+                       tooltip-placement="none">
+    </waltz-entity-link>
+</h4>
+
+<!-- TABLE PROPS -->
+<div ng-switch="$ctrl.entity.kind">
+    <div ng-switch-when="APPLICATION">
+        <div ng-include="'wesp-application-summary'"></div>
+    </div>
+</div>
+
+<!-- DESC -->
+<div>
+    <waltz-markdown text="$ctrl.entity.description">
+    </waltz-markdown>
+</div>
+
+
+<!-- TABLE PROP ENTITY TEMPLATES -->
+<script type="text/ng-template"
+        id="wesp-application-summary">
+    <table class="table table-condensed small">
+        <tr>
+            <td>Asset Code:</td>
+            <td>
+                <span ng-bind="$ctrl.entity.assetCode"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Kind</td>
+            <td>
+                <span ng-bind="$ctrl.entity.applicationKind | toDisplayName:'applicationKind'"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Lifecycle Status:</td>
+            <td>
+                <span ng-bind="$ctrl.entity.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Criticality</td>
+            <td>
+                <span ng-bind="$ctrl.entity.businessCriticality | toDisplayName:'criticality'"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Organisational Unit:</td>
+            <td>
+                <waltz-entity-link entity-ref="$ctrl.orgUnit">
+                </waltz-entity-link>
+            </td>
+        </tr>
+    </table>
+</script>
