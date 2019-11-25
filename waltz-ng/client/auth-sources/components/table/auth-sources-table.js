@@ -32,6 +32,7 @@ const bindings = {
 
 const initialState = {
     consumersByAuthSourceId: {},
+    columnDefs: null
 };
 
 
@@ -134,19 +135,14 @@ function controller($q, serviceBroker, enumValueService) {
         const dataTypesByCode= _.keyBy(vm.dataTypes, "code");
         const orgUnitsById = _.keyBy(vm.orgUnits, "id");
 
-        if (!vm.columnDefs) {
-            vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
-            vm.gridData = [];
-        }
-
-
+        vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
         vm.gridData = _.map(vm.authSources, d => {
             const authoritativenessRatingEnum = vm.enums.AuthoritativenessRating[d.rating];
             return {
                 app: d.applicationReference,
-                dataType: Object.assign({}, dataTypesByCode[d.dataType], { kind: "DATA_TYPE" }),
+                dataType: dataTypesByCode[d.dataType],
                 appOrgUnit: d.appOrgUnitReference,
-                declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: "ORG_UNIT" }),
+                declaringOrgUnit: orgUnitsById[d.parentReference.id],
                 description: d.description,
                 rating: d.rating,
                 ratingValue: authoritativenessRatingEnum,
@@ -171,7 +167,7 @@ function controller($q, serviceBroker, enumValueService) {
 
         const consumerPromise = shouldShowConsumers(vm.parentEntityRef)
             ? loadConsumers()
-            : Promise.resolve();
+            : null;
 
         return $q
             .all(_.compact([enumPromise, dataTypePromise, orgUnitPromise, consumerPromise]))
@@ -183,6 +179,7 @@ function controller($q, serviceBroker, enumValueService) {
     };
 
     vm.$onChanges = (changes) => {
+        console.log("oc", { changes })
         if(vm.authSources) {
             loadAll();
         }

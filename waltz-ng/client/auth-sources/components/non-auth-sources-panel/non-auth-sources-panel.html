@@ -57,7 +57,9 @@
                     <tbody>
                     <tr ng-repeat="source in $ctrl.selectedGroup.sources">
                         <td>
-                            <waltz-entity-link entity-ref="source.sourceReference"></waltz-entity-link>
+                            <waltz-entity-link tooltip-placement="right-top"
+                                               entity-ref="source.sourceReference">
+                            </waltz-entity-link>
                         </td>
                         <td>
                             <span ng-bind="source.count"></span>
