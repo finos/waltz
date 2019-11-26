@@ -2,7 +2,7 @@
 import template from "./attestation-summary-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
 import {
     attestationPieConfig,
     mkAppAttestationGridData, prepareSummaryData, attestationSummaryColumnDefs
@@ -26,7 +26,8 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const selectionOptions = mkSelectionOptions(vm.parentEntityRef, "CHILDREN");
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef,
+            determineDownwardsScopeForKind(vm.parentEntityRef.kind));
 
         const attestationInstancePromise = serviceBroker
             .loadViewData(CORE_API.AttestationInstanceStore.findBySelector,
