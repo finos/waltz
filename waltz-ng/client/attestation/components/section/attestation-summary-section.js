@@ -49,6 +49,7 @@ function controller($q,
                 vm.applications = applications;
                 vm.gridDataByLogicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.LOGICAL_DATA_FLOW.key, displayNameService);
                 vm.gridDataByPhysicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.PHYSICAL_FLOW.key, displayNameService);
+
                 vm.summaryData = {
                     logical: prepareSummaryData(vm.gridDataByLogicalFlow),
                     physical: prepareSummaryData(vm.gridDataByPhysicalFlow)
