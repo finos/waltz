@@ -35,6 +35,7 @@ import template from "./boingy-graph.html";
 
 const width = 900;
 const height = 600;
+const DEFAULT_NODE_LIMIT = 500;
 
 
 const bindings = {
@@ -47,7 +48,7 @@ const initialState = {
     selectedNode: null,
     showFilters: false,
     showIsolated: false,
-    showManyNodesWarning: true,
+    showManyNodesWarning: false,
     overrideManyNodesWarning: false
 };
 
@@ -70,7 +71,8 @@ const simulation = forceSimulation()
     .force("link", forceLink().id(d => d.id))
     .force("charge", forceManyBody().strength(-110).distanceMin(1).distanceMax(400))
     .force("x", forceX())
-    .force("y", forceY());
+    .force("y", forceY())
+    .alphaTarget(0);
 
 const actorSymbol = symbol()
     .size(128)
@@ -145,8 +147,7 @@ function drawNodes(nodes,
     function dragStarted(d) {
         if (!event.active) {
             simulation
-               .alphaTarget(0.1)
-               .restart();
+                .restart();
         }
         d.fx = d.x;
         d.fy = d.y;
@@ -160,7 +161,6 @@ function drawNodes(nodes,
     function dragEnded(d) {
         if (!event.active) {
             simulation
-                .alphaTarget(0)
                 .restart();
         }
         d.fx = event.x;
@@ -330,7 +330,7 @@ function controller($timeout, $element) {
     const parts = setup(vizElem);
 
     const debouncedDraw = _.debounce((data) => {
-        const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > 200 ;
+        const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > DEFAULT_NODE_LIMIT ;
         $timeout(() => vm.showManyNodesWarning = tooManyNodes);
 
         if (tooManyNodes) {
@@ -338,7 +338,7 @@ function controller($timeout, $element) {
         } else {
             const enrichedData = enrichData(data);
             draw(enrichedData, parts, vm.tweakers, onSelectNode);
-            simulation.alphaTarget(0.2).restart();
+            simulation.alpha(0.3).restart();
         }
     }, 250);
 
@@ -391,8 +391,6 @@ function controller($timeout, $element) {
 
     function unPinAll() {
         _.forEach(vm.data.entities, d => {
-            d.x = null;
-            d.y = null;
             d.fx = null;
             d.fy = null;
         });
@@ -408,6 +406,7 @@ function controller($timeout, $element) {
             .duration(750)
             .call(myZoom.transform, zoomIdentity);
 
+        simulation.alpha(1);
         debouncedDraw(vm.data);
     };
 
@@ -462,6 +461,7 @@ function controller($timeout, $element) {
             decorators: vm.data.decorators
         };
 
+        simulation.alpha(0.2);
         debouncedDraw(isolatedData);
     };
 
