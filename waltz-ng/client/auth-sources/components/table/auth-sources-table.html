@@ -20,9 +20,11 @@
 <div class="waltz-auth-sources-table">
     <div class="row">
         <div class="col-md-12">
-            <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                    entries="$ctrl.gridData">
-            </waltz-grid-with-search>
+            <div ng-if="$ctrl.gridData.length > 0">
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.gridData">
+                </waltz-grid-with-search>
+            </div>
         </div>
     </div>
 </div>
