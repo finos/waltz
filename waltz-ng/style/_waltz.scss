@@ -1,20 +1,20 @@
 /*!
  * Waltz - Enterprise Architecture
- *  Copyright (C) 2016, 2017 Waltz open source project
- *  See README.md for more information
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 @import "breadcrumbs";
@@ -59,7 +59,6 @@
 @import "../client/entity-svg-diagram/components/viewer/entity-svg-diagram-viewer";
 @import "../client/extensions/extensions";
 @import "../client/flow-diagram/flow-diagram";
-@import "../client/logical-flow/components/app-centric-flow-table/app-centric-flow-table";
 @import "../client/logical-flow/components/boingy-graph/boingy-graph";
 @import "../client/logical-flow/components/logical-flows-tabgroup/logical-flows-tabgroup";
 @import "../client/logical-flow/components/rated-flow-summary/rated-summary-table";
@@ -94,7 +93,7 @@
 
 
 html {
-  overflow-y: scroll;
+    overflow-y: scroll;
 }
 
 
@@ -117,14 +116,14 @@ html {
     padding-top: 70px;
     background: $waltz-background-color;
     font-family: 'Hind', sans-serif;
-    -webkit-box-shadow: 0px 150px 46px 16px $waltz-background-color;
-    -moz-box-shadow: 0px 150px 46px 16px $waltz-background-color;
-    box-shadow: 0px 150px 46px 16px $waltz-background-color;
+    -webkit-box-shadow: 0 150px 46px 16px $waltz-background-color;
+    -moz-box-shadow: 0 150px 46px 16px $waltz-background-color;
+    box-shadow: 0 150px 46px 16px $waltz-background-color;
 }
 
 
 textarea {
-  padding: 10px;
+    padding: 10px;
 }
 
 
@@ -144,14 +143,13 @@ textarea {
 
 
 .clickable:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 
 .no-text-select {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
@@ -159,20 +157,20 @@ textarea {
 
 
 .show-grid {
-  border: 1px solid red;
+    border: 1px solid red;
 }
 
 
 .show-grid div {
-  border: 1px solid green;
+    border: 1px solid green;
 }
 
 
 .no-overflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-wrap: break-word;
 }
 
 
@@ -196,24 +194,24 @@ textarea {
 
 
 .fixed-table {
-  table-layout: fixed;
-  word-wrap: break-word;
+    table-layout: fixed;
+    word-wrap: break-word;
 }
 
 
 .vertical-align {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 
 .waltz-overlay-trigger:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 
 .waltz-overlay-trigger {
-  border-bottom: 1px dotted #0f0746;
+    border-bottom: 1px dotted #0f0746;
 }
 
 
@@ -230,19 +228,19 @@ textarea {
 
 
 .waltz-clickable-definition {
-  border-bottom: 1px dotted #ccc;
+    border-bottom: 1px dotted #ccc;
 }
 
 
 .waltz-clickable-definition:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 
 .waltz-section-actions {
-  margin-top: -42px;
-  float: right;
-  padding: 0 2px 2px 0;
+    margin-top: -42px;
+    float: right;
+    padding: 0 2px 2px 0;
 
     .wsa-action {
         margin-left: 3px;
@@ -252,11 +250,11 @@ textarea {
 
 
 .waltz-tally-count {
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: x-small;
-  margin: auto;
-  padding: 0 3px 0 3px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: x-small;
+    margin: auto;
+    padding: 0 3px 0 3px;
 }
 
 
@@ -277,27 +275,26 @@ textarea {
 
 
 .waltz-sidebar {
-  position: fixed;
-  width: 16%;
-  overflow: hidden;
-  white-space: nowrap;
-  word-wrap: break-word;
-  margin-top: 20px;
-  height: 100%;
+    position: fixed;
+    width: 16%;
+    overflow: hidden;
+    white-space: nowrap;
+    word-wrap: break-word;
+    margin-top: 20px;
+    height: 100%;
 }
 
 
 .waltz-content {
-  margin-bottom: 40px;
+    margin-bottom: 40px;
 }
 
 
 .waltz-page-summary {
-  background: #fff;
-  border: 1px solid $waltz-border-color-lighter;
-  padding: 1em;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
+    background: #fff;
+    border: 1px solid $waltz-border-color-lighter;
+    padding: 1em;
+    border-radius: 3px;
     @include waltz-box-shadow();
 }
 
@@ -310,22 +307,22 @@ textarea {
 
 
 .waltz-side-nav-help {
-  @extend small;
-  color: $text-muted;
-  white-space: normal !important;
+    @extend small;
+    color: $text-muted;
+    white-space: normal !important;
 }
 
 
 .waltz-detail-callout {
-  background-color: lighten($waltz-background-color, 0.5);
-  padding: 0 6px 4px 6px;
-  border-radius: 3px;
-  border: 1px solid $waltz-border-color-lighter;
-  @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+    background-color: lighten($waltz-background-color, 0.5);
+    padding: 0 6px 4px 6px;
+    border-radius: 3px;
+    border: 1px solid $waltz-border-color-lighter;
+    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
 
-  .dismiss:hover {
-    color: mediumblue;
-  }
+    .dismiss:hover {
+        color: mediumblue;
+    }
 }
 
 
@@ -434,8 +431,8 @@ a[disabled="disabled"] {
 }
 
 .waltz-no-margins {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
 }
 
 .waltz-entity-removed {

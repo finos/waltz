@@ -23,17 +23,36 @@
             This section is showing the authoritativeness rating of the data sources. You can interactively change the
             selection by changing the data types below.
         </div>
-        <span ng-if="!$ctrl.selectedItems.length" class="wtf-filter-item">All</span>
-        <span ng-repeat="selectedItem in $ctrl.selectedItems" class="wtf-filter-item">
-            <span ng-bind="selectedItem.name"></span>
-            <waltz-icon class="wtf-filter-delete clickable"
-                        name="close"
-                        ng-click="$ctrl.removeSelected(selectedItem.id)"></waltz-icon>
-        </span>
+
+        <br>
+
+        <div ng-if="$ctrl.selectedItems.length">
+            <b>Active Filters:</b>
+            <span ng-repeat="item in $ctrl.selectedItems"
+                  ng-click="$ctrl.removeSelected(item.id)"
+                  class="wtf-filter-item clickable">
+                <span ng-bind="item.name"></span>
+                <waltz-icon class="wtf-filter-delete clickable"
+                            name="close">
+                </waltz-icon>
+            </span>
+        </div>
+
         <div style="padding-top: 10px">
-            <a ng-click="$ctrl.toggleTreeSelector()">
-                <span ng-if="!$ctrl.editMode">Change data types</span>
-                <span ng-if="$ctrl.editMode">Done</waltz-icon></span>
+            <a ng-click="$ctrl.toggleTreeSelector()"
+               class="clickable">
+                <span class="btn btn-xs btn-success"
+                      ng-if="!$ctrl.editMode && $ctrl.selectedItems.length == 0">
+                    Showing all, filter by data type
+                </span>
+                <span class="btn btn-xs btn-success"
+                      ng-if="!$ctrl.editMode && $ctrl.selectedItems.length > 0">
+                    Filter data types
+                </span>
+                <span class="btn btn-xs btn-success"
+                      ng-if="$ctrl.editMode">
+                    Done
+                </span>
             </a>
         </div>
     </div>
@@ -55,8 +74,7 @@
                      order-by="'-name'"
                      options="$ctrl.treeOptions"
                      expanded-nodes="$ctrl.expandedNodes">
-            <span
-                  ng-click="$ctrl.onSelect(node)">
+            <span ng-click="$ctrl.onSelect(node)">
                 <span class="clickable"
                       ng-bind="node.name"
                       uib-popover="{{node.description}}"
