@@ -66,6 +66,10 @@ export function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findBySelector = (options) => $http
+        .post(`${base}/selector`, options)
+        .then(x => x.data);
+
     const cleanupOrphans = () => {
         return $http
             .get(`${base}/cleanup-orphans`)
@@ -80,6 +84,7 @@ export function store($http, baseApiUrl) {
         findHistoricalForPendingByUser,
         findPersonsById,
         findByEntityRef,
+        findBySelector,
         cleanupOrphans
     };
 }
@@ -130,9 +135,14 @@ export const AttestationInstanceStore_API = {
         serviceFnName: 'findByEntityRef',
         description: 'find instances for an entity'
     },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find instances for the given selector options"
+    },
     cleanupOrphans: {
         serviceName,
         serviceFnName: 'cleanupOrphans',
         description: 'clean up orphan attestations and recipients for applications that no longer exist'
-    },
+    }
 };
