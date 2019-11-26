@@ -355,7 +355,7 @@
             <column name="icon"
                     value="shield"/>
             <column name="title"
-                    value=""/>
+                    value="About"/>
             <column name="priority"
                     value="1"/>
             <column name="width"
@@ -363,11 +363,8 @@
             <column name="encoding"
                     value="MARKDOWN"/>
             <column name="content"
-                    value="Display the summary of attested and non attested applications as pie chart.
-
-                        Application distribution based on
-                        - Logical flow attestation
-                        - Physical flow attestation"/>
+                    value="Display the summary of attested and non attested applications as pie chart.&lt;br/&gt;&lt;br/&gt;
+                    Application distribution based on &lt;ul&gt;&lt;li&gt;Logical flow attestation&lt;/li&gt;&lt;li&gt;Physical flow attestation&lt;/li&gt;"/>
         </insert>
     </changeSet>
 
