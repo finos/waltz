@@ -346,26 +346,14 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="20191126-4486-1"
-               author="muzammilali">
-        <comment>4486: Added static panel info for assessment summary page</comment>
-        <insert tableName="static_panel">
-            <column name="group"
-                    value="SECTION.ATTESTATION_SUMMARY.ABOUT"/>
-            <column name="icon"
-                    value="shield"/>
-            <column name="title"
-                    value="About"/>
-            <column name="priority"
-                    value="1"/>
-            <column name="width"
-                    value="12"/>
-            <column name="encoding"
-                    value="MARKDOWN"/>
-            <column name="content"
-                    value="Display the summary of attested and non attested applications as pie chart.&lt;br/&gt;&lt;br/&gt;
-                    Application distribution based on &lt;ul&gt;&lt;li&gt;Logical flow attestation&lt;/li&gt;&lt;li&gt;Physical flow attestation&lt;/li&gt;"/>
-        </insert>
+    <changeSet id="20191119-4419-4"
+               author="davidwatkins73">
+        <comment>4419: involvement to person fk</comment>
+        <addForeignKeyConstraint constraintName="inv_to_person_fk"
+                                 baseTableName="involvement"
+                                 baseColumnNames="employee_id"
+                                 referencedTableName="person"
+                                 referencedColumnNames="employee_id"/>
     </changeSet>
 
     <changeSet id="20191119-4264-1-a"
@@ -392,4 +380,25 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20191126-4486-1"
+               author="muzammilali">
+        <comment>4486: Added static panel info for assessment summary page</comment>
+        <insert tableName="static_panel">
+            <column name="group"
+                    value="SECTION.ATTESTATION_SUMMARY.ABOUT"/>
+            <column name="icon"
+                    value="shield"/>
+            <column name="title"
+                    value="About"/>
+            <column name="priority"
+                    value="1"/>
+            <column name="width"
+                    value="12"/>
+            <column name="encoding"
+                    value="MARKDOWN"/>
+            <column name="content"
+                    value="Display the summary of attested and non attested applications as pie chart.&lt;br/&gt;&lt;br/&gt;
+                    Application distribution based on &lt;ul&gt;&lt;li&gt;Logical flow attestation&lt;/li&gt;&lt;li&gt;Physical flow attestation&lt;/li&gt;"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

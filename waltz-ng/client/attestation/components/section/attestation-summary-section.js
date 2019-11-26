@@ -57,11 +57,11 @@ function controller($q,
             });
     };
 
-    function gridSelected(d, grid) {
+    const gridSelected = (d, grid) => {
         vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
         vm.columnDefs = attestationSummaryColumnDefs;
         vm.visibility.tableView = true;
-    }
+    };
 
     vm.onSelectLogicalFlow = (d) => {
         gridSelected(d, vm.gridDataByLogicalFlow);

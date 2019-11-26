@@ -13,11 +13,9 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 
 public class AttestationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {
 
-    private static final Condition ATTESTATION_INSTANCE_CONDITION = ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID);
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
     @Override

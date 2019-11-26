@@ -21,6 +21,7 @@
         </waltz-pie-table>
     </div>
 </div>
+
 <div class="row"
      ng-if="$ctrl.visibility.tableView">
     <div class="col-md-12">
@@ -30,7 +31,9 @@
         </waltz-grid-with-search>
     </div>
 </div>
-<div class="row" ng-if="$ctrl.applications.length === 0">
+
+<div class="row"
+     ng-if="$ctrl.applications.length === 0">
     <div class="col-md-12">
         <waltz-no-data >
             <message>

@@ -133,7 +133,7 @@ export const AttestationRunStore_API = {
         serviceName,
         serviceFnName: "findBySelector",
         description: "find runs for the given selector options"
-    },
+    }
 };
 
 

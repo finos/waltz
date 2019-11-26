@@ -19,8 +19,6 @@
 
 package com.khartec.waltz.data.attestation;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
