@@ -26,7 +26,7 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const selectionOptions = mkSelectionOptions(vm.parentEntityRef, "EXACT");
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef, "CHILDREN");
 
         const attestationInstancePromise = serviceBroker
             .loadViewData(CORE_API.AttestationInstanceStore.findBySelector,
