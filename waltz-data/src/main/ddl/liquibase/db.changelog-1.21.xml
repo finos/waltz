@@ -382,7 +382,7 @@
 
     <changeSet id="20191126-4486-1"
                author="muzammilali">
-        <comment>4486: Added static panel info for assessment summary page</comment>
+        <comment>4486: Added static panel info for attestation summary page</comment>
         <insert tableName="static_panel">
             <column name="group"
                     value="SECTION.ATTESTATION_SUMMARY.ABOUT"/>
