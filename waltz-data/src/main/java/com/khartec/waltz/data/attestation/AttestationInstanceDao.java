@@ -218,4 +218,12 @@ public class AttestationInstanceDao {
                 .and(maybeUnattestedOnlyCondition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+    public List<AttestationInstance> findByIdSelector(Select<Record1<Long>> selector) {
+        return dsl.select(ATTESTATION_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .where(ATTESTATION_INSTANCE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

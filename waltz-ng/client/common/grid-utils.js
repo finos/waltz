@@ -131,3 +131,26 @@ export function mkLinkGridCell(columnHeading,
     });
 }
 
+/**
+ * Creates a column def to render date
+ *
+ *
+ * @param columnHeading  column display name
+ * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
+ * @param showIcon  whether to display the icon or not
+ * @returns {{field: *, displayName: *, cellTemplate: string}}
+ */
+export function mkDateGridCell(columnHeading,
+                               dateField,
+                               showIcon = false) {
+    return {
+        field: dateField,
+        displayName: columnHeading,
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>
+            </div>`
+    };
+}
+
+

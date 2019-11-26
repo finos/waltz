@@ -19,6 +19,8 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.*;
@@ -28,6 +30,8 @@ import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,6 +54,8 @@ public class AttestationInstanceService {
     private final AttestationRunService attestationRunService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
+
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
@@ -111,10 +117,21 @@ public class AttestationInstanceService {
     }
 
 
+    public List<AttestationInstance> findByIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = mkIdSelector(options);
+        return attestationInstanceDao.findByIdSelector(selector);
+    }
+
+
     public int cleanupOrphans() {
         return attestationInstanceDao.cleanupOrphans();
     }
 
+
+    private Select<Record1<Long>> mkIdSelector(IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.ATTESTATION, selectionOptions);
+        return genericSelector.selector();
+    }
 
     private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
 
