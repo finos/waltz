@@ -40,7 +40,7 @@ const initialState = {
     filteredEntries: [],
     scopeProvider: null,
     searchFields: [],
-    searchControlMinRows: 10,
+    searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
     onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),

@@ -1,17 +1,33 @@
 
 <div class="row"
      ng-if="$ctrl.applications.length > 0">
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
+                             class="small"
+                             render-mode="minimal-border">
+        </waltz-static-panels>
+    </div>
+    <div class="col-md-4">
         <waltz-pie-table data="$ctrl.summaryData.logical"
-                         config="$ctrl.config"
+                         config="$ctrl.config.logical"
                          name="Logical Flow Attestation summary for Applications">
         </waltz-pie-table>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <waltz-pie-table data="$ctrl.summaryData.physical"
-                         config="$ctrl.config"
-                         name="Physical Flow Attestation summary for Applications">
+                         config="$ctrl.config.physical"
+                         name="Physical Flow Attestation summary for Applications"
+                        >
         </waltz-pie-table>
+    </div>
+</div>
+<div class="row"
+     ng-if="$ctrl.visibility.tableView">
+    <div class="col-md-12">
+        <waltz-grid-with-search entries="$ctrl.selectedApps"
+                                column-defs="$ctrl.columnDefs"
+                                on-initialise="$ctrl.onInitialise">
+        </waltz-grid-with-search>
     </div>
 </div>
 <div class="row" ng-if="$ctrl.applications.length === 0">

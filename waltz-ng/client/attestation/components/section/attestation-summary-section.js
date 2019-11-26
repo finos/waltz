@@ -1,13 +1,19 @@
 
 import template from "./attestation-summary-section.html";
-import {initialiseData, toKeyCounts} from "../../../common";
+import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {attestationPieConfig, prepareSummaryData} from "../../attestation-pie-utils";
+import {
+    attestationPieConfig,
+    mkAppAttestationGridData, prepareSummaryData, attestationSummaryColumnDefs
+} from "../../attestation-pie-utils";
 import {entity} from "../../../common/services/enums/entity";
 
 
 const initialState = {
+    visibility : {
+        tableView: false
+    }
 };
 
 const bindings = {
@@ -15,7 +21,8 @@ const bindings = {
 };
 
 function controller($q,
-                    serviceBroker) {
+                    serviceBroker,
+                    displayNameService) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -38,23 +45,45 @@ function controller($q,
 
         $q.all([attestationInstancePromise, attestationRunPromise, appPromise])
             .then(([attestationInstances, attestationRuns, applications]) => {
-                vm.attestationRuns = attestationRuns;
-                vm.attestationInstances = attestationInstances
                 vm.applications = applications;
+                vm.gridDataByLogicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.LOGICAL_DATA_FLOW.key, displayNameService);
+                vm.gridDataByPhysicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.PHYSICAL_FLOW.key, displayNameService);
                 vm.summaryData = {
-                    logical: prepareSummaryData(applications, attestationRuns, attestationInstances, entity.LOGICAL_DATA_FLOW.key),
-                    physical: prepareSummaryData(applications, attestationRuns, attestationInstances, entity.PHYSICAL_FLOW.key)
+                    logical: prepareSummaryData(vm.gridDataByLogicalFlow),
+                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow)
                 };
+
             });
     };
 
-    vm.config = attestationPieConfig;
+    function gridSelected(d, grid) {
+        vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
+        vm.columnDefs = attestationSummaryColumnDefs;
+        vm.visibility.tableView = true;
+    }
+
+    vm.onSelectLogicalFlow = (d) => {
+        gridSelected(d, vm.gridDataByLogicalFlow);
+    };
+
+    vm.onSelectPhysicalFlow = (d) => {
+        gridSelected(d, vm.gridDataByPhysicalFlow)
+    };
+
+    vm.config =  {
+        logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
+        physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
+    };
+
 
 }
 
+
+
 controller.$inject = [
     "$q",
-    "ServiceBroker"
+    "ServiceBroker",
+    "DisplayNameService"
 ];
 
 
