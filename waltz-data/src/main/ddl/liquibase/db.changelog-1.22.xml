@@ -1,0 +1,214 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.22.xml">
+
+    <!-- 4464 - Software Package Improvements -->
+    <changeSet id="20191120-4496-1"
+               author="kamransaleem">
+        <modifyDataType columnName="external_id"
+                        newDataType="${external-id.type}"
+                        tableName="software_package" />
+    </changeSet>
+
+    <!--
+    <changeSet id="20191120-4496-2"
+               author="kamransaleem">
+        <dropColumn tableName="software_package"
+                    columnName="version" />
+    </changeSet>
+
+    <changeSet id="20191120-4496-3a"
+               dbms="mssql"
+               author="kamransaleem">
+        <dropDefaultValue tableName="software_package"
+                          columnName="maturity_status"/>
+    </changeSet>
+
+    <changeSet id="20191120-4496-3"
+               author="kamransaleem">
+        <dropColumn tableName="software_package"
+                    columnName="maturity_status" />
+    </changeSet>
+
+    <changeSet id="20191120-4496-4"
+               author="kamransaleem">
+        <addColumn tableName="software_package">
+            <column name="created_by"
+                    type="${name.type}"
+                    defaultValue="admin">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191120-4496-5"
+               author="kamransaleem">
+        <addColumn tableName="software_package">
+            <column name="group"
+                    type="${name.type}">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191120-4496-6"
+               author="kamransaleem">
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="vendor"
+                               tableName="software_package"/>
+    </changeSet>
+    -->
+
+
+    <!-- 4464 - Software Version -->
+    <!--
+    <changeSet id="20191120-4496-10"
+               author="kamransaleem">
+        <createTable tableName="software_version">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="software_version_pkey"/>
+            </column>
+            <column name="software_package_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version"
+                    type="${version.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+    -->
+
+    <!-- 4464 - Remove Software Usage -->
+    <!--
+    <changeSet id="20191120-4496-14"
+               author="kamransaleem">
+        <dropTable tableName="software_usage" />
+    </changeSet>
+    -->
+
+    <!-- 4464 - Software Usage -->
+    <!--
+    <changeSet id="20191120-4496-15"
+               author="kamransaleem">
+        <createTable tableName="software_usage">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="software_usage_pkey"/>
+            </column>
+            <column name="application_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="software_version_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+    -->
+
+    <!-- 4464 - Software Version licence -->
+    <!--
+    <changeSet id="20191120-4496-21"
+               author="kamransaleem">
+        <createTable tableName="software_version_licence">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="software_version_licence_pkey"/>
+            </column>
+            <column name="software_version_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="licence_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+    -->
+</databaseChangeLog>
