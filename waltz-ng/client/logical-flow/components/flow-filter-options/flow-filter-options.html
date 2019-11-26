@@ -18,6 +18,23 @@
   -->
 
 <div class="waltz-flow-filter-options">
+    <div ng-include="'wffo-scope-options'"></div>
+    <hr>
+    <div ng-include="'wffo-type-options'"></div>
+</div>
+
+
+<!-- TEMPLATES -->
+
+<!-- TYPE_FILTER -->
+<script type="text/ng-template"
+        id="wffo-type-options">
+
+    <h5>
+        <waltz-icon name="filter"></waltz-icon>
+        Data Type
+        <small>Filter</small>
+    </h5>
 
     <div ng-if="!$ctrl.visibility.tree">
         Showing all flows for all data types.
@@ -47,15 +64,17 @@
         <br>
 
         Alternatively,
-            <a class='clickable'
-               ng-click="$ctrl.onShowAll()">
-                show all.
-            </a>
+        <a class='clickable'
+           ng-click="$ctrl.onShowAll()">
+            show all.
+        </a>
     </div>
+</script>
 
-    <hr>
 
-
+<!-- SCOPE_FILTER -->
+<script type="text/ng-template"
+        id="wffo-scope-options">
     <h5>
         <waltz-icon name="filter"></waltz-icon>
         Scope
@@ -111,5 +130,4 @@
             </label>
         </div>
     </div>
-
-</div>
+</script>
