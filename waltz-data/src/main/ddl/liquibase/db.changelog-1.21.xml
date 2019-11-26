@@ -401,4 +401,14 @@
                     Application distribution based on &lt;ul&gt;&lt;li&gt;Logical flow attestation&lt;/li&gt;&lt;li&gt;Physical flow attestation&lt;/li&gt;"/>
         </insert>
     </changeSet>
+
+
+    <!-- 4525 - Software Package external_id larger -->
+    <changeSet id="20191126-4525-1"
+               author="kamransaleem">
+        <modifyDataType columnName="external_id"
+                        newDataType="${external-id.type}"
+                        tableName="software_package" />
+    </changeSet>
+
 </databaseChangeLog>
