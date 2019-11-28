@@ -25,6 +25,11 @@
         border-bottom: 1px solid #d4d4d4;
     }
 
+    .ui-grid-header {
+        border-right: none;
+        border-bottom: 0 !important;
+    }
+
     .ui-grid-cell {
         border-right: none;
         text-align: left;
