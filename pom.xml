@@ -39,14 +39,14 @@
 
         <hikari.version>2.6.3</hikari.version>
         <immutables.version>2.7.5</immutables.version>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.9.9</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
         <jgrapht.version>1.2.0</jgrapht.version>
         <jool.version>0.9.12</jool.version>
         <junit.version>4.12</junit.version>
-        <jwt.version>3.8.2</jwt.version>
+        <jwt.version>3.8.3</jwt.version>
         <logback.version>1.2.3</logback.version>
         <pcollections.version>2.1.2</pcollections.version>
         <poi.version>3.15</poi.version>
