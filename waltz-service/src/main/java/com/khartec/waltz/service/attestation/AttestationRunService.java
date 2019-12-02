@@ -250,6 +250,11 @@ public class AttestationRunService {
     }
 
 
+    public Collection<AttestationRun> findByIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = mkIdSelector(EntityKind.ATTESTATION, options);
+        return attestationRunDao.findByIdSelector(selector);
+    }
+
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
         return ImmutableAttestationRunCreateCommand.builder()
                 .name("Entity Attestation")

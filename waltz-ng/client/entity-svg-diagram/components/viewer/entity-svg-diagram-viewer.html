@@ -1,14 +1,25 @@
 <div class="wesd-viewer">
-    <!-- svg goes here -->
+    <!-- POPUP -->
+    <div ng-style="$ctrl.popup.style"
+         class="wesd-popup">
+        <waltz-markdown text="$ctrl.popup.text"></waltz-markdown>
+    </div>
+
+    <div class="wesd-svg">
+        <!-- SVG HERE -->
+    </div>
 </div>
+
+
+<!-- CONTROLS -->
 <div style="margin-bottom: 10px"
      class="waltz-visibility-parent">
 
     <div class="waltz-visibility-child-50">
 
-          <span class="wesd-pan-button btn btn-sm btn-success"
-                ng-if="$ctrl.panZoomEnabled"
-                ng-click="$ctrl.togglePanZoom()">
+        <span class="wesd-pan-button btn btn-sm btn-success"
+              ng-if="$ctrl.panZoomEnabled"
+              ng-click="$ctrl.togglePanZoom()">
             Disable Pan and Zoom via mouse
         </span>
 
@@ -44,11 +55,5 @@
             <waltz-icon name="chevron-right"></waltz-icon>
         </span>
 
-
     </div>
-</div>
-
-<div ng-style="$ctrl.popup.style"
-     class="wesd-popup">
-    <waltz-markdown text="$ctrl.popup.text"></waltz-markdown>
 </div>

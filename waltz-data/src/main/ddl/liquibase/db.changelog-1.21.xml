@@ -380,4 +380,35 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20191126-4486-1"
+               author="muzammilali">
+        <comment>4486: Added static panel info for attestation summary page</comment>
+        <insert tableName="static_panel">
+            <column name="group"
+                    value="SECTION.ATTESTATION_SUMMARY.ABOUT"/>
+            <column name="icon"
+                    value="shield"/>
+            <column name="title"
+                    value="About"/>
+            <column name="priority"
+                    value="1"/>
+            <column name="width"
+                    value="12"/>
+            <column name="encoding"
+                    value="MARKDOWN"/>
+            <column name="content"
+                    value="Display the summary of attested and non attested applications as pie chart.&lt;br/&gt;&lt;br/&gt;
+                    Application distribution based on &lt;ul&gt;&lt;li&gt;Logical flow attestation&lt;/li&gt;&lt;li&gt;Physical flow attestation&lt;/li&gt;"/>
+        </insert>
+    </changeSet>
+
+
+    <!-- 4525 - Software Package external_id larger -->
+    <changeSet id="20191126-4525-1"
+               author="kamransaleem">
+        <modifyDataType columnName="external_id"
+                        newDataType="${external-id.type}"
+                        tableName="software_package" />
+    </changeSet>
+
 </databaseChangeLog>

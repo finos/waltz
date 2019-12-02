@@ -26,6 +26,7 @@ import attestedKind from './components/attested-kind/attested-kind';
 import attestationRunOverview from './components/run-overview/attestation-run-overview';
 import attestationRecipients from './components/recipients/attestation-recipients';
 import attestationSection from './components/section/attestation-section';
+import attestationSummarySection from './components/section/attestation-summary-section';
 import inlineLogicalFlowPanel from './components/inline-logical-flow-panel/inline-logical-flow-panel';
 import inlineMeasurableRating from './components/inline-measurable-rating-panel/inline-measurable-rating-panel';
 import inlinePhysicalFlowPanel from './components/inline-physical-flow-panel/inline-physical-flow-panel';
@@ -49,6 +50,7 @@ export default () => {
         attestationRunOverview,
         attestationRecipients,
         attestationSection,
+        attestationSummarySection,
         inlineLogicalFlowPanel,
         inlineMeasurableRating,
         inlinePhysicalFlowPanel

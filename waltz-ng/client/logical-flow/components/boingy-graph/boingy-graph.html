@@ -43,8 +43,8 @@
 
 
 <!-- FILTER OVERLAY -->
-<div style="position: absolute; top: 42px; left: 32px; opacity: 0.9;"
-     ng-if="$ctrl.showFilters">
+<div style="position: absolute; top: 42px; left: 32px; opacity: 0.9; z-index: 1000;"
+     ng-show="$ctrl.showFilters"> <!-- using `show` so filters do not reset when reopening -->
     <waltz-sub-section name="Filters">
         <content>
             <div style="padding: 8px; background-color: white;">
@@ -63,8 +63,8 @@
 
 
 <!-- FOCUS OVERLAY -->
-<div style="position: absolute; top: 42px; left: 32px; opacity: 0.9;"
-     ng-if="$ctrl.selectedNode">
+<div style="position: absolute; top: 42px; left: 32px; opacity: 0.9; max-width: 30%"
+     ng-show="$ctrl.selectedNode">
     <waltz-sub-section name="Selected Node">
         <content>
             <div style="padding: 8px; background-color: white;">
