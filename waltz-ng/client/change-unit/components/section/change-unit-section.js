@@ -78,6 +78,11 @@ function controller(notification, serviceBroker, $q) {
         return $q
             .all([physicalFlowChangeUnitPromise])
             .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
+            .then(() => {
+                if(vm.selectedChangeUnit) {
+                    vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id === vm.selectedChangeUnit.id);
+                }
+            })
     };
 
 
