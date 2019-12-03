@@ -69,7 +69,7 @@
         <logback.version>1.2.3</logback.version>
         <pcollections.version>2.1.2</pcollections.version>
         <poi.version>4.1.1</poi.version>
-        <slf4j.version>1.7.26</slf4j.version>
+        <slf4j.version>1.7.29</slf4j.version>
         <spark.version>2.9.1</spark.version>
         <spring.version>5.1.8.RELEASE</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
