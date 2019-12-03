@@ -53,7 +53,7 @@
     </scm>
 
     <properties>
-        <plugin.maven-compiler.version>3.3</plugin.maven-compiler.version>
+        <plugin.maven-compiler.version>3.8.1</plugin.maven-compiler.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <hikari.version>3.4.1</hikari.version>
