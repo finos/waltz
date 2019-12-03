@@ -27,7 +27,7 @@ const bindings = {
     searchControlMinRows: "<?",
     searchPlaceholderText: "@",
     scopeProvider: "<?",
-    onInitialise: "<",
+    onInitialise: "<?",
     onChange: "<",
     onRowSelect: "<?",
     localStorageKey: "@?"

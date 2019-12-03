@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ function prepareColumns(uiGridConstants, options) {
     const kindCol = {
         field: "cost.costKind",
         displayName: "Cost Type",
-        cellFilter: 'toDisplayName:"CostKind"'
+        cellFilter: "toDisplayName:'CostKind'"
     };
 
     const amountCol = {

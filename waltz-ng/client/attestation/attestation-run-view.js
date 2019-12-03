@@ -34,22 +34,21 @@ const initialState = {
     instances: [],
     selectedInstance: null,
     columnDefs: [],
-    tableData: [],
-    onGridInitialise: (cfg) => console.log('default grid initialise handler for attestation-run-view')
+    tableData: []
 };
 
 
 function mkRagRating(run = {}, instance = {}) {
     if(instance.attestedBy) {
-        return { rag: 'G', name: 'Complete', color: green }
+        return { rag: "G", name: "Complete", color: green }
     }
     const dueDate = moment.utc(run.dueDate, formats.parse );
     const now = moment.utc();
 
     if(now > dueDate) {
-        return { rag: 'R', name: 'Overdue', color: red };
+        return { rag: "R", name: "Overdue", color: red };
     } else {
-        return { rag: 'A', name: 'Pending', color: amber };
+        return { rag: "A", name: "Pending", color: amber };
     }
 }
 
@@ -59,10 +58,10 @@ function mkInstancesWithRagRating(run = {}, instances = []) {
 }
 
 const ratingOrdinal = {
-    'R': 3,
-    'A': 2,
-    'G': 1,
-    'Z': 0
+    "R": 3,
+    "A": 2,
+    "G": 1,
+    "Z": 0
 };
 
 
@@ -74,34 +73,32 @@ const ratingCellTemplate = `
 
 
 function prepareColumnDefs() {
-    const initialCols = [
-        mkEntityLinkGridCell('Subject', 'parentEntity'),
+    return [
+        mkEntityLinkGridCell("Subject", "parentEntity"),
         {
-            field: 'rating',
-            name: 'Status',
+            field: "rating",
+            name: "Status",
             cellTemplate: ratingCellTemplate,
             sortingAlgorithm: (a, b) => {
-                if(a.rag == b.rag) return 0;
+                if(a.rag === b.rag) return 0;
                 return ratingOrdinal[a.rag] - ratingOrdinal[b.rag];
             }
         },
         {
-            field: 'attestedBy',
-            name: 'Attested By',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a ui-sref="main.profile.view ({userId: COL_FIELD})"><span ng-bind="COL_FIELD"></span></a></div>'
+            field: "attestedBy",
+            name: "Attested By",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ui-sref=\"main.profile.view ({userId: COL_FIELD})\"><span ng-bind=\"COL_FIELD\"></span></a></div>"
         },
         {
-            field: 'attestedAt',
-            name: 'Attested At',
-            cellTemplate: '<div class="ui-grid-cell-contents"><waltz-from-now timestamp="COL_FIELD"></waltz-from-now></div>'
+            field: "attestedAt",
+            name: "Attested At",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\"></waltz-from-now></div>"
         },
         {
-            name: 'Recipients',
-            cellTemplate: '<div class="ui-grid-cell-contents"><a ng-click="grid.appScope.selectInstance(row.entity)" class="clickable">Show</a></div>'
+            name: "Recipients",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ng-click=\"grid.appScope.selectInstance(row.entity)\" class=\"clickable\">Show</a></div>"
         }
     ];
-
-    return initialCols;
 }
 
 
@@ -132,22 +129,18 @@ function controller($q,
         vm.selectedInstance = instance;
     };
 
-    vm.onGridInitialise = (cfg) => {
-        vm.exportData = () => cfg.exportFn("attestation_instances.csv");
-    }
-
 }
 
 
 controller.$inject = [
-    '$q',
-    '$stateParams',
-    'ServiceBroker'
+    "$q",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
