@@ -45,8 +45,7 @@
         <waltz-grid-with-search ng-if="$ctrl.rowData.length > 0"
                                 scope-provider="$ctrl"
                                 column-defs="$ctrl.columnDefs"
-                                entries="$ctrl.rowData"
-                                searchPlaceholderText="Search">
+                                entries="$ctrl.rowData">
         </waltz-grid-with-search>
 
         <waltz-no-data ng-if="$ctrl.rowData.length === 0">

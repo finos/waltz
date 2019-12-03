@@ -41,12 +41,15 @@
                 <waltz-grid-with-search scope-provider="ctrl"
                                         column-defs="ctrl.columnDefs"
                                         entries="ctrl.tableData"
-                                        searchPlaceholderText="Search"
-                                        exportFilename="attestation_instances.csv">
+                                        search-placeholder-text="Search">
                 </waltz-grid-with-search>
             </div>
 
             <div class="col-sm-3">
+                <div ng-if="!ctrl.selectedInstance"
+                     style="padding-top: 8px">
+                    Select an attestation run to show recipients
+                </div>
                 <waltz-attestation-recipients class="waltz-fade-if"
                                               ng-if="ctrl.selectedInstance"
                                               instance="ctrl.selectedInstance">

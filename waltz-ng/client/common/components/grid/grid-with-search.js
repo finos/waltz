@@ -25,10 +25,10 @@ const bindings = {
     columnDefs: "<",
     entries: "<",
     searchControlMinRows: "<?",
-    searchPlaceholderText: "@",
+    searchPlaceholderText: "@?",
     scopeProvider: "<?",
     onInitialise: "<?",
-    onChange: "<",
+    onChange: "<?",
     onRowSelect: "<?",
     localStorageKey: "@?"
 };
