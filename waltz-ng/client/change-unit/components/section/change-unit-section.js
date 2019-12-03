@@ -79,6 +79,11 @@ function controller(notification, serviceBroker, $q) {
         return $q
             .all([physicalFlowChangeUnitPromise])
             .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
+            .then(() => {
+                if(vm.selectedChangeUnit) {
+                    vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id === vm.selectedChangeUnit.id);
+                }
+            })
     };
 
 
@@ -96,9 +101,6 @@ function controller(notification, serviceBroker, $q) {
                 .then(r => r.data)
                 .then(() => {
                     loadData(true);
-                    if(vm.selectedChangeUnit) {
-                        vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id = vm.selectedChangeUnit.id);
-                    }
                     notification.success("Change Unit Completed");
                 })
                 .catch(e => displayError(notification, "Failed to complete change unit", e));
