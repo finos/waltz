@@ -21,12 +21,14 @@ package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.application.ApplicationKind;
 import org.immutables.value.Value;
 
 import java.util.Set;
 
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 
@@ -53,6 +55,14 @@ public abstract class IdSelectionOptions {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(scope)
+                .build();
+    }
+
+    public static IdSelectionOptions mkOptsForAllLifecycleStates(EntityReference ref, HierarchyQueryScope scope) {
+        return ImmutableIdSelectionOptions.builder()
+                .entityReference(ref)
+                .scope(scope)
+                .entityLifecycleStatuses(asList(EntityLifecycleStatus.values()))
                 .build();
     }
 
