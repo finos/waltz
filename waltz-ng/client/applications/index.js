@@ -27,7 +27,7 @@ import AppOverview from "./components/overview/app-overview";
 import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
 import AppSelector from "./directives/app-selector";
 import AssetCodeExplorer from "./directives/asset-code-explorer";
-import BasicAppSelector from "./directives/basic-app-selector";
+import BasicAppSelector from "./components/basic-app-selector/basic-app-selector";
 import AppsByInvestmentPie from "./components/apps-by-investment-pie";
 import AppsByLifecyclePhasePie from "./components/apps-by-lifecycle-phase-pie";
 import AppSummary from "./components/app-summary";
@@ -45,8 +45,7 @@ export default () => {
 
     module
         .directive("waltzAppSelector", AppSelector)
-        .directive("waltzAssetCodeExplorer", AssetCodeExplorer)
-        .directive("waltzBasicAppSelector", BasicAppSelector);
+        .directive("waltzAssetCodeExplorer", AssetCodeExplorer);
 
     module
         .component("waltzAppsByInvestmentPie", AppsByInvestmentPie)
@@ -58,6 +57,7 @@ export default () => {
     registerComponents(module, [
         AppCostsSection,
         AppOverview,
+        BasicAppSelector,
         BulkApplicationSelector
     ]);
 
