@@ -67,7 +67,8 @@ function controller(notification, serviceBroker, $q) {
         const physicalFlowChangeUnitPromise = serviceBroker
             .loadViewData(
                 CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
-                [vm.parentEntityRef.id])
+                [vm.parentEntityRef.id],
+                { force: true })
             .then(r => {
                 const extendChangeUnitWithRatings = cu =>
                     Object.assign({}, cu, { assessmentValues: mkAssessmentValuesString(cu) });
@@ -100,11 +101,13 @@ function controller(notification, serviceBroker, $q) {
                 .then(r => r.data)
                 .then(() => {
                     loadData(true);
+                    if(vm.selectedChangeUnit) {
+                        vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id = vm.selectedChangeUnit.id);
+                    }
                     notification.success("Change Unit Completed");
                 })
                 .catch(e => displayError(notification, "Failed to complete change unit", e));
         }
-
     };
 
 
