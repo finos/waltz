@@ -24,6 +24,7 @@ import services from "./services";
 
 import AppCostsSection from "./components/app-costs-section/app-costs-section";
 import AppOverview from "./components/overview/app-overview";
+import AppsSection from "./components/apps-section/apps-section";
 import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
 import AppSelector from "./directives/app-selector";
 import AssetCodeExplorer from "./directives/asset-code-explorer";
@@ -57,6 +58,7 @@ export default () => {
     registerComponents(module, [
         AppCostsSection,
         AppOverview,
+        AppsSection,
         BasicAppSelector,
         BulkApplicationSelector
     ]);
