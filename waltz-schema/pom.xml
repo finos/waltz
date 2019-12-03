@@ -13,7 +13,7 @@
 
 
     <properties>
-        <jooq.version>3.11.9</jooq.version>
+        <jooq.version>3.12.3</jooq.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
