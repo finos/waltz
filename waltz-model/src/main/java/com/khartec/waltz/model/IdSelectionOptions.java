@@ -21,6 +21,7 @@ package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import org.immutables.value.Value;
 
@@ -49,6 +50,7 @@ public abstract class IdSelectionOptions {
         return ImmutableSelectionFilters.builder().build();
     }
 
+  
     public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
@@ -56,8 +58,8 @@ public abstract class IdSelectionOptions {
                 .build();
     }
 
-
-    public static IdSelectionOptions mkOptsForAllLifecyclePhases(EntityReference ref, HierarchyQueryScope scope) {
+  
+    public static IdSelectionOptions mkOptsForAllLifecycleStates(EntityReference ref, HierarchyQueryScope scope) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(scope)
@@ -91,6 +93,6 @@ public abstract class IdSelectionOptions {
             default:
                 return CHILDREN;
         }
-    }
 
+    }
 }
