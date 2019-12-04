@@ -57,7 +57,7 @@ public abstract class IdSelectionOptions {
     }
 
 
-    public static IdSelectionOptions mkOptsForAllLifecyclePhases(EntityReference ref, HierarchyQueryScope scope) {
+    public static IdSelectionOptions mkOptsForAllLifecycleStates(EntityReference ref, HierarchyQueryScope scope) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(scope)
@@ -94,17 +94,4 @@ public abstract class IdSelectionOptions {
 
     }
 
-
-    public static void main(String[] args) {
-        ImmutableIdSelectionOptions opts = ImmutableIdSelectionOptions
-                .builder()
-                .entityReference(EntityReference.mkRef(EntityKind.APPLICATION, 1L))
-                .scope(EXACT)
-                .filters(ImmutableSelectionFilters
-                        .builder()
-                        .addOmitApplicationKinds(ApplicationKind.IN_HOUSE)
-                        .build())
-                .build();
-        System.out.println(opts);
-    }
 }
