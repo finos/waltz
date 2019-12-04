@@ -81,6 +81,20 @@ public abstract class IdSelectionOptions {
             default:
                 return CHILDREN;
         }
+
     }
 
+
+    public static void main(String[] args) {
+        ImmutableIdSelectionOptions opts = ImmutableIdSelectionOptions
+                .builder()
+                .entityReference(EntityReference.mkRef(EntityKind.APPLICATION, 1L))
+                .scope(EXACT)
+                .filters(ImmutableSelectionFilters
+                        .builder()
+                        .addOmitApplicationKinds(ApplicationKind.IN_HOUSE)
+                        .build())
+                .build();
+        System.out.println(opts);
+    }
 }
