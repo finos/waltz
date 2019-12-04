@@ -135,6 +135,7 @@ public class ChangeUnitViewService {
                 .collect(toSet());
     }
 
+
     private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RagName ratingDefinition) {
         return ImmutableAssessmentRatingDetail
                 .builder()

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.model.application.ApplicationKind;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -51,6 +50,7 @@ public abstract class IdSelectionOptions {
         return ImmutableSelectionFilters.builder().build();
     }
 
+  
     public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
@@ -58,6 +58,7 @@ public abstract class IdSelectionOptions {
                 .build();
     }
 
+  
     public static IdSelectionOptions mkOptsForAllLifecycleStates(EntityReference ref, HierarchyQueryScope scope) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
@@ -65,6 +66,7 @@ public abstract class IdSelectionOptions {
                 .entityLifecycleStatuses(asList(EntityLifecycleStatus.values()))
                 .build();
     }
+
 
     public static IdSelectionOptions mkOpts(EntityReference ref) {
         return ImmutableIdSelectionOptions.builder()
