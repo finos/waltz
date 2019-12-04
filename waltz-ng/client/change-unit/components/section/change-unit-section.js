@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,7 +67,8 @@ function controller(notification, serviceBroker, $q) {
         const physicalFlowChangeUnitPromise = serviceBroker
             .loadViewData(
                 CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
-                [vm.parentEntityRef.id])
+                [vm.parentEntityRef.id],
+                { force: true })
             .then(r => {
                 const extendChangeUnitWithRatings = cu =>
                     Object.assign({}, cu, { assessmentValues: mkAssessmentValuesString(cu) });
@@ -78,6 +79,11 @@ function controller(notification, serviceBroker, $q) {
         return $q
             .all([physicalFlowChangeUnitPromise])
             .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
+            .then(() => {
+                if(vm.selectedChangeUnit) {
+                    vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id === vm.selectedChangeUnit.id);
+                }
+            })
     };
 
 
@@ -99,7 +105,6 @@ function controller(notification, serviceBroker, $q) {
                 })
                 .catch(e => displayError(notification, "Failed to complete change unit", e));
         }
-
     };
 
 
