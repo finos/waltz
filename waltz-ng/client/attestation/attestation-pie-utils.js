@@ -31,22 +31,18 @@ export const attestationPieConfig = {
 /**
  * Returns grid data with application, latest attestation, attested status
  * @param applications: all applications subjected for aggregation
- * @param attestationRuns: attestationRun for the applications
  * @param attestationInstances: all attestationInstances for the applications
  * @param attestedEntityKind: Entity Kind against which attestation data needs to be collected
  * **/
 export function mkAppAttestationGridData(applications = [],
-                                         attestationRuns = [],
                                          attestationInstances = [],
                                          attestedEntityKind,
                                          displayNameService) {
-    const attestedRunIdsFilteredByEntityKind =
-        _.chain(attestationRuns)
-            .filter(d => d.attestedEntityKind === attestedEntityKind)
-            .map(d => d.id)
-            .value();
 
-    const attestationByAppId = getAttestationByAppId(attestationInstances, attestedRunIdsFilteredByEntityKind);
+    const attestationByAppId = _.groupBy(
+        _.filter(attestationInstances,
+                inst => inst.attestedEntityKind === attestedEntityKind),
+        "parentEntity.id");
 
     return _.map(applications, app => ({
         application: Object.assign({}, app, mapToDisplayNames(displayNameService, app)),
@@ -63,22 +59,12 @@ export function prepareSummaryData(applications = []) {
 
 export const attestationSummaryColumnDefs = [
     mkEntityLinkGridCell("Name", "application"),
-    { field: "application.assetCode", name: "Asset Code"},
-    { field: "application.kindDisplay", name: "Kind"},
-    { field: "businessCriticalityDisplay", name: "Business Criticality"},
-    { field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
-    { field: "attestation.attestedBy", name: "Last Attested By"},
+    {field: "application.assetCode", name: "Asset Code"},
+    {field: "application.kindDisplay", name: "Kind"},
+    {field: "businessCriticalityDisplay", name: "Business Criticality"},
+    {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
+    {field: "attestation.attestedBy", name: "Last Attested By"},
     mkDateGridCell("Last Attested at", "attestation.attestedAt")
 ];
 
 
-function getAttestationByAppId(attestationInstances, attestedRunIds) {
-    const attestedInstances = _.filter(attestationInstances, instance => isAttested(instance)
-        && _.includes(attestedRunIds, instance.attestationRunId));
-
-    return _.groupBy(attestedInstances, "parentEntity.id");
-
-    function isAttested(instance) {
-        return instance.attestedAt != null;
-    }
-}

@@ -1,0 +1,75 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.22.xml">
+
+    <changeSet id="20191203-4537-1"
+               author="muzammilali">
+        <comment>4537: Added attested entity kind to attestation instance</comment>
+        <addColumn tableName="attestation_instance">
+            <column name="attested_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191203-4537-2"
+               author="muzammilali">
+        <comment>4537: Added index in table attestation_instance for parent_entity_id</comment>
+        <createIndex tableName="attestation_instance"
+                     indexName="idx_attestation_instance_parent_entity_id">
+            <column name="parent_entity_id"
+                    type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20191203-4537-3"
+               author="muzammilali">
+        <comment>4537: Added foreign key constraint to attestation_instance for attestation_run</comment>
+        <addForeignKeyConstraint constraintName="attestation_instance_run_fk"
+                                 baseTableName="attestation_instance"
+                                 baseColumnNames="attestation_run_id"
+                                 referencedTableName="attestation_run"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191203-4537-4"
+               author="muzammilali">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance
+            SET attestation_instance.attested_entity_kind = attestation_run.attested_entity_kind
+            FROM attestation_instance
+            JOIN attestation_run
+            ON (attestation_run.id = attestation_instance.attestation_run_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191203-4537-5"
+               author="muzammilali">
+    <comment>4537: Added not null constraint for attested_entity_knd in attestation_instance table</comment>
+        <addNotNullConstraint columnDataType="${enum.type}"
+                              columnName="attested_entity_kind"
+                              tableName="attestation_instance" />
+    </changeSet>
+</databaseChangeLog>
