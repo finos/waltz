@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { registerComponents } from '../common/module-utils';
+import { registerComponents } from "../common/module-utils";
 
-import routes from './routes';
-import services from './services';
+import routes from "./routes";
+import services from "./services";
 
-import AppCostsSection from './components/app-costs-section/app-costs-section';
-import AppOverview from './components/overview/app-overview';
+import AppCostsSection from "./components/app-costs-section/app-costs-section";
+import AppOverview from "./components/overview/app-overview";
+import AppsSection from "./components/apps-section/apps-section";
 import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
-import RelatedAppsSection from './components/related-apps-section/related-apps-section';
-import AppSelector from './directives/app-selector';
-import AssetCodeExplorer from './directives/asset-code-explorer';
-import BasicAppSelector from './directives/basic-app-selector';
-import AppsByInvestmentPie from './components/apps-by-investment-pie';
-import AppsByLifecyclePhasePie from './components/apps-by-lifecycle-phase-pie';
-import AppsSection from './components/apps-section/apps-section';
-import AppSummary from './components/app-summary';
-import AppTable from './components/app-table';
-import SimpleAppTable from './components/apps-view/simple-app-table';
+import AppSelector from "./directives/app-selector";
+import AssetCodeExplorer from "./directives/asset-code-explorer";
+import BasicAppSelector from "./components/basic-app-selector/basic-app-selector";
+import AppsByInvestmentPie from "./components/apps-by-investment-pie";
+import AppsByLifecyclePhasePie from "./components/apps-by-lifecycle-phase-pie";
+import AppSummary from "./components/app-summary";
+import AppTable from "./components/app-table";
+import SimpleAppTable from "./components/apps-view/simple-app-table";
 
 export default () => {
 
-    const module = angular.module('waltz.applications', []);
+    const module = angular.module("waltz.applications", []);
 
     services(module);
 
@@ -46,23 +45,22 @@ export default () => {
         .config(routes);
 
     module
-        .directive('waltzAppSelector', AppSelector)
-        .directive('waltzAssetCodeExplorer', AssetCodeExplorer)
-        .directive('waltzBasicAppSelector', BasicAppSelector);
+        .directive("waltzAppSelector", AppSelector)
+        .directive("waltzAssetCodeExplorer", AssetCodeExplorer);
 
     module
-        .component('waltzAppsByInvestmentPie', AppsByInvestmentPie)
-        .component('waltzAppsByLifecyclePhasePie', AppsByLifecyclePhasePie)
-        .component('waltzAppsSection', AppsSection)
-        .component('waltzAppSummary', AppSummary)
-        .component('waltzAppTable', AppTable)
-        .component('waltzSimpleAppTable', SimpleAppTable);
+        .component("waltzAppsByInvestmentPie", AppsByInvestmentPie)
+        .component("waltzAppsByLifecyclePhasePie", AppsByLifecyclePhasePie)
+        .component("waltzAppSummary", AppSummary)
+        .component("waltzAppTable", AppTable)
+        .component("waltzSimpleAppTable", SimpleAppTable);
 
     registerComponents(module, [
         AppCostsSection,
         AppOverview,
-        BulkApplicationSelector,
-        RelatedAppsSection
+        AppsSection,
+        BasicAppSelector,
+        BulkApplicationSelector
     ]);
 
     return module.name;

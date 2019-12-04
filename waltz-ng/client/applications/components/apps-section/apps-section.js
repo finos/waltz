@@ -117,4 +117,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzAppsSection",
+    component
+};

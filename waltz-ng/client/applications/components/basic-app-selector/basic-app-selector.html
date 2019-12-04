@@ -19,21 +19,21 @@
 
 <div class="row">
     <div class="col-md-8">
-        <waltz-app-selector model="ctrl.newSource"
-                            on-select="ctrl.select">
+        <waltz-app-selector model="$ctrl.newSource"
+                            on-select="$ctrl.select">
         </waltz-app-selector>
     </div>
     <div class="col-md-4">
-        <button ng-click='ctrl.add(ctrl.newSource.app)'
+        <button ng-click='$ctrl.add($ctrl.newSource.app)'
                 data-ux="basic-app-selector-add"
-                ng-disabled="ctrl.newSource.app == null"
+                ng-disabled="$ctrl.newSource.app == null"
                 class="btn btn-sm btn-primary">
             <waltz-icon name="plus"></waltz-icon>
-            <span ng-bind="ctrl.addLabel"></span>
+            <span ng-bind="$ctrl.addLabel"></span>
         </button>
         <a class="clickable"
-           ng-click="ctrl.cancel()">
-            <span ng-bind="ctrl.cancelLabel"></span>
+           ng-click="$ctrl.cancel()">
+            <span ng-bind="$ctrl.cancelLabel"></span>
         </a>
     </div>
 </div>

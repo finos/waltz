@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,33 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import {registerComponents, registerStores} from '../common/module-utils';
+import {registerComponents, registerStores} from "../common/module-utils";
 
-import bookmarkStore from './services/bookmark-store';
-import bookmarkKindSelect from './components/bookmark-kind-select/bookmark-kind-select';
-import bookmarksSection from './components/bookmarks-section/bookmarks-section';
-import bookmarkKinds from './components/bookmark-kinds/bookmark-kinds';
-import bookmarksViewPanel from './components/bookmarks-view-panel/bookmarks-view-panel';
-import bookmarksEditPanel from './components/bookmarks-edit-panel/bookmarks-edit-panel';
-import bookmarkFormDirective from './directives/bookmark-form';
+import bookmarkStore from "./services/bookmark-store";
+import bookmarkKindSelect from "./components/bookmark-kind-select/bookmark-kind-select";
+import bookmarksSection from "./components/bookmarks-section/bookmarks-section";
+import bookmarkKinds from "./components/bookmark-kinds/bookmark-kinds";
+import bookmarksViewPanel from "./components/bookmarks-view-panel/bookmarks-view-panel";
+import bookmarksEditPanel from "./components/bookmarks-edit-panel/bookmarks-edit-panel";
+import bookmarkForm from "./components/form/bookmark-form";
+
 
 export default () => {
 
-    const module = angular.module('waltz.bookmarks', []);
+    const module = angular.module("waltz.bookmarks", []);
 
     registerStores(module, [bookmarkStore]);
 
     registerComponents(module, [
+        bookmarkForm,
         bookmarkKinds,
         bookmarkKindSelect,
         bookmarksSection,
         bookmarksEditPanel,
         bookmarksViewPanel]);
-
-    module
-        .directive('waltzBookmarkForm', bookmarkFormDirective);
 
     return module.name;
 };

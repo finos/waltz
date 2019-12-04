@@ -48,7 +48,7 @@
                      select="$ctrl.tabSelected('graph', 1)">
                 <br>
 
-                <div ng-if="$ctrl.currentTabIndex == 1">
+                <div ng-if="$ctrl.currentTabIndex === 1">
                     <waltz-logical-flows-boingy-graph parent-entity-ref="$ctrl.parentEntityRef"
                                                       filters="$ctrl.filters">
                     </waltz-logical-flows-boingy-graph>
@@ -64,16 +64,15 @@
                 <waltz-loading-notification show="$ctrl.visibility.loadingFlows"
                                             name="Loading Flow Data">
                 </waltz-loading-notification>
-                <div ng-if="$ctrl.currentTabIndex == 2">
+                <div ng-if="$ctrl.currentTabIndex === 2">
                     <div style="height: 300px">
                         <waltz-logical-flow-table flows="$ctrl.flows"
-                                                  decorators="$ctrl.decorators"
-                                                  on-initialise="$ctrl.onTableInitialise">
+                                                  decorators="$ctrl.decorators">
                         </waltz-logical-flow-table>
                     </div>
                 </div>
 
-                <div ng-if="$ctrl.filteredFlowData.flows.length == 0 && $ctrl.flows.length > 0">
+                <div ng-if="$ctrl.filteredFlowData.flows.length === 0 && $ctrl.flows.length > 0">
                     <div class="alert alert-warning">
                         <strong>No data to show</strong> given the current filter options.  Use the
                         configure button above to adjust these options.
