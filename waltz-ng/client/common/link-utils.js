@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -48,6 +48,7 @@ const stateKindTuples = [
     {kind: "SCENARIO", state: "main.scenario.view"},
     {kind: "SERVER", state: "main.server.view"},
     {kind: "SOFTWARE", state: "main.software-package.view"},
+    {kind: "SURVEY_INSTANCE", state: "main.survey.instance.view"},
     {kind: "TAG", state: "main.tag.id.view"}
 ];
 
