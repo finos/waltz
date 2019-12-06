@@ -99,9 +99,9 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         ListRoute<PhysicalSpecification> searchRoute =
                 (request, response) -> specificationService.search(
-                        request.params("query"),
                         ImmutableEntitySearchOptions.builder()
                                 .userId(getUsername(request))
+                                .searchQuery(request.params("query"))
                                 .build());
 
         DatumRoute<PhysicalSpecification> getByIdRoute =

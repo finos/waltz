@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.service.entity_search;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -40,11 +41,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.length;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.Unchecked.supplier;
 
@@ -110,12 +113,15 @@ public class EntitySearchService {
     }
 
 
-    public List<EntityReference> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
+    public List<EntityReference> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
+        if (StringUtilities.isEmpty(options.searchQuery()) || length(options.searchQuery()) < 3) {
+            return Collections.emptyList();
+        }
+
         List<Future<Collection<? extends WaltzEntity>>> futures = options.entityKinds().stream()
-                .map(ek -> dbExecutorPool.submit(mkCallable(ek, query, options)))
+                .map(ek -> dbExecutorPool.submit(mkCallable(ek, options)))
                 .collect(toList());
 
         return futures.stream()
@@ -126,33 +132,32 @@ public class EntitySearchService {
 
 
     private Callable<Collection<? extends WaltzEntity>> mkCallable(EntityKind entityKind,
-                                                                   String query,
                                                                    EntitySearchOptions options) {
         switch (entityKind) {
             case ACTOR:
-                return () -> actorService.search(query, options);
+                return () -> actorService.search(options);
             case APPLICATION:
-                return () -> applicationService.search(query, options);
+                return () -> applicationService.search(options);
             case APP_GROUP:
-                return () -> appGroupService.search(query, options);
+                return () -> appGroupService.search(options);
             case CHANGE_INITIATIVE:
-                return () -> changeInitiativeService.search(query, options);
+                return () -> changeInitiativeService.search(options);
             case DATA_TYPE:
-                return () -> dataTypeService.search(query);
+                return () -> dataTypeService.search(options);
             case LOGICAL_DATA_ELEMENT:
-                return () -> logicalDataElementService.search(query, options);
+                return () -> logicalDataElementService.search(options);
             case MEASURABLE:
-                return () -> measurableService.search(query, options);
+                return () -> measurableService.search(options);
             case ORG_UNIT:
-                return () -> organisationalUnitService.search(query, options);
+                return () -> organisationalUnitService.search(options);
             case PERSON:
-                return () -> personService.search(query, options);
+                return () -> personService.search(options);
             case PHYSICAL_SPECIFICATION:
-                return () -> physicalSpecificationService.search(query, options);
+                return () -> physicalSpecificationService.search(options);
             case ROADMAP:
-                return () -> roadmapService.search(query, options);
+                return () -> roadmapService.search(options);
             case SERVER:
-                return () -> serverInformationService.search(query, options);
+                return () -> serverInformationService.search(options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }

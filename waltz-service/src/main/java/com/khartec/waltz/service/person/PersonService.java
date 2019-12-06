@@ -80,12 +80,12 @@ public class PersonService {
 
 
     public List<Person> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.PERSON));
+        return search(EntitySearchOptions.mkForEntity(EntityKind.PERSON, query));
     }
 
 
-    public List<Person> search(String query, EntitySearchOptions options) {
-        return personSearchDao.search(query, options);
+    public List<Person> search(EntitySearchOptions options) {
+        return personSearchDao.search(options);
     }
 
 

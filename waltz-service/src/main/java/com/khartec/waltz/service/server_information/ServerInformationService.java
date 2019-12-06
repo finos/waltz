@@ -87,12 +87,12 @@ public class ServerInformationService {
 
 
     public List<ServerInformation> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.SERVER));
+        return search(EntitySearchOptions.mkForEntity(EntityKind.SERVER, query));
     }
 
 
-    public List<ServerInformation> search(String query, EntitySearchOptions options) {
-        return serverInformationSearchDao.search(query, options);
+    public List<ServerInformation> search(EntitySearchOptions options) {
+        return serverInformationSearchDao.search(options);
     }
 
 

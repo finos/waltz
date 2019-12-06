@@ -38,6 +38,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.length;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -98,14 +100,17 @@ public class ActorService {
 
 
     public List<EntityReference> search(String query) {
-        List<Actor> actors = search(query, EntitySearchOptions.mkForEntity(EntityKind.ACTOR));
+        List<Actor> actors = search(EntitySearchOptions.mkForEntity(EntityKind.ACTOR, query));
         return actors.stream()
-                .map(a -> a.entityReference())
+                .map(Actor::entityReference)
                 .collect(toList());
     }
 
 
-    public List<Actor> search(String query, EntitySearchOptions options) {
-        return actorSearchDao.search(query, options);
+    public List<Actor> search(EntitySearchOptions options) {
+        if (length(options.searchQuery()) < 3) {
+            return emptyList();
+        }
+        return actorSearchDao.search(options);
     }
 }

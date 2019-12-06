@@ -49,12 +49,8 @@ public class MeasurableSearchDao {
     }
 
 
-    public List<Measurable> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<Measurable> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

@@ -230,7 +230,7 @@ public class AppGroupEndpoint implements Endpoint {
         };
 
         ListRoute<AppGroup> searchRoute = (request, response) ->
-                appGroupService.search(request.params("query"), mkForEntity(EntityKind.APP_GROUP));
+                appGroupService.search(mkForEntity(EntityKind.APP_GROUP, request.params("query")));
 
 
         getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);
