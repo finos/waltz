@@ -35,6 +35,8 @@ import java.util.Map;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 
 @Service
 public class PersonService {
@@ -80,6 +82,7 @@ public class PersonService {
 
 
     public List<Person> search(String query) {
+        if (isEmpty(query)) return emptyList();
         return search(EntitySearchOptions.mkForEntity(EntityKind.PERSON, query));
     }
 

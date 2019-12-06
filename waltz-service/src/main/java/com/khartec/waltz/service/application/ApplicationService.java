@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 
@@ -90,9 +92,7 @@ public class ApplicationService {
 
 
     public List<Application> search(String query) {
-        if (StringUtilities.isEmpty(query)) {
-            return Collections.emptyList();
-        }
+        if (isEmpty(query)) return emptyList();
         return search(EntitySearchOptions.mkForEntity(EntityKind.APPLICATION, query));
     }
 
