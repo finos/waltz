@@ -21,6 +21,7 @@ package com.khartec.waltz.service.entity_search;
 
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
+import com.khartec.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.WaltzEntity;
@@ -116,7 +117,8 @@ public class EntitySearchService {
     public List<EntityReference> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
-        if (StringUtilities.isEmpty(options.searchQuery()) || length(options.searchQuery()) < 3) {
+        if (StringUtilities.isEmpty(options.searchQuery())
+                || SearchUtilities.mkTerms(options.searchQuery()).isEmpty()) {
             return Collections.emptyList();
         }
 
