@@ -52,26 +52,23 @@ public class SetUtilities {
                 .collect(toSet());
     }
 
+    @SafeVarargs
     public static <T> Set<T> union(Collection<T>... xss) {
         Set<T> result = new HashSet<>();
-        for (Collection xs : xss) {
+        for (Collection<T> xs : xss) {
             result.addAll(xs);
         }
-
-        Arrays.stream(xss)
-                .collect(toSet());
         return result;
     }
 
+    @SafeVarargs
     public static <T> Set<T> orderedUnion(Collection<T>... xss) {
         // LinkedHashSet preserves iteration ordering, source: https://stackoverflow.com/a/16480560
         Set<T> result = new LinkedHashSet<>();
-        for (Collection xs : xss) {
+        for (Collection<T> xs : xss) {
             result.addAll(xs);
         }
 
-        Arrays.stream(xss)
-                .collect(toSet());
         return result;
     }
 
@@ -83,6 +80,7 @@ public class SetUtilities {
      * @param <T>
      * @return xs without all members of yss
      */
+    @SafeVarargs
     public static <T> Set<T> minus(Set<T> xs, Set<T>... yss) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(yss, "yss cannot be null");
