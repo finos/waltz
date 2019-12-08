@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -100,9 +100,10 @@ public class RangeBand<T extends Comparable<T>> implements Predicate<T> {
 
     @Override
     public String toString() {
-        return "RangeBand{" +
-                "low=" + low +
-                ", high=" + high +
-                '}';
+        return new StringBuilder()
+                .append(getLow() == null ? "*" : getLow())
+                .append(" - ")
+                .append(getHigh() == null ? "*" : getHigh())
+                .toString();
     }
 }

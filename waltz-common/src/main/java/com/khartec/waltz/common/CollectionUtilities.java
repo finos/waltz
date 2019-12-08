@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -208,7 +208,7 @@ public class CollectionUtilities {
      * @param <X>        type of elements in `xs`, should implement `Comparable`
      * @return new list with members of `xs` sorted by the items comparator
      */
-    public static <X extends Comparable> List<X> sort(Collection<X> xs) {
+    public static <X extends Comparable<X>> List<X> sort(Collection<X> xs) {
         checkNotNull(xs, "xs cannot be null");
 
         List<X> sorted = new ArrayList<>(xs);

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@ public class ObjectUtilities {
     }
 
 
+    @SafeVarargs
     public static <T> T  firstNotNull(T... ts) {
         for (T t : ts) {
             if (t != null) { return t; }
@@ -37,6 +38,8 @@ public class ObjectUtilities {
         return null;
     }
 
+    
+    @SafeVarargs
     public static <T> boolean any(Predicate<T> pred, T... ts) {
         return Stream
                 .of(ts)

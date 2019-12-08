@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,7 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RangeBandTest {
 
@@ -81,5 +80,12 @@ public class RangeBandTest {
         new RangeBand<>(10, 5);
     }
 
+
+    @Test
+    public void looksPretty() {
+        assertEquals("0 - *", new RangeBand<>(0, null).toString());
+        assertEquals("* - 10", new RangeBand<>(null, 10).toString());
+        assertEquals("0 - 10", new RangeBand<>(0, 10).toString());
+    }
 
 }
