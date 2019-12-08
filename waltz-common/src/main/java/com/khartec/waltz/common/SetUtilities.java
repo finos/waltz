@@ -28,11 +28,13 @@ import static java.util.stream.Collectors.toSet;
 
 public class SetUtilities {
 
+    @SafeVarargs
     public static <T> Set<T> asSet(T... ts) {
         return fromArray(ts);
     }
 
 
+    @SafeVarargs
     public static <T> Set<T> fromArray(T... ts) {
         if (ts == null || ts.length == 0) return new HashSet<>();
 
@@ -75,9 +77,9 @@ public class SetUtilities {
 
     /**
      * Remove vararg of <code>ys's</code> from <code>xs</code>
-     * @param xs
-     * @param yss
-     * @param <T>
+     * @param xs the set to subtract from
+     * @param yss var of of sets to remove from `xs`
+     * @param <T>  type of the elements in the sets
      * @return xs without all members of yss
      */
     @SafeVarargs
