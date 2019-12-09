@@ -32,8 +32,8 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.readBody;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 
 
@@ -53,18 +53,18 @@ public class DataTypesEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String searchPath = mkPath(BASE_URL, "search", ":query");
+        String searchPath = mkPath(BASE_URL, "search");
         String getDataTypeByIdPath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<DataType> searchRoute = (request, response) ->
                 service.search(EntitySearchOptions
-                        .mkForEntity(EntityKind.DATA_TYPE, request.params("query")));
+                        .mkForEntity(EntityKind.DATA_TYPE, readBody(request, String.class)));
 
         DatumRoute<DataType> getDataTypeByIdRoute = (request, response) ->
                 service.getDataTypeById(parseLong(request.params("id")));
 
         getForList(BASE_URL, (request, response) -> service.findAll());
-        getForList(searchPath, searchRoute);
+        postForList(searchPath, searchRoute);
         getForDatum(getDataTypeByIdPath, getDataTypeByIdRoute);
     }
 

@@ -89,7 +89,7 @@ public class AppGroupEndpoint implements Endpoint {
         String addChangeInitiativePath = mkPath(idPath, "change-initiatives");
         String removeChangeInitiativePath = mkPath(idPath, "change-initiatives", ":changeInitiativeId");
 
-        String searchPath = mkPath(BASE_URL, "search", ":query");
+        String searchPath = mkPath(BASE_URL, "search");
 
         DatumRoute<AppGroupDetail> getDetailByIdRoute = (request, response) ->
                 appGroupService.getGroupDetailById(getId(request));
@@ -230,7 +230,7 @@ public class AppGroupEndpoint implements Endpoint {
         };
 
         ListRoute<AppGroup> searchRoute = (request, response) ->
-                appGroupService.search(mkForEntity(EntityKind.APP_GROUP, request.params("query")));
+                appGroupService.search(mkForEntity(EntityKind.APP_GROUP, readBody(request, String.class)));
 
 
         getForList(findGroupSubscriptionsForUserPath, findGroupSubscriptionsRoute);
@@ -261,7 +261,7 @@ public class AppGroupEndpoint implements Endpoint {
         postForDatum(updateGroupOverviewPath, updateGroupOverviewRoute);
         postForDatum(BASE_URL, createNewGroupRoute);
 
-        getForList(searchPath, searchRoute);
+        postForList(searchPath, searchRoute);
     }
 
 }

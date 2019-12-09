@@ -53,7 +53,7 @@ export function store($http, baseApiUrl) {
 
 
     const search = (terms) => $http
-        .get(`${base}/search/${terms}`)
+        .post(`${base}/search`, terms)
         .then(r => r.data);
 
 
