@@ -183,6 +183,18 @@ public class AttestationRunDao {
     }
 
 
+    public List<AttestationRun> findByIdSelector(Select<Record1<Long>> selector) {
+
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_INSTANCE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
     public Long create(String userId, AttestationRunCreateCommand command) {
         checkNotNull(command, "command cannot be null");
 

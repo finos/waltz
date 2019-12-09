@@ -60,6 +60,9 @@ public abstract class Bookmark implements
         return false;
     }
 
+    @Value.Default
+    public boolean isRestricted() { return false; }
+
 
     public EntityReference entityReference() {
         return EntityReference.mkRef(

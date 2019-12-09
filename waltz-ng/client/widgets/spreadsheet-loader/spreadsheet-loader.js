@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,6 @@ const initialState = {
     sheetNames: [],
     workbook: null,
 
-    onGridInitialise: (cfg) => console.log('default grid initialise handler for spreadsheet-loader'),
     onSpreadsheetLoaded: (event) => console.log('default onSpreadsheetLoaded handler for spreadsheet-loader, ', event)
 };
 

@@ -20,6 +20,7 @@
 package com.khartec.waltz.data;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.attestation.AttestationIdSelectorFactory;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
@@ -46,6 +47,7 @@ public class GenericSelectorFactory {
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
+    private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
 
 
     public GenericSelector apply(IdSelectionOptions selectionOptions) {
@@ -112,6 +114,8 @@ public class GenericSelectorFactory {
                 return measurableIdSelectorFactory.apply(selectionOptions);
             case ORG_UNIT:
                 return organisationalUnitIdSelectorFactory.apply(selectionOptions);
+            case ATTESTATION:
+                return attestationIdSelectorFactory.apply(selectionOptions);
             //todo: (KS) Add support for Person
             default:
                 throw new UnsupportedOperationException(String.format("Cannot make generic selector for kind: %s", kind));

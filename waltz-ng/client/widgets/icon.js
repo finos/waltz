@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 
 const bindings = {
     name: "@",
-    size: "@",
-    flip: "@",
-    rotate: "@",
+    size: "@",          // lg | 2x | 3x | 4x | 5x
+    flip: "@",          // 90 | 180 | 270
+    rotate: "@",        // horizontal | vertical
     stack: "@",
     fixedWidth: "@",
     inverse: "@",

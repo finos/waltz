@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.*;
@@ -28,6 +30,8 @@ import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,6 +54,8 @@ public class AttestationInstanceService {
     private final AttestationRunService attestationRunService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
+
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
@@ -111,10 +117,21 @@ public class AttestationInstanceService {
     }
 
 
+    public List<AttestationInstance> findByIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = mkIdSelector(options);
+        return attestationInstanceDao.findByIdSelector(selector);
+    }
+
+
     public int cleanupOrphans() {
         return attestationInstanceDao.cleanupOrphans();
     }
 
+
+    private Select<Record1<Long>> mkIdSelector(IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.ATTESTATION, selectionOptions);
+        return genericSelector.selector();
+    }
 
     private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
 
@@ -129,7 +146,7 @@ public class AttestationInstanceService {
     }
 
 
-    public boolean attestForEntity(String username, AttestEntityCommand createCommand) throws Exception {
+    public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
@@ -158,14 +175,14 @@ public class AttestationInstanceService {
         }
     }
 
-    private Long getRunId(IdCommandResponse idCommandResponse) throws Exception {
+    private Long getRunId(IdCommandResponse idCommandResponse) throws IllegalStateException {
         return idCommandResponse.id()
-                        .orElseThrow(() -> new Exception("Unable to find attestation instance"));
+                        .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this run"));
     }
 
-    private Long getInstanceId(AttestationInstance attestation) throws Exception {
+    private Long getInstanceId(AttestationInstance attestation) throws IllegalStateException {
         return attestation
                 .id()
-                .orElseThrow(() -> new Exception("Unable to attest instance for this entity"));
+                .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this instance"));
     }
 }

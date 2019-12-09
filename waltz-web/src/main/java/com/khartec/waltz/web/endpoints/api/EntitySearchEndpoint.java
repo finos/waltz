@@ -53,13 +53,13 @@ public class EntitySearchEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String searchPath = mkPath(BASE_URL, ":query");
+        String searchPath = mkPath(BASE_URL, "*");
 
         ListRoute<EntityReference> searchRoute = (request, response) ->  {
             String username = getUsername(request);
             EntitySearchOptions entitySearchOptions = readBody(request, EntitySearchOptions.class);
 
-            String query = request.params("query");
+            String query = request.splat()[0];
 
             return entitySearchService.search(
                     query,

@@ -44,6 +44,11 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
     const categoryId = $stateParams.id;
+    vm.categoryRef = {
+        id: categoryId,
+        kind: "MEASURABLE_CATEGORY"
+    };
+
 
     vm.$onInit = () => {
 

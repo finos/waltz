@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOptsForAllLifecycleStates;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
@@ -92,7 +92,7 @@ public class ChangeUnitViewService {
 
     public Set<PhysicalFlowChangeUnitViewItem> findPhysicalFlowChangeUnitsByChangeSetId(long changeSetId){
 
-        IdSelectionOptions idSelectionOptions = mkOpts(mkRef(EntityKind.CHANGE_SET, changeSetId), HierarchyQueryScope.EXACT);
+        IdSelectionOptions idSelectionOptions = mkOptsForAllLifecycleStates(mkRef(EntityKind.CHANGE_SET, changeSetId), HierarchyQueryScope.EXACT);
 
         Collection<PhysicalFlow> physicalFlows = physicalFlowService.findBySelector(idSelectionOptions);
         Collection<PhysicalSpecification> physicalSpecs = physicalSpecificationService.findByIds(map(physicalFlows, PhysicalFlow::specificationId));
@@ -134,6 +134,7 @@ public class ChangeUnitViewService {
                 })
                 .collect(toSet());
     }
+
 
     private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RagName ratingDefinition) {
         return ImmutableAssessmentRatingDetail

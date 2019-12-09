@@ -21,7 +21,7 @@
       class="form-horizontal"
       novalidate
       role="form"
-      ng-submit="ctrl.onSubmit({bookmark: ctrl.bookmark})">
+      ng-submit="$ctrl.onSubmit($ctrl.bookmark)">
     <div class="form-group">
         <label for="title"
                class="col-sm-2 control-label">
@@ -32,8 +32,9 @@
                    id="title"
                    placeholder="Link title"
                    data-ux="bookmarks-title-field"
-                   ng-disabled="ctrl.bookmark.isRequired"
-                   ng-model="ctrl.bookmark.title">
+                   ng-disabled="$ctrl.bookmark.isRequired"
+                   ng-change="$ctrl.onFormChange()"
+                   ng-model="$ctrl.bookmark.title">
             <p class="help-block">Provide a descriptive title for this link</p>
         </div>
     </div>
@@ -46,9 +47,25 @@
             <input class="form-control"
                    id="url"
                    data-ux="bookmarks-url-field"
-                   ng-model="ctrl.bookmark.url"
+                   ng-model="$ctrl.bookmark.url"
+                   ng-change="$ctrl.onFormChange()"
                    maxlength="500"
                    placeholder="URL">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">
+            Restricted URL
+        </label>
+        <div class="col-sm-10">
+            <waltz-toggle label-on='Restricted'
+                          label-off='Not restricted'
+                          icon-on='lock'
+                          icon-off='unlock'
+                          on-toggle='$ctrl.toggleRestricted()'
+                          state='$ctrl.bookmark.isRestricted'>
+            </waltz-toggle>
+            <p class="help-block">Security Permissions apply to this link</p>
         </div>
     </div>
     <div class="form-group">
@@ -56,9 +73,9 @@
             Kind
         </label>
         <div class="col-sm-10">
-            <waltz-bookmark-kind-select selected="ctrl.bookmark.bookmarkKind"
-                                        disabled-condition="ctrl.bookmark.isRequired"
-                                        on-select="ctrl.onKindSelect">
+            <waltz-bookmark-kind-select selected="$ctrl.bookmark.bookmarkKind"
+                                        disabled-condition="$ctrl.bookmark.isRequired"
+                                        on-select="$ctrl.onKindSelect">
             </waltz-bookmark-kind-select>
             <p class="help-block">Categorize this bookmark according to its purpose</p>
         </div>
@@ -72,8 +89,8 @@
                           label-off='Not primary'
                           icon-on='star'
                           icon-off='star-o'
-                          on-toggle='ctrl.togglePrimary()'
-                          state='ctrl.bookmark.isPrimary'>
+                          on-toggle='$ctrl.togglePrimary()'
+                          state='$ctrl.bookmark.isPrimary'>
             </waltz-toggle>
             <p class="help-block">Primary links will be given preference when shown in views</p>
         </div>
@@ -88,19 +105,20 @@
                       cols="80"
                       data-ux="bookmarks-description-field"
                       id="description"
-                      ng-model="ctrl.bookmark.description">
+                      ng-change="$ctrl.onFormChange()"
+                      ng-model="$ctrl.bookmark.description">
             </textarea>
         </div>
     </div>
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
-                    ng-disabled="ctrl.submitDisabled"
+                    ng-disabled="$ctrl.submitDisabled"
                     data-ux="bookmarks-submit-new"
                     class="btn btn-success">
-                {{ ctrl.confirmLabel }}
+                {{ $ctrl.confirmLabel }}
             </button>
-            <a ng-click="ctrl.cancel()"
+            <a ng-click="$ctrl.onCancel()"
                class="clickable">
                 Cancel
             </a>

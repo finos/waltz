@@ -13,7 +13,7 @@
 
 
     <properties>
-        <jooq.version>3.11.9</jooq.version>
+        <jooq.version>3.12.3</jooq.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
@@ -24,7 +24,7 @@
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
                 <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.4.197</jdbc.version>
+                <jdbc.version>1.4.200</jdbc.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>

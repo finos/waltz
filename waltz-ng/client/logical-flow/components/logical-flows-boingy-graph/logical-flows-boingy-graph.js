@@ -33,7 +33,7 @@ const bindings = {
 
 const defaultFilterOptions = {
     type: "ALL",
-    scope: "INTRA"
+    scope: "ALL"
 };
 
 
@@ -53,12 +53,9 @@ const initialState = {
     applications: [],
     flows: [],
     decorators: [],
-    selectedNode: null,
-    isolatedNode: null,
     usedDataTypes: [],
     filterOptions: defaultFilterOptions,
     options: defaultOptions,
-    optionsVisible: false,
     visibility: {
         boingyEverShown: false,
         ignoreLimits: false,
@@ -102,22 +99,13 @@ function mkTypeFilterFn(decorators = []) {
 }
 
 
-function mkIsolatedNodeFilterFn(isolatedNode) {
-    return isolatedNode
-        ? f => f.source.id === isolatedNode.id || f.target.id === isolatedNode.id
-        : () => true;
-}
-
-
 function buildFlowFilter(filterOptions = defaultFilterOptions,
-                         isolatedNode,
                          appIds = [],
                          flowDecorators = []) {
 
     const typeFilterFn = mkTypeFilterFn(flowDecorators);
     const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
-    const isolatedNodeFilterFn = mkIsolatedNodeFilterFn(isolatedNode);
-    return f => typeFilterFn(f) && scopeFilterFn(f) && isolatedNodeFilterFn(f);
+    return f => typeFilterFn(f) && scopeFilterFn(f);
 }
 
 
@@ -134,14 +122,13 @@ function buildDecoratorFilter(options = defaultFilterOptions) {
 function calculateFlowData(allFlows = [],
                            applications = [],
                            allDecorators = [],
-                           filterOptions = defaultFilterOptions,
-                           isolatedNode) {
+                           filterOptions = defaultFilterOptions) {
     // note order is important.  We need to find decorators first
     const decoratorFilterFn = buildDecoratorFilter(filterOptions);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
     const appIds = _.map(applications, d => d.id);
-    const flowFilterFn = buildFlowFilter(filterOptions, isolatedNode, appIds, decorators);
+    const flowFilterFn = buildFlowFilter(filterOptions, appIds, decorators);
     const flows = _.filter(allFlows, flowFilterFn);
 
     const entities = calculateEntities(flows);
@@ -164,19 +151,10 @@ function getDataTypeIds(allDataTypes = [], decorators = []) {
 
 function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
-                              decorators = [],
-                              nodeSelectFn = (d) => console.log("dftg: no nodeSelectFn given", d))
+                              decorators = [])
 {
     const appIds = _.map(applications, "id");
-    const tweakers = logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
-
-    const dfltNodeEnter = tweakers.node.enter;
-    const nodeEnter = selection => selection
-        .on("click.node-select", nodeSelectFn)
-        .call(dfltNodeEnter);
-
-    tweakers.node.enter = nodeEnter;
-    return tweakers;
+    return logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
 }
 
 
@@ -186,12 +164,6 @@ function controller($scope,
                     logicalFlowUtilityService) {
 
     const vm = _.defaultsDeep(this, initialState);
-
-    function unpinAll() {
-        _.forEach(
-            vm.filteredFlowData.entities,
-            d => { d.fx = null; d.fy = null; });
-    }
 
     const loadDetail = () => {
         vm.visibility.loadingFlows = true;
@@ -244,33 +216,14 @@ function controller($scope,
             vm.flows,
             vm.applications,
             vm.decorators,
-            vm.filterOptions,
-            vm.isolatedNode);
+            vm.filterOptions);
 
         vm.graphTweakers = prepareGraphTweakers(
             logicalFlowUtilityService,
             vm.applications,
-            vm.filteredFlowData.decorators,
-            node => $scope.$applyAsync(() => vm.selectedNode = node));
+            vm.filteredFlowData.decorators);
     };
 
-    vm.isolate = (node) => {
-        unpinAll();
-        vm.isolatedNode = node;
-        vm.filterChanged();
-    };
-
-    vm.dismissSelectedNode = () => {
-        unpinAll();
-        vm.isolatedNode = null;
-        vm.selectedNode = null;
-        vm.filterChanged();
-    };
-
-    vm.refocusNode = node => {
-        vm.selectedNode = node;
-        vm.isolate(node);
-    };
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {

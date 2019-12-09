@@ -118,7 +118,7 @@ function controller($q,
                 }
                 serviceBroker
                     .execute(CORE_API.FlowDiagramStore.clone, [diagram.ref.id, newName])
-                    .then(newId => {
+                    .then(() => {
                         notification.success("Diagram cloned");
                         reload();
                     })
@@ -163,7 +163,7 @@ function controller($q,
         reload();
     };
 
-    vm.onDiagramEdit = (diagram) => {
+    vm.onDiagramEdit = () => {
         vm.visibility.flowDiagramMode = "EDIT";
     };
 

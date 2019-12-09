@@ -33,17 +33,40 @@ const bindings = {
     showNonAuthSources: "@?"
 };
 
+const allTabDefinitions = [
+    {
+        name: "Summary",
+        template: "wass-summary-tab-content",
+        excludeFor: ["DATA_TYPE"]
+    }, {
+        name: "Rated Flows Scorecard",
+        template: "wass-scorecard-tab-content"
+    }, {
+        name: "Authoritative Sources",
+        template: "wass-sources-tab-content"
+    }, {
+        name: "Non Authoritative Sources",
+        template: "wass-nonsources-tab-content"
+    }
+];
+
 
 const initialState = {
     authSources: [],
-    selector: null,
-    showNonAuthSources: true,
     visibility: {
-        tab: 0,
         sourceDataRatingsOverlay: false,
         authSourcesList: false
-    }
+    },
+    tabDefinitions: [],
+    selectedTabName:null
 };
+
+
+function mkTabDefinitionsForKind(kind) {
+    return _.reject(
+        allTabDefinitions,
+        td => _.includes(td.excludeFor, kind));
+}
 
 
 function controller(serviceBroker) {
@@ -62,55 +85,37 @@ function controller(serviceBroker) {
     };
 
     const loadNonAuthSources = () => {
-        vm.selector = mkSelector();
+        const selector = mkSelector();
         serviceBroker
             .loadViewData(
                 CORE_API.AuthSourcesStore.findNonAuthSources,
-                [vm.selector])
+                [selector])
             .then(r => vm.nonAuthSources = r.data);
     };
 
     const loadAuthSources = () => {
-        vm.selector = mkSelector();
+        const selector = mkSelector();
         serviceBroker
             .loadViewData(
                 CORE_API.AuthSourcesStore.findAuthSources,
-                [vm.selector])
+                [selector])
             .then(r => {
                 vm.authSources = r.data;
-            })
+            });
     };
 
     vm.$onInit = () => {
-        vm.visibility.tab = vm.parentEntityRef.kind === "DATA_TYPE"
-            ? 1
-            : 0;
-
-        vm.visibility.authSourcesList = vm.parentEntityRef.kind === "ORG_UNIT" || vm.parentEntityRef.kind === "DATA_TYPE"
+        vm.tabDefinitions = mkTabDefinitionsForKind(vm.parentEntityRef.kind);
+        vm.selectedTabName = _.first(vm.tabDefinitions).name;
+        loadAuthSources();
+        loadNonAuthSources();
     };
 
-    vm.$onChanges = (changes) => {
-        if (changes.filters) {
-            loadAuthSources();
-            loadNonAuthSources();
-        }
-    };
 
-    vm.tabSelected = (name, idx) => {
-        vm.visibility.tab = idx;
-        vm.visibility.editBtn = false;
-
-        switch(name) {
-            case "summary":
-                break;
-            case "authSources":
-                loadAuthSources();
-                vm.visibility.editBtn = vm.parentEntityRef.kind === "ORG_UNIT";
-                break;
-            case "nonAuthSources":
-                loadNonAuthSources();
-                break;
-        }
+    vm.activeTab = () => {
+        return _.find(
+            vm.tabDefinitions,
+            td => td.name === vm.selectedTabName);
     };
 
     vm.toggleSourceDataRatingOverlay = () =>
