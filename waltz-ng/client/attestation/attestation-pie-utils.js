@@ -58,7 +58,7 @@ export function prepareSummaryData(applications = []) {
 
 
 export const attestationSummaryColumnDefs = [
-    mkEntityLinkGridCell("Name", "application"),
+    mkEntityLinkGridCell("Name", "application", "left", "right"),
     {field: "application.assetCode", name: "Asset Code"},
     {field: "application.kindDisplay", name: "Kind"},
     {field: "businessCriticalityDisplay", name: "Business Criticality"},
