@@ -49,15 +49,10 @@ public class DataTypeSearchDao {
     }
 
 
-    public List<DataType> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
+    public List<DataType> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
-        if (length(query) < 3) {
-            return emptyList();
-        }
-
-        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         return dataTypeDao.findAll()
                 .stream()
                 .filter(dataType -> {

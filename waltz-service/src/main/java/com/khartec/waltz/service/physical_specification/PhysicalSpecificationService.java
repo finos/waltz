@@ -44,8 +44,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
-import static java.util.Collections.emptyList;
 
 
 @Service
@@ -125,9 +123,8 @@ public class PhysicalSpecificationService {
     }
 
 
-    public List<PhysicalSpecification> search(String query, EntitySearchOptions options) {
-        if (isEmpty(query)) return emptyList();
-        return specificationSearchDao.search(query, options);
+    public List<PhysicalSpecification> search(EntitySearchOptions options) {
+        return specificationSearchDao.search(options);
     }
 
 

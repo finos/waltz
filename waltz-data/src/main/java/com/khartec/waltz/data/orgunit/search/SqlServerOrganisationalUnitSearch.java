@@ -41,8 +41,8 @@ import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_
 public class SqlServerOrganisationalUnitSearch implements FullTextSearch<OrganisationalUnit>, DatabaseVendorSpecific {
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+    public List<OrganisationalUnit> search(DSLContext dsl, EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }

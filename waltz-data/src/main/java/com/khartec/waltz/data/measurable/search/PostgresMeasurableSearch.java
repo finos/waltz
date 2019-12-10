@@ -53,9 +53,9 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
 
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<Measurable> search(DSLContext dsl, EntitySearchOptions options) {
 
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return emptyList();
@@ -63,7 +63,11 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
 
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
-        List<Measurable> measurablesViaFullText = dsl.fetch(SEARCH_POSTGRES, query, query, entityLifecycleCondition, options.limit())
+        List<Measurable> measurablesViaFullText = dsl.fetch(SEARCH_POSTGRES,
+                options.searchQuery(),
+                options.searchQuery(),
+                entityLifecycleCondition,
+                options.limit())
                 .map(MeasurableDao.TO_DOMAIN_MAPPER);
 
         return measurablesViaFullText;

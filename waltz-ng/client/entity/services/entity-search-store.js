@@ -22,10 +22,9 @@ export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-search`;
 
 
-    const search = (query, options) => {
-        const encodedQuery = encodeURIComponent(query);
+    const search = (options) => {
         return $http
-            .post(`${BASE}/${encodedQuery}`, options)
+            .post(`${BASE}`, options)
             .then(result => result.data);
     };
 
