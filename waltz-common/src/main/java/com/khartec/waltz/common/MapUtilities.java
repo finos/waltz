@@ -122,8 +122,16 @@ public class MapUtilities {
     }
 
 
-    public static <K, V> Map<K, V> indexBy(Collection<V> xs, Function<V, K> keyFn) {
+    public static <K, V> Map<K, V> indexBy(Collection<V> xs,
+                                           Function<V, K> keyFn) {
         return indexBy(keyFn, xs);
+    }
+
+
+    public static <K, V, V2> Map<K, V2> indexBy(Collection<V> xs,
+                                                Function<V, K> keyFn,
+                                                Function<V, V2> valueFn) {
+        return indexBy(keyFn, valueFn, xs);
     }
 
 
@@ -134,6 +142,7 @@ public class MapUtilities {
 
         return indexBy(keyFn, identity(), xs);
     }
+
 
 
     public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn,
@@ -250,8 +259,8 @@ public class MapUtilities {
      * @return a map going from K1 -> V
      */
     public static <K1, K2, V> Map<K1, V> compose(Map<K1, K2> map1, Map<K2, V> map2) {
-        Map<K1, V> result = new HashMap();
-        map1.entrySet().forEach(e -> result.put(e.getKey(), map2.get(e.getValue())));
+        Map<K1, V> result = new HashMap<>();
+        map1.forEach((key, value) -> result.put(key, map2.get(value)));
         return result;
     }
 }
