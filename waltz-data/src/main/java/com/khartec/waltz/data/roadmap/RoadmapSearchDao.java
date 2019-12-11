@@ -28,15 +28,8 @@ public class RoadmapSearchDao {
     }
 
 
-    public List<Roadmap> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
-        checkNotNull(options, "options cannot be null");
-
-        if (length(query) < 3) {
-            return emptyList();
-        }
-
-        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
+    public List<Roadmap> search(EntitySearchOptions options) {
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         List<Roadmap> collect = roadmapDao.findAll()
                 .stream()
                 .filter(roadmap -> {

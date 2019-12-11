@@ -40,6 +40,8 @@ public abstract class EntitySearchOptions {
 
     public abstract List<EntityKind> entityKinds();
 
+    public abstract String searchQuery();
+
 
     @Value.Default
     public List<EntityLifecycleStatus> entityLifecycleStatuses() {
@@ -59,9 +61,10 @@ public abstract class EntitySearchOptions {
     }
 
 
-    public static EntitySearchOptions mkForEntity(EntityKind entityKind) {
+    public static EntitySearchOptions mkForEntity(EntityKind entityKind, String searchQuery) {
         return ImmutableEntitySearchOptions.builder()
                 .entityKinds(newArrayList(entityKind))
+                .searchQuery(searchQuery)
                 .build();
     }
 }

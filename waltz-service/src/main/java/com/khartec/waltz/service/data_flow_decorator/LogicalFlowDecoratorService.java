@@ -62,6 +62,7 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.FlowDirection.*;
+import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -212,7 +213,7 @@ public class LogicalFlowDecoratorService {
                         .lastUpdatedAt(nowUtc())
                         .build());
 
-        Collection decorators = requiresRating
+        Collection<LogicalFlowDecorator> decorators = requiresRating
                 ? ratingsCalculator.calculate(unrated)
                 : unrated;
 
@@ -246,7 +247,7 @@ public class LogicalFlowDecoratorService {
                 )
                 .collect(Collectors.toList());
 
-        Collection decorators = ratingsCalculator.calculate(unrated);
+        Collection<LogicalFlowDecorator> decorators = ratingsCalculator.calculate(unrated);
         int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
 
         List<LogicalFlow> effectedFlows = logicalFlowDao.findActiveByFlowIds(
@@ -319,9 +320,7 @@ public class LogicalFlowDecoratorService {
 
 
     private void bulkAudit(List<UpdateDataFlowDecoratorsAction> actions, String username, List<LogicalFlow> effectedFlows) {
-        Map<Long, LogicalFlow> effectedFlowsById = effectedFlows
-                .stream()
-                .collect(Collectors.toMap(f -> f.id().get(), f -> f));
+        Map<Long, LogicalFlow> effectedFlowsById = indexById(effectedFlows);
 
         List<ChangeLog> logEntries = actions
                 .stream()

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -92,7 +92,7 @@ public class TagService {
     }
 
     private void createTagUsage(EntityReference ref, String tag, String username) {
-        Tag existingTag = tagDao.findTagByNameAndTargetKind(ref.kind(), tag);
+        Tag existingTag = tagDao.getTagByNameAndTargetKind(ref.kind(), tag);
 
         Long tagId =  existingTag != null
                 ? existingTag.id().get()

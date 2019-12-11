@@ -42,8 +42,8 @@ import static java.util.Collections.emptyList;
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
     @Override
-    public List<Measurable> search(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(lower(query));
+    public List<Measurable> search(DSLContext dsl, EntitySearchOptions options) {
+        List<String> terms = mkTerms(lower(options.searchQuery()));
 
         if (terms.isEmpty()) {
             return emptyList();

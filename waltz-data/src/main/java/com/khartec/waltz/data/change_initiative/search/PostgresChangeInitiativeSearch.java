@@ -49,8 +49,11 @@ public class PostgresChangeInitiativeSearch implements FullTextSearch<ChangeInit
 
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms, options.limit());
+    public List<ChangeInitiative> search(DSLContext dsl, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
+                options.searchQuery(),
+                options.searchQuery(),
+                options.limit());
         return records.map(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 

@@ -65,6 +65,7 @@ public class AttestationInstanceDao {
                         r.getValue(ENTITY_NAME_FIELD)))
                 .attestedAt(Optional.ofNullable(record.getAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .attestedBy(Optional.ofNullable(record.getAttestedBy()))
+                .attestedEntityKind(EntityKind.valueOf(record.getAttestedEntityKind()))
                 .build();
     };
 
@@ -93,6 +94,7 @@ public class AttestationInstanceDao {
         record.setAttestationRunId(attestationInstance.attestationRunId());
         record.setParentEntityKind(attestationInstance.parentEntity().kind().name());
         record.setParentEntityId(attestationInstance.parentEntity().id());
+        record.setAttestedEntityKind(attestationInstance.attestedEntityKind().name());
 
         record.store();
 
@@ -224,6 +226,7 @@ public class AttestationInstanceDao {
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .where(ATTESTATION_INSTANCE.ID.in(selector))
+                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

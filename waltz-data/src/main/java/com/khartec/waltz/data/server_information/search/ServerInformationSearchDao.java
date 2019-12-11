@@ -50,14 +50,8 @@ public class ServerInformationSearchDao {
     }
 
 
-    public List<ServerInformation> search(String terms, EntitySearchOptions options) {
-        checkNotNull(options, "options cannot be null");
-
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<ServerInformation> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

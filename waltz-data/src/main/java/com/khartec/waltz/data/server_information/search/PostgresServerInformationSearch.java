@@ -50,8 +50,11 @@ public class PostgresServerInformationSearch implements FullTextSearch<ServerInf
 
 
     @Override
-    public List<ServerInformation> search(DSLContext dsl, String query, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, query, query, options.limit());
+    public List<ServerInformation> search(DSLContext dsl, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
+                options.searchQuery(),
+                options.searchQuery(),
+                options.limit());
         return records.map(ServerInformationDao.TO_DOMAIN_MAPPER);
     }
 }

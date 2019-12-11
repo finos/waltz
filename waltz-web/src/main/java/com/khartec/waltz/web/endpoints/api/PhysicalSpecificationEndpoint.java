@@ -76,8 +76,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         String searchPath = mkPath(
                 BASE_URL,
-                "search",
-                ":query");
+                "search");
 
         String getByIdPath = mkPath(
                 BASE_URL,
@@ -99,9 +98,9 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         ListRoute<PhysicalSpecification> searchRoute =
                 (request, response) -> specificationService.search(
-                        request.params("query"),
                         ImmutableEntitySearchOptions.builder()
                                 .userId(getUsername(request))
+                                .searchQuery(readBody(request, String.class))
                                 .build());
 
         DatumRoute<PhysicalSpecification> getByIdRoute =
@@ -112,7 +111,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         getForList(findByAppPath, findByAppRoute);
         postForList(findByIdsPath, findByIdsRoute);
-        getForList(searchPath, searchRoute);
+        postForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

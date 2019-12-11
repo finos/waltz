@@ -81,13 +81,13 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.ORG_UNIT));
+        if (isEmpty(query)) return emptyList();
+        return search(EntitySearchOptions.mkForEntity(EntityKind.ORG_UNIT, query));
     }
 
 
-    public List<OrganisationalUnit> search(String query, EntitySearchOptions options) {
-        if (isEmpty(query)) return emptyList();
-        return organisationalUnitSearchDao.search(query, options);
+    public List<OrganisationalUnit> search(EntitySearchOptions options) {
+        return organisationalUnitSearchDao.search(options);
     }
 
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -105,8 +105,8 @@ public class StringUtilities {
 
     public static String join(Collection<?> values, String separator) {
         return values.stream()
-                .filter(v -> v != null)
-                .map(v -> v.toString())
+                .filter(Objects::nonNull)
+                .map(Object::toString)
                 .collect(Collectors.joining(separator));
     }
 
@@ -119,10 +119,8 @@ public class StringUtilities {
 
 
     public static <T> List<T> splitThenMap(String str, String separator, Function<String, T> itemTransformer) {
+        checkNotNull(itemTransformer, "itemTransformer cannot be null");
         if (isEmpty(str) || isEmpty(separator)) { return Collections.emptyList(); }
-        if (itemTransformer == null) {
-            itemTransformer = s -> (T) s;
-        }
 
         return Arrays
                 .stream(str.split(separator))
