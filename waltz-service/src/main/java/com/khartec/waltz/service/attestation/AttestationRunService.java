@@ -214,6 +214,7 @@ public class AttestationRunService {
                                 .attestationInstance(ImmutableAttestationInstance.builder()
                                         .attestationRunId(attestationRunId)
                                         .parentEntity(ref)
+                                        .attestedEntityKind(attestedKind)
                                         .build())
                                 .userId(userId)
                                 .build();
