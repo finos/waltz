@@ -149,15 +149,15 @@ public class RoadmapService {
 
 
     public List<EntityReference> search(String query) {
-        List<Roadmap> roadmaps = search(query, EntitySearchOptions.mkForEntity(EntityKind.ROADMAP));
+        List<Roadmap> roadmaps = search(EntitySearchOptions.mkForEntity(EntityKind.ROADMAP, query));
         return roadmaps.stream()
                 .map(Roadmap::entityReference)
                 .collect(toList());
     }
 
 
-    public List<Roadmap> search(String query, EntitySearchOptions options) {
-        return roadmapSearchDao.search(query, options);
+    public List<Roadmap> search(EntitySearchOptions options) {
+        return roadmapSearchDao.search(options);
     }
 
 

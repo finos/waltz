@@ -49,12 +49,8 @@ public class ChangeInitiativeSearchDao {
     }
 
 
-    public List<ChangeInitiative> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<ChangeInitiative> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

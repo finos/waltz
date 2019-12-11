@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 public class SearchUtilities
 {
     public static List<String> mkTerms(String query) {
+        checkNotNull(query, "query cannot be null");
         if(query.length() < 3) return new ArrayList<>();
 
         String safeQuery = query

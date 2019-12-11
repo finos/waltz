@@ -39,8 +39,8 @@ public class LogicalDataElementSearchDao {
     }
 
 
-    public List<LogicalDataElement> search(String termsStr, EntitySearchOptions options) {
-        List<String> terms = mkTerms(termsStr);
+    public List<LogicalDataElement> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();

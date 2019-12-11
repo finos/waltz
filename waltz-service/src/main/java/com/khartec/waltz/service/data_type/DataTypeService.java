@@ -21,7 +21,6 @@ package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.search.DataTypeSearchDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +60,8 @@ public class DataTypeService {
     }
 
 
-    public Collection<DataType> search(String query) {
-        return searchDao.search(query, EntitySearchOptions.mkForEntity(EntityKind.DATA_TYPE));
+    public Collection<DataType> search(EntitySearchOptions options) {
+        return searchDao.search(options);
     }
 
     /**
