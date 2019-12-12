@@ -212,7 +212,7 @@ public class AttestationRunDao {
         record.setAttestedEntityKind(command.attestedEntityKind().name());
         record.setAttestedEntityId(command.attestedEntityId().orElse(null));
 
-        record.insert();
+        record.store();
 
         return record.getId();
     }
