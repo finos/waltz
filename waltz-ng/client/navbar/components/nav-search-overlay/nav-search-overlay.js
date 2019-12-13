@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {entityLifecycleStatuses, initialiseData} from "../../../common/index";
-import {entity} from "../../../common/services/enums/entity";
-import {isDescendant} from "../../../common/browser-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { entityLifecycleStatuses, initialiseData } from "../../../common/index";
+import { entity } from "../../../common/services/enums/entity";
+import { isDescendant } from "../../../common/browser-utils";
 
 import template from "./nav-search-overlay.html";
-import {kindToViewState} from "../../../common/link-utils";
+import { kindToViewState } from "../../../common/link-utils";
+import _ from "lodash";
 
 const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
@@ -124,7 +125,8 @@ function controller($element,
         };
 
         return serviceBroker
-            .loadViewData(CORE_API.EntitySearchStore.search, [ query, searchOptions ])
+            .loadViewData(CORE_API.EntitySearchStore.search,
+                [_.assign({}, searchOptions, {"searchQuery": query})])
             .then(r => vm.results[entityKind] = r.data);
     };
 
@@ -132,6 +134,11 @@ function controller($element,
     const doSearch = (query) => {
         if(!query){
             vm.clearSearch();
+            return;
+        }
+
+        if(query.length < 3) {
+            vm.results = {};
             return;
         }
 

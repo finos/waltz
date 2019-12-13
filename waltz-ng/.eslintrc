@@ -15,7 +15,16 @@
     "padded-blocks": 0,
     "no-console": 0,
     "new-cap": 1,
-    "indent": [2, 4, { "SwitchCase": 1 }],
+    "indent": ["error", 4, {
+        "SwitchCase": 1,
+        "CallExpression": {"arguments": "first"},
+
+        "FunctionDeclaration": { "parameters": "first" },
+        "FunctionExpression": { "parameters": "first" },
+        "ObjectExpression": "first",
+        "VariableDeclarator": "first"
+    }],
+//    "indent": [2, 4, { "SwitchCase": 1, "VariableDeclarator": "first" }],
     "no-else-return" : 0,
     "comma-dangle": 0,
     "quotes": ["warn", "double"]

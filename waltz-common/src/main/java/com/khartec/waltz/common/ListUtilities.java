@@ -22,7 +22,6 @@ package com.khartec.waltz.common;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -52,6 +51,7 @@ public class ListUtilities {
     }
 
 
+    @SafeVarargs
     public static <T> List<T> asList(T... ts){
         return newArrayList(ts);
     }
@@ -141,39 +141,6 @@ public class ListUtilities {
     @SafeVarargs
     public static <T> List<T> push(List<T> xs, T... elems) {
         return ListUtilities.concat(xs, Arrays.asList(elems));
-    }
-
-
-    public static <T> Builder<T> builder(Class<T> cls) {
-        return new Builder<>();
-    }
-
-    public static List<Integer> integerRange(int startInclusive, int endExclusive) {
-        return IntStream
-                .range(startInclusive, endExclusive)
-                .mapToObj(Integer::valueOf)
-                .collect(toList());
-    }
-
-
-    public static class Builder<T> {
-
-        private List<T> workingList = new LinkedList<>();
-
-        @SafeVarargs
-        public final Builder<T> addAll(T... ts) {
-            workingList.addAll(Arrays.asList(ts));
-            return this;
-        }
-
-        public final Builder<T> addAll(List<T> ts) {
-            workingList.addAll(ts);
-            return this;
-        }
-
-        public List<T> build() {
-            return Collections.unmodifiableList(workingList);
-        }
     }
 
 

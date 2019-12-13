@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+import { checkIsEntityRef, checkIsIdSelector } from "../../common/checks";
 
 export function store($http, baseApiUrl) {
 
@@ -53,7 +53,7 @@ export function store($http, baseApiUrl) {
 
 
     const search = (terms) => $http
-        .get(`${base}/search/${terms}`)
+        .post(`${base}/search`, terms)
         .then(r => r.data);
 
 

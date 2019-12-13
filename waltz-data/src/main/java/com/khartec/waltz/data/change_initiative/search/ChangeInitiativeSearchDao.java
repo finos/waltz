@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.data.change_initiative.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
@@ -29,7 +28,6 @@ import org.jooq.SQLDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.data.JooqUtilities.*;
@@ -49,12 +47,8 @@ public class ChangeInitiativeSearchDao {
     }
 
 
-    public List<ChangeInitiative> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<ChangeInitiative> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

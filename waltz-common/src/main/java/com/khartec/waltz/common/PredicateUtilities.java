@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,27 +32,51 @@ public class PredicateUtilities {
      *     .stream()
      *       .filter(not(Some::test))
      * </pre>
-     * @param p
-     * @param <T>
-     * @return
+     * @param p  predicate to invert
+     * @param <T>  type of object that the predicate will be testing
+     * @return  true if the predicate fails, false if it passes
      */
     public static <T> Predicate<T> not(Predicate<T> p) {
         return p.negate();
     }
 
 
+    /**
+     * Test if all members of `ts` pass the predicate `p`.
+     *
+     * @param ts  Collection of elements to test
+     * @param p  Predicate to test elements against
+     * @param <T>  Type of the elements
+     * @return  true iff all elements of `ts` pass `p`, or the collection is empty.
+     */
     public static <T> boolean all(Collection<T> ts, Predicate<T> p) {
         return ts.stream()
                 .allMatch(p);
     }
 
 
+    /**
+     * Test if any members of `ts` pass the predicate `p`.
+     *
+     * @param ts  Collection of elements to test
+     * @param p  Predicate to test elements against
+     * @param <T>  Type of the elements
+     * @return  true if any elements of `ts` pass `p`, or the collection is empty.
+     */
     public static <T> boolean any(Collection<T> ts, Predicate<T> p) {
         return ts.stream()
                 .anyMatch(p);
     }
 
 
+    /**
+     * Test if _none_ of the members of `ts` pass the predicate `p`.
+     *
+     * @param ts  Collection of elements to test
+     * @param p  Predicate to test elements against
+     * @param <T>  Type of the elements
+     * @return  true iff no elements in `ts` pass `p`, or the collection is empty.
+     */
     public static <T> boolean none(Collection<T> ts, Predicate<T> p) {
         return ts.stream()
                 .noneMatch(p);

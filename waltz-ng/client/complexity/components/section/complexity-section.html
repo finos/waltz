@@ -70,9 +70,10 @@
                     <!-- SUMMARY SECTION -->
                     <div ng-if="$ctrl.summarySelection"
                          class="waltz-fade-if">
-                        <a ui-sref="main.app.view ({ id: $ctrl.summarySelection.app.id })">
-                            <h5 ng-bind="$ctrl.summarySelection.app.name"></h5>
-                        </a>
+                        <h5>
+                            <waltz-entity-link entity-ref="$ctrl.summarySelection.app">
+                            </waltz-entity-link>
+                        </h5>
 
                         <hr>
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './bookmarks-edit-panel.html';
-import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import template from "./bookmarks-edit-panel.html";
+import { initialiseData } from "../../../common/index";
+import { CORE_API } from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    bookmarks: '<',
-    onDismiss: '<',
-    onReload: '<',
-    parentEntityRef: '<'
+    bookmarks: "<",
+    onDismiss: "<",
+    onReload: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -48,39 +48,43 @@ function controller(notification, serviceBroker) {
 
     vm.create = () => {
         vm.selectedBookmark = {
-            bookmarkKind: 'DOCUMENTATION',
+            bookmarkKind: "DOCUMENTATION",
             lastUpdatedBy: "ignored, server will set"
         };
         vm.visibility.form = true;
     };
 
-    vm.save = (b) => {
+    vm.onSave = (b) => {
         b.parent = vm.parentEntityRef;
         serviceBroker
             .execute(CORE_API.BookmarkStore.save, [b])
             .then(() => {
                 vm.onReload();
                 vm.resetForm();
-                notification.success('Updated bookmarks')
+                notification.success("Updated bookmarks")
             });
+    };
+
+    vm.onCancel = () => {
+        vm.visibility.form = false;
     };
 
     vm.resetForm = () => {
         vm.visibility.form = false;
         vm.bookmark = {
-            bookmarkKind: 'DOCUMENTATION',
+            bookmarkKind: "DOCUMENTATION",
             parent: vm.parentEntityRef
         };
     };
 
     vm.remove = (b) => {
         vm.visibility.form = false;
-        if (confirm('Are you sure you want to remove this bookmark ?')) {
+        if (confirm("Are you sure you want to remove this bookmark ?")) {
             serviceBroker
                 .execute(CORE_API.BookmarkStore.remove, [b.id])
                 .then(() => {
                     vm.onReload();
-                    notification.warning('Removed bookmark');
+                    notification.warning("Removed bookmark");
                 });
         }
     };
@@ -88,7 +92,7 @@ function controller(notification, serviceBroker) {
 }
 
 
-controller.$inject = ['Notification', 'ServiceBroker'];
+controller.$inject = ["Notification", "ServiceBroker"];
 
 
 const component = {
@@ -99,6 +103,6 @@ const component = {
 
 
 export default {
-    id: 'waltzBookmarksEditPanel',
+    id: "waltzBookmarksEditPanel",
     component
 };

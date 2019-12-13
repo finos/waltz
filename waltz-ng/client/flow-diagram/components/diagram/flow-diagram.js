@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,13 @@
  */
 
 import _ from "lodash";
-import {event, select, selectAll} from "d3-selection";
-import {drag} from "d3-drag";
-import {zoom} from "d3-zoom";
-import {initialiseData, perhaps} from "../../../common";
-import {mkCurvedLine, responsivefy, wrapText} from "../../../common/d3-utils";
-import {d3ContextMenu} from "../../../common/d3-context-menu";
-import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
+import { event, select, selectAll } from "d3-selection";
+import { drag } from "d3-drag";
+import { zoom } from "d3-zoom";
+import { initialiseData, perhaps } from "../../../common";
+import { mkCurvedLine, responsivefy, wrapText } from "../../../common/d3-utils";
+import { d3ContextMenu } from "../../../common/d3-context-menu";
+import { drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape } from "../../flow-diagram-utils";
 import template from "./flow-diagram.html";
 
 
@@ -134,7 +134,7 @@ function dragger(commandProcessor) {
 
 
 function dragEnded(d) {
-    const noMove = dragStartPos.x == event.x && dragStartPos.y == event.y;
+    const noMove = dragStartPos.x === event.x && dragStartPos.y === event.y;
     if (noMove) {
         clickHandlers.node(d);
     }

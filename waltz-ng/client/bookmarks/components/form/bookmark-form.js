@@ -17,59 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common";
-import template from "./date-picker-form-input.html";
+import { initialiseData, isEmpty } from "../../../common";
+import template from "./bookmark-form.html";
 
 
 const bindings = {
-    id: "@?",
-    placeHolder: "@",
-    required: "@?",
-    format: "@",
-    allowPastDates: "@?",
-    model: "=",
-    itemId: "<?",
-    onChange: "<?"
+    bookmark: "<",
+    onSubmit: "<",
+    onCancel: "<",
+    confirmLabel: "@?"
 };
 
 
-
-
 const initialState = {
-    dateOptions: {
-        formatYear: "yyyy",
-        startingDay: 1
-    },
-    datePickerOpened: false,
-    placeHolder: "",
-    onChange: (itemId, val) => console.log("default onChange ")
+    confirmLabel: "Save",
+    submitDisabled: true
 };
 
 
 function controller() {
+
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        if (!vm.allowPastDates) {
-            vm.dateOptions.minDate = new Date();
-        }
+    vm.onKindSelect = (code) => {
+        vm.bookmark.bookmarkKind = code;
     };
 
-    vm.datePickerOpen = () => {
-        vm.datePickerOpened = true;
+    vm.togglePrimary = () => {
+        vm.bookmark.isPrimary = !vm.bookmark.isPrimary;
     };
 
-    vm.valueChanged = () => {
-        vm.onChange(vm.itemId, vm.model);
+    vm.toggleRestricted = () => {
+        vm.bookmark.isRestricted = !vm.bookmark.isRestricted;
+    };
+
+    vm.onFormChange = () => {
+        const { url } = vm.bookmark;
+        vm.submitDisabled = isEmpty(url);
+    };
+
+    vm.$onChanges = () => {
+        vm.onFormChange();
     };
 }
 
+controller.$inject = [];
+
 
 const component = {
-    bindings,
     template,
-    controller
+    controller,
+    bindings
 };
 
 
-export default component;
+export default {
+    component,
+    id: "waltzBookmarkForm"
+}

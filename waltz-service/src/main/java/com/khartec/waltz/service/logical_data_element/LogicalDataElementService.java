@@ -53,8 +53,8 @@ public class LogicalDataElementService {
     }
 
 
-    public List<LogicalDataElement> search(String query, EntitySearchOptions options) {
-        return logicalDataElementSearchDao.search(query, options);
+    public List<LogicalDataElement> search(EntitySearchOptions options) {
+        return logicalDataElementSearchDao.search(options);
     }
 
 }

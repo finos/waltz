@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,31 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
-import {invokeFunction} from "../../common";
-import template from './basic-app-selector.html';
+import { initialiseData, invokeFunction } from "../../../common";
+import template from "./basic-app-selector.html";
 
 
-const BINDINGS = {
-    addLabel: '@',
-    cancelLabel: '@',
-    onCancel: '<',
-    onAdd: '<',
-    onSelect: '<'
+const bindings = {
+    addLabel: "@?",
+    cancelLabel: "@?",
+    onCancel: "<",
+    onAdd: "<",
+    onSelect: "<"
 };
 
 
 const initialState = {
-    addLabel: 'Add',
-    cancelLabel: 'Cancel',
-    onCancel: () => console.log('No onCancel provided to basic app selector'),
-    onAdd: (a) => console.log('No onAdd provided to basic app selector', a),
-    onSelect: (a) => console.log('No onSelect provided to basic app selector', a)
+    addLabel: "Add",
+    cancelLabel: "Cancel",
+    onCancel: () => console.log("No onCancel provided to basic app selector"),
+    onAdd: (a) => console.log("No onAdd provided to basic app selector", a),
+    onSelect: (a) => console.log("No onSelect provided to basic app selector", a)
 };
 
 
 function controller() {
-    const vm = _.defaultsDeep(this, initialState);
+    const vm = initialiseData(this, initialState);
 
     vm.add = (app) => {
         if (! app) return ;
@@ -57,17 +56,16 @@ function controller() {
 controller.$inject = [];
 
 
-const directive = {
-    restrict: 'E',
-    replace: false,
+const component = {
     template,
-    scope: {},
-    bindToController: BINDINGS,
-    controller,
-    controllerAs: 'ctrl'
+    bindings,
+    controller
 };
 
 
-export default () => directive;
+export default {
+    component,
+    id: "waltzBasicAppSelector"
+};
 
 

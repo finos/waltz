@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -146,7 +146,7 @@ public class AttestationInstanceService {
     }
 
 
-    public boolean attestForEntity(String username, AttestEntityCommand createCommand) throws Exception {
+    public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
@@ -175,14 +175,14 @@ public class AttestationInstanceService {
         }
     }
 
-    private Long getRunId(IdCommandResponse idCommandResponse) throws Exception {
+    private Long getRunId(IdCommandResponse idCommandResponse) throws IllegalStateException {
         return idCommandResponse.id()
-                        .orElseThrow(() -> new Exception("Unable to find attestation instance"));
+                        .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this run"));
     }
 
-    private Long getInstanceId(AttestationInstance attestation) throws Exception {
+    private Long getInstanceId(AttestationInstance attestation) throws IllegalStateException {
         return attestation
                 .id()
-                .orElseThrow(() -> new Exception("Unable to attest instance for this entity"));
+                .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this instance"));
     }
 }

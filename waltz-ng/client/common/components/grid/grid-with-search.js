@@ -18,17 +18,17 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction, termSearch} from "../../../common";
+import { initialiseData, invokeFunction, termSearch } from "../../../common";
 import template from "./grid-with-search.html";
 
 const bindings = {
     columnDefs: "<",
     entries: "<",
     searchControlMinRows: "<?",
-    searchPlaceholderText: "@",
+    searchPlaceholderText: "@?",
     scopeProvider: "<?",
-    onInitialise: "<",
-    onChange: "<",
+    onInitialise: "<?",
+    onChange: "<?",
     onRowSelect: "<?",
     localStorageKey: "@?"
 };

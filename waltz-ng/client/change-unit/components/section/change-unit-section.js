@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {initialiseData} from "../../../common";
-import {executionStatus} from "../../../common/services/enums/execution-status";
-import {displayError} from "../../../common/error-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
+import { executionStatus } from "../../../common/services/enums/execution-status";
+import { displayError } from "../../../common/error-utils";
 
 import template from "./change-unit-section.html";
 import * as _ from "lodash";
@@ -67,7 +67,8 @@ function controller(notification, serviceBroker, $q) {
         const physicalFlowChangeUnitPromise = serviceBroker
             .loadViewData(
                 CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
-                [vm.parentEntityRef.id])
+                [vm.parentEntityRef.id],
+                { force: true })
             .then(r => {
                 const extendChangeUnitWithRatings = cu =>
                     Object.assign({}, cu, { assessmentValues: mkAssessmentValuesString(cu) });
@@ -78,6 +79,11 @@ function controller(notification, serviceBroker, $q) {
         return $q
             .all([physicalFlowChangeUnitPromise])
             .then(() => vm.changeUnits = _.map(vm.physicalFlowChangeUnits, cu => cu.changeUnit))
+            .then(() => {
+                if(vm.selectedChangeUnit) {
+                    vm.selectedChangeUnit = _.find(vm.changeUnits, cu => cu.id === vm.selectedChangeUnit.id);
+                }
+            })
     };
 
 
@@ -99,7 +105,6 @@ function controller(notification, serviceBroker, $q) {
                 })
                 .catch(e => displayError(notification, "Failed to complete change unit", e));
         }
-
     };
 
 

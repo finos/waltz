@@ -27,7 +27,10 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.application.AppRegistrationRequest;
+import com.khartec.waltz.model.application.AppRegistrationResponse;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.tag.TagService;
@@ -45,6 +48,8 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 
@@ -92,12 +97,13 @@ public class ApplicationService {
 
 
     public List<Application> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
+        if (isEmpty(query)) return emptyList();
+        return search(EntitySearchOptions.mkForEntity(EntityKind.APPLICATION, query));
     }
 
 
-    public List<Application> search(String query, EntitySearchOptions options) {
-        return appSearchDao.search(query, options);
+    public List<Application> search(EntitySearchOptions options) {
+        return appSearchDao.search(options);
     }
 
 

@@ -1,3 +1,22 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <div>
     <waltz-section-actions>
         <button class="btn btn-xs waltz-btn-transparent"
@@ -55,18 +74,14 @@
                             <div ng-if="$ctrl.summarySelection"
                                  class="waltz-fade-if">
                                     <h5>
-                                        <a class='clickable'
-                                           title="Go to application"
-                                           ui-sref="main.app.view ({ id: $ctrl.summarySelection.entityRef.id })">
-                                            <span ng-bind="$ctrl.summarySelection.entityRef.name"></span>
-                                        </a>
+                                        <waltz-entity-link entity-ref="$ctrl.summarySelection.entityRef">
+                                        </waltz-entity-link>
                                         <a class="clickable"
                                            title="Dismiss"
                                            ng-click="$ctrl.summarySelection = null">
                                             <span class="pull-right">x</span>
                                         </a>
                                     </h5>
-
                                 <hr>
 
                                 <table class="table table-condensed table-striped small">

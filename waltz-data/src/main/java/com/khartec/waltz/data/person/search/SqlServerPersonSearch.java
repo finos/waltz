@@ -39,8 +39,8 @@ import static com.khartec.waltz.schema.tables.Person.PERSON;
 public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVendorSpecific {
 
     @Override
-    public List<Person> search(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+    public List<Person> search(DSLContext dsl, EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
@@ -56,7 +56,7 @@ public class SqlServerPersonSearch implements FullTextSearch<Person>, DatabaseVe
         return dsl
                 .select(PERSON.fields())
                 .from(PERSON)
-                .where(PERSON.EMAIL.startsWith(query).or(JooqUtilities.MSSQL.mkContainsPrefix(terms)))
+                .where(PERSON.EMAIL.startsWith(options.searchQuery()).or(JooqUtilities.MSSQL.mkContainsPrefix(terms)))
                 .and(maybeFilterRemoved)
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);

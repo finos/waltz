@@ -30,8 +30,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
-import static com.khartec.waltz.common.StringUtilities.length;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 
@@ -52,15 +50,8 @@ public class ActorSearchDao {
     }
 
 
-    public List<Actor> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
-        checkNotNull(options, "options cannot be null");
-
-        if (length(query) < 3) {
-            return emptyList();
-        }
-
-        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
+    public List<Actor> search(EntitySearchOptions options) {
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         return actorDao.findAll()
                 .stream()
                 .filter(actor -> {

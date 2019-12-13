@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 import template from "./physical-data-section.html";
-import {isRemoved} from "../../../common/entity-utils";
-import {columnDef, withWidth} from "../../../physical-flow/physical-flow-table-utilities";
+import { isRemoved } from "../../../common/entity-utils";
+import { columnDef, withWidth } from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
@@ -29,7 +29,7 @@ const bindings = {
     physicalFlows: "<",
     specifications: "<",
     logicalFlows: "<",
-    onInitialise: "<"
+    onInitialise: "<?"
 };
 
 
@@ -40,7 +40,7 @@ const initialState = {
     logicalFlows: [],
     specifications: [],
     selectedFilter: "ALL",
-    onInitialise: (e) => {}
+    // onInitialise: (e) => {}
 };
 
 

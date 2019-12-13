@@ -19,9 +19,7 @@
 
 package com.khartec.waltz.data.orgunit.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
-import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -30,7 +28,6 @@ import org.jooq.SQLDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.data.JooqUtilities.*;
@@ -49,12 +46,8 @@ public class OrganisationalUnitSearchDao {
     }
 
 
-    public List<OrganisationalUnit> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<OrganisationalUnit> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

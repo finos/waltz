@@ -35,6 +35,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 
 
 @Service
@@ -87,12 +89,13 @@ public class ServerInformationService {
 
 
     public List<ServerInformation> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.SERVER));
+        if (isEmpty(query)) return emptyList();
+        return search(EntitySearchOptions.mkForEntity(EntityKind.SERVER, query));
     }
 
 
-    public List<ServerInformation> search(String query, EntitySearchOptions options) {
-        return serverInformationSearchDao.search(query, options);
+    public List<ServerInformation> search(EntitySearchOptions options) {
+        return serverInformationSearchDao.search(options);
     }
 
 

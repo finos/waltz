@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, invokeFunction} from "../../../common";
+import { initialiseData } from "../../../common";
 
 import template from "./physical-flow-table.html";
-import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-flow-table-utilities";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import { columnDef, fetchData, withWidth } from "../../../physical-flow/physical-flow-table-utilities";
+import { mkSelectionOptions } from "../../../common/selector-utils";
+
 
 const bindings = {
     parentEntityRef: "<",
-    onInitialise: "<",
     optionalColumnDefs: "<"
 };
 
@@ -33,6 +33,7 @@ const bindings = {
 const initialState = {
     tableData: []
 };
+
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -48,7 +49,9 @@ function controller($q, serviceBroker) {
         columnDef.description
     ];
 
-    vm.columnDefs = vm.optionalColumnDefs == null ? defaultColumnDefs : vm.optionalColumnDefs;
+    vm.columnDefs = vm.optionalColumnDefs == null
+        ? defaultColumnDefs
+        : vm.optionalColumnDefs;
 
     vm.$onInit = () => {
         vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
@@ -57,18 +60,8 @@ function controller($q, serviceBroker) {
         vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             "EXACT");
-
     };
 
-    vm.onGridInitialise = (api) => {
-        vm.gridApi = api;
-    };
-
-    vm.exportGrid = () => {
-        vm.gridApi.exportFn("physical_flows.csv");
-    };
-
-    invokeFunction(vm.onInitialise, {export: vm.exportGrid });
 }
 
 

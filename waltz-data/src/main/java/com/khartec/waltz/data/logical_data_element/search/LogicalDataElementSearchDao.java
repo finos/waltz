@@ -1,10 +1,7 @@
 package com.khartec.waltz.data.logical_data_element.search;
 
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.logical_data_element.LogicalDataElementDao;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
 import org.jooq.Condition;
@@ -12,8 +9,6 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,8 +34,8 @@ public class LogicalDataElementSearchDao {
     }
 
 
-    public List<LogicalDataElement> search(String termsStr, EntitySearchOptions options) {
-        List<String> terms = mkTerms(termsStr);
+    public List<LogicalDataElement> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();

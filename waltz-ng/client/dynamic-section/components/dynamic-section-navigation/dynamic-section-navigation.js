@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import { initialiseData } from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
-import {scaleLinear} from "d3-scale";
-import {rgb} from "d3-color";
+import { scaleLinear } from "d3-scale";
+import { rgb } from "d3-color";
 
 export const dynamicSectionNavigationDefaultOffset = 250;
 
@@ -29,7 +29,6 @@ const bindings = {
     availableSections: "<",
     openSections: "<",
     parentEntityRef: "<",
-    onSelect: "<",
     offset: "@?"
 };
 
@@ -83,7 +82,7 @@ function controller(dynamicSectionManager,
             : rgb(255,255,255);
 
         return {
-            'border-bottom' : `2px solid ${color.toString()}`
+            "border-bottom" : `2px solid ${color.toString()}`
         };
     };
 

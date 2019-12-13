@@ -357,4 +357,56 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20191203-4537-1"
+               author="muzammilali">
+        <comment>4537: Added attested entity kind to attestation instance</comment>
+        <addColumn tableName="attestation_instance">
+            <column name="attested_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191203-4537-2"
+               author="muzammilali">
+        <comment>4537: Added index in table attestation_instance for parent_entity_id</comment>
+        <createIndex tableName="attestation_instance"
+                     indexName="idx_attestation_instance_parent_entity_id">
+            <column name="parent_entity_id"
+                    type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20191203-4537-3"
+               author="muzammilali">
+        <comment>4537: Added foreign key constraint to attestation_instance for attestation_run</comment>
+        <addForeignKeyConstraint constraintName="attestation_instance_run_fk"
+                                 baseTableName="attestation_instance"
+                                 baseColumnNames="attestation_run_id"
+                                 referencedTableName="attestation_run"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191203-4537-4"
+               author="muzammilali">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance
+            SET attestation_instance.attested_entity_kind = attestation_run.attested_entity_kind
+            FROM attestation_instance
+            JOIN attestation_run
+            ON (attestation_run.id = attestation_instance.attestation_run_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191203-4537-5"
+               author="muzammilali">
+        <comment>4537: Added not null constraint for attested_entity_knd in attestation_instance table</comment>
+        <addNotNullConstraint columnDataType="${enum.type}"
+                              columnName="attested_entity_kind"
+                              tableName="attestation_instance" />
+    </changeSet>
+
 </databaseChangeLog>

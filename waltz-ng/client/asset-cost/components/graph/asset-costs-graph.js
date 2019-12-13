@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,29 +18,27 @@
  */
 import _ from "lodash";
 import "d3-selection-multi";
-import {initialiseData, isEmpty} from "../../../common";
-import {responsivefy} from "../../../common/d3-utils";
-import {scaleLinear, scaleBand} from "d3-scale";
-import {select} from "d3-selection";
-import {extent} from "d3-array";
-import {axisLeft, axisBottom} from "d3-axis";
-import {format} from "d3-format";
+import { initialiseData, isEmpty } from "../../../common";
+import { responsivefy } from "../../../common/d3-utils";
+import { scaleBand, scaleLinear } from "d3-scale";
+import { select } from "d3-selection";
+import { extent } from "d3-array";
+import { axisBottom, axisLeft } from "d3-axis";
+import { format } from "d3-format";
 import namedSettings from "../../../system/named-settings";
-import {currenciesByCode} from "../../../common/currency-utils";
+import { currenciesByCode } from "../../../common/currency-utils";
 
 
 const template = "<div class='waltz-asset-costs-graph'></div>";
 
 const bindings = {
     costs: "<",
-    onHover: "<",
     onSelect: "<"
 };
 
 
 const initialState = {
     costs: [],
-    onHover: _.identity,
     onSelect: _.identity
 };
 
@@ -100,7 +98,6 @@ function drawYAxis(yScale, container) {
 
 
 function draw(svg, costs = [],
-              onHover = _.identity,
               onSelect = _.identity,
               currencyFormat) {
     // remove any previous elements
@@ -132,8 +129,6 @@ function draw(svg, costs = [],
         .append("g")
         .classed("wacg-bar", true)
         .attr("transform", (d, i) => `translate(0, ${yScale(d.entityRef.name)})`)
-        .on("mouseenter.hover", d => onHover(d))
-        .on("mouseleave.hover", d => onHover(null))
         .on("click.select", d => onSelect(d));
 
     bars.append("rect")
@@ -181,7 +176,6 @@ function controller($element, $scope, settingsService) {
         draw(
             svg,
             aggCosts,
-            x => $scope.$applyAsync(() => vm.onHover(x)),
             x => $scope.$applyAsync(() => vm.onSelect(x)),
             currencyFormat);
 
