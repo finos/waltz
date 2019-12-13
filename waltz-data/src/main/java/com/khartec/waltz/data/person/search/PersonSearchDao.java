@@ -48,12 +48,8 @@ public class PersonSearchDao {
     }
 
 
-    public List<Person> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
-            return Collections.emptyList();
-        }
-
-        return searcher.search(dsl, terms, options);
+    public List<Person> search(EntitySearchOptions options) {
+        return searcher.search(dsl, options);
     }
 
 

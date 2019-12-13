@@ -181,11 +181,8 @@ public class AppGroupDao {
     }
 
 
-    public List<AppGroup> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
-        checkNotNull(options, "options cannot be null");
-
-        List<String> terms = mkTerms(query);
+    public List<AppGroup> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }

@@ -51,8 +51,11 @@ public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseV
 
 
     @Override
-    public List<Application> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES, terms, terms, options.limit());
+    public List<Application> search(DSLContext dsl, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
+                options.searchQuery(),
+                options.searchQuery(),
+                options.limit());
         return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 

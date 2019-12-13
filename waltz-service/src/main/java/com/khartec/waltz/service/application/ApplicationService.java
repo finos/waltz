@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.service.application;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
@@ -36,15 +37,14 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 
@@ -92,12 +92,13 @@ public class ApplicationService {
 
 
     public List<Application> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
+        if (isEmpty(query)) return emptyList();
+        return search(EntitySearchOptions.mkForEntity(EntityKind.APPLICATION, query));
     }
 
 
-    public List<Application> search(String query, EntitySearchOptions options) {
-        return appSearchDao.search(query, options);
+    public List<Application> search(EntitySearchOptions options) {
+        return appSearchDao.search(options);
     }
 
 

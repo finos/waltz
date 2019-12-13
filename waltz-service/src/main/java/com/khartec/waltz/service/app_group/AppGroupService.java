@@ -150,11 +150,8 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroup> search(String terms, EntitySearchOptions options) {
-        checkNotNull(terms, "terms cannot be null");
-        checkNotNull(options, "options cannot be null");
-
-        return appGroupDao.search(terms, options);
+    public List<AppGroup> search(EntitySearchOptions options) {
+        return appGroupDao.search(options);
     }
 
 

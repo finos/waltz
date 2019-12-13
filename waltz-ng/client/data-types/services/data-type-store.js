@@ -28,7 +28,7 @@ function store($http, BaseApiUrl) {
 
 
     const search = (query) => $http
-        .get(`${BASE}/search/${query}`)
+        .post(`${BASE}/search`, query)
         .then(r => r.data);
 
     const getDataTypeById = (id) => $http

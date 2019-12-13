@@ -126,7 +126,7 @@ export function store($http, BaseApiUrl) {
 
 
     const search = (query) => $http
-        .get(`${BASE}/search/${query}`)
+        .post(`${BASE}/search`, query)
         .then(x => x.data);
 
 

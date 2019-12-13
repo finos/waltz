@@ -42,8 +42,8 @@ public class MariaPersonSearch implements FullTextSearch<Person>, DatabaseVendor
 
 
     @Override
-    public List<Person> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
+    public List<Person> search(DSLContext dsl, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, options.searchQuery(), options.limit());
         return records.map(PersonDao.personMapper);
     }
 
