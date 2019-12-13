@@ -48,7 +48,7 @@ public class PersonSearchDao {
     }
 
 
-    public List<Person> search(String query, EntitySearchOptions options) {
+    public List<Person> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         if (terms.isEmpty()) {
             return Collections.emptyList();

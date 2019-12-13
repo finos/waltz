@@ -66,7 +66,7 @@ function controller(entitySearchStore) {
 
     vm.refresh = function(query) {
         if (!query) return;
-        return entitySearchStore.search(query, vm.options)
+        return entitySearchStore.search(_.assign({}, vm.options, {"searchQuery": query}))
             .then((entities) => {
                 vm.entities = vm.selectionFilter
                     ? _.filter(entities, vm.selectionFilter)

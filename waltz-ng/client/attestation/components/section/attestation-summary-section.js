@@ -34,21 +34,16 @@ function controller($q,
                 [selectionOptions])
             .then(r => r.data);
 
-        const attestationRunPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationRunStore.findBySelector,
-                [selectionOptions])
-            .then(r => r.data);
-
         const appPromise = serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector,
                 [selectionOptions])
             .then(r => r.data);
 
-        $q.all([attestationInstancePromise, attestationRunPromise, appPromise])
-            .then(([attestationInstances, attestationRuns, applications]) => {
+        $q.all([attestationInstancePromise, appPromise])
+            .then(([attestationInstances, applications]) => {
                 vm.applications = applications;
-                vm.gridDataByLogicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.LOGICAL_DATA_FLOW.key, displayNameService);
-                vm.gridDataByPhysicalFlow = mkAppAttestationGridData(applications, attestationRuns, attestationInstances, entity.PHYSICAL_FLOW.key, displayNameService);
+                vm.gridDataByLogicalFlow = mkAppAttestationGridData(applications, attestationInstances, entity.LOGICAL_DATA_FLOW.key, displayNameService);
+                vm.gridDataByPhysicalFlow = mkAppAttestationGridData(applications, attestationInstances, entity.PHYSICAL_FLOW.key, displayNameService);
 
                 vm.summaryData = {
                     logical: prepareSummaryData(vm.gridDataByLogicalFlow),
@@ -79,7 +74,6 @@ function controller($q,
 
 
 }
-
 
 
 controller.$inject = [

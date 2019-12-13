@@ -58,7 +58,7 @@ public class ServerInformationSearchDao {
     }
 
 
-    public List<ServerInformation> search(String query, EntitySearchOptions options) {
+    public List<ServerInformation> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
         List<String> terms = mkTerms(query);
 

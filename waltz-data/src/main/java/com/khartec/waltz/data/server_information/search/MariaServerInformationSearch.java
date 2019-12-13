@@ -41,8 +41,8 @@ import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 public class MariaServerInformationSearch implements FullTextSearch<ServerInformation>, DatabaseVendorSpecific {
 
     @Override
-    public List<ServerInformation> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -76,7 +76,7 @@ public class MariaServerInformationSearch implements FullTextSearch<ServerInform
 
         List<ServerInformation> serversViaFullText = dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
-                .where("MATCH(hostname, external_id, operating_system, location) AGAINST (?)", query)
+                .where("MATCH(hostname, external_id, operating_system, location) AGAINST (?)", options.searchQuery())
                 .limit(options.limit())
                 .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
 

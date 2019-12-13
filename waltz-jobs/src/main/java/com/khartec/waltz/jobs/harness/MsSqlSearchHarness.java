@@ -45,11 +45,11 @@ public class MsSqlSearchHarness {
                 .addEntityKinds(EntityKind.APPLICATION)
                 .userId("admin")
                 .limit(EntitySearchOptions.DEFAULT_SEARCH_RESULTS_LIMIT)
+                .searchQuery("sap")
                 .build();
 
         List<Application> results = appSearch.searchFullText(
                 dsl,
-                "sap",
                 searchOptions);
 
         results.stream()

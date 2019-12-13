@@ -36,7 +36,7 @@ import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
     @Override
-    public List<Measurable> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
         Field<Double> rank = DSL

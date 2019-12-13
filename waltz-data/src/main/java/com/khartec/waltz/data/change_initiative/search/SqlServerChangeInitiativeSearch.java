@@ -35,7 +35,7 @@ import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE
 public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
     @Override
-    public List<ChangeInitiative> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         return dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)

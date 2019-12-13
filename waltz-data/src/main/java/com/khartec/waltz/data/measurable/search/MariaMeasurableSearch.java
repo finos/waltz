@@ -49,8 +49,8 @@ public class MariaMeasurableSearch implements FullTextSearch<Measurable>, Databa
 
 
     @Override
-    public List<Measurable> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return emptyList();
@@ -86,7 +86,7 @@ public class MariaMeasurableSearch implements FullTextSearch<Measurable>, Databa
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-        List<Measurable> measurablesViaFullText = dsl.fetch(FULL_TEXT_QUERY, query, entityLifecycleCondition, options.limit())
+        List<Measurable> measurablesViaFullText = dsl.fetch(FULL_TEXT_QUERY, options.searchQuery(), entityLifecycleCondition, options.limit())
                 .map(MeasurableDao.TO_DOMAIN_MAPPER);
 
         return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));

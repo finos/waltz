@@ -34,7 +34,7 @@ import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATI
 public class PostgresServerInformationSearch implements FullTextSearch<ServerInformation> {
 
     @Override
-    public List<ServerInformation> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         Field<Double> rank = DSL
                 .field("ts_rank_cd(to_tsvector({0} || ' ' || {1}), plainto_tsquery({2}))",
                         Double.class,

@@ -61,7 +61,7 @@ public class ApplicationSearchDao {
     }
 
 
-    public List<Application> search(String query, EntitySearchOptions options) {
+    public List<Application> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
         List<String> terms = mkTerms(query);

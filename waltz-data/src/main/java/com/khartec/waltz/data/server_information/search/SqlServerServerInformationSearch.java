@@ -34,7 +34,7 @@ import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 public class SqlServerServerInformationSearch implements FullTextSearch<ServerInformation> {
 
     @Override
-    public List<ServerInformation> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
 
         return dsl.select(SERVER_INFORMATION.fields())

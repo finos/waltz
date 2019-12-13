@@ -36,7 +36,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
     @Override
-    public List<Application> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options) {
+    public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         Field<Double> rank = DSL
                 .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
                         Double.class,

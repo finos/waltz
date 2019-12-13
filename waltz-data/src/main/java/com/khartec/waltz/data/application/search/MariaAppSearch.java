@@ -39,14 +39,14 @@ import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
     @Override
-    public List<Application> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options) {
-        List<String> tokens = map(mkTerms(terms), t -> t.toLowerCase());
+    public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        List<String> tokens = map(mkTerms(options.searchQuery()), t -> t.toLowerCase());
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
         return dsl
                 .select(APPLICATION.fields())
                 .from(APPLICATION)
-                .where("MATCH(name, description, asset_code, parent_asset_code) AGAINST (?)", terms)
+                .where("MATCH(name, description, asset_code, parent_asset_code) AGAINST (?)", options.searchQuery())
                 .and(lifecycleCondition)
                 .union(DSL.selectDistinct(APPLICATION.fields())
                                 .from(APPLICATION)

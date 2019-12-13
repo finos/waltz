@@ -57,8 +57,8 @@ public class MeasurableSearchDao {
     }
 
 
-    public List<Measurable> search(String query, EntitySearchOptions options) {
-        List<String> terms = mkTerms(lower(query));
+    public List<Measurable> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(lower(options));
 
         if (terms.isEmpty()) {
             return emptyList();

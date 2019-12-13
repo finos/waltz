@@ -56,7 +56,7 @@ public class ChangeInitiativeSearchDao {
     }
 
 
-    public List<ChangeInitiative> search(String query, EntitySearchOptions options) {
+    public List<ChangeInitiative> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
         if (terms.isEmpty()) {
             return Collections.emptyList();

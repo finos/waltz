@@ -35,7 +35,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 public class SqlServerAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
     @Override
-    public List<Application> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
 
         return dsl.select(APPLICATION.fields())

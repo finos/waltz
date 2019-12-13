@@ -55,7 +55,7 @@ public class OrganisationalUnitSearchDao {
     }
 
 
-    public List<OrganisationalUnit> search(String query, EntitySearchOptions options) {
+    public List<OrganisationalUnit> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(query);
 
         if (terms.isEmpty()) {

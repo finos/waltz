@@ -47,7 +47,7 @@ public class AppHarness {
         // P & S Gorilla
 
         List<Application> jimmy = new SqlServerAppSearch()
-                .searchFullText(dsl, "Water & Vole", EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
+                .searchFullText(dsl, EntitySearchOptions.mkForEntity(EntityKind.APPLICATION, "Water & Vole"));
 
         System.out.println(jimmy);
 //        ApplicationService applicationService = ctx.getBean(ApplicationService.class);

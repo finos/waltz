@@ -37,7 +37,7 @@ import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
     @Override
-    public List<Measurable> searchFullText(DSLContext dsl, String query, EntitySearchOptions options) {
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(lower(query));
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 

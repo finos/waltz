@@ -41,7 +41,7 @@ public class PhysicalSpecificationHarness {
 
 
         searcher
-                .search("sap", EntitySearchOptions.mkForEntity(EntityKind.PHYSICAL_SPECIFICATION))
+                .search(EntitySearchOptions.mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "sap"))
                 .forEach(ps -> System.out.println(ps.name()));
 
     }
