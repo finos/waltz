@@ -47,7 +47,7 @@ public class MsSqlSearchHarness {
                 .limit(EntitySearchOptions.DEFAULT_SEARCH_RESULTS_LIMIT)
                 .build();
 
-        List<Application> results = appSearch.search(
+        List<Application> results = appSearch.searchFullText(
                 dsl,
                 "sap",
                 searchOptions);

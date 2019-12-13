@@ -19,58 +19,64 @@
 
 package com.khartec.waltz.data.person.search;
 
-import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.data.FullTextSearch;
-import com.khartec.waltz.data.UnsupportedSearcher;
+import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 @Repository
 public class PersonSearchDao {
 
     private final DSLContext dsl;
-    private final FullTextSearch<Person> searcher;
 
 
     @Autowired
     public PersonSearchDao(DSLContext dsl) {
         this.dsl = dsl;
-        this.searcher = determineSearcher(dsl.dialect());
     }
 
 
-    public List<Person> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
+    public List<Person> search(String query, EntitySearchOptions options) {
+        List<String> terms = mkTerms(query);
+        if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return searcher.search(dsl, terms, options);
+        boolean showRemoved = options
+                .entityLifecycleStatuses()
+                .contains(EntityLifecycleStatus.REMOVED);
+
+        Condition maybeFilterRemoved = showRemoved
+                ? DSL.trueCondition()  // match anything
+                : PERSON.IS_REMOVED.isFalse();
+
+        Condition displayNameCondition = terms.stream()
+                .map(PERSON.DISPLAY_NAME::startsWith)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        return dsl
+                .select(PERSON.fields())
+                .from(PERSON)
+                .where(PERSON.EMAIL.startsWith(query)
+                        .or(displayNameCondition))
+                .and(maybeFilterRemoved)
+                .limit(options.limit())
+                .fetch(PersonDao.personMapper);
     }
 
 
-    private FullTextSearch<Person> determineSearcher(SQLDialect dialect) {
-
-        if (isPostgres(dialect)) {
-            return new PostgresPersonSearch();
-        }
-
-        if (isMariaDB(dialect)) {
-            return new MariaPersonSearch();
-        }
-
-        if (isSQLServer(dialect)) {
-            return new SqlServerPersonSearch();
-        }
-
-        return new UnsupportedSearcher<>(dialect);
-    }
 }

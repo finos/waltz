@@ -41,7 +41,7 @@ public class MariaChangeInitiativeSearch implements FullTextSearch<ChangeInitiat
             + " LIMIT ?";
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options) {
         Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
         return records.map(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }

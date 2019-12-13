@@ -45,7 +45,7 @@ public class MariaOrganisationalUnitSearch implements FullTextSearch<Organisatio
 
 
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+    public List<OrganisationalUnit> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options) {
         Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
         return records.map(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }

@@ -19,21 +19,27 @@
 
 package com.khartec.waltz.data.orgunit.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
-import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.UnsupportedSearcher;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
 public class OrganisationalUnitSearchDao {
@@ -49,12 +55,29 @@ public class OrganisationalUnitSearchDao {
     }
 
 
-    public List<OrganisationalUnit> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
+    public List<OrganisationalUnit> search(String query, EntitySearchOptions options) {
+        List<String> terms = mkTerms(query);
+
+        if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return searcher.search(dsl, terms, options);
+        Condition nameCondition = terms.stream()
+                .map(ORGANISATIONAL_UNIT.NAME::containsIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<OrganisationalUnit> orgUnitsViaName = dsl.selectDistinct(ORGANISATIONAL_UNIT.fields())
+                .from(ORGANISATIONAL_UNIT)
+                .where(nameCondition)
+                .orderBy(ORGANISATIONAL_UNIT.NAME)
+                .limit(options.limit())
+                .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
+
+        List<OrganisationalUnit> orgUnitsViaFullText = searcher.searchFullText(dsl, query, options);
+
+        return new ArrayList<>(orderedUnion(orgUnitsViaName, orgUnitsViaFullText));
     }
 
 

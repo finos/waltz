@@ -26,5 +26,5 @@ import java.util.List;
 
 public interface FullTextSearch<T> {
 
-    List<T> search(DSLContext dsl, String terms, EntitySearchOptions options);
+    List<T> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options);
 }
