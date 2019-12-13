@@ -49,10 +49,10 @@
                     </div>
 
                     <div class="col-sm-2 waltz-display-field-label">
-                        Version
+                        Group
                     </div>
                     <div class="col-sm-4">
-                        <span ng-bind="$ctrl.softwarePackage.version"></span>
+                        <span ng-bind="$ctrl.softwarePackage.group"></span>
                     </div>
                 </div>
 
@@ -66,10 +66,10 @@
                     </div>
 
                     <div class="col-sm-2 waltz-display-field-label">
-                        Maturity Status
+                        Notable
                     </div>
                     <div class="col-sm-4">
-                        <waltz-maturity-status status="$ctrl.softwarePackage.maturityStatus"></waltz-maturity-status>
+                        <span ng-bind="$ctrl.softwarePackage.isNotable" />
                     </div>
                 </div>
 

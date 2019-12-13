@@ -30,6 +30,7 @@ import org.immutables.value.Value;
 public abstract class SoftwareUsage implements ProvenanceProvider {
 
     public abstract long applicationId();
+    public abstract long softwareVersionId();
     public abstract long softwarePackageId();
-
+    public abstract long licenceId();
 }

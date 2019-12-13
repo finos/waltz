@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,11 +19,10 @@
 
 package com.khartec.waltz.data.software_catalog;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
-import com.khartec.waltz.model.software_catalog.SoftwarePackage;
+import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackageView;
+import com.khartec.waltz.model.software_catalog.SoftwarePackageView;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.jooq.*;
@@ -36,40 +35,20 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 
 @Repository
-public class SoftwarePackageDao {
+public class SoftwarePackageViewDao {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SoftwarePackageDao.class);
-
-
-    private static final Function<SoftwarePackage, SoftwarePackageRecord> TO_RECORD = sp -> {
-        SoftwarePackageRecord record = new SoftwarePackageRecord();
-
-        record.setVendor(sp.vendor());
-        record.setGroup(sp.group());
-        record.setName(sp.name());
-        record.setNotable(sp.isNotable());
-        record.setDescription(sp.description());
-        record.setExternalId(sp.externalId().orElse(null));
-        record.setCreatedAt(sp.created().map(t -> t.atTimestamp()).orElse(nowUtcTimestamp()));
-        record.setCreatedBy(sp.created().map(t -> t.by()).orElse(""));
-        record.setProvenance(sp.provenance());
-
-        return record;
-    };
+    private static final Logger LOG = LoggerFactory.getLogger(SoftwarePackageViewDao.class);
 
 
-    private static final RecordMapper<Record, SoftwarePackage> TO_DOMAIN = r -> {
+    private static final RecordMapper<Record, SoftwarePackageView> TO_VIEW = r -> {
         SoftwarePackageRecord record = r.into(SOFTWARE_PACKAGE);
-        return ImmutableSoftwarePackage.builder()
+        return ImmutableSoftwarePackageView.builder()
                 .id(record.getId())
                 .vendor(record.getVendor())
                 .group(record.getGroup())
@@ -79,6 +58,7 @@ public class SoftwarePackageDao {
                 .description(record.getDescription())
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
+                .version(r.get(SOFTWARE_VERSION.VERSION))
                 .build();
     };
 
@@ -86,55 +66,42 @@ public class SoftwarePackageDao {
     private final DSLContext dsl;
 
     @Autowired
-    public SoftwarePackageDao(DSLContext dsl) {
+    public SoftwarePackageViewDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 
 
-    public int[] bulkStore(Collection<SoftwarePackage> softwarePackages) {
-        Checks.checkNotNull(softwarePackages, "Cannot store a null collection of software packages");
-
-        List<SoftwarePackageRecord> records = softwarePackages.stream()
-                .map(TO_RECORD)
-                .collect(Collectors.toList());
-
-        LOG.info("Bulk storing " + records.size() + " records");
-        return dsl.batchInsert(records).execute();
-    }
-
-
-    public List<SoftwarePackage> findByIds(Long... ids) {
+    public List<SoftwarePackageView> findByIds(Long... ids) {
         return findByCondition(SOFTWARE_PACKAGE.ID.in(ids));
     }
 
-    public List<SoftwarePackage> findByIds(Collection<Long> ids) {
+    public List<SoftwarePackageView> findByIds(Collection<Long> ids) {
         return findByCondition(SOFTWARE_PACKAGE.ID.in(ids));
     }
 
 
-    public SoftwarePackage getById(long id) {
-        return dsl.select(SOFTWARE_PACKAGE.fields())
-                .from(SOFTWARE_PACKAGE)
-                .where(SOFTWARE_PACKAGE.ID.eq(id))
-                .fetchOne(TO_DOMAIN);
-    }
-
-
-    public List<SoftwarePackage> findByExternalIds(String... externalIds) {
+    public List<SoftwarePackageView> findByExternalIds(String... externalIds) {
         return findByCondition(SOFTWARE_PACKAGE.EXTERNAL_ID.in(externalIds));
     }
 
-    public List<SoftwarePackage> findAll() {
+    public List<SoftwarePackageView> findAll() {
         return findByCondition(DSL.trueCondition());
 
     }
-    // -----
 
-    private List<SoftwarePackage> findByCondition(Condition condition) {
+
+    // -------------------------
+    // ------- PRIVATE ---------
+    // -------------------------
+
+    private List<SoftwarePackageView> findByCondition(Condition condition) {
         return dsl.select(SOFTWARE_PACKAGE.fields())
+                .select(SOFTWARE_VERSION.fields())
                 .from(SOFTWARE_PACKAGE)
+                .innerJoin(SOFTWARE_VERSION)
+                    .on(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(SOFTWARE_PACKAGE.ID))
                 .where(condition)
-                .fetch(TO_DOMAIN);
+                .fetch(TO_VIEW);
     }
 
 

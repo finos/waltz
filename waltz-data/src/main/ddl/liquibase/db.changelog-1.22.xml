@@ -22,35 +22,26 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.22.xml">
 
-    <!-- 4464 - Software Package Improvements -->
     <changeSet id="20191120-4496-1"
-               author="kamransaleem">
-        <modifyDataType columnName="external_id"
-                        newDataType="${external-id.type}"
-                        tableName="software_package" />
-    </changeSet>
-
-    <!--
-    <changeSet id="20191120-4496-2"
                author="kamransaleem">
         <dropColumn tableName="software_package"
                     columnName="version" />
     </changeSet>
 
-    <changeSet id="20191120-4496-3a"
-               dbms="mssql"
-               author="kamransaleem">
+    <changeSet id="20191120-4496-2a"
+               author="kamransaleem"
+               dbms="mssql">
         <dropDefaultValue tableName="software_package"
                           columnName="maturity_status"/>
     </changeSet>
 
-    <changeSet id="20191120-4496-3"
+    <changeSet id="20191120-4496-2"
                author="kamransaleem">
         <dropColumn tableName="software_package"
                     columnName="maturity_status" />
     </changeSet>
 
-    <changeSet id="20191120-4496-4"
+    <changeSet id="20191120-4496-3"
                author="kamransaleem">
         <addColumn tableName="software_package">
             <column name="created_by"
@@ -66,7 +57,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20191120-4496-5"
+    <changeSet id="20191120-4496-4"
                author="kamransaleem">
         <addColumn tableName="software_package">
             <column name="group"
@@ -76,17 +67,72 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20191120-4496-5"
+               author="kamransaleem">
+        <dropNotNullConstraint tableName="software_package"
+                               columnName="vendor"
+                               columnDataType="${name.type}" />
+    </changeSet>
+
     <changeSet id="20191120-4496-6"
                author="kamransaleem">
-        <dropNotNullConstraint columnDataType="${name.type}"
-                               columnName="vendor"
-                               tableName="software_package"/>
+        <comment>4496: adding unique index on software package (ext_id)</comment>
+        <createIndex tableName="software_package"
+                     unique="true"
+                     indexName="idx_software_package_ext_id">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
     </changeSet>
-    -->
+
+    <changeSet id="20191120-4496-7"
+               author="kamransaleem">
+        <comment>4496: adding unique index on software package (name, vendor)</comment>
+        <createIndex tableName="software_package"
+                     unique="true"
+                     indexName="idx_sp_name_vendor">
+            <column name="name"
+                    type="${name.type}" />
+            <column name="group"
+                    type="${name.type}" />
+            <column name="vendor"
+                    type="${name.type}" />
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE vendor is not null and [group] is not null"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet id="20191120-4496-8"
+               author="kamransaleem"
+               dbms="mssql"
+               context="!exclude-ft">
+        <comment>4496: Add Software packages Index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX ON software_package
+            (external_id, name, group, vendor)
+            KEY INDEX software_package_pkey
+            ON WaltzFTS
+            WITH STOPLIST = SYSTEM;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191120-4496-8"
+               author="kamransaleem"
+               dbms="mysql"
+               context="!exclude-ft">
+        <comment>4496: Add Software packages Index</comment>
+        <sql>
+            CREATE FULLTEXT INDEX software_package_ft_idx
+            ON software_package (external_id, name, group, vendor)
+        </sql>
+    </changeSet>
 
 
     <!-- 4464 - Software Version -->
-    <!--
     <changeSet id="20191120-4496-10"
                author="kamransaleem">
         <createTable tableName="software_version">
@@ -128,18 +174,54 @@
             </column>
         </createTable>
     </changeSet>
-    -->
+
+    <changeSet id="20191120-4496-11"
+               author="kamransaleem">
+        <comment>4496: adding unique index on software version (ext_id)</comment>
+        <createIndex tableName="software_version"
+                     unique="true"
+                     indexName="idx_software_version_ext_id">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet id="20191120-4496-12"
+               author="kamransaleem">
+        <comment>4496: adding unique index on software version (version, software_package_id)</comment>
+        <createIndex tableName="software_version"
+                     unique="true"
+                     indexName="idx_su_version_spid">
+            <column name="version"
+                    type="${version.type}" />
+            <column name="software_package_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet id="20191120-4496-13"
+               author="kamransaleem">
+        <comment>4496: fk between software version and software package</comment>
+        <addForeignKeyConstraint baseTableName="software_version"
+                                 baseColumnNames="software_package_id"
+                                 constraintName="soft_version_package_spid_fk"
+                                 referencedTableName="software_package"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 
     <!-- 4464 - Remove Software Usage -->
-    <!--
     <changeSet id="20191120-4496-14"
                author="kamransaleem">
         <dropTable tableName="software_usage" />
     </changeSet>
-    -->
+
 
     <!-- 4464 - Software Usage -->
-    <!--
     <changeSet id="20191120-4496-15"
                author="kamransaleem">
         <createTable tableName="software_usage">
@@ -173,11 +255,33 @@
             </column>
         </createTable>
     </changeSet>
-    -->
+
+    <changeSet id="20191120-4496-16"
+               author="kamransaleem">
+        <comment>4496: adding unique index on software usage (application id, software version id)</comment>
+        <createIndex tableName="software_usage"
+                     unique="true"
+                     indexName="idx_su_app_version">
+            <column name="application_id"
+                    type="${id.type}" />
+            <column name="software_version_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20191120-4496-17"
+               author="kamransaleem">
+        <comment>4496: fk between software usage and software version</comment>
+        <addForeignKeyConstraint baseTableName="software_usage"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="soft_usage_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 
     <!-- 4464 - Software Version licence -->
-    <!--
-    <changeSet id="20191120-4496-21"
+    <changeSet id="20191120-4496-18"
                author="kamransaleem">
         <createTable tableName="software_version_licence">
             <column name="id"
@@ -210,5 +314,47 @@
             </column>
         </createTable>
     </changeSet>
-    -->
+
+    <changeSet id="20191120-4496-19"
+               author="kamransaleem">
+        <comment>4496: adding unique index on software version licence (application id, software version id)</comment>
+        <createIndex tableName="software_version_licence"
+                     unique="true"
+                     indexName="idx_svl_version_licence">
+            <column name="software_version_id"
+                    type="${id.type}" />
+            <column name="licence_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20191120-4496-20"
+               author="kamransaleem">
+        <comment>4496: fk between software version licence - version and licence</comment>
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="svl_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="licence_id"
+                                 constraintName="svl_licence_fk"
+                                 referencedTableName="licence"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20191120-4496-21"
+               author="kamransaleem">
+        <comment>4496: add release date to software version</comment>
+
+        <addColumn tableName="software_version">
+            <column name="releaseDate"
+                    type="DATE"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

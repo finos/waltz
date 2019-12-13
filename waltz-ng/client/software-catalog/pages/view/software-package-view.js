@@ -34,7 +34,7 @@ const initialState = {
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
     entityStatisticSection: dynamicSections.entityStatisticSection,
     licenceSection: dynamicSections.licenceSection,
-
+    softwarePackageVersions: dynamicSections.softwarePackageVersions
 };
 
 

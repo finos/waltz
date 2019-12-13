@@ -32,11 +32,15 @@ public abstract class SoftwarePackage implements
         NameProvider,
         DescriptionProvider,
         ExternalIdProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        CreatedUserTimestampProvider {
 
+    @Nullable
     public abstract String vendor();
-    public abstract String version();
-    public abstract MaturityStatus maturityStatus();
+
+    @Nullable
+    public abstract String group();
+
     public abstract boolean isNotable();
 
 }
