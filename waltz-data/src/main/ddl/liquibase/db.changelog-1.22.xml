@@ -113,7 +113,7 @@
         <comment>4496: Add Software packages Index</comment>
         <sql>
             CREATE FULLTEXT INDEX ON software_package
-            (external_id, name, group, vendor)
+            ([external_id], [name], [group], [vendor])
             KEY INDEX software_package_pkey
             ON WaltzFTS
             WITH STOPLIST = SYSTEM;
@@ -127,7 +127,7 @@
         <comment>4496: Add Software packages Index</comment>
         <sql>
             CREATE FULLTEXT INDEX software_package_ft_idx
-            ON software_package (external_id, name, group, vendor)
+            ON software_package ([external_id], [name], [group], [vendor])
         </sql>
     </changeSet>
 
