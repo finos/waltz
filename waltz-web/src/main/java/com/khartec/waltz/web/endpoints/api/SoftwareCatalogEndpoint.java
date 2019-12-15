@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.software_catalog.SoftwareCatalog;
 import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
@@ -28,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
+
+import java.io.IOException;
 
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
@@ -61,6 +64,8 @@ public class SoftwareCatalogEndpoint implements Endpoint {
 
 
         getForDatum(mkPath(BASE_URL, "package-id", ":id"), this::getByPackageIdRoute);
+        getForDatum(mkPath(BASE_URL, "licence-id", ":id"), this::getByLicenceIdRoute);
+        postForDatum(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
         postForDatum(makeCatalogForAppIdsPath, makeCatalogForAppIdsRoute);
         postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
 
@@ -70,6 +75,18 @@ public class SoftwareCatalogEndpoint implements Endpoint {
     private SoftwareCatalog getByPackageIdRoute(Request request, Response response) {
         long id = getId(request);
         return service.getByPackageId(id);
+    }
+
+
+    private SoftwareCatalog getByLicenceIdRoute(Request request, Response response) {
+        long id = getId(request);
+        return service.getByLicenceId(id);
+    }
+
+
+    private SoftwareCatalog findBySelectorRoute(Request request, Response response) throws IOException {
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+        return service.findBySelector(options);
     }
 
 }

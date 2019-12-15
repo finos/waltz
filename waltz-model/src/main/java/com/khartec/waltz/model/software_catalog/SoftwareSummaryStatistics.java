@@ -33,6 +33,7 @@ import java.util.List;
 public abstract class SoftwareSummaryStatistics implements SummaryStatistics {
 
     public abstract List<Tally<String>> vendorCounts();
-    public abstract List<Tally<String>> maturityCounts();
+    public abstract List<Tally<String>> groupCounts();
+    public abstract List<Tally<String>> nameCounts();
 
 }
