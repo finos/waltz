@@ -1,0 +1,129 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<style>
+    .elv-grid .waltz-grid{
+        height: 700px;
+    }
+</style>
+<div>
+    <waltz-page-header icon="puzzle-piece" name="EUDA List">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>EUDA List</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="col-sm-12 waltz-page-summary waltz-page-summary-attach">
+        <p class="col-sm-12 waltz-paragraph">
+            End User Developed Applications (EUDAs) in Waltz. By selecting a EUDA in the below list, you can promote them to full applications.
+        </p>
+
+        <br>
+        <br>
+
+        <div>
+            <div class="col-sm-8 elv-grid">
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.eudas"
+                                        on-row-select="$ctrl.selectEuda">
+                </waltz-grid-with-search>
+            </div>
+            <div class="col-sm-4" style="margin-top: 50px">
+                <waltz-sub-section name="End User Application">
+                    <content>
+                        <div class="container-fluid"
+                             style="padding: 18px;">
+                            <waltz-no-data ng-if="!$ctrl.selectedEuda">
+                                <message>
+                                    Select an End User Application from the list to see more detail or promote it to a full application.
+                                </message>
+                            </waltz-no-data>
+                            <div ng-if="$ctrl.selectedEuda">
+                                <div>
+                                    <strong>{{$ctrl.selectedEuda.name}}</strong>
+                                    <!--<span ng-bind="$ctrl.selectedEuda.name"></span>-->
+                                </div>
+                                <br>
+                                <div>
+                                    <!--<strong>Description:</strong>-->
+                                    <span ng-bind="$ctrl.selectedEuda.description"></span>
+                                </div>
+                                <br>
+                                <div>
+                                    <strong>Owning Org Unit:</strong>
+                                    <span>
+                                        <waltz-entity-link entity-ref="{
+                                            id: $ctrl.selectedEuda.organisationalUnitId,
+                                            kind: 'ORG_UNIT',
+                                            name: $ctrl.orgUnitsById[$ctrl.selectedEuda.organisationalUnitId].name}">
+                                        </waltz-entity-link>
+                                    </span>
+                                </div>
+                                <br>
+                                <div>
+                                    <strong>Kind:</strong>
+                                    <span ng-bind="$ctrl.selectedEuda.applicationKind"></span>
+                                </div>
+                                <br>
+                                <div>
+                                    <strong>Risk Rating:</strong>
+                                    <span ng-bind="$ctrl.selectedEuda.riskRating | toDisplayName: 'criticality'"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="$ctrl.selectedEuda"
+                             class="waltz-sub-section-controls">
+                            <a class="clickable" ng-click="$ctrl.promoteToApplication($ctrl.selectedEuda.id)">Promote</a>
+                        </div>
+                    </content>
+                </waltz-sub-section>
+
+                <br>
+                <br>
+
+                <waltz-sub-section name="Recently Promoted">
+                    <content>
+                        <div class="container-fluid"
+                             style="padding: 18px;">
+                            <waltz-no-data ng-if="!$ctrl.promotedApplications">
+                                <message>
+                                    Select an End User Application from the list to see more detail or promote it to a full application.
+                                </message>
+                            </waltz-no-data>
+                            <div ng-if="$ctrl.recentlyPromoted">
+                                <ul ng-repeat="euda in $ctrl.recentlyPromoted">
+                                    <waltz-entity-link entity-ref="{
+                                                       id: euda.id,
+                                                       kind: 'APPLICATION',
+                                                       name: $ctrl.orgUnitsById[$ctrl.selectedEuda.organisationalUnitId].name}">
+                                    </waltz-entity-link>
+                                </ul>
+                            </div>
+                        </div>
+                        <div ng-if="$ctrl.selectedEuda"
+                             class="waltz-sub-section-controls">
+                            <a class="clickable" ng-click="$ctrl.promoteToApplication($ctrl.selectedEuda.id)">Promote</a>
+                        </div>
+                    </content>
+                </waltz-sub-section>
+            </div>
+        </div>
+    </div>
+</div>

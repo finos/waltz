@@ -55,6 +55,7 @@ public class EndUserAppDao {
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
                 .riskRating(Criticality.valueOf(record.getRiskRating()))
                 .provenance(record.getProvenance())
+                .isPromoted(record.getIsPromoted())
                 .build();
     };
 
@@ -83,6 +84,28 @@ public class EndUserAppDao {
     public List<EndUserApplication> findBySelector(Select<Record1<Long>> selector) {
         return dsl.selectFrom(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int updateIsPromotedFlag(long id) {
+        return dsl.update(END_USER_APPLICATION)
+                .set(END_USER_APPLICATION.IS_PROMOTED, true)
+                .where(END_USER_APPLICATION.ID.eq(id))
+                .execute();
+    }
+
+    public EndUserApplication getById(Long id) {
+        return dsl
+                .selectFrom(END_USER_APPLICATION)
+                .where(END_USER_APPLICATION.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+    public List<EndUserApplication> findAll() {
+        return dsl
+                .selectFrom(END_USER_APPLICATION)
+                .where(END_USER_APPLICATION.IS_PROMOTED.isFalse())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

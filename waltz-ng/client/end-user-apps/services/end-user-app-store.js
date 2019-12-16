@@ -31,9 +31,21 @@ export function store($http, baseUrl) {
         .get(`${BASE}/count-by/org-unit`)
         .then(result => result.data);
 
+    const promoteToApplication = (id) => $http
+        .post(`${BASE}/promote/${id}`)
+        .then(r => console.log(r))
+        .then(result => result.data);
+
+    const findAll = () => $http
+        .get(`${BASE}`)
+        .then(result => result.data);
+
+
     return {
         findBySelector,
-        countByOrganisationalUnit
+        countByOrganisationalUnit,
+        promoteToApplication,
+        findAll
     };
 }
 
@@ -53,6 +65,16 @@ export const EndUserAppStore_API = {
         serviceName,
         serviceFnName: 'countByOrganisationalUnit',
         description: 'count EUC apps across all OUs'
+    },
+    promoteToApplication: {
+        serviceName,
+        serviceFnName: 'promoteToApplication',
+        description: 'creates application record from euda and marks euda as promoted, returns the application record'
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: 'findAll',
+        description: 'returns all EUDAs that are not promoted'
     }
 };
 

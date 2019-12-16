@@ -72,4 +72,18 @@
                               columnName="attested_entity_kind"
                               tableName="attestation_instance" />
     </changeSet>
+
+    <!-- 4549 - Add column to end user application table for promoting eudas -->
+    <changeSet id="20191212-4549-1"
+               author="woodjes">
+        <comment>4549: Add column to end user application table for promoting eudas</comment>
+        <addColumn tableName="end_user_application">
+            <column name="is_promoted"
+                    defaultValueBoolean="false"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
