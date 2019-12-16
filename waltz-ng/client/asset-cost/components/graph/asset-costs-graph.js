@@ -18,15 +18,15 @@
  */
 import _ from "lodash";
 import "d3-selection-multi";
-import {initialiseData, isEmpty} from "../../../common";
-import {responsivefy} from "../../../common/d3-utils";
-import {scaleLinear, scaleBand} from "d3-scale";
-import {select} from "d3-selection";
-import {extent} from "d3-array";
-import {axisLeft, axisBottom} from "d3-axis";
-import {format} from "d3-format";
+import { initialiseData, isEmpty } from "../../../common";
+import { responsivefy } from "../../../common/d3-utils";
+import { scaleBand, scaleLinear } from "d3-scale";
+import { select } from "d3-selection";
+import { extent } from "d3-array";
+import { axisBottom, axisLeft } from "d3-axis";
+import { format } from "d3-format";
 import namedSettings from "../../../system/named-settings";
-import {currenciesByCode} from "../../../common/currency-utils";
+import { currenciesByCode } from "../../../common/currency-utils";
 
 
 const template = "<div class='waltz-asset-costs-graph'></div>";

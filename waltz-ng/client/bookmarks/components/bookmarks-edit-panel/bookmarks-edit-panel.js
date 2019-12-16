@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import template from "./bookmarks-edit-panel.html";
-import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common/index";
+import { CORE_API } from "../../../common/services/core-api-utils";
 
 
 const bindings = {

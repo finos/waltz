@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.service.application;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.application.search.ApplicationSearchDao;
@@ -28,7 +27,10 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.application.AppRegistrationRequest;
+import com.khartec.waltz.model.application.AppRegistrationResponse;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.tag.TagService;
@@ -37,7 +39,10 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

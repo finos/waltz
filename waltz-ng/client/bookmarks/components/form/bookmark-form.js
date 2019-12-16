@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -18,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData, isEmpty} from "../../../common";
+import { initialiseData, isEmpty } from "../../../common";
 import template from "./bookmark-form.html";
 
 

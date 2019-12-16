@@ -18,10 +18,10 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 import template from "./physical-data-section.html";
-import {isRemoved} from "../../../common/entity-utils";
-import {columnDef, withWidth} from "../../../physical-flow/physical-flow-table-utilities";
+import { isRemoved } from "../../../common/entity-utils";
+import { columnDef, withWidth } from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {

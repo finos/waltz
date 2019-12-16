@@ -85,6 +85,4 @@ public class PersonSearchDao {
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);
     }
-
-
 }

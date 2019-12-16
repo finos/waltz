@@ -26,12 +26,13 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static org.jooq.impl.DSL.select;
-import static org.jooq.impl.DSL.selectDistinct;
+import static org.jooq.impl.DSL.val;
 
 
 public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
@@ -47,8 +48,9 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case APPLICATION:
+                return mkForApplication(options);
             case SOFTWARE:
-                return mkForRef(options);
+                return mkForSoftwarePackage(options);
             case LICENCE:
                 return mkForLicence(options);
             case ACTOR:
@@ -70,44 +72,40 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkFromAppSelector(Select<Record1<Long>> appSelector) {
-        Select<Record1<Long>> aToB = select(ENTITY_RELATIONSHIP.ID_A)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.LICENCE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.in(appSelector));
-        Select<Record1<Long>> bToA = select(ENTITY_RELATIONSHIP.ID_B)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.in(appSelector));
+    private Select<Record1<Long>> mkForSoftwarePackage(IdSelectionOptions options) {
+        EntityReference ref = options.entityReference();
 
-        return aToB.unionAll(bToA);
+        return select(SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .innerJoin(SOFTWARE_VERSION)
+                    .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
+                .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(ref.id()));
+    }
+
+
+    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+        EntityReference ref = options.entityReference();
+
+        return select(SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .innerJoin(SOFTWARE_USAGE)
+                .on(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
+                .where(SOFTWARE_USAGE.APPLICATION_ID.eq(ref.id()));
+    }
+
+
+    private Select<Record1<Long>> mkFromAppSelector(Select<Record1<Long>> appSelector) {
+        return select(SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .innerJoin(SOFTWARE_USAGE)
+                .on(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
+                .where(SOFTWARE_USAGE.APPLICATION_ID.in(appSelector));
 
     }
 
 
     private Select<Record1<Long>> mkForLicence(IdSelectionOptions options) {
         ensureScopeIsExact(options);
-        return select(DSL.val(options.entityReference().id()));
-    }
-
-
-    private Select<Record1<Long>> mkForRef(IdSelectionOptions options) {
-        EntityReference ref = options.entityReference();
-
-        Select<Record1<Long>> aToB = selectDistinct(ENTITY_RELATIONSHIP.ID_A)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.LICENCE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
-
-        Select<Record1<Long>> bToA = selectDistinct(ENTITY_RELATIONSHIP.ID_B)
-                .from(ENTITY_RELATIONSHIP)
-                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
-                .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
-
-        return aToB.union(bToA);
+        return select(val(options.entityReference().id()));
     }
 }

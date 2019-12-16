@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,17 +21,23 @@ package com.khartec.waltz.model.software_catalog;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableSoftwareCatalog.class)
-@JsonDeserialize(as = ImmutableSoftwareCatalog.class)
-public abstract class SoftwareCatalog {
+@JsonSerialize(as = ImmutableSoftwareVersion.class)
+@JsonDeserialize(as = ImmutableSoftwareVersion.class)
+public abstract class SoftwareVersion implements
+        IdProvider,
+        DescriptionProvider,
+        ExternalIdProvider,
+        ProvenanceProvider,
+        CreatedUserTimestampProvider {
 
-    public abstract List<SoftwarePackage> packages();
-    public abstract List<SoftwareUsage> usages();
-    public abstract List<SoftwareVersion> versions();
+    public abstract long softwarePackageId();
+    public abstract String version();
+    public abstract LocalDate releaseDate();
 
 }
