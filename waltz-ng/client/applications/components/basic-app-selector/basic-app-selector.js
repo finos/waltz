@@ -17,8 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import { initialiseData, invokeFunction } from "../../../common";
 import template from "./basic-app-selector.html";
 
 

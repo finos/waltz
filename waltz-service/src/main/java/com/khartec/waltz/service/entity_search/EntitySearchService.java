@@ -48,7 +48,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.StringUtilities.length;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.Unchecked.supplier;
 

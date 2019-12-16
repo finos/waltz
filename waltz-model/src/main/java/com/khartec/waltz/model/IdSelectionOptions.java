@@ -21,7 +21,6 @@ package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import org.immutables.value.Value;
 
