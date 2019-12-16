@@ -56,7 +56,7 @@ public class OrganisationalUnitSearchDao {
 
 
     public List<OrganisationalUnit> search(EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -75,7 +75,7 @@ public class OrganisationalUnitSearchDao {
                 .limit(options.limit())
                 .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
 
-        List<OrganisationalUnit> orgUnitsViaFullText = searcher.searchFullText(dsl, query, options);
+        List<OrganisationalUnit> orgUnitsViaFullText = searcher.searchFullText(dsl, options);
 
         return new ArrayList<>(orderedUnion(orgUnitsViaName, orgUnitsViaFullText));
     }

@@ -43,7 +43,7 @@ public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, Dat
                 .field("ts_rank_cd(to_tsvector({0}), plainto_tsquery({1}))",
                         Double.class,
                         MEASURABLE.DESCRIPTION.lower(),
-                        DSL.inline(query.toLowerCase()));
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
         return dsl
                 .select(MEASURABLE.fields())

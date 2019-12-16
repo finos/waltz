@@ -42,7 +42,7 @@ public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseV
                         Double.class,
                         APPLICATION.DESCRIPTION.lower(),
                         APPLICATION.PARENT_ASSET_CODE.lower(),
-                        DSL.inline(terms.toLowerCase()));
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 

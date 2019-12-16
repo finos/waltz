@@ -42,7 +42,7 @@ public class PostgresOrganisationalUnitSearch implements FullTextSearch<Organisa
                 .field("ts_rank_cd(to_tsvector({0}), plainto_tsquery({1}))",
                         Double.class,
                         ORGANISATIONAL_UNIT.DESCRIPTION.lower(),
-                        DSL.inline(terms.toLowerCase()));
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
         return dsl
                 .select(ORGANISATIONAL_UNIT.fields())

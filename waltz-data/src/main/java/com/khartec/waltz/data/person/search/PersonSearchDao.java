@@ -29,10 +29,12 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
@@ -49,11 +51,24 @@ public class PersonSearchDao {
 
 
     public List<Person> search(EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
+        Condition displayNameCondition = terms.stream()
+                .map(PERSON.DISPLAY_NAME::containsIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Person> peopleViaEmail = executeWithCondition(options, PERSON.EMAIL.startsWithIgnoreCase(options.searchQuery()));
+        List<Person> peopleViaName = executeWithCondition(options, displayNameCondition);
+
+        return new ArrayList<>(orderedUnion(peopleViaEmail, peopleViaName));
+    }
+
+    private List<Person> executeWithCondition(EntitySearchOptions options, Condition condition) {
         boolean showRemoved = options
                 .entityLifecycleStatuses()
                 .contains(EntityLifecycleStatus.REMOVED);
@@ -62,17 +77,10 @@ public class PersonSearchDao {
                 ? DSL.trueCondition()  // match anything
                 : PERSON.IS_REMOVED.isFalse();
 
-        Condition displayNameCondition = terms.stream()
-                .map(PERSON.DISPLAY_NAME::startsWith)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
         return dsl
                 .select(PERSON.fields())
                 .from(PERSON)
-                .where(PERSON.EMAIL.startsWith(query)
-                        .or(displayNameCondition))
+                .where(condition)
                 .and(maybeFilterRemoved)
                 .limit(options.limit())
                 .fetch(PersonDao.personMapper);

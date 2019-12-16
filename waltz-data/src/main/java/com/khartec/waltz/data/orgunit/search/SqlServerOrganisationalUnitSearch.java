@@ -36,7 +36,7 @@ public class SqlServerOrganisationalUnitSearch implements FullTextSearch<Organis
 
     @Override
     public List<OrganisationalUnit> searchFullText(DSLContext dsl, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)

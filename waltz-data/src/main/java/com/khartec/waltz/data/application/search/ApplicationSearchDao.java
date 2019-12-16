@@ -64,7 +64,7 @@ public class ApplicationSearchDao {
     public List<Application> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();
@@ -117,7 +117,7 @@ public class ApplicationSearchDao {
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
 
-        List<Application> appsViaFullText = searcher.searchFullText(dsl, query, options);
+        List<Application> appsViaFullText = searcher.searchFullText(dsl, options);
 
         appsViaName.sort(mkRelevancyComparator(NameProvider::name, terms.get(0)));
 

@@ -58,7 +58,7 @@ public class MeasurableSearchDao {
 
 
     public List<Measurable> search(EntitySearchOptions options) {
-        List<String> terms = mkTerms(lower(options));
+        List<String> terms = mkTerms(lower(options.searchQuery()));
 
         if (terms.isEmpty()) {
             return emptyList();
@@ -94,7 +94,7 @@ public class MeasurableSearchDao {
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-        List<Measurable> measurablesViaFullText = searcher.searchFullText(dsl, query, options);
+        List<Measurable> measurablesViaFullText = searcher.searchFullText(dsl, options);
 
         return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }

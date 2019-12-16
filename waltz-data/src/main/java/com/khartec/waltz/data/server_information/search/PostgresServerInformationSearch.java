@@ -40,7 +40,7 @@ public class PostgresServerInformationSearch implements FullTextSearch<ServerInf
                         Double.class,
                         SERVER_INFORMATION.OPERATING_SYSTEM.lower(),
                         SERVER_INFORMATION.LOCATION.lower(),
-                        DSL.inline(query.toLowerCase()));
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
         return dsl
                 .select(SERVER_INFORMATION.fields())

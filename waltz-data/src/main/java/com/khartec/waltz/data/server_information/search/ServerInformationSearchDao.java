@@ -60,14 +60,14 @@ public class ServerInformationSearchDao {
 
     public List<ServerInformation> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
         Condition externalIdCondition = terms.stream()
-                .map(SERVER_INFORMATION.EXTERNAL_ID::startsWith)
+                .map(SERVER_INFORMATION.EXTERNAL_ID::startsWithIgnoreCase)
                 .collect(Collectors.reducing(
                         DSL.trueCondition(),
                         (acc, frag) -> acc.and(frag)));
@@ -92,7 +92,7 @@ public class ServerInformationSearchDao {
                 .limit(options.limit())
                 .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
 
-        List<ServerInformation> serversViaFullText = searcher.searchFullText(dsl, query, options);
+        List<ServerInformation> serversViaFullText = searcher.searchFullText(dsl, options);
 
         serversViaHostname.sort(mkRelevancyComparator(a -> a.hostname(), terms.get(0)));
         serversViaExternalId.sort(mkRelevancyComparator(a -> a.externalId().orElse(null), terms.get(0)));

@@ -38,7 +38,7 @@ public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, Da
 
     @Override
     public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
-        List<String> terms = mkTerms(lower(query));
+        List<String> terms = mkTerms(lower(options.searchQuery()));
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
         return dsl

@@ -54,7 +54,8 @@
     </changeSet>
 
     <changeSet id="20191203-4537-4"
-               author="muzammilali">
+               author="muzammilali"
+               dbms="mssql">
         <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
         <sql>
             UPDATE attestation_instance
@@ -62,6 +63,19 @@
             FROM attestation_instance
             JOIN attestation_run
             ON (attestation_run.id = attestation_instance.attestation_run_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191203-4537-4"
+               author="muzammilali"
+               dbms="mysql,postgresql,h2">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance
+            SET attested_entity_kind = attestation_run.attested_entity_kind
+            FROM attestation_instance AS inst
+            JOIN attestation_run
+            ON (attestation_run.id = inst.attestation_run_id)
         </sql>
     </changeSet>
 

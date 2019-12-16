@@ -36,7 +36,7 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
 
     @Override
     public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         return dsl.select(APPLICATION.fields())
                 .from(APPLICATION)

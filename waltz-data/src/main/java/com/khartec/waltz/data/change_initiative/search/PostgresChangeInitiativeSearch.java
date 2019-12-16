@@ -35,14 +35,14 @@ import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE
 public class PostgresChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
     @Override
-    public List<ChangeInitiative> searchFullText(DSLContext dsl, String terms, EntitySearchOptions options) {
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
 
         Field<Double> rank = DSL
                 .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
                         Double.class,
                         CHANGE_INITIATIVE.DESCRIPTION.lower(),
                         CHANGE_INITIATIVE.EXTERNAL_ID.lower(),
-                        DSL.inline(terms.toLowerCase()));
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
         return dsl
                 .select(CHANGE_INITIATIVE.fields())

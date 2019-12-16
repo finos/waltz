@@ -57,7 +57,7 @@ public class ChangeInitiativeSearchDao {
 
 
     public List<ChangeInitiative> search(EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
@@ -75,7 +75,7 @@ public class ChangeInitiativeSearchDao {
                 .limit(options.limit())
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
 
-        List<ChangeInitiative> ciViaFullText = searcher.searchFullText(dsl, query, options);
+        List<ChangeInitiative> ciViaFullText = searcher.searchFullText(dsl, options);
         return new ArrayList<>(orderedUnion(ciViaName, ciViaFullText));
     }
 

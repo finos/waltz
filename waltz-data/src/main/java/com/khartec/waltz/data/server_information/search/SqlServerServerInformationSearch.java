@@ -35,7 +35,7 @@ public class SqlServerServerInformationSearch implements FullTextSearch<ServerIn
 
     @Override
     public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
-        List<String> terms = mkTerms(query);
+        List<String> terms = mkTerms(options.searchQuery());
 
         return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
