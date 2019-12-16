@@ -75,7 +75,7 @@
         <super-csv.version>2.4.0</super-csv.version>
         <freemarker.version>2.3.28</freemarker.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
-        <archunit.version>0.12.0</archunit.version>
+        <archunit.version>0.11.0</archunit.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
