@@ -18,15 +18,20 @@
  */
 
 import angular from "angular";
-import { registerComponents, registerStore } from "../common/module-utils";
+import {registerComponents, registerStore} from "../common/module-utils";
 import * as SoftwareCatalogStore from "./services/software-catalog-store";
-import SimpleSoftwareUsagePies from "./components/simple-software-usage-pies";
+// components
+import SimpleSoftwareUsagePies from "./components/usage-pies/simple-software-usage-pies";
+import SoftwarePackageOverview from "./components/overview/software-package-overview";
+import SoftwarePackagesSection from "./components/packages/software-packages-section";
+import SoftwarePackageVersions from "./components/versions/software-package-versions";
+// pages
+import SoftwarePackageView from "./pages/view/software-package-view";
+// directives
 import SimpleSoftwareUsageList from "./directives/simple-software-usage-list";
 import MaturityStatus from "./directives/maturity-status";
 import SoftwareCatalogSection from "./directives/software-catalog-section";
 
-import SoftwarePackageOverview from "./components/overview/software-package-overview";
-import SoftwarePackageView from "./pages/view/software-package-view";
 
 import Routes from "./routes";
 
@@ -40,11 +45,12 @@ export default () => {
 
     registerStore(module, SoftwareCatalogStore);
 
-    module
-        .component("waltzSimpleSoftwareUsagePies", SimpleSoftwareUsagePies);
 
     registerComponents(module, [
+        SimpleSoftwareUsagePies,
         SoftwarePackageOverview,
+        SoftwarePackagesSection,
+        SoftwarePackageVersions,
         SoftwarePackageView
     ]);
 

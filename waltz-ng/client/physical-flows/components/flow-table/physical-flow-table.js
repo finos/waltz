@@ -20,7 +20,7 @@
 import {initialiseData} from "../../../common";
 
 import template from "./physical-flow-table.html";
-import {withWidth, columnDef, fetchData} from "../../../physical-flow/physical-flow-table-utilities";
+import {columnDef, fetchData, withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 

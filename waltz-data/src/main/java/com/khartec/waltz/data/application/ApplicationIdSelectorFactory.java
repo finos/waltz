@@ -27,7 +27,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,8 +126,10 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
                 .from(SOFTWARE_USAGE)
                 .innerJoin(APPLICATION)
-                .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
-                .where(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
+                    .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
+                .innerJoin(SOFTWARE_VERSION)
+                    .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+                .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
                 .and(applicationConditions);
     }
 

@@ -18,12 +18,12 @@
  */
 
 import _ from "lodash";
-import { perhaps, termSearch } from "../../../common";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkLinkGridCell } from "../../../common/grid-utils";
+import {perhaps, termSearch} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
 
 import template from "./technology-section.html";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -166,12 +166,12 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
 function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell("Name", "name", "id", "main.software-package.view"),
-        { field: "externalId", displayName: "External Id" },
-        { field: "version", displayName: "Version"},
-        { field: "description", displayName: "Description"},
-        { field: "maturityStatus", displayName: "Maturity Status", cellTemplate: MATURITY_STATUS_TEMPLATE},
-        { field: "notable", displayName: "Notable"},
+        mkLinkGridCell("Name", "package.name", "package.id", "main.software-package.view"),
+        { field: "version.externalId", displayName: "External Id" },
+        { field: "version.version", displayName: "Version"},
+        { field: "version.releaseDate", displayName: "Release Date"},
+        { field: "package.description", displayName: "Description"},
+        { field: "package.isNotable", displayName: "Notable"},
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "software.csv");
@@ -273,7 +273,15 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             )
             .then(r => {
                 vm.softwareCatalog = r.data;
-                vm.softwareCatalogGridOptions.data = vm.softwareCatalog.packages;
+                const versionsById = _.keyBy(vm.softwareCatalog.versions, v => v.id);
+                const packagesById = _.keyBy(vm.softwareCatalog.packages, v => v.id);
+
+                const gridData = _.map(vm.softwareCatalog.usages, u => Object.assign(
+                    { },
+                    { package: packagesById[u.softwarePackageId] }, { version: versionsById[u.softwareVersionId] })
+                );
+
+                vm.softwareCatalogGridOptions.data = gridData;
             })
             .then(() => refresh(vm.qry));
 

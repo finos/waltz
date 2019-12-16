@@ -19,6 +19,7 @@
 
 package com.khartec.waltz.model.software_catalog;
 
+@Deprecated
 public enum MaturityStatus {
 
     PLANNED,

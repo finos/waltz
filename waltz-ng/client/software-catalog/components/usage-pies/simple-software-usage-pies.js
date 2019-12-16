@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import { maturityColorScale, variableScale } from "../../common/colors";
+import {maturityColorScale, variableScale} from "../../../common/colors";
 import template from "./simple-software-usage-pies.html";
 
 
@@ -97,4 +97,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: "waltzSimpleSoftwareUsagePies"
+};

@@ -30,7 +30,8 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableSoftwareCatalog.class)
 public abstract class SoftwareCatalog {
 
-    public abstract List<SoftwareUsage> usages();
     public abstract List<SoftwarePackage> packages();
+    public abstract List<SoftwareUsage> usages();
+    public abstract List<SoftwareVersion> versions();
 
 }

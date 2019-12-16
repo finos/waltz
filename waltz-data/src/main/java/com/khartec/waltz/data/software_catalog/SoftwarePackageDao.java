@@ -21,12 +21,11 @@ package com.khartec.waltz.data.software_catalog;
 
 import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
-import com.khartec.waltz.model.software_catalog.MaturityStatus;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 
 @Repository
 public class SoftwarePackageDao {
@@ -52,15 +53,14 @@ public class SoftwarePackageDao {
         SoftwarePackageRecord record = new SoftwarePackageRecord();
 
         record.setVendor(sp.vendor());
+        record.setGroup(sp.group());
         record.setName(sp.name());
-        record.setVersion(sp.version());
-        record.setDescription(sp.description());
-
-        record.setMaturityStatus(sp.maturityStatus().name());
         record.setNotable(sp.isNotable());
-
-        record.setProvenance(sp.provenance());
+        record.setDescription(sp.description());
         record.setExternalId(sp.externalId().orElse(null));
+        record.setCreatedAt(sp.created().map(t -> t.atTimestamp()).orElse(nowUtcTimestamp()));
+        record.setCreatedBy(sp.created().map(t -> t.by()).orElse(""));
+        record.setProvenance(sp.provenance());
 
         return record;
     };
@@ -71,12 +71,12 @@ public class SoftwarePackageDao {
         return ImmutableSoftwarePackage.builder()
                 .id(record.getId())
                 .vendor(record.getVendor())
+                .group(record.getGroup())
                 .name(record.getName())
-                .version(record.getVersion())
-                .description(record.getDescription())
                 .isNotable(record.getNotable())
-                .maturityStatus(MaturityStatus.valueOf(record.getMaturityStatus()))
                 .externalId(Optional.ofNullable(record.getExternalId()))
+                .description(record.getDescription())
+                .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
                 .build();
     };
@@ -144,8 +144,10 @@ public class SoftwarePackageDao {
         return dsl
                 .select(groupingField, DSL.count(groupingField))
                 .from(SOFTWARE_PACKAGE)
+                .innerJoin(SOFTWARE_VERSION)
+                    .on(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(SOFTWARE_PACKAGE.ID))
                 .innerJoin(SOFTWARE_USAGE)
-                .on(SOFTWARE_PACKAGE.ID.eq(SOFTWARE_USAGE.SOFTWARE_PACKAGE_ID))
+                    .on(SOFTWARE_USAGE.ID.eq(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID))
                 .where(dsl.renderInlined(condition))
                 .groupBy(groupingField)
                 .fetch(JooqUtilities.TO_STRING_TALLY);

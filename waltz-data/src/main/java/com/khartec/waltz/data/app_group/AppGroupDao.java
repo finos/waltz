@@ -27,7 +27,6 @@ import com.khartec.waltz.model.app_group.AppGroupMemberRole;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,7 +37,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.*;

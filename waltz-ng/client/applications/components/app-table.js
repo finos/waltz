@@ -19,7 +19,7 @@
 import _ from "lodash";
 import {mapToDisplayNames} from "../application-utils";
 
-import template from  "./app-table.html";
+import template from "./app-table.html";
 
 const bindings = {
     applications: "<"

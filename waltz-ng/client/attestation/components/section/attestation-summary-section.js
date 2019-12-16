@@ -1,11 +1,12 @@
-
 import template from "./attestation-summary-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
 import {
     attestationPieConfig,
-    mkAppAttestationGridData, prepareSummaryData, attestationSummaryColumnDefs
+    attestationSummaryColumnDefs,
+    mkAppAttestationGridData,
+    prepareSummaryData
 } from "../../attestation-pie-utils";
 import {entity} from "../../../common/services/enums/entity";
 
