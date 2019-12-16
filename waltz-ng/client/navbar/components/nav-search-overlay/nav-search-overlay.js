@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {entityLifecycleStatuses, initialiseData} from "../../../common/index";
-import {entity} from "../../../common/services/enums/entity";
-import {isDescendant} from "../../../common/browser-utils";
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { entityLifecycleStatuses, initialiseData } from "../../../common/index";
+import { entity } from "../../../common/services/enums/entity";
+import { isDescendant } from "../../../common/browser-utils";
 
 import template from "./nav-search-overlay.html";
-import {kindToViewState} from "../../../common/link-utils";
+import { kindToViewState } from "../../../common/link-utils";
 import _ from "lodash";
 
 const ESCAPE_KEYCODE = 27;

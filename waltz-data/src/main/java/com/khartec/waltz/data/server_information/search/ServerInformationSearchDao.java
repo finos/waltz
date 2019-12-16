@@ -19,7 +19,6 @@
 
 package com.khartec.waltz.data.server_information.search;
 
-import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -29,10 +28,8 @@ import org.jooq.SQLDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.*;
 
 

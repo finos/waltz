@@ -240,11 +240,23 @@ export const dynamicSections = {
         icon: "file-code-o",
         id: 110
     },
-    attestationSummarySection : {
+    attestationSummarySection: {
         componentId: "attestation-summary-section",
         name: "Attestations",
         icon: "check-square-o",
         id: 120
+    },
+    softwarePackageVersions: {
+        componentId: "software-package-versions",
+        name: "Versions",
+        icon: "clock-o",
+        id: 130
+    },
+    softwarePackagesSection: {
+        componentId: "software-packages-section",
+        name: "Software Packages",
+        icon: "gift",
+        id: 140
     }
 };
 

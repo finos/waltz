@@ -21,13 +21,10 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.SetUtilities.*;
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.SetUtilities.intersection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

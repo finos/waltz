@@ -19,7 +19,7 @@
 
 import angular from "angular";
 
-import {registerComponents, registerStores} from "../common/module-utils";
+import { registerComponents, registerStores } from "../common/module-utils";
 
 import bookmarkStore from "./services/bookmark-store";
 import bookmarkKindSelect from "./components/bookmark-kind-select/bookmark-kind-select";

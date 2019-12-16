@@ -30,8 +30,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
-import static com.khartec.waltz.common.StringUtilities.length;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 

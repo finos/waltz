@@ -43,6 +43,7 @@ const initialState = {
     bookmarkSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
+    softwarePackagesSection: dynamicSections.softwarePackagesSection,
 };
 
 

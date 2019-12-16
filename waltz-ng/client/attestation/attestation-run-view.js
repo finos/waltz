@@ -20,10 +20,10 @@
 import _ from "lodash";
 import moment from "moment";
 
-import {CORE_API} from "../common/services/core-api-utils";
-import {formats, initialiseData} from "../common/index";
-import {mkEntityLinkGridCell} from "../common/grid-utils";
-import {amber, green, red} from "../common/colors";
+import { CORE_API } from "../common/services/core-api-utils";
+import { formats, initialiseData } from "../common/index";
+import { mkEntityLinkGridCell } from "../common/grid-utils";
+import { amber, green, red } from "../common/colors";
 
 import template from "./attestation-run-view.html";
 

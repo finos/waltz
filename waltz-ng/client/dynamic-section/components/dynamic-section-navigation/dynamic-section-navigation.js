@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
-import {scaleLinear} from "d3-scale";
-import {rgb} from "d3-color";
+import { scaleLinear } from "d3-scale";
+import { rgb } from "d3-color";
 
 export const dynamicSectionNavigationDefaultOffset = 250;
 

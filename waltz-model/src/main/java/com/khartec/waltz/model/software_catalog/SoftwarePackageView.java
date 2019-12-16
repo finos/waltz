@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,15 +23,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableSoftwareCatalog.class)
-@JsonDeserialize(as = ImmutableSoftwareCatalog.class)
-public abstract class SoftwareCatalog {
+@JsonSerialize(as = ImmutableSoftwarePackage.class)
+@JsonDeserialize(as = ImmutableSoftwarePackage.class)
+public abstract class SoftwarePackageView extends SoftwarePackage {
 
-    public abstract List<SoftwarePackage> packages();
-    public abstract List<SoftwareUsage> usages();
-    public abstract List<SoftwareVersion> versions();
+    public abstract String version();
 
 }
