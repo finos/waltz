@@ -41,7 +41,7 @@ import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 public class MariaServerInformationSearch implements FullTextSearch<ServerInformation>, DatabaseVendorSpecific {
 
     @Override
-    public List<ServerInformation> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
