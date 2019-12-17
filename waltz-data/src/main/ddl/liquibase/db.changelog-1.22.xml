@@ -420,9 +420,9 @@
                dbms="mysql">
         <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
         <sql>
-            UPDATE attestation_instance, attestation_run
-            SET attestation_instance.attested_entity_kind = attestation_run.attested_entity_kind
-            WHERE attestation_run.id = inst.attestation_run_id
+            UPDATE attestation_instance inst, attestation_run run
+            SET inst.attested_entity_kind = run.attested_entity_kind
+            WHERE run.id = inst.attestation_run_id
         </sql>
     </changeSet>
 
