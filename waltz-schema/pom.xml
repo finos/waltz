@@ -32,7 +32,7 @@
 
 
     <properties>
-        <jooq.version>3.12.3</jooq.version>
+        <jooq.version>3.12.3</jooq.version> <!--If this changes see issue #4553 -->
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 

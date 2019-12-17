@@ -54,12 +54,35 @@ function controller($q,
     const loadData = () => {
 
         const runsPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationRunStore.findByEntityRef, [vm.parentEntityRef], { force: true })
+            .loadViewData(CORE_API.AttestationRunStore.findByEntityRef,
+                [vm.parentEntityRef],
+                { force: true })
             .then(r => r.data);
 
         const instancesPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef, [vm.parentEntityRef], { force: true })
+            .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef,
+                [vm.parentEntityRef],
+                { force: true })
             .then(r => r.data);
+
+        const logicalFlowsPromise = serviceBroker
+            .loadViewData(CORE_API.LogicalFlowStore.findByEntityReference,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => r.data);
+
+        const logicalFlowDecoratorPromise = serviceBroker
+            .loadViewData(CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
+                [{
+                    entityReference: vm.parentEntityRef,
+                    scope: 'EXACT'
+                }, 'DATA_TYPE'])
+            .then(r => r.data);
+
+        const dataTypePromise = serviceBroker
+            .loadViewData(CORE_API.DataTypeStore.findAll)
+            .then(r => r.data);
+
 
         const sections = [
             {
@@ -74,8 +97,8 @@ function controller($q,
             }
         ];
 
-        return $q.all([runsPromise, instancesPromise])
-            .then(([runs, instances]) => {
+        return $q.all([runsPromise, instancesPromise, logicalFlowsPromise, logicalFlowDecoratorPromise, dataTypePromise])
+            .then(([runs, instances, logicalFlows, flowDecorators, dataTypes]) => {
 
                 vm.attestations = mkAttestationData(runs, instances);
 
@@ -96,6 +119,22 @@ function controller($q,
                         };
                     })
                     .value();
+
+                const upstreamFlowIds = _.chain(logicalFlows)
+                    .filter(flow => flow.target.id === vm.parentEntityRef.id)
+                    .map(flow => flow.id)
+                    .value();
+
+                const unknownOrDeprecatedDatatypeIds = _.chain(dataTypes)
+                    .filter(dt => dt.deprecated === true || dt.unknown === true)
+                    .map(dt => dt.id)
+                    .value();
+
+                vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes = _.filter(flowDecorators,
+                        d =>
+                            _.includes(upstreamFlowIds, d.dataFlowId)
+                            && _.includes(unknownOrDeprecatedDatatypeIds, d.decoratorEntity.id));
+
             });
     };
 
@@ -112,6 +151,11 @@ function controller($q,
     vm.setCreateType = (type) => vm.createType = type;
 
     vm.attestEntity = () => {
+
+        if(vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes.length !== 0 && vm.createType === 'LOGICAL_DATA_FLOW'){
+            return confirm("This application is connected to unknown and / or deprecated data types, please update these flows before the attestation can be updated.")
+        }
+
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
             return serviceBroker
                 .execute(CORE_API.AttestationInstanceStore.attestEntityForUser,

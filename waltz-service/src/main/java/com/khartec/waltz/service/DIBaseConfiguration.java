@@ -85,9 +85,12 @@ public class DIBaseConfiguration {
             throw iae;
         }
 
-        Settings dslSettings = null;
+        // TODO: remove sql server setting, see #4553
+        Settings dslSettings = new Settings()
+                .withRenderOutputForSQLServerReturningClause(false);
+
         if ("true".equals(System.getProperty(JOOQ_DEBUG_PROPERTY))) {
-            dslSettings = new Settings()
+            dslSettings
                     .withRenderFormatted(true)
                     .withExecuteLogging(true);
         }
