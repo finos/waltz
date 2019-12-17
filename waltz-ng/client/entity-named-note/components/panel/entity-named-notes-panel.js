@@ -24,13 +24,13 @@ import template from "./entity-named-notes-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    notes: '<',
-    allNoteTypes: '<',
-    onSave: '<',
-    onDelete: '<',
-    onEditorDismiss: '<',
-    creatingNote: '<'
+    parentEntityRef: "<",
+    notes: "<",
+    allNoteTypes: "<",
+    onSave: "<",
+    onDelete: "<",
+    onEditorDismiss: "<",
+    creatingNote: "<"
 };
 
 
@@ -39,12 +39,12 @@ const initialState = {
     editingNotes: {},
     expandedNotes: {},
     newNote: {},
-    baseLabelText: 'Show Additional Notes',
-    labelText: 'Show Additional Notes',
+    baseLabelText: "Show Additional Notes",
+    labelText: "Show Additional Notes",
     visibility: {notes: true},
-    onSave: (note) => console.log('entity named notes panel default save handler: ', note),
-    onDelete: (note) => console.log('entity named notes panel default delete handler: ', note),
-    onEditorDismiss: () => console.log('entity named notes panel default dismiss editor handler: ', note),
+    onSave: (note) => console.log("entity named notes panel default save handler: ", note),
+    onDelete: (note) => console.log("entity named notes panel default delete handler: ", note),
+    onEditorDismiss: () => console.log("entity named notes panel default dismiss editor handler: ", note),
 };
 
 
@@ -59,22 +59,26 @@ function controller() {
 
 
     const postLoad = () => {
-        const existingNotesByTypeId = _.keyBy(vm.notes, 'namedNoteTypeId');
+        const existingNotesByTypeId = _.keyBy(vm.notes, "namedNoteTypeId");
 
         vm.creatableNoteTypes = _.chain(vm.allNoteTypes)
             .filter(nt => !nt.isReadOnly)
             .filter(nt => !existingNotesByTypeId[nt.id])
             .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
-            .sortBy('name')
+            .sortBy("name")
             .value();
 
-        vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');
+        vm.noteTypesById = _.keyBy(vm.allNoteTypes, "id");
+
+        vm.notes = _.sortBy(vm.notes,
+                            n => [vm.noteTypesById[n.namedNoteTypeId].position,
+                                    vm.noteTypesById[n.namedNoteTypeId].id]);
 
         const noteTitles = _.chain(vm.notes)
             .map(n => vm.noteTypesById[n.namedNoteTypeId])
             .map(nt => nt.name).value();
 
-        vm.labelText = vm.baseLabelText + ': ' + _.truncate(_.join(noteTitles, ', '), {length: 200});
+        vm.labelText = vm.baseLabelText + ": " + _.truncate(_.join(noteTitles, ", "), {length: 200});
 
     };
 
@@ -111,7 +115,7 @@ function controller() {
     };
 
     vm.deleteNote = (note) => {
-        if (confirm('Are you sure you want to delete this note?')) {
+        if (confirm("Are you sure you want to delete this note?")) {
             invokeFunction(vm.onDelete, note);
         }
     };
@@ -134,5 +138,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntityNamedNotesPanel'
+    id: "waltzEntityNamedNotesPanel"
 };

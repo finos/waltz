@@ -66,8 +66,8 @@
 
     <div ng-if="$ctrl.editing" style="border-radius: 3px; border: 1px solid #eee; background-color: #fafafa; padding: 10px">
 
-        <div ng-if="$ctrl.fieldType === 'text'">
-            <input type="text"
+        <div ng-if="$ctrl.fieldType === 'text' || $ctrl.fieldType === 'number'">
+            <input type="{{ $ctrl.fieldType }}"
                    ng-model="$ctrl.newVal"
                    ng-keydown="$ctrl.onKeyDown($event)"
                    class="form-control input-sm">

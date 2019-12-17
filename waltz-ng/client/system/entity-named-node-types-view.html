@@ -22,7 +22,8 @@
                 <colgroup>
                     <col width="20%">
                     <col width="25%">
-                    <col width="35%">
+                    <col width="25%">
+                    <col width="10%">
                     <col width="10%">
                     <col width="15%">
                 </colgroup>
@@ -32,6 +33,7 @@
                     <th>Description</th>
                     <th>Applicable Entity Kinds</th>
                     <th>Read Only</th>
+                    <th>Position</th>
                     <th>Operation</th>
                 </tr>
                 </thead>
@@ -63,6 +65,13 @@
                         <waltz-editable-field on-save="ctrl.updateIsReadOnly"
                                               field-type="boolean"
                                               initial-val="noteType.isReadOnly"
+                                              ctx="noteType">
+                        </waltz-editable-field>
+                    </td>
+                    <td align="left">
+                        <waltz-editable-field on-save="ctrl.updatePosition"
+                                              field-type="number"
+                                              initial-val="noteType.position"
                                               ctx="noteType">
                         </waltz-editable-field>
                     </td>
@@ -103,6 +112,11 @@
                         <input type="checkbox"
                                ng-model="ctrl.newNoteType.isReadOnly"
                                class="">
+                    </td>
+                    <td>
+                        <input type="number"
+                               ng-model="ctrl.newNoteType.position"
+                               class="form-control input-sm">
                     </td>
                     <td>
                         <button class="btn btn-success btn-xs"

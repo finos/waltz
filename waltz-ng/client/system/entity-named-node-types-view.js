@@ -19,9 +19,9 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import {CORE_API, getApiReference} from '../common/services/core-api-utils';
+import {CORE_API, getApiReference} from "../common/services/core-api-utils";
 
-import template from './entity-named-node-types-view.html';
+import template from "./entity-named-node-types-view.html";
 
 
 const initialState = {
@@ -41,14 +41,14 @@ function controller($q,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-    const componentId = 'entity-named-note-types-view';
+    const componentId = "entity-named-note-types-view";
 
     function update(noteType, change) {
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteTypeStore.update, [noteType.id, change])
             .then(() => {
                 loadNoteTypes(true);
-                notification.success('Updated');
+                notification.success("Updated");
             });
     }
 
@@ -66,6 +66,11 @@ function controller($q,
         return update(type, { isReadOnly: change.newVal });
     };
 
+    vm.updatePosition = (change, type) => {
+        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Cannot be blank");
+        return update(type, { position: change.newVal });
+    };
+
     vm.updateApplicableEntityKinds = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
         return update(type, { applicableEntityKinds: splitEntityKinds(change.newVal) });
@@ -80,13 +85,14 @@ function controller($q,
             name: vm.newNoteType.name,
             description: vm.newNoteType.description,
             applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
-            isReadOnly: vm.newNoteType.isReadOnly
+            isReadOnly: vm.newNoteType.isReadOnly,
+            position: vm.newNoteType.position
         }];
 
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteTypeStore.create, params)
             .then(() => {
-                notification.success('Created new note type: '+ vm.newNoteType.name);
+                notification.success("Created new note type: "+ vm.newNoteType.name);
                 vm.creatingNoteType = false;
                 vm.newNoteType = {};
                 loadNoteTypes(true);
@@ -94,15 +100,15 @@ function controller($q,
     };
 
     vm.deleteNoteType = (id) => {
-        if (confirm('Are you sure you want to delete this note type?')) {
+        if (confirm("Are you sure you want to delete this note type?")) {
             return serviceBroker
                 .execute(CORE_API.EntityNamedNoteTypeStore.remove, [id])
                 .then((r) => {
                     if (r.data) {
-                        notification.success('Deleted');
+                        notification.success("Deleted");
                         loadNoteTypes(true);
                     } else {
-                        notification.error('Failed to delete, ensure that note type is not being used');
+                        notification.error("Failed to delete, ensure that note type is not being used");
                     }
                 });
         }
@@ -133,7 +139,7 @@ function controller($q,
     }
 
     const cacheRefreshListener = (e) => {
-        if (e.eventType === 'REFRESH'
+        if (e.eventType === "REFRESH"
             && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.EntityNamedNoteTypeStore.findAll) {
             loadNoteTypes();
         }
@@ -144,16 +150,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "Notification",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };
