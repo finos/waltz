@@ -101,25 +101,23 @@
                 <waltz-sub-section name="Recently Promoted">
                     <content>
                         <div class="container-fluid"
-                             style="padding: 18px;">
-                            <waltz-no-data ng-if="!$ctrl.promotedApplications">
+                             style="padding: 18px">
+                            <waltz-no-data ng-if="$ctrl.recentlyPromoted.length == 0">
                                 <message>
-                                    Select an End User Application from the list to see more detail or promote it to a full application.
+                                    You have no recently promoted applications.
                                 </message>
                             </waltz-no-data>
                             <div ng-if="$ctrl.recentlyPromoted">
-                                <ul ng-repeat="euda in $ctrl.recentlyPromoted">
-                                    <waltz-entity-link entity-ref="{
-                                                       id: euda.id,
+                                <ul ng-repeat="apps in $ctrl.recentlyPromoted">
+                                    <li>
+                                        <waltz-entity-link entity-ref="{
+                                                       id: apps.appId,
                                                        kind: 'APPLICATION',
-                                                       name: $ctrl.orgUnitsById[$ctrl.selectedEuda.organisationalUnitId].name}">
-                                    </waltz-entity-link>
+                                                       name: apps.name}">
+                                        </waltz-entity-link>
+                                    </li>
                                 </ul>
                             </div>
-                        </div>
-                        <div ng-if="$ctrl.selectedEuda"
-                             class="waltz-sub-section-controls">
-                            <a class="clickable" ng-click="$ctrl.promoteToApplication($ctrl.selectedEuda.id)">Promote</a>
                         </div>
                     </content>
                 </waltz-sub-section>

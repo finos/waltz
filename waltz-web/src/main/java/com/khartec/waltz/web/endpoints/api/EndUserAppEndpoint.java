@@ -68,9 +68,7 @@ public class EndUserAppEndpoint implements Endpoint {
 
             res.type(WebUtilities.TYPE_JSON);
 
-            AppRegistrationResponse appRegistrationResponse = endUserAppService.promoteToApplication(getId(req));
-
-            return  appRegistrationResponse;
+            return endUserAppService.promoteToApplication(getId(req), getUsername(req));
         };
 
         getForList(countByOrgUnitPath, countByOrgUnitRoute);

@@ -30,7 +30,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, $q) {
+function controller(serviceBroker, notification) {
 
     const vm = initialiseData(this, initialState);
 
@@ -61,9 +61,10 @@ function controller(serviceBroker, $q) {
                 .loadViewData(CORE_API.EndUserAppStore.promoteToApplication,
                     [id] )
                 .then(r => {
-                    vm.recentlyPromoted = _.concat(vm.recentlyPromoted, vm.selectedEuda);
-                    vm.selectedEuda = null
+                    vm.recentlyPromoted = _.concat(vm.recentlyPromoted, Object.assign({}, vm.selectedEuda, {appId: r.data.id}));
+                    vm.selectedEuda = null;
                 })
+                .then(() => notification.success('EUDA successfully promoted'))
                 .then(() => loadData());
         }
     }
@@ -98,7 +99,7 @@ function mkColumnDefs() {
 
 controller.$inject = [
     "ServiceBroker",
-    "$q"
+    "Notification"
 ];
 
 
