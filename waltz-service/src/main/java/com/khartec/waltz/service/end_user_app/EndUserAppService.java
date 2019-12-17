@@ -20,12 +20,17 @@
 package com.khartec.waltz.service.end_user_app;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
+import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.ApplicationKind;
@@ -33,6 +38,8 @@ import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.enduserapp.EndUserApplication;
+import com.khartec.waltz.model.involvement.ImmutableInvolvement;
+import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
@@ -46,6 +53,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 @Service
 public class EndUserAppService {
@@ -53,6 +61,7 @@ public class EndUserAppService {
     private final EndUserAppDao endUserAppDao;
     private final ApplicationDao applicationDao;
     private final ChangeLogDao changeLogDao;
+    private final InvolvementDao involvementDao;
     private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory = new EndUserAppIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory= new OrganisationalUnitIdSelectorFactory();
 
@@ -60,13 +69,16 @@ public class EndUserAppService {
     @Autowired
     public EndUserAppService(EndUserAppDao endUserAppDao,
                              ApplicationDao applicationDao,
-                             ChangeLogDao changeLogDao) {
+                             ChangeLogDao changeLogDao,
+                             InvolvementDao involvementDao) {
         checkNotNull(endUserAppDao, "EndUserAppDao is required");
         checkNotNull(applicationDao, "ApplicationDao is required");
         checkNotNull(changeLogDao, "ChangeLogDao is required");
+        checkNotNull(involvementDao, "InvolvementDao is required");
         this.endUserAppDao = endUserAppDao;
         this.applicationDao = applicationDao;
         this.changeLogDao = changeLogDao;
+        this.involvementDao = involvementDao;
     }
 
 
@@ -105,9 +117,31 @@ public class EndUserAppService {
 
         AppRegistrationResponse appRegistrationResponse = applicationDao.registerApp(appRegistrationRequest);
 
+        handleInvolvements(id, appRegistrationResponse);
+
         changeLogDao.write(mkChangeLog(appRegistrationResponse, username));
 
         return appRegistrationResponse;
+    }
+
+
+    private void handleInvolvements(Long id, AppRegistrationResponse appRegistrationResponse) {
+
+        List<Involvement> eudaInvolvements = involvementDao.findByEntityReference(mkRef(EntityKind.END_USER_APPLICATION, id));
+        List<Involvement> appInvolvements = ListUtilities.map(eudaInvolvements, r -> mkAppInvolvement(r, appRegistrationResponse));
+
+        appInvolvements.forEach(involvementDao::save);
+    }
+
+
+    private Involvement mkAppInvolvement(Involvement involvement, AppRegistrationResponse appRegistrationResponse) {
+
+        return ImmutableInvolvement.builder()
+                .entityReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
+                .kindId(involvement.kindId())
+                .employeeId(involvement.employeeId())
+                .provenance(involvement.provenance())
+                .build();
     }
 
 
@@ -115,7 +149,7 @@ public class EndUserAppService {
         return ImmutableChangeLog.builder()
                 .message(String.format("Promoted application '%s' from an end user application", appRegistrationResponse.originalRequest().name()))
                 .operation(Operation.ADD)
-                .parentReference(EntityReference.mkRef(APPLICATION, appRegistrationResponse.id().get()))
+                .parentReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
                 .userId(username)
                 .severity(Severity.INFORMATION)
                 .childKind(EntityKind.END_USER_APPLICATION)
