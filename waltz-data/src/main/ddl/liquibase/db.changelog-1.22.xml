@@ -447,4 +447,35 @@
                               tableName="attestation_instance" />
     </changeSet>
 
+
+    <!-- 4565 - rename software version - release date -->
+    <changeSet id="20191217-4565-1"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date - drop default value</comment>
+        <dropDefaultValue columnDataType="DATE"
+                          columnName="releaseDate"
+                          tableName="software_version" />
+    </changeSet>
+
+
+    <changeSet id="20191217-4565-2"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date</comment>
+        <dropNotNullConstraint columnDataType="DATE"
+                               columnName="releaseDate"
+                               tableName="software_version" />
+
+    </changeSet>
+
+
+    <changeSet id="20191217-4565-3"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date</comment>
+        <renameColumn columnDataType="DATE"
+                      newColumnName="release_date"
+                      oldColumnName="releaseDate"
+                      tableName="software_version" />
+
+    </changeSet>
+
 </databaseChangeLog>
