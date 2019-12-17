@@ -25,36 +25,33 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.List;
+
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
 public class PostgresOrganisationalUnitSearch implements FullTextSearch<OrganisationalUnit>, DatabaseVendorSpecific {
 
-    private static final String QUERY = "SELECT\n" +
-            "  *,\n" +
-            "  ts_rank_cd(\n" +
-            "      setweight(to_tsvector(name), 'A')\n" +
-            "      || setweight(to_tsvector(description), 'D'),\n" +
-            "      plainto_tsquery(?)) AS rank\n" +
-            "FROM organisational_unit\n" +
-            "WHERE\n" +
-            "  setweight(to_tsvector(name), 'A')\n" +
-            "  || setweight(to_tsvector(coalesce(description, '')), 'D')\n" +
-            "  @@ plainto_tsquery(?)\n" +
-            "ORDER BY rank DESC\n" +
-            "LIMIT ?;\n";
-
-
     @Override
-    public List<OrganisationalUnit> search(DSLContext dsl, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(QUERY,
-                options.searchQuery(),
-                options.searchQuery(),
-                options.limit());
-        return records.map(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
+    public List<OrganisationalUnit> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+
+        Field<Double> rank = DSL
+                .field("ts_rank_cd(to_tsvector({0}), plainto_tsquery({1}))",
+                        Double.class,
+                        ORGANISATIONAL_UNIT.DESCRIPTION.lower(),
+                        DSL.inline(options.searchQuery().toLowerCase()));
+
+        return dsl
+                .select(ORGANISATIONAL_UNIT.fields())
+                .select(rank)
+                .from(ORGANISATIONAL_UNIT)
+                .where(rank.greaterThan(Double.MIN_VALUE))
+                .orderBy(rank.desc())
+                .limit(options.limit())
+                .fetch(OrganisationalUnitDao.TO_DOMAIN_MAPPER);
     }
 
 }

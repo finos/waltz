@@ -25,36 +25,33 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+
 public class PostgresChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
-    private static final String SEARCH_POSTGRES
-            = "SELECT *, "
-            + " ts_rank_cd(setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A'), "
-            + "     plainto_tsquery(?)"
-            + " ) AS rank"
-            + " FROM change_initiative"
-            + " WHERE setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
-            + "     @@ plainto_tsquery(?)"
-            + " ORDER BY rank DESC"
-            + " LIMIT ?";
-
-
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
-                options.searchQuery(),
-                options.searchQuery(),
-                options.limit());
-        return records.map(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+
+        Field<Double> rank = DSL
+                .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
+                        Double.class,
+                        CHANGE_INITIATIVE.DESCRIPTION.lower(),
+                        CHANGE_INITIATIVE.EXTERNAL_ID.lower(),
+                        DSL.inline(options.searchQuery().toLowerCase()));
+
+        return dsl
+                .select(CHANGE_INITIATIVE.fields())
+                .select(rank)
+                .from(CHANGE_INITIATIVE)
+                .where(rank.greaterThan(Double.MIN_VALUE))
+                .orderBy(rank.desc())
+                .limit(options.limit())
+                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 
 }

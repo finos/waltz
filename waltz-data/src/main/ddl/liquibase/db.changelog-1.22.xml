@@ -390,7 +390,8 @@
     </changeSet>
 
     <changeSet id="20191203-4537-4"
-               author="muzammilali">
+               author="muzammilali"
+               dbms="mssql">
         <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
         <sql>
             UPDATE attestation_instance
@@ -401,12 +402,80 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20191203-4537-4"
+               author="muzammilali"
+               dbms="postgresql">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance
+            SET attested_entity_kind = attestation_run.attested_entity_kind
+            FROM attestation_instance AS inst
+            JOIN attestation_run
+            ON (attestation_run.id = inst.attestation_run_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191203-4537-4"
+               author="muzammilali"
+               dbms="mysql">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance inst, attestation_run run
+            SET inst.attested_entity_kind = run.attested_entity_kind
+            WHERE run.id = inst.attestation_run_id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20191203-4537-4"
+               author="muzammilali"
+               dbms="h2">
+        <comment>4537: copying attested_entity_kind from attestation_run to attestation_instance</comment>
+        <sql>
+            UPDATE attestation_instance instance
+            SET instance.attested_entity_kind =
+            (select run.attested_entity_kind from attestation_run run where run.id = instance.attestation_run_id)
+            WHERE EXISTS
+            (select * from attestation_run run where run.id = instance.attestation_run_id)
+        </sql>
+    </changeSet>
+
     <changeSet id="20191203-4537-5"
                author="muzammilali">
         <comment>4537: Added not null constraint for attested_entity_knd in attestation_instance table</comment>
         <addNotNullConstraint columnDataType="${enum.type}"
                               columnName="attested_entity_kind"
                               tableName="attestation_instance" />
+    </changeSet>
+
+
+    <!-- 4565 - rename software version - release date -->
+    <changeSet id="20191217-4565-1"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date - drop default value</comment>
+        <dropDefaultValue columnDataType="DATE"
+                          columnName="releaseDate"
+                          tableName="software_version" />
+    </changeSet>
+
+
+    <changeSet id="20191217-4565-2"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date</comment>
+        <dropNotNullConstraint columnDataType="DATE"
+                               columnName="releaseDate"
+                               tableName="software_version" />
+
+    </changeSet>
+
+
+    <changeSet id="20191217-4565-3"
+               author="kamransaleem">
+        <comment>4565 - rename software version - release date</comment>
+        <renameColumn columnDataType="DATE"
+                      newColumnName="release_date"
+                      oldColumnName="releaseDate"
+                      tableName="software_version" />
+
     </changeSet>
 
 </databaseChangeLog>

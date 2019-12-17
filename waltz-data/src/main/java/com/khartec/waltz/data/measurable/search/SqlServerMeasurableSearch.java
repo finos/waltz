@@ -27,66 +27,26 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static java.util.Collections.emptyList;
 
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
     @Override
-    public List<Measurable> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(lower(options.searchQuery()));
-
-        if (terms.isEmpty()) {
-            return emptyList();
-        }
-
-        Condition externalIdCondition = terms.stream()
-                .map(term -> MEASURABLE.EXTERNAL_ID.like("%" + term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
-        List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
-                .from(MEASURABLE)
-                .where(externalIdCondition)
-                .and(entityLifecycleCondition)
-                .orderBy(MEASURABLE.EXTERNAL_ID)
-                .limit(options.limit())
-                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
-
-        Condition nameCondition = terms.stream()
-                .map(term -> MEASURABLE.NAME.like("%" + term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
-        List<Measurable> measurablesViaName = dsl.selectDistinct(MEASURABLE.fields())
-                .from(MEASURABLE)
-                .where(nameCondition)
-                .and(entityLifecycleCondition)
-                .orderBy(MEASURABLE.NAME)
-                .limit(options.limit())
-                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
-
-        List<Measurable> measurablesViaFullText = dsl
+        return dsl
                 .selectFrom(MEASURABLE)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .and(entityLifecycleCondition)
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
-
-        return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
     }
 
 }

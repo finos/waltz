@@ -49,7 +49,7 @@ public class MariaMeasurableSearch implements FullTextSearch<Measurable>, Databa
 
 
     @Override
-    public List<Measurable> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
