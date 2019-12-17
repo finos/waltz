@@ -33,7 +33,6 @@ export function store($http, baseUrl) {
 
     const promoteToApplication = (id) => $http
         .post(`${BASE}/promote/${id}`)
-        .then(r => console.log(r))
         .then(result => result.data);
 
     const findAll = () => $http

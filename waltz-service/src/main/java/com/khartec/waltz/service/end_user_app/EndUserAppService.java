@@ -137,7 +137,7 @@ public class EndUserAppService {
                     .applicationKind(ApplicationKind.EUC)
                     .assetCode(String.valueOf(euda.id().get()))
                     .businessCriticality(euda.riskRating())
-                    .description(euda.description())
+                    .description(euda.description() + "<br>["+ euda.applicationKind() + "]")
                     .lifecyclePhase(euda.lifecyclePhase())
                     .organisationalUnitId(euda.organisationalUnitId())
                     .overallRating(RagRating.R)
