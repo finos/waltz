@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,7 @@ public class SoftwareVersionDao {
                 .description(record.getDescription())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
-                .releaseDate(record.getReleasedate().toLocalDate())
+                .releaseDate(record.getReleaseDate().toLocalDate())
                 .provenance(record.getProvenance())
                 .build();
     };
