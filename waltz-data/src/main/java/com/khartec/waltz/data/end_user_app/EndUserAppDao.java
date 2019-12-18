@@ -26,6 +26,7 @@ import com.khartec.waltz.model.enduserapp.EndUserApplication;
 import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

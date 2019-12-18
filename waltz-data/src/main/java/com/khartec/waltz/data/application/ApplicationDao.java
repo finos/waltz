@@ -28,6 +28,7 @@ import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
+import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

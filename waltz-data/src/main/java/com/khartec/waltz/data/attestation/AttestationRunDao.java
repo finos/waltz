@@ -26,6 +26,7 @@ import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.schema.tables.records.AttestationRunRecord;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
