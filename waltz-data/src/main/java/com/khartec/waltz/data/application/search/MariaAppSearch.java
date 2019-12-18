@@ -39,7 +39,7 @@ import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
     @Override
-    public List<Application> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> tokens = map(mkTerms(options.searchQuery()), t -> t.toLowerCase());
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 

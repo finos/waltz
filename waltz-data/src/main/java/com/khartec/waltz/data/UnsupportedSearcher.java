@@ -42,7 +42,7 @@ public class UnsupportedSearcher<T> implements FullTextSearch<T> {
 
 
     @Override
-    public List<T> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<T> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         LOG.error("Search not supported/implemented for database dialect: " + dialect);
         return emptyList();
     }

@@ -25,48 +25,23 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 
 public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeInitiative>, DatabaseVendorSpecific {
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
-        if (terms.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        Condition nameCondition = terms.stream()
-                .map(term -> CHANGE_INITIATIVE.NAME.like("%" + term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
-        List<ChangeInitiative> ciViaName = dsl.selectDistinct(CHANGE_INITIATIVE.fields())
-                .from(CHANGE_INITIATIVE)
-                .where(nameCondition)
-                .orderBy(CHANGE_INITIATIVE.NAME)
-                .limit(options.limit())
-                .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
-
-        List<ChangeInitiative> ciViaFullText = dsl.select(CHANGE_INITIATIVE.fields())
+        return dsl.select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())
                 .fetch(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
-
-        return new ArrayList<>(orderedUnion(ciViaName, ciViaFullText));
     }
 
 }

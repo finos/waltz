@@ -48,7 +48,7 @@ public class MsSqlSearchHarness {
                 .searchQuery("sap")
                 .build();
 
-        List<Application> results = appSearch.search(
+        List<Application> results = appSearch.searchFullText(
                 dsl,
                 searchOptions);
 

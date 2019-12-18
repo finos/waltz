@@ -24,39 +24,37 @@ import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+
 public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 
-    private static final String SEARCH_POSTGRES
-            = "SELECT *, "
-            + " ts_rank_cd(setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(asset_code, '')), 'A') "
-            + "     || setweight(to_tsvector(coalesce(parent_asset_code, '')), 'A'), "
-            + "     plainto_tsquery(?)"
-            + " ) AS rank"
-            + " FROM application"
-            + " WHERE setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(asset_code, '')), 'A') "
-            + "     || setweight(to_tsvector(coalesce(parent_asset_code, '')), 'A') "
-            + "     @@ plainto_tsquery(?)"
-            + " ORDER BY rank DESC"
-            + " LIMIT ?";
-
-
     @Override
-    public List<Application> search(DSLContext dsl, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
-                options.searchQuery(),
-                options.searchQuery(),
-                options.limit());
-        return records.map(ApplicationDao.TO_DOMAIN_MAPPER);
+    public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        Field<Double> rank = DSL
+                .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
+                        Double.class,
+                        APPLICATION.DESCRIPTION.lower(),
+                        APPLICATION.PARENT_ASSET_CODE.lower(),
+                        DSL.inline(options.searchQuery().toLowerCase()));
+
+        Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
+        return dsl
+                .select(APPLICATION.fields())
+                .select(rank)
+                .from(APPLICATION)
+                .where(rank.greaterThan(Double.MIN_VALUE))
+                .and(lifecycleCondition)
+                .orderBy(rank.desc())
+                .limit(options.limit())
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 }

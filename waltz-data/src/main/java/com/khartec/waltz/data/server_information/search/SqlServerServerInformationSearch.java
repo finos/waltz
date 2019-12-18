@@ -24,64 +24,23 @@ import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
-import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 
 public class SqlServerServerInformationSearch implements FullTextSearch<ServerInformation> {
 
     @Override
-    public List<ServerInformation> search(DSLContext dsl, EntitySearchOptions options) {
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
-        if (terms.isEmpty()) {
-            return Collections.emptyList();
-        }
 
-        Condition externalIdCondition = terms.stream()
-                .map(term -> SERVER_INFORMATION.EXTERNAL_ID.like(term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
-        List<ServerInformation> serversViaExternalId = dsl.selectDistinct(SERVER_INFORMATION.fields())
-                .from(SERVER_INFORMATION)
-                .where(externalIdCondition)
-                .orderBy(SERVER_INFORMATION.HOSTNAME)
-                .limit(options.limit())
-                .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
-
-        Condition hostnameCondition = terms.stream()
-                .map(term -> SERVER_INFORMATION.HOSTNAME.like("%" + term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
-        List<ServerInformation> serversViaHostname = dsl.selectDistinct(SERVER_INFORMATION.fields())
-                .from(SERVER_INFORMATION)
-                .where(hostnameCondition)
-                .orderBy(SERVER_INFORMATION.HOSTNAME)
-                .limit(options.limit())
-                .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
-
-        List<ServerInformation> serversViaFullText = dsl.select(SERVER_INFORMATION.fields())
+        return dsl.select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())
                 .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
-
-        serversViaHostname.sort(mkRelevancyComparator(a -> a.hostname(), terms.get(0)));
-        serversViaExternalId.sort(mkRelevancyComparator(a -> a.externalId().orElse(null), terms.get(0)));
-
-        return new ArrayList<>(orderedUnion(serversViaExternalId, serversViaHostname, serversViaFullText));
     }
 }

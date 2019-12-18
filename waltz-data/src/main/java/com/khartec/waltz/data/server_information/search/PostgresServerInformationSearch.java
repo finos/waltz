@@ -24,37 +24,31 @@ import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+
 public class PostgresServerInformationSearch implements FullTextSearch<ServerInformation> {
 
-    private static final String SEARCH_POSTGRES
-            = "SELECT *, "
-            + " ts_rank_cd(setweight(to_tsvector(hostname), 'A') "
-            + "     || setweight(to_tsvector(operating_system), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
-            + "     || setweight(to_tsvector(location), 'A'), "
-            + "     plainto_tsquery(?)"
-            + " ) AS rank"
-            + " FROM server_information"
-            + " WHERE setweight(to_tsvector(hostname), 'A') "
-            + "     || setweight(to_tsvector(operating_system), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
-            + "     || setweight(to_tsvector(location), 'A') "
-            + "     @@ plainto_tsquery(?)"
-            + " ORDER BY rank DESC"
-            + " LIMIT ?";
-
-
     @Override
-    public List<ServerInformation> search(DSLContext dsl, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(SEARCH_POSTGRES,
-                options.searchQuery(),
-                options.searchQuery(),
-                options.limit());
-        return records.map(ServerInformationDao.TO_DOMAIN_MAPPER);
+    public List<ServerInformation> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        Field<Double> rank = DSL
+                .field("ts_rank_cd(to_tsvector({0} || ' ' || {1}), plainto_tsquery({2}))",
+                        Double.class,
+                        SERVER_INFORMATION.OPERATING_SYSTEM.lower(),
+                        SERVER_INFORMATION.LOCATION.lower(),
+                        DSL.inline(options.searchQuery().toLowerCase()));
+
+        return dsl
+                .select(SERVER_INFORMATION.fields())
+                .select(rank)
+                .from(SERVER_INFORMATION)
+                .where(rank.greaterThan(Double.MIN_VALUE))
+                .orderBy(rank.desc())
+                .limit(options.limit())
+                .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
     }
 }

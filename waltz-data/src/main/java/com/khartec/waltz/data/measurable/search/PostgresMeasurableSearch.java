@@ -26,51 +26,34 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static java.util.Collections.emptyList;
 
 public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 
-    private static final String SEARCH_POSTGRES
-            = "SELECT *, "
-            + " ts_rank_cd(setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A'), "
-            + "     plainto_tsquery(?)"
-            + " ) AS rank"
-            + " FROM measurable"
-            + " WHERE setweight(to_tsvector(name), 'A') "
-            + "     || setweight(to_tsvector(description), 'D') "
-            + "     || setweight(to_tsvector(coalesce(external_id, '')), 'A') "
-            + "     @@ plainto_tsquery(?)"
-            + "  AND ?\n" // lifecycle condition
-            + " ORDER BY rank DESC"
-            + " LIMIT ?";
-
-
     @Override
-    public List<Measurable> search(DSLContext dsl, EntitySearchOptions options) {
-
-        List<String> terms = mkTerms(options.searchQuery());
-
-        if (terms.isEmpty()) {
-            return emptyList();
-        }
-
+    public List<Measurable> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
-        List<Measurable> measurablesViaFullText = dsl.fetch(SEARCH_POSTGRES,
-                options.searchQuery(),
-                options.searchQuery(),
-                entityLifecycleCondition,
-                options.limit())
-                .map(MeasurableDao.TO_DOMAIN_MAPPER);
+        Field<Double> rank = DSL
+                .field("ts_rank_cd(to_tsvector({0}), plainto_tsquery({1}))",
+                        Double.class,
+                        MEASURABLE.DESCRIPTION.lower(),
+                        DSL.inline(options.searchQuery().toLowerCase()));
 
-        return measurablesViaFullText;
+        return dsl
+                .select(MEASURABLE.fields())
+                .select(rank)
+                .from(MEASURABLE)
+                .where(rank.greaterThan(Double.MIN_VALUE))
+                .and(entityLifecycleCondition)
+                .orderBy(rank.desc())
+                .limit(options.limit())
+                .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
     }
 
 }
