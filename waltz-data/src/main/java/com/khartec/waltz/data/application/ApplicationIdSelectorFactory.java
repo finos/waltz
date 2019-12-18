@@ -27,7 +27,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

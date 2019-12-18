@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import { mapToDisplayNames } from "../application-utils";
+import {mapToDisplayNames} from "../application-utils";
 
 import template from "./app-table.html";
 

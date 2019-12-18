@@ -26,7 +26,6 @@ import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 import template from "./date-picker-form-input.html";
 
 

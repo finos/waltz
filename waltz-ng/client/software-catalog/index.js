@@ -18,7 +18,7 @@
  */
 
 import angular from "angular";
-import { registerComponents, registerStore } from "../common/module-utils";
+import {registerComponents, registerStore} from "../common/module-utils";
 import * as SoftwareCatalogStore from "./services/software-catalog-store";
 // components
 import SimpleSoftwareUsagePies from "./components/usage-pies/simple-software-usage-pies";
