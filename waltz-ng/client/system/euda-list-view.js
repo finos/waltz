@@ -74,24 +74,30 @@ function controller(serviceBroker, notification) {
 function mkColumnDefs() {
     return [
         {
+            field: "id",
+            name: "ID",
+            width: "10%"
+        },
+        {
             field: "name",
             name: "Name",
-            width: "25%"
+            width: "30%"
         },
         {
             field: "description",
             name: "Description",
-            width: "25%"
+            width: "30%"
         },
         {
             field: "applicationKind",
             name: "Kind",
-            width: "25%"
+            width: "15%"
         },
         {
             field: "lifecyclePhase",
             name: "Lifecycle Phase",
-            width: "25%"
+            cellFilter: "toDisplayName:'lifecyclePhase'",
+            width: "15%"
         }
     ];
 }
