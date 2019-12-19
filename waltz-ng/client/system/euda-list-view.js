@@ -50,7 +50,6 @@ function controller(serviceBroker, notification) {
         loadData();
     };
 
-
     vm.selectEuda = (euda) => {
         vm.selectedEuda = euda;
     };

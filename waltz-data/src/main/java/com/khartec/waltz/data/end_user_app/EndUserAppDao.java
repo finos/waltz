@@ -95,12 +95,14 @@ public class EndUserAppDao {
                 .execute();
     }
 
+
     public EndUserApplication getById(Long id) {
         return dsl
                 .selectFrom(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
+
 
     public List<EndUserApplication> findAll() {
         return dsl
