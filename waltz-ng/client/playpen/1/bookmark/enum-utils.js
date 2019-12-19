@@ -1,6 +1,8 @@
+
+
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.common;
+import {nest} from "d3-collection";
 
-import org.junit.Test;
+export const nestEnums = (enums = []) => nest()
+    .key(d => d.type)
+    .key(d => d.key)
+    .rollup(_.first)
+    .object(enums);
 
-import static com.khartec.waltz.common.RangeBandUtilities.toPrettyString;
-import static org.junit.Assert.assertEquals;
-
-public class RangeBandUtilitiesTest {
-
-    @Test
-    public void looksPretty() {
-        assertEquals("0 - *", toPrettyString(new RangeBand<>(0, null)));
-        assertEquals("* - 10", toPrettyString(new RangeBand<>(null, 10)));
-        assertEquals("0 - 10", toPrettyString(new RangeBand<>(0, 10)));
-    }
-
-}
+export const getIcon = (nestedEnums, k) => _.get(nestedEnums, ["BookmarkKind", k, "icon"], "circle-o");
+export const getName = (nestedEnums, k) => _.get(nestedEnums, ["BookmarkKind", k, "name"], k);

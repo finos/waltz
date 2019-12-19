@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import _ from "lodash";
-import {mapToDisplayNames} from "../application-utils";
+import { mapToDisplayNames } from "../application-utils";
 
-import template from  "./app-table.html";
+import template from "./app-table.html";
 
 const bindings = {
-    applications: "<",
-    onInitialise: "<"
+    applications: "<"
 };
 
 
 function mkGridData(displayNameService, apps = []) {
     return _.map(apps || [], a => Object.assign(
-            {},
-            a,
-            mapToDisplayNames(displayNameService, a))
+        {},
+        a,
+        mapToDisplayNames(displayNameService, a))
     );
 }
 
@@ -39,12 +38,12 @@ function mkGridData(displayNameService, apps = []) {
 const columnDefs = [
     {
         field: "name",
-        cellTemplate: `<div class="ui-grid-cell-contents" 
+        cellTemplate: `<div class="ui-grid-cell-contents"
                             ng-switch="row.entity['management']">
-                         <span ng-switch-when="End User" 
+                         <span ng-switch-when="End User"
                                ng-bind="COL_FIELD"></span>
                          <a ng-switch-default
-                            ui-sref="main.app.view ({ id: row.entity['id'] })" 
+                            ui-sref="main.app.view ({ id: row.entity['id'] })"
                             ng-bind="COL_FIELD">
                          </a>
                        </div>`

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,11 +21,13 @@ import angular from "angular";
 import {registerComponents, registerStore} from "../common/module-utils";
 import * as EntitySearchStore from "./services/entity-search-store";
 import EntityLinkList from "./components/entity-link-list/entity-link-list";
+import EntitySummaryPanel from "./components/entity-summary-panel/entity-summary-panel";
 
 import entityHierarchyNavigator from "./components/entity-hierarchy-navigator/entity-hierarchy-navigator";
 import entityInvolvementEditor from "./components/entity-involvement-editor/entity-involvement-editor";
 import entitySelector from "./components/entity-selector/entity-selector";
 import relatedEntityEditor from "./components/related-entity-editor/related-entity-editor";
+
 import Routes from "./routes";
 
 
@@ -42,7 +44,9 @@ export default () => {
         .component("waltzEntitySelector", entitySelector)
         .component("waltzRelatedEntityEditor", relatedEntityEditor);
 
-    registerComponents(module, [ EntityLinkList ]);
+    registerComponents(
+        module,
+        [ EntitySummaryPanel, EntityLinkList ]);
 
     return module.name;
 };

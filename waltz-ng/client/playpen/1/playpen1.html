@@ -28,6 +28,18 @@
         </ol>
     </waltz-page-header>
 
+    <waltz-section name="Bookmarks">
+        <waltz-svelte-component component="$ctrl.bookmarkList"
+                                primary-entity-ref="$ctrl.ref">
+        </waltz-svelte-component>
+    </waltz-section>
+
+
+    <!-- NG  BOOKMARKS -->
+    <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                   parent-entity-ref="$ctrl.ref">
+    </waltz-dynamic-section-wrapper>
+
 
     <waltz-section name="As view code">
         <div class="row">
@@ -42,22 +54,6 @@
     <waltz-section name="As view code2">
         <waltz-svelte-component component="$ctrl.app">
         </waltz-svelte-component>
-        </div>
-
-    </waltz-section>
-
-    <waltz-section name="As component">
-        <div class="row">
-            <div class="col-sm-12">
-                <button ng-click="$ctrl.ref = $ctrl.ref1">Ref 1</button>
-                <button ng-click="$ctrl.ref = $ctrl.ref2">Ref 2</button>
-                <button ng-click="$ctrl.ref = $ctrl.ref3">Ref 3</button>
-                <button ng-click="$ctrl.ref = $ctrl.ref4">Ref 4</button>
-
-                <waltz-svelte-component component="$ctrl.testWidget"
-                                        primary-entity-ref="$ctrl.ref">
-                </waltz-svelte-component>
-            </div>
         </div>
 
     </waltz-section>

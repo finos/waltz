@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initialiseData} from '../../../common';
+import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
 import {stringToRef} from "../../../common/entity-utils";
-import {select, event} from 'd3-selection';
-import {zoom} from 'd3-zoom';
+import {select, event} from "d3-selection";
+import {zoom} from "d3-zoom";
 
-import template from './entity-svg-diagram-viewer.html';
+import template from "./entity-svg-diagram-viewer.html";
 
 
 const bindings = {
-    svg: '<'
+    svg: "<"
 };
 
 
@@ -35,21 +35,25 @@ const initialState = {
     panZoomEnabled: false,
     popup: {
         style: {
-            position: 'absolute',
-            background: 'white',
-            display: 'none'
+            position: "absolute",
+            background: "white",
+            display: "none"
         },
         text: ""
     }
 };
+
+const updateTransform = (g, currentZoom, currentTranslate) =>
+    g.attr("transform", `scale(${currentZoom}) translate(${currentTranslate})`);
 
 
 function controller($element, $state, $timeout) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        const holder = $element.find('div')[0];
-        holder.innerHTML= vm.svg;
+        const holder = select($element[0])
+            .select(".wesd-svg")
+            .html(vm.svg);
 
         let currentZoom = 1;
         let currentTranslate = [0,0];
@@ -61,14 +65,11 @@ function controller($element, $state, $timeout) {
                 currentZoom = transform.k;
                 currentTranslate[0] = transform.x;
                 currentTranslate[1] = transform.y;
-                updateTransform();
+                updateTransform(g, currentZoom, currentTranslate);
             }
         };
 
-        const updateTransform = () =>
-            g.attr('transform', `scale(${currentZoom}) translate(${currentTranslate})`);
-
-        const svg = select(holder)
+        const svg = select($element[0])
             .select("svg");
 
         const g = svg
@@ -79,26 +80,26 @@ function controller($element, $state, $timeout) {
 
         const setupZoom = () => {
             svg.call(myZoom)
-                .on('dblclick.zoom', null);
+                .on("dblclick.zoom", null);
         };
 
         const teardownZoom = () => {
-            svg.on('.zoom', null);
+            svg.on(".zoom", null);
         };
 
-        g.selectAll('[data-wesd-node-entity-link]')
-            .on('click', function() {
+        g.selectAll("[data-wesd-node-entity-link]")
+            .on("click", function() {
                 const refStr = select(this)
-                    .attr('data-wesd-node-entity-link');
+                    .attr("data-wesd-node-entity-link");
                 const ref = stringToRef(refStr);
                 const viewState = kindToViewState(ref.kind);
                 $state.go(viewState, {id: ref.id});
             });
 
-        g.selectAll('[data-wesd-node-description]')
-            .on('mouseenter', function() {
+        g.selectAll("[data-wesd-node-description]")
+            .on("mouseenter", function() {
                 const text = select(this)
-                    .attr('data-wesd-node-description');
+                    .attr("data-wesd-node-description");
 
                 let top = 0;
                 let left = 0;
@@ -106,7 +107,7 @@ function controller($element, $state, $timeout) {
                 select(this)
                     .each((d,i,g) => {
                         const gBounds = g[0].getBoundingClientRect();
-                        const holderBounds = holder.getBoundingClientRect();
+                        const holderBounds = holder.node().getBoundingClientRect();
                         top = gBounds.top - holderBounds.top;
                         left = gBounds.left - holderBounds.left + (gBounds.left > 700 ? -250 : 100);
                     });
@@ -114,13 +115,12 @@ function controller($element, $state, $timeout) {
                 $timeout(() => {
                     vm.popup.style.display = "inline-block";
                     vm.popup.style.left = `${left}px`;
-                    vm.popup.style.top = `${top}px`;
                     vm.popup.text = text;
                 });
             })
-            .on('mouseleave', function() {
+            .on("mouseleave", function() {
                 select(this)
-                    .attr('data-wesd-node-description');
+                    .attr("data-wesd-node-description");
                 $timeout(() => {
                     vm.popup.style.display = "none";
                     vm.popup.text = "";
@@ -129,17 +129,17 @@ function controller($element, $state, $timeout) {
 
         vm.zoom = (delta) => {
             currentZoom += delta;
-            updateTransform();
+            updateTransform(g, currentZoom, currentTranslate);
         };
 
         vm.panX = (delta) => {
             currentTranslate[0] += delta;
-            updateTransform();
+            updateTransform(g, currentZoom, currentTranslate);
         };
 
         vm.panY = (delta) => {
             currentTranslate[1] += delta;
-            updateTransform();
+            updateTransform(g, currentZoom, currentTranslate);
         };
 
         vm.togglePanZoom = () => {
@@ -171,5 +171,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntitySvgDiagramViewer'
+    id: "waltzEntitySvgDiagramViewer"
 };

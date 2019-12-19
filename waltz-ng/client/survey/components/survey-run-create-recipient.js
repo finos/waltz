@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {initialiseData} from "../../common/index";
+import { initialiseData } from "../../common/index";
 import _ from "lodash";
-import template from './survey-run-create-recipient.html';
+import template from "./survey-run-create-recipient.html";
 
 
 const bindings = {
-    surveyTemplate: '<',
-    surveyRun: '<',
-    onSave: '<',
-    onGoBack: '<'
+    surveyTemplate: "<",
+    surveyRun: "<",
+    onSave: "<",
+    onGoBack: "<"
 };
 
 
@@ -39,12 +39,15 @@ const initialState = {
 function controller(surveyRunStore) {
     const vm = initialiseData(this, initialState);
 
-    surveyRunStore.generateSurveyRunRecipients(vm.surveyRun.id)
-        .then(r => {
-            vm.surveyRunRecipients = r.data;
-            vm.includedRecipients = [].concat(vm.surveyRunRecipients);
-            vm.excludedRecipients = [];
-        });
+    vm.$onInit = () => {
+        surveyRunStore
+            .generateSurveyRunRecipients(vm.surveyRun.id)
+            .then(r => {
+                vm.surveyRunRecipients = r.data;
+                vm.includedRecipients = [].concat(vm.surveyRunRecipients);
+                vm.excludedRecipients = [];
+            });
+    };
 
     vm.excludeRecipient = (recipient) => {
         _.pull(vm.includedRecipients, recipient);
@@ -69,7 +72,7 @@ function controller(surveyRunStore) {
 
 
 controller.$inject = [
-    'SurveyRunStore'
+    "SurveyRunStore"
 ];
 
 

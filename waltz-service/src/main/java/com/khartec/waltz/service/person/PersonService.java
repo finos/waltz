@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -35,6 +35,8 @@ import java.util.Map;
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 
 @Service
 public class PersonService {
@@ -80,12 +82,13 @@ public class PersonService {
 
 
     public List<Person> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.PERSON));
+        if (isEmpty(query)) return emptyList();
+        return search(EntitySearchOptions.mkForEntity(EntityKind.PERSON, query));
     }
 
 
-    public List<Person> search(String query, EntitySearchOptions options) {
-        return personSearchDao.search(query, options);
+    public List<Person> search(EntitySearchOptions options) {
+        return personSearchDao.search(options);
     }
 
 

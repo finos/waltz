@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,6 +40,8 @@ public abstract class EntitySearchOptions {
 
     public abstract List<EntityKind> entityKinds();
 
+    public abstract String searchQuery();
+
 
     @Value.Default
     public List<EntityLifecycleStatus> entityLifecycleStatuses() {
@@ -59,9 +61,10 @@ public abstract class EntitySearchOptions {
     }
 
 
-    public static EntitySearchOptions mkForEntity(EntityKind entityKind) {
+    public static EntitySearchOptions mkForEntity(EntityKind entityKind, String searchQuery) {
         return ImmutableEntitySearchOptions.builder()
                 .entityKinds(newArrayList(entityKind))
+                .searchQuery(searchQuery)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,19 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.common;
+package com.khartec.waltz.model.software_catalog;
 
-/**
- * Created by dwatkins on 29/04/2016.
- */
-public class RangeBandUtilities {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    public static String toPrettyString(RangeBand<?> band) {
-        return new StringBuilder()
-                .append(band.getLow() == null ? "*" : band.getLow())
-                .append(" - ")
-                .append(band.getHigh() == null ? "*" : band.getHigh())
-                .toString();
-    }
+@Value.Immutable
+@JsonSerialize(as = ImmutableSoftwarePackage.class)
+@JsonDeserialize(as = ImmutableSoftwarePackage.class)
+public abstract class SoftwarePackageView extends SoftwarePackage {
+
+    public abstract String version();
 
 }

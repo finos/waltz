@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -13,7 +32,7 @@
 
 
     <properties>
-        <jooq.version>3.11.9</jooq.version>
+        <jooq.version>3.12.3</jooq.version> <!--If this changes see issue #4553 -->
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
     </properties>
 
@@ -24,7 +43,7 @@
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
                 <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.4.197</jdbc.version>
+                <jdbc.version>1.4.200</jdbc.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
@@ -57,7 +76,7 @@
                 <jdbc.artifact>sqljdbc4</jdbc.artifact>
                 <jdbc.version>4.0</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.pro</jooq.group>
+                <jooq.group>org.jooq.pro-java-8</jooq.group>
                 <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>
@@ -73,7 +92,7 @@
                 <jdbc.artifact>mssql-jdbc</jdbc.artifact>
                 <jdbc.version>6.1.0.jre8</jdbc.version>
                 <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
-                <jooq.group>org.jooq.pro</jooq.group>
+                <jooq.group>org.jooq.pro-java-8</jooq.group>
                 <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
                 <jooq.dialect>SQLSERVER2014</jooq.dialect>
             </properties>

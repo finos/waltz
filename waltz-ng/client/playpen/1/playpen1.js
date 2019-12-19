@@ -22,7 +22,9 @@ import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import App from "./App.svelte";
 import {mkRef} from "../../common/entity-utils";
-import testWidget from "./TestWidget.svelte";
+import TestWidget from "./TestWidget.svelte";
+import BookmarkList from "./bookmark/BookmarkList.svelte";
+import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initData = {
     ref: mkRef("APPLICATION", 18),
@@ -30,7 +32,9 @@ const initData = {
     ref2: mkRef("APPLICATION", 22),
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 122),
-    testWidget,
+    testWidget: TestWidget,
+    bookmarkList: BookmarkList,
+    bookmarksSection: dynamicSections.bookmarksSection,
     app: App
 };
 

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -50,14 +49,14 @@ public class XmlUtilities {
     }
 
 
-    public static String printDocument(Document doc, boolean prettyPrint) throws IOException, TransformerException {
+    public static String printDocument(Document doc, boolean prettyPrint) throws TransformerException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         printDocument(doc, baos, prettyPrint);
         return new String(baos.toByteArray());
     }
 
 
-    public static void printDocument(Document doc, OutputStream out, boolean prettyPrint) throws IOException, TransformerException {
+    public static void printDocument(Document doc, OutputStream out, boolean prettyPrint) throws TransformerException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");

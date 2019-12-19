@@ -38,6 +38,7 @@ public class StreamUtilities {
     }
 
 
+    @SafeVarargs
     public static <T> Stream<T> concat(Collection<T>... values) {
         return Stream.of(values)
                 .flatMap(Collection::stream);
@@ -67,11 +68,12 @@ public class StreamUtilities {
     }
 
 
+    @SafeVarargs
     public static <T> Stream<T> concat(Stream<T>... streams) {
         return Stream
                 .of(streams)
                 .reduce(Stream.empty(),
-                        (acc, s) -> Stream.concat(acc, s));
+                        Stream::concat);
     }
 
 

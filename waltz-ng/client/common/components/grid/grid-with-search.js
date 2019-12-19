@@ -18,17 +18,17 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction, termSearch} from "../../../common";
+import { initialiseData, invokeFunction, termSearch } from "../../../common";
 import template from "./grid-with-search.html";
 
 const bindings = {
     columnDefs: "<",
     entries: "<",
     searchControlMinRows: "<?",
-    searchPlaceholderText: "@",
+    searchPlaceholderText: "@?",
     scopeProvider: "<?",
-    onInitialise: "<",
-    onChange: "<",
+    onInitialise: "<?",
+    onChange: "<?",
     onRowSelect: "<?",
     localStorageKey: "@?"
 };
@@ -40,7 +40,7 @@ const initialState = {
     filteredEntries: [],
     scopeProvider: null,
     searchFields: [],
-    searchControlMinRows: 10,
+    searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
     onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),

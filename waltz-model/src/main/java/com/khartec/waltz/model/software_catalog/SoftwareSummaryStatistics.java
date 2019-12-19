@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -33,6 +33,7 @@ import java.util.List;
 public abstract class SoftwareSummaryStatistics implements SummaryStatistics {
 
     public abstract List<Tally<String>> vendorCounts();
-    public abstract List<Tally<String>> maturityCounts();
+    public abstract List<Tally<String>> groupCounts();
+    public abstract List<Tally<String>> nameCounts();
 
 }

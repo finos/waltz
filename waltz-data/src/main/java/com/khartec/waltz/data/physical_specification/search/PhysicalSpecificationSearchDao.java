@@ -59,8 +59,8 @@ public class PhysicalSpecificationSearchDao {
     }
 
 
-    public List<PhysicalSpecification> search(String termsStr, EntitySearchOptions options) {
-        List<String> terms = mkTerms(termsStr);
+    public List<PhysicalSpecification> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return newArrayList();
         }

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,58 +19,70 @@
 
 package com.khartec.waltz.data.person.search;
 
-import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.data.FullTextSearch;
-import com.khartec.waltz.data.UnsupportedSearcher;
+import com.khartec.waltz.data.person.PersonDao;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.Person;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.khartec.waltz.data.JooqUtilities.*;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
+import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 @Repository
 public class PersonSearchDao {
 
     private final DSLContext dsl;
-    private final FullTextSearch<Person> searcher;
 
 
     @Autowired
     public PersonSearchDao(DSLContext dsl) {
         this.dsl = dsl;
-        this.searcher = determineSearcher(dsl.dialect());
     }
 
 
-    public List<Person> search(String terms, EntitySearchOptions options) {
-        if (StringUtilities.isEmpty(terms)) {
+    public List<Person> search(EntitySearchOptions options) {
+        List<String> terms = mkTerms(options.searchQuery());
+        if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return searcher.search(dsl, terms, options);
+        Condition displayNameCondition = terms.stream()
+                .map(PERSON.DISPLAY_NAME::containsIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<Person> peopleViaEmail = executeWithCondition(options, PERSON.EMAIL.startsWithIgnoreCase(options.searchQuery()));
+        List<Person> peopleViaName = executeWithCondition(options, displayNameCondition);
+
+        return new ArrayList<>(orderedUnion(peopleViaEmail, peopleViaName));
     }
 
+    private List<Person> executeWithCondition(EntitySearchOptions options, Condition condition) {
+        boolean showRemoved = options
+                .entityLifecycleStatuses()
+                .contains(EntityLifecycleStatus.REMOVED);
 
-    private FullTextSearch<Person> determineSearcher(SQLDialect dialect) {
+        Condition maybeFilterRemoved = showRemoved
+                ? DSL.trueCondition()  // match anything
+                : PERSON.IS_REMOVED.isFalse();
 
-        if (isPostgres(dialect)) {
-            return new PostgresPersonSearch();
-        }
-
-        if (isMariaDB(dialect)) {
-            return new MariaPersonSearch();
-        }
-
-        if (isSQLServer(dialect)) {
-            return new SqlServerPersonSearch();
-        }
-
-        return new UnsupportedSearcher<>(dialect);
+        return dsl
+                .select(PERSON.fields())
+                .from(PERSON)
+                .where(condition)
+                .and(maybeFilterRemoved)
+                .limit(options.limit())
+                .fetch(PersonDao.personMapper);
     }
 }

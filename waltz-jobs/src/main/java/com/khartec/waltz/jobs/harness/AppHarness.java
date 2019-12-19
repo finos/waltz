@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,7 +47,7 @@ public class AppHarness {
         // P & S Gorilla
 
         List<Application> jimmy = new SqlServerAppSearch()
-                .search(dsl, "Water & Vole", EntitySearchOptions.mkForEntity(EntityKind.APPLICATION));
+                .searchFullText(dsl, EntitySearchOptions.mkForEntity(EntityKind.APPLICATION, "Water & Vole"));
 
         System.out.println(jimmy);
 //        ApplicationService applicationService = ctx.getBean(ApplicationService.class);

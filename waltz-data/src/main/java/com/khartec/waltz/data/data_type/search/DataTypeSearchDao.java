@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,8 +30,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
-import static com.khartec.waltz.common.StringUtilities.length;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 
@@ -49,15 +47,10 @@ public class DataTypeSearchDao {
     }
 
 
-    public List<DataType> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
+    public List<DataType> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
-        if (length(query) < 3) {
-            return emptyList();
-        }
-
-        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         return dataTypeDao.findAll()
                 .stream()
                 .filter(dataType -> {

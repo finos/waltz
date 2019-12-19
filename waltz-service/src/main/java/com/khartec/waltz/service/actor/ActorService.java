@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @Service
@@ -98,14 +100,15 @@ public class ActorService {
 
 
     public List<EntityReference> search(String query) {
-        List<Actor> actors = search(query, EntitySearchOptions.mkForEntity(EntityKind.ACTOR));
+        if (isEmpty(query)) return emptyList();
+        List<Actor> actors = search(EntitySearchOptions.mkForEntity(EntityKind.ACTOR, query));
         return actors.stream()
-                .map(a -> a.entityReference())
+                .map(Actor::entityReference)
                 .collect(toList());
     }
 
 
-    public List<Actor> search(String query, EntitySearchOptions options) {
-        return actorSearchDao.search(query, options);
+    public List<Actor> search(EntitySearchOptions options) {
+        return actorSearchDao.search(options);
     }
 }

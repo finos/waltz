@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,8 +41,8 @@ public class MariaChangeInitiativeSearch implements FullTextSearch<ChangeInitiat
             + " LIMIT ?";
 
     @Override
-    public List<ChangeInitiative> search(DSLContext dsl, String terms, EntitySearchOptions options) {
-        Result<Record> records = dsl.fetch(QUERY, terms, options.limit());
+    public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
+        Result<Record> records = dsl.fetch(QUERY, options.searchQuery(), options.limit());
         return records.map(ChangeInitiativeDao.TO_DOMAIN_MAPPER);
     }
 

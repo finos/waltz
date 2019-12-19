@@ -180,10 +180,10 @@ public class MapUtilities {
 
     /**
      * Returns true if map is null or empty
-     * @param map
-     * @param <K>
-     * @param <V>
-     * @return
+     * @param map  the map to test
+     * @param <K>  type of the keys in the map
+     * @param <V>  type of the values in the map
+     * @return  true if the map is null or empty
      */
     public static <K, V> boolean isEmpty(Map<K, V> map) {
         return map == null || map.isEmpty();
@@ -198,7 +198,7 @@ public class MapUtilities {
     }
 
     /**
-     * Similar to groupby, however the valueFn runs over the entire group after the initial grouping
+     * Similar to groupBy, however the valueFn runs over the entire group after the initial grouping
      * has been performed
      * @param keyFn  - extracts/derives the grouping key
      * @param valueFn - function which transforms each group
@@ -206,7 +206,8 @@ public class MapUtilities {
      * @param <K> - key type
      * @param <V> - (initial value type)
      * @param <V2> - resultant value type
-     * @return
+     * @return a new map where elements of xs have been grouped by the key fn,
+     *      the resultant group is then transformed using the valueFn.
      */
     public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
                                                      Function<Collection<V>, V2> valueFn,
@@ -231,8 +232,7 @@ public class MapUtilities {
 
     public static<K, K2, V> Map<K2, V> transformKeys(Map<K, V> original, Function<K, K2> transformation) {
         Map<K2, V> output = new HashMap<>();
-        original.entrySet()
-                .forEach(d -> output.put(transformation.apply(d.getKey()), d.getValue()));
+        original.forEach((key, value) -> output.put(transformation.apply(key), value));
         return output;
     }
 
@@ -250,8 +250,8 @@ public class MapUtilities {
      * @return a map going from K1 -> V
      */
     public static <K1, K2, V> Map<K1, V> compose(Map<K1, K2> map1, Map<K2, V> map2) {
-        Map<K1, V> result = new HashMap();
-        map1.entrySet().forEach(e -> result.put(e.getKey(), map2.get(e.getValue())));
+        Map<K1, V> result = new HashMap<>();
+        map1.forEach((key, value) -> result.put(key, map2.get(value)));
         return result;
     }
 }

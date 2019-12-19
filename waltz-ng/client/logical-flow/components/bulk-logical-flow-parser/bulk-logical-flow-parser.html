@@ -1,6 +1,6 @@
 <!--
   ~ Waltz - Enterprise Architecture
-  ~ Copyright (C) 2016, 2017  Waltz open source project
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -87,9 +87,7 @@
         <waltz-grid-with-search ng-if="$ctrl.filteredData.length > 0"
                                 scope-provider="$ctrl"
                                 column-defs="$ctrl.columnDefs"
-                                entries="$ctrl.filteredData"
-                                searchPlaceholderText="Search"
-                                on-initialise="$ctrl.onGridInitialise">
+                                entries="$ctrl.filteredData">
         </waltz-grid-with-search>
 
     </div>

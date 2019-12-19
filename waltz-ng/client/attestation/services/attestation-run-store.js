@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,6 +53,10 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findBySelector = (options) => $http
+        .post(`${base}/selector`, options)
+        .then(x => x.data);
+
     const findResponseSummaries = () => {
         return $http
             .get(`${base}/summary/response`)
@@ -74,7 +78,8 @@ function store($http, baseApiUrl) {
         findAll,
         findByRecipient,
         findResponseSummaries,
-        findByEntityRef
+        findByEntityRef,
+        findBySelector
     };
 }
 
@@ -123,6 +128,11 @@ export const AttestationRunStore_API = {
         serviceName,
         serviceFnName: 'findByEntityRef',
         description: 'find runs for an entity'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find runs for the given selector options"
     }
 };
 

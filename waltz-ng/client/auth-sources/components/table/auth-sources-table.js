@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,13 +26,13 @@ import template from "./auth-sources-table.html";
 
 const bindings = {
     parentEntityRef: "<",
-    authSources: "<",
-    orgUnits: "<",
+    authSources: "<"
 };
 
 
 const initialState = {
     consumersByAuthSourceId: {},
+    columnDefs: null
 };
 
 
@@ -58,9 +58,9 @@ function mkColumnDefs(parentRef) {
                       popover-class="waltz-popover-wide"
                       popover-append-to-body="true"
                       popover-placement="top-right"
-                      popover-trigger="outsideClick" 
-                      ng-bind="COL_FIELD.length > 0 
-                            ? COL_FIELD.length 
+                      popover-trigger="outsideClick"
+                      ng-bind="COL_FIELD.length > 0
+                            ? COL_FIELD.length
                             : '-'">
                 </span>
             </div>`}
@@ -96,9 +96,9 @@ function mkColumnDefs(parentRef) {
     };
 
     return _.compact([
-        mkEntityLinkGridCell("Data Type", "dataType", "none"),
+        mkEntityLinkGridCell("Data Type", "dataType", "none", "right"),
         mkEntityLinkGridCell("Declaring Org Unit", "declaringOrgUnit", "none"),
-        mkEntityLinkGridCell("Application", "app", "none"),
+        mkEntityLinkGridCell("Application", "app", "none", "right"),
         consumerCell,
         ratingCell,
         notesCell
@@ -110,33 +110,49 @@ function controller($q, serviceBroker, enumValueService) {
 
     const vm = initialiseData(this, initialState);
 
-    const mkGridData = () => {
+
+    function loadConsumers() {
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: "CHILDREN"
+        };
+
+        return serviceBroker
+            .loadViewData(
+                CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
+                [ selector ])
+            .then(r => {
+                vm.consumersByAuthSourceId = _
+                    .chain(r.data)
+                    .keyBy(d => d.key.id)
+                    .mapValues(v => _.sortBy(v.value, "name"))
+                    .value();
+            });
+    }
+
+
+    function mkGridData() {
         const dataTypesByCode= _.keyBy(vm.dataTypes, "code");
         const orgUnitsById = _.keyBy(vm.orgUnits, "id");
 
-        if (!vm.columnDefs) {
-            vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
-            vm.gridData = [];
-        }
-
-
+        vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
         vm.gridData = _.map(vm.authSources, d => {
             const authoritativenessRatingEnum = vm.enums.AuthoritativenessRating[d.rating];
             return {
                 app: d.applicationReference,
-                dataType: Object.assign({}, dataTypesByCode[d.dataType], { kind: "DATA_TYPE" }),
+                dataType: dataTypesByCode[d.dataType],
                 appOrgUnit: d.appOrgUnitReference,
-                declaringOrgUnit: Object.assign({}, orgUnitsById[d.parentReference.id], { kind: "ORG_UNIT" }),
+                declaringOrgUnit: orgUnitsById[d.parentReference.id],
                 description: d.description,
                 rating: d.rating,
                 ratingValue: authoritativenessRatingEnum,
                 consumers: vm.consumersByAuthSourceId[d.id] || []
             };
         });
-    };
+    }
 
 
-    const loadAll = () => {
+    function loadAll() {
         const enumPromise = enumValueService
             .loadEnums()
             .then(r => vm.enums = r);
@@ -149,40 +165,21 @@ function controller($q, serviceBroker, enumValueService) {
             .loadAppData(CORE_API.OrgUnitStore.findAll)
             .then(r => vm.orgUnits = r.data);
 
-        const baseDataPromise = $q.all([enumPromise, dataTypePromise, orgUnitPromise]);
-        let promise = baseDataPromise;
+        const consumerPromise = shouldShowConsumers(vm.parentEntityRef)
+            ? loadConsumers()
+            : null;
 
-        if (shouldShowConsumers(vm.parentEntityRef)) {
-            const selector = {
-                entityReference: vm.parentEntityRef,
-                scope: "CHILDREN"
-            };
-
-            promise = baseDataPromise.then(() => {
-                serviceBroker
-                    .loadViewData(
-                        CORE_API.AuthSourcesStore.calculateConsumersForDataTypeIdSelector,
-                        [ selector ])
-                    .then(r => {
-                        vm.consumersByAuthSourceId = _
-                            .chain(r.data)
-                            .keyBy(d => d.key.id)
-                            .mapValues(v => _.sortBy(v.value, "name"))
-                            .value();
-                    });
-            });
-        }
-
-        return promise.then(() => mkGridData());
-    };
-
+        return $q
+            .all(_.compact([enumPromise, dataTypePromise, orgUnitPromise, consumerPromise]))
+            .then(mkGridData);
+    }
 
     vm.$onInit = () => {
         loadAll();
     };
 
     vm.$onChanges = (changes) => {
-        if(changes.authSources) {
+        if(vm.authSources) {
             loadAll();
         }
     };

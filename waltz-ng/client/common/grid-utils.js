@@ -68,7 +68,7 @@ export function mkEntityLinkGridCell(columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link entity-ref="row.entity.${entityRefField}"
-                                   tooltip-placement="${tooltipPlacement}" 
+                                   tooltip-placement="${tooltipPlacement}"
                                    icon-placement="${iconPlacement}">
                 </waltz-entity-link>
             </div>`
@@ -97,7 +97,7 @@ export function mkEntityLabelGridCell(columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-icon-label entity-ref="row.entity.${entityRefField}"
-                                         tooltip-placement="${tooltipPlacement}" 
+                                         tooltip-placement="${tooltipPlacement}"
                                          icon-placement="${iconPlacement}">
                 </waltz-entity-icon-label>
             </div>`
@@ -124,10 +124,33 @@ export function mkLinkGridCell(columnHeading,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" 
+                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })"
                    ng-bind="COL_FIELD">
                 </a>
             </div>`
     });
 }
+
+/**
+ * Creates a column def to render date
+ *
+ *
+ * @param columnHeading  column display name
+ * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
+ * @param showIcon  whether to display the icon or not
+ * @returns {{field: *, displayName: *, cellTemplate: string}}
+ */
+export function mkDateGridCell(columnHeading,
+                               dateField,
+                               showIcon = false) {
+    return {
+        field: dateField,
+        displayName: columnHeading,
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>
+            </div>`
+    };
+}
+
 

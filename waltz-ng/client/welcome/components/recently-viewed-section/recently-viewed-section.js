@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import template from './recently-viewed-section.html';
-
+import template from "./recently-viewed-section.html";
 
 const bindings = {
-    history: '<'
+    history: "<"
 };
-
-
 
 
 const component = {
@@ -32,4 +29,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzRecentlyViewedSection",
+    component
+};

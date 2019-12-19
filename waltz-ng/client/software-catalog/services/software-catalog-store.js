@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,14 +36,26 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+
+    const findBySelector = (options) => $http
+        .post(`${BASE}/selector`, options)
+        .then(x => x.data);
+
+
     const getByPackageId = (id) => $http
         .get(`${BASE}/package-id/${id}`)
         .then(r => r.data);
 
+    const getByLicenceId = (id) => $http
+        .get(`${BASE}/licence-id/${id}`)
+        .then(r => r.data);
+
     return {
         findByAppIds,
+        findBySelector,
         findStatsForSelector,
-        getByPackageId
+        getByPackageId,
+        getByLicenceId
     };
 }
 
@@ -61,6 +73,11 @@ export const SoftwareCatalogStore_API = {
         serviceName,
         serviceFnName: "findByAppIds",
         description: "retrieve catalog for a list of app ids"
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: "findBySelector",
+        description: "find software catalog for a given selector options"
     },
     findStatsForSelector: {
         serviceName,

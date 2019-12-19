@@ -18,7 +18,7 @@
  */
 
 import _ from "lodash";
-import { maturityColorScale, variableScale } from "../../common/colors";
+import { maturityColorScale, variableScale } from "../../../common/colors";
 import template from "./simple-software-usage-pies.html";
 
 
@@ -97,4 +97,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    component,
+    id: "waltzSimpleSoftwareUsagePies"
+};

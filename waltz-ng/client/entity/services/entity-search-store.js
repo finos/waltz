@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,9 @@ export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-search`;
 
 
-    const search = (query, options) => {
-        const encodedQuery = encodeURIComponent(query);
+    const search = (options) => {
         return $http
-            .post(`${BASE}/${encodedQuery}`, options)
+            .post(`${BASE}`, options)
             .then(result => result.data);
     };
 

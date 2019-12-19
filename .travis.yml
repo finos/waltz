@@ -7,11 +7,11 @@ env:
   - NODE_VERSION="7"
 
 script:
-  - mvn clean package -Pwaltz-mariadb,travis-mariadb
+  - mvn -s .lgtm.settings.xml  clean package
   - npm run-script test --prefix ./waltz-ng
 
 addons:
-  mariadb: '10.1'
+#  mariadb: '10.1'
 #  apt:
 #    packages:
 #      - open-java8-installer
@@ -20,7 +20,7 @@ addons:
 install: true
 
 before_install:
-  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
+#  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - nvm install $NODE_VERSION
   - npm install npm -g
 

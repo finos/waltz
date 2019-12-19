@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,6 +42,7 @@ public class EntitySearchHarness {
                 .entityKinds(ListUtilities.newArrayList(
 //                        EntityKind.APPLICATION,
                         EntityKind.LOGICAL_DATA_ELEMENT))
+                .searchQuery("desk")
                 .userId("admin")
                 .build();
 
@@ -54,7 +55,7 @@ public class EntitySearchHarness {
                 "equities"
         };
 
-        searchService.search("desk", searchOptions).forEach(d -> System.out.println(d.name()));
+        searchService.search(searchOptions).forEach(d -> System.out.println(d.name()));
 
         System.exit(-1);
         Arrays.stream(searchTerms)
@@ -62,7 +63,7 @@ public class EntitySearchHarness {
                     System.out.println("-------------------");
                     System.out.printf("Searching for '%s'\n", term);
                     System.out.println("-------------------");
-                    printResults(searchService.search(term, searchOptions));
+                    printResults(searchService.search(searchOptions));
                 });
     }
 

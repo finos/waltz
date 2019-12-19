@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -214,6 +214,7 @@ public class AttestationRunService {
                                 .attestationInstance(ImmutableAttestationInstance.builder()
                                         .attestationRunId(attestationRunId)
                                         .parentEntity(ref)
+                                        .attestedEntityKind(attestedKind)
                                         .build())
                                 .userId(userId)
                                 .build();
@@ -249,6 +250,11 @@ public class AttestationRunService {
         return create(username, mkCreateCommand(entityRunCreateCommand));
     }
 
+
+    public Collection<AttestationRun> findByIdSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = mkIdSelector(EntityKind.ATTESTATION, options);
+        return attestationRunDao.findByIdSelector(selector);
+    }
 
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
         return ImmutableAttestationRunCreateCommand.builder()

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
+import { CORE_API } from "../../../common/services/core-api-utils";
+import { initialiseData } from "../../../common";
 
-import template from './inline-physical-flow-panel.html';
+import template from "./inline-physical-flow-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -59,29 +59,11 @@ function controller(serviceBroker) {
             .then(r => vm.physicalFlows = r.data);
 
     };
-
-    vm.onPhysicalFlowsInitialise = (e) => {
-        vm.physicalFlowProducesExportFn = e.exportProducesFn;
-        vm.physicalFlowConsumesExportFn = e.exportConsumesFn;
-        vm.physicalFlowUnusedSpecificationsExportFn = e.exportUnusedSpecificationsFn;
-    };
-
-    vm.exportPhysicalFlowProduces = () => {
-        vm.physicalFlowProducesExportFn();
-    };
-
-    vm.exportPhysicalFlowConsumes = () => {
-        vm.physicalFlowConsumesExportFn();
-    };
-
-    vm.exportPhysicalFlowUnusedSpecifications = () => {
-        vm.physicalFlowUnusedSpecificationsExportFn();
-    };
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -94,5 +76,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzInlinePhysicalFlowPanel'
+    id: "waltzInlinePhysicalFlowPanel"
 };

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,11 +32,15 @@ public abstract class SoftwarePackage implements
         NameProvider,
         DescriptionProvider,
         ExternalIdProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        CreatedUserTimestampProvider {
 
+    @Nullable
     public abstract String vendor();
-    public abstract String version();
-    public abstract MaturityStatus maturityStatus();
+
+    @Nullable
+    public abstract String group();
+
     public abstract boolean isNotable();
 
 }

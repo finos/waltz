@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -65,6 +65,7 @@ public class BookmarkDao {
                 .provenance(record.getProvenance())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getUpdatedAt().toLocalDateTime())
+                .isRestricted(record.getIsRestricted())
                 .build();
     };
 
@@ -124,6 +125,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
                 .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
+                .set(BOOKMARK.IS_RESTRICTED, bookmark.isRestricted())
                 .returning(BOOKMARK.ID)
                 .fetchOne();
 
@@ -148,6 +150,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
                 .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
+                .set(BOOKMARK.IS_RESTRICTED, bookmark.isRestricted())
                 .where(BOOKMARK.ID.eq(bookmark.id().get()))
                 .execute();
 

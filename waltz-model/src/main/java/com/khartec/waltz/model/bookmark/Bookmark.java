@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,6 +59,9 @@ public abstract class Bookmark implements
     public boolean isRequired() {
         return false;
     }
+
+    @Value.Default
+    public boolean isRestricted() { return false; }
 
 
     public EntityReference entityReference() {

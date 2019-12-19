@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -183,6 +183,18 @@ public class AttestationRunDao {
     }
 
 
+    public List<AttestationRun> findByIdSelector(Select<Record1<Long>> selector) {
+
+        return dsl.select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_INSTANCE.ID.in(selector))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
     public Long create(String userId, AttestationRunCreateCommand command) {
         checkNotNull(command, "command cannot be null");
 
@@ -200,7 +212,7 @@ public class AttestationRunDao {
         record.setAttestedEntityKind(command.attestedEntityKind().name());
         record.setAttestedEntityId(command.attestedEntityId().orElse(null));
 
-        record.insert();
+        record.store();
 
         return record.getId();
     }

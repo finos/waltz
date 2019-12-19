@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export function isPromise(obj) {
     return !!obj && (typeof obj === "object" || typeof obj === "function") && typeof obj.then === "function";

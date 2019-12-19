@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ public class UnsupportedSearcher<T> implements FullTextSearch<T> {
 
 
     @Override
-    public List<T> search(DSLContext dsl, String terms, EntitySearchOptions options) {
+    public List<T> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         LOG.error("Search not supported/implemented for database dialect: " + dialect);
         return emptyList();
     }

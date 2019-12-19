@@ -239,8 +239,25 @@ export const dynamicSections = {
         name: "Specification Definition",
         icon: "file-code-o",
         id: 110
+    },
+    attestationSummarySection: {
+        componentId: "attestation-summary-section",
+        name: "Attestations",
+        icon: "check-square-o",
+        id: 120
+    },
+    softwarePackageVersions: {
+        componentId: "software-package-versions",
+        name: "Versions",
+        icon: "clock-o",
+        id: 130
+    },
+    softwarePackagesSection: {
+        componentId: "software-packages-section",
+        name: "Software Packages",
+        icon: "gift",
+        id: 140
     }
-
 };
 
 
@@ -298,6 +315,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,
+        dynamicSections.attestationSummarySection,
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
@@ -324,6 +342,7 @@ export const dynamicSectionsByKind = {
     "PERSON": [
         dynamicSections.personHierarchySection,
         dynamicSections.personAppsSection,
+        dynamicSections.attestationSummarySection,
         dynamicSections.bookmarksSection,
         dynamicSections.changeInitiativeSection,
         dynamicSections.personChangeSetSection,
@@ -349,6 +368,7 @@ export const dynamicSectionsByKind = {
     ],
     "APP_GROUP": [
         dynamicSections.appsSection,
+        dynamicSections.attestationSummarySection,
         dynamicSections.authSourcesSection,
         dynamicSections.changeInitiativeSection,
         dynamicSections.changeSetSection,

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -53,16 +53,13 @@ public class EntitySearchEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String searchPath = mkPath(BASE_URL, ":query");
+        String searchPath = mkPath(BASE_URL);
 
         ListRoute<EntityReference> searchRoute = (request, response) ->  {
             String username = getUsername(request);
             EntitySearchOptions entitySearchOptions = readBody(request, EntitySearchOptions.class);
 
-            String query = request.params("query");
-
             return entitySearchService.search(
-                    query,
                     ImmutableEntitySearchOptions
                             .copyOf(entitySearchOptions)
                             .withUserId(username));

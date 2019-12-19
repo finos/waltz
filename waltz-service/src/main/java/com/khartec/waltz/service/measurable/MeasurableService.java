@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 package com.khartec.waltz.service.measurable;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -100,12 +102,15 @@ public class MeasurableService {
     }
 
     public Collection<Measurable> search(String query) {
-        return search(query, EntitySearchOptions.mkForEntity(EntityKind.MEASURABLE));
+        if (StringUtilities.isEmpty(query)) {
+            return Collections.emptyList();
+        }
+        return search(EntitySearchOptions.mkForEntity(EntityKind.MEASURABLE, query));
     }
 
 
-    public Collection<Measurable> search(String query, EntitySearchOptions options) {
-        return measurableSearchDao.search(query, options);
+    public Collection<Measurable> search(EntitySearchOptions options) {
+        return measurableSearchDao.search(options);
     }
 
 

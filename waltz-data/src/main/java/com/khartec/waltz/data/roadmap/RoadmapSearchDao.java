@@ -1,3 +1,22 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.khartec.waltz.data.roadmap;
 
 import com.khartec.waltz.data.SearchUtilities;
@@ -10,8 +29,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
-import static com.khartec.waltz.common.StringUtilities.length;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 
@@ -28,15 +45,8 @@ public class RoadmapSearchDao {
     }
 
 
-    public List<Roadmap> search(String query, EntitySearchOptions options) {
-        checkNotNull(query, "query cannot be null");
-        checkNotNull(options, "options cannot be null");
-
-        if (length(query) < 3) {
-            return emptyList();
-        }
-
-        List<String> terms = SearchUtilities.mkTerms(query.toLowerCase());
+    public List<Roadmap> search(EntitySearchOptions options) {
+        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         List<Roadmap> collect = roadmapDao.findAll()
                 .stream()
                 .filter(roadmap -> {

@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,5 +26,5 @@ import java.util.List;
 
 public interface FullTextSearch<T> {
 
-    List<T> search(DSLContext dsl, String terms, EntitySearchOptions options);
+    List<T> searchFullText(DSLContext dsl, EntitySearchOptions options);
 }

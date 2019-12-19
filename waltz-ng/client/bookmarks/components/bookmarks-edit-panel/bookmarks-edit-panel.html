@@ -59,6 +59,9 @@
                 </td>
                 <td>
                     <span ng-bind="bookmark.url"></span>
+                    <span ng-if="bookmark.isRestricted">
+                        <waltz-icon name="lock"></waltz-icon>
+                    </span>
                 </td>
                 <td>
                     <span ng-bind="bookmark.description"></span>
@@ -112,8 +115,8 @@
         <hr>
         <waltz-bookmark-form bookmark="$ctrl.selectedBookmark"
                              confirm-label="{{ $ctrl.selectedBoookmark.id ? 'Edit' : 'Save'}}"
-                             on-cancel="$ctrl.visibility.form = false"
-                             on-submit="$ctrl.save(bookmark)">
+                             on-cancel="$ctrl.onCancel"
+                             on-submit="$ctrl.onSave">
         </waltz-bookmark-form>
     </div>
 

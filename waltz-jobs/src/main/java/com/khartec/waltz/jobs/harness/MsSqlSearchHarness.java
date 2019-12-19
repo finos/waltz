@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -45,11 +45,11 @@ public class MsSqlSearchHarness {
                 .addEntityKinds(EntityKind.APPLICATION)
                 .userId("admin")
                 .limit(EntitySearchOptions.DEFAULT_SEARCH_RESULTS_LIMIT)
+                .searchQuery("sap")
                 .build();
 
-        List<Application> results = appSearch.search(
+        List<Application> results = appSearch.searchFullText(
                 dsl,
-                "sap",
                 searchOptions);
 
         results.stream()

@@ -33,9 +33,11 @@
                     Measurable
                 </a>
             </li>
-            <li><span ng-bind="ctrl.measurable.name"
-                      ng-if="ctrl.measurable"
-            ></span></li>
+            <li>
+                <span ng-bind="ctrl.measurable.name"
+                      ng-if="ctrl.measurable">
+                </span>
+            </li>
         </ol>
     </waltz-page-header>
 
@@ -49,19 +51,17 @@
                               filters="ctrl.filters">
     </waltz-measurable-summary>
 
-    
-    <div ng-if="ctrl.measurable">
-        <!-- NAVIGATION -->
-        <div class="waltz-page-summary waltz-page-summary-attach">
-            <waltz-dynamic-section-navigation offset="650">
-            </waltz-dynamic-section-navigation>
-        </div>
 
-        <br>
-
-        <waltz-dynamic-sections-view parent-entity-ref="ctrl.entityReference"
-                                     filters="ctrl.filters">
-        </waltz-dynamic-sections-view>
+    <!-- NAVIGATION -->
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-dynamic-section-navigation>
+        </waltz-dynamic-section-navigation>
     </div>
+
+    <br>
+
+    <waltz-dynamic-sections-view parent-entity-ref="ctrl.entityReference"
+                                 filters="ctrl.filters">
+    </waltz-dynamic-sections-view>
 
 </div>

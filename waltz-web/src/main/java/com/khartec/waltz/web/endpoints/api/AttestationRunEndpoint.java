@@ -1,6 +1,6 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdCommandResponse;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
@@ -65,6 +66,7 @@ public class AttestationRunEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL);
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByRecipientPath = mkPath(BASE_URL, "user");
+        String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findResponseSummariesPath = mkPath(BASE_URL, "summary", "response");
         String getCreateSummaryPath = mkPath(BASE_URL, "create-summary");
 
@@ -80,6 +82,9 @@ public class AttestationRunEndpoint implements Endpoint {
 
         ListRoute<AttestationRun> findByRecipientRoute = (req, res) ->
                 attestationRunService.findByRecipient(getUsername(req));
+
+        ListRoute<AttestationRun> findBySelectorRoute = ((request, response)
+                -> attestationRunService.findByIdSelector(readIdSelectionOptionsFromBody(request)));
 
         ListRoute<AttestationRunResponseSummary> findResponseSummariesRoute = (req, res) ->
                 attestationRunService
@@ -105,6 +110,7 @@ public class AttestationRunEndpoint implements Endpoint {
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findByRecipientPath, findByRecipientRoute);
         getForList(findResponseSummariesPath, findResponseSummariesRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
         postForDatum(getCreateSummaryPath, getCreateSummaryRoute);
     }
