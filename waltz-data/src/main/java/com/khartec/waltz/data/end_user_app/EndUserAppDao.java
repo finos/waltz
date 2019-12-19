@@ -27,7 +27,6 @@ import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -69,21 +68,24 @@ public class EndUserAppDao {
         return JooqUtilities.calculateLongTallies(
                 dsl,
                 END_USER_APPLICATION,
-                END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID, DSL.trueCondition());
+                END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID,
+                END_USER_APPLICATION.IS_PROMOTED.isFalse());
     }
 
     @Deprecated
     public List<EndUserApplication> findByOrganisationalUnitSelector(Select<Record1<Long>> selector) {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
-                .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(selector))
+                .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(selector)
+                        .and(END_USER_APPLICATION.IS_PROMOTED.isFalse()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<EndUserApplication> findBySelector(Select<Record1<Long>> selector) {
         return dsl.selectFrom(END_USER_APPLICATION)
-                .where(END_USER_APPLICATION.ID.in(selector))
+                .where(END_USER_APPLICATION.ID.in(selector)
+                        .and(END_USER_APPLICATION.IS_PROMOTED.isFalse()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
