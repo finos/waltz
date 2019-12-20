@@ -18,13 +18,13 @@
  */
 
 import _ from "lodash";
-import { event, select, selectAll } from "d3-selection";
-import { drag } from "d3-drag";
-import { zoom } from "d3-zoom";
-import { initialiseData, perhaps } from "../../../common";
-import { mkCurvedLine, responsivefy, wrapText } from "../../../common/d3-utils";
-import { d3ContextMenu } from "../../../common/d3-context-menu";
-import { drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape } from "../../flow-diagram-utils";
+import {event, select, selectAll} from "d3-selection";
+import {drag} from "d3-drag";
+import {zoom} from "d3-zoom";
+import {initialiseData, perhaps} from "../../../common";
+import {mkCurvedLine, responsivefy, wrapText} from "../../../common/d3-utils";
+import {d3ContextMenu} from "../../../common/d3-context-menu";
+import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
 import template from "./flow-diagram.html";
 
 
@@ -533,6 +533,7 @@ function setupPanAndZoom(commandProcessor) {
     }
 
     const myZoom = zoom()
+        .filter(() => event.metaKey || event.ctrlKey)
         .scaleExtent([1 / 4, 2])
         .on("zoom", zoomed);
 
