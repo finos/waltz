@@ -68,7 +68,7 @@ export function mkEntityLinkGridCell(columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link entity-ref="row.entity.${entityRefField}"
-                                   tooltip-placement="${tooltipPlacement}" 
+                                   tooltip-placement="${tooltipPlacement}"
                                    icon-placement="${iconPlacement}">
                 </waltz-entity-link>
             </div>`
@@ -97,7 +97,7 @@ export function mkEntityLabelGridCell(columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-entity-icon-label entity-ref="row.entity.${entityRefField}"
-                                         tooltip-placement="${tooltipPlacement}" 
+                                         tooltip-placement="${tooltipPlacement}"
                                          icon-placement="${iconPlacement}">
                 </waltz-entity-icon-label>
             </div>`
@@ -124,7 +124,7 @@ export function mkLinkGridCell(columnHeading,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })" 
+                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })"
                    ng-bind="COL_FIELD">
                 </a>
             </div>`

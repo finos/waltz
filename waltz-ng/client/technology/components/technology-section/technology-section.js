@@ -37,8 +37,8 @@ function mkEndOfLifeCell(title, dateField, flagField) {
         displayName: title,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <span ng-bind="row.entity.${dateField}"></span> 
-                <waltz-icon ng-if="row.entity.${flagField}" 
+                <span ng-bind="row.entity.${dateField}"></span>
+                <waltz-icon ng-if="row.entity.${flagField}"
                             name="power-off">
                 </waltz-icon>
             </div>`
@@ -47,7 +47,7 @@ function mkEndOfLifeCell(title, dateField, flagField) {
 
 
 const MATURITY_STATUS_TEMPLATE = `
-    <div class="ui-grid-cell-contents"> 
+    <div class="ui-grid-cell-contents">
         <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status>
     </div>`;
 
@@ -96,8 +96,8 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             width: "5%",
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <waltz-icon ng-if="COL_FIELD" 
+                <div class="ui-grid-cell-contents">
+                    <waltz-icon ng-if="COL_FIELD"
                                 name="check">
                     </waltz-icon>
                 </div>`

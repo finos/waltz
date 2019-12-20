@@ -1,3 +1,5 @@
+
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -17,17 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.khartec.waltz.model.software_catalog;
+import {nest} from "d3-collection";
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+export const nestEnums = (enums = []) => nest()
+    .key(d => d.type)
+    .key(d => d.key)
+    .rollup(_.first)
+    .object(enums);
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableSoftwarePackage.class)
-@JsonDeserialize(as = ImmutableSoftwarePackage.class)
-public abstract class SoftwarePackageView extends SoftwarePackage {
-
-    public abstract String version();
-
-}
+export const getIcon = (nestedEnums, k) => _.get(nestedEnums, ["BookmarkKind", k, "icon"], "circle-o");
+export const getName = (nestedEnums, k) => _.get(nestedEnums, ["BookmarkKind", k, "name"], k);

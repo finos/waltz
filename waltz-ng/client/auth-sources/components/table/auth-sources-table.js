@@ -58,9 +58,9 @@ function mkColumnDefs(parentRef) {
                       popover-class="waltz-popover-wide"
                       popover-append-to-body="true"
                       popover-placement="top-right"
-                      popover-trigger="outsideClick" 
-                      ng-bind="COL_FIELD.length > 0 
-                            ? COL_FIELD.length 
+                      popover-trigger="outsideClick"
+                      ng-bind="COL_FIELD.length > 0
+                            ? COL_FIELD.length
                             : '-'">
                 </span>
             </div>`}
