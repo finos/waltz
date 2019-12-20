@@ -64,6 +64,7 @@ function controller(serviceBroker, notification) {
                     vm.selectedEuda = null;
                 })
                 .then(() => notification.success('EUDA successfully promoted'))
+                .catch(e => notification.error(`Could not promote EUDA: ${e.data.message}`))
                 .then(() => loadData());
         }
     }

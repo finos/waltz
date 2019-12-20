@@ -20,7 +20,6 @@
 package com.khartec.waltz.service.end_user_app;
 
 import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
@@ -52,6 +51,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
@@ -109,7 +109,7 @@ public class EndUserAppService {
 
     public AppRegistrationResponse promoteToApplication(Long id, String username){
 
-        AppRegistrationRequest appRegistrationRequest = createAppRegistrationRequest(id);
+        AppRegistrationRequest appRegistrationRequest = mkAppRegistrationRequestForEuda(id);
 
         checkNotNull(appRegistrationRequest, "EUDA has already been promoted");
 
@@ -117,7 +117,7 @@ public class EndUserAppService {
 
         AppRegistrationResponse appRegistrationResponse = applicationDao.registerApp(appRegistrationRequest);
 
-        handleInvolvements(id, appRegistrationResponse);
+        migrateEudaInvolvements(id, appRegistrationResponse);
 
         changeLogDao.write(mkChangeLog(appRegistrationResponse, username));
 
@@ -125,23 +125,19 @@ public class EndUserAppService {
     }
 
 
-    private void handleInvolvements(Long id, AppRegistrationResponse appRegistrationResponse) {
+    private void migrateEudaInvolvements(Long id, AppRegistrationResponse appRegistrationResponse) {
 
         List<Involvement> eudaInvolvements = involvementDao.findByEntityReference(mkRef(EntityKind.END_USER_APPLICATION, id));
-        List<Involvement> appInvolvements = ListUtilities.map(eudaInvolvements, r -> mkAppInvolvement(r, appRegistrationResponse));
+
+        List<Involvement> appInvolvements = map(eudaInvolvements,
+                r -> ImmutableInvolvement.builder()
+                    .entityReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
+                    .kindId(r.kindId())
+                    .employeeId(r.employeeId())
+                    .provenance(r.provenance())
+                    .build());
 
         appInvolvements.forEach(involvementDao::save);
-    }
-
-
-    private Involvement mkAppInvolvement(Involvement involvement, AppRegistrationResponse appRegistrationResponse) {
-
-        return ImmutableInvolvement.builder()
-                .entityReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
-                .kindId(involvement.kindId())
-                .employeeId(involvement.employeeId())
-                .provenance(involvement.provenance())
-                .build();
     }
 
 
@@ -158,7 +154,7 @@ public class EndUserAppService {
     }
 
 
-    private AppRegistrationRequest createAppRegistrationRequest(Long id) {
+    private AppRegistrationRequest mkAppRegistrationRequestForEuda(Long id) {
 
         EndUserApplication euda = endUserAppDao.getById(id);
 
