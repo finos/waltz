@@ -478,4 +478,17 @@
 
     </changeSet>
 
+
+    <!-- 4498: entity_named_note_type Explicit Order -->
+    <changeSet id="20191217-4498-1"
+               author="rovats">
+        <comment>4498: entity named note positions</comment>
+        <addColumn tableName="entity_named_note_type">
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

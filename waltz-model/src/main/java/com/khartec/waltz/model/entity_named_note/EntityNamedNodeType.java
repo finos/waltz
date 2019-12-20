@@ -39,4 +39,5 @@ public abstract class EntityNamedNodeType implements
 {
     public abstract Set<EntityKind> applicableEntityKinds();
     public abstract boolean isReadOnly();
+    public abstract int position();
 }

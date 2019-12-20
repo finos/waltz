@@ -60,6 +60,7 @@ public class EntityNamedNoteTypeDao {
                 .description(r.getDescription())
                 .addAllApplicableEntityKinds(applicableEntityKinds)
                 .isReadOnly(r.getIsReadonly())
+                .position(r.getPosition())
                 .build();
     };
 
@@ -120,6 +121,7 @@ public class EntityNamedNoteTypeDao {
         record.setDescription(command.description().orElse(""));
         record.setApplicableEntityKinds(kinds);
         record.setIsReadonly(command.isReadOnly().orElse(false));
+        record.setPosition(command.position().orElse(0));
 
         record.store();
 
@@ -140,6 +142,8 @@ public class EntityNamedNoteTypeDao {
                 .ifPresent(kinds -> record.setApplicableEntityKinds(join(kinds, SEPARATOR)));
         command.isReadOnly()
                 .ifPresent(readOnly -> record.setIsReadonly(readOnly));
+        command.position()
+                .ifPresent(position -> record.setPosition(position));
 
         return dsl.executeUpdate(record) == 1;
     }
