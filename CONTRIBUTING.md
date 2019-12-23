@@ -2,7 +2,7 @@
 Thanks for your interest in the project! Here is some basic information about how to contribute.
  
 # Contributor License Agreement (CLA)
-All contributions to [Waltz Open Source](http://www.waltz-technology.com/) projects must be made under a [Contributor License Agreement](https://github.com/khartec/waltz/blob/master/ccla.pdf) that authorizes the project to distribute your code under the LGPL v3 License. 
+All contributions to [Waltz Open Source](http://www.waltz-technology.com/) projects must be made under a [Contributor License Agreement](https://github.com/khartec/waltz/blob/master/ccla.pdf) that authorizes the project to distribute your code under the APL v2 License. 
  
 Pull requests (PRs) submitted to the project cannot be accepted until you have a CLA in place with the project.
  
