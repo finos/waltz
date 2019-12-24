@@ -34,6 +34,7 @@ import EntityNamedNoteTypesView from "./entity-named-node-types-view";
 import InvolvementKindsView from "./involvement-kinds-view";
 import StaticPanelsView from "./static-panels-view";
 import RatingSchemesView from "./rating-schemes-view";
+import EudaListView from "./euda-list-view";
 
 const listViewState = {
     url: "/list",
@@ -96,6 +97,12 @@ const ratingSchemesState = {
 };
 
 
+const eudaListState = {
+    url: "/euda-list",
+    views: { "content@": EudaListView }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state("main.system", baseState)
@@ -108,6 +115,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.involvement-kinds", involvementKindsState)
         .state("main.system.static-panels", staticPanelsState)
         .state("main.system.rating-schemes", ratingSchemesState)
+        .state("main.system.euda-list", eudaListState)
         .state("main.system.recalculate", recalculateState);
 }
 
