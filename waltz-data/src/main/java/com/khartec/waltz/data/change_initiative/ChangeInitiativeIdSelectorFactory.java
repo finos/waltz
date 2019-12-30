@@ -116,20 +116,20 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
         EntityReference ref = options.entityReference();
 
         Select<Record1<Long>> aToB = DSL
-                .selectDistinct(ENTITY_RELATIONSHIP.ID_A)
+                .selectDistinct(ENTITY_RELATIONSHIP.ID_A.as("id"))
                 .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(ref.id()));
 
         Select<Record1<Long>> bToA = DSL
-                .selectDistinct(ENTITY_RELATIONSHIP.ID_B)
+                .selectDistinct(ENTITY_RELATIONSHIP.ID_B.as("id"))
                 .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(ref.kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_A.eq(ref.id()));
 
-        return aToB.union(bToA);
+        return DSL.selectFrom(aToB.union(bToA).asTable());
     }
 
 }

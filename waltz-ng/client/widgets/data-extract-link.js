@@ -24,10 +24,10 @@ import {displayError} from "../common/error-utils";
 
 
 const bindings = {
-    name: "@",
+    name: "@?",
     extract: "@",
-    method: "@",
-    filename: "@",
+    method: "@?",
+    filename: "@?",
     requestBody: "<",
     styling: "@?" // link | button
 };
@@ -79,7 +79,6 @@ function controller($http, notification, baseExtractUrl) {
         if (format === "XLSX") {
             options.responseType = "arraybuffer";
         }
-
         switch (vm.method) {
             case "GET":
                 return $http

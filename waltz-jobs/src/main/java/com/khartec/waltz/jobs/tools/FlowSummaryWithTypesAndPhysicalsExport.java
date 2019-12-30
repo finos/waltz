@@ -230,9 +230,10 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ref.id()))
                 .and(ENTITY_HIERARCHY.KIND.eq(ref.kind().name()));
 
-        Select<Record1<Long>> ouSelector = mkOrgUnitSelector.apply(infraRef)
-                .unionAll(mkOrgUnitSelector.apply(entRiskRef))
-                .unionAll(mkOrgUnitSelector.apply(regCtrlRef));
+        Select<Record1<Long>> ouSelector = DSL.selectFrom(
+                mkOrgUnitSelector.apply(infraRef)
+                    .unionAll(mkOrgUnitSelector.apply(entRiskRef))
+                    .unionAll(mkOrgUnitSelector.apply(regCtrlRef)).asTable());
 
         return DSL
                 .select(APPLICATION.ID)

@@ -140,14 +140,15 @@ public class InvolvementDao {
 
     @Deprecated
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        SelectOrderByStep<Record1<String>> employeeIds = dsl
-                .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
-                .from(PERSON_HIERARCHY)
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
-                .union(DSL.select(DSL.value(employeeId))
-                        .from(PERSON_HIERARCHY));
+        SelectOrderByStep<Record1<String>> employeeIds = DSL
+                .selectFrom(DSL
+                    .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
+                    .from(PERSON_HIERARCHY)
+                    .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
+                    .union(DSL.select(DSL.value(employeeId))
+                            .from(PERSON_HIERARCHY)).asTable());
 
-        SelectConditionStep<Record1<Long>> applicationIds = dsl
+        SelectConditionStep<Record1<Long>> applicationIds = DSL
                 .selectDistinct(INVOLVEMENT.ENTITY_ID)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND

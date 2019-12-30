@@ -75,7 +75,7 @@ public class EntityReferenceNameResolver {
             SelectSelectStep<Record2<String, Long>> firstPart = parts.get(0);
             if (parts.size() > 1) {
                 List<SelectSelectStep<Record2<String, Long>>> tail = ListUtilities.drop(parts, 1);
-                tail.forEach(part -> firstPart.union(part));
+                tail.forEach(firstPart::union);
             }
 
             Table<Record2<String, Long>> tempRefs = firstPart.asTable("temp_refs");
