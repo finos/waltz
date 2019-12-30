@@ -149,6 +149,40 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>database.url</property>
+                                    <message>Property 'database.url' must be specified, usually via a profile in your settings.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>database.user</property>
+                                    <message>Property 'database.user' must be specified, usually via a profile in your settings.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>jooq.group</property>
+                                    <message>Property 'jooq.group' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>jdbc.driver</property>
+                                    <message>Property 'jdbc.driver' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.maven.version}</version>
