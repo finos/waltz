@@ -121,9 +121,11 @@ public class AppGroupDao {
                 .from(APPLICATION_GROUP_OU_ENTRY)
                 .where(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.in(orgUnitIds));
 
-        SelectOrderByStep<Record1<Long>> appGroups = groupsFromAppGroupEntry.unionAll(groupsFromAppGroupOUEntry);
+        SelectWhereStep<Record1<Long>> appGroups = DSL
+                .selectFrom(groupsFromAppGroupEntry.union(groupsFromAppGroupOUEntry).asTable());
 
-        return dsl.select(APPLICATION_GROUP.fields())
+        return dsl
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(appGroups))
                 .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())

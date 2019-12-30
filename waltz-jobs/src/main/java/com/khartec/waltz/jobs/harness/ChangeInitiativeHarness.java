@@ -24,6 +24,9 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -37,14 +40,21 @@ public class ChangeInitiativeHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        DSLContext dsl = ctx.getBean(DSLContext.class);
         ChangeInitiativeDao dao = ctx.getBean(ChangeInitiativeDao.class);
         ChangeInitiativeIdSelectorFactory selectorFactory = new ChangeInitiativeIdSelectorFactory();
 
         IdSelectionOptions opts = mkOpts(
-                mkRef(EntityKind.APPLICATION, 40),
+                mkRef(EntityKind.APP_GROUP, 2),
                 HierarchyQueryScope.EXACT);
 
-        dao.findForSelector(selectorFactory.apply(opts));
+        Select<Record1<Long>> selector = selectorFactory.apply(opts);
+
+        dsl.fetch(selector).formatCSV(System.out);
+
+        dao.findForSelector(selector);
+
+
 
     }
 

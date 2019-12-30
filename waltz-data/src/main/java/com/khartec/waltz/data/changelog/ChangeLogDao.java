@@ -92,12 +92,14 @@ public class ChangeLogDao {
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
 
-        SelectConditionStep<Record> byParentRef = DSL.select(CHANGE_LOG.fields())
+        SelectConditionStep<Record> byParentRef = DSL
+                .select(CHANGE_LOG.fields())
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()));
 
-        SelectConditionStep<Record> byUserId = DSL.select(CHANGE_LOG.fields())
+        SelectConditionStep<Record> byUserId = DSL
+                .select(CHANGE_LOG.fields())
                 .from(CHANGE_LOG)
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(CHANGE_LOG.USER_ID))
                 .where(PERSON.ID.eq(ref.id()));
@@ -106,7 +108,7 @@ public class ChangeLogDao {
 
         return dsl
                 .select(union.fields())
-                .from(union)
+                .from(union.asTable())
                 .orderBy(union.field("created_at").desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_DOMAIN_MAPPER);

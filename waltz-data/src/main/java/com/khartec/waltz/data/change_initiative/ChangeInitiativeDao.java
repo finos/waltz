@@ -110,7 +110,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(selector)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
 
-        SelectOrderByStep<Record1<Long>> hierarchySelector = descendants.unionAll(ancestors);
+        SelectOrderByStep<Record1<Long>> hierarchySelector = DSL.selectFrom(descendants.union(ancestors).asTable());
 
         return findForSelector(hierarchySelector);
     }
