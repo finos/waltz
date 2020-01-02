@@ -16,11 +16,11 @@
  *
  */
 
-import { initialiseData } from "../../../common";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
+import {initialiseData} from "../../../common";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./licence-view.html";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {

@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import { initialiseData } from "../../common/index";
+import {initialiseData} from "../../common/index";
 import _ from "lodash";
 import template from "./survey-run-create-recipient.html";
 

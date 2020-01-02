@@ -16,11 +16,11 @@
  *
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 
 import template from "./physical-flow-table.html";
-import { columnDef, fetchData, withWidth } from "../../../physical-flow/physical-flow-table-utilities";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {columnDef, fetchData, withWidth} from "../../../physical-flow/physical-flow-table-utilities";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
