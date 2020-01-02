@@ -119,5 +119,4 @@ public class SoftwarePackageViewDao {
                 .groupBy(groupingField)
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
-
 }

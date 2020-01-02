@@ -39,6 +39,7 @@ public abstract class EndUserApplication implements
     public abstract String applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract Criticality riskRating();
+    public abstract Boolean isPromoted();
 
     @Value.Default
     public String provenance() {
