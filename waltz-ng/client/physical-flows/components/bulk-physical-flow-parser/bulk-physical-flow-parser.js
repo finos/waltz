@@ -201,11 +201,7 @@ function controller($scope, serviceBroker, notification) {
 
             return serviceBroker
                 .execute(CORE_API.PhysicalFlowStore.validateUpload, [mappedData])
-                // .then(r => {
-                //     console.log(r);
-                //     return r.data;
-                // })
-                ;
+                .then(r => r.data);
         }
     };
 
