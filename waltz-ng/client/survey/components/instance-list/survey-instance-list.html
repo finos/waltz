@@ -105,7 +105,7 @@
             </td>
             <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
             </td>
-            <td ng-bind="row.surveyRun.issuedOn | date:'dd-MM-yyyy'">
+            <td ng-bind="row.surveyRun.issuedOn | date:'yyyy-MM-dd'">
             </td>
             <td>
                 <span ng-if="row.surveyInstance.submittedBy"
@@ -117,7 +117,7 @@
             </td>
             <td>
                 <span ng-if="row.surveyInstance.submittedAt"
-                      ng-bind="row.surveyInstance.submittedAt | date:'dd-MM-yyyy'">
+                      ng-bind="row.surveyInstance.submittedAt | date:'yyyy-MM-dd'">
                 </span>
                 <span ng-if="! row.surveyInstance.submittedAt">
                             -
@@ -134,7 +134,7 @@
             </td>
             <td>
                 <span ng-if="row.surveyInstance.approvedAt"
-                      ng-bind="row.surveyInstance.approvedAt | date:'dd-MM-yyyy'">
+                      ng-bind="row.surveyInstance.approvedAt | date:'yyyy-MM-dd'">
                 </span>
                 <span ng-if="! row.surveyInstance.approvedAt">
                             -
