@@ -268,8 +268,14 @@ public class PhysicalFlowEndpoint implements Endpoint {
             Throwable cause = ex.getCause();
             if(cause != null) {
                 String errorMsg = cause.getMessage();
-                throw new IOException(String.format("Cannot validate physical flows, some of the required attributes are not set: %s",
-                        errorMsg.substring(errorMsg.indexOf("[") + 1, errorMsg.indexOf("]"))), ex);
+
+                String missingAttributes = errorMsg.substring(errorMsg.indexOf("["), errorMsg.indexOf("]") + 1);
+                int lineNr = ex.getPath().get(0).getIndex() + 1;
+
+                throw new IOException(String.format("Cannot validate physical flows, some of the required attributes are not set: %s in line %d",
+                        missingAttributes,
+                        lineNr),
+                        ex);
             }
             throw ex;
         }
