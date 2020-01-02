@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.jobs.harness;
@@ -25,6 +24,9 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -38,14 +40,21 @@ public class ChangeInitiativeHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
+        DSLContext dsl = ctx.getBean(DSLContext.class);
         ChangeInitiativeDao dao = ctx.getBean(ChangeInitiativeDao.class);
         ChangeInitiativeIdSelectorFactory selectorFactory = new ChangeInitiativeIdSelectorFactory();
 
         IdSelectionOptions opts = mkOpts(
-                mkRef(EntityKind.APPLICATION, 40),
+                mkRef(EntityKind.APP_GROUP, 2),
                 HierarchyQueryScope.EXACT);
 
-        dao.findForSelector(selectorFactory.apply(opts));
+        Select<Record1<Long>> selector = selectorFactory.apply(opts);
+
+        dsl.fetch(selector).formatCSV(System.out);
+
+        dao.findForSelector(selector);
+
+
 
     }
 

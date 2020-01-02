@@ -1,27 +1,26 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import {CORE_API, getApiReference} from '../common/services/core-api-utils';
+import {CORE_API, getApiReference} from "../common/services/core-api-utils";
 
-import template from './entity-named-node-types-view.html';
+import template from "./entity-named-node-types-view.html";
 
 
 const initialState = {
@@ -41,14 +40,14 @@ function controller($q,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-    const componentId = 'entity-named-note-types-view';
+    const componentId = "entity-named-note-types-view";
 
     function update(noteType, change) {
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteTypeStore.update, [noteType.id, change])
             .then(() => {
                 loadNoteTypes(true);
-                notification.success('Updated');
+                notification.success("Updated");
             });
     }
 
@@ -66,6 +65,11 @@ function controller($q,
         return update(type, { isReadOnly: change.newVal });
     };
 
+    vm.updatePosition = (change, type) => {
+        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Cannot be blank");
+        return update(type, { position: change.newVal });
+    };
+
     vm.updateApplicableEntityKinds = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
         return update(type, { applicableEntityKinds: splitEntityKinds(change.newVal) });
@@ -80,13 +84,14 @@ function controller($q,
             name: vm.newNoteType.name,
             description: vm.newNoteType.description,
             applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
-            isReadOnly: vm.newNoteType.isReadOnly
+            isReadOnly: vm.newNoteType.isReadOnly,
+            position: vm.newNoteType.position
         }];
 
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteTypeStore.create, params)
             .then(() => {
-                notification.success('Created new note type: '+ vm.newNoteType.name);
+                notification.success("Created new note type: "+ vm.newNoteType.name);
                 vm.creatingNoteType = false;
                 vm.newNoteType = {};
                 loadNoteTypes(true);
@@ -94,15 +99,15 @@ function controller($q,
     };
 
     vm.deleteNoteType = (id) => {
-        if (confirm('Are you sure you want to delete this note type?')) {
+        if (confirm("Are you sure you want to delete this note type?")) {
             return serviceBroker
                 .execute(CORE_API.EntityNamedNoteTypeStore.remove, [id])
                 .then((r) => {
                     if (r.data) {
-                        notification.success('Deleted');
+                        notification.success("Deleted");
                         loadNoteTypes(true);
                     } else {
-                        notification.error('Failed to delete, ensure that note type is not being used');
+                        notification.error("Failed to delete, ensure that note type is not being used");
                     }
                 });
         }
@@ -133,7 +138,7 @@ function controller($q,
     }
 
     const cacheRefreshListener = (e) => {
-        if (e.eventType === 'REFRESH'
+        if (e.eventType === "REFRESH"
             && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.EntityNamedNoteTypeStore.findAll) {
             loadNoteTypes();
         }
@@ -144,16 +149,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "Notification",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

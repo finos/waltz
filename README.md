@@ -35,10 +35,13 @@ NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/na
 - Spark framework
 - JDBC via JOOQ
 
+See [pom.xml](https://github.com/khartec/waltz/blob/master/pom.xml) for a full list of Java dependencies.
+
 
 ### Supported Databases
 
 - MariaDB
+- Postgres 
 - Microsoft SQL Server (2012+)  
   - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
 

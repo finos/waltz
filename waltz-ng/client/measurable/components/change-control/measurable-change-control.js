@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import template from "./measurable-change-control.html";
 import { initialiseData } from "../../../common";
 import { CORE_API } from "../../../common/services/core-api-utils";
@@ -87,15 +105,15 @@ function controller(notification,
 
     const updateMenu = {
         name: "Update",
-        description: `These are operations modify an existing taxonomy element.  Care must be taken 
-                to prevent inadvertently altering the <em>meaning</em> of nodes.  The operations 
+        description: `These are operations modify an existing taxonomy element.  Care must be taken
+                to prevent inadvertently altering the <em>meaning</em> of nodes.  The operations
                 will not result in data loss.`,
         options: [
             {
                 name: "Name",
                 code: "UPDATE_NAME",
                 title: "Update name",
-                description: `The name of the taxonomy item may be changed, however care should be 
+                description: `The name of the taxonomy item may be changed, however care should be
                     taken to prevent inadvertently altering the <em>meaning</em> of the item`,
                 icon: "edit",
                 onShow: () => {
@@ -109,7 +127,7 @@ function controller(notification,
                 name: "Description",
                 code: "UPDATE_DESCRIPTION",
                 icon: "edit",
-                description: `The description of the taxonomy item may be changed, however care should be 
+                description: `The description of the taxonomy item may be changed, however care should be
                     taken to prevent inadvertently altering the <em>meaning</em> of the item.`,
                 onShow: () => {
                     resetForm({ description: vm.measurable.description });
@@ -136,7 +154,7 @@ function controller(notification,
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
                 icon: "edit",
-                description: `The external identifier of the taxonomy item may be changed, however care should be 
+                description: `The external identifier of the taxonomy item may be changed, however care should be
                     taken to prevent potentially breaking downstream consumers / reporting systems that rely
                     on the identifier.`,
                 onShow: () => {
@@ -151,7 +169,7 @@ function controller(notification,
                 code: "MOVE",
                 icon: "arrows",
                 description: `Taxonomy items can be moved from one part of the tree to another.  Be aware that
-                    child nodes <em>will</em> move with their parent. Also note that this operation may affect the 
+                    child nodes <em>will</em> move with their parent. Also note that this operation may affect the
                     <em>cumulative</em> values for the impacted branches.`,
                 onChange: (dest) => {
                     if (dest.id === vm.parent.id) {
@@ -180,7 +198,7 @@ function controller(notification,
 
     const creationMenu = {
         name: "Create",
-        description: `These operations introduce new elements in the taxonomy. They will 
+        description: `These operations introduce new elements in the taxonomy. They will
                 <strong>not</strong> result in data loss.`,
         color: "#0b8829",
         options: [
@@ -218,7 +236,7 @@ function controller(notification,
 
     const destructiveMenu = {
         name: "Destructive",
-        description: `These operations <strong>will</strong> potentially result in data loss and 
+        description: `These operations <strong>will</strong> potentially result in data loss and
                 should be used with care`,
         color: "#b40400",
         options: [
