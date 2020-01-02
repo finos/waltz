@@ -181,7 +181,7 @@ function parseErrorCount(data = []) {
 }
 
 
-function controller($scope, serviceBroker) {
+function controller($scope, serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     vm.columnDefs = mkColumnDefs();
@@ -201,7 +201,11 @@ function controller($scope, serviceBroker) {
 
             return serviceBroker
                 .execute(CORE_API.PhysicalFlowStore.validateUpload, [mappedData])
-                .then(r => r.data);
+                // .then(r => {
+                //     console.log(r);
+                //     return r.data;
+                // })
+                ;
         }
     };
 
@@ -227,8 +231,11 @@ function controller($scope, serviceBroker) {
             })
             .catch(err => {
                 vm.loading = false;
-                vm.errorMessage = err.data.message;
-                console.error('error resolving flows: ', err, vm.errorMessage)
+
+                vm.errorMessage = _.split(err.data.message, "/")[0].trim();
+                console.error('error resolving flows: ', err, vm.errorMessage);
+
+                notification.error(vm.errorMessage);
             });
     };
 
@@ -296,7 +303,8 @@ function controller($scope, serviceBroker) {
 
 controller.$inject = [
     '$scope',
-    'ServiceBroker'
+    'ServiceBroker',
+    'Notification'
 ];
 
 

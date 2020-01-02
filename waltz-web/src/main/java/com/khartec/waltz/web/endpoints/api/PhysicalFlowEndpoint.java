@@ -44,6 +44,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static java.util.Arrays.asList;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
@@ -266,7 +267,9 @@ public class PhysicalFlowEndpoint implements Endpoint {
         } catch (JsonMappingException ex) {
             Throwable cause = ex.getCause();
             if(cause != null) {
-                throw new IOException(cause.getMessage(), ex);
+                String errorMsg = cause.getMessage();
+                throw new IOException(String.format("Cannot validate physical flows, some of the required attributes are not set: %s",
+                        errorMsg.substring(errorMsg.indexOf("[") + 1, errorMsg.indexOf("]"))), ex);
             }
             throw ex;
         }
@@ -275,7 +278,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
         requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
+        List<PhysicalFlowUploadCommand> commands = asList(readBody(request, PhysicalFlowUploadCommand[].class));
         String username = getUsername(request);
 
         return physicalFlowUploadService.upload(username, commands);
