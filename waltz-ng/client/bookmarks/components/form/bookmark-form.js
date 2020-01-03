@@ -16,7 +16,7 @@
  *
  */
 
-import { initialiseData, isEmpty } from "../../../common";
+import {initialiseData, isEmpty} from "../../../common";
 import template from "./bookmark-form.html";
 
 

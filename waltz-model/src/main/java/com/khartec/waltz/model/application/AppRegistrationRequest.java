@@ -44,6 +44,6 @@ public abstract class AppRegistrationRequest {
     public abstract Set<String> tags();
     public abstract RagRating overallRating();
     public abstract Criticality businessCriticality();
-
+    public abstract Optional<String> provenance();
 
 }

@@ -17,11 +17,11 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import { initialiseData } from "../../../common";
-import { mkLinkGridCell } from "../../../common/grid-utils";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {initialiseData} from "../../../common";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./software-packages-section.html";
 

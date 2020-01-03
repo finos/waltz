@@ -16,10 +16,10 @@
  *
  */
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { executionStatus } from "../../../common/services/enums/execution-status";
-import { displayError } from "../../../common/error-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {executionStatus} from "../../../common/services/enums/execution-status";
+import {displayError} from "../../../common/error-utils";
 
 import template from "./change-unit-section.html";
 import * as _ from "lodash";

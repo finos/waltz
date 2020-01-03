@@ -17,7 +17,7 @@
  */
 
 import template from "./sub-section.html";
-import { initialiseData } from "../common/index";
+import {initialiseData} from "../common/index";
 
 
 const bindings = {

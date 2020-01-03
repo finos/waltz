@@ -16,8 +16,8 @@
  *
  */
 
-import { initialiseData } from "../../../common";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
+import {initialiseData} from "../../../common";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./software-package-view.html";
 
