@@ -16,7 +16,7 @@
  *
  */
 
-import { checkIsEntityRef, checkIsIdSelector } from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 export function store($http, baseApiUrl) {
 

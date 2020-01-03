@@ -16,7 +16,7 @@
  *
  */
 
-import { initialiseData, invokeFunction } from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
 import template from "./basic-app-selector.html";
 
 

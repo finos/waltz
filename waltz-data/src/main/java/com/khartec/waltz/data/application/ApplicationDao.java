@@ -179,6 +179,7 @@ public class ApplicationDao {
         record.setOverallRating(request.overallRating().name());
         record.setUpdatedAt(Timestamp.from(Instant.now()));
         record.setBusinessCriticality(request.businessCriticality().name());
+        record.setProvenance(request.provenance().orElse("waltz"));
 
         try {
             int count = record.insert();

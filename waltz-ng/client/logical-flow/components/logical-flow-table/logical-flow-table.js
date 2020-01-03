@@ -16,8 +16,8 @@
  *
  */
 import _ from "lodash";
-import { mkEntityLinkGridCell } from "../../../common/grid-utils";
-import { mkAuthoritativeRatingSchemeItems } from "../../../ratings/rating-utils";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 
 
 const bindings = {

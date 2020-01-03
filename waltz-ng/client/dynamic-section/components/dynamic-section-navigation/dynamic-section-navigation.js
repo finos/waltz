@@ -16,11 +16,11 @@
  *
  */
 import _ from "lodash";
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 
 import template from "./dynamic-section-navigation.html";
-import { scaleLinear } from "d3-scale";
-import { rgb } from "d3-color";
+import {scaleLinear} from "d3-scale";
+import {rgb} from "d3-color";
 
 export const dynamicSectionNavigationDefaultOffset = 250;
 

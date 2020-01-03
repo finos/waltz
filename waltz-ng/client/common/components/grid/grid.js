@@ -16,7 +16,7 @@
  *
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 import template from "./grid.html";
 
 
