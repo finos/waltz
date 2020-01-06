@@ -25,6 +25,7 @@ import roles from "../../../user/system-roles";
 
 import template from "./roadmap-scenario-diagram.html";
 import {getDefaultRating} from "../../../ratings/rating-utils";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
@@ -163,7 +164,9 @@ function controller($q,
                     localStorageService,
                     notification,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    $window,
+                    $state) {
 
     const vm = initialiseData(this, initialState);
 
@@ -381,12 +384,16 @@ function controller($q,
                 const row = d.domainCoordinates.row.name;
                 const ratingName = _.get(vm, ["ratingsByCode", d.state.rating, "name"], "?");
                 const comment = _.get(d, ["state", "comment"], "- No comment -");
+                const urlEnding = $state.href(kindToViewState( d.node.kind ), { id: d.node.id });
+                const url = $window.location.origin + urlEnding;
 
                 const html = `
                     <table class="table table-condensed small">
                         <thead>
                         <tr>
-                            <th colspan="2">${ name }</th>
+                            <th colspan="2">
+                                <a href="${ url }">${ name }</a>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -542,7 +549,9 @@ controller.$inject = [
     "localStorageService",
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$window",
+    "$state"
 ];
 
 
