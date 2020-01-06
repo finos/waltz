@@ -16,14 +16,22 @@
  *
  */
 
+import template from "./svg-diagram.html";
 import _ from "lodash";
 import angular from "angular";
-import {select} from "d3-selection";
+import {event, select} from "d3-selection";
+import {zoom, zoomIdentity} from "d3-zoom";
+import {initialiseData} from "../../common";
 
 
 const bindings = {
     blockProcessor: "<",
     diagram: "<"
+};
+
+
+const initialState = {
+    zoomEnabled: false
 };
 
 
@@ -38,7 +46,7 @@ function resize(elem, win) {
 
 
 function controller($element, $window) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => angular
         .element($window)
@@ -53,14 +61,21 @@ function controller($element, $window) {
 
         if (_.isNil(vm.blockProcessor)) return;
 
-        const svg = $element
-            .empty()
+        // remove any existing svg elements
+        $element.find("svg").remove();
+
+        // append new svg
+        const svgEl = $element
             .append(vm.diagram.svg);
+
+        vm.svgGroupSel = select($element[0])
+                            .select("svg")
+                            .select("svg > g");
 
         resize($element, $window);
 
         const dataProp = `data-${vm.diagram.keyProperty}`;
-        const dataBlocks = svg.querySelectorAll(`[${dataProp}]`);
+        const dataBlocks = svgEl.querySelectorAll(`[${dataProp}]`);
 
         const blocks = _.map(
             dataBlocks,
@@ -72,6 +87,43 @@ function controller($element, $window) {
         _.each(blocks, vm.blockProcessor);
     };
 
+    // pan + zoom
+    function zoomed() {
+        const t = event.transform;
+
+        vm.svgGroupSel
+            .attr("transform", t);
+    }
+
+    const myZoom = zoom()
+        .on("zoom", zoomed);
+
+    vm.enableZoom = () => {
+        select($element[0])
+            .select("svg")
+            .call(myZoom)
+            .on("dblclick.zoom", null);
+
+        vm.zoomEnabled = true;
+    };
+
+    vm.disableZoom = () => {
+        select($element[0])
+            .select("svg")
+            .on(".zoom", null);
+
+        vm.zoomEnabled = false;
+    };
+
+    vm.resetZoom = () => {
+        vm.svgGroupSel
+            .attr("transform", "scale(1) translate(0,0)");
+
+        // reset stored transform values
+        select($element[0])
+            .select("svg")
+            .call(zoom().transform, zoomIdentity);
+    };
 }
 
 
@@ -82,6 +134,7 @@ controller.$inject = [
 
 
 export default {
+    template,
     bindings,
     controller
 };
