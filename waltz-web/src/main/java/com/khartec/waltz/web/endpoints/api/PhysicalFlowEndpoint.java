@@ -40,6 +40,8 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -267,15 +269,21 @@ public class PhysicalFlowEndpoint implements Endpoint {
         } catch (JsonMappingException ex) {
             Throwable cause = ex.getCause();
             if(cause != null) {
-                String errorMsg = cause.getMessage();
 
-                String missingAttributes = errorMsg.substring(errorMsg.indexOf("["), errorMsg.indexOf("]") + 1);
+                String message = cause.getMessage();
+
+                Matcher match = Pattern.compile(".*\\[(.*)\\].*").matcher(message);
+
+                String errorMsg = (match.find())
+                        ? String.format("Cannot resolve physical flows as the following attributes are missing [%s]", match.group(1))
+                        : message;
+
                 int lineNr = ex.getPath().get(0).getIndex() + 1;
 
-                throw new IOException(String.format("Cannot validate physical flows, some of the required attributes are not set: %s in line %d",
-                        missingAttributes,
+                throw new IOException(String.format("%s in line %d",
+                        errorMsg,
                         lineNr),
-                        ex);
+                        cause);
             }
             throw ex;
         }

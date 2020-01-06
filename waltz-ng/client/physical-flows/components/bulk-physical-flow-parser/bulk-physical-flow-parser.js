@@ -26,6 +26,7 @@ import {downloadTextFile} from "../../../common/file-utils";
 
 
 import template from "./bulk-physical-flow-parser.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -229,9 +230,8 @@ function controller($scope, serviceBroker, notification) {
                 vm.loading = false;
 
                 vm.errorMessage = _.split(err.data.message, "/")[0].trim();
-                console.error('error resolving flows: ', err, vm.errorMessage);
 
-                notification.error(vm.errorMessage);
+                displayError(notification, "Physical flows could not be created", err);
             });
     };
 
