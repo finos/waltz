@@ -532,6 +532,7 @@ function setupPanAndZoom(commandProcessor) {
     }
 
     const myZoom = zoom()
+        .filter(() => event.metaKey || event.ctrlKey)
         .scaleExtent([1 / 4, 2])
         .on("zoom", zoomed);
 
