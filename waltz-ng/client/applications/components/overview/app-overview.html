@@ -228,7 +228,8 @@
                             <a class="clickable small"
                                ng-if="!$ctrl.showAllAppGroups && $ctrl.appGroups.length > 10"
                                ng-click="$ctrl.toggleAppGroupDisplay()">
-                                [show all {{$ctrl.appGroups.length}}]
+                                [show all
+                                <span ng-bind="$ctrl.appGroups.length"></span>]
                             </a>
                             <a class="clickable small"
                                ng-if="$ctrl.showAllAppGroups"
