@@ -21,7 +21,6 @@ package com.khartec.waltz.data.software_catalog;
 
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwareUsage;
 import com.khartec.waltz.model.software_catalog.SoftwareUsage;
-import com.khartec.waltz.schema.tables.records.SoftwareUsageRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -39,13 +38,12 @@ import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VE
 public class SoftwareUsageDao {
 
     private static final RecordMapper<Record, SoftwareUsage> TO_DOMAIN = r -> {
-        SoftwareUsageRecord record = r.into(SOFTWARE_USAGE);
         return ImmutableSoftwareUsage.builder()
-                .applicationId(record.getApplicationId())
-                .softwareVersionId(record.getSoftwareVersionId())
+                .applicationId(r.get(SOFTWARE_USAGE.APPLICATION_ID))
+                .softwareVersionId(r.get(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
                 .softwarePackageId(r.get(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID))
                 .licenceId(r.get(SOFTWARE_VERSION_LICENCE.LICENCE_ID))
-                .provenance(record.getProvenance())
+                .provenance(r.get(SOFTWARE_USAGE.PROVENANCE))
                 .build();
     };
     
@@ -77,6 +75,12 @@ public class SoftwareUsageDao {
     }
 
 
+    public List<SoftwareUsage> findBySoftwareVersionId(long versionId) {
+        return findByCondition(
+                SOFTWARE_VERSION.ID.eq(versionId));
+    }
+
+
     public List<SoftwareUsage> findByLicenceId(long id) {
         List<SoftwareUsage> byCondition = findByCondition(
                 SOFTWARE_VERSION_LICENCE.LICENCE_ID.in(id));
@@ -85,7 +89,13 @@ public class SoftwareUsageDao {
 
 
     private List<SoftwareUsage> findByCondition(Condition condition) {
-        return dsl.select(SOFTWARE_USAGE.fields())
+        return dsl.selectDistinct(
+                SOFTWARE_USAGE.APPLICATION_ID,
+                SOFTWARE_USAGE.SOFTWARE_VERSION_ID,
+                SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID,
+                SOFTWARE_VERSION_LICENCE.LICENCE_ID,
+                SOFTWARE_USAGE.PROVENANCE
+        )
                 .select(SOFTWARE_VERSION.fields())
                 .select(SOFTWARE_VERSION_LICENCE.fields())
                 .from(SOFTWARE_USAGE)

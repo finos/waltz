@@ -64,6 +64,7 @@ public class SoftwareCatalogEndpoint implements Endpoint {
 
 
         getForDatum(mkPath(BASE_URL, "package-id", ":id"), this::getByPackageIdRoute);
+        getForDatum(mkPath(BASE_URL, "version-id", ":id"), this::getByVersionIdRoute);
         getForDatum(mkPath(BASE_URL, "licence-id", ":id"), this::getByLicenceIdRoute);
         postForDatum(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
         postForDatum(makeCatalogForAppIdsPath, makeCatalogForAppIdsRoute);
@@ -75,6 +76,12 @@ public class SoftwareCatalogEndpoint implements Endpoint {
     private SoftwareCatalog getByPackageIdRoute(Request request, Response response) {
         long id = getId(request);
         return service.getByPackageId(id);
+    }
+
+
+    private SoftwareCatalog getByVersionIdRoute(Request request, Response response) {
+        long id = getId(request);
+        return service.getByVersionId(id);
     }
 
 

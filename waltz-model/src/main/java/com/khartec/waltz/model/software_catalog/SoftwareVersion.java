@@ -31,13 +31,30 @@ import java.time.LocalDate;
 @JsonDeserialize(as = ImmutableSoftwareVersion.class)
 public abstract class SoftwareVersion implements
         IdProvider,
+        NameProvider,
         DescriptionProvider,
         ExternalIdProvider,
         ProvenanceProvider,
-        CreatedUserTimestampProvider {
+        CreatedUserTimestampProvider,
+        EntityKindProvider,
+        WaltzEntity {
 
     public abstract long softwarePackageId();
     public abstract String version();
     public abstract LocalDate releaseDate();
 
+    @Value.Default
+    public String name() { return version(); }
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.SOFTWARE_VERSION; }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.SOFTWARE_VERSION)
+                .id(id().get())
+                .name(version())
+                .description(description())
+                .build();
+    }
 }

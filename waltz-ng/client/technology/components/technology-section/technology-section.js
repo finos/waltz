@@ -18,12 +18,13 @@
  */
 
 import _ from "lodash";
-import { perhaps, termSearch } from "../../../common";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkLinkGridCell } from "../../../common/grid-utils";
+import {perhaps, termSearch} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 
 import template from "./technology-section.html";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
@@ -166,12 +167,13 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
 function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell("Name", "package.name", "package.id", "main.software-package.view"),
-        { field: "version.externalId", displayName: "External Id" },
-        { field: "version.version", displayName: "Version"},
-        { field: "version.releaseDate", displayName: "Release Date"},
-        { field: "package.description", displayName: "Description"},
-        { field: "package.isNotable", displayName: "Notable"},
+        withWidth(mkEntityLinkGridCell("Name", "package", "none", "right"), "20%"),
+        { field: "version.externalId", displayName: "External Id", width: "35%" },
+        // { field: "version.version", displayName: "Version", width: "10%"},
+        withWidth(mkEntityLinkGridCell("Version", "version", "none", "right"), "10%"),
+        { field: "version.releaseDate", displayName: "Release Date", width: "5%"},
+        { field: "package.description", displayName: "Description", width: "25%"},
+        { field: "package.isNotable", displayName: "Notable", width: "5%"}
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "software.csv");
@@ -245,9 +247,9 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             .then(r => {
                 vm.databases = r.data;
                 _.forEach(vm.databases,
-                    (db) => Object.assign(db, {
-                        "isEndOfLife": isEndOfLife(db.endOfLifeStatus)
-                    })
+                          (db) => Object.assign(db, {
+                              "isEndOfLife": isEndOfLife(db.endOfLifeStatus)
+                          })
                 );
                 vm.databaseGridOptions.data = vm.databases;
             })
@@ -257,11 +259,12 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.LicenceStore.findBySelector,
-                [ mkSelectionOptions(vm.parentEntityRef)]
+                [mkSelectionOptions(vm.parentEntityRef)]
             )
             .then(r => {
                 vm.licences = r.data;
                 vm.licenceGridOptions.data = vm.licences;
+                return vm.licences;
             })
             .then(() => refresh(vm.qry));
 
@@ -269,22 +272,28 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.SoftwareCatalogStore.findByAppIds,
-                [ [vm.parentEntityRef.id] ]
+                [[vm.parentEntityRef.id]]
             )
-            .then(r => {
-                vm.softwareCatalog = r.data;
+            .then(r => r.data)
+            .then(softwareCatalog => {
+                vm.softwareCatalog = softwareCatalog;
                 const versionsById = _.keyBy(vm.softwareCatalog.versions, v => v.id);
                 const packagesById = _.keyBy(vm.softwareCatalog.packages, v => v.id);
 
-                const gridData = _.map(vm.softwareCatalog.usages, u => Object.assign(
-                    { },
-                    { package: packagesById[u.softwarePackageId] }, { version: versionsById[u.softwareVersionId] })
-                );
+                const gridData = _
+                    .chain(vm.softwareCatalog.usages)
+                    .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId"])))
+                    .uniqWith(_.isEqual)
+                    .map(u => Object.assign(
+                        { },
+                        { package: packagesById[u.softwarePackageId] },
+                        { version: versionsById[u.softwareVersionId] }
+                    ))
+                    .value();
 
                 vm.softwareCatalogGridOptions.data = gridData;
             })
             .then(() => refresh(vm.qry));
-
     };
 
     vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);

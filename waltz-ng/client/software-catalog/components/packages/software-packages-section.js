@@ -18,11 +18,11 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import { initialiseData } from "../../../common";
-import { mkLinkGridCell } from "../../../common/grid-utils";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {initialiseData} from "../../../common";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./software-packages-section.html";
 
@@ -61,7 +61,12 @@ function mkColumnDefs() {
 
 
 function mkGridData(packages = [], versions = [], usages = []) {
-    const usagesByVersionId = _.groupBy(usages, "softwareVersionId");
+    const usagesByVersionId = _
+        .chain(usages)
+        .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId", "applicationId"])))
+        .uniqWith(_.isEqual)
+        .groupBy(u => u.softwareVersionId)
+        .value();
 
     const versionsById = _.keyBy(versions, v => v.id);
     const packagesById = _.keyBy(packages, v => v.id);

@@ -18,8 +18,8 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 
 import template from "./software-package-versions.html";
 
@@ -46,10 +46,6 @@ function mkColumnDefs() {
             name: "External Id",
         },
         {
-            field: "description",
-            name: "Description",
-        },
-        {
             field: "releaseDate",
             cellTemplate: `
                 <waltz-from-now class="text-muted"
@@ -66,7 +62,12 @@ function mkColumnDefs() {
 
 
 function mkGridData(softwarePackage = {}, versions = [], usages = []) {
-    const usagesByVersionId = _.groupBy(usages, "softwareVersionId");
+    const usagesByVersionId = _
+        .chain(usages)
+        .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId", "applicationId"])))
+        .uniqWith(_.isEqual)
+        .groupBy(u => u.softwareVersionId)
+        .value();
 
     const gridData = _.map(versions, v => Object.assign(
         {},
@@ -92,8 +93,8 @@ function controller(serviceBroker) {
 
                 vm.columnDefs = mkColumnDefs();
                 vm.gridData = mkGridData(vm.softwarePackage,
-                    vm.softwareCatalog.versions,
-                    vm.softwareCatalog.usages);
+                                         vm.softwareCatalog.versions,
+                                         vm.softwareCatalog.usages);
             });
     };
 

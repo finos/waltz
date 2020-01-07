@@ -101,6 +101,8 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForPerson(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
+            case SOFTWARE_VERSION:
+                return mkForSoftwareVersion(options);
             case TAG:
                 return mkForTag(options);
             default:
@@ -131,6 +133,20 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .innerJoin(SOFTWARE_VERSION)
                     .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
                 .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
+                .and(applicationConditions);
+    }
+
+
+    private Select<Record1<Long>> mkForSoftwareVersion(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition applicationConditions = mkApplicationConditions(options);
+        return DSL
+                .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
+                .from(SOFTWARE_USAGE)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
+                .where(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(options.entityReference().id()))
                 .and(applicationConditions);
     }
 

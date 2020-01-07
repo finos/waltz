@@ -51,6 +51,8 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 return mkForApplication(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
+            case SOFTWARE_VERSION:
+                return mkForSoftwareVersion(options);
             case LICENCE:
                 return mkForLicence(options);
             case ACTOR:
@@ -80,6 +82,15 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
                 .innerJoin(SOFTWARE_VERSION)
                     .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
                 .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(ref.id()));
+    }
+
+
+    private Select<Record1<Long>> mkForSoftwareVersion(IdSelectionOptions options) {
+        EntityReference ref = options.entityReference();
+
+        return select(SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .where(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(ref.id()));
     }
 
 
