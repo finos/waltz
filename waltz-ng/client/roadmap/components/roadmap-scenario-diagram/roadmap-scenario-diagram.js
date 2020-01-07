@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
@@ -7,6 +25,7 @@ import roles from "../../../user/system-roles";
 
 import template from "./roadmap-scenario-diagram.html";
 import {getDefaultRating} from "../../../ratings/rating-utils";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
@@ -145,7 +164,9 @@ function controller($q,
                     localStorageService,
                     notification,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    $window,
+                    $state) {
 
     const vm = initialiseData(this, initialState);
 
@@ -363,12 +384,16 @@ function controller($q,
                 const row = d.domainCoordinates.row.name;
                 const ratingName = _.get(vm, ["ratingsByCode", d.state.rating, "name"], "?");
                 const comment = _.get(d, ["state", "comment"], "- No comment -");
+                const urlEnding = $state.href(kindToViewState( d.node.kind ), { id: d.node.id });
+                const url = $window.location.origin + urlEnding;
 
                 const html = `
                     <table class="table table-condensed small">
                         <thead>
                         <tr>
-                            <th colspan="2">${ name }</th>
+                            <th colspan="2">
+                                <a href="${ url }">${ name }</a>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -385,7 +410,7 @@ function controller($q,
                             <td>${ comment }</td>
                         </tr>
                         <tr>
-                            <td>Rating:</td> 
+                            <td>Rating:</td>
                             <td>${ ratingName }</td>
                         </tr>
                         </tbody>
@@ -524,7 +549,9 @@ controller.$inject = [
     "localStorageService",
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$window",
+    "$state"
 ];
 
 

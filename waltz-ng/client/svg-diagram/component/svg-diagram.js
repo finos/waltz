@@ -1,30 +1,37 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
+import template from "./svg-diagram.html";
 import _ from "lodash";
 import angular from "angular";
-import {select} from "d3-selection";
+import {event, select} from "d3-selection";
+import {zoom, zoomIdentity} from "d3-zoom";
+import {initialiseData} from "../../common";
 
 
 const bindings = {
     blockProcessor: "<",
     diagram: "<"
+};
+
+
+const initialState = {
+    zoomEnabled: false
 };
 
 
@@ -39,7 +46,7 @@ function resize(elem, win) {
 
 
 function controller($element, $window) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => angular
         .element($window)
@@ -54,14 +61,21 @@ function controller($element, $window) {
 
         if (_.isNil(vm.blockProcessor)) return;
 
-        const svg = $element
-            .empty()
+        // remove any existing svg elements
+        $element.find("svg").remove();
+
+        // append new svg
+        const svgEl = $element
             .append(vm.diagram.svg);
+
+        vm.svgGroupSel = select($element[0])
+                            .select("svg")
+                            .select("svg > g");
 
         resize($element, $window);
 
         const dataProp = `data-${vm.diagram.keyProperty}`;
-        const dataBlocks = svg.querySelectorAll(`[${dataProp}]`);
+        const dataBlocks = svgEl.querySelectorAll(`[${dataProp}]`);
 
         const blocks = _.map(
             dataBlocks,
@@ -73,6 +87,43 @@ function controller($element, $window) {
         _.each(blocks, vm.blockProcessor);
     };
 
+    // pan + zoom
+    function zoomed() {
+        const t = event.transform;
+
+        vm.svgGroupSel
+            .attr("transform", t);
+    }
+
+    const myZoom = zoom()
+        .on("zoom", zoomed);
+
+    vm.enableZoom = () => {
+        select($element[0])
+            .select("svg")
+            .call(myZoom)
+            .on("dblclick.zoom", null);
+
+        vm.zoomEnabled = true;
+    };
+
+    vm.disableZoom = () => {
+        select($element[0])
+            .select("svg")
+            .on(".zoom", null);
+
+        vm.zoomEnabled = false;
+    };
+
+    vm.resetZoom = () => {
+        vm.svgGroupSel
+            .attr("transform", "scale(1) translate(0,0)");
+
+        // reset stored transform values
+        select($element[0])
+            .select("svg")
+            .call(zoom().transform, zoomIdentity);
+    };
 }
 
 
@@ -83,6 +134,7 @@ controller.$inject = [
 
 
 export default {
+    template,
     bindings,
     controller
 };
