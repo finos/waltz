@@ -5,7 +5,7 @@
 The following table list the people and/or organisations involved with Waltz
 
 | Name | Type |
-| -- | -- |
+| --- | --- |
 | [David Watkins](https://github.com/davidwatkins73) | individual |
 | [Deutsche Bank](https://github.com/db-waltz) | organisational |
 | [Kamran Saleem](https://github.com/kamransaleem) | individual |
@@ -17,7 +17,7 @@ The following table list the people and/or organisations involved with Waltz
 Waltz depends on many great libraries and projects, including:
 
 | Name | License | Website |
-| -- | -- | -- |
+| --- | --- | --- |
 | Angular | [MIT](https://opensource.org/licenses/MIT) | https://angularjs.org/ |
 | Babel | [MIT](https://opensource.org/licenses/MIT) | https://babeljs.io/ |
 | Bootstrap | [MIT](https://opensource.org/licenses/MIT) | http://getbootstrap.com/ |

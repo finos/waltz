@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.application;
@@ -59,16 +58,16 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
 
-    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
-    private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
+    private static final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    private static final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
-    private final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("fd");
-    private final Involvement involvement = INVOLVEMENT.as("inv");
-    private final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf");
-    private final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr");
-    private final Person person = PERSON.as("p");
-    private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
+    private static final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("fd");
+    private static final Involvement involvement = INVOLVEMENT.as("inv");
+    private static final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf");
+    private static final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr");
+    private static final Person person = PERSON.as("p");
+    private static final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
 
 
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -179,13 +178,14 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
     }
 
 
-    private Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
+    public static Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         long actorId = options.entityReference().id();
 
         Condition applicationConditions = mkApplicationConditions(options);
 
-        Select<Record1<Long>> sourceAppIds = DSL.select(logicalFlow.SOURCE_ENTITY_ID)
+        Select<Record1<Long>> sourceAppIds = DSL
+                .select(logicalFlow.SOURCE_ENTITY_ID)
                 .from(logicalFlow)
                 .innerJoin(APPLICATION).on(APPLICATION.ID.eq(logicalFlow.SOURCE_ENTITY_ID))
                 .where(logicalFlow.TARGET_ENTITY_ID.eq(actorId)
@@ -203,8 +203,8 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                         .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
                         .and(applicationConditions);
 
-        return sourceAppIds
-                .union(targetAppIds);
+        return DSL.selectFrom(sourceAppIds
+                .union(targetAppIds).asTable());
     }
 
 
@@ -248,9 +248,10 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(applicationConditions);
 
-        return directlyReferencedApps
-                .unionAll(appsViaSourcesOfFlows)
-                .unionAll(appsViaTargetsOfFlows);
+        return DSL.selectFrom(
+                directlyReferencedApps
+                    .unionAll(appsViaSourcesOfFlows)
+                    .unionAll(appsViaTargetsOfFlows).asTable());
     }
 
 
@@ -352,10 +353,15 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .from(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(options.entityReference().id()));
 
+        SelectWhereStep<Record1<Long>> appIds = DSL
+                .selectFrom(directApps
+                        .union(applicationIdsFromAssociatedOrgUnits)
+                        .asTable());
+
         return DSL
                 .select(APPLICATION.ID)
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(directApps.unionAll(applicationIdsFromAssociatedOrgUnits)))
+                .where(APPLICATION.ID.in(appIds))
                 .and(applicationConditions);
     }
 
@@ -427,7 +433,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector)
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
 
-        Field appId = DSL.field("app_id", Long.class);
+        Field<Long> appId = DSL.field("app_id", Long.class);
 
         Condition applicationConditions = mkApplicationConditions(options);
 
@@ -447,8 +453,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
         return DSL
                 .selectDistinct(appId)
-                .from(sources)
-                .union(targets);
+                .from(sources.union(targets).asTable());
     }
 
 

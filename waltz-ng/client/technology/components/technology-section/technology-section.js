@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -22,10 +21,10 @@ import {perhaps, termSearch} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 
-import template from "./technology-section.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
+import template from "./technology-section.html";
 
 const bindings = {
     parentEntityRef: "<"
@@ -38,8 +37,8 @@ function mkEndOfLifeCell(title, dateField, flagField) {
         displayName: title,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <span ng-bind="row.entity.${dateField}"></span> 
-                <waltz-icon ng-if="row.entity.${flagField}" 
+                <span ng-bind="row.entity.${dateField}"></span>
+                <waltz-icon ng-if="row.entity.${flagField}"
                             name="power-off">
                 </waltz-icon>
             </div>`
@@ -48,7 +47,7 @@ function mkEndOfLifeCell(title, dateField, flagField) {
 
 
 const MATURITY_STATUS_TEMPLATE = `
-    <div class="ui-grid-cell-contents"> 
+    <div class="ui-grid-cell-contents">
         <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status>
     </div>`;
 
@@ -97,8 +96,8 @@ function prepareServerGridOptions($animate, uiGridConstants) {
             width: "5%",
             filter: mkBooleanColumnFilter(uiGridConstants),
             cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <waltz-icon ng-if="COL_FIELD" 
+                <div class="ui-grid-cell-contents">
+                    <waltz-icon ng-if="COL_FIELD"
                                 name="check">
                     </waltz-icon>
                 </div>`
