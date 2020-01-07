@@ -272,10 +272,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
                 String message = cause.getMessage();
 
-                Matcher match = Pattern.compile(".*\\[(.*)\\].*").matcher(message);
+                Matcher match = Pattern.compile(".*required attributes.*\\[(.*)\\].*").matcher(message);
 
                 String errorMsg = (match.find())
-                        ? String.format("Cannot resolve physical flows as the following attributes are missing [%s]", match.group(1))
+                        ? String.format("Cannot resolve physical flows as the required attributes are missing [%s]", match.group(1))
                         : message;
 
                 int lineNr = ex.getPath().get(0).getIndex() + 1;
