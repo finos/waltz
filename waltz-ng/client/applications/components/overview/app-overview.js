@@ -34,13 +34,15 @@ const initialState = {
     aliases: [],
     app: null,
     appGroups: [],
+    appGroupsToDisplay: [],
     complexity: null,
     organisationalUnit: null,
     tags: [],
     visibility: {
         aliasEditor: false,
         tagEditor: false
-    }
+    },
+    showAllAppGroups: false
 };
 
 
@@ -92,7 +94,15 @@ function controller($state, serviceBroker, notification) {
             .loadAppData(
                 CORE_API.AppGroupStore.findRelatedByEntityRef,
                 [vm.parentEntityRef])
-            .then(r => vm.appGroups = r.data);
+            .then(r => {
+                vm.appGroups = _.orderBy(r.data, ['appGroupKind', 'name'], ['desc', 'asc']);
+
+                if (vm.showAllAppGroups){
+                    vm.appGroupsToDisplay = vm.appGroups
+                } else {
+                    vm.appGroupsToDisplay = _.filter(vm.appGroups, r => vm.appGroups.indexOf(r) < 10);
+                }
+            });
     }
 
     vm.$onInit = () => {
@@ -126,6 +136,11 @@ function controller($state, serviceBroker, notification) {
             vm.tags = r.data;
         })
         .catch(e => displayError(notification, "Could not update tags", e));
+
+    vm.toggleAppGroupDisplay = () => {
+        vm.showAllAppGroups = !vm.showAllAppGroups;
+        loadAppGroups();
+    }
 }
 
 
