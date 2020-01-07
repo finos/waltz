@@ -53,6 +53,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhysicalFlowEndpoint.class);
     private static final String BASE_URL = mkPath("api", "physical-flow");
+    private static final Pattern ERROR_PATTERN = Pattern.compile(".*required attributes.*\\[(.*)\\].*");
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
@@ -272,7 +273,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
                 String message = cause.getMessage();
 
-                Matcher match = Pattern.compile(".*required attributes.*\\[(.*)\\].*").matcher(message);
+                Matcher match = ERROR_PATTERN.matcher(message);
 
                 String errorMsg = (match.find())
                         ? String.format("Cannot resolve physical flows as the required attributes are missing [%s]", match.group(1))
