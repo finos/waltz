@@ -45,6 +45,9 @@ function indexResponses(responses = []) {
                     ? "true"
                     : "false";
             }
+            if (_.isNil(qr.booleanResponse) && !_.isString(qr.booleanResponse)){
+                qr.booleanResponse = "null"
+            }
             if (!_.isNil(qr.dateResponse)) {
                 qr.dateResponse = moment(qr.dateResponse, formats.parseDateOnly).toDate()
             }
