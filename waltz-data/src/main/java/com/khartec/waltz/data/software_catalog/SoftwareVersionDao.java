@@ -91,7 +91,7 @@ public class SoftwareVersionDao {
 
 
     public List<SoftwareVersion> findByLicenceId(long id) {
-        return dsl.selectDistinct(SOFTWARE_VERSION.fields())
+        return dsl.select(SOFTWARE_VERSION.fields())
                 .from(SOFTWARE_VERSION)
                 .innerJoin(SOFTWARE_VERSION_LICENCE)
                 .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION.ID))

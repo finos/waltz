@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import {groupByVersionId} from "../../software-catalog-utilities";
 
 import template from "./software-packages-section.html";
 
@@ -60,21 +61,15 @@ function mkColumnDefs() {
 
 
 function mkGridData(packages = [], versions = [], usages = []) {
-    const usagesByVersionId = _
-        .chain(usages)
-        .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId", "applicationId"])))
-        .uniqWith(_.isEqual)
-        .groupBy(u => u.softwareVersionId)
-        .value();
+    const usagesByVersionId = groupByVersionId(usages);
 
-    const versionsById = _.keyBy(versions, v => v.id);
     const packagesById = _.keyBy(packages, v => v.id);
 
-    const gridData = _.map(usages, u => Object.assign(
+    const gridData = _.map(versions, v => Object.assign(
         { },
-        { package: packagesById[u.softwarePackageId] },
-        { version: versionsById[u.softwareVersionId] },
-        { usageCount: _.get(usagesByVersionId, `[${u.softwareVersionId}].length`, 0) })
+        { package: packagesById[v.softwarePackageId] },
+        { version: v },
+        { usageCount: _.get(usagesByVersionId, `[${v.id}].length`, 0) })
     );
 
     return gridData;

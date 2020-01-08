@@ -20,10 +20,7 @@ package com.khartec.waltz.data.software_catalog;
 
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwareUsage;
 import com.khartec.waltz.model.software_catalog.SoftwareUsage;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -88,22 +85,22 @@ public class SoftwareUsageDao {
 
 
     private List<SoftwareUsage> findByCondition(Condition condition) {
-        return dsl.selectDistinct(
-                SOFTWARE_USAGE.APPLICATION_ID,
-                SOFTWARE_USAGE.SOFTWARE_VERSION_ID,
-                SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID,
-                SOFTWARE_VERSION_LICENCE.LICENCE_ID,
-                SOFTWARE_USAGE.PROVENANCE
+        return dsl.select(
+            SOFTWARE_USAGE.APPLICATION_ID,
+            SOFTWARE_USAGE.SOFTWARE_VERSION_ID,
+            SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID,
+            SOFTWARE_VERSION_LICENCE.LICENCE_ID,
+            SOFTWARE_USAGE.PROVENANCE
         )
-                .select(SOFTWARE_VERSION.fields())
-                .select(SOFTWARE_VERSION_LICENCE.fields())
-                .from(SOFTWARE_USAGE)
-                .innerJoin(SOFTWARE_VERSION)
-                    .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
-                .innerJoin(SOFTWARE_VERSION_LICENCE)
-                    .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION.ID))
-                .where(condition)
-                .fetch(TO_DOMAIN);
+        .select(SOFTWARE_VERSION.fields())
+        .select(SOFTWARE_VERSION_LICENCE.fields())
+        .from(SOFTWARE_USAGE)
+        .innerJoin(SOFTWARE_VERSION)
+        .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+        .innerJoin(SOFTWARE_VERSION_LICENCE)
+        .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION.ID))
+        .where(condition)
+        .fetch(TO_DOMAIN);
     }
 
 }

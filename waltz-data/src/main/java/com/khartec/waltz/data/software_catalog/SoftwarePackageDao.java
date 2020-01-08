@@ -130,7 +130,7 @@ public class SoftwarePackageDao {
     // -----
 
     private List<SoftwarePackage> findByCondition(Condition condition) {
-        return dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+        return dsl.select(SOFTWARE_PACKAGE.fields())
                 .from(SOFTWARE_PACKAGE)
                 .where(condition)
                 .fetch(TO_DOMAIN);

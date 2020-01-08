@@ -168,7 +168,6 @@ function prepareSoftwareCatalogGridOptions($animate, uiGridConstants) {
     const columnDefs = [
         withWidth(mkEntityLinkGridCell("Name", "package", "none", "right"), "20%"),
         { field: "version.externalId", displayName: "External Id", width: "35%" },
-        // { field: "version.version", displayName: "Version", width: "10%"},
         withWidth(mkEntityLinkGridCell("Version", "version", "none", "right"), "10%"),
         { field: "version.releaseDate", displayName: "Release Date", width: "5%"},
         { field: "package.description", displayName: "Description", width: "25%"},

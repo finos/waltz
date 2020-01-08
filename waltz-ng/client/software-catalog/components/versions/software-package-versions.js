@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
+import {groupByVersionId} from "../../software-catalog-utilities";
 
 import template from "./software-package-versions.html";
 
@@ -61,12 +62,7 @@ function mkColumnDefs() {
 
 
 function mkGridData(softwarePackage = {}, versions = [], usages = []) {
-    const usagesByVersionId = _
-        .chain(usages)
-        .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId", "applicationId"])))
-        .uniqWith(_.isEqual)
-        .groupBy(u => u.softwareVersionId)
-        .value();
+    const usagesByVersionId = groupByVersionId(usages);
 
     const gridData = _.map(versions, v => Object.assign(
         {},

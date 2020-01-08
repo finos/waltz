@@ -159,9 +159,9 @@ const entityLoaders = {
     "SOFTWARE_VERSION": {
         method: CORE_API.SoftwareCatalogStore.getByVersionId,
         mkProps: (catalog, displayNameService, serviceBroker) => {
-            const version = _.get(catalog, "versions[0]");
-            const softwarePackage = _.get(catalog, "packages[0]");
-            const usages = _.get(catalog, "usages");
+            const version = _.get(catalog, ["versions", 0], null);
+            const softwarePackage = _.get(catalog, ["packages", 0], null);
+            const usages = _.get(catalog, "usages", []);
 
             const appUsages = _.chain(usages)
                 .map(u => u.applicationId)
@@ -187,23 +187,23 @@ const entityLoaders = {
             return [
                 {
                     name: "Name",
-                    value: softwarePackage.name
+                    value: _.get(softwarePackage, "name", "-")
                 },
                 {
                     name: "Version",
-                    value: version.version
+                    value: _.get(version, "version", "-")
                 },
                 {
                     name: "External Id",
-                    value: version.externalId
+                    value: _.get(version, "externalId", "-")
                 },
                 {
                     name: "Release Date",
-                    value: version.releaseDate || "-"
+                    value: _.get(version, "releaseDate", "-")
                 },
                 {
                     name: "Description",
-                    value: version.description || "-"
+                    value: _.get(version, "description", "-")
                 },
                 licenceProperty,
                 {
