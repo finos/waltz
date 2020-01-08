@@ -39,16 +39,20 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static java.util.Arrays.asList;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhysicalFlowEndpoint.class);
     private static final String BASE_URL = mkPath("api", "physical-flow");
+    private static final Pattern ERROR_PATTERN = Pattern.compile(".*required attributes.*\\[(.*)\\].*");
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
@@ -265,7 +269,21 @@ public class PhysicalFlowEndpoint implements Endpoint {
         } catch (JsonMappingException ex) {
             Throwable cause = ex.getCause();
             if(cause != null) {
-                throw new IOException(cause.getMessage(), ex);
+
+                String message = cause.getMessage();
+
+                Matcher match = ERROR_PATTERN.matcher(message);
+
+                String errorMsg = (match.find())
+                        ? String.format("Cannot resolve physical flows as the required attributes are missing [%s]", match.group(1))
+                        : message;
+
+                int lineNr = ex.getPath().get(0).getIndex() + 1;
+
+                throw new IOException(String.format("%s in line %d",
+                        errorMsg,
+                        lineNr),
+                        cause);
             }
             throw ex;
         }
@@ -274,7 +292,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
         requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
+        List<PhysicalFlowUploadCommand> commands = asList(readBody(request, PhysicalFlowUploadCommand[].class));
         String username = getUsername(request);
 
         return physicalFlowUploadService.upload(username, commands);
