@@ -88,8 +88,6 @@ public class SoftwareUsageDao {
         return dsl.select(
             SOFTWARE_USAGE.APPLICATION_ID,
             SOFTWARE_USAGE.SOFTWARE_VERSION_ID,
-            SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID,
-            SOFTWARE_VERSION_LICENCE.LICENCE_ID,
             SOFTWARE_USAGE.PROVENANCE
         )
         .select(SOFTWARE_VERSION.fields())
