@@ -502,4 +502,14 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <!-- 4592: asset costs table from decimal(10,2) to decimal(16,2) -->
+    <changeSet id="20200109-4592-1"
+               author="woodjes">
+        <modifyDataType tableName="asset_cost"
+                        columnName="amount"
+                        newDataType="DECIMAL(16,2)"/>
+    </changeSet>
+
 </databaseChangeLog>
