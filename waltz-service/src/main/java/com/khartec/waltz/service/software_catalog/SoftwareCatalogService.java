@@ -111,6 +111,19 @@ public class SoftwareCatalogService {
     }
 
 
+    public SoftwareCatalog getByVersionId(long id) {
+        SoftwareVersion version = softwareVersionDao.getByVersionId(id);
+        SoftwarePackage softwarePackage = softwarePackageDao.getById(version.softwarePackageId());
+        List<SoftwareUsage> softwareUsages = softwareUsageDao.findBySoftwareVersionId(id);
+
+        return ImmutableSoftwareCatalog.builder()
+                .usages(softwareUsages)
+                .packages(ListUtilities.newArrayList(softwarePackage))
+                .versions(ListUtilities.newArrayList(version))
+                .build();
+    }
+
+
     public SoftwareCatalog getByLicenceId(long id) {
         List<SoftwareUsage> softwareUsages = softwareUsageDao.findByLicenceId(id);
         List<Long> packageIds = ListUtilities.map(softwareUsages, su -> su.softwarePackageId());
