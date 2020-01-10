@@ -38,7 +38,8 @@
             <h4>Historical Attestations:</h4>
             <table class="table table-striped table-condensed small">
                 <colgroup>
-                    <col width="16%">
+                    <col width="1%">
+                    <col width="15%">
                     <col width="20%">
                     <col width="16%">
                     <col width="12%">
@@ -48,6 +49,7 @@
                 </colgroup>
                 <thead>
                 <tr>
+                    <th></th>
                     <th>Attestation</th>
                     <th>Description</th>
                     <th>Target</th>
@@ -58,15 +60,26 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true">
+                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true"
+                    ng-class="{'success': attestation.instance.attestedAt,
+                    'warning': !attestation.instance.attestedAt && !$ctrl.outOfDate(attestation.run.dueDate),
+                    'danger': !attestation.instance.attestedAt && $ctrl.outOfDate(attestation.run.dueDate)}"
+                    uib-popover="{{ $ctrl.determinePopover(attestation) }}"
+                    popover-class="waltz-popover-width-700"
+                    popover-append-to-body="true"
+                    popover-placement="top"
+                    popover-trigger="mouseenter">
+                    <td>
+                        <waltz-icon ng-if="attestation.instance.attestedAt"
+                                    name="check">
+                        </waltz-icon>
+                        <waltz-icon ng-if="!attestation.instance.attestedAt"
+                                    name="times">
+                        </waltz-icon>
+                    </td>
                     <td ng-bind="attestation.run.name">
                     </td>
-                    <td ng-bind="attestation.run.description | truncate:150"
-                        uib-popover="{{ attestation.run.description }}"
-                        popover-class="waltz-popover-width-700"
-                        popover-append-to-body="true"
-                        popover-placement="right"
-                        popover-trigger="mouseenter">
+                    <td ng-bind="attestation.run.description | truncate:150">
                     </td>
                     <td>
                         <waltz-attested-kind run="attestation.run"></waltz-attested-kind>

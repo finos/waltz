@@ -23,7 +23,7 @@ import template from "./attestation-section.html";
 
 const initialState = {
     attestations: [],
-    createType: null,
+    createType: null
 };
 
 const bindings = {
@@ -152,7 +152,8 @@ function controller($q,
     vm.attestEntity = () => {
 
         if(vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes.length !== 0 && vm.createType === 'LOGICAL_DATA_FLOW'){
-            return confirm("This application is connected to unknown and / or deprecated data types, please update these flows before the attestation can be updated.")
+            confirm("This application is connected to unknown and / or deprecated data types, please update these flows before the attestation can be updated.");
+            return notification.error("Flows cannot be attested. Please update all unknown and deprecated datatypes before attesting logical flows.");
         }
 
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
@@ -168,6 +169,27 @@ function controller($q,
     vm.cancelAttestation = () => {
         vm.setCreateType(null);
     };
+
+    const today = new Date();
+
+    vm.outOfDate = (dueDate) => {
+        const plannedDate = new Date(dueDate);
+        return today > plannedDate;
+    };
+
+    vm.determinePopover = (attestation) => {
+
+        const outOfDate = vm.outOfDate(attestation.run.dueDate);
+
+        if (attestation.instance.attestedAt) {
+            return "This attestation has been completed"
+        } else if (outOfDate){
+            return "This attestation has not been completed and is now overdue"
+        } else {
+            return "This attestation has not been completed"
+        }
+    }
+
 }
 
 
