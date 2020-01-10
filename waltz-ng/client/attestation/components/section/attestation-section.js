@@ -177,7 +177,7 @@ function controller($q,
         return today > plannedDate;
     };
 
-    vm.determinePopover = (attestation) => {
+    vm.determinePopoverText = (attestation) => {
 
         const outOfDate = vm.outOfDate(attestation.run.dueDate);
 

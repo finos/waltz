@@ -64,7 +64,7 @@
                     ng-class="{'success': attestation.instance.attestedAt,
                     'warning': !attestation.instance.attestedAt && !$ctrl.outOfDate(attestation.run.dueDate),
                     'danger': !attestation.instance.attestedAt && $ctrl.outOfDate(attestation.run.dueDate)}"
-                    uib-popover="{{ $ctrl.determinePopover(attestation) }}"
+                    uib-popover="{{ $ctrl.determinePopoverText(attestation) }}"
                     popover-class="waltz-popover-width-700"
                     popover-append-to-body="true"
                     popover-placement="top"
