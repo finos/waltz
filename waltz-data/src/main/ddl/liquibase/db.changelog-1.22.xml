@@ -463,6 +463,7 @@
 
     <!-- 4565 - rename software version - release date -->
     <changeSet id="20191217-4565-1"
+               failOnError="false"
                author="kamransaleem">
         <comment>4565 - rename software version - release date - drop default value</comment>
         <dropDefaultValue columnDataType="DATE"
@@ -472,6 +473,7 @@
 
 
     <changeSet id="20191217-4565-2"
+               failOnError="false"
                author="kamransaleem">
         <comment>4565 - rename software version - release date</comment>
         <dropNotNullConstraint columnDataType="DATE"
