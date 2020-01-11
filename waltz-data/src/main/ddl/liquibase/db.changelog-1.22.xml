@@ -344,6 +344,7 @@
     </changeSet>
 
     <changeSet id="20191120-4496-21"
+                dbms="mssql,postgresql"
                author="kamransaleem">
         <comment>4496: add release date to software version</comment>
 
@@ -351,6 +352,20 @@
             <column name="releaseDate"
                     type="DATE"
                     defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20191120-4496-21"
+                dbms="mysql"
+                author="kamransaleem">
+        <comment>4496: add release date to software version</comment>
+
+        <addColumn tableName="software_version">
+            <column name="releaseDate"
+                    type="DATE">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
