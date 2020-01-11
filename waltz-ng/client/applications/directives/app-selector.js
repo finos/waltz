@@ -20,7 +20,6 @@ import {initialiseData, invokeFunction} from "../../common";
 import template from './app-selector.html';
 
 
-
 const BINDINGS = {
     model: '=',
     onSelect: '<'

@@ -26,6 +26,7 @@ export function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+
     const findStatsForSelector = (id, kind, scope = "CHILDREN") => {
         const options = _.isObject(id)
             ? id
@@ -45,16 +46,24 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/package-id/${id}`)
         .then(r => r.data);
 
+
+    const getByVersionId = (id) => $http
+        .get(`${BASE}/version-id/${id}`)
+        .then(r => r.data);
+
+
     const getByLicenceId = (id) => $http
         .get(`${BASE}/licence-id/${id}`)
         .then(r => r.data);
+
 
     return {
         findByAppIds,
         findBySelector,
         findStatsForSelector,
         getByPackageId,
-        getByLicenceId
+        getByLicenceId,
+        getByVersionId
     };
 }
 
@@ -87,6 +96,11 @@ export const SoftwareCatalogStore_API = {
         serviceName,
         serviceFnName: 'getByPackageId',
         description: 'executes getByPackageId'
+    },
+    getByVersionId: {
+        serviceName,
+        serviceFnName: 'getByVersionId',
+        description: 'executes getByVersionId'
     },
 };
 

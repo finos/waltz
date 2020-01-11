@@ -61,6 +61,7 @@ public enum EntityKind {
     SCENARIO,
     SERVER,
     SOFTWARE,
+    SOFTWARE_VERSION,
     SURVEY_INSTANCE,
     SURVEY_RUN,
     SURVEY_TEMPLATE,

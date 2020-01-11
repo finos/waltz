@@ -17,9 +17,9 @@
  */
 
 import _ from "lodash";
-import { tallyBy } from "../../common/tally-utils";
-import { notEmpty } from "../../common";
-import { criticalityColorScale, lifecyclePhaseColorScale, variableScale } from "../../common/colors";
+import {tallyBy} from "../../common/tally-utils";
+import {notEmpty} from "../../common";
+import {criticalityColorScale, lifecyclePhaseColorScale, variableScale} from "../../common/colors";
 
 import template from "./app-summary.html";
 
