@@ -344,7 +344,7 @@
     </changeSet>
 
     <changeSet id="20191120-4496-21"
-                dbms="mssql,postgresql"
+                dbms="mssql,postgresql,h2"
                author="kamransaleem">
         <comment>4496: add release date to software version</comment>
 
