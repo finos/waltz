@@ -36,7 +36,7 @@ function mkErrorMessage(message, e) {
 
 /**
  * Displays the given message as an error in the toaster.
- * If e is provided then the `e.data.message` attribute will be
+ * If e is provided then the `e.data.message` attribute will be5
  * included (if present).  Also prints the message to `console.log`
  *
  * @param notificationService

@@ -19,3 +19,25 @@
 export function isPromise(obj) {
     return !!obj && (typeof obj === "object" || typeof obj === "function") && typeof obj.then === "function";
 }
+
+
+/**
+ * Given an array of responses (typically from a $q call) will
+ * return a new array with the data elements resolved.  e.g.
+ *
+ * ```
+ * $q
+ *   .all([zebrasPromies, hipposPromise, elephantsPromise])
+ *   .then(responses => {
+ *       const [zerbras, hippos, elephants] = resolveResponses(responses);
+ *       ...
+ *   })
+ * ```
+ *
+ * @param responses
+ * @returns {Array}
+ */
+export function resolveResponses(responses = []) {
+    return _.map(responses, r => r.data);
+}
+

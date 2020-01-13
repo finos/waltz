@@ -22,16 +22,19 @@ import template from "./assessment-rating-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
 import {displayError} from "../../../common/error-utils";
+import {resolveResponses} from "../../../common/promise-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
 };
 
+
 const modes = {
     LIST: "LIST",
     VIEW: "VIEW"
 };
+
 
 const initialState = {
     mode: modes.LIST,
@@ -43,24 +46,35 @@ function controller($q, notification, serviceBroker) {
 
     const loadAll = () => {
         const definitionsPromise = serviceBroker
-            .loadViewData(CORE_API.AssessmentDefinitionStore.findByKind, [vm.parentEntityRef.kind]);
+            .loadViewData(
+                CORE_API.AssessmentDefinitionStore.findByKind,
+                [vm.parentEntityRef.kind]);
 
         const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.AssessmentRatingStore.findForEntityReference, [vm.parentEntityRef], {force: true});
+            .loadViewData(
+                CORE_API.AssessmentRatingStore.findForEntityReference,
+                [vm.parentEntityRef],
+                {force: true});
 
-        const ratingSchemePromise = serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findAll);
+        const ratingSchemePromise = serviceBroker
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findAll);
 
-        $q.all([definitionsPromise, ratingsPromise, ratingSchemePromise])
-            .then(([r1, r2, r3]) => ([r1.data, r2.data, r3.data]))
-            .then(([definitions, ratings, ratingSchemes]) => {
-                vm.assessmentDefinitions = definitions;
-                vm.assessmentRatings = ratings;
-                vm.ratingSchemes = ratingSchemes;
+        return $q
+            .all([definitionsPromise, ratingsPromise, ratingSchemePromise])
+            .then(responses => {
+                [vm.assessmentDefinitions, vm.assessmentRatings, vm.ratingSchemes] = resolveResponses(responses);
 
-                vm.assessments = mkEnrichedAssessmentDefinitions(vm.assessmentDefinitions, vm.ratingSchemes, vm.assessmentRatings);
+                vm.assessments = mkEnrichedAssessmentDefinitions(
+                    vm.assessmentDefinitions,
+                    vm.ratingSchemes,
+                    vm.assessmentRatings);
+
                 if (vm.selectedAssessment) {
                     // re-find the selected assessment
-                    vm.selectedAssessment = _.find(vm.assessments, a => a.definition.id === vm.selectedAssessment.definition.id);
+                    vm.selectedAssessment = _.find(
+                        vm.assessments,
+                        a => a.definition.id === vm.selectedAssessment.definition.id);
                 }
             });
     };
@@ -70,16 +84,21 @@ function controller($q, notification, serviceBroker) {
         loadAll();
     };
 
+
+    // INTERACT
+
     vm.onSelect = (def) => {
         vm.selectedAssessment = def;
         vm.mode = modes.VIEW;
     };
+
 
     vm.onClose = () => {
         vm.selectedAssessment = null;
         vm.mode = modes.LIST;
         loadAll();
     };
+
 
     vm.onRemove = (ctx) => {
         return serviceBroker

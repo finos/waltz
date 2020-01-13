@@ -19,10 +19,10 @@
 import services from "./services";
 import { registerComponents } from "../common/module-utils";
 import AssessmentEditor from "./components/editor/assessment-editor";
+import AssessmentEditorNew from "./components/editor-new/assessment-editor-new";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
-
 
 export default () => {
 
@@ -32,6 +32,7 @@ export default () => {
 
     registerComponents(module, [
         AssessmentEditor,
+        AssessmentEditorNew,
         AssessmentRatingList,
         AssessmentRatingSubSection,
         AssessmentRatingSummaryPies

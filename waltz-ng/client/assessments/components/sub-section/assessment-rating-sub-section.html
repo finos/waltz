@@ -16,7 +16,7 @@
   ~
   -->
 
-<waltz-sub-section name="Assessments">
+<waltz-sub-section name="Assessments" small="{{$ctrl.selectedAssessment.definition.name}}">
     <content>
         <div class="waltz-sub-section-content">
             <div ng-switch="$ctrl.mode" style="padding: 5px 0">
@@ -26,11 +26,11 @@
                     </waltz-assessment-rating-list>
                 </div>
                 <div ng-switch-when="VIEW">
-                    <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
+                    <waltz-assessment-editor-new assessment="$ctrl.selectedAssessment"
                                              on-save="$ctrl.onSave"
                                              on-close="$ctrl.onClose"
                                              on-remove="$ctrl.onRemove">
-                    </waltz-assessment-editor>
+                    </waltz-assessment-editor-new>
                 </div>
             </div>
         </div>
