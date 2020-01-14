@@ -37,7 +37,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class ComplexityExtractor extends BaseDataExtractor {
+public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 

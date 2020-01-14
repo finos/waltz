@@ -38,7 +38,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class SurveyRunExtractor extends BaseDataExtractor {
+public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SurveyRunExtractor.class);
     private static List<Field> SURVEY_RESPONSE_FIELDS;
@@ -165,9 +165,11 @@ public class SurveyRunExtractor extends BaseDataExtractor {
                 .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull());
     }
 
+
     private String mkFilename(String postfix) {
         return "survey-run-instances-" + postfix;
     }
+
 
     private String getSurveyRunNameById(long id) {
         return dsl.select(SURVEY_RUN.NAME)
@@ -175,6 +177,7 @@ public class SurveyRunExtractor extends BaseDataExtractor {
                 .where(SURVEY_RUN.ID.eq(id))
                 .fetchOne().component1();
     }
+
 
     private String getSurveyRunNameByInstanceId(long surveyInstanceId) {
         return dsl.select(SURVEY_RUN.NAME)
@@ -186,4 +189,5 @@ public class SurveyRunExtractor extends BaseDataExtractor {
                 ))
                 .fetchOne().component1();
     }
+
 }

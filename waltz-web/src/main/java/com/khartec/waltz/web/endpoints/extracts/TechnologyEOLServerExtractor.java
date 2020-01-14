@@ -36,7 +36,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class TechnologyEOLServerExtractor extends BaseDataExtractor {
+public class TechnologyEOLServerExtractor extends DirectQueryBasedDataExtractor {
 
     private final EntityReferenceNameResolver nameResolver;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
