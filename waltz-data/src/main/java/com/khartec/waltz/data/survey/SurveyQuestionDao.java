@@ -142,7 +142,7 @@ public class SurveyQuestionDao {
     private List<SurveyQuestion> findForTemplateIdSelector(Select<Record1<Long>> templateIdSelector) {
         return dsl.selectFrom(SURVEY_QUESTION)
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.in(templateIdSelector))
-                .orderBy(SURVEY_QUESTION.POSITION.asc())
+                .orderBy(SURVEY_QUESTION.POSITION.asc(), SURVEY_QUESTION.QUESTION_TEXT)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

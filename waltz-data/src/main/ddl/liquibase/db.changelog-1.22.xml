@@ -74,6 +74,7 @@
     </changeSet>
 
     <changeSet id="20191120-4496-6"
+               failOnError="false"
                author="kamransaleem">
         <comment>4496: adding unique index on software package (ext_id)</comment>
         <createIndex tableName="software_package"
