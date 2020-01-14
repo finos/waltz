@@ -34,16 +34,12 @@
 <script type="text/ng-template"
         id="wt/toggle-content.html">
     <span ng-show="$ctrl.state">
-        <span style="font-size: larger">
-            <waltz-icon name="{{ $ctrl.iconOn }}"></waltz-icon>
-        </span>
+        <waltz-icon name="{{ $ctrl.iconOn }}"></waltz-icon>
         <span ng-bind="$ctrl.labelOn"></span>
     </span>
 
     <span ng-show="! $ctrl.state">
-        <span style="font-size: larger">
-            <waltz-icon name="{{ $ctrl.iconOff }}"></waltz-icon>
-        </span>
+        <waltz-icon name="{{ $ctrl.iconOff }}"></waltz-icon>
         <span ng-bind="$ctrl.labelOff"></span>
     </span>
 </script>

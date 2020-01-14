@@ -147,6 +147,31 @@ const entityLoaders = {
                 }];
         }
     },
+    "PHYSICAL_SPECIFICATION": {
+        method: CORE_API.PhysicalSpecificationStore.getById,
+        mkProps: (spec, displayNameService, serviceBroker) => {
+            // serviceBroker
+            //     .loadViewData(CORE_API.PhysicalSpecificationStore.getById, [spec.specificationId])
+            //     .then(r => {
+            //         specificationFormat.value = ;
+            //         flow.name = r.data.name;
+            //         flow.description = flow.description || r.data.description;
+            //     });
+
+            return [
+                {
+                    name: "Owning Entity",
+                    value: spec.owningEntity.name
+                }, {
+                    name: "Format",
+                    value: displayNameService.lookup("dataFormatKind", spec.format, "?")
+                },
+                {
+                    name: "Provenance",
+                    value: spec.provenance
+                }];
+        }
+    },
     "DATA_TYPE": {
         method: CORE_API.DataTypeStore.getDataTypeById,
         mkProps: (dt) => ([
