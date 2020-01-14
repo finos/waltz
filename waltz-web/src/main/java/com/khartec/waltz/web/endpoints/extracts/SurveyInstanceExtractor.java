@@ -381,24 +381,24 @@ public class SurveyInstanceExtractor implements DataExtractor {
     }
 
 
-    private Object findValueInRecord(SurveyQuestion v1, Record qr) {
-        if (qr == null) {
+    private Object findValueInRecord(SurveyQuestion q, Record r) {
+        if (r == null) {
             return null;
         }
-        switch (v1.fieldType()) {
+        switch (q.fieldType()) {
             case NUMBER:
-                return qr.get(sqr.NUMBER_RESPONSE);
+                return r.get(sqr.NUMBER_RESPONSE);
             case BOOLEAN:
-                return qr.get(sqr.BOOLEAN_RESPONSE);
+                return r.get(sqr.BOOLEAN_RESPONSE);
             case DATE:
-                return qr.get(sqr.DATE_RESPONSE);
+                return r.get(sqr.DATE_RESPONSE);
             case APPLICATION:
             case PERSON:
-                return ofNullable(qr.get(responseNameField))
-                        .map(name -> name + " (" + qr.get(responseExtIdField) + ")")
+                return ofNullable(r.get(responseNameField))
+                        .map(name -> name + " (" + r.get(responseExtIdField) + ")")
                         .orElse(null);
             default:
-                return qr.get(sqr.STRING_RESPONSE);
+                return r.get(sqr.STRING_RESPONSE);
         }
     }
 
