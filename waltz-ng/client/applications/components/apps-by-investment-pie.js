@@ -16,8 +16,8 @@
  *
  */
 
-import { ragColorScale } from "../../common/colors";
-import { toKeyCounts } from "../../common";
+import {ragColorScale} from "../../common/colors";
+import {toKeyCounts} from "../../common";
 import template from "./apps-by-investment-pie.html";
 
 

@@ -34,6 +34,7 @@ export function determineDownwardsScopeForKind(kind) {
         case "SCENARIO":
         case "SERVER":
         case "SOFTWARE":
+        case "SOFTWARE_VERSION":
             return "EXACT";
         default:
             return "CHILDREN";

@@ -32,7 +32,9 @@ public abstract class SoftwarePackage implements
         DescriptionProvider,
         ExternalIdProvider,
         ProvenanceProvider,
-        CreatedUserTimestampProvider {
+        CreatedUserTimestampProvider,
+        EntityKindProvider,
+        WaltzEntity {
 
     @Nullable
     public abstract String vendor();
@@ -42,4 +44,15 @@ public abstract class SoftwarePackage implements
 
     public abstract boolean isNotable();
 
+    @Value.Default
+    public EntityKind kind() { return EntityKind.SOFTWARE; }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.SOFTWARE)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }
