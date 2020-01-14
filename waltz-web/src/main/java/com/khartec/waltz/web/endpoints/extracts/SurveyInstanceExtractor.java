@@ -171,7 +171,6 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                                                String reportName,
                                                                List<SurveyQuestion> questions,
                                                                List<List<Object>> reportRows) throws IOException {
-
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, mkExcelReport(reportName, questions, reportRows));
@@ -180,7 +179,6 @@ public class SurveyInstanceExtractor implements DataExtractor {
             default:
                 throw new UnsupportedOperationException("This report does not support export format: " + format);
         }
-
     }
 
 
