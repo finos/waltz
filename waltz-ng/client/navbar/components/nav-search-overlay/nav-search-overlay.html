@@ -40,7 +40,7 @@
             <input type='search'
                    class="form-control"
                    ng-model="$ctrl.query"
-                   ng-model-options="{ debounce: 250 }"
+                   ng-model-options="{ debounce: 300 }"
                    ng-change="$ctrl.doSearch()"
                    autocomplete="off"
                    autofocus="autofocus"
@@ -76,7 +76,7 @@
                             'clickable' : $ctrl.results[category].length > 0,
                             'wnso-selected': $ctrl.selectedCategory === category
                         }"
-                        ng-click="$ctrl.toggleCategory(category)">
+                        ng-click="$ctrl.onToggleCategory(category)">
                         <td>
                             <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}">
                                 <waltz-icon fixed-width="true"
@@ -103,10 +103,9 @@
                     <tr>
                         <th colspan="2">
                             Results
-
                             <waltz-toggle class="pull-right"
                                           state="$ctrl.showActiveOnly"
-                                          on-toggle="$ctrl.toggleActiveOnly()"
+                                          on-toggle="$ctrl.onToggleActiveOnly()"
                                           label-on="Active only"
                                           label-off="Active only">
                             </waltz-toggle>
