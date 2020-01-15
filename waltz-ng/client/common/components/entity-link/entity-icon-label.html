@@ -64,10 +64,11 @@
 <script type="text/ng-template"
         id="weil-popover-custom">
     <div ng-init="$ctrl.lazyLoad()"
+         style="overflow-wrap: break-word"
          class="small">
         <div ng-if="!$ctrl.ready">Loading...</div>
         <div ng-if="$ctrl.ready">
-            <h5 style="overflow-wrap: break-word">
+            <h5>
                 <span ng-bind="$ctrl.entity.name"></span>
             </h5>
 
