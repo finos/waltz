@@ -142,7 +142,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 reportName,
                 questions,
                 reportRows);
-}
+    }
 
 
     private Tuple3<ExtractFormat, String,byte[]> prepareInstancesOfRun(ExtractFormat format,
@@ -199,11 +199,11 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private List<String> mkHeaderStrings(List<SurveyQuestion> questions) {
         List<String> staticHeaders = newArrayList(
-                "NAME",
-                    "ID",
-                    "STATUS",
-                    "ID",
-                    "STATUS",
+                    "NAME",
+                    "RUN ID",
+                    "RUN STATUS",
+                    "SURVEY ID",
+                    "SURVEY STATUS",
                     "SUBJECT_NAME",
                     "SUBJECT_EXT_ID",
                     "SUBMITTED_AT",

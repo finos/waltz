@@ -106,9 +106,6 @@ public class AuthFlowsRatios {
                         "\t"))
                 .collect(joining("\n"));
 
-
-        float i = 3 / 2;
-
         System.out.printf(
                 "%s\n%s\n",
                 mkHeader(),
