@@ -39,7 +39,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class LicencesExtractor extends BaseDataExtractor {
+public class LicencesExtractor extends DirectQueryBasedDataExtractor {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 

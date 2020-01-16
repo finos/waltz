@@ -25,7 +25,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
-import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +107,7 @@ public class Main {
             endpoint.register();
         });
 
-        Map<String, BaseDataExtractor> extractors = ctx.getBeansOfType(BaseDataExtractor.class);
+        Map<String, DataExtractor> extractors = ctx.getBeansOfType(DataExtractor.class);
         extractors.forEach((name, extractor) -> {
             LOG.info("Registering Extractor: {}", name);
             extractor.register();

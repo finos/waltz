@@ -41,7 +41,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class ScenarioExtractor extends BaseDataExtractor {
+public class ScenarioExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScenarioExtractor.class);
 

@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
@@ -244,4 +245,26 @@ public class CollectionUtilities {
                 .findFirst();
     }
 
+
+    public static <X> long sumBy(Collection<X> xs, ToLongFunction<X> fn) {
+        return xs.stream().mapToLong(fn).sum();
+    }
+
+
+    public static Long sumInts(Collection<Integer> values) {
+        long acc = 0;
+        for(Integer v : values) {
+            acc += v;
+        }
+        return acc;
+    }
+
+
+    public static Long sumLongs(Collection<Long> values) {
+        long acc = 0;
+        for(Long v : values) {
+            acc += v;
+        }
+        return acc;
+    }
 }

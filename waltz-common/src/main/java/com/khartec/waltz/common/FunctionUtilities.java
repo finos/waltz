@@ -69,7 +69,7 @@ public class FunctionUtilities {
             T r = supplier.get();
             long end = System.currentTimeMillis();
 
-            LOG.info("-- dur [{}]: {}", name, (end - st));
+            LOG.info("duration [{}]: {}", name, (end - st));
             return r;
         } catch (Exception e) {
             String msg = String.format("Unexpected error when timing [%s]: %s", name, e.getMessage());

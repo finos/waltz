@@ -39,7 +39,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class TechnologyEOLDatabaseExtractor extends BaseDataExtractor {
+public class TechnologyEOLDatabaseExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TechnologyEOLDatabaseExtractor.class);
     private final EntityReferenceNameResolver nameResolver;

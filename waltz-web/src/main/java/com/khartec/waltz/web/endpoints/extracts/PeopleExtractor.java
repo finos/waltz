@@ -38,7 +38,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class PeopleExtractor extends BaseDataExtractor{
+public class PeopleExtractor extends DirectQueryBasedDataExtractor {
 
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
