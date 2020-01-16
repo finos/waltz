@@ -43,7 +43,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class PhysicalFlowExtractor extends BaseDataExtractor {
+public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 

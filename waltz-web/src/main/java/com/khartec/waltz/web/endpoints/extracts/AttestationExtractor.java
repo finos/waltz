@@ -37,7 +37,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class AttestationExtractor extends BaseDataExtractor {
+public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(AttestationExtractor.class);
 
