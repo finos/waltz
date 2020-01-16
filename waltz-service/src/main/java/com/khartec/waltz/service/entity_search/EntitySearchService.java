@@ -21,9 +21,7 @@ package com.khartec.waltz.service.entity_search;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.SearchUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.WaltzEntity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.app_group.AppGroupService;
@@ -120,11 +118,14 @@ public class EntitySearchService {
             return Collections.emptyList();
         }
 
-        List<Future<Collection<? extends WaltzEntity>>> futures = options.entityKinds().stream()
+        List<Future<Collection<? extends WaltzEntity>>> futures = options
+                .entityKinds()
+                .stream()
                 .map(ek -> dbExecutorPool.submit(mkCallable(ek, options)))
                 .collect(toList());
 
-        return futures.stream()
+        return futures
+                .stream()
                 .flatMap(f -> supplier(f::get).get().stream())
                 .map(WaltzEntity::entityReference)
                 .collect(toList());

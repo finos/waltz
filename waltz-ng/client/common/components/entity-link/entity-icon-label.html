@@ -64,12 +64,13 @@
 <script type="text/ng-template"
         id="weil-popover-custom">
     <div ng-init="$ctrl.lazyLoad()"
+         style="overflow-wrap: break-word"
          class="small">
         <div ng-if="!$ctrl.ready">Loading...</div>
         <div ng-if="$ctrl.ready">
-            <h4>
+            <h5>
                 <span ng-bind="$ctrl.entity.name"></span>
-            </h4>
+            </h5>
 
             <div style="margin-left: 12px;  margin-bottom: 6px;"
                  ng-if="$ctrl.imageUrl">

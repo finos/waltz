@@ -41,7 +41,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class MeasurableCategoryExtractor extends BaseDataExtractor {
+public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MeasurableCategoryExtractor.class);
 

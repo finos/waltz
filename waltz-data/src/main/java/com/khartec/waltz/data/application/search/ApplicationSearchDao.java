@@ -35,7 +35,6 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
@@ -71,11 +70,10 @@ public class ApplicationSearchDao {
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
-        Condition assetCodeCondition = terms.stream()
+        Condition assetCodeCondition = terms
+                .stream()
                 .map(APPLICATION.ASSET_CODE::startsWith)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+                .reduce(DSL.trueCondition(), Condition::and);
 
         List<Application> appsViaAssetCode = dsl.selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
@@ -85,13 +83,13 @@ public class ApplicationSearchDao {
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        Condition aliasCondition = terms.stream()
+        Condition aliasCondition = terms
+                .stream()
                 .map(ENTITY_ALIAS.ALIAS::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name()),
-                        (acc, frag) -> acc.and(frag)));
+                .reduce(ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name()), Condition::and);
 
-        List<Application> appsViaAlias = dsl.selectDistinct(APPLICATION.fields())
+        List<Application> appsViaAlias = dsl
+                .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .innerJoin(ENTITY_ALIAS)
                 .on(ENTITY_ALIAS.ID.eq(APPLICATION.ID))
@@ -101,13 +99,13 @@ public class ApplicationSearchDao {
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        Condition nameCondition = terms.stream()
+        Condition nameCondition = terms
+                .stream()
                 .map(APPLICATION.NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+                .reduce(DSL.trueCondition(), Condition::and);
 
-        List<Application> appsViaName = dsl.selectDistinct(APPLICATION.fields())
+        List<Application> appsViaName = dsl
+                .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(nameCondition)
                 .and(lifecycleCondition)

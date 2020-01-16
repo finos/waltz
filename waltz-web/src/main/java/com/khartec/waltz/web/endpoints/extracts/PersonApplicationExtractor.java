@@ -33,7 +33,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class PersonApplicationExtractor extends BaseDataExtractor {
+public class PersonApplicationExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersonApplicationExtractor.class);
 

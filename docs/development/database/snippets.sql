@@ -77,6 +77,20 @@ DELETE FROM survey_template;
  */
 
 --[FLOWS]---
+
+-- produce graphviz like output for set of phys flows by assoc tag:
+--   prefix with `digraph G { rankdir=LR;`
+select distinct(concat('"', sa.name, '" -> "', ta.name, '"'))
+from physical_flow pf
+inner join logical_flow lf on pf.logical_flow_id = lf.id
+inner join application sa on sa.id = lf.source_entity_id
+inner join application ta on ta.id = lf.target_entity_id
+inner join tag_usage tu on tu.entity_id = pf.id and tu.entity_kind = 'PHYSICAL_FLOW'
+inner join tag t on t.id = tu.tag_id
+where t.target_kind = 'PHYSICAL_FLOW';
+--   postfix with `}`
+
+
 -- find deleted logical flows which still have remaining physical flows
 select distinct
 	aSource.name,

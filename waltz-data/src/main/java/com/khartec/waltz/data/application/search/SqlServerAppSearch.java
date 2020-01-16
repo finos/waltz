@@ -37,8 +37,8 @@ public class SqlServerAppSearch implements FullTextSearch<Application>, Database
     public List<Application> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
 
-        return dsl.select(APPLICATION.fields())
-                .from(APPLICATION)
+        return dsl
+                .selectFrom(APPLICATION)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()))
                 .limit(options.limit())
