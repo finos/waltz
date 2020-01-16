@@ -34,7 +34,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class AllocationsExtractor extends BaseDataExtractor{
+public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 

@@ -36,7 +36,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class ApplicationExtractor extends BaseDataExtractor {
+public class ApplicationExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationExtractor.class);
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
