@@ -39,23 +39,18 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static java.util.Optional.ofNullable;
 
 
-public abstract class BaseDataExtractor {
+public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
     protected DSLContext dsl;
 
 
-    public BaseDataExtractor(DSLContext dsl) {
+    public DirectQueryBasedDataExtractor(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
         this.dsl = dsl;
     }
-
-
-    public abstract void register();
 
 
     protected Object writeExtract(String suggestedFilenameStem,
@@ -107,11 +102,6 @@ public abstract class BaseDataExtractor {
     }
 
 
-    private String sanitizeSheetName(String suggestedFilenameStem) {
-        return mkSafe(suggestedFilenameStem).replaceAll("[:;*?/\\\\]", "");
-    }
-
-
     private Object writeAsCSV(String suggestedFilenameStem,
                               Select<?> qry,
                               Response response) {
@@ -157,14 +147,6 @@ public abstract class BaseDataExtractor {
             Cell cell = headerRow.createCell(colNum.getAndIncrement());
             cell.setCellValue(Objects.toString(f.getName()));
         });
-    }
-
-
-    private ExtractFormat parseExtractFormat(Request request) {
-        return readEnum(
-                request.queryParams("format"),
-                ExtractFormat.class,
-                v -> ExtractFormat.CSV);
     }
 
 }
