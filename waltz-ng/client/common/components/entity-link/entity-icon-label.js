@@ -147,6 +147,22 @@ const entityLoaders = {
                 }];
         }
     },
+    "PHYSICAL_SPECIFICATION": {
+        method: CORE_API.PhysicalSpecificationStore.getById,
+        mkProps: (spec, displayNameService, serviceBroker) => {
+            return [
+                {
+                    name: "Owning Entity",
+                    value: spec.owningEntity.name
+                }, {
+                    name: "Format",
+                    value: displayNameService.lookup("dataFormatKind", spec.format, "?")
+                }, {
+                    name: "Provenance",
+                    value: spec.provenance
+                }];
+        }
+    },
     "DATA_TYPE": {
         method: CORE_API.DataTypeStore.getDataTypeById,
         mkProps: (dt) => ([

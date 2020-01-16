@@ -41,6 +41,7 @@ public abstract class Application implements
         ProvenanceProvider,
         WaltzEntity,
         EntityLifecycleStatusProvider,
+        ExternalIdProvider,
         OrganisationalUnitIdProvider {
 
     public abstract Optional<String> assetCode();
@@ -62,6 +63,7 @@ public abstract class Application implements
     }
 
 
+    @Override
     @Value.Derived
     public Optional<String> externalId() { return assetCode(); }
 

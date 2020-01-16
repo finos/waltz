@@ -22,10 +22,10 @@ import template from "./toggle.html";
 
 
 const bindings = {
-    labelOn: "@",
-    labelOff: "@",
-    iconOn: "@",
-    iconOff: "@",
+    labelOn: "@?",
+    labelOff: "@?",
+    iconOn: "@?",
+    iconOff: "@?",
     onToggle: "&",
     state: "<",
     readOnly: "<"
