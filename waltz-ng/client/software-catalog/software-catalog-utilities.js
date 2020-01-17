@@ -1,12 +1,14 @@
 import _ from "lodash";
 
-export function groupByVersionId(usages = []) {
-    const usagesByVersionId = _
+export function countByVersionId(usages = []) {
+    // console.time('counting usages')
+    const countsByVersionId =  _
         .chain(usages)
-        .map(u => Object.assign({}, _.pick(u, ["softwarePackageId", "softwareVersionId", "applicationId"])))
-        .uniqWith(_.isEqual)
-        .groupBy(u => u.softwareVersionId)
+        .map(u => Object.assign({}, _.pick(u, ["softwareVersionId", "applicationId"])))
+        .uniqBy(u => "v:" + u.softwareVersionId + "_a:" + u.applicationId)
+        .countBy(u => u.softwareVersionId)
         .value();
 
-    return usagesByVersionId;
+    // console.timeEnd('counting usages')
+    return countsByVersionId;
 }
