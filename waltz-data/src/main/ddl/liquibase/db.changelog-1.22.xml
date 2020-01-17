@@ -530,4 +530,20 @@
                         newDataType="DECIMAL(16,2)"/>
     </changeSet>
 
+
+    <!-- 3842: svg_diagram width/height percentage config -->
+    <changeSet id="20200114-3842-1"
+               author="rovats">
+        <comment>3842: svg diagram width, height percentage config</comment>
+        <addColumn tableName="svg_diagram">
+            <column name="display_width_percent"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="display_height_percent"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

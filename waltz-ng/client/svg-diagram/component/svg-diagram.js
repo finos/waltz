@@ -35,13 +35,12 @@ const initialState = {
 };
 
 
-function resize(elem, win) {
-
-    const width = win.innerWidth * 0.7 || 1024;
+function resize(elem, win, widthPercent, heightPercent) {
+    const width = (win.innerWidth * ((widthPercent || 70) / 100)) || 1024;
     select(elem[0])
         .select("svg")
         .attr("width", `${width}px`)
-        .attr("height", `${width*0.8}px`);
+        .attr("height", `${width*((heightPercent || 80) / 100)}px`);
 }
 
 
@@ -50,11 +49,11 @@ function controller($element, $window) {
 
     vm.$onInit = () => angular
         .element($window)
-        .on("resize", () => resize($element, $window));
+        .on("resize", () => resize($element, $window, vm.diagram.displayWidthPercent, vm.diagram.displayHeightPercent));
 
     vm.$onDestroy = () => angular
         .element($window)
-        .off("resize", () => resize($element, $window));
+        .off("resize", () => resize($element, $window, vm.diagram.displayWidthPercent, vm.diagram.displayHeightPercent));
 
     vm.$onChanges = () => {
         if (!vm.diagram) return;
@@ -72,7 +71,7 @@ function controller($element, $window) {
                             .select("svg")
                             .select("svg > g");
 
-        resize($element, $window);
+        resize($element, $window, vm.diagram.displayWidthPercent, vm.diagram.displayHeightPercent);
 
         const dataProp = `data-${vm.diagram.keyProperty}`;
         const dataBlocks = svgEl.querySelectorAll(`[${dataProp}]`);

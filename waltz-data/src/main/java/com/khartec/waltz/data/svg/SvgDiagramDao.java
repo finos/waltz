@@ -50,6 +50,8 @@ public class SvgDiagramDao {
                 .group(record.getGroup())
                 .svg(record.getSvg())
                 .product(record.getProduct())
+                .displayWidthPercent(record.getDisplayWidthPercent())
+                .displayHeightPercent(record.getDisplayHeightPercent())
                 .build();
     };
 
