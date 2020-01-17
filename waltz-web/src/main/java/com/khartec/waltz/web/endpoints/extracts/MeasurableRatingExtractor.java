@@ -25,7 +25,6 @@ import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.*;
-import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

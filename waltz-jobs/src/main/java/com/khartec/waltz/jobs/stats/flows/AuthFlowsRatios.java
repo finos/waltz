@@ -8,7 +8,6 @@ import com.khartec.waltz.schema.tables.EnumValue;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.service.DIConfiguration;
-import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Seq;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ import java.util.Map;
 import static com.khartec.waltz.common.CollectionUtilities.sumInts;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static java.util.stream.Collectors.joining;
-import static org.jooq.lambda.Seq.seq;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

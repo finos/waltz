@@ -21,7 +21,6 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
-import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
