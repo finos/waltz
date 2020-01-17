@@ -67,7 +67,7 @@ function controller($element,
     const documentClick = (e) => {
         const element = $element[0];
         if(!isDescendant(element, e.target)) {
-            vm.dismiss();
+            vm.onDismiss();
         }
     };
 
@@ -90,16 +90,6 @@ function controller($element,
     vm.$onDestroy = () => {
         $document.off("click", documentClick);
     };
-
-
-    vm.onDismiss = () => {
-        if (vm.onDismiss) {
-            vm.onDismiss();
-        } else {
-            console.log("No dismiss handler registered");
-        }
-    };
-
 
     vm.onToggleCategory = (c) => {
         if ((vm.results[c] || []).length === 0) {
@@ -180,7 +170,7 @@ function controller($element,
             if(vm.query) {
                 vm.clearSearch();
             } else {
-                vm.dismiss();
+                vm.onDismiss();
             }
         }
         evt.stopPropagation();
@@ -191,7 +181,7 @@ function controller($element,
 
     const onOverlayKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
-            vm.dismiss();
+            vm.onDismiss();
         }
     };
 
