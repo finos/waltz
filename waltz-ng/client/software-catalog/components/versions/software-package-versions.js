@@ -68,7 +68,7 @@ function mkColumnDefs() {
             cellTemplate: `<div class="ui-grid-cell-contents">
                                <a class="clickable" 
                                   ng-bind="COL_FIELD" 
-                                  ng-click="grid.appScope.selectVersion(row.entity)">
+                                  ng-click="grid.appScope.onSelectVersion(row.entity)">
                                </a>
                            </div>`
         }
@@ -106,7 +106,7 @@ function controller(serviceBroker) {
     };
 
 
-    vm.selectVersion = (version) => {
+    vm.onSelectVersion = (version) => {
         vm.selectedVersion = version;
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [mkSelectionOptions(version)])
