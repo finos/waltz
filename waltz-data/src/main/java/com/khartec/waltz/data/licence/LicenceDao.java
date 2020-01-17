@@ -39,6 +39,9 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Licence.LICENCE;
+import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 
 
 @Repository
@@ -103,32 +106,12 @@ public class LicenceDao {
     public List<Tally<Long>> countApplications() {
 
         Field licenceId = DSL.field("licence_id", Long.class);
-        Field appId = DSL.field("app_id", Long.class);
 
-
-        SelectConditionStep<Record2<Long, Long>> appToLicence = DSL.selectDistinct(LICENCE.ID.as(licenceId), APPLICATION.ID.as(appId))
-                .from(ENTITY_RELATIONSHIP)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_A))
-                .innerJoin(LICENCE)
-                    .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
-                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name()));
-
-        SelectConditionStep<Record2<Long, Long>> licenceToApp = DSL.selectDistinct(LICENCE.ID.as(licenceId), APPLICATION.ID.as(appId))
-                .from(ENTITY_RELATIONSHIP)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_B))
-                .innerJoin(LICENCE)
-                    .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
-                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.LICENCE.name()));
-
-
-        Table<Record2<Long, Long>> appLicences = appToLicence
-                .union(licenceToApp)
+        Table<Record2<Long, Long>> appLicences = DSL.selectDistinct(SOFTWARE_USAGE.APPLICATION_ID, SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .innerJoin(SOFTWARE_USAGE)
+                    .on(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
                 .asTable("appLicences");
-
 
         return JooqUtilities.calculateLongTallies(
                 dsl,

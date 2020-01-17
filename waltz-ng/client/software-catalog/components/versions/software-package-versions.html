@@ -19,8 +19,29 @@
 <div>
 
     <waltz-grid-with-search class="software-package-version-grid"
+                            scope-provider="$ctrl"
                             entries="$ctrl.gridData"
                             column-defs="$ctrl.columnDefs">
     </waltz-grid-with-search>
+
+    <div ng-if="$ctrl.selectedApps && $ctrl.selectedApps.length > 0">
+        <hr>
+        <h4>
+            Applications using
+            <strong>
+                    <span ng-bind="$ctrl.softwarePackage.name">
+                    </span>
+            </strong>
+            version
+            <strong>
+                    <span ng-bind="$ctrl.selectedVersion.name">
+                    </span>
+            </strong>
+            (<span ng-bind="$ctrl.selectedApps.length"></span>)
+        </h4>
+
+        <waltz-app-table applications="$ctrl.selectedApps">
+        </waltz-app-table>
+    </div>
 
 </div>

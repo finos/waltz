@@ -19,7 +19,8 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
-import {groupByVersionId} from "../../software-catalog-utilities";
+import {countByVersionId, groupByVersionId} from "../../software-catalog-utilities";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./software-package-versions.html";
 
@@ -31,7 +32,8 @@ const bindings = {
 
 const initialState = {
     softwareCatalog: null,
-    softwarePackage: null
+    softwarePackage: null,
+    selectedVersion: null
 };
 
 
@@ -39,7 +41,14 @@ function mkColumnDefs() {
     return [
         {
             field: "version",
-            name: "Version",
+            displayName: "Version",
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <waltz-entity-link entity-ref="row.entity"
+                                       tooltip-placement="right"
+                                       icon-placement="none">
+                    </waltz-entity-link>
+                </div>`
         },
         {
             field: "externalId",
@@ -55,23 +64,26 @@ function mkColumnDefs() {
         },
         {
             field: "usageCount",
-            name: "# Applications"
+            name: "# Applications",
+            cellTemplate: `<div class="ui-grid-cell-contents">
+                               <a class="clickable" 
+                                  ng-bind="COL_FIELD" 
+                                  ng-click="grid.appScope.onSelectVersion(row.entity)">
+                               </a>
+                           </div>`
         }
     ];
 }
 
 
 function mkGridData(softwarePackage = {}, versions = [], usages = []) {
-    const usagesByVersionId = groupByVersionId(usages);
-
+    const countsByVersionId = countByVersionId(usages);
     const gridData = _.map(versions, v => Object.assign(
         {},
         v,
-        {usageCount: _.get(usagesByVersionId, `[${v.id}].length`, 0)}));
-
+        {usageCount: _.get(countsByVersionId, `[${v.id}]`, 0) }));
     return gridData;
 }
-
 
 
 function controller(serviceBroker) {
@@ -90,6 +102,17 @@ function controller(serviceBroker) {
                 vm.gridData = mkGridData(vm.softwarePackage,
                                          vm.softwareCatalog.versions,
                                          vm.softwareCatalog.usages);
+            });
+    };
+
+
+    vm.onSelectVersion = (version) => {
+        vm.selectedVersion = version;
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [mkSelectionOptions(version)])
+            .then(r => r.data)
+            .then(apps => {
+                vm.selectedApps = apps;
             });
     };
 
