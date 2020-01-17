@@ -57,7 +57,6 @@ const initialState = {
 };
 
 
-
 function controller($element,
                     $document,
                     $timeout,
@@ -92,7 +91,8 @@ function controller($element,
         $document.off("click", documentClick);
     };
 
-    vm.dismiss = () => {
+
+    vm.onDismiss = () => {
         if (vm.onDismiss) {
             vm.onDismiss();
         } else {
@@ -100,7 +100,8 @@ function controller($element,
         }
     };
 
-    vm.toggleCategory = (c) => {
+
+    vm.onToggleCategory = (c) => {
         if ((vm.results[c] || []).length === 0) {
             return;
         }
@@ -113,7 +114,8 @@ function controller($element,
 
 
     // helper fn, to reduce boilerplate
-    const handleSearch = (query, entityKind) => {
+    const handleSearch = (query,
+                          entityKind) => {
         const statuses = vm.showActiveOnly
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
@@ -141,18 +143,18 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, entity.APPLICATION.key,);
-        handleSearch(query, entity.CHANGE_INITIATIVE.key,);
-        handleSearch(query, entity.DATA_TYPE.key,);
-        handleSearch(query, entity.PERSON.key,);
-        handleSearch(query, entity.MEASURABLE.key,);
-        handleSearch(query, entity.ORG_UNIT.key,);
-        handleSearch(query, entity.ACTOR.key,);
-        handleSearch(query, entity.PHYSICAL_SPECIFICATION.key,);
-        handleSearch(query, entity.APP_GROUP.key,);
-        handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key,);
-        handleSearch(query, entity.ROADMAP.key,);
-        handleSearch(query, entity.SERVER.key,);
+        handleSearch(query, entity.APPLICATION.key);
+        handleSearch(query, entity.CHANGE_INITIATIVE.key);
+        handleSearch(query, entity.DATA_TYPE.key);
+        handleSearch(query, entity.PERSON.key);
+        handleSearch(query, entity.MEASURABLE.key);
+        handleSearch(query, entity.ORG_UNIT.key);
+        handleSearch(query, entity.ACTOR.key);
+        handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
+        handleSearch(query, entity.APP_GROUP.key);
+        handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
+        handleSearch(query, entity.ROADMAP.key);
+        handleSearch(query, entity.SERVER.key);
     };
 
     vm.doSearch = () => doSearch(vm.query);
@@ -193,7 +195,7 @@ function controller($element,
         }
     };
 
-    vm.toggleActiveOnly = () => {
+    vm.onToggleActiveOnly = () => {
         vm.showActiveOnly = ! vm.showActiveOnly;
         vm.doSearch();
     };

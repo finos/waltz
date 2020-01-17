@@ -27,7 +27,7 @@ const bindings = {
     entityKinds: "<",
     entityLifecycleStatuses: "<?",
     itemId: "<",
-    limit: "<",
+    limit: "<?",
     onSelect: "<",
     required: "<",
     selectionFilter: "<"

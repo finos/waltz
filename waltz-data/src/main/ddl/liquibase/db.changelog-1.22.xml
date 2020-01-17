@@ -74,6 +74,7 @@
     </changeSet>
 
     <changeSet id="20191120-4496-6"
+               failOnError="false"
                author="kamransaleem">
         <comment>4496: adding unique index on software package (ext_id)</comment>
         <createIndex tableName="software_package"
@@ -518,6 +519,15 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+    </changeSet>
+
+
+    <!-- 4592: asset costs table from decimal(10,2) to decimal(16,2) -->
+    <changeSet id="20200109-4592-1"
+               author="woodjes">
+        <modifyDataType tableName="asset_cost"
+                        columnName="amount"
+                        newDataType="DECIMAL(16,2)"/>
     </changeSet>
 
 

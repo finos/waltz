@@ -39,7 +39,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class LogicalFlowExtractor extends BaseDataExtractor {
+public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Field<String> SOURCE_NAME_FIELD = mkNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,

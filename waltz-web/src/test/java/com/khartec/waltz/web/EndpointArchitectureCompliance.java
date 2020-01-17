@@ -19,7 +19,8 @@
 package com.khartec.waltz.web;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DirectQueryBasedDataExtractor;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
 import org.springframework.stereotype.Service;
@@ -57,9 +58,9 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
     @Test
     public void extractorsNeedServiceAnnotation() {
         ArchRule rule = classes().that()
-                .areAssignableTo(BaseDataExtractor.class)
+                .areAssignableTo(DataExtractor.class)
                 .and()
-                .dontHaveSimpleName("BaseDataExtractor")
+                .dontHaveSimpleName("DataExtractor")
                 .should()
                 .haveNameMatching(".*Extractor")
                 .andShould()
@@ -73,9 +74,9 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .haveNameMatching(".*Extractor")
                 .and()
-                .dontHaveSimpleName("BaseDataExtractor")
+                .dontHaveSimpleName("DirectQueryBasedDataExtractor")
                 .should()
-                .beAssignableTo(BaseDataExtractor.class);
+                .beAssignableTo(DirectQueryBasedDataExtractor.class);
         rule.check(waltzOnlyClasses);
     }
 
