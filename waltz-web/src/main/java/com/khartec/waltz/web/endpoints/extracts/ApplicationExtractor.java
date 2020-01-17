@@ -22,6 +22,7 @@ import com.khartec.waltz.data.SelectorUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.Application;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

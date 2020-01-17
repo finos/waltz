@@ -23,6 +23,7 @@ import com.khartec.waltz.model.survey.ImmutableSurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -23,6 +23,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
