@@ -24,7 +24,7 @@
         <!-- Dismiss -->
         <small class="pull-right">
             <a class="clickable"
-               ng-click="$ctrl.dismiss()">
+               ng-click="$ctrl.onDismiss()">
                 <waltz-icon name="close"></waltz-icon>
             </a>
         </small>
@@ -118,7 +118,7 @@
                         <tr ng-repeat="item in $ctrl.results[category]">
                             <td>
                                 <waltz-entity-link tooltip-placement="bottom"
-                                                   ng-click="$ctrl.dismiss()"
+                                                   ng-click="$ctrl.onDismiss()"
                                                    entity-ref="item">
                                 </waltz-entity-link>
                             </td>
