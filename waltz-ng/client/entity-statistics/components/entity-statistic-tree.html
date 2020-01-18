@@ -17,6 +17,15 @@
   -->
 
 <div>
+
+    <waltz-search-control on-query="$ctrl.doSearch"
+                          min-characters='2'
+                          delay="200"
+                          placeholder-text="Search">
+    </waltz-search-control>
+
+    <br>
+
     <treecontrol class="tree-light"
                  order-by="'-name'"
                  tree-model="$ctrl.definitionTree"
@@ -25,4 +34,5 @@
                  on-selection="$ctrl.handleSelection(node)">
         <span ng-bind="node.name"></span>
     </treecontrol>
+
 </div>

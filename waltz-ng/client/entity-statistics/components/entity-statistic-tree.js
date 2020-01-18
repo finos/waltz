@@ -16,14 +16,14 @@
  *
  */
 
-import {buildHierarchies, findNode} from "../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, findNode, prepareSearchNodes} from "../../common/hierarchy-utils";
 import template from "./entity-statistic-tree.html";
 
 
 const bindings = {
     definitions: "<",
     onSelection: "<",
-    currentDefinitionId: "<"
+    currentDefinitionId: "<?"
 };
 
 
@@ -33,8 +33,12 @@ const initialState = {
 };
 
 
-function buildDefinitionTree(definitions = []) {
-    return buildHierarchies(definitions, false);
+function buildDefinitionTree(definitions = [], searchQuery) {
+    const includedDefinitions = searchQuery
+        ? doSearch(searchQuery, definitions)
+        : definitions;
+
+    return buildHierarchies(includedDefinitions, false);
 }
 
 
@@ -52,10 +56,14 @@ function findParents(forest, currentNode) {
 function controller() {
     const vm = Object.assign(this, initialState);
 
+    let searchableItems = [];
+
     vm.$onChanges = () => {
-        vm.definitionTree = buildDefinitionTree(vm.definitions);
         vm.currentNode = findNode(vm.definitionTree, vm.currentDefinitionId);
         vm.expandedNodes = findParents(vm.definitionTree, vm.currentNode);
+
+        searchableItems = prepareSearchNodes(vm.definitions);
+        vm.doSearch(); // do an _empty_ search to show all nodes
     };
 
     vm.treeOptions = {
@@ -64,12 +72,19 @@ function controller() {
         equality: (a, b) => a && b && a.id === b.id
     };
 
+
     vm.handleSelection = (node) =>  {
         if (node.id !== vm.currentDefinitionId) {
             vm.currentDefinitionId = node.id;
             vm.onSelection(node);
         }
-    }
+    };
+
+
+    vm.doSearch = (qry) => {
+        vm.definitionTree = buildDefinitionTree(doSearch(qry, searchableItems));
+    };
+
 }
 
 
