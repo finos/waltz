@@ -53,29 +53,33 @@ function controller($q,
     const loadData = () => {
 
         const runsPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationRunStore.findByEntityRef,
+            .loadViewData(
+                CORE_API.AttestationRunStore.findByEntityRef,
                 [vm.parentEntityRef],
                 { force: true })
             .then(r => r.data);
 
         const instancesPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef,
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findByEntityRef,
                 [vm.parentEntityRef],
                 { force: true })
             .then(r => r.data);
 
         const logicalFlowsPromise = serviceBroker
-            .loadViewData(CORE_API.LogicalFlowStore.findByEntityReference,
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findByEntityReference,
                 [vm.parentEntityRef],
                 {force: true})
             .then(r => r.data);
 
         const logicalFlowDecoratorPromise = serviceBroker
-            .loadViewData(CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
+            .loadViewData(
+                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
                 [{
                     entityReference: vm.parentEntityRef,
-                    scope: 'EXACT'
-                }, 'DATA_TYPE'])
+                    scope: "EXACT"
+                }, "DATA_TYPE"])
             .then(r => r.data);
 
         const dataTypePromise = serviceBroker
@@ -96,7 +100,8 @@ function controller($q,
             }
         ];
 
-        return $q.all([runsPromise, instancesPromise, logicalFlowsPromise, logicalFlowDecoratorPromise, dataTypePromise])
+        return $q
+            .all([runsPromise, instancesPromise, logicalFlowsPromise, logicalFlowDecoratorPromise, dataTypePromise])
             .then(([runs, instances, logicalFlows, flowDecorators, dataTypes]) => {
 
                 vm.attestations = mkAttestationData(runs, instances);
@@ -129,11 +134,13 @@ function controller($q,
                     .map(dt => dt.id)
                     .value();
 
-                vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes = _.filter(flowDecorators,
-                        d =>
-                            _.includes(upstreamFlowIds, d.dataFlowId)
-                            && _.includes(unknownOrDeprecatedDatatypeIds, d.decoratorEntity.id));
-
+                vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes = _.filter(
+                    flowDecorators,
+                    d => {
+                        const isUpstream = _.includes(upstreamFlowIds, d.dataFlowId);
+                        const isUnknownOrDeprecated = _.includes(unknownOrDeprecatedDatatypeIds, d.decoratorEntity.id);
+                        return isUpstream && isUnknownOrDeprecated;
+                    });
             });
     };
 
@@ -151,15 +158,18 @@ function controller($q,
 
     vm.attestEntity = () => {
 
-        if(vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes.length !== 0 && vm.createType === 'LOGICAL_DATA_FLOW'){
-            confirm("This application is connected to unknown and / or deprecated data types, please update these flows before the attestation can be updated.");
+        if(vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes.length !== 0 && vm.createType === "LOGICAL_DATA_FLOW"){
             return notification.error("Flows cannot be attested. Please update all unknown and deprecated datatypes before attesting logical flows.");
         }
 
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
+            const attestationCommand = mkAttestationCommand(
+                vm.parentEntityRef,
+                vm.createType);
             return serviceBroker
-                .execute(CORE_API.AttestationInstanceStore.attestEntityForUser,
-                    [mkCreateCommand(vm.parentEntityRef, vm.createType)])
+                .execute(
+                    CORE_API.AttestationInstanceStore.attestEntityForUser,
+                    [attestationCommand])
                 .then(() => notification.success("Attested successfully"))
                 .then(() => loadData())
                 .then(() => vm.setCreateType(null));
@@ -193,11 +203,11 @@ function controller($q,
 }
 
 
-function mkCreateCommand(parentEntityRef, entityKind){
-
+function mkAttestationCommand(parentEntityRef, entityKind){
     return {
         entityReference: parentEntityRef,
-        attestedEntityKind: entityKind};
+        attestedEntityKind: entityKind
+    };
 }
 
 

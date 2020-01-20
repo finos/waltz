@@ -16,23 +16,23 @@
  *
  */
 
-import {initialiseData, invokeFunction} from '../../../common/index';
+import {initialiseData, invokeFunction} from "../../../common/index";
 
-import template from './attestation-confirmation.html';
+import template from "./attestation-confirmation.html";
 
 
 const bindings = {
-    instance: '<',
-    run: '<',
-    attestedEntityRef: '<?',
-    onConfirm: '<',
-    onCancel: '<'
+    instance: "<",
+    run: "<",
+    attestedEntityRef: "<?",
+    onConfirm: "<?",
+    onCancel: "<?"
 };
 
 
 const initialState = {
-    onConfirm: (attestation) => console.log('default onConfirm handler for attestation-confirmation: '+ instance),
-    onCancel: () => console.log('default onCancel handler for attestation-confirmation')
+    onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ instance),
+    onCancel: () => console.log("default onCancel handler for attestation-confirmation")
 };
 
 
@@ -62,5 +62,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAttestationConfirmation'
+    id: "waltzAttestationConfirmation"
 };
