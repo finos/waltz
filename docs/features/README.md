@@ -8,6 +8,7 @@ Feature | Overview
 [Asset Costs](asset_costs/README.md) | Cost information for apps
 [Bookmarks](bookmarks/README.md) | External bookmark collections 
 [Complexity](complexity/README.md) | Application complexity calculations
+[Entity Lifecycle](entity_lifecycle/README.md) | Explanation of how record and entity lifecycle is managed
 [Entity Notes](entity_notes/README.md) | Unstructured notes that can be attached to entities
 [Entity Relationship](entity_relationship/README.md) | Custom relationships between entities
 [Flow Diagrams](flow_diagrams/README.md) | User created diagrams showing flows between applications
