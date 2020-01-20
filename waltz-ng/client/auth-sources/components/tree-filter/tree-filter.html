@@ -63,7 +63,7 @@
             <waltz-search-control on-query="$ctrl.doSearch"
                                   min-characters='2'
                                   delay="200"
-                                  placeholderText="Search Data Types">
+                                  placeholder-text="Search Data Types">
             </waltz-search-control>
         </div>
     </div>
@@ -83,8 +83,8 @@
                 </span>
             </span>
             <waltz-icon name="close" ng-if="$ctrl.isSelected(node)"
-                        ng-click="$ctrl.removeSelected(node.id)"></waltz-icon>
-
+                        ng-click="$ctrl.removeSelected(node.id)">
+            </waltz-icon>
         </treecontrol>
     </div>
 </div>
