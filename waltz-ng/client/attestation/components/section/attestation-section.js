@@ -52,6 +52,11 @@ function controller($q,
 
     const loadData = () => {
 
+        const selector = {
+            entityReference: vm.parentEntityRef,
+            scope: "EXACT"
+        };
+
         const runsPromise = serviceBroker
             .loadViewData(
                 CORE_API.AttestationRunStore.findByEntityRef,
@@ -70,16 +75,14 @@ function controller($q,
             .loadViewData(
                 CORE_API.LogicalFlowStore.findByEntityReference,
                 [vm.parentEntityRef],
-                {force: true})
+                { force: true })
             .then(r => r.data);
 
         const logicalFlowDecoratorPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [{
-                    entityReference: vm.parentEntityRef,
-                    scope: "EXACT"
-                }, "DATA_TYPE"])
+                [selector, "DATA_TYPE"],
+                { force: true })
             .then(r => r.data);
 
         const dataTypePromise = serviceBroker
