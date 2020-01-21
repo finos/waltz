@@ -62,6 +62,14 @@ public class SvgDiagramDao {
     }
 
 
+    public SvgDiagram getById(long id) {
+        return dsl.select()
+                .from(SVG_DIAGRAM)
+                .where(SVG_DIAGRAM.ID.eq(id))
+                .fetchOne(svgMapper);
+    }
+
+
     public List<SvgDiagram> findByGroups(String[] groups) {
         return FunctionUtilities.time("SDD.findByGroups", () -> dsl.select()
                 .from(SVG_DIAGRAM)

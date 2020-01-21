@@ -18,11 +18,6 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.model.measurable.Measurable;
-
-import java.util.List;
-import java.util.Set;
-
 /**
  * Created by dwatkins on 06/06/2017.
  */
@@ -43,6 +38,22 @@ public class EntityReferenceUtilities {
                 .name()
                 .map(n -> n + " " + idStr)
                 .orElse(idStr);
+    }
+
+
+    public static String toUrl(EntityReference ref, String baseUrl) {
+        switch (ref.kind()) {
+            case DATA_TYPE:
+                return baseUrl + "data-types/" + ref.id();
+            case MEASURABLE:
+                return baseUrl + "measurable/" + ref.id();
+            case ORG_UNIT:
+                return baseUrl + "org-units/" + ref.id();
+            case PERSON:
+                return baseUrl + "person/id/" + ref.id();
+            default:
+                throw new IllegalArgumentException("Could not generate URL for: " + ref);
+        }
     }
 
 }

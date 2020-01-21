@@ -156,6 +156,15 @@ public class PersonDao {
     }
 
 
+    public Map<String, Long> getEmployeeIdToIdMap() {
+        return dsl.select(PERSON.EMPLOYEE_ID, PERSON.ID)
+                .from(PERSON)
+                .where(PERSON.EMPLOYEE_ID.isNotNull())
+                .and(PERSON.IS_REMOVED.isFalse())
+                .fetchMap(PERSON.EMPLOYEE_ID, PERSON.ID);
+    }
+
+
     public int[] bulkSave(List<ImmutablePerson> people) {
 
         checkNotNull(people, "Cannot bulk save a null collection of people");

@@ -96,6 +96,11 @@ public class PersonService {
     }
 
 
+    public Map<String, Long> getEmployeeIdToIdMap() {
+        return personDao.getEmployeeIdToIdMap();
+    }
+
+
     public int[] bulkSave(List<ImmutablePerson> people) {
         return personDao.bulkSave(people);
     }

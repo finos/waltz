@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
@@ -56,6 +57,11 @@ public class OrganisationalUnitService {
 
     public List<OrganisationalUnit> findAll() {
         return dao.findAll();
+    }
+
+
+    public Set<Long> findAllIds() {
+        return dao.findAllIds();
     }
 
 

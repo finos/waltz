@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -73,5 +74,10 @@ public class DataTypeService {
                 .stream()
                 .filter(DataType::unknown)
                 .findFirst();
+    }
+
+
+    public Map<String, Long> getCodeToIdMap() {
+        return dataTypeDao.getCodeToIdMap();
     }
 }

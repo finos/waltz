@@ -47,6 +47,16 @@ public class SvgDiagramService {
     }
 
 
+    public SvgDiagram getById(long id) {
+        SvgDiagram diagram = svgDiagramDao.getById(id);
+        return Unchecked.supplier(() -> {
+            String updatedSvg = convertProductSpecificSvg(diagram);
+            return ImmutableSvgDiagram.copyOf(diagram)
+                    .withSvg(updatedSvg);
+        }).get();
+    }
+
+
     public Collection<SvgDiagram> findByGroups(String... groups) {
         return svgDiagramDao.findByGroups(groups)
                 .stream()

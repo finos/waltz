@@ -27,6 +27,14 @@
             ng-click="$ctrl.resetZoom()">
         Reset
     </button>
+
+    <!-- EXPORT BTN -->
+    <waltz-data-extract-link name="Export SVG"
+                             styling="button"
+                             format="SVG"
+                             class="waltz-visibility-child-30"
+                             extract="nav-aid/{{$ctrl.diagram.id}}">
+    </waltz-data-extract-link>
 </div>
 
 <!-- SVG goes here -->
