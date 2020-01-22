@@ -38,7 +38,7 @@
 
         <waltz-toggle class="pull-right"
                       state="ctrl.showAttested"
-                      on-toggle="ctrl.toggleFilter()"
+                      on-toggle="ctrl.onToggleFilter()"
                       label-on="Hide previous attestations"
                       label-off="Show previous attestations">
         </waltz-toggle>
@@ -49,71 +49,50 @@
              class="waltz-display-section wailuv-run waltz-animate-repeat">
             <h4 ng-bind="run.name"></h4>
             <div class="row">
-                <div class="col-sm-3">
-
-                    <!-- Attested Ref -->
-                    <div class="row">
-                        <div class="col-sm-4 waltz-display-field-label">
-                            Attested entity
-                        </div>
-                        <div class="col-sm-8">
-                            <waltz-attested-kind run="run"></waltz-attested-kind>
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="row">
-                        <div class="col-sm-4 waltz-display-field-label">
-                            Description
-                        </div>
-                        <div class="col-sm-8">
-                            <span ng-bind="run.description | truncate:150"
-                                  uib-popover="{{ run.description }}"
-                                  popover-class="waltz-popover-width-700"
-                                  popover-append-to-body="true"
-                                  popover-placement="right"
-                                  popover-trigger="mouseenter">
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Due -->
-                    <div class="row">
-                        <div class="col-sm-4 waltz-display-field-label">
-                            Due
-                        </div>
-                        <div class="col-sm-8">
-                            <waltz-from-now timestamp="run.dueDate"
-                                            days-only="true">
-                            </waltz-from-now>
-                        </div>
-                    </div>
-
-                    <!-- Issued By -->
-                    <div class="row">
-                        <div class="col-sm-4 waltz-display-field-label">
-                            Issued by
-                        </div>
-                        <div class="col-sm-8">
-                            <span ng-bind="run.issuedBy"></span>
-                        </div>
-                    </div>
-
-                    <!-- Issued On -->
-                    <div class="row">
-                        <div class="col-sm-4 waltz-display-field-label">
-                            Issued on
-                        </div>
-                        <div class="col-sm-8">
-                            <waltz-from-now timestamp="run.issuedOn"
-                                            days-only="true">
-                            </waltz-from-now>
-                        </div>
-                    </div>
-
-                </div>
-
                 <div class="col-sm-9">
+                    <table class="table table-condensed small">
+                        <tr>
+                            <td><span>Attested Entity</span></td>
+                            <td>
+                                <waltz-attested-kind run="run">
+                                </waltz-attested-kind>
+                            </td>
+                            <td><span>Due</span></td>
+                            <td>
+                                <waltz-from-now timestamp="run.dueDate"
+                                                days-only="true">
+                                </waltz-from-now>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>Issued On</span></td>
+                            <td>
+                                <waltz-from-now timestamp="run.issuedOn"
+                                                days-only="true">
+                                </waltz-from-now>
+                            </td>
+                            <td><span>Issued By</span></td>
+                            <td>
+                                <span ng-bind="run.issuedBy"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span>Description</span></td>
+                            <td colspan="3">
+                                <span ng-bind="run.description | truncate:150"
+                                      uib-popover="{{ run.description }}"
+                                      popover-class="waltz-popover-width-700"
+                                      popover-append-to-body="true"
+                                      popover-placement="right"
+                                      popover-trigger="mouseenter">
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
                     <table class="table table-condensed">
                         <colgroup>
                             <col width="35%">
@@ -166,26 +145,10 @@
                             class="waltz-fade-if">
                             <td colspan="3"
                                 style="padding-right: 3em; border-top: none">
-                                <waltz-attestation-confirmation instance="ctrl.selectedAttestation"
-                                                                run="run"
-                                                                attested-entity-ref="run.attestedEntityRef"
-                                                                on-confirm="ctrl.attestEntity"
-                                                                on-cancel="ctrl.cancelAttestation"
-                                                                ng-switch="run.attestedEntityKind">
-
-                                    <waltz-inline-logical-flow-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                     ng-switch-when="LOGICAL_DATA_FLOW">
-                                    </waltz-inline-logical-flow-panel>
-
-                                    <waltz-inline-physical-flow-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                      ng-switch-when="PHYSICAL_FLOW">
-                                    </waltz-inline-physical-flow-panel>
-
-                                    <waltz-inline-measurable-rating-panel parent-entity-ref="ctrl.selectedAttestation.parentEntity"
-                                                                          measurable-category-ref="run.attestedEntityRef"
-                                                                          ng-switch-when="MEASURABLE_CATEGORY">
-                                    </waltz-inline-measurable-rating-panel>
-
+                                <waltz-attestation-confirmation parent-entity-ref="instance.parentEntity"
+                                                                on-confirm="ctrl.onAttestEntity"
+                                                                on-cancel="ctrl.onCancelAttestation"
+                                                                attestation-kind="run.attestedEntityKind">
                                 </waltz-attestation-confirmation>
                             </td>
                         </tr>

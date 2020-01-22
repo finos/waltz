@@ -16,6 +16,9 @@
  *
  */
 
+@import "../../../../style/variables";
+
+
 .waltz-attestation-confirmation {
     $wac-border-color: $waltz-green-background;
     border-left: 10px solid $wac-border-color;
@@ -25,13 +28,10 @@
     background: white;
 
     .wac-header {
-        text-align: right;
         background-color: $wac-border-color;
+        text-align: right;
         padding: 10px;
-    }
-
-    .wac-declaration {
-        font-size: medium;
+        font-weight: bold;
     }
 
     .wac-entity {
