@@ -114,16 +114,16 @@ function mkEntityRef(person) {
 
 
 function mkCurrentInvolvements(involvements = []) {
-    return _.chain(involvements)
-        .flatMap(i => {
+    return _.flatMap(
+        involvements,
+        i => {
             const personEntityRef = mkEntityRef(i.person);
             return _.map(i.involvements, inv => ({
                 entity: personEntityRef,
                 involvement: +inv.kindId,
                 isReadOnly: inv.provenance !== "waltz"
             }));
-        })
-        .value();
+        });
 }
 
 
@@ -133,6 +133,10 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 
     const refresh = () => {
         const options = mkSelectionOptions(vm.parentEntityRef, determineUpwardsScopeForKind(vm.parentEntityRef.kind));
+        const kindPromise = serviceBroker
+            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
+            .then(r => r.data);
+
         const involvementPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
@@ -147,26 +151,21 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
                 { force: true })
             .then(r => r.data);
 
-        $q.all([involvementPromise, peoplePromise])
-            .then(([involvements = [], people = []]) => {
+        return $q
+            .all([involvementPromise, peoplePromise, kindPromise])
+            .then(([involvements = [], people = [], involvementKinds = []]) => {
                 const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
                 vm.gridData = mkGridData(aggInvolvements, displayNameService);
                 vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
+                vm.involvementKinds = involvementKinds;
             });
     };
 
-
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
-            .then(r => vm.involementKinds = r.data);
-    };
 
     vm.$onChanges = (changes) => {
         if (changes.parentEntityRef && vm.parentEntityRef) {
             refresh();
         }
-
 
         vm.allowedInvolvements = _.map(
             displayNameService.getAllByType("involvementKind"),

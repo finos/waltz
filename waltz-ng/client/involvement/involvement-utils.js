@@ -18,14 +18,20 @@
 
 import _ from "lodash";
 
-export function aggregatePeopleInvolvements(involvements, people) {
+
+export function aggregatePeopleInvolvements(involvements = [], people = []) {
     const involvementsByPerson = _
         .chain(involvements)
         .groupBy('employeeId')
-        .mapValues(xs => _.map(xs, x => ({
-            kindId: x.kindId,
-            provenance: x.provenance
-        })))
+        .mapValues(xs => _  // dedupe involvement kinds for person
+            .chain(xs)
+            .map(x => ({
+                kindId: x.kindId,
+                provenance: x.provenance
+            }))
+            .uniqBy(d => d.kindId)
+            .value()
+        )
         .value();
 
     return _
@@ -34,6 +40,7 @@ export function aggregatePeopleInvolvements(involvements, people) {
         .uniqBy(i => i.person.id)
         .value();
 }
+
 
 export function aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds = []) {
     const peopleById = _.keyBy(people, "employeeId");
