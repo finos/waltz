@@ -119,7 +119,7 @@ function controller($q,
             .all([runsPromise, instancesPromise])
             .then(([runs, instances]) => {
                 vm.attestations = mkAttestationData(runs, instances);
-                vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, baseSections);
+                vm.attestationSections = mkAttestationSections(baseSections, vm.attestations);
             });
     };
 
