@@ -16,7 +16,8 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.StringUtilities.isNumericLong;
 import static com.khartec.waltz.common.StringUtilities.toOptional;
-import static com.khartec.waltz.model.EntityLinkUtilities.mkLink;
+import static com.khartec.waltz.model.EntityLinkUtilities.mkExternalIdLink;
+import static com.khartec.waltz.model.EntityLinkUtilities.mkIdLink;
 import static com.khartec.waltz.web.WebUtilities.getLong;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
@@ -99,25 +100,25 @@ public class NavAidExtractor extends BinaryDataBasedDataExtractor {
     private Function<String, Optional<String>> mkMeasurableKeyToUrl(Long categoryId) {
         Map<String, Long> extToIdMap = measurableService.findExternalIdToIdMapByCategoryId(categoryId);
         return (extId) -> Optional.ofNullable(extToIdMap.get(extId))
-                                    .map(id -> mkLink(baseUrl, EntityKind.MEASURABLE, id));
+                                    .map(id -> mkIdLink(baseUrl, EntityKind.MEASURABLE, id));
     }
 
 
     private Function<String, Optional<String>> mkDataTypeKeyToUrl() {
         return (dtCode) -> Optional.ofNullable(dtCode)
-                                    .map(dc -> mkLink(baseUrl, EntityKind.DATA_TYPE, dc));
+                                    .map(dc -> mkExternalIdLink(baseUrl, EntityKind.DATA_TYPE, dc));
     }
 
 
     private Function<String, Optional<String>> mkOrgUnitKeyToUrl() {
         return (unitId) -> toOptional(isNumericLong(unitId)
-                                            ? mkLink(baseUrl, EntityKind.ORG_UNIT, Long.valueOf(unitId))
+                                            ? mkIdLink(baseUrl, EntityKind.ORG_UNIT, Long.valueOf(unitId))
                                             : null);
     }
 
 
     private Function<String, Optional<String>> mkPersonKeyToUrl() {
         return (empId) -> Optional.ofNullable(empId)
-                                    .map(eId -> mkLink(baseUrl, EntityKind.PERSON, eId));
+                                    .map(eId -> mkExternalIdLink(baseUrl, EntityKind.PERSON, eId));
     }
 }
