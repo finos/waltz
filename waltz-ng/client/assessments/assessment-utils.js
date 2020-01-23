@@ -115,8 +115,8 @@ export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = 
  * @returns {*}
  */
 export function filterByAssessmentRating(entities = [],
-                                  assessmentRatings = [],
-                                  requiredRating) {
+                                         assessmentRatings = [],
+                                         requiredRating) {
     const assessmentRatingsByRef = _
         .chain(assessmentRatings)
         .filter(d => d.assessmentDefinitionId === requiredRating.assessmentId)
