@@ -25,9 +25,15 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
 import template from "./technology-section.html";
+import {countByVersionsByPackageId} from "../../../software-catalog/software-catalog-utilities";
 
 const bindings = {
     parentEntityRef: "<"
+};
+
+const initialState = {
+    activeTabIndex: 0,
+    repeatedPackages: []
 };
 
 
@@ -277,6 +283,17 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
                 vm.softwareCatalog = softwareCatalog;
                 const versionsById = _.keyBy(vm.softwareCatalog.versions, v => v.id);
                 const packagesById = _.keyBy(vm.softwareCatalog.packages, v => v.id);
+
+                const packageCounts = countByVersionsByPackageId(vm.softwareCatalog.usages);
+                vm.repeatedPackages =_.chain(packageCounts)
+                    .map((v,k) => ({
+                        package: packagesById[k],
+                        packageId: k,
+                        count: v
+                    }))
+                    .filter(p => p.count > 1)
+                    .orderBy(["count"], ["desc"])
+                    .value();
 
                 const gridData = _
                     .chain(vm.softwareCatalog.usages)
