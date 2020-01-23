@@ -3,10 +3,7 @@ package com.khartec.waltz.web.endpoints.extracts;
 import com.khartec.waltz.common.SvgUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.svg.SvgDiagram;
-import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.measurable.MeasurableService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.svg.SvgDiagramService;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.StringUtilities.isNumericLong;
 import static com.khartec.waltz.common.StringUtilities.toOptional;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.EntityReferenceUtilities.toUrl;
+import static com.khartec.waltz.model.EntityLinkUtilities.mkLink;
 import static com.khartec.waltz.web.WebUtilities.getLong;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
@@ -33,23 +28,14 @@ public class NavAidExtractor extends BinaryDataBasedDataExtractor {
     @Value("${waltz.base.url}")
     private String baseUrl;
 
-    private final DataTypeService dataTypeService;
     private final MeasurableService measurableService;
-    private final OrganisationalUnitService organisationalUnitService;
-    private final PersonService personService;
     private final SvgDiagramService svgDiagramService;
 
 
     @Autowired
-    public NavAidExtractor(DataTypeService dataTypeService,
-                           MeasurableService measurableService,
-                           OrganisationalUnitService organisationalUnitService,
-                           PersonService personService,
+    public NavAidExtractor(MeasurableService measurableService,
                            SvgDiagramService svgDiagramService) {
-        this.dataTypeService = dataTypeService;
         this.measurableService = measurableService;
-        this.organisationalUnitService = organisationalUnitService;
-        this.personService = personService;
         this.svgDiagramService = svgDiagramService;
     }
 
@@ -113,28 +99,25 @@ public class NavAidExtractor extends BinaryDataBasedDataExtractor {
     private Function<String, Optional<String>> mkMeasurableKeyToUrl(Long categoryId) {
         Map<String, Long> extToIdMap = measurableService.findExternalIdToIdMapByCategoryId(categoryId);
         return (extId) -> Optional.ofNullable(extToIdMap.get(extId))
-                                    .map(id -> toUrl(mkRef(EntityKind.MEASURABLE, id), baseUrl));
+                                    .map(id -> mkLink(baseUrl, EntityKind.MEASURABLE, id));
     }
 
 
     private Function<String, Optional<String>> mkDataTypeKeyToUrl() {
-        Map<String, Long> codeToIdMap = dataTypeService.getCodeToIdMap();
-        return (dtCode) -> Optional.ofNullable(codeToIdMap.get(dtCode))
-                                    .map(id -> toUrl(mkRef(EntityKind.DATA_TYPE, id), baseUrl));
+        return (dtCode) -> Optional.ofNullable(dtCode)
+                                    .map(dc -> mkLink(baseUrl, EntityKind.DATA_TYPE, dc));
     }
 
 
     private Function<String, Optional<String>> mkOrgUnitKeyToUrl() {
-        Set<Long> allIds = organisationalUnitService.findAllIds();
-        return (unitId) -> toOptional(isNumericLong(unitId) && allIds.contains(Long.valueOf(unitId))
-                                            ? toUrl(mkRef(EntityKind.ORG_UNIT, Long.valueOf(unitId)), baseUrl)
+        return (unitId) -> toOptional(isNumericLong(unitId)
+                                            ? mkLink(baseUrl, EntityKind.ORG_UNIT, Long.valueOf(unitId))
                                             : null);
     }
 
 
     private Function<String, Optional<String>> mkPersonKeyToUrl() {
-        Map<String, Long> empIdToIdMap = personService.getEmployeeIdToIdMap();
-        return (empId) -> Optional.ofNullable(empIdToIdMap.get(empId))
-                                    .map(id -> toUrl(mkRef(EntityKind.PERSON, id), baseUrl));
+        return (empId) -> Optional.ofNullable(empId)
+                                    .map(eId -> mkLink(baseUrl, EntityKind.PERSON, eId));
     }
 }

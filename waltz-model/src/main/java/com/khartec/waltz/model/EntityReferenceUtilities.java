@@ -40,20 +40,4 @@ public class EntityReferenceUtilities {
                 .orElse(idStr);
     }
 
-
-    public static String toUrl(EntityReference ref, String baseUrl) {
-        switch (ref.kind()) {
-            case DATA_TYPE:
-                return baseUrl + "data-types/" + ref.id();
-            case MEASURABLE:
-                return baseUrl + "measurable/" + ref.id();
-            case ORG_UNIT:
-                return baseUrl + "org-units/" + ref.id();
-            case PERSON:
-                return baseUrl + "person/id/" + ref.id();
-            default:
-                throw new IllegalArgumentException("Could not generate URL for: " + ref);
-        }
-    }
-
 }

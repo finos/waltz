@@ -35,7 +35,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -90,13 +89,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
         return dsl.select(ou.fields())
                 .from(ou)
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public Set<Long> findAllIds() {
-        return dsl.select(ou.ID)
-                .from(ou)
-                .fetchSet(ou.ID);
     }
 
 

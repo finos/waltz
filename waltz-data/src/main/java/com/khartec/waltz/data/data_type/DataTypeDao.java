@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
@@ -101,13 +100,5 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .selectFrom(DATA_TYPE)
                 .where(DATA_TYPE.ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN);
-    }
-
-
-    public Map<String, Long> getCodeToIdMap() {
-        return dsl
-                .select(DATA_TYPE.CODE, DATA_TYPE.ID)
-                .from(DATA_TYPE)
-                .fetchMap(DATA_TYPE.CODE, DATA_TYPE.ID);
     }
 }
