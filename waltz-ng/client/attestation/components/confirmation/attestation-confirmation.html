@@ -17,33 +17,53 @@
   -->
 
 <div class="waltz-attestation-confirmation">
-
     <div class="wac-header">
-        <span class="wac-declaration">
-            You are attesting that the
-            <waltz-attested-kind run="$ctrl.run"
-                                 class="wac-entity">
-            </waltz-attested-kind>
-            for
-            <span ng-bind="$ctrl.instance.parentEntity.name"
-                  class="wac-entity">
-            </span> are correct.
+        You are attesting that the
+        <span ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
         </span>
+        entries for
+        <waltz-entity-icon-label entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-icon-label>
+        are correct.
 
         <span style="padding-left: 30px">
-            <a class="btn btn-success btn-sm"
-               ng-click="$ctrl.confirm($ctrl.instance)">
+            <button class="btn btn-sm"
+                    ng-class="{
+                        'disabled': $ctrl.disabled,
+                        'btn-success': !$ctrl.disabled
+                    }"
+                    ng-disabled="$ctrl.disabled"
+                    ng-click="$ctrl.confirm($ctrl.instance)">
                 Confirm
-            </a>
+            </button>
             <a ng-click="$ctrl.cancel()"
                class="clickable">
                 Cancel
             </a>
         </span>
+
+        <div class="alert alert-danger"
+             style="margin-top: 6px"
+             ng-if="$ctrl.disabled">
+            <span ng-bind="$ctrl.message"></span>
+        </div>
     </div>
 
     <div class="wac-content">
-        <ng-transclude></ng-transclude>
+        <div ng-switch="$ctrl.attestationKind">
+            <waltz-inline-logical-flow-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                             ng-switch-when="LOGICAL_DATA_FLOW">
+            </waltz-inline-logical-flow-panel>
+
+            <waltz-inline-physical-flow-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                              ng-switch-when="PHYSICAL_FLOW">
+            </waltz-inline-physical-flow-panel>
+
+            <waltz-inline-measurable-rating-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                  measurable-category-ref="run.attestedEntityRef"
+                                                  ng-switch-when="MEASURABLE_CATEGORY">
+            </waltz-inline-measurable-rating-panel>
+        </div>
     </div>
 
 </div>

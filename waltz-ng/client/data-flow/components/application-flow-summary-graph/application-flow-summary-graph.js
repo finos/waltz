@@ -16,18 +16,18 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {select} from "d3-selection";
 import {scaleLinear} from "d3-scale";
 
-import {initialiseData} from '../../../common';
+import {initialiseData} from "../../../common";
 import {authoritativeRatingBackgroundColorScale, authoritativeRatingColorScale} from "../../../common/colors";
 
-import template from './application-flow-summary-graph.html';
+import template from "./application-flow-summary-graph.html";
 
 
 const bindings = {
-    summaryData: '<'
+    summaryData: "<"
 };
 
 
@@ -42,7 +42,7 @@ const h = rowHeight * 3;
 const colWidth = 120;
 const colPadding = 5;
 const w = colWidth * 3;
-const keys = ['NO_OPINION', 'DISCOURAGED', 'SECONDARY', 'PRIMARY'];
+const keys = ["NO_OPINION", "DISCOURAGED", "SECONDARY", "PRIMARY"];
 
 
 const cellTransforms = {
@@ -58,65 +58,65 @@ const cellTransforms = {
 
 
 const styles = {
-    BAND: 'wafsg-band',
-    BAR: 'wafsg-bar'
+    BAND: "wafsg-band",
+    BAR: "wafsg-bar"
 };
 
 
 function drawBackground(svg) {
     const verticalLines = [colWidth, colWidth * 2];
 
-    svg.selectAll('line')
+    svg.selectAll("line")
         .data(verticalLines)
         .enter()
-        .append('line')
-        .attr('x1', d => d)
-        .attr('x2', d => d)
-        .attr('y1', rowHeight)
-        .attr('y2', h)
-        .attr('stroke', '#ddd')
+        .append("line")
+        .attr("x1", d => d)
+        .attr("x2", d => d)
+        .attr("y1", rowHeight)
+        .attr("y2", h)
+        .attr("stroke", "#ddd")
 }
 
 
 function drawCenterLabels(svg) {
     const labels = svg
-        .append('g')
-        .style('border', '1px solid red')
-        .attr('transform', `translate(${colWidth}, ${rowHeight})`);
+        .append("g")
+        .style("border", "1px solid red")
+        .attr("transform", `translate(${colWidth}, ${rowHeight})`);
 
     const labelData = [
-        'Known',
-        'Unknown'];
+        "Known",
+        "Unknown"];
 
     labels
-        .selectAll('text')
+        .selectAll("text")
         .data(labelData)
         .enter()
-        .append('text')
+        .append("text")
         .text(d => d)
-        .attr('text-anchor', 'middle')
-        .attr('x', colWidth / 2)
-        .attr('y', (d, idx) => rowHeight * (idx + 0.5) + 4);
+        .attr("text-anchor", "middle")
+        .attr("x", colWidth / 2)
+        .attr("y", (d, idx) => rowHeight * (idx + 0.5) + 4);
 }
 
 
 function drawTitleBar(svg) {
     const titleBar = svg
-        .append('g')
-        .attr('transform', `translate(0, ${rowHeight / 2})`);
+        .append("g")
+        .attr("transform", `translate(0, ${rowHeight / 2})`);
 
     const titleData = [
-        { title: 'Inbound', padding: -4, x: colWidth, anchor: 'end' },
-        { title: 'Outbound', padding: 4, x: colWidth * 2, anchor: 'start' }];
+        { title: "Inbound", padding: -4, x: colWidth, anchor: "end" },
+        { title: "Outbound", padding: 4, x: colWidth * 2, anchor: "start" }];
 
     titleBar
-        .selectAll('text')
+        .selectAll("text")
         .data(titleData)
         .enter()
-        .append('text')
+        .append("text")
         .text(d => d.title)
-        .attr('text-anchor', d => d.anchor)
-        .attr('x', d => d.x + d.padding);
+        .attr("text-anchor", d => d.anchor)
+        .attr("x", d => d.x + d.padding);
 }
 
 
@@ -170,9 +170,9 @@ function drawData(svg, data = []) {
 
     const newBars = bars
         .enter()
-        .append('g')
+        .append("g")
         .classed(styles.BAR, true)
-        .attr('transform', d => cellTransforms[d.row][d.col]);
+        .attr("transform", d => cellTransforms[d.row][d.col]);
 
 
     const bands = newBars
@@ -180,15 +180,15 @@ function drawData(svg, data = []) {
         .data(d => d.stack);
 
     bands.enter()
-        .append('rect')
+        .append("rect")
         .classed(styles.BAND, true)
-        .attr('x', d => scale(d[0]))
-        .attr('y', rowPadding)
-        .attr('height', rowHeight - (2 * rowPadding))
-        .attr('width', d => scale(d[1] - d[0]))
-        .attr('stroke', (d, idx) => authoritativeRatingBackgroundColorScale(keys[idx]))
-        .attr('stroke-width', 0.5)
-        .attr('fill', (d, idx) => authoritativeRatingColorScale(keys[idx]));
+        .attr("x", d => scale(d[0]))
+        .attr("y", rowPadding)
+        .attr("height", rowHeight - (2 * rowPadding))
+        .attr("width", d => scale(d[1] - d[0]))
+        .attr("stroke", (d, idx) => authoritativeRatingBackgroundColorScale(keys[idx]))
+        .attr("stroke-width", 0.5)
+        .attr("fill", (d, idx) => authoritativeRatingColorScale(keys[idx]));
 }
 
 
@@ -202,11 +202,11 @@ function controller($element) {
     vm.$onChanges = () => redraw();
 
     vm.$onInit = () => {
-        const holder = $element[0].firstChild;
+        const holder = $element.find("svg")[0];
 
         svg = select(holder)
-            .attr('width', w)
-            .attr('height', h);
+            .attr("width", w)
+            .attr("height", h);
 
         drawBackground(svg);
         drawTitleBar(svg);
@@ -217,7 +217,7 @@ function controller($element) {
 
 
 controller.$inject = [
-    '$element'
+    "$element"
 ];
 
 
@@ -230,5 +230,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzApplicationFlowSummaryGraph'
+    id: "waltzApplicationFlowSummaryGraph"
 };
