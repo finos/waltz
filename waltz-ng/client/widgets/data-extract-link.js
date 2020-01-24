@@ -27,6 +27,7 @@ const bindings = {
     name: "@?",
     extract: "@",
     method: "@?",
+    format: "@?",
     filename: "@?",
     requestBody: "<",
     styling: "@?" // link | button
@@ -104,6 +105,7 @@ function controller($http, notification, baseExtractUrl) {
 
     vm.exportCsv = () => doExport("CSV");
     vm.exportXlsx = () => doExport("XLSX");
+    vm.exportAs = (format) => doExport(format);
 }
 
 

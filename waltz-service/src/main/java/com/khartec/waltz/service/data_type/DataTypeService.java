@@ -59,6 +59,11 @@ public class DataTypeService {
     }
 
 
+    public DataType getDataTypeByCode(String code) {
+        return dataTypeDao.getByCode(code);
+    }
+
+
     public Collection<DataType> search(EntitySearchOptions options) {
         return searchDao.search(options);
     }

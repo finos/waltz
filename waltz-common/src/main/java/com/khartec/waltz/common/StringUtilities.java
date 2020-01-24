@@ -81,6 +81,12 @@ public class StringUtilities {
     }
 
 
+    public static boolean isNumericLong(String value) {
+        return ! isEmpty(value)
+                && parseLong(value, null) != null;
+    }
+
+
     public static String mkSafe(String str) {
         return str == null
                 ? ""

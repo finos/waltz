@@ -37,6 +37,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
@@ -238,6 +239,16 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Map<String, Long> findExternalIdToIdMapByCategoryId(Long categoryId) {
+        return dsl
+                .select(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .and(MEASURABLE.EXTERNAL_ID.isNotNull())
+                .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
 }
