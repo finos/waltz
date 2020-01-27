@@ -413,8 +413,7 @@ public class LogicalFlowDao {
         Condition condition = flows
                 .stream()
                 .map(t -> isSourceCondition(t.source())
-                        .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
+                        .and(isTargetCondition(t.target())))
                 .reduce((a, b) -> a.or(b))
                 .get();
 
