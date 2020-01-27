@@ -547,6 +547,16 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 4396: cleanup/remove perspectives -->
+    <changeSet id="20200125-4396-1"
+               author="davidwatkins73">
+        <comment>4396: cleanup/remove perspectives</comment>
+        <dropTable tableName="perspective_definition"/>
+        <dropTable tableName="perspective_rating"/>
+    </changeSet>
+
+
     <!-- 4626: involvement: add read-only flag -->
     <changeSet id="20200124-4626-1"
                author="kearash1">
