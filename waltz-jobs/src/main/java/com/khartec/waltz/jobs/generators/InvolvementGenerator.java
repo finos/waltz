@@ -66,7 +66,8 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         appRef.id(),
                         randomPick(employeeIds),
                         SAMPLE_DATA_PROVENANCE,
-                        kindId));
+                        kindId,
+                        true));
     }
 
 
@@ -140,7 +141,8 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         id,
                         randomPick(directors),
                         SAMPLE_DATA_PROVENANCE,
-                        Long.valueOf(rnd.nextInt(13) + 1)))
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> ouSponsors = orgUnitIds.stream()
@@ -149,7 +151,8 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         id,
                         randomPick(directors),
                         SAMPLE_DATA_PROVENANCE,
-                        Long.valueOf(rnd.nextInt(13) + 1)))
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
                 .collect(Collectors.toList());
 
         dsl.batchInsert(devInvolvements).execute();
