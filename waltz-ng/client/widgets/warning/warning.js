@@ -1,4 +1,5 @@
-/*!
+
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,20 +17,12 @@
  *
  */
 
-@import "./basic-info-tile";
-@import "./change-timeline";
-@import "./column-mapper/column-mapper";
-@import "./keyword-list";
-@import "./markdown";
-@import "./no-data/no-data";
-@import "./overlay-panel";
-@import "./page-header/page-header";
-@import "./pie/pie";
-@import "./pie/pie-segment-table";
-@import "./search";
-@import "./section";
-@import "./sub-section";
-@import "./simple-stack-chart";
-@import "./yq-select";
-@import "./warning/warning";
-@import "../auth-sources/components/tree-filter/tree-filter";
+import template from "./warning.html";
+
+export default  {
+    template,
+    transclude: {
+        message: "message",
+        content: "content"
+    }
+};
