@@ -556,4 +556,18 @@
         <dropTable tableName="perspective_rating"/>
     </changeSet>
 
+
+    <!-- 4626: involvement: add read-only flag -->
+    <changeSet id="20200124-4626-1"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <addColumn tableName="involvement">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
