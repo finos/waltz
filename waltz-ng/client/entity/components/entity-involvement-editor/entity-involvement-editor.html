@@ -53,12 +53,17 @@
                             </span>
                         </td>
                         <td>
-                            <span class="waltz-visibility-child-50"
-                                  ng-if="!rel.isReadOnly">
+                            <span ng-if="!rel.isReadOnly">
                                 <a ng-click="$ctrl.onRemove(rel)"
                                    class="clickable">
                                     Remove
                                 </a>
+                            </span>
+                            <span class="waltz-visibility-child-50"
+                                ng-if="rel.isReadOnly">
+                                Read only
+                                <waltz-icon name="lock">
+                                </waltz-icon>
                             </span>
                         </td>
                     </tr>

@@ -59,7 +59,7 @@ public class InvolvementDao {
 
     private final DSLContext dsl;
 
-    private final RecordMapper<Record, Involvement> involvementMapper = r -> {
+    private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
         return ImmutableInvolvement.builder()
                 .employeeId(involvementRecord.getEmployeeId())
@@ -68,6 +68,7 @@ public class InvolvementDao {
                         .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                         .id(involvementRecord.getEntityId())
                         .build())
+                .isReadOnly(involvementRecord.getIsReadonly())
                 .provenance(involvementRecord.getProvenance())
                 .build();
     };
@@ -80,6 +81,7 @@ public class InvolvementDao {
         record.setEmployeeId(inv.employeeId());
         record.setKindId(inv.kindId());
         record.setProvenance(inv.provenance());
+        record.setIsReadonly(inv.isReadOnly());
         return record;
     };
 
@@ -97,7 +99,7 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
     }
 
 
@@ -113,7 +115,7 @@ public class InvolvementDao {
                 .selectFrom(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
     }
 
 
@@ -121,7 +123,7 @@ public class InvolvementDao {
         return dsl.select()
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
     }
 
 

@@ -91,7 +91,7 @@ public class PersonResolver {
         dump("No Org", noOrgSiphon, t -> t.v1);
         dump("No Person", noPersonSiphon, t -> t.v2);
 
-        Set<InvolvementRecord> records = map(orgEmpInvTuples, t -> new InvolvementRecord(EntityKind.ORG_UNIT.name(), t.v1, t.v2, provenance, t.v3));
+        Set<InvolvementRecord> records = map(orgEmpInvTuples, t -> new InvolvementRecord(EntityKind.ORG_UNIT.name(), t.v1, t.v2, provenance, t.v3, true));
         dsl.batchInsert(records).execute();
 
     }
