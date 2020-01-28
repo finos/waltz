@@ -74,7 +74,7 @@ function prepareColumns(uiGridConstants, options) {
         displayName: "Year"
     };
 
-    const appCol = mkEntityLinkGridCell("Application", "application", "none");
+    const appCol = mkEntityLinkGridCell("Application", "application", "none", "right");
 
     const assetCodeCol = {
         field: "assetCode"

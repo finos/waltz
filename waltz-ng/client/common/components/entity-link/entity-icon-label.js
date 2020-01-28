@@ -30,8 +30,8 @@ global.genericAvatarDataUrl = genericAvatarDataUrl;
 
 const bindings = {
     entityRef: "<",
-    iconPlacement: "@",
-    tooltipPlacement: "@"
+    iconPlacement: "@?",
+    tooltipPlacement: "@?"
 };
 
 
