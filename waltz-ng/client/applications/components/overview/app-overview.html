@@ -180,7 +180,8 @@
                     </div>
                     <div class="col-sm-4">
                         <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
-                                        timestamp="$ctrl.app.plannedRetirementDate">
+                                        timestamp="$ctrl.app.plannedRetirementDate"
+                                        days-only="true">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.plannedRetirementDate">
                             -
@@ -191,7 +192,8 @@
                     </div>
                     <div class="col-sm-4">
                         <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
-                                        timestamp="$ctrl.app.actualRetirementDate">
+                                        timestamp="$ctrl.app.actualRetirementDate"
+                                        days-only="true">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.actualRetirementDate">
                             -
