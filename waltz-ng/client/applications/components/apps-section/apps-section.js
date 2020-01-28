@@ -34,6 +34,10 @@ const bindings = {
 const initialState = {
     apps: [],
     endUserApps: [],
+    combinedCount: 0,
+    visibility:{
+        tab: "SUMMARY"
+    }
 };
 
 
@@ -54,7 +58,7 @@ function controller($scope,
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        vm.combinedApps = combine(vm.apps, vm.endUserApps);
+        vm.combinedCount = _.size(vm.apps) + _.size(vm.endUserApps);
     };
 
     const loadAll = () => {
@@ -69,7 +73,7 @@ function controller($scope,
             .then(r => r.data)
             .then(apps => vm.apps = _.map(
                 apps,
-                a => _.assign(a, { management: "IT" })))
+                a => Object.assign({}, a, {management: "IT"})))
             .then(refresh);
 
         if (vm.parentEntityRef.kind === "ORG_UNIT") {
@@ -78,7 +82,7 @@ function controller($scope,
                 .then(r => r.data)
                 .then(endUserApps => vm.endUserApps = _.map(
                     endUserApps,
-                    a => _.assign(a, { platform: a.applicationKind }, DEFAULT_APP_SETTINGS)))
+                    a => Object.assign({}, a, DEFAULT_APP_SETTINGS, { platform: a.applicationKind })))
                 .then(refresh);
         }
     };
@@ -89,10 +93,15 @@ function controller($scope,
     };
 
     vm.$onChanges = (changes) => {
-        vm.combinedApps = combine(vm.apps, vm.endUserApps);
-
         if(changes.filters) {
             loadAll();
+        }
+    };
+
+    vm.onTabSelect = (tabName) => {
+        vm.visibility.tab = tabName;
+        if (tabName === "DETAIL") {
+            vm.combinedApps = combine(vm.apps, vm.endUserApps);
         }
     };
 

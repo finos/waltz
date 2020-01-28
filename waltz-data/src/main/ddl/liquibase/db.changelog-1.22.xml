@@ -73,6 +73,16 @@
                                columnDataType="${name.type}" />
     </changeSet>
 
+    <changeSet id="20191120-4496-6a"
+               author="davidwatkins73">
+        <comment>4496: preparing table for addition of unique index</comment>
+        <sql>
+            update software_package
+            set external_id = null
+            where external_id = '';
+        </sql>
+    </changeSet>
+
     <changeSet id="20191120-4496-6"
                failOnError="false"
                author="kamransaleem">
@@ -569,5 +579,16 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <changeSet id="20200124-4626-2"
+               author="davidwatkins73">
+        <sql>
+            UPDATE involvement
+            SET is_readonly = ${true.value}
+            WHERE provenance != 'waltz'
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

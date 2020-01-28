@@ -18,6 +18,8 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
+import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
+import {mapToDisplayNames} from "../applications/application-utils";
 
 
 
@@ -29,6 +31,14 @@ function mkAttestationCommand(attestedEntityRef, attestationKind){
 }
 
 
+/**
+ * Sends an attestation to the server and returns a promise.
+ *
+ * @param serviceBroker
+ * @param attestedEntityRef
+ * @param attestationKind
+ * @return Promise
+ */
 export function attest(serviceBroker, attestedEntityRef, attestationKind) {
     const attestationCommand = mkAttestationCommand(
         attestedEntityRef,
@@ -40,8 +50,20 @@ export function attest(serviceBroker, attestedEntityRef, attestationKind) {
 }
 
 
-
-
+/**
+ * Logical flows are unattestable if they have unknown data types
+ * and/or deprecated data types.
+ *
+ * Currently only upstream flows (with respect to the endpointRef)
+ * are considered.
+ *
+ * @param endpointRef  which app we are attesting on behalf of, used
+ *      to give us the directionality of the flow
+ * @param logicalFlows  set of all logical flows to be checked
+ * @param dataTypes  all dataTypes
+ * @param flowDecorators  all decorations for the above flows
+ * @return {*}
+ */
 function calcUnattestableLogicalFlows(endpointRef, logicalFlows, dataTypes, flowDecorators) {
     const upstreamFlowIds = _.chain(logicalFlows)
         .filter(flow => flow.target.id === endpointRef.id)
@@ -63,6 +85,19 @@ function calcUnattestableLogicalFlows(endpointRef, logicalFlows, dataTypes, flow
 }
 
 
+/**
+ * Logical flows are unattestable if they have unknown data types
+ * and/or deprecated data types.
+ *
+ * Currently only upstream flows (with respect to the endpoint given
+ * in the selector)
+ * are considered.
+ *
+ * @param $q  service to combine promises
+ * @param serviceBroker  service to communicate to Waltz server
+ * @param selector  selector (typicall app) of the entity being attested to
+ * @return {*}
+ */
 export function loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector) {
 
     const logicalFlowsPromise = serviceBroker
@@ -93,3 +128,41 @@ export function loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector)
                 flowDecorators);
         });
 }
+
+
+
+
+
+/**
+ * Returns grid data with application, latest attestation, attested status
+ * @param applications: all applications subjected for aggregation
+ * @param attestationInstances: all attestationInstances for the applications
+ * @param attestedEntityKind: Entity Kind against which attestation data needs to be collected
+ * **/
+export function mkAttestationSummaryDataForApps(applications = [],
+                                                attestationInstances = [],
+                                                displayNameService) {
+
+    const attestationByAppId = _.groupBy(
+        attestationInstances,
+        "parentEntity.id");
+
+    return _.map(
+        applications,
+        app => ({
+            application: Object.assign({}, app, mapToDisplayNames(displayNameService, app)),
+            isAttested: (_.has(attestationByAppId, String(app.id)) ? "ATTESTED" : "NEVER_ATTESTED"),
+            attestation: _.maxBy(attestationByAppId[app.id], "attestedAt")
+        }));
+}
+
+
+export const attestationSummaryColumnDefs = [
+    mkEntityLinkGridCell("Name", "application", "left", "right"),
+    {field: "application.assetCode", name: "Asset Code"},
+    {field: "application.kindDisplay", name: "Kind"},
+    {field: "businessCriticalityDisplay", name: "Business Criticality"},
+    {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
+    {field: "attestation.attestedBy", name: "Last Attested By"},
+    mkDateGridCell("Last Attested at", "attestation.attestedAt")
+];
