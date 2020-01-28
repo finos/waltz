@@ -34,10 +34,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -99,6 +96,14 @@ public class MeasurableService {
     public List<Measurable> findByCategoryId(Long categoryId) {
         return measurableDao.findByCategoryId(categoryId);
     }
+
+
+    public Map<String, Long> findExternalIdToIdMapByCategoryId(Long categoryId) {
+        checkNotNull(categoryId, "categoryId cannot be null");
+
+        return measurableDao.findExternalIdToIdMapByCategoryId(categoryId);
+    }
+
 
     public Collection<Measurable> search(String query) {
         if (StringUtilities.isEmpty(query)) {

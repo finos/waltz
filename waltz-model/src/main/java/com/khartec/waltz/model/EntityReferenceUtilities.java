@@ -18,11 +18,6 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.model.measurable.Measurable;
-
-import java.util.List;
-import java.util.Set;
-
 /**
  * Created by dwatkins on 06/06/2017.
  */

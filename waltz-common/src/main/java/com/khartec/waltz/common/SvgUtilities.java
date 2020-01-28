@@ -33,6 +33,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.XmlUtilities.*;
 
@@ -60,6 +62,39 @@ public class SvgUtilities {
                 );
 
         return printDocument(svg, false); // do NOT toPrettyString print visio
+    }
+
+
+    public static String addWaltzEntityLinks(String svgStr,
+                                             String keyProp,
+                                             Function<String, Optional<String>> keyToUrl) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException, TransformerException {
+        DocumentBuilder builder = createNonValidatingDocumentBuilderFactory().newDocumentBuilder();
+        InputSource svgSource = new InputSource(new ByteArrayInputStream(svgStr.getBytes()));
+        Document svg = builder.parse(svgSource);
+
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        NodeList nodes = (NodeList) xpath.evaluate("//*", svg, XPathConstants.NODESET);
+
+        stream(nodes)
+                .forEach(n -> stream(n.getChildNodes())
+                        .filter(c -> c.hasAttributes() && c.getAttributes().getNamedItem("data-" + keyProp) != null)
+                        .forEach(c -> {
+                            String keyVal = c.getAttributes()
+                                                .getNamedItem("data-" + keyProp)
+                                                .getNodeValue();
+
+                            keyToUrl.apply(keyVal)
+                                    .ifPresent(url -> {
+                                        Element linkNode = svg.createElement("a");
+                                        linkNode.setAttribute("href", url);
+                                        linkNode.setAttribute("target", "_blank");
+                                        c.getParentNode().appendChild(linkNode);
+                                        linkNode.appendChild(c);
+                                    });
+                        })
+                );
+
+        return printDocument(svg, false);
     }
 
 }
