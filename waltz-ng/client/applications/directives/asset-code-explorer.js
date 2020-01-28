@@ -27,6 +27,7 @@ function controller(appStore) {
         vm.status = 'LOADING';
         appStore.findRelatedById(vm.application.id).then(related => {
             vm.related = related;
+            vm.relatedCount = _.sumBy(_.values(related), _.size);
             vm.status = 'LOADED';
         });
     };
