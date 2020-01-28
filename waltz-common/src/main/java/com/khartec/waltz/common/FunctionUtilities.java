@@ -79,6 +79,18 @@ public class FunctionUtilities {
 
     }
 
+    public static void time(String name, Runnable runner) {
+        long st = System.currentTimeMillis();
+        try {
+            runner.run();
+            long end = System.currentTimeMillis();
+            LOG.info("duration [{}]: {}", name, (end - st));
+        } catch (Exception e) {
+            String msg = String.format("Unexpected error when timing [%s]: %s", name, e.getMessage());
+            LOG.error(msg, e);
+        }
+    }
+
 
     /**
      * Returns a `BiFunction` which always ignores its arguments and returns

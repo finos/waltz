@@ -22,8 +22,8 @@ import template from './change-log-section.html';
 
 
 const bindings = {
-    parentEntityRef: '<',
-    userName: '<'
+    parentEntityRef: "<",
+    userName: "<"
 };
 
 
@@ -74,7 +74,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
