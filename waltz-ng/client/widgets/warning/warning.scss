@@ -16,20 +16,24 @@
  *
  */
 
-@import "./basic-info-tile";
-@import "./change-timeline";
-@import "./column-mapper/column-mapper";
-@import "./keyword-list";
-@import "./markdown";
-@import "./no-data/no-data";
-@import "./overlay-panel";
-@import "./page-header/page-header";
-@import "./pie/pie";
-@import "./pie/pie-segment-table";
-@import "./search";
-@import "./section";
-@import "./sub-section";
-@import "./simple-stack-chart";
-@import "./yq-select";
-@import "./warning/warning";
-@import "../auth-sources/components/tree-filter/tree-filter";
+.waltz-warning {
+    background: #fffdfa;
+    background: linear-gradient(90deg, #fffdfa 0%, rgba(255,255,255,1) 100%);
+    padding: 15px;
+    margin-bottom: 6px;
+    border-radius: 3px;
+    box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
+    border-left: 4px solid rgba(222, 139, 6, 0.99);
+
+    .ww-message {
+        color: #DE8B06;
+
+        span {
+            vertical-align: middle;
+        }
+    }
+
+    content {
+        color: #7B7D7D;
+    }
+}

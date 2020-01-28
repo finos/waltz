@@ -23,74 +23,76 @@ import EditableEnum from "./editable-enum/editable-enum";
 import EditableDropdown from "./editable-dropdown/editable-dropdown";
 import SpreadsheetLoader from "./spreadsheet-loader/spreadsheet-loader";
 import {registerComponents} from "../common/module-utils";
-import ChangeTimeline from './change-timeline';
-import ErrorAlert from './error-alert';
-import ExternalLink from './external-link';
-import FromNow from './from-now';
-import JumpTo from './jump-to';
-import LoadingNotification from './loading-notification';
-import MailTo from './mail-to';
-import OverlayPanel from './overlay-panel';
-import PhoneLink from './phone-link';
-import RagIndicator from './rag-indicator';
-import Search from './search';
-import SectionActions from './section-actions';
-import StepCount from './step-count';
-import YqSelect from './yq-select';
-import BasicInfoTile from './basic-info-tile';
-import DataExtractLink from './data-extract-link';
-import EditableField from './editable-field';
-import Icon from './icon';
-import InlineEditArea from './inline-edit-area';
-import KeywordList from './keyword-list';
-import KeywordEdit from './keyword-edit';
-import NoData from './no-data';
-import Markdown from './markdown';
-import PageHeader from './page-header/page-header';
-import Pie from './pie/pie';
-import PieSegmentTable from './pie/pie-segment-table';
-import PieTable from './pie/pie-table';
-import Section from './section';
-import SimpleStackChart from './simple-stack-chart';
-import Toggle from './toggle';
-import Twistie from './twistie';
+import ChangeTimeline from "./change-timeline";
+import ErrorAlert from "./error-alert";
+import ExternalLink from "./external-link";
+import FromNow from "./from-now";
+import JumpTo from "./jump-to";
+import LoadingNotification from "./loading-notification";
+import MailTo from "./mail-to";
+import OverlayPanel from "./overlay-panel";
+import PhoneLink from "./phone-link";
+import RagIndicator from "./rag-indicator";
+import Search from "./search";
+import SectionActions from "./section-actions";
+import StepCount from "./step-count";
+import YqSelect from "./yq-select";
+import BasicInfoTile from "./basic-info-tile";
+import DataExtractLink from "./data-extract-link";
+import EditableField from "./editable-field";
+import Icon from "./icon";
+import InlineEditArea from "./inline-edit-area";
+import KeywordList from "./keyword-list";
+import KeywordEdit from "./keyword-edit";
+import NoData from "./no-data/no-data";
+import Markdown from "./markdown";
+import PageHeader from "./page-header/page-header";
+import Pie from "./pie/pie";
+import PieSegmentTable from "./pie/pie-segment-table";
+import PieTable from "./pie/pie-table";
+import Section from "./section";
+import SimpleStackChart from "./simple-stack-chart";
+import Toggle from "./toggle";
+import Twistie from "./twistie";
+import Warning from "./warning/warning"
 
 
 export default () => {
-    const module = angular.module('waltz.widgets', []);
+    const module = angular.module("waltz.widgets", []);
 
-    module.directive('waltzChangeTimeline', ChangeTimeline);
-    module.directive('waltzErrorAlert', ErrorAlert);
-    module.directive('waltzExternalLink', ExternalLink);
-    module.directive('waltzFromNow', FromNow);
-    module.directive('waltzJumpTo', JumpTo);
+    module.directive("waltzChangeTimeline", ChangeTimeline);
+    module.directive("waltzErrorAlert", ErrorAlert);
+    module.directive("waltzExternalLink", ExternalLink);
+    module.directive("waltzFromNow", FromNow);
+    module.directive("waltzJumpTo", JumpTo);
 
-    module.directive('waltzMailTo', MailTo);
-    module.directive('waltzOverlayPanel', OverlayPanel);
-    module.directive('waltzPhoneLink', PhoneLink);
-    module.directive('waltzRagIndicator', RagIndicator);
-    module.directive('waltzSearch', Search);
-    module.directive('waltzSectionActions', SectionActions);
-    module.directive('waltzStepCount', StepCount);
-    module.directive('waltzYqSelect', YqSelect);
+    module.directive("waltzMailTo", MailTo);
+    module.directive("waltzOverlayPanel", OverlayPanel);
+    module.directive("waltzPhoneLink", PhoneLink);
+    module.directive("waltzRagIndicator", RagIndicator);
+    module.directive("waltzSearch", Search);
+    module.directive("waltzSectionActions", SectionActions);
+    module.directive("waltzStepCount", StepCount);
+    module.directive("waltzYqSelect", YqSelect);
     module
-        .component('waltzBasicInfoTile', BasicInfoTile)
-        .component('waltzDataExtractLink', DataExtractLink)
-        .component('waltzEditableField', EditableField)
-        .component('waltzIcon', Icon)
-        .component('waltzInlineEditArea', InlineEditArea)
-        .component('waltzKeywordList', KeywordList)
-        .component('waltzKeywordEdit', KeywordEdit)
-        .component('waltzNoData', NoData)
-        .component('waltzMarkdown', Markdown)
-        .component('waltzPageHeader', PageHeader)
-        .component('waltzPie', Pie)
-        .component('waltzPieSegmentTable', PieSegmentTable)
-        .component('waltzPieTable', PieTable)
-        .component('waltzSection', Section)
-        .component('waltzSimpleStackChart', SimpleStackChart)
-        .component('waltzToggle', Toggle)
-        .component('waltzTwistie', Twistie);
+        .component("waltzBasicInfoTile", BasicInfoTile)
+        .component("waltzDataExtractLink", DataExtractLink)
+        .component("waltzEditableField", EditableField)
+        .component("waltzIcon", Icon)
+        .component("waltzInlineEditArea", InlineEditArea)
+        .component("waltzKeywordList", KeywordList)
+        .component("waltzKeywordEdit", KeywordEdit)
+        .component("waltzNoData", NoData)
+        .component("waltzMarkdown", Markdown)
+        .component("waltzPageHeader", PageHeader)
+        .component("waltzPie", Pie)
+        .component("waltzPieSegmentTable", PieSegmentTable)
+        .component("waltzPieTable", PieTable)
+        .component("waltzSection", Section)
+        .component("waltzSimpleStackChart", SimpleStackChart)
+        .component("waltzToggle", Toggle)
+        .component("waltzTwistie", Twistie)
+        .component("waltzWarning", Warning);
 
     registerComponents(module, [
         ColumnMapper,
