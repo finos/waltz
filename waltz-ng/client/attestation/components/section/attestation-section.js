@@ -56,7 +56,9 @@ function mkAttestationData(attestationRuns = [], attestationInstances = []){
 }
 
 
-function mkAttestationSections(baseSections = [], attestations = []) {
+function mkAttestationSections(baseSections = [], attestations = [], unattestedChanges = []) {
+    const unattestedChangesByChildKind = _.groupBy(unattestedChanges, d => d.childKind);
+
     const attestationsByKind = _
         .chain(attestations)
         .filter(d => d.instance.attestedAt != null)
@@ -70,7 +72,8 @@ function mkAttestationSections(baseSections = [], attestations = []) {
             const latestAttestation = _.findLast(attestationsByKind[s.type]);
             return {
                 section: s,
-                latestAttestation: latestAttestation
+                latestAttestation: latestAttestation,
+                unattestedChanges: _.get(unattestedChangesByChildKind, [s.type], [])
             };
         })
         .value();
@@ -88,14 +91,15 @@ function controller($q,
             type: "LOGICAL_DATA_FLOW",
             name: "Logical Flow - latest attestation",
             actionLabel:  "Attest logical flows",
-            typeName: "Logical Flows"
+            typeName: "Logical Flows",
+            unattestedChanges: []
         },
         {
             type: "PHYSICAL_FLOW",
             name: "Physical Flow - latest attestation",
             actionLabel:  "Attest physical flows",
             typeName: "Physical Flows",
-            validator: () => Promise.resolve()
+            unattestedChanges: []
         }
     ];
 
@@ -115,11 +119,18 @@ function controller($q,
                 { force: true })
             .then(r => r.data);
 
+        const unattestedChangesPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeLogStore.findUnattestedChangesByEntityReference,
+                [entityReference],
+                { force: true })
+            .then(r => r.data);
+
         return $q
-            .all([runsPromise, instancesPromise])
-            .then(([runs, instances]) => {
+            .all([runsPromise, instancesPromise, unattestedChangesPromise])
+            .then(([runs, instances, unattestedChanges]) => {
                 vm.attestations = mkAttestationData(runs, instances);
-                vm.attestationSections = mkAttestationSections(baseSections, vm.attestations);
+                vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
             });
     };
 

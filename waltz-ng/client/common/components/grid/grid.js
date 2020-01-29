@@ -16,7 +16,7 @@
  *
  */
 
-import {initialiseData} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
 import template from "./grid.html";
 
 
@@ -59,10 +59,13 @@ function controller(uiGridExporterConstants,
             enableRowSelection: vm.onRowSelect ? true: false,
             onRegisterApi: function(gridApi){
                 vm.gridApi = gridApi;
-                vm.onInitialise({
-                    exportFn: vm.exportData,
-                    gridApi: vm.gridApi
-                });
+
+                invokeFunction(
+                    vm.onInitialise,
+                    {
+                        exportFn: vm.exportData,
+                        gridApi: vm.gridApi
+                    });
 
                 if (vm.onRowSelect) {
                     gridApi.selection.setMultiSelect(false);

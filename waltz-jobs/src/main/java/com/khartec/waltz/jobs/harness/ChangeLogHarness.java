@@ -19,25 +19,38 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.attestation.AttestationViewDao;
+import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.service.DIBaseConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.List;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
-public class AttestationViewHarness {
+public class ChangeLogHarness {
+
+
+    public static final int WALTZ = 20506;
+    public static final int DBKINETIC = 141535001;
+    public static final int CRES_EMEA = 16276;
+
 
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
 
-        AttestationViewDao dao = ctx.getBean(AttestationViewDao.class);
-        EntityReference ref = mkRef(EntityKind.APPLICATION, 16869);
+        ChangeLogDao dao = ctx.getBean(ChangeLogDao.class);
+        EntityReference ref = mkRef(EntityKind.APPLICATION, CRES_EMEA);
 
-        FunctionUtilities.time("foo", () -> dao.foo(ref));
+        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+        List<ChangeLog> changes = FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+        System.out.println(changes);
     }
 
 

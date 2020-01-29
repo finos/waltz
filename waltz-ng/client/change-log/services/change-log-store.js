@@ -29,35 +29,49 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+
+    const findUnattestedChangesByEntityReference = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/${ref.kind}/${ref.id}/unattested`)
+            .then(result => result.data);
+    };
+
     const findForUserName = (userName, limit = null) =>
         $http.get(`${BASE}/user/${userName}`, {params: {limit}})
             .then(r => r.data);
 
     return {
         findByEntityReference,
+        findUnattestedChangesByEntityReference,
         findForUserName
     };
 }
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'ChangeLogStore';
+const serviceName = "ChangeLogStore";
 
 
 export const ChangeLogStore_API = {
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'finds change log entries for a given entity reference and limit (default: 30)'
+        serviceFnName: "findByEntityReference",
+        description: "finds change log entries for a given entity reference and limit (default: 30)"
+    },
+    findUnattestedChangesByEntityReference: {
+        serviceName,
+        serviceFnName: "findUnattestedChangesByEntityReference",
+        description: "finds change log entries for a given entity reference since its last set of attestations"
     },
     findForUserName: {
         serviceName,
-        serviceFnName: 'findForUserName',
-        description: 'finds change log entries for a given user name and limit (default: no limit)'
+        serviceFnName: "findForUserName",
+        description: "'finds change log entries for a given user name and limit (default: no limit)"
     }
 };
 

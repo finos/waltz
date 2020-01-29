@@ -21,7 +21,7 @@ import template from "./change-log-table.html";
 
 const bindings = {
     entries: "<",
-    onInitialise: "<"
+    onInitialise: "<?"
 };
 
 

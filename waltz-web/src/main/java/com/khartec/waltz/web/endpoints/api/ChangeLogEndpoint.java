@@ -47,6 +47,7 @@ public class ChangeLogEndpoint implements Endpoint {
 
     @Override
     public void register() {
+
         getForList(
                 mkPath(BASE_URL, "user", ":userId"),
                 (request, response) -> service.findByUser(request.params("userId"), getLimit(request)));
@@ -60,6 +61,13 @@ public class ChangeLogEndpoint implements Endpoint {
                     } else {
                         return service.findByParentReference(ref, getLimit(request));
                     }
+                });
+
+        getForList(
+                mkPath(BASE_URL, ":kind", ":id", "unattested"),
+                (request, response) -> {
+                    EntityReference ref = getEntityReference(request);
+                    return service.findUnattestedChanges(ref);
                 });
 
 
