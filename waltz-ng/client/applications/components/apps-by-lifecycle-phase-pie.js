@@ -16,9 +16,9 @@
  *
  */
 
-import { lifecyclePhaseColorScale } from "../../common/colors";
-import { lifecyclePhase } from "../../common/services/enums/lifecycle-phase";
-import { toKeyCounts } from "../../common";
+import {lifecyclePhaseColorScale} from "../../common/colors";
+import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
+import {toKeyCounts} from "../../common";
 import template from "./apps-by-lifecycle-phase-pie.html";
 
 

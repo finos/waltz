@@ -16,7 +16,9 @@
   ~
   -->
 
-<div class="btn-group"
+<!-- format not specified, default to CSV + XLSX -->
+<div ng-if="! $ctrl.format"
+     class="btn-group"
      uib-dropdown
      dropdown-append-to-body>
     <a ng-class="$ctrl.classes"
@@ -44,4 +46,15 @@
             </a>
         </li>
     </ul>
+</div>
+
+<!-- format specified, eg: SVG -->
+<div ng-if="$ctrl.format"
+     class="btn-group">
+    <a ng-class="$ctrl.classes"
+       ng-click="$ctrl.exportAs($ctrl.format)">
+        <waltz-icon ng-if="! $ctrl.extracting" name="cloud-download"></waltz-icon>
+        <waltz-icon ng-if="$ctrl.extracting" name="refresh" spin="true"></waltz-icon>
+        <span ng-bind="$ctrl.name"></span>
+    </a>
 </div>

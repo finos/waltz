@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -17,7 +16,7 @@
  *
  */
 
-import { checkIsCreateActorCommand } from "../../common/checks";
+import {checkIsCreateActorCommand} from "../../common/checks";
 
 
 export function store($http, BaseApiUrl) {

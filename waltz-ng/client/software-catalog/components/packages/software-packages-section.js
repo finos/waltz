@@ -20,10 +20,12 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import {initialiseData} from "../../../common";
-import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import {countByVersionId, groupByVersionId} from "../../software-catalog-utilities";
 
 import template from "./software-packages-section.html";
+import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
@@ -33,17 +35,19 @@ const bindings = {
 
 const initialState = {
     softwareCatalog: null,
+    selectedPackage: null,
+    selectedVersion: null
 };
 
 
 function mkColumnDefs() {
     return [
         mkLinkGridCell("Name",
-            "package.name",
-            "package.id",
-            "main.software-package.view"),
+                       "package.name",
+                       "package.id",
+                       "main.software-package.view"),
         { field: "version.externalId", displayName: "External Id" },
-        { field: "version.version", displayName: "Version"},
+        mkEntityLinkGridCell("Version", "version", "none", "right"),
         {
             field: "releaseDate",
             cellTemplate: `
@@ -54,23 +58,29 @@ function mkColumnDefs() {
         },
         { field: "package.description", displayName: "Description" },
         { field: "package.isNotable", displayName: "Notable" },
-        { field: "usageCount", name: "# Applications" }
+        {
+            field: "usageCount",
+            name: "# Applications",
+            cellTemplate: `<div class="ui-grid-cell-contents">
+                               <a class="clickable" 
+                                  ng-bind="COL_FIELD" 
+                                  ng-click="grid.appScope.onSelectVersion(row.entity)">
+                               </a>
+                           </div>`
+        }
     ]
 }
 
 
 function mkGridData(packages = [], versions = [], usages = []) {
-    const usagesByVersionId = _.groupBy(usages, "softwareVersionId");
-
-    const versionsById = _.keyBy(versions, v => v.id);
+    const countsByVersionId = countByVersionId(usages);
     const packagesById = _.keyBy(packages, v => v.id);
 
-    const gridData = _.map(usages, u => Object.assign(
+    const gridData = _.map(versions, v => Object.assign(
         { },
-        { package: packagesById[u.softwarePackageId] },
-        { version: versionsById[u.softwareVersionId] },
-        { usageCount: _.get(usagesByVersionId, `[${u.softwareVersionId}].length`, 0) })
-    );
+        { package: packagesById[v.softwarePackageId] },
+        { version: v },
+        { usageCount: _.get(countsByVersionId, `[${v.id}]`, 0) }));
 
     return gridData;
 }
@@ -88,9 +98,22 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.softwareCatalog = r.data;
                 vm.columnDefs = mkColumnDefs();
-                vm.gridData = mkGridData(vm.softwareCatalog.packages,
+                vm.gridData = mkGridData(
+                    vm.softwareCatalog.packages,
                     vm.softwareCatalog.versions,
                     vm.softwareCatalog.usages);
+            });
+    };
+
+
+    vm.onSelectVersion = (row) => {
+        vm.selectedPackage = row.package;
+        vm.selectedVersion = row.version;
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [mkSelectionOptions(vm.selectedVersion)])
+            .then(r => r.data)
+            .then(apps => {
+                vm.selectedApps = apps;
             });
     };
 

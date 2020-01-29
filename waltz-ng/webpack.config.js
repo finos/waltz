@@ -21,6 +21,8 @@ var webpack = require("webpack");
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var Visualizer = require("webpack-visualizer-plugin");
 var git = require("git-rev-sync");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
 
 
 var basePath = path.resolve(__dirname);
@@ -68,6 +70,7 @@ module.exports = {
         //poll: 1000
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: "Waltz",
             filename: "index.html",

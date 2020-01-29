@@ -72,9 +72,9 @@ public class ListUtilities {
 
 
     @SafeVarargs
-    public static <T> List<T> concat(List<T>... tss) {
+    public static <T> List<T> concat(List<? extends T>... tss) {
         List<T> result = new ArrayList<>();
-        for (List<T> ts : tss) {
+        for (List<? extends T> ts : tss) {
             if (ts != null) {
                 result.addAll(ts);
             }

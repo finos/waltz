@@ -17,10 +17,10 @@
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { invokeFunction } from "../../../common/index";
-import { sameRef, toEntityRef } from '../../../common/entity-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {invokeFunction} from "../../../common/index";
+import {sameRef, toEntityRef} from '../../../common/entity-utils';
 
 import template from "./bulk-application-selector.html";
 

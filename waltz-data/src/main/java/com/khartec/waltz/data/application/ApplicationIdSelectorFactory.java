@@ -87,7 +87,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case LICENCE:
-                return mkForEntityRelationship(options);
+                return mkForLicence(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case SCENARIO:
@@ -100,12 +100,15 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForPerson(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
+            case SOFTWARE_VERSION:
+                return mkForSoftwareVersion(options);
             case TAG:
                 return mkForTag(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
     }
+
 
     private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
         return DSL.select(TAG_USAGE.ENTITY_ID)
@@ -130,6 +133,36 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .innerJoin(SOFTWARE_VERSION)
                     .on(SOFTWARE_VERSION.ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
                 .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(options.entityReference().id()))
+                .and(applicationConditions);
+    }
+
+
+    private Select<Record1<Long>> mkForSoftwareVersion(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition applicationConditions = mkApplicationConditions(options);
+        return DSL
+                .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
+                .from(SOFTWARE_USAGE)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
+                .where(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(options.entityReference().id()))
+                .and(applicationConditions);
+    }
+
+
+    private Select<Record1<Long>> mkForLicence(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition applicationConditions = mkApplicationConditions(options);
+        return DSL
+                .selectDistinct(SOFTWARE_USAGE.APPLICATION_ID)
+                .from(SOFTWARE_USAGE)
+                .innerJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(SOFTWARE_USAGE.APPLICATION_ID))
+                .innerJoin(SOFTWARE_VERSION_LICENCE)
+                    .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+                .where(SOFTWARE_VERSION_LICENCE.LICENCE_ID.eq(options.entityReference().id()))
                 .and(applicationConditions);
     }
 

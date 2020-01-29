@@ -16,8 +16,10 @@
  *
  */
 
-import { checkIsEntityRef } from "./checks";
-import { CORE_API } from "./services/core-api-utils";
+
+import _ from "lodash";
+import {checkIsEntityRef} from "./checks";
+import {CORE_API} from "./services/core-api-utils";
 
 export function sameRef(r1, r2, options = { skipChecks: false }) {
     if (! options.skipChecks) {
@@ -98,8 +100,12 @@ function determineLoadByExtIdCall(kind) {
     switch (kind) {
         case "APPLICATION":
             return CORE_API.ApplicationStore.findByAssetCode;
+        case "DATA_TYPE":
+            return CORE_API.DataTypeStore.getDataTypeByCode;
         case "MEASURABLE":
             return CORE_API.MeasurableStore.findByExternalId;
+        case "PERSON":
+            return CORE_API.PersonStore.getByEmployeeId;
         case "PHYSICAL_FLOW":
             return CORE_API.PhysicalFlowStore.findByExternalId;
         default:
@@ -123,7 +129,8 @@ export function loadByExtId(serviceBroker, kind, extId) {
         const remoteCall = determineLoadByExtIdCall(kind);
         return serviceBroker
             .loadViewData(remoteCall, [extId])
-            .then(r => r.data);
+            .then(r => _.defaultTo(r.data, []))
+            .then(d => _.isArray(d) ? d : [d])
     } catch (e) {
         return Promise.reject(e);
     }

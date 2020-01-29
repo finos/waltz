@@ -50,6 +50,8 @@ public class SvgDiagramDao {
                 .group(record.getGroup())
                 .svg(record.getSvg())
                 .product(record.getProduct())
+                .displayWidthPercent(record.getDisplayWidthPercent())
+                .displayHeightPercent(record.getDisplayHeightPercent())
                 .build();
     };
 
@@ -57,6 +59,14 @@ public class SvgDiagramDao {
     @Autowired
     public SvgDiagramDao(DSLContext dsl) {
         this.dsl = dsl;
+    }
+
+
+    public SvgDiagram getById(long id) {
+        return dsl.select()
+                .from(SVG_DIAGRAM)
+                .where(SVG_DIAGRAM.ID.eq(id))
+                .fetchOne(svgMapper);
     }
 
 

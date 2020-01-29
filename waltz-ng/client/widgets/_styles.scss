@@ -21,7 +21,7 @@
 @import "./column-mapper/column-mapper";
 @import "./keyword-list";
 @import "./markdown";
-@import "./no-data";
+@import "./no-data/no-data";
 @import "./overlay-panel";
 @import "./page-header/page-header";
 @import "./pie/pie";
@@ -31,4 +31,5 @@
 @import "./sub-section";
 @import "./simple-stack-chart";
 @import "./yq-select";
+@import "./warning/warning";
 @import "../auth-sources/components/tree-filter/tree-filter";

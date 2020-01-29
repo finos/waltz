@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 
@@ -43,4 +44,8 @@ public abstract class SvgDiagram implements IdProvider,
         return "visio";
     }
 
+    @Nullable
+    public abstract Integer displayWidthPercent();
+    @Nullable
+    public abstract Integer displayHeightPercent();
 }

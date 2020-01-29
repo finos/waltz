@@ -1,3 +1,4 @@
+
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -16,19 +17,12 @@
  *
  */
 
-package com.khartec.waltz.model.perspective;
+import template from "./warning.html";
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
-
-@Value.Immutable
-@JsonSerialize(as = ImmutablePerspectiveRatingValue.class)
-@JsonDeserialize(as = ImmutablePerspectiveRatingValue.class)
-public abstract class PerspectiveRatingValue {
-
-    public abstract char rating();
-    public abstract long measurableX();
-    public abstract long measurableY();
-
-}
+export default  {
+    template,
+    transclude: {
+        message: "message",
+        content: "content"
+    }
+};

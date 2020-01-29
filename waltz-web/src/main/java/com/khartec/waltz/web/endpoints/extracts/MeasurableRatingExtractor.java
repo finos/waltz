@@ -38,7 +38,7 @@ import static spark.Spark.post;
 
 
 @Service
-public class MeasurableRatingExtractor extends BaseDataExtractor {
+public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final Measurable m = MEASURABLE.as("m");

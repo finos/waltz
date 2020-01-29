@@ -36,6 +36,8 @@ function determineMimeType(format) {
             return "application/octet-stream;charset=utf-8";
         case "XLSX":
             return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        case "SVG":
+            return "image/svg+xml";
         default:
             throw `Cannot determine mime type for format: ${format}`;
     }

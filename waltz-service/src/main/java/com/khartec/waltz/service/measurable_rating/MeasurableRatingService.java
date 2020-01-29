@@ -24,7 +24,6 @@ import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.data.perspective_rating.PerspectiveRatingDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -54,7 +53,6 @@ public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
-    private final PerspectiveRatingDao perspectiveRatingDao;
     private final ChangeLogService changeLogService;
     private final MeasurableCategoryDao measurableCategoryDao;
 
@@ -66,18 +64,15 @@ public class MeasurableRatingService {
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableCategoryDao measurableCategoryDao,
-                                   PerspectiveRatingDao perspectiveRatingDao,
                                    ChangeLogService changeLogService) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
-        checkNotNull(perspectiveRatingDao, "perspectiveRatingDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableCategoryDao = measurableCategoryDao;
-        this.perspectiveRatingDao = perspectiveRatingDao;
         this.changeLogService = changeLogService;
     }
 
@@ -158,7 +153,6 @@ public class MeasurableRatingService {
         Measurable measurable = measurableDao.getById(command.measurableId());
 
         boolean success = measurableRatingDao.remove(command);
-        perspectiveRatingDao.cascadeRemovalOfMeasurableRating(command.entityReference(), command.measurableId());
 
         if (success && measurable != null) {
             writeChangeLogEntry(

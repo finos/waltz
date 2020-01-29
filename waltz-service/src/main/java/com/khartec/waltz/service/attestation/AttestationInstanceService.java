@@ -140,7 +140,7 @@ public class AttestationInstanceService {
                 .userId(username)
                 .severity(Severity.INFORMATION)
                 .childKind(attestedKind)
-                .operation(Operation.ADD)
+                .operation(Operation.ATTEST)
                 .build());
     }
 

@@ -38,15 +38,47 @@
         </waltz-source-data-overlay>
 
 
-        <uib-tabset>
+        <uib-tabset active="$ctrl.activeTabIndex">
 
             <uib-tab heading="Overview">
+                <waltz-warning ng-if="$ctrl.repeatedPackages.length > 0">
+                    <message>
+                        <strong>Multiple versions</strong> of the same Software Package
+                    </message>
+                    <content>
+                        <div>
+                            There are multiple versions of the same Software Package in use across this application.
+                            Consider consolidating to a single version.  The top 10 are listed below, please review
+                            fully in the <a class="clickable" ng-click="$ctrl.activeTabIndex = 1">Software</a> tab.
+                        </div>
+                        <br>
+                        <div class="text-muted">
+                            <span ng-repeat="p in $ctrl.repeatedPackages | limitTo:10">
+                                <span ng-bind="p.package.name"></span>
+                                (<span ng-bind="p.count"></span>)<span ng-if="!$last">, </span>
+                            </span>
+                        </div>
+                    </content>
+                </waltz-warning>
+
                 <waltz-technology-summary-pies servers="$ctrl.filteredServers"
                                                server-usages="$ctrl.filteredServerUsage"
                                                databases="$ctrl.filteredDatabases">
                 </waltz-technology-summary-pies>
             </uib-tab>
 
+            <uib-tab heading="Software"
+                     select="showSoftwareCatalog = true"
+                     disable="$ctrl.softwareCatalog.packages.length == 0">
+                <div ng-if="showSoftwareCatalog">
+                    <br>
+                    <div style="font-size: smaller; height: 300px"
+                         ui-grid-exporter
+                         ui-grid-resize-columns
+                         ui-grid="$ctrl.softwareCatalogGridOptions">
+                    </div>
+                </div>
+            </uib-tab>
 
             <uib-tab heading="Servers"
                      select="showServerDetail = true"
@@ -70,19 +102,6 @@
                          ui-grid-exporter
                          ui-grid-resize-columns
                          ui-grid="$ctrl.databaseGridOptions">
-                    </div>
-                </div>
-            </uib-tab>
-
-            <uib-tab heading="Software"
-                     select="showSoftwareCatalog = true"
-                     disable="$ctrl.softwareCatalog.packages.length == 0">
-                <div ng-if="showSoftwareCatalog">
-                    <br>
-                    <div style="font-size: smaller; height: 300px"
-                         ui-grid-exporter
-                         ui-grid-resize-columns
-                         ui-grid="$ctrl.softwareCatalogGridOptions">
                     </div>
                 </div>
             </uib-tab>

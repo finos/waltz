@@ -24,7 +24,7 @@
         <!-- Dismiss -->
         <small class="pull-right">
             <a class="clickable"
-               ng-click="$ctrl.dismiss()">
+               ng-click="$ctrl.onDismiss()">
                 <waltz-icon name="close"></waltz-icon>
             </a>
         </small>
@@ -40,7 +40,7 @@
             <input type='search'
                    class="form-control"
                    ng-model="$ctrl.query"
-                   ng-model-options="{ debounce: 250 }"
+                   ng-model-options="{ debounce: 300 }"
                    ng-change="$ctrl.doSearch()"
                    autocomplete="off"
                    autofocus="autofocus"
@@ -60,7 +60,13 @@
                     <thead>
                         <tr>
                             <th colspan="2">
-                                Filter
+                                <span uib-popover="Use the options below to restrict the search to specific types"
+                                      popover-placement="left"
+                                      popover-popup-delay="300"
+                                      popover-append-to-body="true"
+                                      popover-trigger="mouseenter">
+                                    Filter results
+                                </span>
                             </th>
                         </tr>
                     </thead>
@@ -70,7 +76,7 @@
                             'clickable' : $ctrl.results[category].length > 0,
                             'wnso-selected': $ctrl.selectedCategory === category
                         }"
-                        ng-click="$ctrl.toggleCategory(category)">
+                        ng-click="$ctrl.onToggleCategory(category)">
                         <td>
                             <span ng-class="{'text-muted' : ! $ctrl.results[category].length > 0}">
                                 <waltz-icon fixed-width="true"
@@ -97,10 +103,9 @@
                     <tr>
                         <th colspan="2">
                             Results
-
                             <waltz-toggle class="pull-right"
                                           state="$ctrl.showActiveOnly"
-                                          on-toggle="$ctrl.toggleActiveOnly()"
+                                          on-toggle="$ctrl.onToggleActiveOnly()"
                                           label-on="Active only"
                                           label-off="Active only">
                             </waltz-toggle>
@@ -112,8 +117,8 @@
                            ng-if="$ctrl.selectedCategory === category || $ctrl.selectedCategory === null">
                         <tr ng-repeat="item in $ctrl.results[category]">
                             <td>
-                                <waltz-entity-link tooltip-placement="right"
-                                                   ng-click="$ctrl.dismiss()"
+                                <waltz-entity-link tooltip-placement="bottom"
+                                                   ng-click="$ctrl.onDismiss()"
                                                    entity-ref="item">
                                 </waltz-entity-link>
                             </td>

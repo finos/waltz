@@ -16,12 +16,13 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {nest} from "d3-collection";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common/index";
 
-import template from './attestation-instance-list-user-view.html';
+import template from "./attestation-instance-list-user-view.html";
+import {attest} from "./attestation-utils";
 
 
 const initialState = {
@@ -50,8 +51,8 @@ function controller($q,
             .then(r => r.data);
 
         const historicalInstancesPromise = serviceBroker
-                .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalForPendingByUser, [], {force: true})
-                .then(r => r.data);
+            .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalForPendingByUser, [], {force: true})
+            .then(r => r.data);
 
         $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
             .then(([runs, instances, historicInstances]) => {
@@ -66,7 +67,7 @@ function controller($q,
                         {},
                         i,
                         { historic: _.get(historicByParentRefByChildKind, [i.parentEntity.kind, i.parentEntity.id, i.childEntityKind], []) } ))
-                    .groupBy('attestationRunId')
+                    .groupBy("attestationRunId")
                     .value();
 
                 vm.runsWithInstances =  _.chain(runs)
@@ -82,18 +83,18 @@ function controller($q,
     loadData();
 
     // interaction
-    vm.attestEntity = (instance) => {
-        serviceBroker
-            .execute(CORE_API.AttestationInstanceStore.attestInstance, [instance.id])
+    vm.onAttestEntity = () => {
+        const instance = vm.selectedAttestation;
+        attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
             .then(() => vm.selectedAttestation = null);
     };
 
-    vm.cancelAttestation = () => {
+    vm.onCancelAttestation = () => {
         vm.selectedAttestation = null;
     };
 
-    vm.toggleFilter = () => {
+    vm.onToggleFilter = () => {
         vm.showAttested = !vm.showAttested;
         loadData();
     };
@@ -102,14 +103,14 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker',
-    'UserService'
+    "$q",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 }

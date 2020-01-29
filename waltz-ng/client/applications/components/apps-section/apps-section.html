@@ -20,7 +20,7 @@
 
     <waltz-section-actions>
         <button class="btn btn-xs btn-primary"
-                ng-if="$ctrl.visibility.tab == 2"
+                ng-if="$ctrl.visibility.tab == 'DETAIL'"
                 ng-click="$ctrl.export()">
             <waltz-icon name="cloud-download"></waltz-icon>
             Export
@@ -36,17 +36,18 @@
                                entities="['APPLICATION', 'END_USER_APPLICATION']">
     </waltz-source-data-overlay>
 
-    <uib-tabset ng-if="$ctrl.combinedApps.length > 0">
-        <uib-tab heading="Summary" select="$ctrl.visibility.tab = 1">
+    <uib-tabset ng-if="$ctrl.combinedCount > 0">
+        <uib-tab heading="Summary"
+                 select="$ctrl.onTabSelect('SUMMARY')">
             <waltz-app-summary apps="$ctrl.apps"
                                end-user-apps="$ctrl.endUserApps">
             </waltz-app-summary>
         </uib-tab>
 
-        <uib-tab select="$ctrl.visibility.tab = 2"
+        <uib-tab select="$ctrl.onTabSelect('DETAIL')"
                  heading="Applications">
             <br>
-            <div ng-if="$ctrl.visibility.tab == 2">
+            <div ng-if="$ctrl.visibility.tab == 'DETAIL'">
                 <waltz-app-table applications="$ctrl.combinedApps"
                                  on-initialise="$ctrl.onInitialise">
                 </waltz-app-table>
@@ -54,7 +55,7 @@
         </uib-tab>
     </uib-tabset>
 
-    <waltz-no-data ng-if="$ctrl.combinedApps.length == 0">
+    <waltz-no-data ng-if="$ctrl.combinedCount == 0">
         <message>
             There are <strong>no application </strong>
             associations.

@@ -180,7 +180,8 @@
                     </div>
                     <div class="col-sm-4">
                         <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
-                                        timestamp="$ctrl.app.plannedRetirementDate">
+                                        timestamp="$ctrl.app.plannedRetirementDate"
+                                        days-only="true">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.plannedRetirementDate">
                             -
@@ -191,7 +192,8 @@
                     </div>
                     <div class="col-sm-4">
                         <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
-                                        timestamp="$ctrl.app.actualRetirementDate">
+                                        timestamp="$ctrl.app.actualRetirementDate"
+                                        days-only="true">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.actualRetirementDate">
                             -
@@ -220,11 +222,22 @@
                     </div>
                     <div class="col-sm-10">
                         <ul class="list-unstyled list-inline">
-                            <li ng-repeat="appGroup in $ctrl.appGroups | orderBy:'name'">
+                            <li ng-repeat="appGroup in $ctrl.appGroupsToDisplay">
                                 <waltz-entity-link entity-ref="appGroup">
                                 </waltz-entity-link>
                                 <span ng-hide="$last">, </span>
                             </li>
+                            <a class="clickable small"
+                               ng-if="!$ctrl.showAllAppGroups && $ctrl.appGroups.length > 10"
+                               ng-click="$ctrl.toggleAppGroupDisplay()">
+                                [show all
+                                <span ng-bind="$ctrl.appGroups.length"></span>]
+                            </a>
+                            <a class="clickable small"
+                               ng-if="$ctrl.showAllAppGroups"
+                               ng-click="$ctrl.toggleAppGroupDisplay()">
+                                [show less]
+                            </a>
                         </ul>
                     </div>
                 </div>

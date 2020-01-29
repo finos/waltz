@@ -16,9 +16,9 @@
  *
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./simple-app-table.html";
 

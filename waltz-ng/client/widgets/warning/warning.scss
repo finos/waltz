@@ -1,4 +1,4 @@
-/*
+/*!
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,20 +16,24 @@
  *
  */
 
-package com.khartec.waltz.model.perspective;
+.waltz-warning {
+    background: #fffdfa;
+    background: linear-gradient(90deg, #fffdfa 0%, rgba(255,255,255,1) 100%);
+    padding: 15px;
+    margin-bottom: 6px;
+    border-radius: 3px;
+    box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
+    border-left: 4px solid rgba(222, 139, 6, 0.99);
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import org.immutables.value.Value;
+    .ww-message {
+        color: #DE8B06;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutablePerspectiveRating.class)
-@JsonDeserialize(as = ImmutablePerspectiveRating.class)
-public abstract class PerspectiveRating implements
-        LastUpdatedProvider {
+        span {
+            vertical-align: middle;
+        }
+    }
 
-    public abstract EntityReference entityReference();
-    public abstract PerspectiveRatingValue value();
+    content {
+        color: #7B7D7D;
+    }
 }

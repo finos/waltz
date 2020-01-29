@@ -69,11 +69,17 @@ public class SoftwareVersionDao {
         this.dsl = dsl;
     }
 
-
     public List<SoftwareVersion> findBySoftwarePackageId(long id) {
         return dsl.selectFrom(SOFTWARE_VERSION)
                 .where(SOFTWARE_VERSION.SOFTWARE_PACKAGE_ID.eq(id))
                 .fetch(TO_DOMAIN);
+    }
+
+
+    public SoftwareVersion getByVersionId(long id) {
+        return dsl.selectFrom(SOFTWARE_VERSION)
+                .where(SOFTWARE_VERSION.ID.eq(id))
+                .fetchOne(TO_DOMAIN);
     }
 
 
