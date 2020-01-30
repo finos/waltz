@@ -16,22 +16,14 @@
  *
  */
 
-package com.khartec.waltz.model.assessment_rating;
+package com.khartec.waltz.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.CommentProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableSaveAssessmentRatingCommand.class)
-@JsonDeserialize(as = ImmutableSaveAssessmentRatingCommand.class)
-public abstract class SaveAssessmentRatingCommand extends AssessmentRatingCommand implements
-        CommentProvider,
-        ProvenanceProvider {
+public interface CommentProvider {
 
-    public abstract long ratingId();
+    @Value
+    @Value.Auxiliary
+    @Nullable
+    String comment();
 }
-
-

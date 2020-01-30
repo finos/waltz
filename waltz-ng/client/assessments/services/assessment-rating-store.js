@@ -31,17 +31,10 @@ export function store($http, BaseApiUrl) {
     };
 
 
-    const create = (ref, assessmentDefinitionId, ratingId, description = null) => {
+    const store = (ref, assessmentDefinitionId, ratingId, comment = null) => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, description })
-            .then(d => d.data);
-    };
-
-    const update = (ref, assessmentDefinitionId, ratingId, description = null) => {
-        checkIsEntityRef(ref);
-        return $http
-            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, description })
+            .post(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`, { ratingId, comment })
             .then(d => d.data);
     };
 
@@ -62,8 +55,7 @@ export function store($http, BaseApiUrl) {
     return {
         findForEntityReference,
         findByTargetKindForRelatedSelector,
-        create,
-        update,
+        store,
         remove
     };
 }
@@ -89,15 +81,10 @@ export const AssessmentRatingStore_API = {
         serviceFnName: "findByTargetKindForRelatedSelector",
         description: "find all assessment ratings for a particular target kind by a selector for that kind [targetKind, selector]"
     },
-    create: {
+    store: {
         serviceName,
-        serviceFnName: "create",
-        description: "create a rating"
-    },
-    update: {
-        serviceName,
-        serviceFnName: "update",
-        description: "update a rating"
+        serviceFnName: "store",
+        description: "update or create a rating"
     },
     remove: {
         serviceName,

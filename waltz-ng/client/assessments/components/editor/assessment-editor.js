@@ -28,33 +28,87 @@ const bindings = {
 };
 
 
-const initialState = {
-
+const modes = {
+    EDIT: "EDIT",
+    VIEW: "VIEW"
 };
 
 
-function controller(notification) {
+const initialState = {
+    mode: modes.VIEW,
+    isEditable: false,
+    readOnlyReason: null,
+    working: null
+};
+
+
+function controller(notification, userService) {
     const vm = initialiseData(this, initialState);
 
-    vm.onSaveRating = (ratingId) => {
-        const comments = vm.assessment.rating ? vm.assessment.rating.description : "";
-        return vm.onSave(ratingId, comments, vm.assessment);
+
+    vm.doSave = () => {
+        if (vm.working.ratingId == null) {
+            alert("Cannot save without a valid rating selection");
+            return;
+        }
+        return vm
+            .onSave(
+                vm.assessment.definition.id,
+                vm.working.ratingId,
+                vm.working.comment)
+            .then(() => vm.onClose());
     };
 
-    vm.onSaveDescription = (commentChange) => {
-        const rating = vm.assessment.rating;
-        if (rating){
-            return vm.onSave(rating.ratingId, commentChange.newVal, vm.assessment);
-        } else {
-            notification.warning("Please create a rating before you add any description");
-        }
+
+    vm.onEdit = () => {
+        vm.mode = modes.EDIT;
     };
+
+
+    vm.onCancelEdit = () => {
+        vm.mode = modes.VIEW;
+    };
+
+
+    vm.$onInit = () => {
+        const definition = vm.assessment.definition;
+        const readOnly = definition.isReadOnly;
+
+        vm.working = _.pick(
+            vm.assessment.rating,
+            ["comment", "ratingId"]);
+
+        userService
+            .whoami()
+            .then(u => {
+                const permittedRole = definition.permittedRole;
+                if (readOnly) {
+                    // assessment is readonly therefore cannot be edited
+                    vm.isEditable = false;
+                    vm.readOnlyReason = "This assessment is marked as read only";
+                } else if (! _.isEmpty(permittedRole)) {
+                    // permitted role is not empty therefore need to check user roles
+                    if (userService.hasRole(u, permittedRole)) {
+                        vm.isEditable = true;
+                        vm.readOnlyReason = null;
+                    } else {
+                        vm.isEditable = false;
+                        vm.readOnlyReason = "You do not have permission to modify this assessment";
+                    }
+                } else {
+                    // permitted roles is empty therefore anyone can edit
+                    vm.isEditable = true;
+                    vm.readOnlyReason = null;
+                }
+            });
+    }
 
 }
 
 
 controller.$inject = [
-    "Notification"
+    "Notification",
+    "UserService"
 ];
 
 

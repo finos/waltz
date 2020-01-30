@@ -101,6 +101,9 @@ function controller($q, notification, serviceBroker) {
 
 
     vm.onRemove = (ctx) => {
+        if (! confirm("Are yo sure you want to remove this assessment ?")) {
+            return;
+        }
         return serviceBroker
             .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
             .then(() => {
@@ -113,12 +116,11 @@ function controller($q, notification, serviceBroker) {
     };
 
 
-    vm.onSave = (value, comments, ctx) => {
-        const saveMethod = ctx.rating
-            ? CORE_API.AssessmentRatingStore.update
-            : CORE_API.AssessmentRatingStore.create;
+    vm.onSave = (definitionId, ratingId, comments) => {
         return serviceBroker
-            .execute(saveMethod, [vm.parentEntityRef, ctx.definition.id, value, comments])
+            .execute(
+                CORE_API.AssessmentRatingStore.store,
+                [vm.parentEntityRef, definitionId, ratingId, comments])
             .then(d => {
                 loadAll();
                 notification.success("Assessment saved");
