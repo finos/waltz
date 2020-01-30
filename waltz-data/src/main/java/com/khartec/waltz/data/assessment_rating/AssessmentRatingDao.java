@@ -52,7 +52,7 @@ public class AssessmentRatingDao {
                 .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
-                .description(mkSafe(record.getDescription()))
+                .comment(mkSafe(record.getDescription()))
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
@@ -66,7 +66,7 @@ public class AssessmentRatingDao {
         record.setEntityKind(command.entityReference().kind().name());
         record.setAssessmentDefinitionId(command.assessmentDefinitionId());
         record.setRatingId(command.ratingId());
-        record.setDescription(command.description());
+        record.setDescription(command.comment());
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdatedAt()));
         record.setLastUpdatedBy(command.lastUpdatedBy());
         record.setProvenance(command.provenance());
@@ -94,17 +94,19 @@ public class AssessmentRatingDao {
     }
 
 
-    public boolean update(SaveAssessmentRatingCommand command) {
+    public boolean store(SaveAssessmentRatingCommand command) {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeUpdate(record) == 1;
-    }
+        EntityReference ref = command.entityReference();
+        boolean isUpdate = dsl.fetchExists(dsl
+                .selectFrom(ASSESSMENT_RATING)
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id()))
+                .and(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId())));
 
-
-    public boolean create(SaveAssessmentRatingCommand command) {
-        checkNotNull(command, "command cannot be null");
-        AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeInsert(record) == 1;
+        return isUpdate
+                ? dsl.executeUpdate(record) == 1
+                : dsl.executeInsert(record) == 1;
     }
 
 

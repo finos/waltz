@@ -20,10 +20,7 @@ package com.khartec.waltz.model.assessment_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 
@@ -31,7 +28,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableAssessmentRating.class)
 @JsonDeserialize(as = ImmutableAssessmentRating.class)
 public abstract class AssessmentRating implements
-        DescriptionProvider,
+        CommentProvider,
         LastUpdatedProvider,
         ProvenanceProvider {
 

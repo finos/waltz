@@ -75,8 +75,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
         getForList(findForEntityPath, this::findForEntityRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
-        postForDatum(modifyPath, this::createRoute);
-        putForDatum(modifyPath, this::updateRoute);
+        postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
     }
 
@@ -92,18 +91,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
-    private boolean updateRoute(Request request, Response z) throws IOException {
+    private boolean storeRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);
         verifyCanWrite(request, command.assessmentDefinitionId());
-        return assessmentRatingService.update(command, getUsername(request));
+        return assessmentRatingService.store(command, getUsername(request));
     }
 
-
-    private boolean createRoute(Request request, Response z) throws IOException {
-        SaveAssessmentRatingCommand command = mkCommand(request);
-        verifyCanWrite(request, command.assessmentDefinitionId());
-        return assessmentRatingService.create(command, getUsername(request));
-    }
 
 
     private boolean removeRoute(Request request, Response z) throws IOException {
@@ -131,7 +124,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
-                .description(StringUtilities.mkSafe((String) body.get("description")))
+                .comment(StringUtilities.mkSafe((String) body.get("comment")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .provenance("waltz")

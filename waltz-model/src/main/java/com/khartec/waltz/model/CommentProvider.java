@@ -16,7 +16,14 @@
  *
  */
 
-export const UP_ARROW = '\u25b4';
-export const DOWN_ARROW = '\u25be';
-export const LEFT_ARROW = '\u25c2';
-export const RIGHT_ARROW = '\u25b8';
+package com.khartec.waltz.model;
+
+import org.immutables.value.Value;
+
+public interface CommentProvider {
+
+    @Value
+    @Value.Auxiliary
+    @Nullable
+    String comment();
+}

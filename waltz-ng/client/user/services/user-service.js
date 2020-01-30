@@ -62,7 +62,7 @@ function service(http, baseUrl, $auth) {
 
     /**
      * @param user object with roles array property
-     * @param role - either obj w/ key or string
+     * @param role - either obj w/ `key` or plain string
      * @returns {boolean}
      */
     const hasRole = ( { roles = [] }, role) => {

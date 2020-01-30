@@ -73,44 +73,23 @@ public class AssessmentRatingService {
     }
 
 
-    public boolean update(SaveAssessmentRatingCommand command, String username) {
+    public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
-                        "Updated %s as [%s - %s]",
+                        "Storing assessment %s as [%s - %s]",
                         assessmentDefinition.name(),
                         ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
-                        command.description()))
+                        command.comment()))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
                 .userId(username)
-                .childKind(command.entityReference().kind())
                 .severity(Severity.INFORMATION)
                 .operation(Operation.UPDATE)
                 .build();
 
         changeLogService.write(logEntry);
 
-        return assessmentRatingDao.update(command);
-    }
-
-
-    public boolean create(SaveAssessmentRatingCommand command, String username) {
-        ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(format(
-                        "Created %s as [%s - %s]",
-                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name(),
-                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
-                        command.description()))
-                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
-                .userId(username)
-                .childKind(command.entityReference().kind())
-                .severity(Severity.INFORMATION)
-                .operation(Operation.ADD)
-                .build();
-
-        changeLogService.write(logEntry);
-
-        return assessmentRatingDao.create(command);
+        return assessmentRatingDao.store(command);
     }
 
 

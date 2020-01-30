@@ -23,7 +23,6 @@ import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
 
-
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
