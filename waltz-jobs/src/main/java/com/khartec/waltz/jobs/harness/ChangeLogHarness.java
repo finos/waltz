@@ -34,9 +34,6 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 public class ChangeLogHarness {
 
 
-    public static final int WALTZ = 20506;
-    public static final int DBKINETIC = 141535001;
-    public static final int CRES_EMEA = 16276;
 
 
     public static void main(String[] args) {
@@ -44,7 +41,7 @@ public class ChangeLogHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
 
         ChangeLogDao dao = ctx.getBean(ChangeLogDao.class);
-        EntityReference ref = mkRef(EntityKind.APPLICATION, CRES_EMEA);
+        EntityReference ref = mkRef(EntityKind.APPLICATION, 1234L);
 
         FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
         FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
