@@ -171,6 +171,25 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <div ng-if="attestationSection.unattestedChanges.length > 0">
+                    <waltz-warning>
+                        <message>Unattested changes detected</message>
+                        <content>
+                            <div ng-if="! attestationSection.showingUnattestedChanges">
+                                <a ng-click="attestationSection.showingUnattestedChanges = true"
+                                   class="clickable">
+                                    Show the <span ng-bind="attestationSection.unattestedChanges.length"></span>
+                                    unattested change/s.
+                                </a>
+                            </div>
+                            <div ng-if="attestationSection.showingUnattestedChanges">
+                                <waltz-change-log-table entries="attestationSection.unattestedChanges"></waltz-change-log-table>
+                            </div>
+                        </content>
+                    </waltz-warning>
+                </div>
+
             </div>
             <div class="waltz-sub-section-controls clickable"
                  ng-if="attestationSection.latestAttestation">
