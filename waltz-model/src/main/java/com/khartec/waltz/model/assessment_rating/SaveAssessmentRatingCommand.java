@@ -20,7 +20,7 @@ package com.khartec.waltz.model.assessment_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.CommentProvider;
 import com.khartec.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -28,7 +28,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableSaveAssessmentRatingCommand.class)
 @JsonDeserialize(as = ImmutableSaveAssessmentRatingCommand.class)
 public abstract class SaveAssessmentRatingCommand extends AssessmentRatingCommand implements
-        DescriptionProvider,
+        CommentProvider,
         ProvenanceProvider {
 
     public abstract long ratingId();

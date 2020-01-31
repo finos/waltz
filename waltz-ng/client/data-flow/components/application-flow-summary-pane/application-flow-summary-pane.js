@@ -16,31 +16,31 @@
  *
  */
 
-import _ from 'lodash';
-import { initialiseData } from '../../../common';
+import _ from "lodash";
+import { initialiseData } from "../../../common";
 
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { findUnknownDataTypeId } from '../../../data-types/data-type-utils';
+import { findUnknownDataTypeId } from "../../../data-types/data-type-utils";
 import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
 import { nest } from "d3-collection";
 
-import template from './application-flow-summary-pane.html';
+import template from "./application-flow-summary-pane.html";
 import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
     authoritativeCols: [
-        'PRIMARY',
-        'SECONDARY',
-        'DISCOURAGED',
-        'NO_OPINION'
+        "PRIMARY",
+        "SECONDARY",
+        "DISCOURAGED",
+        "NO_OPINION"
     ],
     visibility: {
         stats: false
@@ -49,19 +49,19 @@ const initialState = {
 
 
 function enrichDecorators(parentEntityRef, unknownDataTypeId, logicalFlows = [], decorators = []) {
-    const logicalFlowsById = _.keyBy(logicalFlows, 'id');
+    const logicalFlowsById = _.keyBy(logicalFlows, "id");
     const isKnownDataType = (decorator) => decorator.decoratorEntity.id !== unknownDataTypeId;
 
     return _
         .chain(decorators)
-        .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
+        .filter(d => d.decoratorEntity.kind === "DATA_TYPE")
         .map(d => {
             const flow = logicalFlowsById[d.dataFlowId];
             return {
                 decorator: d,
                 logicalFlow: flow,
                 direction: categorizeDirection(flow, parentEntityRef),
-                mappingStatus: isKnownDataType(d) ? 'KNOWN': 'UNKNOWN'
+                mappingStatus: isKnownDataType(d) ? "KNOWN": "UNKNOWN"
             };
         })
         .value();
@@ -110,7 +110,8 @@ function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
     const producerOrConsumerPhysicalFlows = physicalFlows
         .filter(pf => logicalFlowIds.includes(pf.logicalFlowId));
 
-    const summaryData = tallyBy(producerOrConsumerPhysicalFlows,
+    const summaryData = tallyBy(
+        producerOrConsumerPhysicalFlows,
         "freshnessIndicator");
 
     _.each(summaryData, d => d.color = _.get(enumValues, [d.key, "data", "iconColor"], "none"));
@@ -125,7 +126,7 @@ function controller($q, serviceBroker) {
     const reload = (unknownDataTypeId) => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
+            scope: "EXACT"
         };
 
         const logicalFlowPromise = serviceBroker
@@ -137,7 +138,7 @@ function controller($q, serviceBroker) {
         const decorationPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, 'DATA_TYPE'])
+                [selector, "DATA_TYPE"])
             .then(r => r.data);
 
         $q.all([logicalFlowPromise, decorationPromise])
@@ -188,8 +189,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker',
+    "$q",
+    "ServiceBroker",
 ];
 
 
@@ -202,5 +203,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzApplicationFlowSummaryPane'
+    id: "waltzApplicationFlowSummaryPane"
 };

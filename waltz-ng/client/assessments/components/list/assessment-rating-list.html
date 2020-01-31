@@ -120,7 +120,7 @@
                                      show-name="true">
         </waltz-rating-indicator-cell>
         <span style="position: relative; top: -4px;"
-              ng-if="item.rating.description.length > 0">
+              ng-if="item.rating.comment.length > 0">
             <waltz-icon name="sticky-note-o">
             </waltz-icon>
         </span>
@@ -158,9 +158,9 @@
                 </div>
             </div>
             <hr class="waltz-no-margins"
-                ng-if="item.rating.description">
+                ng-if="item.rating.comment">
             <span class="text-muted">
-                <waltz-markdown text="item.rating.description">
+                <waltz-markdown text="item.rating.comment">
                 </waltz-markdown>
             </span>
         </div>
