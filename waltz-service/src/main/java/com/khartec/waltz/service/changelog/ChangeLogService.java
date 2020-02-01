@@ -32,10 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.*;
@@ -94,7 +91,7 @@ public class ChangeLogService {
     }
 
 
-    public int[] write(List<ChangeLog> changeLogs) {
+    public int[] write(Collection<ChangeLog> changeLogs) {
         return changeLogDao.write(changeLogs);
     }
 
