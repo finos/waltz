@@ -18,16 +18,12 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -39,7 +35,6 @@ import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,15 +46,11 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
 import static java.lang.String.format;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Service
@@ -158,8 +149,8 @@ public class PhysicalFlowService {
                     "Merged physical flow %s to: %s",
                     fromRef.id(),
                     toRef.id());
-            writeChangeLogs(
-                    toId,
+            changeLogService.writeChangeLogEntries(
+                    toRef,
                     username,
                     postamble,
                     Operation.UPDATE);
@@ -200,7 +191,7 @@ public class PhysicalFlowService {
                         .isLastPhysicalFlow(!physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId()));
             }
 
-            writeChangeLogs(
+            changeLogService.writeChangeLogEntries(
                     physicalFlow,
                     username,
                     " removed",
@@ -216,7 +207,7 @@ public class PhysicalFlowService {
         checkNotNull(username, "username cannot be null");
 
         //check we have a logical data flow
-        LogicalFlow logicalFlow = ensureLogicalDataFlowExists(command.logicalFlowId(), username);
+        ensureLogicalDataFlowExistsAndIsNotRemoved(command.logicalFlowId(), username);
 
         LocalDateTime now = nowUtc();
         long specId = command
@@ -254,7 +245,7 @@ public class PhysicalFlowService {
 
         long physicalFlowId = physicalFlowDao.create(flow);
 
-        writeChangeLogs(
+        changeLogService.writeChangeLogEntries(
                 ImmutablePhysicalFlow.copyOf(flow).withId(physicalFlowId),
                 username,
                 " created",
@@ -279,8 +270,8 @@ public class PhysicalFlowService {
                     "Physical flow id: %d specification definition id changed to: %d",
                     flowId,
                     command.newSpecDefinitionId());
-            writeChangeLogs(
-                    flowId,
+            changeLogService.writeChangeLogEntries(
+                    mkRef(PHYSICAL_FLOW, flowId),
                     userName,
                     postamble,
                     Operation.UPDATE);
@@ -300,17 +291,15 @@ public class PhysicalFlowService {
     }
 
 
-    private LogicalFlow ensureLogicalDataFlowExists(long logicalFlowId, String username) {
+    private void ensureLogicalDataFlowExistsAndIsNotRemoved(long logicalFlowId, String username) {
         LogicalFlow logicalFlow = logicalFlowService.getById(logicalFlowId);
         if (logicalFlow == null) {
             throw new IllegalArgumentException("Unknown logical flow: " + logicalFlowId);
         } else {
             if (logicalFlow.entityLifecycleStatus().equals(EntityLifecycleStatus.REMOVED)) {
                 logicalFlowService.restoreFlow(logicalFlowId, username);
-                return ImmutableLogicalFlow.copyOf(logicalFlow).withEntityLifecycleStatus(EntityLifecycleStatus.ACTIVE);
             }
         }
-        return logicalFlow;
     }
 
 
@@ -320,8 +309,8 @@ public class PhysicalFlowService {
 
         if (rc != 0) {
             String postamble = format("Updated attribute %s to %s", command.name(), command.value());
-            writeChangeLogs(
-                    command.entityReference().id(),
+            changeLogService.writeChangeLogEntries(
+                    command.entityReference(),
                     username,
                     postamble,
                     Operation.UPDATE);
@@ -330,31 +319,6 @@ public class PhysicalFlowService {
         return rc;
     }
 
-
-    public void writeChangeLogs(PhysicalFlow physicalFlow, String userId, String postamble, Operation operation) {
-
-        Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(physicalFlow);
-        String message = format("%s: %s", t.v1, postamble);
-        Set<ChangeLog> changeLogEntries = SetUtilities.map(
-                t.v2,
-                r -> (ChangeLog) ImmutableChangeLog
-                        .builder()
-                        .parentReference(r)
-                        .message(message)
-                        .severity(Severity.INFORMATION)
-                        .userId(userId)
-                        .childKind(PHYSICAL_FLOW)
-                        .operation(operation)
-                        .build());
-
-        changeLogService.write(changeLogEntries);
-
-    }
-
-    public void writeChangeLogs(long physicalFlowId, String userId, String postamble, Operation operation) {
-        PhysicalFlow physicalFlow = getById(physicalFlowId);
-        writeChangeLogs(physicalFlow, userId, postamble, operation);
-    }
 
     // -- HELPERS
 
@@ -379,27 +343,6 @@ public class PhysicalFlowService {
                         command.name());
                 throw new UnsupportedOperationException(errMsg);
         }
-    }
-
-
-    private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(PhysicalFlow physicalFlow) {
-        LogicalFlow logicalFlow = logicalFlowService.getById(physicalFlow.logicalFlowId());
-        PhysicalSpecification specification = physicalSpecificationService.getById(physicalFlow.specificationId());
-
-        String messagePreamble = format(
-                "Physical flow: %s, from: %s, to: %s",
-                specification.name(),
-                safeName(logicalFlow.source()),
-                safeName(logicalFlow.target()));
-
-        return tuple(
-                messagePreamble,
-                asSet(
-                        physicalFlow.entityReference(),
-                        logicalFlow.entityReference(),
-                        logicalFlow.source(),
-                        logicalFlow.target()));
-
     }
 
 

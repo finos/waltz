@@ -22,7 +22,9 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.tag.TagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.tag.Tag;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +41,16 @@ import static com.khartec.waltz.common.SetUtilities.fromCollection;
 @Service
 public class TagService {
 
-    private final TagDao tagDao;
     private static final Logger LOG = LoggerFactory.getLogger(TagService.class);
 
+    private final TagDao tagDao;
+    private final ChangeLogService changeLogService;
+
+
     @Autowired
-    public TagService(TagDao tagDao) {
+    public TagService(TagDao tagDao, ChangeLogService changeLogService) {
         this.tagDao = tagDao;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -62,6 +68,7 @@ public class TagService {
         return tagDao.getById(id);
     }
 
+    
     public List<Tag> updateTags(EntityReference ref, Collection<String> tags, String username) {
         checkNotNull(tags, "tags cannot be null");
         LOG.info("Adding tags {} for entity ref {}", tags, ref);
@@ -87,8 +94,25 @@ public class TagService {
             toAdd.forEach(tag -> createTagUsage(ref, tag, username));
         }
 
+        writeChangeLogEntries(ref, username, toRemove, toAdd);
+        
         return findTagsForEntityReference(ref);
     }
+
+
+    private void writeChangeLogEntries(EntityReference ref,
+                                       String username,
+                                       Set<String> removed,
+                                       Set<String> added) {
+
+        String postamble = new StringBuilder()
+                .append(added.isEmpty() ? "" : " Added tags: " + added + ". ")
+                .append(removed.isEmpty() ? "" : "Removed tags: " + removed + ". ")
+                .toString();
+
+        changeLogService.writeChangeLogEntries(ref, username, postamble, Operation.UPDATE);
+    }
+
 
     private void createTagUsage(EntityReference ref, String tag, String username) {
         Tag existingTag = tagDao.getTagByNameAndTargetKind(ref.kind(), tag);

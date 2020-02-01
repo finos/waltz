@@ -60,6 +60,7 @@ import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityKind.*;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.FlowDirection.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static java.util.Collections.emptyList;
@@ -187,7 +188,13 @@ public class LogicalFlowDecoratorService {
         LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
         int[] deleted = logicalFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
         dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
-        audit("Removed", decoratorReferences, flow, username);
+
+        changeLogService.writeChangeLogEntries(
+                mkRef(LOGICAL_DATA_FLOW, flowId),
+                username,
+                mkAuditMessage(Operation.REMOVE, decoratorReferences),
+                Operation.REMOVE);
+
         return deleted;
     }
 
@@ -219,7 +226,11 @@ public class LogicalFlowDecoratorService {
 
         int[] added = logicalFlowDecoratorDao.addDecorators(decorators);
         dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
-        audit("Added", decoratorReferences, flow, username);
+        changeLogService.writeChangeLogEntries(
+                mkRef(LOGICAL_DATA_FLOW, flowId),
+                username,
+                mkAuditMessage(Operation.ADD, decoratorReferences),
+                Operation.ADD);
 
         return added;
     }
@@ -309,26 +320,21 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private void audit(String verb,
-                       Collection<EntityReference> decorators,
-                       LogicalFlow flow,
-                       String username) {
-
-        List<ChangeLog> logEntries = mkChangeLogEntries(verb, decorators, flow, username);
-        changeLogService.write(logEntries);
-    }
-
-
-    private void bulkAudit(List<UpdateDataFlowDecoratorsAction> actions, String username, List<LogicalFlow> effectedFlows) {
-        Map<Long, LogicalFlow> effectedFlowsById = indexById(effectedFlows);
+    private void bulkAudit(List<UpdateDataFlowDecoratorsAction> actions, String username, List<LogicalFlow> affectedFlows) {
+        Map<Long, LogicalFlow> affectedFlowsById = indexById(affectedFlows);
 
         List<ChangeLog> logEntries = actions
                 .stream()
                 .flatMap(action -> {
-                    LogicalFlow flow = effectedFlowsById.get(action.flowId());
+                    LogicalFlow flow = affectedFlowsById.get(action.flowId());
 
-                    List<ChangeLog> addedLogEntries = mkChangeLogEntries("Bulk added", action.addedDecorators(), flow, username);
-                    List<ChangeLog> removedLogEntries = mkChangeLogEntries("Bulk removed", action.removedDecorators(), flow, username);
+                    List<ChangeLog> addedLogEntries = action.addedDecorators().isEmpty()
+                        ? emptyList()
+                        : mkChangeLogEntries(mkAuditMessage(Operation.ADD, action.addedDecorators()), flow, username);
+
+                    List<ChangeLog> removedLogEntries = action.removedDecorators().isEmpty()
+                        ? emptyList()
+                        : mkChangeLogEntries(mkAuditMessage(Operation.REMOVE, action.removedDecorators()), flow, username);
 
                     return Stream.concat(addedLogEntries.stream(), removedLogEntries.stream());
                 })
@@ -337,35 +343,39 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    private List<ChangeLog> mkChangeLogEntries(String verb,
-                                               Collection<EntityReference> decorators,
-                                               LogicalFlow flow,
-                                               String username) {
-        checkNotEmpty(verb, "verb cannot be empty");
-        checkNotNull(decorators, "decorators cannot be null");
-        checkNotNull(flow, "flow cannot be null");
-        checkNotEmpty(username, "username cannot be empty");
-
-        if(isEmpty(decorators)) {
-            return Collections.emptyList();
-        }
-
+    private String mkAuditMessage(Operation op, Collection<EntityReference> decoratorReferences) {
         String dtNames = dataTypeDao
-                .findByIds(map(decorators, EntityReference::id))
+                .findByIds(map(decoratorReferences, EntityReference::id))
                 .stream()
                 .map(NameProvider::name)
                 .collect(joining(", ", "", ""));
+
+        switch (op) {
+            case ADD:
+                return "Added data types: " + dtNames;
+            case REMOVE:
+                return "Removed data types: " + dtNames;
+            default:
+                return "Modified data types: " + dtNames;
+        }
+    }
+
+    private List<ChangeLog> mkChangeLogEntries(String message,
+                                               LogicalFlow flow,
+                                               String username) {
+        checkNotEmpty(message, "message cannot be empty");
+        checkNotNull(flow, "flow cannot be null");
+        checkNotEmpty(username, "username cannot be empty");
 
         ImmutableChangeLog sourceCL = ImmutableChangeLog.builder()
                 .parentReference(flow.source())
                 .userId(username)
                 .severity(Severity.INFORMATION)
                 .message(String.format(
-                        "%s types: %s for logical flow between %s and %s",
-                        verb,
-                        dtNames,
+                        "Logical flow between %s and %s: %s",
                         flow.source().name().orElse(Long.toString(flow.source().id())),
-                        flow.target().name().orElse(Long.toString(flow.target().id()))))
+                        flow.target().name().orElse(Long.toString(flow.target().id())),
+                        message))
                 .childKind(EntityKind.LOGICAL_DATA_FLOW)
                 .operation(Operation.UPDATE)
                 .build();
