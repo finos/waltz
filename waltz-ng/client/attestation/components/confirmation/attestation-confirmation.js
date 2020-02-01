@@ -43,13 +43,11 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function disableSubmission(message) {
-        console.log("Disabling submission because: ", message)
         vm.message = message;
         vm.disabled = true;
     }
 
     function enableSubmission() {
-        console.log("Enabling submission");
         vm.message = null;
         vm.disabled = false;
     }

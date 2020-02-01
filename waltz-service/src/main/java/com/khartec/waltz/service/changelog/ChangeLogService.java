@@ -99,6 +99,19 @@ public class ChangeLogService {
     }
 
 
+    /**
+     * Given an entity ref this function will determine all changelog entries made _after_ the latest
+     * attestations for that entity.  Change log is matched between the attestation kind and the change
+     * log child kind.
+     *
+     * @param ref  target reference
+     * @return list of changes (empty if no attestations or if no changes)
+     */
+    public List<ChangeLog> findUnattestedChanges(EntityReference ref) {
+        return changeLogDao.findUnattestedChanges(ref);
+    }
+
+
     ////////////////////// PRIVATE HELPERS //////////////////////////////////////////
 
     private List<ChangeLog> findByParentReferenceForPhysicalFlow(EntityReference ref,

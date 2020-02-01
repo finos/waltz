@@ -23,6 +23,7 @@ import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.schema.tables.AttestationInstance;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -211,5 +212,53 @@ public class ChangeLogDao {
         return dsl.batch(queries).execute();
     }
 
+
+    /**
+     * Given an entity ref this function will determine all changelog entries made _after_ the latest
+     * attestations for that entity.  Change log is matched between the attestation kind and the change
+     * log child kind.
+     *
+     * @param ref
+     * @return list of changes (empty if no attestations or if no changes)
+     */
+    public List<ChangeLog> findUnattestedChanges(EntityReference ref) {
+        com.khartec.waltz.schema.tables.ChangeLog cl = com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
+        AttestationInstance ai = AttestationInstance.ATTESTATION_INSTANCE.as("ai");
+
+        Condition changeLogEntryOfInterest = cl.OPERATION.in(
+                Operation.UPDATE.name(),
+                Operation.ADD.name(),
+                Operation.REMOVE.name());
+
+        // this query works by first finding the latest attestations for the given entity
+        Table<Record4<String, Long, String, Timestamp>> latestAttestationsSubQuery = DSL
+                .select(ai.PARENT_ENTITY_KIND.as("pek"),
+                        ai.PARENT_ENTITY_ID .as("pei"),
+                        ai.ATTESTED_ENTITY_KIND.as("aek"),
+                        DSL.max(ai.ATTESTED_AT).as("aat"))
+                .from(ai)
+                .where(ai.PARENT_ENTITY_ID.eq(ref.id()))
+                .and(ai.PARENT_ENTITY_KIND.eq(ref.kind().name()))
+                .and(ai.ATTESTED_AT.isNotNull())
+                .groupBy(ai.PARENT_ENTITY_KIND, ai.PARENT_ENTITY_ID, ai.ATTESTED_ENTITY_KIND)
+                .asTable("latest_attestation");
+
+        // and joining that query to the changelog (for that entity)
+        Condition joinChangeLogToLatestAttestationCondition = latestAttestationsSubQuery.field("pek", String.class).eq(cl.PARENT_KIND)
+                .and(latestAttestationsSubQuery.field("pei", Long.class).eq(cl.PARENT_ID))
+                .and(latestAttestationsSubQuery.field("aek", String.class).eq(cl.CHILD_KIND));
+
+        // giving the final query which limits the changelog based to those entries after the latest attestation:
+        SelectConditionStep<Record> qry = dsl
+                .select(cl.fields())
+                .from(cl)
+                .innerJoin(latestAttestationsSubQuery)
+                .on(joinChangeLogToLatestAttestationCondition)
+                .where(cl.CREATED_AT.greaterThan(latestAttestationsSubQuery.field("aat", Timestamp.class)))
+                .and(changeLogEntryOfInterest);
+
+        return qry.fetch(ChangeLogDao.TO_DOMAIN_MAPPER);
+
+    }
 
 }
