@@ -29,6 +29,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,5 +101,13 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .selectFrom(DATA_TYPE)
                 .where(DATA_TYPE.ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN);
+    }
+
+
+    public List<DataType> findByIds(Collection<Long> ids) {
+        return dsl
+                .selectFrom(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(ids))
+                .fetch(TO_DOMAIN);
     }
 }

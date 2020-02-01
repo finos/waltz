@@ -64,6 +64,7 @@ import static com.khartec.waltz.model.FlowDirection.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.joining;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -349,14 +350,20 @@ public class LogicalFlowDecoratorService {
             return Collections.emptyList();
         }
 
+        String dtNames = dataTypeDao
+                .findByIds(map(decorators, EntityReference::id))
+                .stream()
+                .map(NameProvider::name)
+                .collect(joining(", ", "", ""));
+
         ImmutableChangeLog sourceCL = ImmutableChangeLog.builder()
                 .parentReference(flow.source())
                 .userId(username)
                 .severity(Severity.INFORMATION)
                 .message(String.format(
-                        "%s characteristics: %s, for flow between %s and %s",
+                        "%s types: %s for logical flow between %s and %s",
                         verb,
-                        decorators.toString(),
+                        dtNames,
                         flow.source().name().orElse(Long.toString(flow.source().id())),
                         flow.target().name().orElse(Long.toString(flow.target().id()))))
                 .childKind(EntityKind.LOGICAL_DATA_FLOW)
@@ -386,7 +393,6 @@ public class LogicalFlowDecoratorService {
         return dataTypes
                 .stream()
                 .map(dt -> {
-
                     DataType exactDataType = dataTypesById.get(dt.id());
                     Set<DataTypeDirectionKey> keysForDatatype = filterKeySetByDataTypeId(logicalFlowIdsByDataType, asSet(dt.id().get()));
 
