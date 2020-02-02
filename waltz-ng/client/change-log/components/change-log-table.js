@@ -59,7 +59,12 @@ function controller() {
             field: "userId",
             name: "User",
             width: "10%",
-            cellTemplate: "<div class='ui-grid-cell-contents'><a ui-sref='main.profile.view ({userId: COL_FIELD})'><span ng-bind='COL_FIELD'></span></a></div>"
+            cellTemplate: `
+                <div class='ui-grid-cell-contents'>
+                    <waltz-person-link tooltip-placement='left'
+                                       user-id='COL_FIELD'>
+                    </waltz-person-link>
+                </div>`
         },
         {
             field: "createdAt",

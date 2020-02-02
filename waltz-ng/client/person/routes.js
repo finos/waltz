@@ -15,8 +15,8 @@
  * See the License for the specific
  *
  */
-import HomePage from './pages/home/person-home';
-import PersonPage from './pages/view/person-view';
+import HomePage from "./pages/home/person-home";
+import PersonPage from "./pages/view/person-view";
 import {CORE_API} from "../common/services/core-api-utils";
 
 
@@ -44,38 +44,70 @@ personEmployeeIdBouncer.$inject = [
 ];
 
 
+function userIdBouncer($state, $stateParams, serviceBroker) {
+    const userId = $stateParams.userId;
+    serviceBroker
+        .loadViewData(
+            CORE_API.PersonStore.findByUserId,
+            [ userId ])
+        .then(r => r.data)
+        .then(person => {
+            if (person) {
+                return $state.go("main.person.id", {id: person.id}, { location: "replace"});
+            } else {
+                console.log(`Cannot find corresponding person: ${userId}`);
+            }
+        });
+}
+
+
+userIdBouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
+];
+
+
 // --- ROUTES ---
 
 const personHome = {
-    url: 'person',
-    views: {'content@': HomePage }
+    url: "person",
+    views: {"content@": HomePage }
 };
 
 const personViewByEmployeeId = {
-    url: '/{empId:string}',
-    views: {'content@': PersonPage },
+    url: "/{empId:string}",
+    views: {"content@": PersonPage },
     resolve: {
         bouncer: personEmployeeIdBouncer
     }
 };
 
+const personViewByUserId = {
+    url: "/user-id/{userId:string}",
+    views: {"content@": PersonPage },
+    resolve: {
+        bouncer: userIdBouncer
+    }
+};
+
 const personViewByPersonId = {
-    url: '/id/{id:int}',
-    views: {'content@': PersonPage },
+    url: "/id/{id:int}",
+    views: {"content@": PersonPage },
 };
 
 
 // --- SETUP ---
 
 function setup($stateProvider) {
-
     $stateProvider
-        .state('main.person', personHome)
-        .state('main.person.view', personViewByEmployeeId)
-        .state('main.person.id', personViewByPersonId);
+        .state("main.person", personHome)
+        .state("main.person.view", personViewByEmployeeId)
+        .state("main.person.id", personViewByPersonId)
+        .state("main.person.userId", personViewByUserId);
 }
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;
