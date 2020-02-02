@@ -44,19 +44,28 @@ function controller() {
             field: "message",
             name: "Message",
             width: "70%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><span title=\"{{COL_FIELD}}\" ng-bind=\"COL_FIELD\"></span></div>"
+            cellTemplate: `
+                <div class='ui-grid-cell-contents'>
+                    <span uib-popover='{{COL_FIELD}}'
+                          popover-append-to-body='true'
+                          popover-trigger='mouseenter'
+                          popover-popup-delay="300"
+                          popover-class="waltz-popover-width-500"
+                          ng-bind='COL_FIELD'>
+                    </span>
+                </div>`
         },
         {
             field: "userId",
             name: "User",
             width: "10%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ui-sref=\"main.profile.view ({userId: COL_FIELD})\"><span ng-bind=\"COL_FIELD\"></span></a></div>"
+            cellTemplate: "<div class='ui-grid-cell-contents'><a ui-sref='main.profile.view ({userId: COL_FIELD})'><span ng-bind='COL_FIELD'></span></a></div>"
         },
         {
             field: "createdAt",
             name: "Timestamp",
             width: "10%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\"></waltz-from-now></div>"
+            cellTemplate: "<div class='ui-grid-cell-contents'><waltz-from-now timestamp='COL_FIELD'></waltz-from-now></div>"
         }
     ];
 
