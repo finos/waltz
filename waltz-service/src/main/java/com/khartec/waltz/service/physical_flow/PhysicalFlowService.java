@@ -22,11 +22,8 @@ import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
@@ -44,7 +41,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,9 +49,8 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
+import static java.lang.String.format;
 
 
 @Service
@@ -150,131 +145,60 @@ public class PhysicalFlowService {
                 username);
 
         if(updateStatus > 0) {
-            logChange(username,
+            String postamble = format(
+                    "Merged physical flow %s to: %s",
+                    fromRef.id(),
+                    toRef.id());
+            changeLogService.writeChangeLogEntries(
                     toRef,
-                    String.format("Merged physical flow %s to: %s",
-                            fromRef.id(),
-                            toRef.id()),
+                    username,
+                    postamble,
                     Operation.UPDATE);
         }
         return updateStatus + moveCount > 0;
     }
 
 
-    private void copyExternalIdFromFlowAndSpecification(String username,
-                                                        EntityReference toRef,
-                                                        PhysicalFlow sourcePhysicalFlow) {
-        PhysicalFlow targetPhysicalFlow = physicalFlowDao.getById(toRef.id());
-
-        Set<String> externalIdentifiers =
-                externalIdentifierService.findByEntityReference(toRef)
-                .stream()
-                .map(ExternalIdentifier::externalId)
-                .collect(Collectors.toSet());
-
-        sourcePhysicalFlow
-                .externalId()
-                .filter(id -> !isEmpty(id))
-                .ifPresent(sourceExtId -> {
-                    if(isEmpty(targetPhysicalFlow.externalId())) {
-                        physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
-                    } else if(!externalIdentifiers.contains(sourceExtId)) {
-                        externalIdentifierService.create(toRef, sourceExtId, username);
-                        externalIdentifiers.add(sourceExtId);
-                    }
-                });
-
-        PhysicalSpecification sourceSpec = physicalSpecificationService.getById(sourcePhysicalFlow.specificationId());
-
-        sourceSpec
-                .externalId()
-                .filter(id -> !isEmpty(id))
-                .ifPresent(sourceExtId -> {
-                    PhysicalSpecification targetSpec = physicalSpecificationService
-                            .getById(targetPhysicalFlow.specificationId());
-
-                    if(isEmpty(targetSpec.externalId())) {
-                        targetSpec.id()
-                                .ifPresent(id ->
-                                        physicalSpecificationService.updateExternalId(id, sourceExtId));
-                    } else if(!externalIdentifiers.contains(sourceExtId)) {
-                        externalIdentifierService.create(toRef, sourceExtId, username);
-                    }
-                });
-    }
-
-
     public PhysicalFlowDeleteCommandResponse delete(PhysicalFlowDeleteCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
+        ImmutablePhysicalFlowDeleteCommandResponse.Builder responseBuilder = ImmutablePhysicalFlowDeleteCommandResponse.builder()
+                .originalCommand(command)
+                .entityReference(mkRef(PHYSICAL_FLOW, command.flowId()))
+                .outcome(CommandOutcome.SUCCESS)
+                .isSpecificationUnused(false)
+                .isLastPhysicalFlow(false);
+
         PhysicalFlow physicalFlow = physicalFlowDao.getById(command.flowId());
 
-        CommandOutcome commandOutcome = CommandOutcome.SUCCESS;
-        String responseMessage = null;
-        boolean isSpecificationUnused = false;
-        boolean isLastPhysicalFlow = false;
-
         if (physicalFlow == null) {
-            commandOutcome = CommandOutcome.FAILURE;
-            responseMessage = "Flow not found";
+            return responseBuilder
+                    .outcome(CommandOutcome.FAILURE)
+                    .message("Flow not found")
+                    .build();
         } else {
-            LogicalFlow logicalFlow = logicalFlowService.getById(physicalFlow.logicalFlowId());
             int deleteCount = physicalFlowDao.delete(command.flowId());
 
             if (deleteCount == 0) {
-                commandOutcome = CommandOutcome.FAILURE;
-                responseMessage = "This flow cannot be deleted as it is being used in a lineage";
+                return responseBuilder
+                        .outcome(CommandOutcome.FAILURE)
+                        .message("This flow cannot be deleted as it is being used in a lineage")
+                        .build();
             } else {
-                externalIdentifierService.delete(mkRef(PHYSICAL_FLOW, physicalFlow.id().get()));
-                isSpecificationUnused = !physicalSpecificationService.isUsed(physicalFlow.specificationId());
-                isLastPhysicalFlow = !physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId());
+                externalIdentifierService.delete(physicalFlow.entityReference());
+                responseBuilder
+                        .isSpecificationUnused(!physicalSpecificationService.isUsed(physicalFlow.specificationId()))
+                        .isLastPhysicalFlow(!physicalFlowDao.hasPhysicalFlows(physicalFlow.logicalFlowId()));
             }
 
-            // log changes against source and target entities
-            if (commandOutcome == CommandOutcome.SUCCESS) {
-                PhysicalSpecification specification = physicalSpecificationService.getById(physicalFlow.specificationId());
-
-                String flowRemovalMessage = String.format(
-                        "Physical flow: %s, from: %s, to: %s removed.",
-                        specification.name(),
-                        safeName(logicalFlow.source()),
-                        safeName(logicalFlow.target()));
-
-                logChange(username,
-                        mkRef(PHYSICAL_FLOW, physicalFlow.id().get()),
-                        flowRemovalMessage,
-                        Operation.REMOVE);
-
-                logChange(username,
-                        mkRef(PHYSICAL_SPECIFICATION, physicalFlow.specificationId()),
-                        flowRemovalMessage,
-                        Operation.REMOVE);
-
-                logChange(username,
-                        logicalFlow.target(),
-                        String.format("Physical flow: %s, from: %s removed.",
-                                specification.name(),
-                                safeName(logicalFlow.source())),
-                        Operation.REMOVE);
-
-                logChange(username,
-                        logicalFlow.source(),
-                        String.format("Physical flow: %s, to: %s removed.",
-                                specification.name(),
-                                safeName(logicalFlow.target())),
-                        Operation.REMOVE);
-            }
+            changeLogService.writeChangeLogEntries(
+                    physicalFlow,
+                    username,
+                    " removed",
+                    Operation.REMOVE);
         }
 
-
-        return ImmutablePhysicalFlowDeleteCommandResponse.builder()
-                .originalCommand(command)
-                .entityReference(mkRef(PHYSICAL_FLOW, command.flowId()))
-                .outcome(commandOutcome)
-                .message(Optional.ofNullable(responseMessage))
-                .isSpecificationUnused(isSpecificationUnused)
-                .isLastPhysicalFlow(isLastPhysicalFlow)
-                .build();
+        return responseBuilder.build();
     }
 
 
@@ -283,7 +207,7 @@ public class PhysicalFlowService {
         checkNotNull(username, "username cannot be null");
 
         //check we have a logical data flow
-        LogicalFlow logicalFlow = ensureLogicalDataFlowExists(command.logicalFlowId(), username);
+        ensureLogicalDataFlowExistsAndIsNotRemoved(command.logicalFlowId(), username);
 
         LocalDateTime now = nowUtc();
         long specId = command
@@ -321,26 +245,10 @@ public class PhysicalFlowService {
 
         long physicalFlowId = physicalFlowDao.create(flow);
 
-        logChange(username,
-                logicalFlow.source(),
-                String.format("Added physical flow (%s) to: %s",
-                        command.specification().name(),
-                        safeName(logicalFlow.target())),
-                Operation.ADD);
-
-        logChange(username,
-                logicalFlow.target(),
-                String.format("Added physical flow (%s) from: %s",
-                        command.specification().name(),
-                        safeName(logicalFlow.source())),
-                Operation.ADD);
-
-        logChange(username,
-                mkRef(PHYSICAL_SPECIFICATION, specId),
-                String.format("Added physical flow (%s) from: %s, to %s",
-                        command.specification().name(),
-                        safeName(logicalFlow.source()),
-                        safeName(logicalFlow.target())),
+        changeLogService.writeChangeLogEntries(
+                ImmutablePhysicalFlow.copyOf(flow).withId(physicalFlowId),
+                username,
+                " created",
                 Operation.ADD);
 
         return ImmutablePhysicalFlowCreateCommandResponse.builder()
@@ -358,11 +266,14 @@ public class PhysicalFlowService {
         int updateCount = physicalFlowDao.updateSpecDefinition(userName, flowId, command.newSpecDefinitionId());
 
         if (updateCount > 0) {
-            logChange(userName,
+            String postamble = format(
+                    "Physical flow id: %d specification definition id changed to: %d",
+                    flowId,
+                    command.newSpecDefinitionId());
+            changeLogService.writeChangeLogEntries(
                     mkRef(PHYSICAL_FLOW, flowId),
-                    String.format("Physical flow id: %d specification definition id changed to: %d",
-                            flowId,
-                            command.newSpecDefinitionId()),
+                    userName,
+                    postamble,
                     Operation.UPDATE);
         }
 
@@ -379,17 +290,16 @@ public class PhysicalFlowService {
         return physicalFlowDao.cleanupOrphans();
     }
 
-    private LogicalFlow ensureLogicalDataFlowExists(long logicalFlowId, String username) {
+
+    private void ensureLogicalDataFlowExistsAndIsNotRemoved(long logicalFlowId, String username) {
         LogicalFlow logicalFlow = logicalFlowService.getById(logicalFlowId);
         if (logicalFlow == null) {
             throw new IllegalArgumentException("Unknown logical flow: " + logicalFlowId);
         } else {
             if (logicalFlow.entityLifecycleStatus().equals(EntityLifecycleStatus.REMOVED)) {
                 logicalFlowService.restoreFlow(logicalFlowId, username);
-                return ImmutableLogicalFlow.copyOf(logicalFlow).withEntityLifecycleStatus(EntityLifecycleStatus.ACTIVE);
             }
         }
-        return logicalFlow;
     }
 
 
@@ -398,8 +308,12 @@ public class PhysicalFlowService {
         int rc = doUpdateAttribute(command);
 
         if (rc != 0) {
-            String message = String.format("Updated attribute %s to %s", command.name(), command.value());
-            logChange(username, command.entityReference(), message, Operation.UPDATE);
+            String postamble = format("Updated attribute %s to %s", command.name(), command.value());
+            changeLogService.writeChangeLogEntries(
+                    command.entityReference(),
+                    username,
+                    postamble,
+                    Operation.UPDATE);
         }
 
         return rc;
@@ -407,24 +321,6 @@ public class PhysicalFlowService {
 
 
     // -- HELPERS
-
-    private void logChange(String userId,
-                           EntityReference ref,
-                           String message,
-                           Operation operation) {
-
-        ChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(ref)
-                .message(message)
-                .severity(Severity.INFORMATION)
-                .userId(userId)
-                .childKind(PHYSICAL_FLOW)
-                .operation(operation)
-                .build();
-
-        changeLogService.write(logEntry);
-    }
-
 
     private int doUpdateAttribute(SetAttributeCommand command) {
         long flowId = command.entityReference().id();
@@ -442,11 +338,53 @@ public class PhysicalFlowService {
             case "entity_lifecycle_status":
                 return physicalFlowDao.updateEntityLifecycleStatus(flowId, EntityLifecycleStatus.valueOf(command.value()));
             default:
-                String errMsg = String.format(
+                String errMsg = format(
                         "Cannot update attribute %s on flow as unknown attribute name",
                         command.name());
                 throw new UnsupportedOperationException(errMsg);
         }
     }
 
+
+    private void copyExternalIdFromFlowAndSpecification(String username,
+                                                        EntityReference toRef,
+                                                        PhysicalFlow sourcePhysicalFlow) {
+        PhysicalFlow targetPhysicalFlow = physicalFlowDao.getById(toRef.id());
+
+        Set<String> externalIdentifiers =
+                externalIdentifierService.findByEntityReference(toRef)
+                        .stream()
+                        .map(ExternalIdentifier::externalId)
+                        .collect(Collectors.toSet());
+
+        sourcePhysicalFlow
+                .externalId()
+                .filter(id -> !isEmpty(id))
+                .ifPresent(sourceExtId -> {
+                    if(isEmpty(targetPhysicalFlow.externalId())) {
+                        physicalFlowDao.updateExternalId(toRef.id(), sourceExtId);
+                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                        externalIdentifierService.create(toRef, sourceExtId, username);
+                        externalIdentifiers.add(sourceExtId);
+                    }
+                });
+
+        PhysicalSpecification sourceSpec = physicalSpecificationService.getById(sourcePhysicalFlow.specificationId());
+
+        sourceSpec
+                .externalId()
+                .filter(id -> !isEmpty(id))
+                .ifPresent(sourceExtId -> {
+                    PhysicalSpecification targetSpec = physicalSpecificationService
+                            .getById(targetPhysicalFlow.specificationId());
+
+                    if(isEmpty(targetSpec.externalId())) {
+                        targetSpec.id()
+                                .ifPresent(id ->
+                                        physicalSpecificationService.updateExternalId(id, sourceExtId));
+                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                        externalIdentifierService.create(toRef, sourceExtId, username);
+                    }
+                });
+    }
 }

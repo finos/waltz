@@ -25,6 +25,7 @@ import PersonChangeSetSection from "./components/person-change-set-section/perso
 import PersonSummary from "./components/summary/person-summary";
 import PersonAppsSection from "./components/person-apps-section/person-apps-section";
 import PersonHierarchySection from "./components/person-hierarchy-section/person-hierarchy-section";
+import PersonLink from "./components/person-link/person-link";
 import PersonList from "./components/person-list/person-list";
 
 import Routes from "./routes";
@@ -43,6 +44,7 @@ export default () => {
         PersonChangeSetSection,
         PersonHierarchySection,
         PersonSummary,
+        PersonLink,
         PersonList
     ]);
 
